@@ -1,0 +1,8 @@
+addons:
+  apt:
+    packages:
+      - agda-bin
+
+script:
+  - agda --allow-unsolved-metas ub.agda
+
