@@ -1,8 +1,9 @@
-dist: xenial
-
-matrix:
+jobs:
   include:
-    - dist: bionic
+    - os: linux
+      dist: xenial
+    - os: linux
+      dist: bionic
 
 addons:
   apt:
