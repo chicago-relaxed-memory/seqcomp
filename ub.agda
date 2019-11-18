@@ -1,5 +1,10 @@
 module ub where
 
+  infixr 10 _≡_
+  infixr 20 _,_ _×_
+  infixr 30 _[_:=_]
+  infixr 40 pre_ act_ acc_ val_
+
 ----------------------
 
   postulate Event : Set
@@ -118,7 +123,7 @@ module ub where
     PSubst = record { subst = subst } where
 
       subst : Pomset → Register → Value → Pomset
-      subst P r v = record { E = E ; _≤_ = _≤_ ; ℓ = λ e → (((pre ℓ(e)) [ r := v ]) , (act ℓ(e))) } where open Pomset P
+      subst P r v = record { E = E ; _≤_ = _≤_ ; ℓ = λ e → (pre ℓ(e) [ r := v ] , act ℓ(e)) } where open Pomset P
 
   data load-cases (r : Register) (x : Address) (v : Value) (P P′ : Pomset) (e : Event) : Set where
 
