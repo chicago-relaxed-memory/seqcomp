@@ -1,3 +1,7 @@
+dist:
+  - xenial
+  - bionic
+
 addons:
   apt:
     packages:
