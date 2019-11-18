@@ -118,7 +118,7 @@ module ub where
     PSubst = record { subst = subst } where
 
       subst : Pomset → Register → Value → Pomset
-      subst P r v = record { E = E ; _≤_ = _≤_ ; ℓ = λ e → ((pre ℓ(e)) [ r := v ] , act ℓ(e)) } where open Pomset P
+      subst P r v = record { E = E ; _≤_ = _≤_ ; ℓ = λ e → (((pre ℓ(e)) [ r := v ]) , (act ℓ(e))) } where open Pomset P
 
   data load-cases (r : Register) (x : Address) (v : Value) (P P′ : Pomset) (e : Event) : Set where
 
