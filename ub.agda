@@ -134,34 +134,34 @@ module ub where
       subst : Pomset → Register → Value → Pomset
       subst P r v = record { E = E ; _≤_ = _≤_ ; ℓ = λ e → (pre ℓ(e) [ r := v ] , act ℓ(e)) ; well = well } where open Pomset P
 
-  data load-cases (r : Register) (x : Address) (v : Value) (P P′ : Pomset) (e : Event) : Set where
+  data load-cases (r : Register) (x : Address) (P P′ : Pomset) (e : Event) : Set where
 
     old-dependent : let open Pomset P in let open Pomset P′ renaming (E to E′; _<_ to _<′_ ; ℓ to ℓ′) in
-      ∀ {d} →
+      ∀ {v d} →
       d ∈ E →
       e ∈ E′ →
       d < e →
       act ℓ(d) ≡ (R x v) →
       pre ℓ′(e) ≡ (pre ℓ(e)) [ r := v ] →
       ----------------------
-      e ∈ load-cases r x v P P′
+      e ∈ load-cases r x P P′
 
     old-independent : let open Pomset P in let open Pomset P′ renaming (E to E′; ℓ to ℓ′) in
       e ∈ E′ →
       pre ℓ′(e) ≡ pre ℓ(e) →
       (pre ℓ′(e) is-independent-of r) →
       ----------------------
-      e ∈ load-cases r x v P P′
+      e ∈ load-cases r x P P′
 
     new-load : let open Pomset P in let open Pomset P′ renaming (E to E′ ; ℓ to ℓ′) in
-      ∀ {w} →
+      ∀ {v} →
       e ∉ E′ →
-      act ℓ(e) ≡ (R x w) →
+      act ℓ(e) ≡ (R x v) →
       ----------------------
-      e ∈ load-cases r x v P P′
+      e ∈ load-cases r x P P′
 
     new-ub : let open Pomset P in let open Pomset P′ renaming (E to E′ ; ℓ to ℓ′ ; _<_ to _<′_) in
-      ∀ {w c d} →
+      ∀ {v w c d} →
       c ∈ E →
       d ∈ E →
       e ∉ E′ →
@@ -171,7 +171,7 @@ module ub where
       c < e →
       d < e →
       ----------------------
-      e ∈ load-cases r x v P P′
+      e ∈ load-cases r x P P′
 
   data ⟦_⟧ : Cmd → Pomset → Set₁ where
 
@@ -180,13 +180,13 @@ module ub where
       ----------------------
       P ∈ ⟦ exit ⟧
 
-    load : ∀ {P P′ r x v C} → let open Pomset P in let open Pomset P′ renaming (E to E′; _≤_ to _≤′_ ; ℓ to ℓ′) in
+    load : ∀ {P P′ r x C} → let open Pomset P in let open Pomset P′ renaming (E to E′; _≤_ to _≤′_ ; ℓ to ℓ′) in
       P′ ∈ ⟦ C ⟧ →
       (E′ ⊆ E) →
       (∀ {d e} → (d ∈ E′) → (e ∈ E′) → (d ≤′ e) → (d ≤ e)) →
       (∀ {d e} → (d ∈ E′) → (e ∈ E′) → (d ≤′ e) → (d ≤ e)) →
       (∀ {e} → (e ∈ E′) → (act ℓ(e) ≡ act ℓ′(e))) →
-      (∀ {e} → (e ∈ E) → (e ∈ load-cases r x v P P′)) →
+      (∀ {e} → (e ∈ E) → (e ∈ load-cases r x P P′)) →
       ----------------------
       P ∈ ⟦ load r := x ∙ C ⟧
 
