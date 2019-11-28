@@ -104,6 +104,11 @@ module ub where
 
 ----------------------
 
+  data WellOrder {X : Set} (_<_ : X → X → Set) (y : X) : Set where
+    indn : (∀ {x} → (x < y) → (x ∈ WellOrder _<_)) → (y ∈ WellOrder _<_)
+
+----------------------
+
   data Action : Set where
     R : Address → Value → Action
     W : Address → Value → Action
@@ -114,8 +119,9 @@ module ub where
     field _≤_ : Event → Event → Set
     field ℓ : Event → (Precondition × Action)
 
-    _<_ : Event → Event → Set
-    d < e = (d ≤ e) × (d ≢ e)
+    _<_ = (λ d e → (d ≤ e) × (d ≢ e))
+
+    field well : ∀ {e} → (e ∈ E) → (e ∈ WellOrder _<_)
 
   pre_ = fst
   act_ = snd
@@ -126,7 +132,7 @@ module ub where
     PSubst = record { subst = subst } where
 
       subst : Pomset → Register → Value → Pomset
-      subst P r v = record { E = E ; _≤_ = _≤_ ; ℓ = λ e → (pre ℓ(e) [ r := v ] , act ℓ(e)) } where open Pomset P
+      subst P r v = record { E = E ; _≤_ = _≤_ ; ℓ = λ e → (pre ℓ(e) [ r := v ] , act ℓ(e)) ; well = well } where open Pomset P
 
   data load-cases (r : Register) (x : Address) (v : Value) (P P′ : Pomset) (e : Event) : Set where
 
@@ -397,15 +403,18 @@ module ub where
      σ′ : Store
      σ′ x = (rw , none)
 
-     ¬σCσ′ : (⟨ σ ⟩ exit ⟨ σ′ ⟩) → ∀ x → FALSE
-     ¬σCσ′ (done σ≡σ′) x with σ≡σ′ {x}
-     ¬σCσ′ (done σ≡σ′) x | ()
-     ¬σCσ′ (step () _)
+     ¬σCσ′ : ∀ x → (⟨ σ ⟩ exit ⟨ σ′ ⟩) → FALSE
+     ¬σCσ′ x (done σ≡σ′) with σ≡σ′ {x}
+     ¬σCσ′ x (done σ≡σ′) | ()
+     ¬σCσ′ x (step () _)
+
+     e∈W⇒e∉E : ∀ {e} → (e ∈ WellOrder _<_) → (e ∉ E)
+     e∈W⇒e∉E {e} (indn d<e⇒d∈W) e∈E with inspect (act ℓ(e))
+     e∈W⇒e∉E {e} (indn d<e⇒d∈W) e∈E | (R x v) with≡ ae=Rxv = ¬σCσ′ x (σPσ′⇒σCσ′ (segv-load e∈E refl ae=Rxv (λ d∈E d<e → CONTRADICTION (e∈W⇒e∉E (d<e⇒d∈W d<e) d∈E))))
+     e∈W⇒e∉E {e} (indn d<e⇒d∈W) e∈E | (W x v) with≡ ae=Wxv = ¬σCσ′ x (σPσ′⇒σCσ′ (segv-store e∈E refl ae=Wxv (λ d∈E d<e → CONTRADICTION (e∈W⇒e∉E (d<e⇒d∈W d<e) d∈E))))
 
      E=∅ : ∀ {e} → (e ∉ E)
-     E=∅ {e} e∈E with inspect (act ℓ(e))
-     E=∅ {e} e∈E | (R x v) with≡ ae=Rxv = ¬σCσ′ (σPσ′⇒σCσ′ (segv-load e∈E refl ae=Rxv {!!})) x
-     E=∅ {e} e∈E | (W x v) with≡ ae=Wxv = ¬σCσ′ (σPσ′⇒σCσ′ (segv-store e∈E refl ae=Wxv {!!})) x
+     E=∅ e∈E = e∈W⇒e∉E (well e∈E) e∈E
 
   that {P} {C = (load r := x ∙ C)} σPσ′⇒σCσ′ = {!!}
 
