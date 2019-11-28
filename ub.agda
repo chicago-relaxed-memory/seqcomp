@@ -46,6 +46,9 @@ module ub where
   ≡-cong : ∀ {X Y} (f : X → Y) {x y} → (x ≡ y) → (f x ≡ f y)
   ≡-cong f refl = refl
 
+  ≡-cong₂ : ∀ {X Y Z} (f : X → Y → Z) {x₁ x₂ y₁ y₂} → (x₁ ≡ x₂) → (y₁ ≡ y₂) → (f x₁ y₁ ≡ f x₂ y₂)
+  ≡-cong₂ f refl refl = refl
+
   _≢_ : ∀ {X : Set} → X → X → Set
   x ≢ y = (x ≡ y) → FALSE
 
@@ -235,10 +238,10 @@ module ub where
   data ⟪_⟫_⟪_⟫ (σ : Store) (P : Pomset) (σ′ : Store) : Set where
 
     ok : let open Pomset P in
-        (∀ {e x v α} → (e ∈ E) → (act ℓ(e) ≡ (R x v)) → (σ(x) ≡ (α , some v))) →
+        (∀ {e x v} → (e ∈ E) → (act ℓ(e) ≡ (R x v)) → (val σ(x) ≡ some v)) →
         (∀ {e x v} → (e ∈ E) → (act ℓ(e) ≡ (W x v)) → (σ′(x) ≡ (rw , some v))) →
-        (∀ {x α β v w} → (σ(x) ≡ (α , v)) → (σ′(x) ≡ (β , w)) → (α ≡ β)) →
-        (∀ {x} → (∀ {e v} → (e ∈ E) → (act ℓ(e) ≢ (W x v))) → (σ(x) ≡ σ′(x))) →
+        (∀ {x} → (acc σ(x) ≡ acc σ′(x))) →
+        (∀ {x} → (∀ {e v} → (e ∈ E) → (act ℓ(e) ≢ (W x v))) → (val σ(x) ≡ val σ′(x))) →
         ----------------------------
         ⟪ σ ⟫ P ⟪ σ′ ⟫
 
@@ -270,10 +273,10 @@ module ub where
   {-# NON_TERMINATING #-}
   this : ∀ {P C σ σ′} → (P ∈ ⟦ C ⟧) → (⟪ σ ⟫ P ⟪ σ′ ⟫) → (⟨ σ ⟩ C ⟨ σ′ ⟩)
 
-  this {P} {exit} {σ} {σ′} (exit E=∅) (ok _ _ _ H) = done σ=σ' where
+  this {P} {exit} {σ} {σ′} (exit E=∅) (ok _ _ acc✓ val✓) = done σ=σ' where
 
      σ=σ' : ∀ {x} → (σ(x) ≡ σ′(x))
-     σ=σ' = H (λ e∈E → CONTRADICTION (E=∅ e∈E))
+     σ=σ' {x} = ≡-cong₂ _,_ acc✓ (val✓ (λ e∈E _ → E=∅ e∈E))
 
   this {P} {exit} (exit E=∅) (segv-load e∈E _ _ _) = CONTRADICTION (E=∅ e∈E)
 
@@ -345,13 +348,40 @@ module ub where
     σC[r:=w]σ′ : ⟨ σ ⟩ (C [ r := w ]) ⟨ σ′ ⟩
     σC[r:=w]σ′ = this (sem-resp-subst r w P′∈⟦C⟧) (sem-ignores-subst r w σP′σ′)
 
-  this {P} {load r := x ∙ C} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (segv-store e∈E aσy=ro ae=Wyu <✓) | some w₁ with≡ vσx=somew | new-load _ ae=Rxv with ≡-trans (≡-symm ae=Wyu) ae=Rxv
-  this {P} {load r := x ∙ C} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (segv-store e∈E aσy=ro ae=Wyu <✓) | some w₁ with≡ vσx=somew | new-load x₁ ae=Rxv | ()
+  this {P} {load r := x ∙ C} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (segv-store e∈E aσy=ro ae=Wyu <✓) | some w with≡ vσx=somew | new-load _ ae=Rxv with ≡-trans (≡-symm ae=Wyu) ae=Rxv
+  this {P} {load r := x ∙ C} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (segv-store e∈E aσy=ro ae=Wyu <✓) | some w with≡ vσx=somew | new-load _ ae=Rxv | ()
 
-  this {P} {load r := x ∙ C} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (segv-store e∈E aσy=ro ae=Wyu <✓) | some w₁ with≡ vσx=somew | new-ub c∈E d∈E _ v≠t ac=Rxv ad=Rxt c<e d<e with ≡-trans (≡-symm (<✓ c∈E c<e ac=Rxv)) (<✓ d∈E d<e ad=Rxt)
-  this {P} {load r := x ∙ C} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (segv-store e∈E aσy=ro ae=Wyu <✓) | some w₁ with≡ vσx=somew | new-ub c∈E d∈E _ v≠t ac=Rxv ad=Rxt c<e d<e | refl = CONTRADICTION (v≠t refl)
+  this {P} {load r := x ∙ C} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (segv-store e∈E aσy=ro ae=Wyu <✓) | some w with≡ vσx=somew | new-ub c∈E d∈E _ v≠t ac=Rxv ad=Rxt c<e d<e with ≡-trans (≡-symm (<✓ c∈E c<e ac=Rxv)) (<✓ d∈E d<e ad=Rxt)
+  this {P} {load r := x ∙ C} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (segv-store e∈E aσy=ro ae=Wyu <✓) | some w with≡ vσx=somew | new-ub c∈E d∈E _ v≠t ac=Rxv ad=Rxt c<e d<e | refl = CONTRADICTION (v≠t refl)
 
-  this {P} {load r := x ∙ C} {σ} {σ′} (load P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (ok x₁ x₂ x₃ x₄) | some w with≡ vσx=somew = {!!}
+  this {P} {load r := x ∙ C} {σ} {σ′} (load {P′ = P′} P′∈⟦C⟧ E′⊆E ≤′⊆≤ ≤⊆≤′ a′⊆a P✓) (ok R✓ W✓ acc✓ val✓) | some w with≡ vσx=somew = step (load-ok vσx=somew) σC[r:=w]σ′ where
+
+    open Pomset P
+    open Pomset P′ renaming (_<_ to _<′_ ; ℓ to ℓ′ ; E to E′)
+
+    R′✓ : ∀ {e x v} → (e ∈ E′) → (act ℓ′(e) ≡ (R x v)) → (val σ(x) ≡ some v)
+    R′✓ e∈E′ aℓ′e=Rxv = R✓ (E′⊆E e∈E′) (≡-trans (a′⊆a e∈E′) aℓ′e=Rxv)
+
+    W′✓ : ∀ {e x v} → (e ∈ E′) → (act ℓ′(e) ≡ (W x v)) → (σ′(x) ≡ (rw , some v))
+    W′✓ e∈E′ aℓ′e=Wxv = W✓ (E′⊆E e∈E′) (≡-trans (a′⊆a e∈E′) aℓ′e=Wxv)
+
+    val′✓ : ∀ {x} → (∀ {e v} → (e ∈ E′) → (act ℓ′(e) ≢ (W x v))) → (val σ(x) ≡ val σ′(x))
+    val′✓ {x} a′✓ = val✓ a✓ where
+
+       a✓ : ∀ {e v} → (e ∈ E) → (act ℓ(e) ≢ (W x v))
+       a✓ e∈E aℓe=Wxv with (P✓ e∈E)
+       a✓ e∈E aℓe=Wxv | old-dependent _ e∈E′ _ _ _ = a′✓ e∈E′ (≡-trans (≡-symm (a′⊆a e∈E′)) aℓe=Wxv)
+       a✓ e∈E aℓe=Wxv | old-independent e∈E′ _ _ = a′✓ e∈E′ (≡-trans (≡-symm (a′⊆a e∈E′)) aℓe=Wxv)
+       a✓ e∈E aℓe=Wxv | new-load _ aℓe=Rxw with ≡-trans (≡-symm aℓe=Wxv) aℓe=Rxw
+       a✓ e∈E aℓe=Wxv | new-load _ aℓe=Rxw | ()
+       a✓ e∈E aℓe=Wxv | new-ub c∈E d∈E _ v≠w aℓc=Rxv aℓd=Rxw _ _ with ≡-trans (≡-symm (R✓ c∈E aℓc=Rxv)) (R✓ d∈E aℓd=Rxw)
+       a✓ e∈E aℓe=Wxv | new-ub c∈E d∈E _ v≠v aℓc=Rxv aℓd=Rxv _ _ | refl = v≠v refl
+
+    σP′σ′ : ⟪ σ ⟫ P′ ⟪ σ′ ⟫
+    σP′σ′ = ok R′✓ W′✓ acc✓ val′✓
+
+    σC[r:=w]σ′ : ⟨ σ ⟩ (C [ r := w ]) ⟨ σ′ ⟩
+    σC[r:=w]σ′ = this (sem-resp-subst r w P′∈⟦C⟧) (sem-ignores-subst r w σP′σ′)
 
 ----------------------
 
