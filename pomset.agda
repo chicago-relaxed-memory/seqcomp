@@ -13,7 +13,9 @@ module pomset (DM : DataModel) (Event : Set) where
   data Visibles : Action → Set where
     R : ∀ {a v} → ((R a v) ∈ Visibles)
     W : ∀ {a v} → ((W a v) ∈ Visibles)
-    
+
+  Invisibles = λ e → (Visibles e → FALSE)
+  
   data Reads : Action → Set where
     R : ∀ {a v} → ((R a v) ∈ Reads)
     
@@ -25,10 +27,10 @@ module pomset (DM : DataModel) (Event : Set) where
     WR : ∀ {x v w} → ((W x v , R x w) ∈ Conflicts)
     WW : ∀ {x v w} → ((W x v , W x w) ∈ Conflicts)
     
-  dec-vis : ∀ a → Dec(a ∈ Visibles)
-  dec-vis (R x v) = yes R
-  dec-vis (W x v) = yes W
-  dec-vis (✓ ϕ) = no (λ ())
+  dec-Visibles : ∀ a → Dec(a ∈ Visibles)
+  dec-Visibles (R x v) = yes R
+  dec-Visibles (W x v) = yes W
+  dec-Visibles (✓ ϕ) = no (λ ())
   
   postcondition : Action → Formula
   postcondition (R x v) = tt
@@ -56,11 +58,22 @@ module pomset (DM : DataModel) (Event : Set) where
     ↓ : Event → Event → Set
     ↓(e) = λ d → (d ≤ e)
 
+    V : Event → Set
+    V(e) = (e ∈ E) × (act(e) ∈ Visibles)
+
     field ≤-refl : ∀ {e} → (e ≤ e)
     field ≤-trans : ∀ {c d e} → (c ≤ d) → (d ≤ e) → (c ≤ e)
     field ≤-asym : ∀ {d e} → (e ≤ d) → (d ≤ e) → (d ≡ e)
-    field ✓-max : ∀ {d e} → (d < e) → (act(d) ∈ Visibles)
+    field ✓-max : ∀ {d e} → (d < e) → (d ∈ V)
 
+    V⊆E : (V ⊆ E)
+    V⊆E e (e∈E , _) = e∈E
+    
+    dec-V : ∀ e → (e ∈ E) → Dec(e ∈ V)
+    dec-V e e∈E with dec-Visibles(act(e))
+    dec-V e e∈E | yes a∈V = yes (e∈E , a∈V)
+    dec-V e e∈E | no  a∉V = no (λ e∈V → a∉V (snd e∈V))
+    
     data _⊨_⇝_ (D : Event → Set) (ϕ : Formula) (ψ : Formula) : Set where
       ⇝-defn : ∀ {e ϕ′ ψ′} → 
         (ℓ(e) ≡ (ϕ′ , ✓ ψ′)) →

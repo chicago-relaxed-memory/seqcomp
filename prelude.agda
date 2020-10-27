@@ -20,6 +20,12 @@ module prelude where
   ≡-cong₂ : ∀ {X Y Z} (f : X → Y → Z) {x₁ x₂ y₁ y₂} → (x₁ ≡ x₂) → (y₁ ≡ y₂) → (f x₁ y₁ ≡ f x₂ y₂)
   ≡-cong₂ f refl refl = refl
 
+  ≡-subst : ∀ {X} (P : X → Set) {x y} → (x ≡ y) → (P x) → (P y)
+  ≡-subst f refl Px = Px
+
+  ≡-subst₂ : ∀ {X Y} (P : X → Y → Set) {x₁ x₂ y₁ y₂} → (x₁ ≡ x₂) → (y₁ ≡ y₂) → (P x₁ y₁) → (P x₂ y₂)
+  ≡-subst₂ f refl refl Pxy = Pxy
+
   _≢_ : ∀ {X : Set} → X → X → Set
   x ≢ y = (x ≡ y) → FALSE
 
@@ -53,7 +59,6 @@ module prelude where
   _⊆_ : ∀ {α} {X : Set α} → (X → Set α) → (X → Set α) → (Set α)
   (E ⊆ F) = ∀ e → (e ∈ E) → (e ∈ F)
 
-  data _∪_ {α} {X : Set α} (A : X → Set α) (B : X → Set α) (x : X) : (Set α) where
-    inl : (x ∈ A) → (x ∈ (A ∪ B))
-    inr : (x ∈ B) → (x ∈ (A ∪ B))
-    
+  _∩_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
+  (E ∩ F) = λ e → (e ∈ E) × (e ∈ F)
+  
