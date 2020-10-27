@@ -51,7 +51,7 @@ module prelude where
   e ∉ E = E e → FALSE
 
   _⊆_ : ∀ {α} {X : Set α} → (X → Set α) → (X → Set α) → (Set α)
-  (E ⊆ F) = ∀ {e} → (e ∈ E) → (e ∈ F)
+  (E ⊆ F) = ∀ e → (e ∈ E) → (e ∈ F)
 
   data _∪_ {α} {X : Set α} (A : X → Set α) (B : X → Set α) (x : X) : (Set α) where
     inl : (x ∈ A) → (x ∈ (A ∪ B))

@@ -10,7 +10,9 @@ module data-model where
 
     field _⊨_ : Formula → Formula → Set
 
+    field tt : Formula
     field _∨_ : Formula → Formula → Formula
 
+    field ⊨-refl : ∀ {ϕ} → (ϕ ⊨ ϕ)
     
 
