@@ -61,6 +61,9 @@ module pomset (DM : DataModel) (Event : Set) where
     V : Event → Set
     V(e) = (e ∈ E) × (act(e) ∈ Visibles)
 
+    I : Event → Set
+    I(e) = (e ∈ E) × (act(e) ∈ Invisibles)
+
     field ≤-refl : ∀ {e} → (e ≤ e)
     field ≤-trans : ∀ {c d e} → (c ≤ d) → (d ≤ e) → (c ≤ e)
     field ≤-asym : ∀ {d e} → (e ≤ d) → (d ≤ e) → (d ≡ e)
@@ -75,10 +78,14 @@ module pomset (DM : DataModel) (Event : Set) where
     dec-V e e∈E | no  a∉V = no (λ e∈V → a∉V (snd e∈V))
     
     data _⊨_⇝_ (D : Event → Set) (ϕ : Formula) (ψ : Formula) : Set where
-      ⇝-defn : ∀ {e ϕ′ ψ′} → 
-        (ℓ(e) ≡ (ϕ′ , ✓ ψ′)) →
-        (ϕ ⊨ ϕ′) →
-        (ψ′ ⊨ ψ) →
+      ⇝-defn : ∀ e →
+        (e ∈ I) →
+        (ϕ ⊨ pre(e)) →
+        (post(e) ⊨ ψ) →
         (∀ d → (d < e) → (d ∈ D)) →
         ---------------------------
         D ⊨ ϕ ⇝ ψ
+
+    ⇝-resp-⊆ : ∀ {C D ϕ ψ} → (C ⊆ D) → (C ⊨ ϕ ⇝ ψ) → (D ⊨ ϕ ⇝ ψ)
+    ⇝-resp-⊆ C⊆D (⇝-defn e e∈I ϕ⊨pre post⊨ψ d<e⇒d∈C) = ⇝-defn e e∈I ϕ⊨pre post⊨ψ (λ d d<e → C⊆D d (d<e⇒d∈C d d<e))
+    
