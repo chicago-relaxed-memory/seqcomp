@@ -71,6 +71,17 @@ module pomset (DM : DataModel) (Event : Set) where
 
     V⊆E : (V ⊆ E)
     V⊆E e (e∈E , _) = e∈E
+
+    I⊆E : (I ⊆ E)
+    I⊆E e (e∈E , _) = e∈E
+
+    I∩V⊆∅ : ((I ∩ V) ⊆ ∅)
+    I∩V⊆∅ e ((_ , ae∉Vis) , (_ , ae∈Vis)) = ae∉Vis ae∈Vis
+    
+    E⊆I∪V : (E ⊆ (I ∪ V))
+    E⊆I∪V e e∈E with dec-Visibles (act(e))
+    E⊆I∪V e e∈E | yes ae∈Vis = inr (e∈E , ae∈Vis)
+    E⊆I∪V e e∈E | no  ae∉Vis = inl (e∈E , ae∉Vis)
     
     dec-V : ∀ e → (e ∈ E) → Dec(e ∈ V)
     dec-V e e∈E with dec-Visibles(act(e))

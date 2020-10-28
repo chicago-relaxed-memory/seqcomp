@@ -12,8 +12,8 @@ module semantics (DM : DataModel) (Event : Set) where
   data SKIP (P₀ : Pomset) (e : Event) : Set where
   
     impl :
-      let open Pomset P₀ using () renaming (pre to pre₀ ; post to post₀ ; act to act₀; V to V₀) in
-      (e ∉ V₀) →
+      let open Pomset P₀ using () renaming (pre to pre₀ ; post to post₀ ; I to I₀) in
+      (e ∈ I₀) →
       (pre₀(e) ⊨ post₀(e)) →
       -------------------------
       (e ∈ SKIP P₀)
@@ -35,14 +35,12 @@ module semantics (DM : DataModel) (Event : Set) where
   data ℓ-COMP (P₀ P₁ P₂ : Pomset) (e : Event) : Set where
 
     cut :
-      let open Pomset P₀ using () renaming (act to act₀ ; pre to pre₀ ; post to post₀ ; V to V₀) in
-      let open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; post to post₁ ; V to V₁) in
-      let open Pomset P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; post to post₂ ; V to V₂) in
-      (e ∈ E₁) →
-      (e ∈ E₂) →
-      (e ∉ V₀) →
-      (e ∉ V₁) →
-      (e ∉ V₂) →
+      let open Pomset P₀ using () renaming (I to I₀ ; pre to pre₀ ; post to post₀) in
+      let open Pomset P₁ using () renaming (I to I₁ ; pre to pre₁ ; post to post₁) in
+      let open Pomset P₂ using () renaming (I to I₂ ; pre to pre₂ ; post to post₂) in
+      (e ∈ I₀) →
+      (e ∈ I₁) →
+      (e ∈ I₂) →
       (pre₀(e) ⊨ pre₁(e)) →
       (post₁(e) ⊨ pre₂(e)) →
       (post₂(e) ⊨ post₀(e)) →
@@ -50,9 +48,10 @@ module semantics (DM : DataModel) (Event : Set) where
       (e ∈ ℓ-COMP P₀ P₁ P₂)
 
     left :
-      let open Pomset P₀ using () renaming (act to act₀ ; pre to pre₀ ; post to post₀) in
-      let open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; post to post₁ ; V to V₁) in
+      let open Pomset P₀ using () renaming (V to V₀ ; act to act₀ ; pre to pre₀) in
+      let open Pomset P₁ using () renaming (V to V₁ ; act to act₁ ; pre to pre₁) in
       let open Pomset P₂ using () renaming (E to E₂) in
+      (e ∈ V₀) →
       (e ∈ V₁) →
       (e ∉ E₂) →
       (act₀(e) ≡ act₁(e)) →
@@ -61,9 +60,10 @@ module semantics (DM : DataModel) (Event : Set) where
       (e ∈ ℓ-COMP P₀ P₁ P₂)
 
     right : ∀ {ϕ} →
-      let open Pomset P₀ using () renaming (act to act₀ ; pre to pre₀ ; ↓ to ↓₀) in
+      let open Pomset P₀ using () renaming (V to V₀ ; act to act₀ ; pre to pre₀ ; ↓ to ↓₀) in
       let open Pomset P₁ using () renaming (E to E₁ ; _⊨_⇝_ to _⊨₁_⇝_) in
-      let open Pomset P₂ using () renaming (act to act₂ ; pre to pre₂ ; post to post₂ ; V to V₂) in
+      let open Pomset P₂ using () renaming (V to V₂ ; act to act₂ ; pre to pre₂) in
+      (e ∈ V₀) →
       (e ∉ E₁) →
       (e ∈ V₂) →
       (act₀(e) ≡ act₂(e)) →
@@ -73,9 +73,10 @@ module semantics (DM : DataModel) (Event : Set) where
       (e ∈ ℓ-COMP P₀ P₁ P₂)
 
     both : ∀ {ϕ} →
-      let open Pomset P₀ using () renaming (act to act₀ ; pre to pre₀ ; ↓ to ↓₀) in
-      let open Pomset P₁ using () renaming (act to act₁ ; pre to pre₁ ; _⊨_⇝_ to _⊨₁_⇝_ ; V to V₁) in
-      let open Pomset P₂ using () renaming (act to act₂ ; pre to pre₂ ; V to V₂) in
+      let open Pomset P₀ using () renaming (V to V₀ ; act to act₀ ; pre to pre₀ ; ↓ to ↓₀) in
+      let open Pomset P₁ using () renaming (V to V₁ ; act to act₁ ; pre to pre₁ ; _⊨_⇝_ to _⊨₁_⇝_) in
+      let open Pomset P₂ using () renaming (V to V₂ ; act to act₂ ; pre to pre₂) in
+      (e ∈ V₀) →
       (e ∈ V₁) →
       (e ∈ V₂) →
       (act₀(e) ≡ act₁(e)) →

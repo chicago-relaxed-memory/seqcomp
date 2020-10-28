@@ -44,6 +44,10 @@ module prelude where
     field fst : X
     field snd : Y
 
+  data _⊎_ (X Y : Set) : Set where
+    inl : X → (X ⊎ Y)
+    inr : Y → (X ⊎ Y)
+
   open _×_ public
 
   data Maybe (X : Set) : Set where
@@ -59,6 +63,12 @@ module prelude where
   _⊆_ : ∀ {α} {X : Set α} → (X → Set α) → (X → Set α) → (Set α)
   (E ⊆ F) = ∀ e → (e ∈ E) → (e ∈ F)
 
+  ∅ : ∀ {X : Set} → (X → Set)
+  ∅ = λ e → FALSE
+  
   _∩_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
   (E ∩ F) = λ e → (e ∈ E) × (e ∈ F)
+  
+  _∪_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
+  (E ∪ F) = λ e → (e ∈ E) ⊎ (e ∈ F)
   
