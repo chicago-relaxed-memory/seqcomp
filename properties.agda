@@ -40,49 +40,42 @@ module properties (DM : DataModel) (Event : Set) where
     
   sem-resp-≲ : ∀ {P Q C} → (P ≲ Q) → (P ∈ ⟦ C ⟧) → (Q ∈ ⟦ C ⟧)
 
-  sem-resp-≲ {P} {Q} P≲Q (⟦skip⟧ P hyp-E) = ⟦skip⟧ Q lemma-E where
+  sem-resp-≲ {P} {Q} P≲Q (⟦skip⟧ P E⊆I pre⊨post) = ⟦skip⟧ Q F⊆J qre⊨qost  where
 
     open Pomset P using (ℓ ; act ; V)
     open Pomset Q using () renaming (E to F ; I to J ; V to U ; ℓ to m ; act to bct ; pre to qre ; post to qost)
     open _≲_ P≲Q using (F⊆E ; U⊆V ; V⊆U ; F∩I⊆J ; qre⊨pre ; post⊨qost)
 
-    lemma-E : ∀ e → (e ∈ F) → (e ∈ SKIP Q)
-    lemma-E e e∈F with hyp-E e (F⊆E e e∈F)
-    lemma-E e e∈F | impl e∈I pre⊨post = impl e∈J qre⊨qost where
-
-      e∈J : (e ∈ J)
-      e∈J = F∩I⊆J e (e∈F , e∈I)
+    F⊆J : (F ⊆ J)
+    F⊆J e e∈F = F∩I⊆J e (e∈F , E⊆I e (F⊆E e e∈F))
+    
+    qre⊨qost : ∀ e → (e ∈ F) → qre(e) ⊨ qost(e)
+    qre⊨qost e e∈F = ⊨-trans (qre⊨pre e e∈F) (⊨-trans (pre⊨post e (F⊆E e e∈F)) (post⊨qost e (F⊆J e e∈F)))
       
-      qre⊨qost : qre(e) ⊨ qost(e)
-      qre⊨qost = ⊨-trans (qre⊨pre e e∈F) (⊨-trans pre⊨post (post⊨qost e e∈J))
-      
-  sem-resp-≲ {P} {Q} P≲Q (⟦comp⟧ C₁ C₂ P P₁ P₂ P₁∈C₁ P₂∈C₂ hyp-E hyp-ℓ hyp-≤) = ⟦comp⟧ C₁ C₂ Q P₁ P₂ P₁∈C₁ P₂∈C₂ lemma-E lemma-ℓ lemma-≤  where
+  sem-resp-≲ {P} {Q} P≲Q (⟦comp⟧ C₁ C₂ P P₁ P₂ P₁∈C₁ P₂∈C₂ V₁∪V₂⊆V hyp-ℓ hyp-≤) = ⟦comp⟧ C₁ C₂ Q P₁ P₂ P₁∈C₁ P₂∈C₂ V₁∪V₂⊆U lemma-ℓ lemma-≤  where
 
-    open Pomset P using (E ; V)
+    open Pomset P using (E ; V ; V⊆E)
     open Pomset P₁ using () renaming (V to V₁ ; V⊆E to V₁⊆E₁ ; I∩V⊆∅ to I₁∩V₁⊆∅ ; ⇝-resp-⊆ to ⇝₁-resp-⊆)
     open Pomset P₂ using () renaming (V to V₂ ; V⊆E to V₂⊆E₂ ;  I∩V⊆∅ to I₂∩V₂⊆∅)
-    open Pomset Q using () renaming (E to F ; V⊆E to U⊆F ; ℓ to m ; _≤_ to _≼_ ; act to bct ; pre to qre ; post to qost)
+    open Pomset Q using () renaming (E to F ; V to U ; V⊆E to U⊆F ; ℓ to m ; _≤_ to _≼_ ; act to bct ; pre to qre ; post to qost)
     open _≲_ P≲Q using (F⊆E ; V⊆F ; U⊆V ; V⊆U ; F∩I⊆J ; act=bct ; qre⊨pre ; post⊨qost ; ≤⊆≼ ; ↓⊆⇓)
 
     V₁⊆V : V₁ ⊆ V
-    V₁⊆V e e∈V₁ with hyp-ℓ e (hyp-E e (left e∈V₁))
+    V₁⊆V e e∈V₁ with hyp-ℓ e (V⊆E e (V₁∪V₂⊆V e (inl e∈V₁)))
     V₁⊆V e e∈V₁ | cut _ e∈I₁ _ _ _ _ = CONTRADICTION (I₁∩V₁⊆∅ e (e∈I₁ , e∈V₁))
     V₁⊆V e e∈V₁ | left e∈V _ _ _ _ = e∈V
     V₁⊆V e e∈V₁ | right e∈V _ _ _ _ _ = e∈V
     V₁⊆V e e∈V₁ | both e∈V _ _ _ _ _ _ = e∈V
 
     V₂⊆V : V₂ ⊆ V
-    V₂⊆V e e∈V₂ with hyp-ℓ e (hyp-E e (right e∈V₂))
+    V₂⊆V e e∈V₂ with hyp-ℓ e (V⊆E e (V₁∪V₂⊆V e (inr e∈V₂)))
     V₂⊆V e e∈V₂ | cut _ _ e∈I₂ _ _ _ = CONTRADICTION (I₂∩V₂⊆∅ e (e∈I₂ , e∈V₂))
     V₂⊆V e e∈V₂ | left e∈V _ _ _ _ = e∈V
     V₂⊆V e e∈V₂ | right e∈V _ _ _ _ _ = e∈V
     V₂⊆V e e∈V₂ | both e∈V _ _ _ _ _ _ = e∈V
     
-    lemma-E : (∀ e → (e ∈ E-COMP Q P₁ P₂) → (e ∈ F))
-    lemma-E e (left e∈V₁) with hyp-E e (left e∈V₁)
-    lemma-E e (left e∈V₁) | e∈E = V⊆F e (V₁⊆V e e∈V₁)
-    lemma-E e (right e∈V₂) with hyp-E e (right e∈V₂)
-    lemma-E e (right e∈V₂) | e∈E = V⊆F e (V₂⊆V e e∈V₂)
+    V₁∪V₂⊆U : ((V₁ ∪ V₂) ⊆ U)
+    V₁∪V₂⊆U e e∈V₁∪V₂ = V⊆U e (V₁∪V₂⊆V e e∈V₁∪V₂)
 
     lemma-ℓ : (∀ e → (e ∈ F) → (e ∈ ℓ-COMP Q P₁ P₂))
     lemma-ℓ e e∈F with hyp-ℓ e (F⊆E e e∈F)
@@ -123,9 +116,9 @@ module properties (DM : DataModel) (Event : Set) where
     lemma-≤ d e X = ≤⊆≼ d e (hyp-≤ d e X)
    
   right-unit-sub : ∀ C → ⟦ C ⟧ ⊆ ⟦ C ∙ skip ⟧
-  right-unit-sub C P₀ P₀∈C = ⟦comp⟧ C skip P₀ P₀ P₂ P₀∈C P₂∈⟦skip⟧ lemma-E lemma-ℓ lemma-≤ where
+  right-unit-sub C P₀ P₀∈C = ⟦comp⟧ C skip P₀ P₀ P₂ P₀∈C P₂∈⟦skip⟧ V₀∪V₂⊆V₀ lemma-ℓ lemma-≤ where
 
-    open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; V⊆E to V₀⊆E₀ ; E⊆I∪V to E₀⊆I₀∪V₀ ; I∩V⊆∅ to I₀∩V₀⊆∅ ; ℓ to ℓ₀ ; act to act₀ ; post to post₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; dec-V to dec-V₀)
+    open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; V to V₀ ; V⊆E to V₀⊆E₀ ; E⊆I∪V to E₀⊆I₀∪V₀ ; I∩V⊆∅ to I₀∩V₀⊆∅ ; ℓ to ℓ₀ ; act to act₀ ; post to post₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; dec-V to dec-V₀)
 
     ℓ₂ : Event → (Formula × Action)
     ℓ₂ e = (post₀(e) , ✓(post₀(e)))
@@ -136,16 +129,16 @@ module properties (DM : DataModel) (Event : Set) where
     P₂ : Pomset
     P₂ = record { E = I₀ ; _≤_ = _≡_ ; ℓ = ℓ₂ ; ✓-max = ✓-max₂ ; ≤-refl = refl ; ≤-trans = ≡-trans ; ≤-asym = (λ _ d=e → d=e) }
 
-    open Pomset P₂ using () renaming (I to I₂ ; pre to pre₂)
+    open Pomset P₂ using () renaming (I to I₂ ; V to V₂ ; pre to pre₂)
 
     I₀⊆I₂ : (I₀ ⊆ I₂)
-    I₀⊆I₂ = {!!}
+    I₀⊆I₂ e e∈I₀ = (e∈I₀ , λ ())
 
     P₂∈⟦skip⟧ : P₂ ∈ ⟦ skip ⟧
-    P₂∈⟦skip⟧ = ⟦skip⟧ P₂ (λ e e∈I₀ → impl (I₀⊆I₂ e e∈I₀) ⊨-refl)
+    P₂∈⟦skip⟧ = ⟦skip⟧ P₂ I₀⊆I₂ (λ e e∈E → ⊨-refl)
 
-    lemma-E : (∀ e → (e ∈ E-COMP P₀ P₀ P₂) → (e ∈ E₀))
-    lemma-E e (left e∈V₀) = V₀⊆E₀ e e∈V₀
+    V₀∪V₂⊆V₀ : ((V₀ ∪ V₂) ⊆ V₀)
+    V₀∪V₂⊆V₀ e (inl e∈V₉) = e∈V₉ 
     
     lemma-ℓ : (∀ e → (e ∈ E₀) → (e ∈ ℓ-COMP P₀ P₀ P₂))
     lemma-ℓ e e∈E₀ with E₀⊆I₀∪V₀ e e∈E₀ 
@@ -157,8 +150,41 @@ module properties (DM : DataModel) (Event : Set) where
     lemma-≤ d .d (right refl) = ≤₀-refl
   
   right-unit-sup : ∀ C → ⟦ C ∙ skip ⟧ ⊆ ⟦ C ⟧
-  right-unit-sup C P₀ (⟦comp⟧ _ _ _ P₁ P₂ P₁∈C (⟦skip⟧ _ hyp-E₂) hyp-E₁ hyp-ℓ₁ hyp-≤₁) = sem-resp-≲ P₁≲P₀ P₁∈C where
-  
+  right-unit-sup C P₀ (⟦comp⟧ _ _ _ P₁ P₂ P₁∈C (⟦skip⟧ _ E₂⊆I₂ pre₂⊨post) V₁∪V₂⊆V₀ hyp-ℓ hyp-≤) = sem-resp-≲ P₁≲P₀ P₁∈C where
+
+    open Pomset P₀ using () renaming (E to E₀ ; V to V₀ ; I to I₀ ; act to act₀ ; pre to pre₀ ; post to post₀ ; _≤_ to _≤₀_)
+    open Pomset P₁ using () renaming (E to E₁ ; V to V₁ ; I to I₁ ; act to act₁ ; pre to pre₁ ; post to post₁ ; _≤_ to _≤₁_ ; I⊆E to I₁⊆E₁ ; V⊆E to V₁⊆E₁)
+    open Pomset P₂ using () renaming (V⊆E to V₂⊆E₂ ; I∩V⊆∅ to I₂∩V₂⊆∅)
+
+    E₀⊆E₁ : (E₀ ⊆ E₁)
+    E₀⊆E₁ e e∈E₀ with hyp-ℓ e e∈E₀
+    E₀⊆E₁ e e∈E₀ | cut _ e∈I₁ _ _ _ _ = I₁⊆E₁ e e∈I₁
+    E₀⊆E₁ e e∈E₀ | left _ e∈V₁ _ _ _ = V₁⊆E₁ e e∈V₁
+    E₀⊆E₁ e e∈E₀ | right _ _ e∈V₂ _ _ _ = CONTRADICTION (I₂∩V₂⊆∅ e (E₂⊆I₂ e (V₂⊆E₂ e e∈V₂) , e∈V₂))
+    E₀⊆E₁ e e∈E₀ | both _ e∈V₁ _ _ _ _ _ = V₁⊆E₁ e e∈V₁
+
+    V₁⊆V₀ : (V₁ ⊆ V₀)
+    V₁⊆V₀ e e∈V₁ = V₁∪V₂⊆V₀ e (inl e∈V₁)
+
+    act₁=act₀ : ∀ e → (e ∈ V₀) → (act₁ e ≡ act₀ e)
+    act₁=act₀ = {!!}
+
+    pre₀⊨pre₁ : ∀ e → (e ∈ E₀) → (pre₀ e ⊨ pre₁ e)
+    pre₀⊨pre₁ = {!!}
+    
+    post₁⊨post₀ : ∀ e → (e ∈ I₀) → (post₁ e ⊨ post₀ e)
+    post₁⊨post₀  = {!!}
+
+    ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
+    ≤₁⊆≤₀ = {!!}
+    
     P₁≲P₀ : P₁ ≲ P₀
-    P₁≲P₀ = {!!}
+    P₁≲P₀ = record
+              { F⊆E = E₀⊆E₁
+              ; V⊆U = V₁⊆V₀ 
+              ; act=bct = act₁=act₀
+              ; qre⊨pre = pre₀⊨pre₁
+              ; post⊨qost = post₁⊨post₀
+              ; ≤⊆≼ = ≤₁⊆≤₀ 
+              }
     

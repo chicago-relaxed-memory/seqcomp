@@ -8,29 +8,6 @@ module semantics (DM : DataModel) (Event : Set) where
   open DataModel DM
   open command(DM)
   open pomset(DM)(Event)
-
-  data SKIP (P₀ : Pomset) (e : Event) : Set where
-  
-    impl :
-      let open Pomset P₀ using () renaming (pre to pre₀ ; post to post₀ ; I to I₀) in
-      (e ∈ I₀) →
-      (pre₀(e) ⊨ post₀(e)) →
-      -------------------------
-      (e ∈ SKIP P₀)
-
-  data E-COMP (P₀ P₁ P₂ : Pomset) (e : Event) : Set where
-
-    left :
-      let open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; V to V₁) in
-      (e ∈ V₁) →
-      -------------------------      
-      (e ∈ E-COMP P₀ P₁ P₂)
-      
-    right :
-      let open Pomset P₂ using () renaming (E to E₂ ; act to act₂ ; V to V₂) in
-      (e ∈ V₂) →
-      -------------------------
-      (e ∈ E-COMP P₀ P₁ P₂)
       
   data ℓ-COMP (P₀ P₁ P₂ : Pomset) (e : Event) : Set where
 
@@ -112,15 +89,18 @@ module semantics (DM : DataModel) (Event : Set) where
   data ⟦_⟧ : Command → Pomset → Set₁ where
 
     ⟦skip⟧ : ∀ P₀ →
-      let open Pomset P₀ using () renaming (E to E₀) in
-      (∀ e → (e ∈ E₀) → (e ∈ SKIP P₀)) →
+      let open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; pre to pre₀ ; post to post₀) in
+      (E₀ ⊆ I₀) →
+      (∀ e → (e ∈ E₀) → (pre₀(e) ⊨ post₀(e))) →
       (P₀ ∈ ⟦ skip ⟧)
       
     ⟦comp⟧ : ∀ C₁ C₂ P₀ P₁ P₂ →    
-      let open Pomset P₀ using () renaming (_≤_ to _≤₀_ ; E to E₀) in
+      let open Pomset P₀ using () renaming (E to E₀ ; V to V₀ ; _≤_ to _≤₀_) in
+      let open Pomset P₁ using () renaming (V to V₁) in
+      let open Pomset P₂ using () renaming (V to V₂) in
       (P₁ ∈ ⟦ C₁ ⟧) →
       (P₂ ∈ ⟦ C₂ ⟧) →
-      (∀ e → (e ∈ E-COMP P₀ P₁ P₂) → (e ∈ E₀)) →
+      ((V₁ ∪ V₂) ⊆ V₀) →
       (∀ e → (e ∈ E₀) → (e ∈ ℓ-COMP P₀ P₁ P₂)) →
       (∀ d e → ((d , e) ∈ ≤-COMP P₁ P₂) → (d ≤₀ e)) →
       (P₀ ∈ ⟦ C₁ ∙ C₂ ⟧)
