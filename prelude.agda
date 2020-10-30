@@ -63,7 +63,7 @@ module prelude where
   _⊆_ : ∀ {α} {X : Set α} → (X → Set α) → (X → Set α) → (Set α)
   (E ⊆ F) = ∀ e → (e ∈ E) → (e ∈ F)
 
-  ∅ : ∀ {X : Set} → (X → Set)
+  ∅ : ∀ {α} {X : Set α} → (X → Set)
   ∅ = λ e → FALSE
   
   _∩_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
@@ -72,3 +72,7 @@ module prelude where
   _∪_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
   (E ∪ F) = λ e → (e ∈ E) ⊎ (e ∈ F)
   
+  data ℕ : Set where
+    zero : ℕ
+    succ : ℕ → ℕ
+  {-# BUILTIN NATURAL ℕ #-}

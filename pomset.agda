@@ -10,11 +10,11 @@ module pomset (DM : DataModel) (Event : Set) where
      W : Address → Value → Action
      ✓ : Formula → Action
 
-  data Visibles : Action → Set where
-    R : ∀ {a v} → ((R a v) ∈ Visibles)
-    W : ∀ {a v} → ((W a v) ∈ Visibles)
+  data Externals : Action → Set where
+    R : ∀ {a v} → ((R a v) ∈ Externals)
+    W : ∀ {a v} → ((W a v) ∈ Externals)
 
-  Invisibles = λ e → (Visibles e → FALSE)
+  Internals = λ e → (Externals e → FALSE)
   
   data Reads : Action → Set where
     R : ∀ {a v} → ((R a v) ∈ Reads)
@@ -27,10 +27,10 @@ module pomset (DM : DataModel) (Event : Set) where
     WR : ∀ {x v w} → ((W x v , R x w) ∈ Conflicts)
     WW : ∀ {x v w} → ((W x v , W x w) ∈ Conflicts)
     
-  dec-Visibles : ∀ a → Dec(a ∈ Visibles)
-  dec-Visibles (R x v) = yes R
-  dec-Visibles (W x v) = yes W
-  dec-Visibles (✓ ϕ) = no (λ ())
+  dec-Externals : ∀ a → Dec(a ∈ Externals)
+  dec-Externals (R x v) = yes R
+  dec-Externals (W x v) = yes W
+  dec-Externals (✓ ϕ) = no (λ ())
   
   postcondition : Action → Formula
   postcondition (R x v) = tt
@@ -58,45 +58,45 @@ module pomset (DM : DataModel) (Event : Set) where
     ↓ : Event → Event → Set
     ↓(e) = λ d → (d ≤ e)
 
-    V : Event → Set
-    V(e) = (e ∈ E) × (act(e) ∈ Visibles)
+    X : Event → Set
+    X(e) = (e ∈ E) × (act(e) ∈ Externals)
 
     I : Event → Set
-    I(e) = (e ∈ E) × (act(e) ∈ Invisibles)
+    I(e) = (e ∈ E) × (act(e) ∈ Internals)
 
     field ≤-refl : ∀ {e} → (e ≤ e)
     field ≤-trans : ∀ {c d e} → (c ≤ d) → (d ≤ e) → (c ≤ e)
     field ≤-asym : ∀ {d e} → (e ≤ d) → (d ≤ e) → (d ≡ e)
-    field ✓-max : ∀ {d e} → (d < e) → (d ∈ V)
+    field ✓-max : ∀ {d e} → (d < e) → (d ∈ X)
 
-    V⊆E : (V ⊆ E)
-    V⊆E e (e∈E , _) = e∈E
+    X⊆E : (X ⊆ E)
+    X⊆E e (e∈E , _) = e∈E
 
     I⊆E : (I ⊆ E)
     I⊆E e (e∈E , _) = e∈E
 
-    I∩V⊆∅ : ((I ∩ V) ⊆ ∅)
-    I∩V⊆∅ e ((_ , ae∉Vis) , (_ , ae∈Vis)) = ae∉Vis ae∈Vis
+    I∩X⊆∅ : ((I ∩ X) ⊆ ∅)
+    I∩X⊆∅ e ((_ , ae∉X) , (_ , ae∈X)) = ae∉X ae∈X
     
-    E⊆I∪V : (E ⊆ (I ∪ V))
-    E⊆I∪V e e∈E with dec-Visibles (act(e))
-    E⊆I∪V e e∈E | yes ae∈Vis = inr (e∈E , ae∈Vis)
-    E⊆I∪V e e∈E | no  ae∉Vis = inl (e∈E , ae∉Vis)
+    E⊆I∪X : (E ⊆ (I ∪ X))
+    E⊆I∪X e e∈E with dec-Externals (act(e))
+    E⊆I∪X e e∈E | yes ae∈X = inr (e∈E , ae∈X)
+    E⊆I∪X e e∈E | no  ae∉X = inl (e∈E , ae∉X)
     
-    dec-V : ∀ e → (e ∈ E) → Dec(e ∈ V)
-    dec-V e e∈E with dec-Visibles(act(e))
-    dec-V e e∈E | yes a∈V = yes (e∈E , a∈V)
-    dec-V e e∈E | no  a∉V = no (λ e∈V → a∉V (snd e∈V))
+    dec-X : ∀ e → (e ∈ E) → Dec(e ∈ X)
+    dec-X e e∈E with dec-Externals(act(e))
+    dec-X e e∈E | yes a∈X = yes (e∈E , a∈X)
+    dec-X e e∈E | no  a∉X = no (λ e∈X → a∉X (snd e∈X))
     
-    data _⊨_⇝_ (D : Event → Set) (ϕ : Formula) (ψ : Formula) : Set where
-      ⇝-defn : ∀ e →
+    data _▷_ (D : Event → Set) (ϕψ : (Formula × Formula)) : Set where
+      ▷-defn : ∀ e →
         (e ∈ I) →
-        (ϕ ⊨ pre(e)) →
-        (post(e) ⊨ ψ) →
+        (fst(ϕψ) ⊨ pre(e)) →
+        (post(e) ⊨ snd(ϕψ)) →
         (∀ d → (d < e) → (d ∈ D)) →
         ---------------------------
-        D ⊨ ϕ ⇝ ψ
+        D ▷ ϕψ
 
-    ⇝-resp-⊆ : ∀ {C D ϕ ψ} → (C ⊆ D) → (C ⊨ ϕ ⇝ ψ) → (D ⊨ ϕ ⇝ ψ)
-    ⇝-resp-⊆ C⊆D (⇝-defn e e∈I ϕ⊨pre post⊨ψ d<e⇒d∈C) = ⇝-defn e e∈I ϕ⊨pre post⊨ψ (λ d d<e → C⊆D d (d<e⇒d∈C d d<e))
+    ▷-resp-⊆ : ∀ {C D ϕ ψ} → (C ⊆ D) → (C ▷ (ϕ , ψ)) → (D ▷ (ϕ , ψ))
+    ▷-resp-⊆ C⊆D (▷-defn e e∈I ϕ⊨pre post⊨ψ d<e⇒d∈C) = ▷-defn e e∈I ϕ⊨pre post⊨ψ (λ d d<e → C⊆D d (d<e⇒d∈C d d<e))
     

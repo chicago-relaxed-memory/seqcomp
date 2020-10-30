@@ -9,8 +9,8 @@ module command (DM : DataModel) where
 
     skip : Command
     _∙_ : Command → Command → Command
-    if_then_ : Expression → Command → Command
-    [_]:=_ : Expression → Expression → Command
-    _:=[_] : Register → Expression → Command
+    if_then_ : Formula → Command → Command
+    [_]:=_ : Address → Expression → Command
+    _:=[_] : Register → Address → Command
     _:=_ : Register → Expression → Command
     

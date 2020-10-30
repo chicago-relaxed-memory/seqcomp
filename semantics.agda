@@ -8,99 +8,62 @@ module semantics (DM : DataModel) (Event : Set) where
   open DataModel DM
   open command(DM)
   open pomset(DM)(Event)
-      
-  data ℓ-COMP (P₀ P₁ P₂ : Pomset) (e : Event) : Set where
 
-    cut :
-      let open Pomset P₀ using () renaming (I to I₀ ; pre to pre₀ ; post to post₀) in
-      let open Pomset P₁ using () renaming (I to I₁ ; pre to pre₁ ; post to post₁) in
-      let open Pomset P₂ using () renaming (I to I₂ ; pre to pre₂ ; post to post₂) in
-      (e ∈ I₀) →
-      (e ∈ I₁) →
-      (e ∈ I₂) →
-      (pre₀(e) ⊨ pre₁(e)) →
-      (post₁(e) ⊨ pre₂(e)) →
-      (post₂(e) ⊨ post₀(e)) →
-      -------------------------
-      (e ∈ ℓ-COMP P₀ P₁ P₂)
+  record SKIP (P₀ : Pomset) : Set₁ where
+  
+   open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; X to X₀ ; pre to pre₀ ; post to post₀)
+   field E₀⊆I₀ :  (E₀ ⊆ I₀)
+   field pre₀⊨post₀ : (∀ e → (e ∈ E₀) → (pre₀(e) ⊨ post₀(e)))
 
-    left :
-      let open Pomset P₀ using () renaming (V to V₀ ; act to act₀ ; pre to pre₀) in
-      let open Pomset P₁ using () renaming (V to V₁ ; act to act₁ ; pre to pre₁) in
-      let open Pomset P₂ using () renaming (E to E₂) in
-      (e ∈ V₀) →
-      (e ∈ V₁) →
-      (e ∉ E₂) →
-      (act₀(e) ≡ act₁(e)) →
-      (pre₀(e) ⊨ pre₁(e)) →
-      -------------------------
-      (e ∈ ℓ-COMP P₀ P₁ P₂)
+  record _●_ (𝒫₁ 𝒫₂ : Pomset → Set₁) (P₀ : Pomset) : Set₁ where
 
-    right : ∀ {ϕ} →
-      let open Pomset P₀ using () renaming (V to V₀ ; act to act₀ ; pre to pre₀ ; ↓ to ↓₀) in
-      let open Pomset P₁ using () renaming (E to E₁ ; _⊨_⇝_ to _⊨₁_⇝_) in
-      let open Pomset P₂ using () renaming (V to V₂ ; act to act₂ ; pre to pre₂) in
-      (e ∈ V₀) →
-      (e ∉ E₁) →
-      (e ∈ V₂) →
-      (act₀(e) ≡ act₂(e)) →
-      (pre₀(e) ⊨ ϕ) →
-      (↓₀(e) ⊨₁ ϕ ⇝ pre₂(e)) →
-      -------------------------
-      (e ∈ ℓ-COMP P₀ P₁ P₂)
+   field P₁ : Pomset
+   field P₂ : Pomset
 
-    both : ∀ {ϕ} →
-      let open Pomset P₀ using () renaming (V to V₀ ; act to act₀ ; pre to pre₀ ; ↓ to ↓₀) in
-      let open Pomset P₁ using () renaming (V to V₁ ; act to act₁ ; pre to pre₁ ; _⊨_⇝_ to _⊨₁_⇝_) in
-      let open Pomset P₂ using () renaming (V to V₂ ; act to act₂ ; pre to pre₂) in
-      (e ∈ V₀) →
-      (e ∈ V₁) →
-      (e ∈ V₂) →
-      (act₀(e) ≡ act₁(e)) →
-      (act₀(e) ≡ act₂(e)) →
-      (pre₀(e) ⊨ (pre₁(e) ∨ ϕ)) →
-      (↓₀(e) ⊨₁ ϕ ⇝ pre₂(e)) →
-      -------------------------
-      (e ∈ ℓ-COMP P₀ P₁ P₂)
+   field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
+   field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
+   
+   open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; X to X₀ ; act to act₀ ; pre to pre₀ ; post to post₀ ; _≤_ to _≤₀_ ; ↓ to ↓₀)
+   open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; X to X₁ ; act to act₁ ; pre to pre₁ ; post to post₁ ; _≤_ to _≤₁_ ; _▷_ to _▷₁_)
+   open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; X to X₂ ; act to act₂ ; pre to pre₂ ; post to post₂ ; _≤_ to _≤₂_)
 
-  data ≤-COMP (P₁ P₂ : Pomset) : (Event × Event) → Set where
+   field E₀⊆E₁∪E₂ : E₀ ⊆ (E₁ ∪ E₂)
+   field X₁∪X₂⊆X₀ : ((X₁ ∪ X₂) ⊆ X₀)
 
-    left : ∀ {d e} →
-      let open Pomset P₁ using () renaming (_≤_ to _≤₁_) in
-      (d ≤₁ e) →
-      -------------------------
-      ((d , e) ∈ ≤-COMP P₁ P₂)
+   field int-pre₀⊨pre₁ : ∀ e → (e ∈ I₀) → (pre₀(e) ⊨ pre₁(e))
+   field int-post₁⊨pre₂ : ∀ e → (e ∈ I₀) → (post₁(e) ⊨ pre₂(e))
+   field int-post₂⊨post₀ : ∀ e → (e ∈ I₀) → (post₂(e) ⊨ post₀(e))
 
-    right : ∀ {d e} →
-      let open Pomset P₂ using () renaming (_≤_ to _≤₂_) in
-      (d ≤₂ e) →
-      -------------------------
-      ((d , e) ∈ ≤-COMP P₁ P₂)
+   field pre′₂ : Event → Formula
+   field pre′₂✓ : ∀ e → (e ∈ X₂) → (↓₀(e) ▷₁ (pre′₂(e) , pre₂(e)))
 
-    coherence : ∀ {d e} →
-      let open Pomset P₁ using () renaming (E to E₁ ; act to act₁) in
-      let open Pomset P₂ using () renaming (E to E₂ ; act to act₂) in
-      (d ∈ E₁) →
-      (e ∈ E₂) →
-      (act₁(d) , act₂(e)) ∈ Conflicts →
-      -------------------------
-      ((d , e) ∈ ≤-COMP P₁ P₂)
+   field ext-pre₀⊨pre₁ : ∀ e → (e ∈ X₁) → (e ∉ E₂) → (pre₀(e) ⊨ pre₁(e))
+   field ext-pre₀⊨pre′₂ : ∀ e → (e ∉ E₁) → (e ∈ X₂) → (pre₀(e) ⊨ pre′₂(e))
+   field ext-pre₀⊨pre₁∨pre′₂ : ∀ e → (e ∈ X₁) → (e ∈ X₂) → (pre₀(e) ⊨ (pre₁(e) ∨ pre′₂(e)))
+   
+   field ext-act₀=act₁ : ∀ e → (e ∈ X₁) → (act₀(e) ≡ act₁(e))
+   field ext-act₀=act₂ : ∀ e → (e ∈ X₂) → (act₀(e) ≡ act₂(e))
 
-  data ⟦_⟧ : Command → Pomset → Set₁ where
+   field ≤₁⊆≤₀ : ∀ d e → (d ∈ E₀) → (e ∈ E₀) → (d ≤₁ e) → (d ≤₀ e)
+   field ≤₂⊆≤₀ : ∀ d e → (d ∈ E₀) → (e ∈ E₀) → (d ≤₂ e) → (d ≤₀ e)
+   field coherence :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → ((act₁(e) , act₂(e)) ∈ Conflicts) → (d ≤₀ e)
+   
+  record _◁_ (ϕ : Formula) (𝒫₁ : Pomset → Set₁) (P : Pomset) : Set₁ where
+    -- TODO
+    
+  record LOAD (r : Register) (a : Address)  (P : Pomset) : Set₁ where
+    -- TODO
 
-    ⟦skip⟧ : ∀ P₀ →
-      let open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; pre to pre₀ ; post to post₀) in
-      (E₀ ⊆ I₀) →
-      (∀ e → (e ∈ E₀) → (pre₀(e) ⊨ post₀(e))) →
-      (P₀ ∈ ⟦ skip ⟧)
-      
-    ⟦comp⟧ : ∀ C₁ C₂ P₀ P₁ P₂ →    
-      let open Pomset P₀ using () renaming (E to E₀ ; V to V₀ ; _≤_ to _≤₀_) in
-      let open Pomset P₁ using () renaming (V to V₁) in
-      let open Pomset P₂ using () renaming (V to V₂) in
-      (P₁ ∈ ⟦ C₁ ⟧) →
-      (P₂ ∈ ⟦ C₂ ⟧) →
-      ((V₁ ∪ V₂) ⊆ V₀) →
-      (∀ e → (e ∈ E₀) → (e ∈ ℓ-COMP P₀ P₁ P₂)) →
-      (∀ d e → ((d , e) ∈ ≤-COMP P₁ P₂) → (d ≤₀ e)) →
-      (P₀ ∈ ⟦ C₁ ∙ C₂ ⟧)
+  record STORE (a : Address) (M : Expression) (P : Pomset) : Set₁ where
+    -- TODO
+  
+  record LET (r : Register) (M : Expression) (P : Pomset) : Set₁ where
+    -- TODO
+  
+  ⟦_⟧ : Command → Pomset → Set₁
+  ⟦ skip ⟧ = SKIP
+  ⟦ C₁ ∙ C₂ ⟧ = ⟦ C₁ ⟧ ● ⟦ C₂ ⟧
+  ⟦ if ϕ then C ⟧ = ϕ ◁ ⟦ C ⟧
+  ⟦ r :=[ a ] ⟧ = LOAD r a
+  ⟦ [ a ]:= M ⟧ = STORE a M
+  ⟦ r := M ⟧ = LET r M
