@@ -43,16 +43,7 @@ module prelude where
     constructor _,_
     field fst : X
     field snd : Y
-
-  data _⊎_ (X Y : Set) : Set where
-    inl : X → (X ⊎ Y)
-    inr : Y → (X ⊎ Y)
-
   open _×_ public
-
-  data Maybe (X : Set) : Set where
-    none : Maybe X
-    some : X → Maybe X
 
   _∈_ : ∀ {α} {X : Set α} → X → (X → Set α) → Set α
   e ∈ E = E e
@@ -69,8 +60,10 @@ module prelude where
   _∩_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
   (E ∩ F) = λ e → (e ∈ E) × (e ∈ F)
   
-  _∪_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
-  (E ∪ F) = λ e → (e ∈ E) ⊎ (e ∈ F)
+  data _∪_ {X : Set} (E F : X → Set) (e : X) : Set where
+    left : (e ∈ E) → (e ∉ F) → (e ∈ (E ∪ F))
+    right : (e ∉ E) → (e ∈ F) → (e ∈ (E ∪ F))
+    both : (e ∈ E) → (e ∈ F) → (e ∈ (E ∪ F))
   
   data ℕ : Set where
     zero : ℕ

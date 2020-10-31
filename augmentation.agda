@@ -59,7 +59,8 @@ module augmentation (DM : DataModel) (Event : Set) where
   sem-resp-≲ {P₀} {Q₀} {C₁ ∙ C₂} P₀≲Q₀ P₀∈⟦C₁⟧●⟦C₂⟧ = Q₀∈⟦C₁⟧●⟦C₂⟧ where
 
     open _●_ P₀∈⟦C₁⟧●⟦C₂⟧
-    open Pomset P₁ using () renaming (▷-resp-⊆ to ▷₁-resp-⊆)
+    open Pomset P₁ using () renaming (X⊆E to X₁⊆E₁ ; ▷-resp-⊆ to ▷₁-resp-⊆)
+    open Pomset P₂ using () renaming (X⊆E to X₂⊆E₂)
     open Pomset Q₀ using () renaming (I⊆E to J₀⊆F₀ ; X⊆E to Y₀⊆F₀)
     open _≲_ P₀≲Q₀ using () renaming (F⊆E to F₀⊆E₀ ; X⊆Y to X₀⊆Y₀ ; Y⊆X to Y₀⊆X₀ ; J⊆I to J₀⊆I₀ ; act=bct to act₀=bct₀ ; qre⊨pre to qre₀⊨pre₀ ; post⊨qost to post₀⊨qost₀ ; ↓⊆⇓ to ↓₀⊆⇓₀ ; ≤⊆≼ to ≤₀⊆≼₀) 
 
@@ -72,17 +73,18 @@ module augmentation (DM : DataModel) (Event : Set) where
                      ; E₀⊆E₁∪E₂ = λ e e∈F₀ → E₀⊆E₁∪E₂ e (F₀⊆E₀ e e∈F₀)
                      ; I₀⊆I₁∩I₂ = λ e e∈J₀ → I₀⊆I₁∩I₂ e (J₀⊆I₀ e e∈J₀)
                      ; X₀⊆X₁∪X₂ = λ e e∈Y₀ → X₀⊆X₁∪X₂ e (Y₀⊆X₀ e e∈Y₀) 
-                     ; X₁∪X₂⊆X₀ = λ e e∈X₁∪X₂ → X₀⊆Y₀ e (X₁∪X₂⊆X₀ e e∈X₁∪X₂) 
+                     ; X₁⊆X₀ = λ e e∈X₁ → X₀⊆Y₀ e (X₁⊆X₀ e e∈X₁) 
+                     ; X₂⊆X₀ = λ e e∈X₂ → X₀⊆Y₀ e (X₂⊆X₀ e e∈X₂) 
                      ; int-pre₀⊨pre₁ = λ e e∈J₀ → ⊨-trans (qre₀⊨pre₀ e (J₀⊆F₀ e e∈J₀)) (int-pre₀⊨pre₁ e (J₀⊆I₀ e e∈J₀))
                      ; int-post₁⊨pre₂ = λ e e∈J₀ → int-post₁⊨pre₂ e (J₀⊆I₀ e e∈J₀)
                      ; int-post₂⊨post₀ = λ e e∈J₀ → ⊨-trans (int-post₂⊨post₀ e (J₀⊆I₀ e e∈J₀)) (post₀⊨qost₀ e e∈J₀)
                      ; pre′₂ = pre′₂
                      ; pre′₂✓ = λ e e∈X₂ → ▷₁-resp-⊆ (↓₀⊆⇓₀ e) (pre′₂✓ e e∈X₂)
-                     ; ext-pre₀⊨pre₁ = λ e e∈X₁ e∉E₂ → ⊨-trans (qre₀⊨pre₀ e (Y₀⊆F₀ e (X₀⊆Y₀ e (X₁∪X₂⊆X₀ e (inl e∈X₁))))) (ext-pre₀⊨pre₁ e e∈X₁ e∉E₂)
-                     ; ext-pre₀⊨pre′₂ = λ e e∉E₁ e∈X₂ → ⊨-trans (qre₀⊨pre₀ e (Y₀⊆F₀ e (X₀⊆Y₀ e (X₁∪X₂⊆X₀ e (inr e∈X₂))))) (ext-pre₀⊨pre′₂ e e∉E₁ e∈X₂)
-                     ; ext-pre₀⊨pre₁∨pre′₂ = λ e e∈X₁ e∈X₂ → ⊨-trans (qre₀⊨pre₀ e (Y₀⊆F₀ e (X₀⊆Y₀ e (X₁∪X₂⊆X₀ e (inl e∈X₁))))) (ext-pre₀⊨pre₁∨pre′₂ e e∈X₁ e∈X₂)
-                     ; ext-act₀=act₁ = λ e e∈X₁ → ≡-trans (≡-symm (act₀=bct₀ e (X₀⊆Y₀ e (X₁∪X₂⊆X₀ e (inl e∈X₁))))) (ext-act₀=act₁ e e∈X₁)
-                     ; ext-act₀=act₂ =  λ e e∈X₂ → ≡-trans (≡-symm (act₀=bct₀ e (X₀⊆Y₀ e (X₁∪X₂⊆X₀ e (inr e∈X₂))))) (ext-act₀=act₂ e e∈X₂)
+                     ; ext-pre₀⊨pre₁ = λ e e∈X₁ e∉E₂ → ⊨-trans (qre₀⊨pre₀ e (Y₀⊆F₀ e (X₀⊆Y₀ e (X₁⊆X₀ e e∈X₁)))) (ext-pre₀⊨pre₁ e e∈X₁ e∉E₂)
+                     ; ext-pre₀⊨pre′₂ = λ e e∉E₁ e∈X₂ → ⊨-trans (qre₀⊨pre₀ e (Y₀⊆F₀ e (X₀⊆Y₀ e (X₂⊆X₀ e e∈X₂)))) (ext-pre₀⊨pre′₂ e e∉E₁ e∈X₂)
+                     ; ext-pre₀⊨pre₁∨pre′₂ = λ e e∈X₁ e∈X₂ → ⊨-trans (qre₀⊨pre₀ e (Y₀⊆F₀ e (X₀⊆Y₀ e (X₁⊆X₀ e e∈X₁)))) (ext-pre₀⊨pre₁∨pre′₂ e e∈X₁ e∈X₂)
+                     ; ext-act₀=act₁ = λ e e∈X₁ → ≡-trans (≡-symm (act₀=bct₀ e (X₀⊆Y₀ e (X₁⊆X₀ e e∈X₁)))) (ext-act₀=act₁ e e∈X₁)
+                     ; ext-act₀=act₂ =  λ e e∈X₂ → ≡-trans (≡-symm (act₀=bct₀ e (X₀⊆Y₀ e (X₂⊆X₀ e e∈X₂)))) (ext-act₀=act₂ e e∈X₂)
                      ; ≤₁⊆≤₀ = λ d e d∈E₁ e∈E₁ d≤₁e → ≤₀⊆≼₀ d e (≤₁⊆≤₀ d e d∈E₁ e∈E₁ d≤₁e)
                      ; ≤₂⊆≤₀ = λ d e d∈E₂ e∈E₂ d≤₂e → ≤₀⊆≼₀ d e (≤₂⊆≤₀ d e d∈E₂ e∈E₂ d≤₂e)
                      ; coherence = λ d e d∈X₁ e∈X₂ d#e → ≤₀⊆≼₀ d e (coherence d e d∈X₁ e∈X₂ d#e)

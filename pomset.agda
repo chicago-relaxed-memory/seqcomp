@@ -80,8 +80,8 @@ module pomset (DM : DataModel) (Event : Set) where
     
     E⊆I∪X : (E ⊆ (I ∪ X))
     E⊆I∪X e e∈E with dec-Externals (act(e))
-    E⊆I∪X e e∈E | yes ae∈X = inr (e∈E , ae∈X)
-    E⊆I∪X e e∈E | no  ae∉X = inl (e∈E , ae∉X)
+    E⊆I∪X e e∈E | yes ae∈X = right (λ{ (_ , ae∉X) → ae∉X ae∈X }) (e∈E , ae∈X)
+    E⊆I∪X e e∈E | no  ae∉X = left (e∈E , ae∉X) λ{ (_ , ae∈X) → ae∉X ae∈X }
     
     dec-X : ∀ e → (e ∈ E) → Dec(e ∈ X)
     dec-X e e∈E with dec-Externals(act(e))

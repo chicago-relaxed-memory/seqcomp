@@ -33,7 +33,8 @@ module semantics (DM : DataModel) (Event : Set) where
    field E₀⊆E₁∪E₂ : E₀ ⊆ (E₁ ∪ E₂)
    field I₀⊆I₁∩I₂ : I₀ ⊆ (I₁ ∩ I₂)
    field X₀⊆X₁∪X₂ : (X₀ ⊆ (X₁ ∪ X₂))
-   field X₁∪X₂⊆X₀ : ((X₁ ∪ X₂) ⊆ X₀)
+   field X₁⊆X₀ : (X₁ ⊆ X₀)
+   field X₂⊆X₀ : (X₂ ⊆ X₀)
 
    field int-pre₀⊨pre₁ : ∀ e → (e ∈ I₀) → (pre₀(e) ⊨ pre₁(e))
    field int-post₁⊨pre₂ : ∀ e → (e ∈ I₀) → (post₁(e) ⊨ pre₂(e))
