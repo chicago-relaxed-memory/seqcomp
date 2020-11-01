@@ -56,7 +56,7 @@ module pomset (DM : DataModel) (Event : Set) where
     (d < e) = (d ≤ e) × (d ≢ e)
 
     ↓ : Event → Event → Set
-    ↓(e) = λ d → (d ≤ e)
+    ↓(e) = λ d → (d ∈ E) × (d ≤ e)
 
     X : Event → Set
     X(e) = (e ∈ E) × (act(e) ∈ Externals)
@@ -67,7 +67,7 @@ module pomset (DM : DataModel) (Event : Set) where
     field ≤-refl : ∀ {e} → (e ≤ e)
     field ≤-trans : ∀ {c d e} → (c ≤ d) → (d ≤ e) → (c ≤ e)
     field ≤-asym : ∀ {d e} → (e ≤ d) → (d ≤ e) → (d ≡ e)
-    field ✓-max : ∀ {d e} → (d < e) → (d ∈ X)
+    field I-max : ∀ {d e} → (d ≤ e) → (d ∈ I) → (d ≡ e)
 
     X⊆E : (X ⊆ E)
     X⊆E e (e∈E , _) = e∈E
@@ -78,10 +78,10 @@ module pomset (DM : DataModel) (Event : Set) where
     I∩X⊆∅ : ((I ∩ X) ⊆ ∅)
     I∩X⊆∅ e ((_ , ae∉X) , (_ , ae∈X)) = ae∉X ae∈X
     
-    E⊆I∪X : (E ⊆ (I ∪ X))
-    E⊆I∪X e e∈E with dec-Externals (act(e))
-    E⊆I∪X e e∈E | yes ae∈X = right (λ{ (_ , ae∉X) → ae∉X ae∈X }) (e∈E , ae∈X)
-    E⊆I∪X e e∈E | no  ae∉X = left (e∈E , ae∉X) λ{ (_ , ae∈X) → ae∉X ae∈X }
+    E⊆I⊎X : (E ⊆ (I ⊎ X))
+    E⊆I⊎X e e∈E with dec-Externals (act(e))
+    E⊆I⊎X e e∈E | yes ae∈X = right (λ{ (_ , ae∉X) → ae∉X ae∈X }) (e∈E , ae∈X)
+    E⊆I⊎X e e∈E | no  ae∉X = left (e∈E , ae∉X) λ{ (_ , ae∈X) → ae∉X ae∈X }
     
     dec-X : ∀ e → (e ∈ E) → Dec(e ∈ X)
     dec-X e e∈E with dec-Externals(act(e))

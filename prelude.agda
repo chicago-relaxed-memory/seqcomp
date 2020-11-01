@@ -65,6 +65,10 @@ module prelude where
     right : (e ∉ E) → (e ∈ F) → (e ∈ (E ∪ F))
     both : (e ∈ E) → (e ∈ F) → (e ∈ (E ∪ F))
   
+  data _⊎_ {X : Set} (E F : X → Set) (e : X) : Set where
+    left : (e ∈ E) → (e ∉ F) → (e ∈ (E ⊎ F))
+    right : (e ∉ E) → (e ∈ F) → (e ∈ (E ⊎ F))
+
   data ℕ : Set where
     zero : ℕ
     succ : ℕ → ℕ
