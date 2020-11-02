@@ -45,6 +45,7 @@ module semantics (DM : DataModel) (Event : Set) where
    field int-post₂⊨post₀ : ∀ e → (e ∈ I₀) → (post₂(e) ⊨ post₀(e))
 
    field pre′₂ : Event → Formula
+   -- TODO weaker condition for reads than writes?
    field pre′₂✓ : ∀ e → (e ∈ X₂) → (↓₀(e) ▷₁ (pre′₂(e) , pre₂(e)))
           
    field ext-pre₀⊨pre₁ : ∀ e → (e ∈ X₁) → (e ∉ E₂) → (pre₀(e) ⊨ pre₁(e))
