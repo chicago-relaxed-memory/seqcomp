@@ -93,12 +93,12 @@ module properties (DM : DataModel) (Event : Set) where
     
     P₁≲P₀ : P₁ ≲ P₀
     P₁≲P₀ = record
-              { F⊆E = E₀⊆E₁
-              ; X⊆Y = λ e e∈X₁ → X₁⊆X₀ e e∈X₁
-              ; act=bct = λ e e∈X₀ → ≡-symm (ext-act₀=act₁ e (X₀⊆X₁ e e∈X₀))
-              ; qre⊨pre = pre₀⊨pre₁
-              ; post⊨qost = λ e e∈I₀ → ⊨-trans (int-post₁⊨pre₂ e e∈I₀) (⊨-trans (pre₂⊨post₂ e (I₂⊆E₂ e (I₀⊆I₂ e e∈I₀))) (int-post₂⊨post₀ e e∈I₀))
-              ; ≤⊆≼ = λ d e d∈E₀ e∈E₀ d≤₁e → ≤₁⊆≤₀ d e (d∈E₀ , (E₀⊆E₁ d d∈E₀)) (e∈E₀ , (E₀⊆E₁ e e∈E₀)) d≤₁e
+              { E′⊆E = E₀⊆E₁
+              ; X⊆X′ = λ e e∈X₁ → X₁⊆X₀ e e∈X₁
+              ; act=act′ = λ e e∈X₀ → ≡-symm (ext-act₀=act₁ e (X₀⊆X₁ e e∈X₀))
+              ; pre′⊨pre = pre₀⊨pre₁
+              ; post⊨post′ = λ e e∈I₀ → ⊨-trans (int-post₁⊨pre₂ e e∈I₀) (⊨-trans (pre₂⊨post₂ e (I₂⊆E₂ e (I₀⊆I₂ e e∈I₀))) (int-post₂⊨post₀ e e∈I₀))
+              ; ≤⊆≤′ = λ d e d∈E₀ e∈E₀ d≤₁e → ≤₁⊆≤₀ d e (d∈E₀ , (E₀⊆E₁ d d∈E₀)) (e∈E₀ , (E₀⊆E₁ e e∈E₀)) d≤₁e
               }
     
     P₀∈⟦C⟧ = sem-resp-≲ P₁≲P₀ P₁∈⟦C⟧
