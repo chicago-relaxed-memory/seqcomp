@@ -1,3 +1,4 @@
+
 open import prelude
 open import data-model using ( DataModel )
 import command
@@ -5,7 +6,7 @@ import pomset
 import semantics
 import augmentation
 
-module properties (DM : DataModel) (Event : Set) where
+module monoid (DM : DataModel) (Event : Set) where
 
   open DataModel DM
   open command(DM)
@@ -13,8 +14,20 @@ module properties (DM : DataModel) (Event : Set) where
   open semantics(DM)(Event)
   open augmentation(DM)(Event)
 
-  right-unit-sub : ∀ C → ⟦ C ⟧ ⊆ ⟦ C ∙ skip ⟧
-  right-unit-sub C P₀ P₀∈⟦C⟧ = P₀∈⟦C∙skip⟧ where
+  -- PROPOSITION: sequential composition forms a monoid
+  
+  ⟦C⟧⊆⟦C∙skip⟧ : ∀ C → ⟦ C ⟧ ⊆ ⟦ C ∙ skip ⟧
+  ⟦C∙skip⟧⊆⟦C⟧ : ∀ C → ⟦ C ∙ skip ⟧ ⊆ ⟦ C ⟧
+
+  ⟦C⟧⊆⟦skip∙C⟧ : ∀ C → ⟦ C ⟧ ⊆ ⟦ skip ∙ C ⟧
+  ⟦skip∙C⟧⊆⟦C⟧ : ∀ C → ⟦ skip ∙ C ⟧ ⊆ ⟦ C ⟧
+
+  ⟦C₁∙⟨C₂∙C₃⟩⟧⊆⟦⟨C₁∙C₂⟩∙C₃⟧ : ∀ C₁ C₂ C₃ → ⟦ C₁ ∙ (C₂ ∙ C₃) ⟧ ⊆ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
+  ⟦⟨C₁∙C₂⟩∙C₃⟧⊆⟦C₁∙⟨C₂∙C₃⟩⟧ : ∀ C₁ C₂ C₃ → ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧ ⊆ ⟦ C₁ ∙ (C₂ ∙ C₃) ⟧
+
+  -- PROOF that skip is a right unit
+  
+  ⟦C⟧⊆⟦C∙skip⟧ C P₀ P₀∈⟦C⟧ = P₀∈⟦C∙skip⟧ where
 
     open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; E⊆I⊎X to E₀⊆I₀⊎X₀ ; I∩X⊆∅ to I₀∩X₀⊆∅ ; post to post₀ ; ≤-refl to ≤₀-refl)
 
@@ -66,8 +79,7 @@ module properties (DM : DataModel) (Event : Set) where
                     ; coherence =  λ d e d∈X₁ ()
                     }
 
-  right-unit-sup : ∀ C → ⟦ C ∙ skip ⟧ ⊆ ⟦ C ⟧
-  right-unit-sup C P₀ P₀∈⟦C∙skip⟧ = P₀∈⟦C⟧ where
+  ⟦C∙skip⟧⊆⟦C⟧ C P₀ P₀∈⟦C∙skip⟧ = P₀∈⟦C⟧ where
 
     open _●_ P₀∈⟦C∙skip⟧ using (P₁ ; P₂ ; E₀⊆E₁∪E₂ ; I₀⊆I₁ ; I₀⊆I₂ ; X₁⊆X₀ ; X₂⊆X₀ ; X₀⊆X₁∪X₂ ; X₀∩E₂⊆X₂ ; ext-act₀=act₁ ; int-pre₀⊨pre₁ ; int-post₁⊨pre₂ ; int-post₂⊨post₀ ; ext-pre₀⊨pre₁ ; ≤₁⊆≤₀) renaming (P₁∈𝒫₁ to P₁∈⟦C⟧ ; P₂∈𝒫₂ to P₂∈⟦skip⟧)
     open SKIP P₂∈⟦skip⟧ using () renaming (X₀⊆∅ to X₂⊆∅ ; pre₀⊨post₀ to pre₂⊨post₂)
@@ -102,3 +114,16 @@ module properties (DM : DataModel) (Event : Set) where
               }
     
     P₀∈⟦C⟧ = sem-resp-≲ P₁≲P₀ P₁∈⟦C⟧
+
+  -- PROOF that skip is a left unit
+
+  ⟦C⟧⊆⟦skip∙C⟧ = {!!}
+  
+  ⟦skip∙C⟧⊆⟦C⟧ = {!!}
+  
+  -- PROOF of associativity
+
+  ⟦C₁∙⟨C₂∙C₃⟩⟧⊆⟦⟨C₁∙C₂⟩∙C₃⟧ = {!!}
+  ⟦⟨C₁∙C₂⟩∙C₃⟧⊆⟦C₁∙⟨C₂∙C₃⟩⟧ = {!!}
+
+  -- QED
