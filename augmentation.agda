@@ -74,13 +74,12 @@ module augmentation (DM : DataModel) (Event : Set) where
                      ; P₂ = P₂
                      ; P₁∈𝒫₁ = P₁∈𝒫₁
                      ; P₂∈𝒫₂ = P₂∈𝒫₂
+                     ; E₀⊆E₁∪E₂ = λ e e∈E′₀ → E₀⊆E₁∪E₂ e (E′₀⊆E₀ e e∈E′₀) 
                      ; I₀⊆I₁ = λ e e∈I′₀ → I₀⊆I₁ e (I′₀⊆I₀ e e∈I′₀)
                      ; I₀⊆I₂ = λ e e∈I′₀ → I₀⊆I₂ e (I′₀⊆I₀ e e∈I′₀)
                      ; X₀⊆X₁∪X₂ = λ e e∈X′₀ → X₀⊆X₁∪X₂ e (X′₀⊆X₀ e e∈X′₀) 
                      ; X₁⊆X₀ = λ e e∈X₁ → X₀⊆X′₀ e (X₁⊆X₀ e e∈X₁) 
                      ; X₂⊆X₀ = λ e e∈X₂ → X₀⊆X′₀ e (X₂⊆X₀ e e∈X₂)
-                     ; I₁∩X₂⊆∅ = I₁∩X₂⊆∅ 
-                     ; I₂∩X₁⊆∅ = I₂∩X₁⊆∅
                      ; int-pre₀⊨pre₁ = λ e e∈I′₀ → ⊨-trans (pre′₀⊨pre₀ e (I′₀⊆E′₀ e e∈I′₀)) (int-pre₀⊨pre₁ e (I′₀⊆I₀ e e∈I′₀))
                      ; int-post₁⊨pre₂ = λ e e∈I′₀ → int-post₁⊨pre₂ e (I′₀⊆I₀ e e∈I′₀)
                      ; int-post₂⊨post₀ = λ e e∈I′₀ → ⊨-trans (int-post₂⊨post₀ e (I′₀⊆I₀ e e∈I′₀)) (post₀⊨post′₀ e e∈I′₀)
