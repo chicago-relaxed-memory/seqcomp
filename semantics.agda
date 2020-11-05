@@ -27,8 +27,8 @@ module semantics (DM : DataModel) (Event : Set) where
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
    open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; X to X₀ ; X⊆E to X₀⊆E₀ ; E⊆I⊎X to E₀⊆I₀⊎X₀ ; I∩X⊆∅ to I₀∩X₀⊆∅ ; act to act₀ ; pre to pre₀ ; post to post₀ ; _≤_ to _≤₀_ ; ↓ to ↓₀)
-   open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; X to X₁ ; X⊆E to X₁⊆E₁ ; E⊆I⊎X to E₁⊆I₁⊎X₁ ; I⊆E to I₁⊆E₁ ; I∩X⊆∅ to I₁∩X₁⊆∅ ; act to act₁ ; pre to pre₁ ; post to post₁ ; _≤_ to _≤₁_ ; _▷_ to _▷₁_)
-   open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; X to X₂ ; X⊆E to X₂⊆E₂ ; E⊆I⊎X to E₂⊆I₂⊎X₂ ; I⊆E to I₂⊆E₂ ; I∩X⊆∅ to I₂∩X₂⊆∅ ; act to act₂ ; pre to pre₂ ; post to post₂ ; _≤_ to _≤₂_)
+   open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; X to X₁ ; RE to RE₁ ; X⊆E to X₁⊆E₁ ; E⊆I⊎X to E₁⊆I₁⊎X₁ ; I⊆E to I₁⊆E₁ ; I∩X⊆∅ to I₁∩X₁⊆∅ ; act to act₁ ; pre to pre₁ ; post to post₁ ; _≤_ to _≤₁_)
+   open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; X to X₂ ; WE to WE₂ ; X⊆E to X₂⊆E₂ ; E⊆I⊎X to E₂⊆I₂⊎X₂ ; I⊆E to I₂⊆E₂ ; I∩X⊆∅ to I₂∩X₂⊆∅ ; act to act₂ ; pre to pre₂ ; post to post₂ ; _≤_ to _≤₂_)
 
    field E₀⊆E₁∪E₂ : (E₀ ⊆ (E₁ ∪ E₂))
    
@@ -43,10 +43,15 @@ module semantics (DM : DataModel) (Event : Set) where
    field int-post₁⊨pre₂ : ∀ e → (e ∈ I₀) → (post₁(e) ⊨ pre₂(e))
    field int-post₂⊨post₀ : ∀ e → (e ∈ I₀) → (post₂(e) ⊨ post₀(e))
 
-   field pre′₂ : Event → Formula
-   -- TODO weaker condition for reads than writes?
-   field pre′₂✓ : ∀ e → (e ∈ X₂) → (↓₀(e) ▷₁ (pre′₂(e) , pre₂(e)))
-          
+   -- TODO bikeshed the name
+   field just : Event → Event
+   field just-I : ∀ e → (e ∈ X₂) → (just(e) ∈ I₁)
+   field just-≤ : ∀ d e → (d ∈ RE₁) → (e ∈ WE₂) → (d ≤₁ just(e)) → (d ≤₀ e)
+   
+   pre′₂ = λ e → pre₁(just(e))
+   post′₁ = λ e → post₁(just(e))
+   
+   field ext-post′₁⊨pre₂ : ∀ e → (e ∈ X₂) → (post′₁(e) ⊨ pre₂(e))
    field ext-pre₀⊨pre₁ : ∀ e → (e ∈ X₁) → (e ∉ X₂) → (pre₀(e) ⊨ pre₁(e))
    field ext-pre₀⊨pre′₂ : ∀ e → (e ∉ X₁) → (e ∈ X₂) → (pre₀(e) ⊨ pre′₂(e))
    field ext-pre₀⊨pre₁∨pre′₂ : ∀ e → (e ∈ X₁) → (e ∈ X₂) → (pre₀(e) ⊨ (pre₁(e) ∨ pre′₂(e)))

@@ -63,10 +63,13 @@ module augmentation (DM : DataModel) (Event : Set) where
   sem-resp-≲ {P₀} {P′₀} {C₁ ∙ C₂} P₀≲P′₀ P₀∈⟦C₁⟧●⟦C₂⟧ = P′₀∈⟦C₁⟧●⟦C₂⟧ where
 
     open _●_ P₀∈⟦C₁⟧●⟦C₂⟧
-    open Pomset P₁ using () renaming (X⊆E to X₁⊆E₁ ; ▷-resp-⊆ to ▷₁-resp-⊆)
-    open Pomset P₂ using () renaming (X⊆E to X₂⊆E₂)
+    open Pomset P₁ using () renaming (RE⊆X to RE₁⊆X₁)
+    open Pomset P₂ using () renaming (WE⊆X to WE₂⊆X₂)
     open Pomset P′₀ using () renaming (I⊆E to I′₀⊆E′₀ ; X⊆E to X′₀⊆E′₀)
     open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; X⊆X′ to X₀⊆X′₀ ; X′⊆X to X′₀⊆X₀ ; I′⊆I to I′₀⊆I₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; post⊨post′ to post₀⊨post′₀ ; ↓⊆↓′ to ↓₀⊆↓′₀ ; ≤⊆≤′ to ≤₀⊆≤′₀) 
+
+    X₁⊆X′₀ = λ e e∈X₁ → X₀⊆X′₀ e (X₁⊆X₀ e e∈X₁)
+    X₂⊆X′₀ = λ e e∈X₂ → X₀⊆X′₀ e (X₂⊆X₀ e e∈X₂)
 
     P′₀∈⟦C₁⟧●⟦C₂⟧ : P′₀ ∈ (⟦ C₁ ⟧ ● ⟦ C₂ ⟧)
     P′₀∈⟦C₁⟧●⟦C₂⟧ = record
@@ -78,21 +81,23 @@ module augmentation (DM : DataModel) (Event : Set) where
                      ; I₀⊆I₁ = λ e e∈I′₀ → I₀⊆I₁ e (I′₀⊆I₀ e e∈I′₀)
                      ; I₀⊆I₂ = λ e e∈I′₀ → I₀⊆I₂ e (I′₀⊆I₀ e e∈I′₀)
                      ; X₀⊆X₁∪X₂ = λ e e∈X′₀ → X₀⊆X₁∪X₂ e (X′₀⊆X₀ e e∈X′₀) 
-                     ; X₁⊆X₀ = λ e e∈X₁ → X₀⊆X′₀ e (X₁⊆X₀ e e∈X₁) 
-                     ; X₂⊆X₀ = λ e e∈X₂ → X₀⊆X′₀ e (X₂⊆X₀ e e∈X₂)
+                     ; X₁⊆X₀ = X₁⊆X′₀
+                     ; X₂⊆X₀ = X₂⊆X′₀
                      ; int-pre₀⊨pre₁ = λ e e∈I′₀ → ⊨-trans (pre′₀⊨pre₀ e (I′₀⊆E′₀ e e∈I′₀)) (int-pre₀⊨pre₁ e (I′₀⊆I₀ e e∈I′₀))
                      ; int-post₁⊨pre₂ = λ e e∈I′₀ → int-post₁⊨pre₂ e (I′₀⊆I₀ e e∈I′₀)
                      ; int-post₂⊨post₀ = λ e e∈I′₀ → ⊨-trans (int-post₂⊨post₀ e (I′₀⊆I₀ e e∈I′₀)) (post₀⊨post′₀ e e∈I′₀)
-                     ; pre′₂ = pre′₂
-                     ; pre′₂✓ = λ e e∈X₂ → ▷₁-resp-⊆ (↓₀⊆↓′₀ e (X′₀⊆E′₀ e (X₀⊆X′₀ e (X₂⊆X₀ e e∈X₂)))) (pre′₂✓ e e∈X₂)
-                     ; ext-pre₀⊨pre₁ = λ e e∈X₁ e∉E₂ → ⊨-trans (pre′₀⊨pre₀ e (X′₀⊆E′₀ e (X₀⊆X′₀ e (X₁⊆X₀ e e∈X₁)))) (ext-pre₀⊨pre₁ e e∈X₁ e∉E₂)
-                     ; ext-pre₀⊨pre′₂ = λ e e∉E₁ e∈X₂ → ⊨-trans (pre′₀⊨pre₀ e (X′₀⊆E′₀ e (X₀⊆X′₀ e (X₂⊆X₀ e e∈X₂)))) (ext-pre₀⊨pre′₂ e e∉E₁ e∈X₂)
-                     ; ext-pre₀⊨pre₁∨pre′₂ = λ e e∈X₁ e∈X₂ → ⊨-trans (pre′₀⊨pre₀ e (X′₀⊆E′₀ e (X₀⊆X′₀ e (X₁⊆X₀ e e∈X₁)))) (ext-pre₀⊨pre₁∨pre′₂ e e∈X₁ e∈X₂)
-                     ; ext-act₀=act₁ = λ e e∈X₁ → ≡-trans (≡-symm (act₀=act′₀ e (X₀⊆X′₀ e (X₁⊆X₀ e e∈X₁)))) (ext-act₀=act₁ e e∈X₁)
-                     ; ext-act₀=act₂ =  λ e e∈X₂ → ≡-trans (≡-symm (act₀=act′₀ e (X₀⊆X′₀ e (X₂⊆X₀ e e∈X₂)))) (ext-act₀=act₂ e e∈X₂)
+                     ; just = just
+                     ; just-I = just-I
+                     ; just-≤  = λ d e d∈RE₁ e∈WE₂ d≤₁e → ≤₀⊆≤′₀ d e (X′₀⊆E′₀ d (X₁⊆X′₀ d (RE₁⊆X₁ d d∈RE₁))) (X′₀⊆E′₀ e (X₂⊆X′₀ e (WE₂⊆X₂ e e∈WE₂))) (just-≤ d e d∈RE₁ e∈WE₂ d≤₁e)
+                     ; ext-post′₁⊨pre₂ = ext-post′₁⊨pre₂
+                     ; ext-pre₀⊨pre₁ = λ e e∈X₁ e∉E₂ → ⊨-trans (pre′₀⊨pre₀ e (X′₀⊆E′₀ e (X₁⊆X′₀ e e∈X₁))) (ext-pre₀⊨pre₁ e e∈X₁ e∉E₂)
+                     ; ext-pre₀⊨pre′₂ = λ e e∉E₁ e∈X₂ → ⊨-trans (pre′₀⊨pre₀ e (X′₀⊆E′₀ e (X₂⊆X′₀ e e∈X₂))) (ext-pre₀⊨pre′₂ e e∉E₁ e∈X₂)
+                     ; ext-pre₀⊨pre₁∨pre′₂ = λ e e∈X₁ e∈X₂ → ⊨-trans (pre′₀⊨pre₀ e (X′₀⊆E′₀ e (X₁⊆X′₀ e e∈X₁))) (ext-pre₀⊨pre₁∨pre′₂ e e∈X₁ e∈X₂)
+                     ; ext-act₀=act₁ = λ e e∈X₁ → ≡-trans (≡-symm (act₀=act′₀ e (X₁⊆X′₀ e e∈X₁))) (ext-act₀=act₁ e e∈X₁)
+                     ; ext-act₀=act₂ =  λ e e∈X₂ → ≡-trans (≡-symm (act₀=act′₀ e (X₂⊆X′₀ e e∈X₂))) (ext-act₀=act₂ e e∈X₂)
                      ; ≤₁⊆≤₀ = λ{ d e (d∈E′₀ , d∈E₁) (e∈E′₀ , e∈E₁) d≤₁e → ≤₀⊆≤′₀ d e d∈E′₀ e∈E′₀ (≤₁⊆≤₀ d e (E′₀⊆E₀ d d∈E′₀ , d∈E₁) (E′₀⊆E₀ e e∈E′₀ , e∈E₁) d≤₁e) }
                      ; ≤₂⊆≤₀ = λ{ d e (d∈E′₀ , d∈E₂) (e∈E′₀ , e∈E₂) d≤₂e → ≤₀⊆≤′₀ d e d∈E′₀ e∈E′₀ (≤₂⊆≤₀ d e (E′₀⊆E₀ d d∈E′₀ , d∈E₂) (E′₀⊆E₀ e e∈E′₀ , e∈E₂) d≤₂e) }
-                     ; coherence = λ d e d∈X₁ e∈X₂ d#e → ≤₀⊆≤′₀ d e (X′₀⊆E′₀ d (X₀⊆X′₀ d (X₁⊆X₀ d d∈X₁))) (X′₀⊆E′₀ e (X₀⊆X′₀ e (X₂⊆X₀ e e∈X₂))) (coherence d e d∈X₁ e∈X₂ d#e)
+                     ; coherence = λ d e d∈X₁ e∈X₂ d#e → ≤₀⊆≤′₀ d e (X′₀⊆E′₀ d (X₁⊆X′₀ d d∈X₁)) (X′₀⊆E′₀ e (X₂⊆X′₀ e e∈X₂)) (coherence d e d∈X₁ e∈X₂ d#e)
                      }
     
   -- TODO

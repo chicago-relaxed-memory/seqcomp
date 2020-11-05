@@ -18,10 +18,16 @@ module pomset (DM : DataModel) (Event : Set) where
   
   data Reads : Action → Set where
     R : ∀ {a v} → ((R a v) ∈ Reads)
-    
+
+  Reads⊆Externals : Reads ⊆ Externals
+  Reads⊆Externals _ R = R
+  
   data Writes : Action → Set where
     W : ∀ {a v} → ((W a v) ∈ Writes)
-    
+
+  Writes⊆Externals : Writes ⊆ Externals
+  Writes⊆Externals _ W = W
+  
   data Conflicts : (Action × Action) → Set where
     RW : ∀ {x v w} → ((R x v , W x w) ∈ Conflicts)
     WR : ∀ {x v w} → ((W x v , R x w) ∈ Conflicts)
@@ -64,6 +70,13 @@ module pomset (DM : DataModel) (Event : Set) where
     I : Event → Set
     I(e) = (e ∈ E) × (act(e) ∈ Internals)
 
+    RE : Event → Set
+    RE(e) = (e ∈ E) × (act(e) ∈ Reads)
+
+    WE : Event → Set
+    WE(e) = (e ∈ E) × (act(e) ∈ Writes)
+
+    field dec-E : ∀ e → Dec(e ∈ E)
     field ≤-refl : ∀ {e} → (e ≤ e)
     field ≤-trans : ∀ {c d e} → (c ≤ d) → (d ≤ e) → (c ≤ e)
     field ≤-asym : ∀ {d e} → (e ≤ d) → (d ≤ e) → (d ≡ e)
@@ -75,6 +88,18 @@ module pomset (DM : DataModel) (Event : Set) where
     I⊆E : (I ⊆ E)
     I⊆E e (e∈E , _) = e∈E
 
+    RE⊆E : (RE ⊆ E)
+    RE⊆E e (e∈E , _) = e∈E
+
+    RE⊆X : (RE ⊆ X)
+    RE⊆X e (e∈E , a∈R) = (e∈E , Reads⊆Externals _ a∈R)
+
+    WE⊆E : (WE ⊆ E)
+    WE⊆E e (e∈E , _) = e∈E
+
+    WE⊆X : (WE ⊆ X)
+    WE⊆X e (e∈E , a∈W) = (e∈E , Writes⊆Externals _ a∈W)
+
     I∩X⊆∅ : ((I ∩ X) ⊆ ∅)
     I∩X⊆∅ e ((_ , ae∉X) , (_ , ae∈X)) = ae∉X ae∈X
     
@@ -83,20 +108,14 @@ module pomset (DM : DataModel) (Event : Set) where
     E⊆I⊎X e e∈E | yes ae∈X = right (λ{ (_ , ae∉X) → ae∉X ae∈X }) (e∈E , ae∈X)
     E⊆I⊎X e e∈E | no  ae∉X = left (e∈E , ae∉X) λ{ (_ , ae∈X) → ae∉X ae∈X }
     
-    dec-X : ∀ e → (e ∈ E) → Dec(e ∈ X)
-    dec-X e e∈E with dec-Externals(act(e))
-    dec-X e e∈E | yes a∈X = yes (e∈E , a∈X)
-    dec-X e e∈E | no  a∉X = no (λ e∈X → a∉X (snd e∈X))
+    dec-I : ∀ e → Dec(e ∈ I)
+    dec-I e with dec-E(e) | dec-Externals(act(e))
+    dec-I e | yes e∈E | yes a∈X = no (λ e∈I → snd e∈I a∈X)
+    dec-I e | yes e∈E | no  a∉X = yes (e∈E , a∉X)
+    dec-I e | no e∉E  | _ = no (λ e∈I → e∉E (I⊆E e e∈I))
     
-    data _▷_ (D : Event → Set) (ϕψ : (Formula × Formula)) : Set where
-      ▷-defn : ∀ e →
-        (e ∈ I) →
-        (fst(ϕψ) ⊨ pre(e)) →
-        (post(e) ⊨ snd(ϕψ)) →
-        (∀ d → (d < e) → (d ∈ D)) →
-        ---------------------------
-        D ▷ ϕψ
-
-    ▷-resp-⊆ : ∀ {C D ϕ ψ} → (C ⊆ D) → (C ▷ (ϕ , ψ)) → (D ▷ (ϕ , ψ))
-    ▷-resp-⊆ C⊆D (▷-defn e e∈I ϕ⊨pre post⊨ψ d<e⇒d∈C) = ▷-defn e e∈I ϕ⊨pre post⊨ψ (λ d d<e → C⊆D d (d<e⇒d∈C d d<e))
-    
+    dec-X : ∀ e → Dec(e ∈ X)
+    dec-X e with dec-E(e) | dec-Externals(act(e))
+    dec-X e | yes e∈E | yes a∈X = yes (e∈E , a∈X)
+    dec-X e | yes e∈E | no  a∉X = no (λ e∈X → a∉X (snd e∈X))
+    dec-X e | no e∉E  | _ = no (λ e∈X → e∉E (X⊆E e e∈X))

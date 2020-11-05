@@ -64,7 +64,18 @@ module prelude where
     left : (e ∈ E) → (e ∉ F) → (e ∈ (E ∪ F))
     right : (e ∉ E) → (e ∈ F) → (e ∈ (E ∪ F))
     both : (e ∈ E) → (e ∈ F) → (e ∈ (E ∪ F))
+
+  neither : ∀ {X E F} {e : X} → (e ∉ E) → (e ∉ F) → (e ∉ (E ∪ F))
+  neither e∉E e∉F (left e∈E _) = e∉E e∈E
+  neither e∉E e∉F (right _ e∈F) = e∉F e∈F
+  neither e∉E e∉F (both e∈E _) = e∉E e∈E
   
+  dec-∪ : ∀ {X E F} {e : X} → Dec(e ∈ E) → Dec(e ∈ F) → Dec(e ∈ (E ∪ F))
+  dec-∪ (yes e∈E) (yes e∈F) = yes (both e∈E e∈F)
+  dec-∪ (yes e∈E) (no e∉F) = yes (left e∈E e∉F)
+  dec-∪ (no e∉E) (yes e∈F) = yes (right e∉E e∈F)
+  dec-∪ (no e∉E) (no e∉F)  = no (neither e∉E e∉F)
+
   data _⊎_ {X : Set} (E F : X → Set) (e : X) : Set where
     left : (e ∈ E) → (e ∉ F) → (e ∈ (E ⊎ F))
     right : (e ∉ E) → (e ∈ F) → (e ∈ (E ⊎ F))
