@@ -60,6 +60,9 @@ module prelude where
   _∩_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
   (E ∩ F) = λ e → (e ∈ E) × (e ∈ F)
   
+  _∖_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
+  (E ∖ F) = λ e → (e ∈ E) × (e ∉ F)
+  
   data _∪_ {X : Set} (E F : X → Set) (e : X) : Set where
     left : (e ∈ E) → (e ∉ F) → (e ∈ (E ∪ F))
     right : (e ∉ E) → (e ∈ F) → (e ∈ (E ∪ F))
@@ -75,6 +78,25 @@ module prelude where
   dec-∪ (yes e∈E) (no e∉F) = yes (left e∈E e∉F)
   dec-∪ (no e∉E) (yes e∈F) = yes (right e∉E e∈F)
   dec-∪ (no e∉E) (no e∉F)  = no (neither e∉E e∉F)
+
+  E∪F⊆F∪E : ∀ {X} {E F : X → Set} → (E ∪ F) ⊆ (F ∪ E)
+  E∪F⊆F∪E e (left e∈E e∉F) = right e∉F e∈E
+  E∪F⊆F∪E e (right e∉E e∈F) = left e∈F e∉E
+  E∪F⊆F∪E e (both e∈E e∈F) = both e∈F e∈E
+  
+  E∪F∖F⊆E∖F : ∀ {X} {E F : X → Set} → ((E ∪ F) ∖ F) ⊆ (E ∖ F)
+  E∪F∖F⊆E∖F e (left e∈E _ , e∉F) = (e∈E , e∉F)
+  E∪F∖F⊆E∖F e (right _ e∈F , e∉F) = CONTRADICTION (e∉F e∈F)
+  E∪F∖F⊆E∖F e (both _ e∈F , e∉F) = CONTRADICTION (e∉F e∈F)
+  
+  E∖F⊆E : ∀ {X} {E F : X → Set} → (E ∖ F) ⊆ E
+  E∖F⊆E e (e∈E , _) = e∈E
+
+  E∪F∖F⊆E : ∀ {X} {E F : X → Set} → ((E ∪ F) ∖ F) ⊆ E
+  E∪F∖F⊆E {X} {E} {F} e e∈E∪F∖F = E∖F⊆E {X} {E} {F} e (E∪F∖F⊆E∖F e e∈E∪F∖F)
+
+  E∪F∖E⊆F : ∀ {X} {E F : X → Set} → ((E ∪ F) ∖ E) ⊆ F
+  E∪F∖E⊆F e (e∈E∪F , e∉F) = E∪F∖F⊆E e (E∪F⊆F∪E e e∈E∪F , e∉F)
 
   data _⊎_ {X : Set} (E F : X → Set) (e : X) : Set where
     left : (e ∈ E) → (e ∉ F) → (e ∈ (E ⊎ F))

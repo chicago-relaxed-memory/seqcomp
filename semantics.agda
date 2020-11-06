@@ -27,11 +27,9 @@ module semantics (DM : DataModel) (Event : Set) where
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
    open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; X to X₀ ; X⊆E to X₀⊆E₀ ; E⊆I⊎X to E₀⊆I₀⊎X₀ ; I∩X⊆∅ to I₀∩X₀⊆∅ ; act to act₀ ; pre to pre₀ ; post to post₀ ; _≤_ to _≤₀_ ; ↓ to ↓₀)
-   open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; X to X₁ ; RE to RE₁ ; X⊆E to X₁⊆E₁ ; E⊆I⊎X to E₁⊆I₁⊎X₁ ; I⊆E to I₁⊆E₁ ; I∩X⊆∅ to I₁∩X₁⊆∅ ; act to act₁ ; pre to pre₁ ; post to post₁ ; _≤_ to _≤₁_)
-   open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; X to X₂ ; WE to WE₂ ; X⊆E to X₂⊆E₂ ; E⊆I⊎X to E₂⊆I₂⊎X₂ ; I⊆E to I₂⊆E₂ ; I∩X⊆∅ to I₂∩X₂⊆∅ ; act to act₂ ; pre to pre₂ ; post to post₂ ; _≤_ to _≤₂_)
+   open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; X to X₁ ; RE to RE₁ ; X⊆E to X₁⊆E₁ ; E⊆I⊎X to E₁⊆I₁⊎X₁ ; I⊆E to I₁⊆E₁ ; I∩X⊆∅ to I₁∩X₁⊆∅ ; dec-E to dec-E₁ ; act to act₁ ; pre to pre₁ ; post to post₁ ; _≤_ to _≤₁_)
+   open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; X to X₂ ; WE to WE₂ ; X⊆E to X₂⊆E₂ ; E⊆I⊎X to E₂⊆I₂⊎X₂ ; I⊆E to I₂⊆E₂ ; I∩X⊆∅ to I₂∩X₂⊆∅ ; dec-E to dec-E₂ ; act to act₂ ; pre to pre₂ ; post to post₂ ; _≤_ to _≤₂_)
 
-   field E₀⊆E₁∪E₂ : (E₀ ⊆ (E₁ ∪ E₂))
-   
    field I₀⊆I₁ : I₀ ⊆ I₁
    field I₀⊆I₂ : I₀ ⊆ I₂
 
@@ -43,7 +41,6 @@ module semantics (DM : DataModel) (Event : Set) where
    field int-post₁⊨pre₂ : ∀ e → (e ∈ I₀) → (post₁(e) ⊨ pre₂(e))
    field int-post₂⊨post₀ : ∀ e → (e ∈ I₀) → (post₂(e) ⊨ post₀(e))
 
-   -- TODO bikeshed the name
    field just : Event → Event
    field just-I : ∀ e → (e ∈ X₂) → (just(e) ∈ I₁)
    field just-≤ : ∀ d e → (d ∈ RE₁) → (e ∈ WE₂) → (d ≤₁ just(e)) → (d ≤₀ e)
@@ -63,6 +60,26 @@ module semantics (DM : DataModel) (Event : Set) where
    field ≤₂⊆≤₀ : ∀ d e → (d ∈ (E₀ ∩ E₂)) → (e ∈ (E₀ ∩ E₂)) → (d ≤₂ e) → (d ≤₀ e)
    field coherence :  ∀ d e → (d ∈ X₁) → (e ∈ X₂) → ((act₁(e) , act₂(e)) ∈ Conflicts) → (d ≤₀ e)
 
+   E₁⊆E₁∪E₂ : E₁ ⊆ (E₁ ∪ E₂)
+   E₁⊆E₁∪E₂ e e∈E₁ with dec-E₂ e
+   E₁⊆E₁∪E₂ e e∈E₁ | yes e∈E₂ = both e∈E₁ e∈E₂
+   E₁⊆E₁∪E₂ e e∈E₁ | no e∉E₂ = left e∈E₁ e∉E₂
+
+   E₂⊆E₁∪E₂ : E₂ ⊆ (E₁ ∪ E₂)
+   E₂⊆E₁∪E₂ e e∈E₂ with dec-E₁ e
+   E₂⊆E₁∪E₂ e e∈E₂ | yes e∈E₁ = both e∈E₁ e∈E₂
+   E₂⊆E₁∪E₂ e e∈E₂ | no e∉E₁ = right e∉E₁ e∈E₂
+   
+   X₁∪X₂⊆E₁∪E₂ : (X₁ ∪ X₂) ⊆ (E₁ ∪ E₂)
+   X₁∪X₂⊆E₁∪E₂ e (left e∈X₁ _) = E₁⊆E₁∪E₂ e (X₁⊆E₁ e e∈X₁)
+   X₁∪X₂⊆E₁∪E₂ e (right _ e∈X₂) = E₂⊆E₁∪E₂ e (X₂⊆E₂ e e∈X₂)
+   X₁∪X₂⊆E₁∪E₂ e (both e∈X₁ e∈X₂) = both (X₁⊆E₁ e e∈X₁) (X₂⊆E₂ e e∈X₂)
+   
+   E₀⊆E₁∪E₂ : (E₀ ⊆ (E₁ ∪ E₂))
+   E₀⊆E₁∪E₂ e e∈E₀ with E₀⊆I₀⊎X₀ e e∈E₀ 
+   E₀⊆E₁∪E₂ e e∈E₀ | left e∈I₀ _ = both (I₁⊆E₁ e (I₀⊆I₁ e e∈I₀)) (I₂⊆E₂ e (I₀⊆I₂ e e∈I₀))
+   E₀⊆E₁∪E₂ e e∈E₀ | right _ e∈X₀ = X₁∪X₂⊆E₁∪E₂ e (X₀⊆X₁∪X₂ e e∈X₀)
+   
    I₀∩X₁⊆∅ : (I₀ ∩ X₁) ⊆ ∅
    I₀∩X₁⊆∅ e (e∈I₀ , e∈X₁) = I₀∩X₀⊆∅ e (e∈I₀ , (X₁⊆X₀ e e∈X₁))
    

@@ -63,7 +63,6 @@ module monoid (DM : DataModel) (Event : Set) where
                     ; P₂ = P₂
                     ; P₁∈𝒫₁ = P₀∈⟦C⟧
                     ; P₂∈𝒫₂ = P₂∈⟦skip⟧
-                    ; E₀⊆E₁∪E₂ = E₀⊆E₁∪E₂
                     ; I₀⊆I₁ = λ e e∈I₀ → e∈I₀
                     ; I₀⊆I₂ = λ e e∈I₀ → (e∈I₀ , λ ())
                     ; X₀⊆X₁∪X₂ = λ e e∈X₀ → left e∈X₀ (λ ())
@@ -155,7 +154,6 @@ module monoid (DM : DataModel) (Event : Set) where
                     ; P₂ = P₂
                     ; P₁∈𝒫₁ = P₁∈⟦skip⟧
                     ; P₂∈𝒫₂ = P₀∈⟦C⟧
-                    ; E₀⊆E₁∪E₂ = λ e e∈E₀ → both e∈E₀ e∈E₀
                     ; I₀⊆I₁ = λ e e∈I₀ → (I₀⊆E₀ e e∈I₀ , λ ())
                     ; I₀⊆I₂ = λ e e∈I₀ → e∈I₀
                     ; X₀⊆X₁∪X₂ = λ e e∈X₀ → right (λ ()) e∈X₀
@@ -222,8 +220,8 @@ module monoid (DM : DataModel) (Event : Set) where
      open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (P₁ to P₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₂∈⟦C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; pre′₂ to pre′₃)
 
      open Pomset P₀ using () renaming (E to E₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; I-max to I₀-max)
-     open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; dec-E to dec-E₁ ; dec-X to dec-X₁)
-     open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; ℓ to ℓ₂ ; act to act₂ ; post to post₂ ; dec-E to dec-E₂ ; dec-X to dec-X₂)
+     open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; X to X₁ ; I⊆E to I₁⊆E₁ ; E⊆I⊎X to E₁⊆I₁⊎X₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; dec-E to dec-E₁ ; dec-X to dec-X₁ ; dec-I to dec-I₁)
+     open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; X to X₂ ; I⊆E to I₂⊆E₂ ; ℓ to ℓ₂ ; act to act₂ ; post to post₂ ; dec-E to dec-E₂ ; dec-X to dec-X₂ ; dec-I to dec-I₂)
 
      pre′₂ = pre′₂₃
      
@@ -245,6 +243,7 @@ module monoid (DM : DataModel) (Event : Set) where
      ℓ₁₂ : Event → (Formula × Action)
      ℓ₁₂ e = (pre₁₂ e , act₁₂ e)
      
+     E₁₂ = (I₁ ∩ I₂) ⊎ (X₁ ∪ X₂)
      I₁₂ = _
 
      data _≤₁₂_ : Event → Event → Set where
@@ -267,28 +266,37 @@ module monoid (DM : DataModel) (Event : Set) where
 
      P₁₂ : Pomset
      P₁₂ = record
-             { E = E₁ ∪ E₂
+             { E = E₁₂
              ; _≤_ = _≤₁₂_
              ; ℓ = ℓ₁₂
-             ; dec-E = λ e → dec-∪ (dec-E₁ e) (dec-E₂ e) 
+             ; dec-E = {!!}
              ; ≤-refl = ≤₁₂-refl 
              ; ≤-trans = ≤₁₂-trans
              ; ≤-asym = ≤₁₂-asym
              ; I-max = I₁₂-max
              }
+          
+     I₁₂⊆I₁∩I₂ : I₁₂ ⊆ (I₁ ∩ I₂)
+     I₁₂⊆I₁∩I₂ e e∈I₁₂ with dec-X₁ e 
+     I₁₂⊆I₁∩I₂ e (left e∈I₁∩I₂ _ , _) | _ = e∈I₁∩I₂
+     I₁₂⊆I₁∩I₂ e (right _ e∈X₁∪X₂ , a∈I) | yes (_ , a∈X) = CONTRADICTION (a∈I a∈X)
+     I₁₂⊆I₁∩I₂ e (right _ e∈X₁∪X₂ , _) | no e∉X₁ with E∪F∖E⊆F e (e∈X₁∪X₂ , e∉X₁)
+     I₁₂⊆I₁∩I₂ e (right _ e∈X₁∪X₂ , a∈I) | no e∉X₁ | (_ , a∈X) = CONTRADICTION (a∈I a∈X)
      
      I₁₂⊆I₁ : I₁₂ ⊆ I₁
-     I₁₂⊆I₁ = {!!}
+     I₁₂⊆I₁ e e∈I₁₂ = fst(I₁₂⊆I₁∩I₂ e e∈I₁₂)
      
+     I₁₂⊆I₂ : I₁₂ ⊆ I₂
+     I₁₂⊆I₂ e e∈I₁₂ = snd(I₁₂⊆I₁∩I₂ e e∈I₁₂)
+
      P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
      P₁₂∈⟦C₁∙C₂⟧ = record
                      { P₁ = P₁
                      ; P₂ = P₂
                      ; P₁∈𝒫₁ = P₁∈⟦C₁⟧
                      ; P₂∈𝒫₂ = P₂∈⟦C₂⟧
-                     ; E₀⊆E₁∪E₂ = {!!}
-                     ; I₀⊆I₁ = {!!}
-                     ; I₀⊆I₂ = {!!}
+                     ; I₀⊆I₁ = I₁₂⊆I₁
+                     ; I₀⊆I₂ = I₁₂⊆I₂
                      ; X₀⊆X₁∪X₂ = {!!}
                      ; X₁⊆X₀ = {!!}
                      ; X₂⊆X₀ = {!!}
@@ -315,7 +323,6 @@ module monoid (DM : DataModel) (Event : Set) where
                          ; P₂ = P₃
                          ; P₁∈𝒫₁ = P₁₂∈⟦C₁∙C₂⟧
                          ; P₂∈𝒫₂ = P₃∈⟦C₃⟧
-                         ; E₀⊆E₁∪E₂ = {!!}
                          ; I₀⊆I₁ = {!!}
                          ; I₀⊆I₂ = {!!}
                          ; X₀⊆X₁∪X₂ = {!!}
