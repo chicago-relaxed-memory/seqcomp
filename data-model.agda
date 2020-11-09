@@ -19,5 +19,6 @@ module data-model where
 
     field ⊨-refl : ∀ {ϕ} → (ϕ ⊨ ϕ)
     field ⊨-trans : ∀ {ϕ ψ χ} → (ϕ ⊨ ψ) → (ψ ⊨ χ) → (ϕ ⊨ χ)
+    field ⊨-resp-∨ : ∀ {ϕ ψ ξ ζ} → (ϕ ⊨ ψ) → (ξ ⊨ ζ) → ((ϕ ∨ ξ) ⊨ (ψ ∨ ζ))
     
 
