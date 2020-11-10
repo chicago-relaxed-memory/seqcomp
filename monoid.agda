@@ -5,6 +5,7 @@ import command
 import pomset
 import semantics
 import augmentation
+import examples
 
 module monoid (DM : DataModel) (Event : Set) where
 
@@ -13,6 +14,7 @@ module monoid (DM : DataModel) (Event : Set) where
   open pomset(DM)(Event)
   open semantics(DM)(Event)
   open augmentation(DM)(Event)
+  open examples(DM)(Event)
 
   -- PROPOSITION: sequential composition forms a monoid
   
@@ -29,98 +31,54 @@ module monoid (DM : DataModel) (Event : Set) where
   
   ⟦C⟧⊆⟦C∙skip⟧ C P₀ P₀∈⟦C⟧ = P₀∈⟦C∙skip⟧ where
 
-    -- open Pomset P₀ using () renaming (E to E₀ ; I to I₀ ; dec-I to dec-I₀ ; E⊆I⊎X to E₀⊆I₀⊎X₀ ; I∩X⊆∅ to I₀∩X₀⊆∅ ; post to post₀ ; ≤-refl to ≤₀-refl)
-
-    -- P₁ = P₀
-    -- P₂ = record
-    --        { E = I₀
-    --        ; _≤_ = _≡_
-    --        ; ℓ = λ e → (post₀(e) , ✓(post₀(e)))
-    --        ; dec-E = dec-I₀
-    --        ; ≤-refl = refl
-    --        ; ≤-trans = ≡-trans
-    --        ; ≤-asym = λ _ d=e → d=e
-    --        ; I-max = λ d=e _ → d=e
-    --        }
-
-    -- open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; X⊆E to X₁⊆E₁)
-    -- open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; I⊆E to I₂⊆E₂)
-
-    -- P₂∈⟦skip⟧ : P₂ ∈ ⟦ skip ⟧ 
-    -- P₂∈⟦skip⟧ = record
-    --               { E₀⊆I₀ = λ e e∈I₀ → (e∈I₀ , λ ())
-    --               ; pre₀⊨post₀ = λ e e∈E₂ → ⊨-refl
-    --               }
-
-    -- E₀⊆E₁∪E₂ : E₀ ⊆ (E₁ ∪ E₂)
-    -- E₀⊆E₁∪E₂ e e∈E₀ with E₀⊆I₀⊎X₀ e e∈E₀
-    -- E₀⊆E₁∪E₂ e e∈E₀ | left e∈I₀ e∉X₀ = both e∈E₀ e∈I₀
-    -- E₀⊆E₁∪E₂ e e∈E₀ | right e∉I₀ e∈X₀ = left e∈E₀ e∉I₀
+    open Pomset P₀ using () renaming (≤-refl to ≤₀-refl)
 
     P₀∈⟦C∙skip⟧ : P₀ ∈ ⟦ C ∙ skip ⟧
-    P₀∈⟦C∙skip⟧ = ?
-    -- P₀∈⟦C∙skip⟧ = record
-    --                 { P₁ = P₁
-    --                 ; P₂ = P₂
-    --                 ; P₁∈𝒫₁ = P₀∈⟦C⟧
-    --                 ; P₂∈𝒫₂ = P₂∈⟦skip⟧
-    --                 ; I₀⊆I₁ = λ e e∈I₀ → e∈I₀
-    --                 ; I₀⊆I₂ = λ e e∈I₀ → (e∈I₀ , λ ())
-    --                 ; X₀⊆X₁∪X₂ = λ e e∈X₀ → left e∈X₀ (λ ())
-    --                 ; X₁⊆X₀ = λ e e∈X₁ → e∈X₁
-    --                 ; X₂⊆X₀ = λ e ()
-    --                 ; int-pre₀⊨pre₁ = λ e e∈I₀ → ⊨-refl
-    --                 ; int-post₁⊨pre₂ = λ e e∈I₀ → ⊨-refl
-    --                 ; int-post₂⊨post₀ = λ e e∈I₀ → ⊨-refl
-    --                 ; just = λ e → e
-    --                 ; just-I = λ e ()
-    --                 ; just-≤ = λ d e d∈RE₁ ()
-    --                 ; ext-post′₁⊨pre₂ = λ e ()
-    --                 ; ext-pre₀⊨pre₁ = λ e e∈X₁ e∉X₂ → ⊨-refl
-    --                 ; ext-pre₀⊨pre′₂ = λ e e∉E₁ ()
-    --                 ; ext-pre₀⊨pre₁∨pre′₂ = λ e e∩X₁ ()
-    --                 ; ext-act₀=act₁ = λ e e∈X₁ → refl
-    --                 ; ext-act₀=act₂ = λ e ()
-    --                 ; ≤₁⊆≤₀ = λ d e d∈E₁ e∈E₁ d≤₁e → d≤₁e
-    --                 ; ≤₂⊆≤₀ = λ{ d .d d∈E₁ e∈E₁ refl → ≤₀-refl }
-    --                 ; coherence =  λ d e d∈X₁ ()
-    --                 }
+    P₀∈⟦C∙skip⟧ = record
+                    { P₁ = P₀
+                    ; P₂ = Pskip
+                    ; P₁∈𝒫₁ = P₀∈⟦C⟧
+                    ; P₂∈𝒫₂ = Pskip∈⟦skip⟧
+                    ; E₀⊆E₁∪E₂ = λ e e∈E₀ → left e∈E₀ (λ ())
+                    ; E₁⊆E₀ = λ e e∈E₀ → e∈E₀
+                    ; E₂⊆E₀ = λ e ()
+                    ; ≤₁⊆≤₀ = λ d e d≤₀e → d≤₀e
+                    ; ≤₂⊆≤₀ = λ { e .e refl → ≤₀-refl }
+                    ; coherence = λ d e d∈E₀ ()
+                    ; pre₀⊨pre₁ = λ e e∈E₀ _ → ⊨-refl
+                    ; pre₀⊨pre′₂ = λ e e∉E₀ ()
+                    ; pre₀⊨pre₁∨pre′₂ = λ e e∈E₀ () 
+                    ; act₀=act₁ = λ e e∈E₀ → refl
+                    ; act₀=act₂ = λ e ()
+                    ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-refl
+                    }
 
   ⟦C∙skip⟧⊆⟦C⟧ C P₀ P₀∈⟦C∙skip⟧ = P₀∈⟦C⟧ where
 
-    -- open _●_ P₀∈⟦C∙skip⟧ using (P₁ ; P₂ ; E₀⊆E₁∪E₂ ; I₀⊆I₁ ; I₀⊆I₂ ; X₁⊆X₀ ; X₂⊆X₀ ; X₀⊆X₁∪X₂ ; ext-act₀=act₁ ; int-pre₀⊨pre₁ ; int-post₁⊨pre₂ ; int-post₂⊨post₀ ; ext-pre₀⊨pre₁ ; ≤₁⊆≤₀) renaming (P₁∈𝒫₁ to P₁∈⟦C⟧ ; P₂∈𝒫₂ to P₂∈⟦skip⟧)
-    -- open SKIP P₂∈⟦skip⟧ using () renaming (X₀⊆∅ to X₂⊆∅ ; pre₀⊨post₀ to pre₂⊨post₂)
-    -- open Pomset P₀ using () renaming (E to E₀ ; X to X₀ ; E⊆I⊎X to E₀⊆I₀⊎X₀ ; I∩X⊆∅ to I₀∩X₀⊆∅ ; pre to pre₀)
-    -- open Pomset P₁ using () renaming (E to E₁ ; X to X₁ ; I⊆E to I₁⊆E₁ ; X⊆E to X₁⊆E₁ ; pre to pre₁)
-    -- open Pomset P₂ using () renaming (E to E₂ ; X to X₂ ; I⊆E to I₂⊆E₂)
+    open _●_ P₀∈⟦C∙skip⟧ using (P₁ ; P₂ ; E₀⊆E₁∪E₂ ; E₁⊆E₀ ; E₂⊆E₀ ; act₀=act₁ ; pre₀⊨pre₁ ; ≤₁⊆≤₀ ; τ₀ϕ⊨τ₁τ₂ϕ) renaming (P₁∈𝒫₁ to P₁∈⟦C⟧ ; P₂∈𝒫₂ to P₂∈⟦skip⟧)
+    open SKIP P₂∈⟦skip⟧ using () renaming (E₀⊆∅ to E₂⊆∅ ; τ₀ϕ⊨ϕ to τ₂ϕ⊨ϕ)
 
-    -- X₀⊆X₁ : (X₀ ⊆ X₁)
-    -- X₀⊆X₁ e e∈X₀ with X₀⊆X₁∪X₂ e e∈X₀
-    -- X₀⊆X₁ e e∈X₀ | left e∈X₁ _ = e∈X₁
-    -- X₀⊆X₁ e e∈X₀ | right _ e∈X₂ = CONTRADICTION (X₂⊆∅ e e∈X₂)
-    -- X₀⊆X₁ e e∈X₀ | both _ e∈X₂ = CONTRADICTION (X₂⊆∅ e e∈X₂)
+    open Pomset P₀ using () renaming (E to E₀)
+    open Pomset P₁ using () renaming (E to E₁ ; τ-resp-⊨ to τ₁-resp-⊨)
+    open Pomset P₂ using () renaming (E to E₂)
 
-    -- E₀⊆E₁ : (E₀ ⊆ E₁)
-    -- E₀⊆E₁ e e∈E₀ with E₀⊆I₀⊎X₀ e e∈E₀
-    -- E₀⊆E₁ e e∈E₀ | left e∈I₀  _ = I₁⊆E₁ e (I₀⊆I₁ e e∈I₀)
-    -- E₀⊆E₁ e e∈E₀ | right _ e∈X₀ = X₁⊆E₁ e (X₀⊆X₁ e e∈X₀)
+    E₀⊆E₁ : (E₀ ⊆ E₁)
+    E₀⊆E₁ e e∈E₀ with E₀⊆E₁∪E₂ e e∈E₀
+    E₀⊆E₁ e e∈E₀ | left e∈E₁ _ = e∈E₁
+    E₀⊆E₁ e e∈E₀ | right _ e∈E₂ = CONTRADICTION (E₂⊆∅ e e∈E₂)
+    E₀⊆E₁ e e∈E₀ | both _  e∈E₂ =  CONTRADICTION (E₂⊆∅ e e∈E₂)
 
-    -- pre₀⊨pre₁ : ∀ e → (e ∈ E₀) → (pre₀(e)  ⊨ pre₁(e))
-    -- pre₀⊨pre₁ e e∈E₀ with E₀⊆I₀⊎X₀ e e∈E₀
-    -- pre₀⊨pre₁ e e∈E₀ | left e∈I₀ _ = int-pre₀⊨pre₁ e e∈I₀
-    -- pre₀⊨pre₁ e e∈E₀ | right _ e∈X₀ = ext-pre₀⊨pre₁ e (X₀⊆X₁ e e∈X₀) (X₂⊆∅ e)
+    P₁≲P₀ : P₁ ≲ P₀
+    P₁≲P₀ = record
+              { E′⊆E = E₀⊆E₁
+              ; E⊆E′ = E₁⊆E₀
+              ; act=act′ = λ e e∈E₁ → ≡-symm (act₀=act₁ e e∈E₁)
+              ; pre′⊨pre = λ e e∈E₁ → pre₀⊨pre₁ e e∈E₁ (E₂⊆∅ e)
+              ; ≤⊆≤′ = ≤₁⊆≤₀
+              ; τ′⊨τ = λ C ϕ → ⊨-trans (τ₀ϕ⊨τ₁τ₂ϕ C ϕ) (τ₁-resp-⊨ C _ ϕ (τ₂ϕ⊨ϕ C ϕ))
+              }
     
-    -- P₁≲P₀ : P₁ ≲ P₀
-    -- P₁≲P₀ = record
-    --           { E′⊆E = E₀⊆E₁
-    --           ; X⊆X′ = λ e e∈X₁ → X₁⊆X₀ e e∈X₁
-    --           ; act=act′ = λ e e∈X₀ → ≡-symm (ext-act₀=act₁ e (X₀⊆X₁ e e∈X₀))
-    --           ; pre′⊨pre = pre₀⊨pre₁
-    --           ; post⊨post′ = λ e e∈I₀ → ⊨-trans (int-post₁⊨pre₂ e e∈I₀) (⊨-trans (pre₂⊨post₂ e (I₂⊆E₂ e (I₀⊆I₂ e e∈I₀))) (int-post₂⊨post₀ e e∈I₀))
-    --           ; ≤⊆≤′ = λ d e d∈E₀ e∈E₀ d≤₁e → ≤₁⊆≤₀ d e (d∈E₀ , (E₀⊆E₁ d d∈E₀)) (e∈E₀ , (E₀⊆E₁ e e∈E₀)) d≤₁e
-    --           }
-    
-    P₀∈⟦C⟧ = sem-resp-≲ ? ?
+    P₀∈⟦C⟧ = sem-resp-≲ P₁≲P₀ P₁∈⟦C⟧
 
   -- PROOF that skip is a left unit
 
@@ -150,7 +108,7 @@ module monoid (DM : DataModel) (Event : Set) where
     --               }
 
     P₀∈⟦skip∙C⟧ : P₀ ∈ ⟦ skip ∙ C ⟧
-    P₀∈⟦skip∙C⟧ = ?
+    P₀∈⟦skip∙C⟧ = {!!}
     -- P₀∈⟦skip∙C⟧ = record
     --                 { P₁ = P₁
     --                 ; P₂ = P₂
@@ -212,7 +170,7 @@ module monoid (DM : DataModel) (Event : Set) where
     --           ; ≤⊆≤′ = λ d e d∈E₀ e∈E₀ d≤₂e → ≤₂⊆≤₀ d e (d∈E₀ , E₀⊆E₂ d d∈E₀) (e∈E₀ , E₀⊆E₂ e e∈E₀) d≤₂e
     --           }
     
-    P₀∈⟦C⟧ = sem-resp-≲ ? ?
+    P₀∈⟦C⟧ = sem-resp-≲ {!!} {!!}
   
   -- PROOF of associativity
 
@@ -320,7 +278,7 @@ module monoid (DM : DataModel) (Event : Set) where
      --                 }
      
      P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₀ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
-     P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = ?
+     P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = {!!}
      -- P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = record
      --                     { P₁ = P₁₂
      --                     ; P₂ = P₃

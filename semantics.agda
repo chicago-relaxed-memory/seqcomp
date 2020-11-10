@@ -23,7 +23,7 @@ module semantics (DM : DataModel) (Event : Set) where
    field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
-   open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ↓W to ↓W₀ ; τ to τ₀)
+   open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ↓RW to ↓RW₀ ; τ to τ₀)
    open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; τ to τ₁)
    open Pomset P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; _≤_ to _≤₂_ ; τ to τ₂)
 
@@ -36,7 +36,7 @@ module semantics (DM : DataModel) (Event : Set) where
    field coherence :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → ((act₁(e) , act₂(e)) ∈ Conflicts) → (d ≤₀ e)
 
    pre′₂ : Event → Formula
-   pre′₂(e) = τ₁(↓W₀(e))(pre₂(e))
+   pre′₂(e) = τ₁(↓RW₀(e))(pre₂(e))
    
    field pre₀⊨pre₁ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (pre₀(e) ⊨ pre₁(e))
    field pre₀⊨pre′₂ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (pre₀(e) ⊨ pre′₂(e))

@@ -13,8 +13,8 @@ module augmentation (DM : DataModel) (Event : Set) where
 
   record _≲_ (P P′ : Pomset) : Set₁ where
 
-    open Pomset P using (E ; act ; pre ; _≤_ ; τ ; ↓W)
-    open Pomset P′ using () renaming (E to E′ ; act to act′ ; pre to pre′ ; _≤_ to _≤′_; ≤-refl to ≤′-refl ; τ to τ′ ; ↓W to ↓W′)
+    open Pomset P using (E ; act ; pre ; _≤_ ; τ ; RE ; WE ; ↓RW ; WE⊆↓RW ; RE⊆↓RW ; ≤⊆↓RW)
+    open Pomset P′ using () renaming (E to E′ ; act to act′ ; pre to pre′ ; _≤_ to _≤′_; ≤-refl to ≤′-refl ; τ to τ′ ; RE to RE′ ; WE to WE′ ; ↓RW to ↓RW′ ; WE⊆↓RW to WE′⊆↓RW′ ; RE⊆↓RW to RE′⊆↓RW′ ; ≤⊆↓RW to ≤′⊆↓RW′)
 
     field E′⊆E : (E′ ⊆ E)
     field E⊆E′ : (E ⊆ E′)
@@ -22,11 +22,17 @@ module augmentation (DM : DataModel) (Event : Set) where
     field pre′⊨pre : ∀ e → (e ∈ E) → (pre′(e) ⊨ pre(e))
     field ≤⊆≤′ : ∀ d e → (d ≤ e) → (d ≤′ e)
     field τ′⊨τ : ∀ C ϕ → (τ′(C)(ϕ) ⊨ τ(C)(ϕ))
+    
+    RE⊆RE′ : (RE ⊆ RE′)
+    RE⊆RE′ e (e∈E , ae∈R) = (E⊆E′ e e∈E , ≡-subst Reads (act=act′ e e∈E) ae∈R)
 
-    ↓W⊆↓W' : ∀ e → (e ∈ E) → (Carrier(↓W(e)) ⊆ Carrier(↓W′(e)))
-    ↓W⊆↓W' e e∈E with act(e) | act′(e) | act=act′ e e∈E
-    ↓W⊆↓W' e e∈E  | R x v | R _ _ | refl = E⊆E′ 
-    ↓W⊆↓W' e e∈E  | W x c | W _ _ | refl = λ d → ≤⊆≤′ d e
+    WE⊆WE′ : (WE ⊆ WE′)
+    WE⊆WE′ e (e∈E , ae∈W) = (E⊆E′ e e∈E , ≡-subst Writes (act=act′ e e∈E) ae∈W)
+
+    ↓RW⊆↓RW' : ∀ e → (e ∈ E) → (↓RW(e) ⊆ ↓RW′(e))
+    ↓RW⊆↓RW' e e∈E d (WE⊆↓RW d∈WE) = WE′⊆↓RW′ (WE⊆WE′ d d∈WE)
+    ↓RW⊆↓RW' e e∈E d (RE⊆↓RW e∈RE) = RE′⊆↓RW′ (RE⊆RE′ e e∈RE)
+    ↓RW⊆↓RW' e e∈E d (≤⊆↓RW d≤e) = ≤′⊆↓RW′ (≤⊆≤′ d e d≤e)
     
   sem-resp-≲ : ∀ {P P′ C} → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
 
@@ -45,15 +51,15 @@ module augmentation (DM : DataModel) (Event : Set) where
     open _●_ P₀∈⟦C₁⟧●⟦C₂⟧
     open Pomset P₁ using () renaming (τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆)
     open Pomset P₂ using () renaming (E to E₂ ; pre to pre₂)
-    open Pomset P₀ using () renaming (↓W to ↓W₀)
-    open Pomset P′₀ using () renaming (↓W to ↓W′₀)
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ↓W⊆↓W' to ↓W₀⊆↓W'₀) 
+    open Pomset P₀ using () renaming (↓RW to ↓RW₀)
+    open Pomset P′₀ using () renaming (↓RW to ↓RW′₀)
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ↓RW⊆↓RW' to ↓RW₀⊆↓RW'₀) 
 
     pre″₂ : Event → Formula
-    pre″₂(e) = τ₁(↓W′₀(e))(pre₂(e))
+    pre″₂(e) = τ₁(↓RW′₀(e))(pre₂(e))
    
     pre′₂⊨pre″₂ : ∀ e → (e ∈ E₂) → (pre′₂(e) ⊨ pre″₂(e))
-    pre′₂⊨pre″₂ e e∈E₂ = τ₁-resp-⊆ (↓W₀(e)) (↓W′₀(e)) (pre₂(e)) (↓W₀⊆↓W'₀ e (E₂⊆E₀ e e∈E₂))
+    pre′₂⊨pre″₂ e e∈E₂ = τ₁-resp-⊆ (↓RW₀(e)) (↓RW′₀(e)) (pre₂(e)) (↓RW₀⊆↓RW'₀ e (E₂⊆E₀ e e∈E₂))
     
     P′₀∈⟦C₁⟧●⟦C₂⟧ : P′₀ ∈ (⟦ C₁ ⟧ ● ⟦ C₂ ⟧)
     P′₀∈⟦C₁⟧●⟦C₂⟧ = record

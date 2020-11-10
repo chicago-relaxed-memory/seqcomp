@@ -14,6 +14,7 @@ module data-model where
     field _⊨_ : Formula → Formula → Set
 
     field tt : Formula
+    field ff : Formula
     field _∨_ : Formula → Formula → Formula
     field _==_ : Expression → Expression → Formula
 
