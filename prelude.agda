@@ -106,3 +106,16 @@ module prelude where
     zero : ℕ
     succ : ℕ → ℕ
   {-# BUILTIN NATURAL ℕ #-}
+
+  postulate EXCLUDED_MIDDLE : ∀ X → Dec(X)
+  
+  E⊆E∪F : ∀ {X} {E F :  X → Set} → E ⊆ (E ∪ F)
+  E⊆E∪F {F = F} e e∈E with EXCLUDED_MIDDLE(e ∈ F)
+  E⊆E∪F e e∈E | yes e∈F = both e∈E e∈F
+  E⊆E∪F e e∈E | no e∉F = left e∈E e∉F
+  
+  F⊆E∪F : ∀ {X} {E F :  X → Set} → F ⊆ (E ∪ F)
+  F⊆E∪F {E = E} e e∈E with EXCLUDED_MIDDLE(e ∈ E)
+  F⊆E∪F e e∈F | yes e∈E = both e∈E e∈F
+  F⊆E∪F e e∈F | no e∉E = right e∉E e∈F
+  

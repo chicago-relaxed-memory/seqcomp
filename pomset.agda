@@ -61,3 +61,7 @@ module pomset (DM : DataModel) (Event : Set) where
     WE⊆E : (WE ⊆ E)
     WE⊆E e (e∈E , _) = e∈E
 
+    dec-E : ∀ e → Dec(e ∈ E)
+    dec-E e = EXCLUDED_MIDDLE(e ∈ E)
+      
+    

@@ -136,135 +136,75 @@ module monoid (DM : DataModel) (Event : Set) where
 
   ⟦C₁∙⟨C₂∙C₃⟩⟧⊆⟦⟨C₁∙C₂⟩∙C₃⟧ C₁ C₂ C₃ P₀ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ =  P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ where
 
-     -- open _●_ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ using (P₁) renaming (P₂ to P₂₃ ; P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂₃∈⟦C₂∙C₃⟧ ; just to just₂₃ ; pre′₂ to pre′₂₃)
-     -- open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (P₁ to P₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₂∈⟦C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; pre′₂ to pre′₃)
+     open _●_ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ using (P₁ ; ≤₁⊆≤₀ ; act₀=act₁ ; pre₀⊨pre₁) renaming (P₂ to P₂₃ ; P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂₃∈⟦C₂∙C₃⟧ ; act₀=act₂ to act₀=act₂₃ ; pre′₂ to pre′₂₃ ; ≤₂⊆≤₀ to ≤₂₃⊆≤₀ ; coherence to coherence₀)
+     open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (P₁ to P₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₂∈⟦C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; pre′₂ to pre′₃ ; E₁⊆E₀ to E₂⊆E₂₃ ; ≤₁⊆≤₀ to ≤₂⊆≤₂₃ ; act₀=act₁ to act₂₃=act₂)
+     
+     open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; ↓RW to ↓RW₀)
+     open Pomset P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-⊨ to τ₁-resp-⊨)
+     open Pomset P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-⊨ to τ₂-resp-⊨)
 
-     -- open Pomset P₀ using () renaming (E to E₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; I-max to I₀-max)
-     -- open Pomset P₁ using () renaming (E to E₁ ; I to I₁ ; X to X₁ ; I⊆E to I₁⊆E₁ ; E⊆I⊎X to E₁⊆I₁⊎X₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; dec-E to dec-E₁ ; dec-X to dec-X₁ ; dec-I to dec-I₁)
-     -- open Pomset P₂ using () renaming (E to E₂ ; I to I₂ ; X to X₂ ; I⊆E to I₂⊆E₂ ; ℓ to ℓ₂ ; act to act₂ ; post to post₂ ; dec-E to dec-E₂ ; dec-X to dec-X₂ ; dec-I to dec-I₂)
+     act₁₂ : Event → Action
+     act₁₂ = act₀
 
-     -- pre′₂ = pre′₂₃
-     
-     -- prex₁₂ : Event → Formula
-     -- prex₁₂ e with dec-X₁ e
-     -- prex₁₂ e | yes _ = pre₁ e ∨ pre′₂ e
-     -- prex₁₂ e | no  _ = pre′₂ e
-     
-     -- pre₁₂ : Event → Formula
-     -- pre₁₂ e with dec-X₂ e
-     -- pre₁₂ e | yes _ = prex₁₂ e
-     -- pre₁₂ e | no  _ = pre₁ e
+     pre′₂ : Event → Formula
+     pre′₂(e) = τ₁(↓RW₀(e))(pre₂(e))
 
-     -- act₁₂ : Event → Action
-     -- act₁₂ e with dec-X₁ e
-     -- act₁₂ e | yes _ = act₁ e
-     -- act₁₂ e | no  _ = act₂ e
-     
-     -- ℓ₁₂ : Event → (Formula × Action)
-     -- ℓ₁₂ e = (pre₁₂ e , act₁₂ e)
-     
-     -- E₁₂ = (I₁ ∩ I₂) ⊎ (X₁ ∪ X₂)
-     -- I₁₂ = _
+     pre₁₂ : Event → Formula
+     pre₁₂ e with dec-E₁(e) | dec-E₂(e)
+     pre₁₂ e | yes _ | yes _ = pre₁(e) ∨ pre′₂(e)
+     pre₁₂ e | yes _ | no  _ = pre₁(e)
+     pre₁₂ e | no _  | _     = pre′₂(e)
 
-     -- data _≤₁₂_ : Event → Event → Set where
-     --   ≤₁₂-refl : ∀ {e} → (e ≤₁₂ e)
-     --   ≤₀-in-≤₁₂ : ∀ {d e} → (d ∉ I₁₂) → (d ≤₀ e) → (d ≤₁₂ e)
+     P₁₂ : Pomset
+     P₁₂ = record
+             { E = E₁ ∪ E₂
+             ; _≤_ = _≤₀_
+             ; ℓ = λ e → (pre₁₂ e , act₁₂ e)
+             ; τ = λ C ϕ → τ₁(C)(τ₂(C)(ϕ))
+             ; ≤-refl = ≤₀-refl
+             ; ≤-trans = ≤₀-trans
+             ; ≤-asym = ≤₀-asym
+             ; τ-resp-⊆ = λ C D ϕ C⊆D → ⊨-trans (τ₁-resp-⊆ C D (τ₂ C ϕ) C⊆D) (τ₁-resp-⊨ D (τ₂ C ϕ) (τ₂ D ϕ) (τ₂-resp-⊆ C D ϕ C⊆D))
+             ; τ-resp-⊨ = λ C ϕ ψ ϕ⊨ψ → τ₁-resp-⊨ C (τ₂ C ϕ) (τ₂ C ψ) (τ₂-resp-⊨ C ϕ ψ ϕ⊨ψ)
+             }
 
-     -- ≤₁₂-trans : ∀ {c d e} → (c ≤₁₂ d) → (d ≤₁₂ e) → (c ≤₁₂ e)
-     -- ≤₁₂-trans ≤₁₂-refl d≤e = d≤e
-     -- ≤₁₂-trans c≤d ≤₁₂-refl = c≤d
-     -- ≤₁₂-trans (≤₀-in-≤₁₂ c∉I c≤d) (≤₀-in-≤₁₂ _ d≤e) = ≤₀-in-≤₁₂ c∉I (≤₀-trans c≤d d≤e)
+     act₀=act₂ : ∀ e → (e ∈ E₂)  → (act₀(e) ≡ act₂(e))
+     act₀=act₂ = {!!}
      
-     -- ≤₁₂-asym : ∀ {d e} → (e ≤₁₂ d) → (d ≤₁₂ e) → (d ≡ e)
-     -- ≤₁₂-asym ≤₁₂-refl d≤e = refl
-     -- ≤₁₂-asym c≤d ≤₁₂-refl = refl
-     -- ≤₁₂-asym (≤₀-in-≤₁₂ c∉I c≤d) (≤₀-in-≤₁₂ _ d≤e) = ≤₀-asym c≤d d≤e
-     
-     -- I₁₂-max : ∀ {d e} → (d ≤₁₂ e) → (d ∈ I₁₂) → (d ≡ e)
-     -- I₁₂-max ≤₁₂-refl d∈I₁₂ = refl
-     -- I₁₂-max (≤₀-in-≤₁₂ d∉I₁₂ d≤₀e) d∈I₁₂ = CONTRADICTION (d∉I₁₂ d∈I₁₂)
+     pre₁₂⊨pre₁ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (pre₁₂(e) ⊨ pre₁(e))
+     pre₁₂⊨pre₁ e e∈E₁ e∉E₂ with dec-E₁(e) | dec-E₂(e)
+     pre₁₂⊨pre₁ e e∈E₁ e∉E₂ | yes _ | yes e∈E₂ = CONTRADICTION (e∉E₂ e∈E₂)
+     pre₁₂⊨pre₁ e e∈E₁ e∉E₂ | yes _ | no _ = ⊨-refl
+     pre₁₂⊨pre₁ e e∈E₁ e∉E₂ | no e∉E₁ | _ = CONTRADICTION (e∉E₁ e∈E₁)
 
-     -- P₁₂ : Pomset
-     -- P₁₂ = record
-     --         { E = E₁₂
-     --         ; _≤_ = _≤₁₂_
-     --         ; ℓ = ℓ₁₂
-     --         ; dec-E = {!!}
-     --         ; ≤-refl = ≤₁₂-refl 
-     --         ; ≤-trans = ≤₁₂-trans
-     --         ; ≤-asym = ≤₁₂-asym
-     --         ; I-max = I₁₂-max
-     --         }
-          
-     -- I₁₂⊆I₁∩I₂ : I₁₂ ⊆ (I₁ ∩ I₂)
-     -- I₁₂⊆I₁∩I₂ e e∈I₁₂ with dec-X₁ e 
-     -- I₁₂⊆I₁∩I₂ e (left e∈I₁∩I₂ _ , _) | _ = e∈I₁∩I₂
-     -- I₁₂⊆I₁∩I₂ e (right _ e∈X₁∪X₂ , a∈I) | yes (_ , a∈X) = CONTRADICTION (a∈I a∈X)
-     -- I₁₂⊆I₁∩I₂ e (right _ e∈X₁∪X₂ , _) | no e∉X₁ with E∪F∖E⊆F e (e∈X₁∪X₂ , e∉X₁)
-     -- I₁₂⊆I₁∩I₂ e (right _ e∈X₁∪X₂ , a∈I) | no e∉X₁ | (_ , a∈X) = CONTRADICTION (a∈I a∈X)
+     pre₁₂⊨pre′₂ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (pre₁₂(e) ⊨ pre′₂(e))
+     pre₁₂⊨pre′₂ e e∉E₁ e∈E₂ with dec-E₁(e) | dec-E₂(e)
+     pre₁₂⊨pre′₂ e e∉E₁ e∈E₂ | yes e∈E₁ | yes _ = CONTRADICTION (e∉E₁ e∈E₁)
+     pre₁₂⊨pre′₂ e e∉E₁ e∈E₂ | yes e∈E₁ | no _ = CONTRADICTION (e∉E₁ e∈E₁)
+     pre₁₂⊨pre′₂ e e∉E₁ e∈E₂ | no _ | _ = {!!}
      
-     -- I₁₂⊆I₁ : I₁₂ ⊆ I₁
-     -- I₁₂⊆I₁ e e∈I₁₂ = fst(I₁₂⊆I₁∩I₂ e e∈I₁₂)
-     
-     -- I₁₂⊆I₂ : I₁₂ ⊆ I₂
-     -- I₁₂⊆I₂ e e∈I₁₂ = snd(I₁₂⊆I₁∩I₂ e e∈I₁₂)
-
-     -- P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
-     -- P₁₂∈⟦C₁∙C₂⟧ = record
-     --                 { P₁ = P₁
-     --                 ; P₂ = P₂
-     --                 ; P₁∈𝒫₁ = P₁∈⟦C₁⟧
-     --                 ; P₂∈𝒫₂ = P₂∈⟦C₂⟧
-     --                 ; I₀⊆I₁ = I₁₂⊆I₁
-     --                 ; I₀⊆I₂ = I₁₂⊆I₂
-     --                 ; X₀⊆X₁∪X₂ = {!!}
-     --                 ; X₁⊆X₀ = {!!}
-     --                 ; X₂⊆X₀ = {!!}
-     --                 ; int-pre₀⊨pre₁ = {!!}
-     --                 ; int-post₁⊨pre₂ = {!!}
-     --                 ; int-post₂⊨post₀ = {!!}
-     --                 ; just = {!!}
-     --                 ; just-I = {!!}
-     --                 ; just-≤ = {!!}
-     --                 ; ext-post′₁⊨pre₂ = {!!}
-     --                 ; ext-pre₀⊨pre₁ = {!!}
-     --                 ; ext-pre₀⊨pre′₂ = {!!}
-     --                 ; ext-pre₀⊨pre₁∨pre′₂ = {!!}
-     --                 ; ext-act₀=act₁ = {!!}
-     --                 ; ext-act₀=act₂ = {!!}
-     --                 ; ≤₁⊆≤₀ = {!!}
-     --                 ; ≤₂⊆≤₀ = {!!}
-     --                 ; coherence = {!!}
-     --                 }
+     P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
+     P₁₂∈⟦C₁∙C₂⟧ = record
+                     { P₁ = P₁
+                     ; P₂ = P₂
+                     ; P₁∈𝒫₁ = P₁∈⟦C₁⟧
+                     ; P₂∈𝒫₂ = P₂∈⟦C₂⟧
+                     ; E₀⊆E₁∪E₂ = λ e e∈E₁∪E₂ → e∈E₁∪E₂
+                     ; E₁⊆E₀ = E⊆E∪F
+                     ; E₂⊆E₀ = F⊆E∪F
+                     ; ≤₁⊆≤₀ = ≤₁⊆≤₀
+                     ; ≤₂⊆≤₀ = λ d e d≤₂e → ≤₂₃⊆≤₀ d e (≤₂⊆≤₂₃ d e d≤₂e)
+                     ; coherence = λ d e d∈E₁ e∈E₂ a₁#a₂ → coherence₀ d e d∈E₁ (E₂⊆E₂₃ e e∈E₂) (≡-subst (λ X → (act₁ d , X) ∈ Conflicts) (≡-symm (act₂₃=act₂ e e∈E₂)) a₁#a₂)
+                     ; pre₀⊨pre₁ = pre₁₂⊨pre₁
+                     ; pre₀⊨pre′₂ = {!pre₁₂⊨pre′₂!}
+                     ; pre₀⊨pre₁∨pre′₂ = {!!}
+                     ; act₀=act₁ = act₀=act₁
+                     ; act₀=act₂ = act₀=act₂
+                     ; τ₀ϕ⊨τ₁τ₂ϕ = {!!}
+                     }
      
      P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₀ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
      P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = {!!}
-     -- P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = record
-     --                     { P₁ = P₁₂
-     --                     ; P₂ = P₃
-     --                     ; P₁∈𝒫₁ = P₁₂∈⟦C₁∙C₂⟧
-     --                     ; P₂∈𝒫₂ = P₃∈⟦C₃⟧
-     --                     ; I₀⊆I₁ = {!!}
-     --                     ; I₀⊆I₂ = {!!}
-     --                     ; X₀⊆X₁∪X₂ = {!!}
-     --                     ; X₁⊆X₀ = {!!}
-     --                     ; X₂⊆X₀ = {!!}
-     --                     ; int-pre₀⊨pre₁ = {!!}
-     --                     ; int-post₁⊨pre₂ = {!!}
-     --                     ; int-post₂⊨post₀ = {!!}
-     --                     ; just = {!!}
-     --                     ; just-I = {!!}
-     --                     ; just-≤ = {!!}
-     --                     ; ext-post′₁⊨pre₂ = {!!}
-     --                     ; ext-pre₀⊨pre₁ = {!!}
-     --                     ; ext-pre₀⊨pre′₂ = {!!}
-     --                     ; ext-pre₀⊨pre₁∨pre′₂ = {!!}
-     --                     ; ext-act₀=act₁ = {!!}
-     --                     ; ext-act₀=act₂ = {!!}
-     --                     ; ≤₁⊆≤₀ = {!!}
-     --                     ; ≤₂⊆≤₀ = {!!}
-     --                     ; coherence = {!!}
-     --                     }
      
   ⟦⟨C₁∙C₂⟩∙C₃⟧⊆⟦C₁∙⟨C₂∙C₃⟩⟧ = {!!}
 
