@@ -13,8 +13,8 @@ module augmentation (DM : DataModel) (Event : Set) where
 
   record _≲_ (P P′ : Pomset) : Set₁ where
 
-    open Pomset P using (E ; act ; pre ; _≤_ ; τ ; RE ; WE ; ↓RW ; WE⊆↓RW ; RE⊆↓RW ; ≤⊆↓RW)
-    open Pomset P′ using () renaming (E to E′ ; act to act′ ; pre to pre′ ; _≤_ to _≤′_; ≤-refl to ≤′-refl ; τ to τ′ ; RE to RE′ ; WE to WE′ ; ↓RW to ↓RW′ ; WE⊆↓RW to WE′⊆↓RW′ ; RE⊆↓RW to RE′⊆↓RW′ ; ≤⊆↓RW to ≤′⊆↓RW′)
+    open Pomset P using (E ; act ; pre ; _≤_ ; τ ; RE ; WE ; ↓RW)
+    open Pomset P′ using () renaming (E to E′ ; act to act′ ; pre to pre′ ; _≤_ to _≤′_; ≤-refl to ≤′-refl ; τ to τ′ ; RE to RE′ ; WE to WE′ ; ↓RW to ↓RW′)
 
     field E′⊆E : (E′ ⊆ E)
     field E⊆E′ : (E ⊆ E′)
@@ -25,14 +25,18 @@ module augmentation (DM : DataModel) (Event : Set) where
     
     RE⊆RE′ : (RE ⊆ RE′)
     RE⊆RE′ e (e∈E , ae∈R) = (E⊆E′ e e∈E , ≡-subst Reads (act=act′ e e∈E) ae∈R)
+    
+    RE′⊆RE : (RE′ ⊆ RE)
+    RE′⊆RE e (e∈E′ , ae∈R) = (E′⊆E e e∈E′ , ≡-subst Reads (≡-symm (act=act′ e (E′⊆E e e∈E′))) ae∈R)
 
     WE⊆WE′ : (WE ⊆ WE′)
     WE⊆WE′ e (e∈E , ae∈W) = (E⊆E′ e e∈E , ≡-subst Writes (act=act′ e e∈E) ae∈W)
+    
+    WE′⊆WE : (WE′ ⊆ WE)
+    WE′⊆WE e (e∈E′ , ae∈W) = (E′⊆E e e∈E′ , ≡-subst Writes (≡-symm (act=act′ e (E′⊆E e e∈E′))) ae∈W)
 
     ↓RW⊆↓RW' : ∀ e → (e ∈ E) → (↓RW(e) ⊆ ↓RW′(e))
-    ↓RW⊆↓RW' e e∈E d (WE⊆↓RW d∈WE) = WE′⊆↓RW′ (WE⊆WE′ d d∈WE)
-    ↓RW⊆↓RW' e e∈E d (RE⊆↓RW e∈RE) = RE′⊆↓RW′ (RE⊆RE′ e e∈RE)
-    ↓RW⊆↓RW' e e∈E d (≤⊆↓RW d≤e) = ≤′⊆↓RW′ (≤⊆≤′ d e d≤e)
+    ↓RW⊆↓RW' e e∈E d d∈↓RWe d∈RE′ e∈WE′ = ≤⊆≤′ d e (d∈↓RWe (RE′⊆RE d d∈RE′) (WE′⊆WE e e∈WE′))
     
   sem-resp-≲ : ∀ {P P′ C} → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
 

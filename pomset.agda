@@ -8,7 +8,6 @@ module pomset (DM : DataModel) (Event : Set) where
   data Action : Set where
      R : Address → Value → Action
      W : Address → Value → Action
-     UB : Action
      
   data Reads : Action → Set where
     R : ∀ {a v} → ((R a v) ∈ Reads)
@@ -20,6 +19,13 @@ module pomset (DM : DataModel) (Event : Set) where
     RW : ∀ {x v w} → ((R x v , W x w) ∈ Conflicts)
     WR : ∀ {x v w} → ((W x v , R x w) ∈ Conflicts)
     WW : ∀ {x v w} → ((W x v , W x w) ∈ Conflicts)
+
+  record PartialOrder : Set₁ where
+
+    field _≤_ : Event → Event → Set
+    field ≤-refl : ∀ {e} → (e ≤ e)
+    field ≤-trans : ∀ {c d e} → (c ≤ d) → (d ≤ e) → (c ≤ e)
+    field ≤-asym : ∀ {d e} → (e ≤ d) → (d ≤ e) → (d ≡ e)
   
   record Pomset : Set₁ where
 
@@ -50,10 +56,8 @@ module pomset (DM : DataModel) (Event : Set) where
     field τ-resp-⊆ : ∀ C D ϕ → (C ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     field τ-resp-⊨ : ∀ C ϕ ψ → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
 
-    data ↓RW (e d : Event) : Set where
-      WE⊆↓RW : (d ∈ WE) → (d ∈ ↓RW(e))
-      RE⊆↓RW : (e ∈ RE) → (d ∈ ↓RW(e))
-      ≤⊆↓RW  : (d ≤ e) → (d ∈ ↓RW(e))
+    ↓RW : Event → Event → Set
+    ↓RW(e) = λ d → (d ∈ RE) → (e ∈ WE) → (d ≤ e)
     
     RE⊆E : (RE ⊆ E)
     RE⊆E e (e∈E , _) = e∈E
@@ -64,4 +68,6 @@ module pomset (DM : DataModel) (Event : Set) where
     dec-E : ∀ e → Dec(e ∈ E)
     dec-E e = EXCLUDED_MIDDLE(e ∈ E)
       
+    PO : PartialOrder
+    PO = record { _≤_ = _≤_ ; ≤-refl = ≤-refl ; ≤-trans = ≤-trans ; ≤-asym = ≤-asym }
     
