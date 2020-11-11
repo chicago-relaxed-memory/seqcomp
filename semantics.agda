@@ -31,9 +31,12 @@ module semantics (DM : DataModel) (Event : Set) where
    field E₁⊆E₀ : (E₁ ⊆ E₀)
    field E₂⊆E₀ : (E₂ ⊆ E₀)
 
+   E₁∪E₂⊆E₀ : ((E₁ ∪ E₂) ⊆ E₀)
+   E₁∪E₂⊆E₀ = cond E₁⊆E₀ E₂⊆E₀
+   
    field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
    field ≤₂⊆≤₀ : ∀ d e → (d ≤₂ e) → (d ≤₀ e)
-   field coherence :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → ((act₁(d) , act₂(e)) ∈ Conflicts) → (d ≤₀ e)
+   field coherence :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → (Conflicts (act₁(d)) (act₂(e))) → (d ≤₀ e)
 
    pre′₂ : Event → Formula
    pre′₂(e) = τ₁(↓RW₀(e))(pre₂(e))

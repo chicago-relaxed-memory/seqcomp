@@ -97,7 +97,30 @@ module prelude where
 
   E∪F∖E⊆F : ∀ {X} {E F : X → Set} → ((E ∪ F) ∖ E) ⊆ F
   E∪F∖E⊆F e (e∈E∪F , e∉F) = E∪F∖F⊆E e (E∪F⊆F∪E e e∈E∪F , e∉F)
+  
+  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F : ∀ {X} {D E F : X → Set} → (D ∪ (E ∪ F)) ⊆ ((D ∪ E) ∪ F)
+  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (left e∈D e∉E∪F) = left (left e∈D (λ e∈E → e∉E∪F (left e∈E (λ e∈F → e∉E∪F (both e∈E e∈F))))) λ e∈F → e∉E∪F (right (λ e∈E → e∉E∪F (both e∈E e∈F)) e∈F)
+  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (right e∉D (left e∈E e∉F)) = left (right e∉D e∈E) e∉F
+  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (right e∉D (right e∉E e∈F)) = right (neither e∉D e∉E) e∈F
+  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (right e∉D (both e∈E e∈F)) = both (right e∉D e∈E) e∈F
+  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (both e∈D (left e∈E e∉F)) = left (both e∈D e∈E) e∉F
+  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (both e∈D (right e∉E e∈F)) = both (left e∈D e∉E) e∈F
+  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (both e∈D (both e∈E e∈F)) = both (both e∈D e∈E) e∈F
 
+  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ : ∀ {X} {D E F : X → Set} → ((D ∪ E) ∪ F) ⊆ (D ∪ (E ∪ F))
+  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (left (left e∈D e∉E) e∉F) = left e∈D (neither e∉E e∉F)
+  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (left (right e∉D e∈E) e∉F) = right e∉D (left e∈E e∉F)
+  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (left (both e∈D e∈E) e∉F) = both e∈D (left e∈E e∉F)
+  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (right e∉D∪E e∈F) = right (λ e∈D → e∉D∪E (left e∈D (λ e∈E → e∉D∪E (both e∈D e∈E)))) (right (λ e∈E → e∉D∪E (right (λ e∈D → e∉D∪E (both e∈D e∈E)) e∈E)) e∈F)
+  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (both (left e∈D e∉E) e∈F) = both e∈D (right e∉E e∈F)
+  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (both (right e∉D e∈E) e∈F) = right e∉D (both e∈E e∈F)
+  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (both (both e∈D e∈E) e∈F) = both e∈D (both e∈E e∈F)
+
+  cond : ∀ {X : Set} {D E F : X → Set} → (D ⊆ F) → (E ⊆ F) → ((D ∪ E) ⊆ F)
+  cond D⊆F E⊆F e (left e∈D _) = D⊆F e e∈D
+  cond D⊆F E⊆F e (right _ e∈E) = E⊆F e e∈E
+  cond D⊆F E⊆F e (both e∈D _) = D⊆F e e∈D
+  
   data _⊎_ {X : Set} (E F : X → Set) (e : X) : Set where
     left : (e ∈ E) → (e ∉ F) → (e ∈ (E ⊎ F))
     right : (e ∉ E) → (e ∈ F) → (e ∈ (E ⊎ F))
@@ -118,4 +141,3 @@ module prelude where
   F⊆E∪F {E = E} e e∈E with EXCLUDED_MIDDLE(e ∈ E)
   F⊆E∪F e e∈F | yes e∈E = both e∈E e∈F
   F⊆E∪F e e∈F | no e∉E = right e∉E e∈F
-  

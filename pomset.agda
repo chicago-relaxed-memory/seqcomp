@@ -15,10 +15,10 @@ module pomset (DM : DataModel) (Event : Set) where
   data Writes : Action → Set where
     W : ∀ {a v} → ((W a v) ∈ Writes)
 
-  data Conflicts : (Action × Action) → Set where
-    RW : ∀ {x v w} → ((R x v , W x w) ∈ Conflicts)
-    WR : ∀ {x v w} → ((W x v , R x w) ∈ Conflicts)
-    WW : ∀ {x v w} → ((W x v , W x w) ∈ Conflicts)
+  data Conflicts : Action → Action → Set where
+    RW : ∀ {x v w} → Conflicts (R x v) (W x w)
+    WR : ∀ {x v w} → Conflicts (W x v) (R x w)
+    WW : ∀ {x v w} → Conflicts (W x v) (W x w)
 
   record PartialOrder : Set₁ where
 

@@ -136,60 +136,108 @@ module monoid (DM : DataModel) (Event : Set) where
 
   ⟦C₁∙⟨C₂∙C₃⟩⟧⊆⟦⟨C₁∙C₂⟩∙C₃⟧ C₁ C₂ C₃ P₀ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ =  P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ where
 
-     open _●_ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ using (P₁ ; ≤₁⊆≤₀ ; act₀=act₁ ; pre₀⊨pre₁) renaming (P₂ to P₂₃ ; P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂₃∈⟦C₂∙C₃⟧ ; act₀=act₂ to act₀=act₂₃ ; pre′₂ to pre′₂₃ ; ≤₂⊆≤₀ to ≤₂₃⊆≤₀ ; coherence to coherence₀)
-     open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (P₁ to P₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₂∈⟦C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; pre′₂ to pre′₃ ; E₁⊆E₀ to E₂⊆E₂₃ ; E₂⊆E₀ to E₃⊆E₂₃ ; ≤₁⊆≤₀ to ≤₂⊆≤₂₃ ; ≤₂⊆≤₀ to ≤₃⊆≤₂₃ ; act₀=act₁ to act₂₃=act₂ ; act₀=act₂ to act₂₃=act₃)
+     open _●_ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ using (P₁ ; E₁⊆E₀ ;  ≤₁⊆≤₀ ; act₀=act₁ ; pre₀⊨pre₁) renaming (P₂ to P₂₃ ; P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂₃∈⟦C₂∙C₃⟧ ; E₂⊆E₀ to E₂₃⊆E₀ ; E₀⊆E₁∪E₂ to E₀⊆E₁∪E₂₃ ; act₀=act₂ to act₀=act₂₃ ; pre′₂ to pre′₂₃ ; pre₀⊨pre′₂ to pre₀⊨pre′₂₃ ; pre₀⊨pre₁∨pre′₂ to pre₀⊨pre₁∨pre′₂₃ ; ≤₂⊆≤₀ to ≤₂₃⊆≤₀ ; coherence to coherence₀ ; τ₀ϕ⊨τ₁τ₂ϕ to τ₀ϕ⊨τ₁τ₂₃ϕ)
+     open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (P₁ to P₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₂∈⟦C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; pre′₂ to pre′₃ ; E₁⊆E₀ to E₂⊆E₂₃ ; E₂⊆E₀ to E₃⊆E₂₃ ; E₀⊆E₁∪E₂ to E₂₃⊆E₂∪E₃ ; ≤₁⊆≤₀ to ≤₂⊆≤₂₃ ; ≤₂⊆≤₀ to ≤₃⊆≤₂₃ ; act₀=act₁ to act₂₃=act₂ ; act₀=act₂ to act₂₃=act₃ ; coherence to coherence₂₃; τ₀ϕ⊨τ₁τ₂ϕ to τ₂₃ϕ⊨τ₂τ₃ϕ)
      
-     open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; ↓RW to ↓RW₀m ; PO to PO₀)
+     open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; ↓RW to ↓RW₀ ; PO to PO₀)
      open Pomset P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-⊨ to τ₁-resp-⊨)
      open Pomset P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-⊨ to τ₂-resp-⊨)
-     open Pomset P₃ using () renaming (E to E₃ ; act to act₃)
+     open Pomset P₃ using () renaming (E to E₃ ; act to act₃ ; τ to τ₃)
+     open Pomset P₂₃ using () renaming (E to E₂₃ ; τ to τ₂₃ ; pre to pre₂₃)
 
      P₁₂ : Pomset
-     P₁₂ = Pcomp PO₀ P₁ P₂
+     P₁₂ = Pcomp act₀ PO₀ P₁ P₂
 
      P₁₂₃ : Pomset
-     P₁₂₃ = Pcomp PO₀ P₁₂ P₃
+     P₁₂₃ = Pcomp act₀ PO₀ P₁₂ P₃
 
-     open Pomset P₁₂ using () renaming (E to E₁₂ ; act to act₁₂)
-     open Pomset P₁₂₃ using () renaming (E to E₁₂₃ ; act to act₁₂₃)
+     open Pomset P₁₂ using () renaming (E to E₁₂ ; pre to pre₁₂ ; dec-E to dec-E₁₂ ; ↓RW to ↓RW₁₂)
+     open Pomset P₁₂₃ using () renaming (E to E₁₂₃ ; pre to pre₁₂₃ ; dec-E to dec-E₁₂₃)
      
-     act₀=act₁₂ : ∀ e → (e ∈ E₁₂) → (act₀(e) ≡ act₁₂(e))
-     act₀=act₁₂ = {!!}
-
-     act₀=act₁₂₃ : ∀ e → (e ∈ E₁₂₃) → (act₀(e) ≡ act₁₂₃(e))
-     act₀=act₁₂₃ = {!!}
-
-     coherence₁₂₃ : ∀ d e → (d ∈ E₁₂) → (e ∈ E₃) → (act₁₂ d , act₃ e) ∈ Conflicts → (d ≤₀ e)
-     coherence₁₂₃ = {!!}
+     act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
+     act₀=act₂ e e∈E₂ = ≡-trans (act₀=act₂₃ e (E₂⊆E₂₃ e e∈E₂)) (act₂₃=act₂ e e∈E₂)
      
-     PO₀∈CompP₁P₂ : PO₀ ∈ Compatible P₁ P₂
+     act₀=act₃ : ∀ e → (e ∈ E₃) → (act₀(e) ≡ act₃(e))
+     act₀=act₃ e e∈E₃ = ≡-trans (act₀=act₂₃ e (E₃⊆E₂₃ e e∈E₃)) (act₂₃=act₃ e e∈E₃)
+
+     coherence₁₂ : ∀ d e → (d ∈ E₁) → (e ∈ E₂) → Conflicts (act₁ d) (act₂ e) → (d ≤₀ e)
+     coherence₁₂ d e d∈E₁ e∈E₂ a₁#a₂ = coherence₀ d e d∈E₁ (E₂⊆E₂₃ e e∈E₂) (≡-subst₂ Conflicts refl (≡-symm (act₂₃=act₂ e e∈E₂)) a₁#a₂)
+     
+     coherence₁₂₃ : ∀ d e → (d ∈ E₁₂) → (e ∈ E₃) → Conflicts (act₀ d) (act₃ e) → (d ≤₀ e)
+     coherence₁₂₃ d e (left d∈E₁ _) e∈E₃ a₁₂#a₃ = coherence₀ d e d∈E₁ (E₃⊆E₂₃ e e∈E₃) (≡-subst₂ Conflicts (act₀=act₁ d d∈E₁) (≡-symm (act₂₃=act₃ e e∈E₃)) a₁₂#a₃)
+     coherence₁₂₃ d e (right _ d∈E₂) e∈E₃ a₁₂#a₃ = ≤₂₃⊆≤₀ d e (coherence₂₃ d e d∈E₂ e∈E₃ (≡-subst₂ Conflicts (act₀=act₂ d d∈E₂) refl a₁₂#a₃))
+     coherence₁₂₃ d e (both d∈E₁ _) e∈E₃ a₁₂#a₃ = coherence₀ d e d∈E₁ (E₃⊆E₂₃ e e∈E₃) (≡-subst₂ Conflicts (act₀=act₁ d d∈E₁) (≡-symm (act₂₃=act₃ e e∈E₃)) a₁₂#a₃)
+     
+     PO₀∈CompP₁P₂ : Compatible act₀ PO₀ P₁ P₂
      PO₀∈CompP₁P₂ = record
-                      { act₁=act₂ = λ{ e (e∈E₁ , e∈E₂) → ≡-trans (≡-symm (act₀=act₁ e e∈E₁)) (≡-trans (act₀=act₂₃ e (E₂⊆E₂₃ e e∈E₂)) (act₂₃=act₂ e e∈E₂)) }
+                      { act₀=act₁ = act₀=act₁
+                      ; act₀=act₂ = act₀=act₂
                       ; ≤₁⊆≤₀ = ≤₁⊆≤₀
                       ; ≤₂⊆≤₀ = λ d e d≤₂e → ≤₂₃⊆≤₀ d e (≤₂⊆≤₂₃ d e d≤₂e)
-                      ; coherence = λ d e d∈E₁ e∈E₂ a₁#a₂ → coherence₀ d e d∈E₁ (E₂⊆E₂₃ e e∈E₂) ((≡-subst (λ X → (act₁ d , X) ∈ Conflicts) (≡-symm (act₂₃=act₂ e e∈E₂)) a₁#a₂)) }
+                      ; coherence = coherence₁₂ }
      
-     PO₀∈CompP₁₂P₃ : PO₀ ∈ Compatible P₁₂ P₃
+     PO₀∈CompP₁₂P₃ : Compatible act₀ PO₀ P₁₂ P₃
      PO₀∈CompP₁₂P₃ = record
-                       { act₁=act₂ = λ{ e (e∈E₁₂ , e∈E₃) → ≡-trans (≡-symm (act₀=act₁₂ e e∈E₁₂)) (≡-trans (act₀=act₂₃ e (E₃⊆E₂₃ e e∈E₃)) (act₂₃=act₃ e e∈E₃)) }
+                       { act₀=act₁ = λ e e∈E₁₂ → refl
+                       ; act₀=act₂ = act₀=act₃
                        ; ≤₁⊆≤₀ = λ d e d≤₀e → d≤₀e
                        ; ≤₂⊆≤₀ = λ d e d≤₃e → ≤₂₃⊆≤₀ d e (≤₃⊆≤₂₃ d e d≤₃e)
                        ; coherence = coherence₁₂₃ }
      
      P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
-     P₁₂∈⟦C₁∙C₂⟧ = Pcomp∈⟦C₁∙C₂⟧ C₁ C₂ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
+     P₁₂∈⟦C₁∙C₂⟧ = Pcomp∈⟦C₁∙C₂⟧ C₁ C₂ act₀ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
 
+     open _●_ P₁₂∈⟦C₁∙C₂⟧ using () renaming (pre′₂ to pre′₁₂ ; pre₀⊨pre′₂ to pre₁₂⊨pre′₁₂)
+     
      P₁₂∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₁₂₃ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
-     P₁₂∈⟦⟨C₁∙C₂⟩∙C₃⟧ = Pcomp∈⟦C₁∙C₂⟧ (C₁ ∙ C₂) C₃ PO₀ P₁₂ P₃ P₁₂∈⟦C₁∙C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₁₂P₃
+     P₁₂∈⟦⟨C₁∙C₂⟩∙C₃⟧ = Pcomp∈⟦C₁∙C₂⟧ (C₁ ∙ C₂) C₃ act₀ PO₀ P₁₂ P₃ P₁₂∈⟦C₁∙C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₁₂P₃
 
+     E₂⊆E₀ : E₂ ⊆ E₀
+     E₂⊆E₀ e e∈E₂ = E₂₃⊆E₀ e (E₂⊆E₂₃ e e∈E₂)
+
+     E₃⊆E₀ : E₃ ⊆ E₀
+     E₃⊆E₀ e e∈E₃ = E₂₃⊆E₀ e (E₃⊆E₂₃ e e∈E₃)
+     
+     E₁₂⊆E₀ : E₁₂ ⊆ E₀
+     E₁₂⊆E₀ = cond E₁⊆E₀ E₂⊆E₀
+     
+     E₁₂₃⊆E₀ : E₁₂₃ ⊆ E₀
+     E₁₂₃⊆E₀ = cond E₁₂⊆E₀ E₃⊆E₀
+     
+     E₀⊆E₁₂₃ : E₀ ⊆ E₁₂₃
+     E₀⊆E₁₂₃ e e∈E₀ with E₀⊆E₁∪E₂₃ e e∈E₀
+     E₀⊆E₁₂₃ e e∈E₀ | left e∈E₁ _ = E⊆E∪F e (E⊆E∪F e e∈E₁)
+     E₀⊆E₁₂₃ e e∈E₀ | right _ e∈E₂₃ with E₂₃⊆E₂∪E₃ e e∈E₂₃
+     E₀⊆E₁₂₃ e e∈E₀ | right _ e∈E₂₃ | left e∈E₂ _ = E⊆E∪F e (F⊆E∪F e e∈E₂)
+     E₀⊆E₁₂₃ e e∈E₀ | right _ e∈E₂₃ | right _ e∈E₃ = F⊆E∪F e e∈E₃
+     E₀⊆E₁₂₃ e e∈E₀ | right _ e∈E₂₃ | both _ e∈E₃ = F⊆E∪F e e∈E₃
+     E₀⊆E₁₂₃ e e∈E₀ | both e∈E₁ _ = E⊆E∪F e (E⊆E∪F e e∈E₁)
+
+     pre′₂₃⊨pre′₁₂ : ∀ e → (e ∈ E₂) → (e ∉ E₃) → (pre′₂₃ e) ⊨ (pre′₁₂ e)
+     pre′₂₃⊨pre′₁₂ = {!!}
+     
+     pre₀⊨pre₁₂ : ∀ e → (e ∈ E₁₂) → (e ∉ E₃) → (pre₀(e) ⊨ pre₁₂(e))
+     pre₀⊨pre₁₂ e _ e∉E₃ with dec-E₁₂(e)
+     pre₀⊨pre₁₂ e _ e∉E₃ | yes (left e∈E₁ e∉E₂) = pre₀⊨pre₁ e e∈E₁ (λ e∈E₂₃ → neither e∉E₂ e∉E₃ (E₂₃⊆E₂∪E₃ e e∈E₂₃))
+     pre₀⊨pre₁₂ e _ e∉E₃ | yes (right e∉E₁ e∈E₂) = ⊨-trans (pre₀⊨pre′₂₃ e e∉E₁ (E₂⊆E₂₃ e e∈E₂)) (pre′₂₃⊨pre′₁₂ e e∈E₂ e∉E₃)
+     pre₀⊨pre₁₂ e _ e∉E₃ | yes (both e∈E₁ e∈E₂) = ⊨-trans (pre₀⊨pre₁∨pre′₂₃ e e∈E₁ (E₂⊆E₂₃ e e∈E₂)) (⊨-resp-∨ ⊨-refl (pre′₂₃⊨pre′₁₂ e e∈E₂ e∉E₃))
+     pre₀⊨pre₁₂ e e∈E₁₂ e∉E₃ | no e∉E₁₂ = CONTRADICTION (e∉E₁₂ e∈E₁₂)
+     
+     pre₀⊨pre₁₂₃ : ∀ e → (e ∈ E₁₂₃) → (pre₀(e) ⊨ pre₁₂₃(e))
+     pre₀⊨pre₁₂₃ e _ with dec-E₁₂₃(e)
+     pre₀⊨pre₁₂₃ e _ | yes (left e∈E₁₂ e∉E₃) = pre₀⊨pre₁₂ e e∈E₁₂ e∉E₃
+     pre₀⊨pre₁₂₃ e _ | yes (right x x₁) = {!!}
+     pre₀⊨pre₁₂₃ e _ | yes (both x x₁) = {!!}
+     pre₀⊨pre₁₂₃ e _ | no x = {!!}
+     
      P₁₂₃≲P₀ : P₁₂₃ ≲ P₀
      P₁₂₃≲P₀ = record
-                 { E′⊆E = λ e e∈E₀ → {!!}
-                 ; E⊆E′ = λ e e∈E₁₂₃ → {!!}
-                 ; act=act′ = λ e e∈E₁₂₃ → ≡-symm (act₀=act₁₂₃ e e∈E₁₂₃)
+                 { E′⊆E = E₀⊆E₁₂₃
+                 ; E⊆E′ = E₁₂₃⊆E₀
+                 ; act=act′ = λ e e∈E₁₂₃ → refl
                  ; pre′⊨pre = {!!}
                  ; ≤⊆≤′ = λ d e d≤₀e → d≤₀e
-                 ; τ′⊨τ = {!!}
+                 ; τ′⊨τ = λ C ϕ → ⊨-trans (τ₀ϕ⊨τ₁τ₂₃ϕ C ϕ) (τ₁-resp-⊨ C (τ₂₃ C ϕ) (τ₂ C (τ₃ C ϕ)) (τ₂₃ϕ⊨τ₂τ₃ϕ C ϕ))
                  }
 
      P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₀ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
