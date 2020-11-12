@@ -55,6 +55,8 @@ module pomset (DM : DataModel) (Event : Set) where
 
     field τ-resp-∩⊆ : ∀ C D ϕ → ((C ∩ E) ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     field τ-resp-⊨ : ∀ C ϕ ψ → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
+    -- TODO: make this a field
+    postulate τ-resp-∨ : ∀ C ϕ ψ → (τ(C)(ϕ ∨ ψ) ⊨ (τ(C)(ϕ) ∨ τ(C)(ψ)))
 
     τ-resp-⊆ : ∀ C D ϕ → (C ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     τ-resp-⊆ C D ϕ C⊆D = τ-resp-∩⊆ C D ϕ (λ{ e (e∈C , _) → C⊆D e e∈C})
