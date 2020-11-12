@@ -38,12 +38,15 @@ module semantics (DM : DataModel) (Event : Set) where
    field ≤₂⊆≤₀ : ∀ d e → (d ≤₂ e) → (d ≤₀ e)
    field coherence :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → (Conflicts (act₁(d)) (act₂(e))) → (d ≤₀ e)
 
-   pre′₂ : Event → Formula
-   pre′₂(e) = τ₁(↓RW₀(e))(pre₂(e))
+   lhs₀ : Event → Formula
+   lhs₀ = pre₁
+
+   rhs₀ : Event → Formula
+   rhs₀(e) = τ₁(↓RW₀(e))(pre₂(e))
    
-   field pre₀⊨pre₁ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (pre₀(e) ⊨ pre₁(e))
-   field pre₀⊨pre′₂ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (pre₀(e) ⊨ pre′₂(e))
-   field pre₀⊨pre₁∨pre′₂ : ∀ e → (e ∈ E₁) → (e ∈ E₂) → (pre₀(e) ⊨ (pre₁(e) ∨ pre′₂(e)))
+   field pre₀⊨lhs₀ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (pre₀(e) ⊨ lhs₀(e))
+   field pre₀⊨rhs₀ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (pre₀(e) ⊨ rhs₀(e))
+   field pre₀⊨lhs₀∨rhs₀ : ∀ e → (e ∈ E₁) → (e ∈ E₂) → (pre₀(e) ⊨ (lhs₀(e) ∨ rhs₀(e)))
    
    field act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
    field act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
