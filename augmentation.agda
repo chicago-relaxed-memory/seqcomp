@@ -36,7 +36,7 @@ module augmentation (DM : DataModel) (Event : Set) where
     WE′⊆WE e (e∈E′ , ae∈W) = (E′⊆E e e∈E′ , ≡-subst Writes (≡-symm (act=act′ e (E′⊆E e e∈E′))) ae∈W)
 
     ↓RW⊆↓RW' : ∀ e → (e ∈ E) → (↓RW(e) ⊆ ↓RW′(e))
-    ↓RW⊆↓RW' e e∈E d d∈↓RWe d∈RE′ e∈WE′ = ≤⊆≤′ d e (d∈↓RWe (RE′⊆RE d d∈RE′) (WE′⊆WE e e∈WE′))
+    ↓RW⊆↓RW' e e∈E d (d∈E , d∈↓RWe) = (E⊆E′ d d∈E , λ d∈RE′ e∈WE′ → ≤⊆≤′ d e (d∈↓RWe (RE′⊆RE d d∈RE′) (WE′⊆WE e e∈WE′)))
     
   sem-resp-≲ : ∀ {P P′ C} → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
 

@@ -53,11 +53,14 @@ module pomset (DM : DataModel) (Event : Set) where
     field ≤-trans : ∀ {c d e} → (c ≤ d) → (d ≤ e) → (c ≤ e)
     field ≤-asym : ∀ {d e} → (e ≤ d) → (d ≤ e) → (d ≡ e)
 
-    field τ-resp-⊆ : ∀ C D ϕ → (C ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
+    field τ-resp-∩⊆ : ∀ C D ϕ → ((C ∩ E) ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     field τ-resp-⊨ : ∀ C ϕ ψ → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
 
+    τ-resp-⊆ : ∀ C D ϕ → (C ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
+    τ-resp-⊆ C D ϕ C⊆D = τ-resp-∩⊆ C D ϕ (λ{ e (e∈C , _) → C⊆D e e∈C})
+    
     ↓RW : Event → Event → Set
-    ↓RW(e) = λ d → (d ∈ RE) → (e ∈ WE) → (d ≤ e)
+    ↓RW(e) = λ d → (d ∈ E) × ((d ∈ RE) → (e ∈ WE) → (d ≤ e))
     
     RE⊆E : (RE ⊆ E)
     RE⊆E e (e∈E , _) = e∈E
@@ -65,6 +68,9 @@ module pomset (DM : DataModel) (Event : Set) where
     WE⊆E : (WE ⊆ E)
     WE⊆E e (e∈E , _) = e∈E
 
+    ↓RW⊆E : ∀ e → (↓RW(e) ⊆ E)
+    ↓RW⊆E e d (d∈E , _)= d∈E
+    
     dec-E : ∀ e → Dec(e ∈ E)
     dec-E e = EXCLUDED_MIDDLE(e ∈ E)
       
