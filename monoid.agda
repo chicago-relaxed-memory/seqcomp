@@ -35,9 +35,9 @@ module monoid (DM : DataModel) (Event : Set) where
     P₀∈⟦C∙skip⟧ : P₀ ∈ ⟦ C ∙ skip ⟧
     P₀∈⟦C∙skip⟧ = record
                     { P₁ = P₀
-                    ; P₂ = Pskip act₀
+                    ; P₂ = skipP act₀
                     ; P₁∈𝒫₁ = P₀∈⟦C⟧
-                    ; P₂∈𝒫₂ = Pskip∈⟦skip⟧ act₀
+                    ; P₂∈𝒫₂ = skipP∈⟦skip⟧ act₀
                     ; E₀⊆E₁∪E₂ = λ e e∈E₀ → left e∈E₀ (λ ())
                     ; E₁⊆E₀ = λ e e∈E₀ → e∈E₀
                     ; E₂⊆E₀ = λ e ()
@@ -87,9 +87,9 @@ module monoid (DM : DataModel) (Event : Set) where
 
     P₀∈⟦skip∙C⟧ : P₀ ∈ ⟦ skip ∙ C ⟧
     P₀∈⟦skip∙C⟧ = record
-                    { P₁ = Pskip act₀
+                    { P₁ = skipP act₀
                     ; P₂ = P₀
-                    ; P₁∈𝒫₁ = Pskip∈⟦skip⟧ act₀
+                    ; P₁∈𝒫₁ = skipP∈⟦skip⟧ act₀
                     ; P₂∈𝒫₂ = P₀∈⟦C⟧
                     ; E₀⊆E₁∪E₂ = λ e e∈E₀ → right (λ ()) e∈E₀
                     ; E₁⊆E₀ = λ e ()
@@ -146,10 +146,10 @@ module monoid (DM : DataModel) (Event : Set) where
      open Pomset P₂₃ using () renaming (E to E₂₃ ; τ to τ₂₃ ; pre to pre₂₃; ↓RW to ↓RW₂₃ ; RE to RE₂₃ ; WE to WE₂₃)
 
      P₁₂ : Pomset
-     P₁₂ = Pcomp act₀ PO₀ P₁ P₂
+     P₁₂ = compP act₀ PO₀ P₁ P₂
 
      P₁₂₃ : Pomset
-     P₁₂₃ = Pcomp act₀ PO₀ P₁₂ P₃
+     P₁₂₃ = compP act₀ PO₀ P₁₂ P₃
 
      open Pomset P₁₂ using () renaming (E to E₁₂ ; pre to pre₁₂ ; dec-E to dec-E₁₂ ; RE to RE₁₂ ; WE to WE₁₂ ; ↓RW to ↓RW₁₂)
      open Pomset P₁₂₃ using () renaming (E to E₁₂₃ ; pre to pre₁₂₃ ; dec-E to dec-E₁₂₃ ; RE to RE₁₂₃ ; WE to WE₁₂₃ ; ↓RW to ↓RW₁₂₃)
@@ -185,10 +185,10 @@ module monoid (DM : DataModel) (Event : Set) where
                        ; coherence = coherence₁₂₃ }
      
      P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
-     P₁₂∈⟦C₁∙C₂⟧ = Pcomp∈⟦C₁∙C₂⟧ C₁ C₂ act₀ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
+     P₁₂∈⟦C₁∙C₂⟧ = compP∈⟦C₁∙C₂⟧ C₁ C₂ act₀ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
      
      P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₁₂₃ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
-     P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ = Pcomp∈⟦C₁∙C₂⟧ (C₁ ∙ C₂) C₃ act₀ PO₀ P₁₂ P₃ P₁₂∈⟦C₁∙C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₁₂P₃
+     P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ = compP∈⟦C₁∙C₂⟧ (C₁ ∙ C₂) C₃ act₀ PO₀ P₁₂ P₃ P₁₂∈⟦C₁∙C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₁₂P₃
 
      open _●_ P₁₂∈⟦C₁∙C₂⟧ using () renaming (E₁⊆E₀ to E₁⊆E₁₂ ; E₂⊆E₀ to E₂⊆E₁₂ ; rhs₀ to rhs₁₂ ; pre₀⊨rhs₀ to pre₁₂⊨rhs₁₂)
      open _●_ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ using () renaming (lhs₀ to lhs₁₂₃ ; rhs₀ to rhs₁₂₃ ; pre₀⊨rhs₀ to pre₁₂₃⊨rhs₁₂₃)
