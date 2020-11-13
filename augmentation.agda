@@ -63,7 +63,7 @@ module augmentation (DM : DataModel) (Event : Set) where
     rhs′₀(e) = τ₁(↓RW′₀(e))(pre₂(e))
    
     rhs₀⊨rhs′₀ : ∀ e → (e ∈ E₂) → (rhs₀(e) ⊨ rhs′₀(e))
-    rhs₀⊨rhs′₀ e e∈E₂ = τ₁-resp-⊆ (↓RW₀(e)) (↓RW′₀(e)) (pre₂(e)) (↓RW₀⊆↓RW'₀ e (E₂⊆E₀ e e∈E₂))
+    rhs₀⊨rhs′₀ e e∈E₂ = τ₁-resp-⊆ (↓RW₀⊆↓RW'₀ e (E₂⊆E₀ e e∈E₂))
     
     P′₀∈⟦C₁⟧●⟦C₂⟧ : P′₀ ∈ (⟦ C₁ ⟧ ● ⟦ C₂ ⟧)
     P′₀∈⟦C₁⟧●⟦C₂⟧ = record
