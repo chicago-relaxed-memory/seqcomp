@@ -39,6 +39,11 @@ module prelude where
     yes : X → Dec X
     no : (X → FALSE) → Dec X
 
+  data ℕ : Set where
+    zero : ℕ
+    succ : ℕ → ℕ
+  {-# BUILTIN NATURAL ℕ #-}
+
   record _×_ (X Y : Set) : Set where
     constructor _,_
     field fst : X
@@ -60,9 +65,6 @@ module prelude where
   _∩_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
   (E ∩ F) = λ e → (e ∈ E) × (e ∈ F)
   
-  _∖_ :  ∀ {X : Set} → (X → Set) → (X → Set) → (X → Set)
-  (E ∖ F) = λ e → (e ∈ E) × (e ∉ F)
-  
   data _∪_ {X : Set} (E F : X → Set) (e : X) : Set where
     left : (e ∈ E) → (e ∉ F) → (e ∈ (E ∪ F))
     right : (e ∉ E) → (e ∈ F) → (e ∈ (E ∪ F))
@@ -73,71 +75,60 @@ module prelude where
   neither e∉E e∉F (right _ e∈F) = e∉F e∈F
   neither e∉E e∉F (both e∈E _) = e∉E e∈E
   
-  dec-∪ : ∀ {X E F} {e : X} → Dec(e ∈ E) → Dec(e ∈ F) → Dec(e ∈ (E ∪ F))
-  dec-∪ (yes e∈E) (yes e∈F) = yes (both e∈E e∈F)
-  dec-∪ (yes e∈E) (no e∉F) = yes (left e∈E e∉F)
-  dec-∪ (no e∉E) (yes e∈F) = yes (right e∉E e∈F)
-  dec-∪ (no e∉E) (no e∉F)  = no (neither e∉E e∉F)
-
-  E∪F⊆F∪E : ∀ {X} {E F : X → Set} → (E ∪ F) ⊆ (F ∪ E)
-  E∪F⊆F∪E e (left e∈E e∉F) = right e∉F e∈E
-  E∪F⊆F∪E e (right e∉E e∈F) = left e∈F e∉E
-  E∪F⊆F∪E e (both e∈E e∈F) = both e∈F e∈E
-  
-  E∪F∖F⊆E∖F : ∀ {X} {E F : X → Set} → ((E ∪ F) ∖ F) ⊆ (E ∖ F)
-  E∪F∖F⊆E∖F e (left e∈E _ , e∉F) = (e∈E , e∉F)
-  E∪F∖F⊆E∖F e (right _ e∈F , e∉F) = CONTRADICTION (e∉F e∈F)
-  E∪F∖F⊆E∖F e (both _ e∈F , e∉F) = CONTRADICTION (e∉F e∈F)
-  
-  E∖F⊆E : ∀ {X} {E F : X → Set} → (E ∖ F) ⊆ E
-  E∖F⊆E e (e∈E , _) = e∈E
-
-  E∪F∖F⊆E : ∀ {X} {E F : X → Set} → ((E ∪ F) ∖ F) ⊆ E
-  E∪F∖F⊆E {X} {E} {F} e e∈E∪F∖F = E∖F⊆E {X} {E} {F} e (E∪F∖F⊆E∖F e e∈E∪F∖F)
-
-  E∪F∖E⊆F : ∀ {X} {E F : X → Set} → ((E ∪ F) ∖ E) ⊆ F
-  E∪F∖E⊆F e (e∈E∪F , e∉F) = E∪F∖F⊆E e (E∪F⊆F∪E e e∈E∪F , e∉F)
-  
-  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F : ∀ {X} {D E F : X → Set} → (D ∪ (E ∪ F)) ⊆ ((D ∪ E) ∪ F)
-  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (left e∈D e∉E∪F) = left (left e∈D (λ e∈E → e∉E∪F (left e∈E (λ e∈F → e∉E∪F (both e∈E e∈F))))) λ e∈F → e∉E∪F (right (λ e∈E → e∉E∪F (both e∈E e∈F)) e∈F)
-  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (right e∉D (left e∈E e∉F)) = left (right e∉D e∈E) e∉F
-  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (right e∉D (right e∉E e∈F)) = right (neither e∉D e∉E) e∈F
-  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (right e∉D (both e∈E e∈F)) = both (right e∉D e∈E) e∈F
-  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (both e∈D (left e∈E e∉F)) = left (both e∈D e∈E) e∉F
-  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (both e∈D (right e∉E e∈F)) = both (left e∈D e∉E) e∈F
-  D∪⟨E∪F⟩⊆⟨D∪E⟩∪F e (both e∈D (both e∈E e∈F)) = both (both e∈D e∈E) e∈F
-
-  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ : ∀ {X} {D E F : X → Set} → ((D ∪ E) ∪ F) ⊆ (D ∪ (E ∪ F))
-  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (left (left e∈D e∉E) e∉F) = left e∈D (neither e∉E e∉F)
-  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (left (right e∉D e∈E) e∉F) = right e∉D (left e∈E e∉F)
-  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (left (both e∈D e∈E) e∉F) = both e∈D (left e∈E e∉F)
-  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (right e∉D∪E e∈F) = right (λ e∈D → e∉D∪E (left e∈D (λ e∈E → e∉D∪E (both e∈D e∈E)))) (right (λ e∈E → e∉D∪E (right (λ e∈D → e∉D∪E (both e∈D e∈E)) e∈E)) e∈F)
-  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (both (left e∈D e∉E) e∈F) = both e∈D (right e∉E e∈F)
-  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (both (right e∉D e∈E) e∈F) = right e∉D (both e∈E e∈F)
-  ⟨D∪E⟩∪F⊆D∪⟨E∪F⟩ e (both (both e∈D e∈E) e∈F) = both e∈D (both e∈E e∈F)
-
-  cond : ∀ {X : Set} {D E F : X → Set} → (D ⊆ F) → (E ⊆ F) → ((D ∪ E) ⊆ F)
-  cond D⊆F E⊆F e (left e∈D _) = D⊆F e e∈D
-  cond D⊆F E⊆F e (right _ e∈E) = E⊆F e e∈E
-  cond D⊆F E⊆F e (both e∈D _) = D⊆F e e∈D
-  
-  data _⊎_ {X : Set} (E F : X → Set) (e : X) : Set where
-    left : (e ∈ E) → (e ∉ F) → (e ∈ (E ⊎ F))
-    right : (e ∉ E) → (e ∈ F) → (e ∈ (E ⊎ F))
-
-  data ℕ : Set where
-    zero : ℕ
-    succ : ℕ → ℕ
-  {-# BUILTIN NATURAL ℕ #-}
-
   postulate EXCLUDED_MIDDLE : ∀ X → Dec(X)
+
+  _⁻¹[_] : ∀ {X Y : Set} → (X → Y) → (Y → Set) → (X → Set)
+  f ⁻¹[ E ] = λ e → (f e) ∈ E
   
-  E⊆E∪F : ∀ {X} {E F :  X → Set} → E ⊆ (E ∪ F)
-  E⊆E∪F {F = F} e e∈E with EXCLUDED_MIDDLE(e ∈ F)
-  E⊆E∪F e e∈E | yes e∈F = both e∈E e∈F
-  E⊆E∪F e e∈E | no e∉F = left e∈E e∉F
+  ⊆-left-∪ : ∀ {X} {E F :  X → Set} → E ⊆ (E ∪ F)
+  ⊆-left-∪ {F = F} e e∈E with EXCLUDED_MIDDLE(e ∈ F)
+  ⊆-left-∪ e e∈E | yes e∈F = both e∈E e∈F
+  ⊆-left-∪ e e∈E | no e∉F = left e∈E e∉F
   
-  F⊆E∪F : ∀ {X} {E F :  X → Set} → F ⊆ (E ∪ F)
-  F⊆E∪F {E = E} e e∈E with EXCLUDED_MIDDLE(e ∈ E)
-  F⊆E∪F e e∈F | yes e∈E = both e∈E e∈F
-  F⊆E∪F e e∈F | no e∉E = right e∉E e∈F
+  ⊆-right-∪ : ∀ {X} {E F :  X → Set} → F ⊆ (E ∪ F)
+  ⊆-right-∪ {E = E} e e∈E with EXCLUDED_MIDDLE(e ∈ E)
+  ⊆-right-∪ e e∈F | yes e∈E = both e∈E e∈F
+  ⊆-right-∪ e e∈F | no e∉E = right e∉E e∈F
+  
+  ⊆-refl : ∀ {X : Set} {E : X → Set} → (E ⊆ E)
+  ⊆-refl e e∈E = e∈E
+
+  ⊆-trans : ∀ {X : Set} {D E F : X → Set} → (D ⊆ E) → (E ⊆ F) → (D ⊆ F)
+  ⊆-trans D⊆E E⊆F e e∈D = E⊆F e (D⊆E e e∈D)
+
+  ⊆-resp-∪ : ∀ {X : Set} {C D E F : X → Set} → (C ⊆ D) → (E ⊆ F) → ((C ∪ E) ⊆ (D ∪ F))
+  ⊆-resp-∪ C⊆D E⊆F e (left e∈C _) = ⊆-left-∪ e (C⊆D e e∈C)
+  ⊆-resp-∪ C⊆D E⊆F e (right _ e∈E) = ⊆-right-∪ e (E⊆F e e∈E)
+  ⊆-resp-∪ C⊆D E⊆F e (both e∈C e∈E) = both (C⊆D e e∈C) (E⊆F e e∈E)
+  
+  ⊆-elim-∪ : ∀ {X : Set} {D E F : X → Set} → (D ⊆ F) → (E ⊆ F) → ((D ∪ E) ⊆ F)
+  ⊆-elim-∪ D⊆F E⊆F e (left e∈D _) = D⊆F e e∈D
+  ⊆-elim-∪ D⊆F E⊆F e (right _ e∈E) = E⊆F e e∈E
+  ⊆-elim-∪ D⊆F E⊆F e (both e∈D _) = D⊆F e e∈D
+  
+  ⊆-assocl-∪ : ∀ {X} {D E F : X → Set} → (D ∪ (E ∪ F)) ⊆ ((D ∪ E) ∪ F)
+  ⊆-assocl-∪ =  ⊆-elim-∪ (⊆-trans ⊆-left-∪ ⊆-left-∪) (⊆-elim-∪ (⊆-trans ⊆-right-∪ ⊆-left-∪) ⊆-right-∪)
+  
+  ⊆-assocr-∪ : ∀ {X} {D E F : X → Set} → ((D ∪ E) ∪ F) ⊆ (D ∪ (E ∪ F))
+  ⊆-assocr-∪ =  ⊆-elim-∪ (⊆-elim-∪ ⊆-left-∪ (⊆-trans ⊆-left-∪ ⊆-right-∪)) (⊆-trans ⊆-right-∪ ⊆-right-∪)
+
+  ⊆-resp-∩ : ∀ {X} {C D E F :  X → Set} → (C ⊆ D) → (E ⊆ F) → ((C ∩ E) ⊆ (D ∩ F))
+  ⊆-resp-∩ C⊆D E⊆F e (e∈C , e∈E) = (C⊆D e e∈C , E⊆F e e∈E)
+
+  ⊆-left-∩ : ∀ {X} {E F :  X → Set} → (E ∩ F) ⊆ E
+  ⊆-left-∩ e (e∈E , e∈F) = e∈E
+
+  ⊆-right-∩ : ∀ {X} {E F :  X → Set} → (E ∩ F) ⊆ F
+  ⊆-right-∩ e (e∈E , e∈F) = e∈F
+
+  ⊆-resp-∩⁻¹ : ∀ {X Y : Set} {E F : X → Set} {f g : X → Y} → (∀ e → (e ∈ E) → (f(e) ≡ g(e))) → (E ⊆ F) → (G : Y → Set) → ((E ∩ (g ⁻¹[ G ])) ⊆ (F ∩ (f ⁻¹[ G ])))
+  ⊆-resp-∩⁻¹ f=g E⊆F G e (e∈E , e∈f⁻¹[G]) = (E⊆F e e∈E , ≡-subst G (≡-symm(f=g e e∈E)) e∈f⁻¹[G])
+    
+  ⊆-refl-∩⁻¹ : ∀ {X Y : Set} {E F : X → Set} {f g : X → Y} → (∀ e → (e ∈ F) → (f(e) ≡ g(e))) → (F ⊆ E) → (G : Y → Set) → (((E ∩ (f ⁻¹[ G ])) ∩ F) ⊆ (F ∩ (g ⁻¹[ G ])))
+  ⊆-refl-∩⁻¹ f=g E⊆F G e ((e∈E , e∈f⁻¹[G]) , e∈F) = (e∈F , ≡-subst G (f=g e e∈F) e∈f⁻¹[G])
+    
+  ⊆-intro-∩ : ∀ {X : Set} {D E F : X → Set} → (D ⊆ E) → (D ⊆ F) → (D ⊆ (E ∩ F))
+  ⊆-intro-∩ D⊆E D⊆F e e∈D = (D⊆E e e∈D , D⊆F e e∈D)
+
+  ⊆-elim-∅ : ∀ {X : Set} {E : X → Set} → (∅ ⊆ E)
+  ⊆-elim-∅ e ()

@@ -38,13 +38,13 @@ module monoid (DM : DataModel) (Event : Set) where
                     ; P₂ = skipP act₀
                     ; P₁∈𝒫₁ = P₀∈⟦C⟧
                     ; P₂∈𝒫₂ = skipP∈⟦skip⟧ act₀
-                    ; E₀⊆E₁∪E₂ = λ e e∈E₀ → left e∈E₀ (λ ())
-                    ; E₁⊆E₀ = λ e e∈E₀ → e∈E₀
-                    ; E₂⊆E₀ = λ e ()
+                    ; E₀⊆E₁∪E₂ = ⊆-left-∪
+                    ; E₁⊆E₀ = ⊆-refl
+                    ; E₂⊆E₀ = ⊆-elim-∅
                     ; ≤₁⊆≤₀ = λ d e d≤₀e → d≤₀e
                     ; ≤₂⊆≤₀ = λ { e .e refl → ≤₀-refl }
                     ; coherence = λ d e d∈E₀ ()
-                    ; pre₀⊨lhs₀ = λ e e∈E₀ _ → ⊨-refl
+                    ; pre₀⊨lhs₀ = λ e e∈E₀ e∉E₂ → ⊨-refl
                     ; pre₀⊨rhs₀ = λ e e∉E₀ ()
                     ; pre₀⊨lhs₀∨rhs₀ = λ e e∈E₀ () 
                     ; act₀=act₁ = λ e e∈E₀ → refl
@@ -61,15 +61,9 @@ module monoid (DM : DataModel) (Event : Set) where
     open Pomset P₁ using () renaming (E to E₁ ; τ-resp-⊨ to τ₁-resp-⊨)
     open Pomset P₂ using () renaming (E to E₂)
 
-    E₀⊆E₁ : (E₀ ⊆ E₁)
-    E₀⊆E₁ e e∈E₀ with E₀⊆E₁∪E₂ e e∈E₀
-    E₀⊆E₁ e e∈E₀ | left e∈E₁ _ = e∈E₁
-    E₀⊆E₁ e e∈E₀ | right _ e∈E₂ = CONTRADICTION (E₂⊆∅ e e∈E₂)
-    E₀⊆E₁ e e∈E₀ | both _  e∈E₂ =  CONTRADICTION (E₂⊆∅ e e∈E₂)
-
     P₁≲P₀ : P₁ ≲ P₀
     P₁≲P₀ = record
-              { E′⊆E = E₀⊆E₁
+              { E′⊆E = ⊆-trans E₀⊆E₁∪E₂ (⊆-elim-∪ ⊆-refl (⊆-trans E₂⊆∅ ⊆-elim-∅))
               ; E⊆E′ = E₁⊆E₀
               ; act=act′ = λ e e∈E₁ → ≡-symm (act₀=act₁ e e∈E₁)
               ; pre′⊨pre = λ e e∈E₁ → pre₀⊨lhs₀ e e∈E₁ (E₂⊆∅ e)
@@ -91,14 +85,14 @@ module monoid (DM : DataModel) (Event : Set) where
                     ; P₂ = P₀
                     ; P₁∈𝒫₁ = skipP∈⟦skip⟧ act₀
                     ; P₂∈𝒫₂ = P₀∈⟦C⟧
-                    ; E₀⊆E₁∪E₂ = λ e e∈E₀ → right (λ ()) e∈E₀
-                    ; E₁⊆E₀ = λ e ()
-                    ; E₂⊆E₀ = λ e e∈E₀ → e∈E₀
+                    ; E₀⊆E₁∪E₂ = ⊆-right-∪
+                    ; E₁⊆E₀ = ⊆-elim-∅
+                    ; E₂⊆E₀ = ⊆-refl
                     ; ≤₁⊆≤₀ = λ { e .e refl → ≤₀-refl }
                     ; ≤₂⊆≤₀ = λ d e d≤₀e → d≤₀e
                     ; coherence = λ d e ()
                     ; pre₀⊨lhs₀ = λ e ()
-                    ; pre₀⊨rhs₀ = λ e _ e∈E₀ → ⊨-refl
+                    ; pre₀⊨rhs₀ = λ e e∉E₁ e∈E₀ → ⊨-refl
                     ; pre₀⊨lhs₀∨rhs₀ = λ e ()
                     ; act₀=act₁ = λ e ()
                     ; act₀=act₂ = λ e e∈E₀ → refl
@@ -114,15 +108,9 @@ module monoid (DM : DataModel) (Event : Set) where
     open Pomset P₁ using () renaming (E to E₁)
     open Pomset P₂ using () renaming (E to E₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊨ to τ₂-resp-⊨)
 
-    E₀⊆E₂ : (E₀ ⊆ E₂)
-    E₀⊆E₂ e e∈E₀ with E₀⊆E₁∪E₂ e e∈E₀
-    E₀⊆E₂ e e∈E₀ | right _ e∈E₂ = e∈E₂
-    E₀⊆E₂ e e∈E₀ | left e∈E₁ _ = CONTRADICTION (E₁⊆∅ e e∈E₁)
-    E₀⊆E₂ e e∈E₀ | both e∈E₁ _ =  CONTRADICTION (E₁⊆∅ e e∈E₁)
-    
     P₂≲P₀ : P₂ ≲ P₀
     P₂≲P₀ = record
-              { E′⊆E = E₀⊆E₂
+              { E′⊆E = ⊆-trans E₀⊆E₁∪E₂ (⊆-elim-∪ (⊆-trans E₁⊆∅ ⊆-elim-∅) ⊆-refl)
               ; E⊆E′ = E₂⊆E₀
               ; act=act′ = λ e e∈E₀ → ≡-symm (act₀=act₂ e e∈E₀)
               ; pre′⊨pre = λ e e∈E₂ → ⊨-trans (pre₀⊨rhs₀ e (E₁⊆∅ e) e∈E₂) (τ₁ϕ⊨ϕ (↓RW₀(e)) (pre₂(e)))
@@ -192,54 +180,42 @@ module monoid (DM : DataModel) (Event : Set) where
 
      open _●_ P₁₂∈⟦C₁∙C₂⟧ using () renaming (E₁⊆E₀ to E₁⊆E₁₂ ; E₂⊆E₀ to E₂⊆E₁₂ ; rhs₀ to rhs₁₂ ; pre₀⊨rhs₀ to pre₁₂⊨rhs₁₂)
      open _●_ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ using () renaming (lhs₀ to lhs₁₂₃ ; rhs₀ to rhs₁₂₃ ; pre₀⊨rhs₀ to pre₁₂₃⊨rhs₁₂₃)
-
-     E₂⊆E₀ : E₂ ⊆ E₀
-     E₂⊆E₀ e e∈E₂ = E₂₃⊆E₀ e (E₂⊆E₂₃ e e∈E₂)
-
-     E₃⊆E₀ : E₃ ⊆ E₀
-     E₃⊆E₀ e e∈E₃ = E₂₃⊆E₀ e (E₃⊆E₂₃ e e∈E₃)
      
      E₁₂⊆E₀ : E₁₂ ⊆ E₀
-     E₁₂⊆E₀ = cond E₁⊆E₀ E₂⊆E₀
+     E₁₂⊆E₀ = ⊆-elim-∪ E₁⊆E₀ (⊆-trans E₂⊆E₂₃ E₂₃⊆E₀)
      
      E₁₂₃⊆E₀ : E₁₂₃ ⊆ E₀
-     E₁₂₃⊆E₀ = cond E₁₂⊆E₀ E₃⊆E₀
+     E₁₂₃⊆E₀ = ⊆-elim-∪ E₁₂⊆E₀ (⊆-trans E₃⊆E₂₃ E₂₃⊆E₀) 
      
      E₀⊆E₁₂₃ : E₀ ⊆ E₁₂₃
-     E₀⊆E₁₂₃ e e∈E₀ with E₀⊆E₁∪E₂₃ e e∈E₀
-     E₀⊆E₁₂₃ e e∈E₀ | left e∈E₁ _ = E⊆E∪F e (E⊆E∪F e e∈E₁)
-     E₀⊆E₁₂₃ e e∈E₀ | right _ e∈E₂₃ with E₂₃⊆E₂∪E₃ e e∈E₂₃
-     E₀⊆E₁₂₃ e e∈E₀ | right _ e∈E₂₃ | left e∈E₂ _ = E⊆E∪F e (F⊆E∪F e e∈E₂)
-     E₀⊆E₁₂₃ e e∈E₀ | right _ e∈E₂₃ | right _ e∈E₃ = F⊆E∪F e e∈E₃
-     E₀⊆E₁₂₃ e e∈E₀ | right _ e∈E₂₃ | both _ e∈E₃ = F⊆E∪F e e∈E₃
-     E₀⊆E₁₂₃ e e∈E₀ | both e∈E₁ _ = E⊆E∪F e (E⊆E∪F e e∈E₁)
+     E₀⊆E₁₂₃ = ⊆-trans E₀⊆E₁∪E₂₃ (⊆-trans (⊆-resp-∪ ⊆-refl E₂₃⊆E₂∪E₃) ⊆-assocl-∪)
 
      E₂₃⊆E₁₂₃ : E₂₃ ⊆ E₁₂₃
-     E₂₃⊆E₁₂₃ e e∈E₂₃ = E₀⊆E₁₂₃ e (E₂₃⊆E₀ e e∈E₂₃)
+     E₂₃⊆E₁₂₃ = ⊆-trans E₂₃⊆E₀ E₀⊆E₁₂₃
 
      RE₁₂⊆RE₀ : RE₁₂ ⊆ RE₀
-     RE₁₂⊆RE₀ e (e∈E₁₂ , a∈R) = (E₁₂⊆E₀ e e∈E₁₂ , a∈R)
+     RE₁₂⊆RE₀ = ⊆-resp-∩⁻¹ (λ _ _ → refl) E₁₂⊆E₀ Reads
 
      RE₁₂₃⊆RE₀ : RE₁₂₃ ⊆ RE₀
-     RE₁₂₃⊆RE₀ e (e∈E₁₂₃ , a∈R) = (E₁₂₃⊆E₀ e e∈E₁₂₃ , a∈R)
+     RE₁₂₃⊆RE₀  = ⊆-resp-∩⁻¹ (λ _ _ → refl) E₁₂₃⊆E₀ Reads
 
      RE₁₂₃∩E₂₃⊆RE₂₃ : (RE₁₂₃ ∩ E₂₃) ⊆ RE₂₃
-     RE₁₂₃∩E₂₃⊆RE₂₃ e (e∈RE₁₂₃ , e∈E₂₃) = RE₀∩E₂₃⊆RE₂₃ e (RE₁₂₃⊆RE₀ e e∈RE₁₂₃ , e∈E₂₃)
- 
+     RE₁₂₃∩E₂₃⊆RE₂₃ = ⊆-refl-∩⁻¹ act₀=act₂₃ E₂₃⊆E₁₂₃ Reads
+
      WE₁₂⊆WE₀ : WE₁₂ ⊆ WE₀
-     WE₁₂⊆WE₀ e (e∈E₁₂ , a∈W) = (E₁₂⊆E₀ e e∈E₁₂ , a∈W)
+     WE₁₂⊆WE₀ = ⊆-resp-∩⁻¹ (λ _ _ → refl) E₁₂⊆E₀ Writes
 
      WE₁₂₃⊆WE₀ : WE₁₂₃ ⊆ WE₀
-     WE₁₂₃⊆WE₀ e (e∈E₁₂₃ , a∈W) = (E₁₂₃⊆E₀ e e∈E₁₂₃ , a∈W)
+     WE₁₂₃⊆WE₀  = ⊆-resp-∩⁻¹ (λ _ _ → refl) E₁₂₃⊆E₀ Writes
 
      WE₁₂₃∩E₂₃⊆WE₂₃ : (WE₁₂₃ ∩ E₂₃) ⊆ WE₂₃
-     WE₁₂₃∩E₂₃⊆WE₂₃ e (e∈WE₁₂₃ , e∈E₂₃) = WE₀∩E₂₃⊆WE₂₃ e (WE₁₂₃⊆WE₀ e e∈WE₁₂₃ , e∈E₂₃)
+     WE₁₂₃∩E₂₃⊆WE₂₃ = ⊆-refl-∩⁻¹ act₀=act₂₃ E₂₃⊆E₁₂₃ Writes
      
      RW↓₀⊆↓RW₁₂₃ : ∀ e → (↓RW₀(e) ⊆ ↓RW₁₂₃(e))
-     RW↓₀⊆↓RW₁₂₃ e d (d∈E₀ , d∈↓RWe) = (E₀⊆E₁₂₃ d d∈E₀ , λ d∈RE₁₂₃ e∈WE₁₂₃ → d∈↓RWe (RE₁₂₃⊆RE₀ d d∈RE₁₂₃) (WE₁₂₃⊆WE₀ e e∈WE₁₂₃))
+     RW↓₀⊆↓RW₁₂₃ e = ⊆-resp-∩ E₀⊆E₁₂₃ (λ d d∈↓RWe d∈RE₁₂₃ e∈WE₁₂₃ → d∈↓RWe (RE₁₂₃⊆RE₀ d d∈RE₁₂₃) (WE₁₂₃⊆WE₀ e e∈WE₁₂₃))
      
      RW↓₀∩E₁₂⊆↓RW₁₂ : ∀ e → (e ∈ E₁₂) → ((↓RW₀(e) ∩ E₁₂) ⊆ ↓RW₁₂(e))
-     RW↓₀∩E₁₂⊆↓RW₁₂ e e∈E₁₂ d ((d∈E₀ , d∈↓RWe) , d∈E₁₂) = (d∈E₁₂ , λ d∈RE₁₂ e∈RE₁₂ → d∈↓RWe (RE₁₂⊆RE₀ d d∈RE₁₂) (WE₁₂⊆WE₀ e e∈RE₁₂))
+     RW↓₀∩E₁₂⊆↓RW₁₂ e e∈E₁₂  d ((d∈E₀ , d∈↓RWe) , d∈E₁₂) = (d∈E₁₂ , λ d∈RE₁₂ e∈RE₁₂ → d∈↓RWe (RE₁₂⊆RE₀ d d∈RE₁₂) (WE₁₂⊆WE₀ e e∈RE₁₂))
      
      RW↓₀∩E₁⊆↓RW₁₂ : ∀ e → (e ∈ E₁₂) → ((↓RW₀(e) ∩ E₁) ⊆ ↓RW₁₂(e))
      RW↓₀∩E₁⊆↓RW₁₂ e e∈E₁₂ d (d∈↓RWe , d∈E₁) = RW↓₀∩E₁₂⊆↓RW₁₂ e e∈E₁₂ d (d∈↓RWe , (E₁⊆E₁₂ d d∈E₁))
@@ -248,7 +224,7 @@ module monoid (DM : DataModel) (Event : Set) where
      RW↓₂₃⊆↓RW₁₂₃ e e∈E₂₃ d (d∈E₂₃ , d∈↓RWe) = (E₂₃⊆E₁₂₃ d d∈E₂₃ , λ d∈RE₁₂₃ e∈WE₁₂₃ → ≤₂₃⊆≤₀ d e (d∈↓RWe (RE₁₂₃∩E₂₃⊆RE₂₃ d (d∈RE₁₂₃ , d∈E₂₃)) (WE₁₂₃∩E₂₃⊆WE₂₃ e (e∈WE₁₂₃ , e∈E₂₃))))
           
      rhs₀⊨rhs₁₂ : ∀ e → (e ∈ E₂) → (e ∉ E₃) → (rhs₀ e) ⊨ (rhs₁₂ e)
-     rhs₀⊨rhs₁₂ e e∈E₂ e∉E₂ = ⊨-trans (τ₁-resp-∩⊆ (↓RW₀ e) (↓RW₁₂ e) (pre₂₃ e) λ{ d (d∈↓RW₀ , d∈E₁) → RW↓₀∩E₁₂⊆↓RW₁₂ e (E₂⊆E₁₂ e e∈E₂) d (d∈↓RW₀ , (E₁⊆E₁₂ d d∈E₁)) }) (τ₁-resp-⊨ (↓RW₁₂ e) (pre₂₃ e) (pre₂ e) (pre₂₃⊨lhs₂₃ e e∈E₂ e∉E₂))
+     rhs₀⊨rhs₁₂ e e∈E₂ e∉E₂ = ⊨-trans (τ₁-resp-∩⊆ (↓RW₀ e) (↓RW₁₂ e) (pre₂₃ e) (RW↓₀∩E₁⊆↓RW₁₂ e (E₂⊆E₁₂ e e∈E₂))) (τ₁-resp-⊨ (↓RW₁₂ e) (pre₂₃ e) (pre₂ e) (pre₂₃⊨lhs₂₃ e e∈E₂ e∉E₂))
      
      rhs₀⊨rhs₁₂₃ : ∀ e → (e ∉ E₂) → (e ∈ E₃) → (rhs₀ e) ⊨ (rhs₁₂₃ e)
      rhs₀⊨rhs₁₂₃ e e∉E₂ e∈E₃ = ⊨-trans (τ₁-resp-⊆ (↓RW₀ e) (↓RW₁₂₃ e) (pre₂₃ e) (RW↓₀⊆↓RW₁₂₃ e)) (τ₁-resp-⊨ (↓RW₁₂₃ e) (pre₂₃ e) _ (⊨-trans (pre₂₃⊨rhs₂₃ e e∉E₂ e∈E₃) (τ₂-resp-⊆ (↓RW₂₃ e) (↓RW₁₂₃ e) (pre₃ e) (RW↓₂₃⊆↓RW₁₂₃ e (E₃⊆E₂₃ e e∈E₃)))))
