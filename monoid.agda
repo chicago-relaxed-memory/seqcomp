@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+
 open import prelude
 open import data-model using ( DataModel )
 import command

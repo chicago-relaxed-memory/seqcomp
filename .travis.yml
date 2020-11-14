@@ -11,5 +11,5 @@ addons:
       - agda
 
 script:
-  - agda --allow-unsolved-metas ub.agda
+  - agda main.agda
 
