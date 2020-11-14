@@ -25,6 +25,7 @@ module examples (DM : DataModel) (Event : Set) where
             ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-refl
             ; τ-resp-⊨ = λ ϕ⊨ψ → ϕ⊨ψ
             ; τ-resp-∨ = ⊨-refl
+            ; τ-refl-∨ = ⊨-refl
             }
 
   skipP∈⟦skip⟧ : ∀ act → skipP act ∈ ⟦ skip ⟧
@@ -38,8 +39,8 @@ module examples (DM : DataModel) (Event : Set) where
   compP act₀ PO₀ P₁ P₂ = P₀ where
 
      open PartialOrder PO₀ using () renaming (_≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym)
-     open Pomset P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨)
-     open Pomset P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨ ; τ-resp-∨ to τ₂-resp-∨)
+     open Pomset P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨ ; τ-refl-∨ to τ₁-refl-∨)
+     open Pomset P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨ ; τ-resp-∨ to τ₂-resp-∨ ; τ-refl-∨ to τ₂-refl-∨)
 
      E₀ = E₁ ∪ E₂
      dec-E₀ = λ e → EXCLUDED_MIDDLE(e ∈ E₀)
@@ -68,6 +69,7 @@ module examples (DM : DataModel) (Event : Set) where
              ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-trans (τ₁-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-left-∪) C∩E⊆D)) (τ₁-resp-⊨ (τ₂-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-right-∪) C∩E⊆D)))
              ; τ-resp-⊨ = λ ϕ⊨ψ → τ₁-resp-⊨ (τ₂-resp-⊨ ϕ⊨ψ)
              ; τ-resp-∨ = ⊨-trans (τ₁-resp-⊨ τ₂-resp-∨) τ₁-resp-∨
+             ; τ-refl-∨ = ⊨-trans τ₁-refl-∨ (τ₁-resp-⊨ τ₂-refl-∨)
              }
 
   record Compatible (act₀ : Event → Action) (PO₀ : PartialOrder) (P₁ P₂ : Pomset) : Set₁ where
@@ -140,3 +142,42 @@ module examples (DM : DataModel) (Event : Set) where
                      ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-refl
                      }
 
+  record compLemmas (C₁ C₂ act₀ PO₀ P₁ P₂) : Set₁ where
+
+     field P₁∈⟦C₁⟧ : (P₁ ∈ ⟦ C₁ ⟧)
+     field P₂∈⟦C₂⟧ : (P₂ ∈ ⟦ C₂ ⟧)
+     field PO₀∈CompP₁P₂ : (Compatible act₀ PO₀ P₁ P₂)
+ 
+     open Compatible PO₀∈CompP₁P₂
+     
+     P₀ = compP act₀ PO₀ P₁ P₂
+     
+     open Pomset P₀ using () renaming (dec-E to dec-E₀ ; pre to pre₀)
+     open Pomset P₁ using () renaming (E to E₁)
+     open Pomset P₂ using () renaming (E to E₂)
+
+     P₀∈⟦C₁∙C₂⟧ : P₀ ∈ ⟦ C₁ ∙ C₂ ⟧
+     P₀∈⟦C₁∙C₂⟧ = compP∈⟦C₁∙C₂⟧ C₁ C₂ act₀ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
+
+     open _●_ P₀∈⟦C₁∙C₂⟧ using (lhs₀ ; rhs₀)
+     
+     lhs₀⊨pre₀ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (lhs₀(e) ⊨ pre₀(e))
+     lhs₀⊨pre₀ e e∈E₁ e∉E₂ with dec-E₀(e)
+     lhs₀⊨pre₀ e e∈E₁ e∉E₂ | yes (left _ _) = ⊨-refl
+     lhs₀⊨pre₀ e e∈E₁ e∉E₂ | yes (right _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     lhs₀⊨pre₀ e e∈E₁ e∉E₂ | yes (both _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     lhs₀⊨pre₀ e e∈E₁ e∉E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (left e∈E₁ e∉E₂))
+
+     rhs₀⊨pre₀ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (rhs₀(e) ⊨ pre₀(e))
+     rhs₀⊨pre₀ e e∉E₁ e∈E₂ with dec-E₀(e)
+     rhs₀⊨pre₀ e e∉E₁ e∈E₂ | yes (left e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     rhs₀⊨pre₀ e e∉E₁ e∈E₂ | yes (right _ _) = ⊨-refl
+     rhs₀⊨pre₀ e e∉E₁ e∈E₂ | yes (both e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     rhs₀⊨pre₀ e e∉E₁ e∈E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (right e∉E₁ e∈E₂))
+
+     lhs₀∨rhs₀⊨pre₀ : ∀ e → (e ∈ E₁) → (e ∈ E₂) → ((lhs₀(e) ∨ rhs₀(e)) ⊨ pre₀(e))
+     lhs₀∨rhs₀⊨pre₀ e e∈E₁ e∈E₂ with dec-E₀(e)
+     lhs₀∨rhs₀⊨pre₀ e e∈E₁ e∈E₂ | yes (left _ e∉E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     lhs₀∨rhs₀⊨pre₀ e e∈E₁ e∈E₂ | yes (right e∉E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     lhs₀∨rhs₀⊨pre₀ e e∈E₁ e∈E₂ | yes (both _ _) = ⊨-refl
+     lhs₀∨rhs₀⊨pre₀ e e∈E₁ e∈E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (both e∈E₁ e∈E₂))
