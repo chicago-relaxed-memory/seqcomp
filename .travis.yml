@@ -1,9 +1,4 @@
-jobs:
-  include:
-    - os: linux
-      dist: xenial
-    - os: linux
-      dist: bionic
+dist: focal
 
 addons:
   apt:
