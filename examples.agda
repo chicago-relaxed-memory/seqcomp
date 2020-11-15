@@ -142,7 +142,7 @@ module examples (DM : DataModel) (Event : Set) where
                      ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-refl
                      }
 
-  record compLemmas (C₁ C₂ act₀ PO₀ P₁ P₂) : Set₁ where
+  record compLemmas (C₁ C₂ : Command) (act₀ : Event → Action) (PO₀ : PartialOrder) (P₁ P₂ : Pomset) : Set₁ where
 
      field P₁∈⟦C₁⟧ : (P₁ ∈ ⟦ C₁ ⟧)
      field P₂∈⟦C₂⟧ : (P₂ ∈ ⟦ C₂ ⟧)
