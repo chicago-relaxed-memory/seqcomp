@@ -75,6 +75,10 @@ module prelude where
   neither e∉E e∉F (right _ e∈F) = e∉F e∈F
   neither e∉E e∉F (both e∈E _) = e∉E e∈E
   
+  data _⊎_ {X : Set} (E F : X → Set) (e : X) : Set where
+    left : (e ∈ E) → (e ∉ F) → (e ∈ (E ⊎ F))
+    right : (e ∉ E) → (e ∈ F) → (e ∈ (E ⊎ F))
+    
   postulate EXCLUDED_MIDDLE : ∀ X → Dec(X)
 
   _⁻¹[_] : ∀ {X Y : Set} → (X → Y) → (Y → Set) → (X → Set)

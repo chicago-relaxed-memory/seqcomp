@@ -93,7 +93,33 @@ module semantics (DM : DataModel) (Event : Set) where
     -- TODO
 
   record _|||_ (𝒫₁ 𝒫₂ : Pomset → Set₁) (P₀ : Pomset) : Set₁ where
-    -- TODO
+
+   field P₁ : Pomset
+   field P₂ : Pomset
+
+   field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
+   field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
+   
+   open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ↓RW to ↓RW₀ ; RE to RE₀ ; WE to WE₀ ; RE⊆E to RE₀⊆E₀ ; τ to τ₀)
+   open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; ↓RW to ↓RW₁ ; RE to RE₁ ; WE to WE₁ ; τ to τ₁)
+   open Pomset P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; _≤_ to _≤₂_ ; ↓RW to ↓RW₂ ; RE to RE₂ ; WE to WE₂ ; τ to τ₂)
+
+   field E₀⊆E₁⊎E₂ : (E₀ ⊆ (E₁ ⊎ E₂))
+   field E₁⊆E₀ : (E₁ ⊆ E₀)
+   field E₂⊆E₀ : (E₂ ⊆ E₀)
+   field E₁∩E₂⊆∅ : (E₁ ∩ E₂) ⊆ ∅ 
+   
+   field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
+   field ≤₂⊆≤₀ : ∀ d e → (d ≤₂ e) → (d ≤₀ e)
+   
+   field pre₀⊨pre₁ : ∀ e → (e ∈ E₁) → (pre₀(e) ⊨ pre₁(e))
+   field pre₀⊨pre₂ : ∀ e → (e ∈ E₂) → (pre₀(e) ⊨ pre₂(e))
+   
+   field act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
+   field act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
+   
+   field τ₀ϕ⊨τ₁ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ τ₁(C)(ϕ)
+   field τ₀ϕ⊨τ₂ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ τ₂(C)(ϕ)
 
   NIL = THREAD SKIP
 
