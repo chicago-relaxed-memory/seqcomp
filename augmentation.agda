@@ -94,14 +94,30 @@ module augmentation (DM : DataModel) (Event : Set) where
 
   sem-resp-≲ {P} {P′} (fork G join) P≲P′ P∈⟪G⟫ = sen-resp-≲ G P≲P′ P∈⟪G⟫
 
-  -- TODO
-  sen-resp-≲ {P} {P′} nil P≲P′ P∈NIL = record {}
-  sen-resp-≲ {P} {P′} (thread C) P≲P′ P∈THREAD = record {}
+  sen-resp-≲ {P} {P′} nil P≲P′ P∈NIL = sem-resp-≲ skip P≲P′ P∈NIL
   
+  sen-resp-≲ {P₀} {P′₀} (thread C) P₀≲P′₀ P₀∈THREAD = P′₀∈THREAD where
+
+    open THREAD P₀∈THREAD
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀) 
+    
+    P′₀∈THREAD : P′₀ ∈ THREAD ⟦ C ⟧
+    P′₀∈THREAD = record
+                  { P₁ = P₁
+                  ; P₁∈𝒫 = P₁∈𝒫
+                  ; E₁⊆E₀ = ⊆-trans E₁⊆E₀ E₀⊆E′₀
+                  ; E₀⊆E₁ = ⊆-trans E′₀⊆E₀ E₀⊆E₁
+                  ; ≤₁⊆≤₀ = λ d e d≤₁e → ≤₀⊆≤′₀ d e (≤₁⊆≤₀ d e d≤₁e)
+                  ; pre₀⊨pre₁ = λ e e∈E₁ → ⊨-trans (pre′₀⊨pre₀ e (E₁⊆E₀ e e∈E₁)) (pre₀⊨pre₁ e e∈E₁)
+                  ; act₀=act₁ = λ e e∈E₁ → ≡-trans (≡-symm (act₀=act′₀ e (E₁⊆E₀ e e∈E₁))) (act₀=act₁ e e∈E₁)
+                  ; τ₀ϕ⊨ϕ =  λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ϕ C ϕ)
+                  ; τ₀ϕ⊨ff = λ C ϕ e e∈C e∉E → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ff C ϕ e (E′₀⊆E₀ e e∈C) e∉E)
+                  }
+    
   sen-resp-≲ {P₀} {P′₀} (G₁ ∥ G₂) P₀≲P′₀ P₀∈⟪G₁⟫|||⟪G₂⟫ = P′₀∈⟪G₁⟫|||⟪G₂⟫ where
 
     open _|||_ P₀∈⟪G₁⟫|||⟪G₂⟫
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ↓RW⊆↓RW' to ↓RW₀⊆↓RW'₀) 
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀) 
 
     P′₀∈⟪G₁⟫|||⟪G₂⟫ : P′₀ ∈ (⟪ G₁ ⟫ ||| ⟪ G₂ ⟫)
     P′₀∈⟪G₁⟫|||⟪G₂⟫ = record
