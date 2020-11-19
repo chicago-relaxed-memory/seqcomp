@@ -88,11 +88,27 @@ module semantics (DM : DataModel) (Event : Set) where
   
   record LET (r : Register) (M : Expression) (P : Pomset) : Set₁ where
     -- TODO
-  
+
+  record THREAD (𝒫₁ : Pomset → Set₁) (P : Pomset) : Set₁ where
+    -- TODO
+
+  record _|||_ (𝒫₁ 𝒫₂ : Pomset → Set₁) (P₀ : Pomset) : Set₁ where
+    -- TODO
+
+  NIL = THREAD SKIP
+
   ⟦_⟧ : Command → Pomset → Set₁
+  ⟪_⟫ : ThreadGroup → Pomset → Set₁
+  
   ⟦ skip ⟧ = SKIP
   ⟦ C₁ ∙ C₂ ⟧ = ⟦ C₁ ⟧ ● ⟦ C₂ ⟧
   ⟦ if ϕ then C ⟧ = ϕ ◁ ⟦ C ⟧
   ⟦ r :=[ a ] ⟧ = LOAD r a
   ⟦ [ a ]:= M ⟧ = STORE a M
   ⟦ r := M ⟧ = LET r M
+  ⟦ fork G join ⟧ = ⟪ G ⟫
+
+  ⟪ nil ⟫ = NIL
+  ⟪ thread C ⟫ = THREAD ⟦ C ⟧
+  ⟪ G₁ ∥ G₂ ⟫ = ⟪ G₁ ⟫ ||| ⟪ G₂ ⟫
+  

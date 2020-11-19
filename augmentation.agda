@@ -38,9 +38,10 @@ module augmentation (DM : DataModel) (Event : Set) where
     ↓RW⊆↓RW' : ∀ e → (e ∈ E) → (↓RW(e) ⊆ ↓RW′(e))
     ↓RW⊆↓RW' e e∈E d (d∈E , d∈↓RWe) = (E⊆E′ d d∈E , λ d∈RE′ e∈WE′ → ≤⊆≤′ d e (d∈↓RWe (RE′⊆RE d d∈RE′) (WE′⊆WE e e∈WE′)))
     
-  sem-resp-≲ : ∀ {P P′ C} → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
+  sem-resp-≲ : ∀ {P P′} C → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
+  sen-resp-≲ : ∀ {P P′} G → (P ≲ P′) → (P ∈ ⟪ G ⟫) → (P′ ∈ ⟪ G ⟫)
 
-  sem-resp-≲ {P₀} {P′₀} {skip} P₀≲P′₀ P₀∈SKIP = P′₀∈SKIP  where
+  sem-resp-≲ {P₀} {P′₀} skip P₀≲P′₀ P₀∈SKIP = P′₀∈SKIP  where
 
     open SKIP P₀∈SKIP using (E₀⊆∅ ; τ₀ϕ⊨ϕ)
     open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; τ′⊨τ to τ′₀⊨τ₀)
@@ -50,7 +51,7 @@ module augmentation (DM : DataModel) (Event : Set) where
                 { E₀⊆∅ = λ e e∈E′₀ → E₀⊆∅ e (E′₀⊆E₀ e e∈E′₀)
                 ; τ₀ϕ⊨ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ϕ C ϕ) }
 
-  sem-resp-≲ {P₀} {P′₀} {C₁ ∙ C₂} P₀≲P′₀ P₀∈⟦C₁⟧●⟦C₂⟧ = P′₀∈⟦C₁⟧●⟦C₂⟧ where
+  sem-resp-≲ {P₀} {P′₀} (C₁ ∙ C₂) P₀≲P′₀ P₀∈⟦C₁⟧●⟦C₂⟧ = P′₀∈⟦C₁⟧●⟦C₂⟧ where
 
     open _●_ P₀∈⟦C₁⟧●⟦C₂⟧
     open Pomset P₁ using () renaming (τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆)
@@ -86,7 +87,13 @@ module augmentation (DM : DataModel) (Event : Set) where
                       }
     
   -- TODO
-  sem-resp-≲ {P} {P′} {if ϕ then C} P≲P′ P∈ϕ▷⟦C⟧ = record {}
-  sem-resp-≲ {P} {P′} {r :=[ a ]} P≲P′ P∈LOAD = record {}
-  sem-resp-≲ {P} {P′} {[ x ]:= x₁} P≲P′ P∈STORE = record {}
-  sem-resp-≲ {P} {P′} {r := M} P≲P′ P∈LET = record {}
+  sem-resp-≲ {P} {P′} (if ϕ then C) P≲P′ P∈ϕ▷⟦C⟧ = record {}
+  sem-resp-≲ {P} {P′} (r :=[ a ]) P≲P′ P∈LOAD = record {}
+  sem-resp-≲ {P} {P′} ([ a ]:= M) P≲P′ P∈STORE = record {}
+  sem-resp-≲ {P} {P′} (r := M) P≲P′ P∈LET = record {}
+  sem-resp-≲ {P} {P′} (fork G join) P≲P′ P∈⟪G⟫ = sen-resp-≲ G P≲P′ P∈⟪G⟫
+
+  -- TODO
+  sen-resp-≲ {P} {P′} nil P≲P′ P∈NIL = record {}
+  sen-resp-≲ {P} {P′} (thread C) P≲P′ P∈THREAD = record {}
+  sen-resp-≲ {P} {P′} (G₁ ∥ G₂) P≲P′ P∈⟪G₁⟫|||⟪G₂⟫ = record {}

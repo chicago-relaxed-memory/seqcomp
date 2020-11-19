@@ -71,7 +71,7 @@ module monoid (DM : DataModel) (Event : Set) where
               ; τ′⊨τ = λ C ϕ → ⊨-trans (τ₀ϕ⊨τ₁τ₂ϕ C ϕ) (τ₁-resp-⊨ (τ₂ϕ⊨ϕ C ϕ))
               }
     
-    P₀∈⟦C⟧ = sem-resp-≲ P₁≲P₀ P₁∈⟦C⟧
+    P₀∈⟦C⟧ = sem-resp-≲ C P₁≲P₀ P₁∈⟦C⟧
 
   -- PROOF that skip is a left unit
 
@@ -118,7 +118,7 @@ module monoid (DM : DataModel) (Event : Set) where
               ; τ′⊨τ = λ C ϕ → ⊨-trans (τ₀ϕ⊨τ₁τ₂ϕ C ϕ) (τ₁ϕ⊨ϕ C (τ₂ C ϕ))
               }
     
-    P₀∈⟦C⟧ = sem-resp-≲ P₂≲P₀ P₂∈⟦C⟧
+    P₀∈⟦C⟧ = sem-resp-≲ C P₂≲P₀ P₂∈⟦C⟧
   
   -- PROOF of associativity
 
@@ -181,7 +181,10 @@ module monoid (DM : DataModel) (Event : Set) where
      open _●_ P₁₂∈⟦C₁∙C₂⟧ using () renaming (E₁⊆E₀ to E₁⊆E₁₂ ; E₂⊆E₀ to E₂⊆E₁₂ ; rhs₀ to rhs₁₂ ; pre₀⊨rhs₀ to pre₁₂⊨rhs₁₂)
      open _●_ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ using () renaming (lhs₀ to lhs₁₂₃ ; rhs₀ to rhs₁₂₃ ; pre₀⊨rhs₀ to pre₁₂₃⊨rhs₁₂₃)
 
+     lemmas₁₂ : compLemmas C₁ C₂ act₀ PO₀ P₁ P₂
      lemmas₁₂ = record { P₁∈⟦C₁⟧ = P₁∈⟦C₁⟧ ; P₂∈⟦C₂⟧ = P₂∈⟦C₂⟧ ; PO₀∈CompP₁P₂ = PO₀∈CompP₁P₂ }
+     
+     lemmas₁₂₃ : compLemmas (C₁ ∙ C₂) C₃ act₀ PO₀ P₁₂ P₃
      lemmas₁₂₃ = record { P₁∈⟦C₁⟧ = P₁₂∈⟦C₁∙C₂⟧ ; P₂∈⟦C₂⟧ = P₃∈⟦C₃⟧ ; PO₀∈CompP₁P₂ = PO₀∈CompP₁₂P₃ }
 
      open compLemmas lemmas₁₂ using () renaming (lhs₀⊨pre₀ to lhs₁₂⊨pre₁₂; rhs₀⊨pre₀ to rhs₁₂⊨pre₁₂ ; lhs₀∨rhs₀⊨pre₀ to lhs₁₂∨rhs₁₂⊨pre₁₂)
@@ -267,7 +270,7 @@ module monoid (DM : DataModel) (Event : Set) where
                  }
 
      P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₀ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
-     P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = sem-resp-≲ P₁₂₃≲P₀ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧
+     P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = sem-resp-≲ ((C₁ ∙ C₂) ∙ C₃) P₁₂₃≲P₀ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧
      
   ⟦⟨C₁∙C₂⟩∙C₃⟧⊆⟦C₁∙⟨C₂∙C₃⟩⟧ C₁ C₂ C₃ P₀ P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ where
 
@@ -328,7 +331,10 @@ module monoid (DM : DataModel) (Event : Set) where
      open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (E₁⊆E₀ to E₂⊆E₂₃ ; E₂⊆E₀ to E₃⊆E₂₃ ; rhs₀ to rhs₂₃ ; pre₀⊨lhs₀ to pre₂₃⊨lhs₂₃)
      open _●_ P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧ using () renaming (lhs₀ to lhs₁₂₃ ; rhs₀ to rhs₁₂₃ ; pre₀⊨rhs₀ to pre₁₂₃⊨rhs₁₂₃)
      
+     lemmas₂₃ : compLemmas C₂ C₃ act₀ PO₀ P₂ P₃
      lemmas₂₃ = record { P₁∈⟦C₁⟧ = P₂∈⟦C₂⟧ ; P₂∈⟦C₂⟧ = P₃∈⟦C₃⟧ ; PO₀∈CompP₁P₂ = PO₀∈CompP₂P₃ }
+     
+     lemmas₁₂₃ : compLemmas C₁ (C₂ ∙ C₃) act₀ PO₀ P₁ P₂₃
      lemmas₁₂₃ = record { P₁∈⟦C₁⟧ = P₁∈⟦C₁⟧ ; P₂∈⟦C₂⟧ = P₂₃∈⟦C₂∙C₃⟧ ; PO₀∈CompP₁P₂ = PO₀∈CompP₁P₂₃ }
 
      open compLemmas lemmas₂₃ using () renaming (lhs₀⊨pre₀ to lhs₂₃⊨pre₂₃; rhs₀⊨pre₀ to rhs₂₃⊨pre₂₃ ; lhs₀∨rhs₀⊨pre₀ to lhs₂₃∨rhs₂₃⊨pre₂₃)
@@ -414,6 +420,6 @@ module monoid (DM : DataModel) (Event : Set) where
                  }
 
      P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ : P₀ ∈ ⟦ C₁ ∙ (C₂ ∙ C₃) ⟧
-     P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ = sem-resp-≲ P₁₂₃≲P₀ P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧
+     P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ = sem-resp-≲ (C₁ ∙ (C₂ ∙ C₃)) P₁₂₃≲P₀ P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧
      
   -- QED

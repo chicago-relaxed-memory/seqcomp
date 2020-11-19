@@ -17,7 +17,7 @@ module main (DM : DataModel) (Event : Set) where
 
   -- PROPOSITION: semantics is augment-closed
 
-  sem-resp-≲ : ∀ {P P′ C} → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
+  sem-resp-≲ : ∀ {P P′} C → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
 
   -- PROOF in augmentation.agda  
 
