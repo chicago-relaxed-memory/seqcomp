@@ -112,8 +112,22 @@ module augmentation (DM : DataModel) (Event : Set) where
                }
 
 
-  -- TODO
-  sem-resp-≲ {P} {P′} (r :=[ a ]) P≲P′ P∈LOAD = record {}
+  sem-resp-≲ {P} {P′} (r :=[ a ]) P≲P′ P∈LOAD = P′∈LOAD where
+
+    open LOAD P∈LOAD
+    open _≲_ P≲P′
+
+    P′∈LOAD : P′ ∈ LOAD r a
+    P′∈LOAD = record
+                { e = e
+                ; v = v
+                ; e∈E = E⊆E′ e e∈E
+                ; d=e = λ d d∈E′ → d=e d (E′⊆E d d∈E′)
+                ; act=Rav = ≡-trans (≡-symm (act=act′ e e∈E)) act=Rav
+                ; τϕ⊨ϕ[v/r] = λ C ϕ → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[v/r] C ϕ)
+                ; τϕ⊨ϕ[[a]/r] = λ C ϕ e∉C → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[[a]/r] C ϕ e∉C)
+                }
+
   sem-resp-≲ {P} {P′} ([ a ]:= M) P≲P′ P∈STORE = record {}
   sem-resp-≲ {P} {P′} (r := M) P≲P′ P∈LET = record {}
 
