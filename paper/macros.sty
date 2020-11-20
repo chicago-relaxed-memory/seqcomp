@@ -1,0 +1,837 @@
+% recommended by ACM
+% \usepackage[T1]{fontenc}
+% \usepackage[utf8]{inputenc}
+% \usepackage{microtype}
+
+%\usepackage{anyfontsize}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{cleveref}
+\usepackage{hyphenat}
+\usepackage{xparse}
+\usepackage{verbatim}
+\usepackage{stmaryrd}
+\usepackage{soul}
+\newcommand{\hlfancy}[2]{\sethlcolor{#1}\hl{#2}}
+%\usepackage{alltt}
+%\usepackage{makecell}
+% \usepackage[defblank]{paralist}
+% \usepackage[caption=false]{subfig}
+
+
+
+\newcommand{\floc}{\mathsf{loc}}
+\newcommand{\fthrd}{\mathsf{thread}}
+\newcommand{\Thrd}{\mathcal{T}}
+\newcommand{\aThrd}{\alpha}
+\newcommand{\bThrd}{\kappa}%\upsilon}
+
+\newcommand{\mathhl}[1]{\!\!\smash{\colorbox{gray!20!white}{$\displaystyle \mathstrut\smash{#1}$}}\!\!}
+\newcommand{\mathhlscript}[1]{\!\!\smash{\colorbox{gray!20!white}{$\scriptstyle {#1}$}}\!\!}
+
+\newcommand{\classC}{\mathtt{C}}
+\newcommand{\classD}{\mathtt{D}}
+
+\newcounter{mypara}
+\newcommand{\myparagraph}[1]{\paragraph{#1}\stepcounter{mypara}\belowpdfbookmark{#1}{mypara\arabic{mypara}}}
+\newcommand{\noparagraph}[1]{\stepcounter{mypara}\belowpdfbookmark{#1}{mypara\arabic{mypara}}}
+
+
+\newcommand{\modeRLXquiet}{{}}
+\newcommand{\Rdis}[2]{\mathsf{weaken}_{\mathsf{R}#1#2}}
+\newcommand{\Wdis}[2]{\mathsf{weaken}_{\mathsf{W}#1#2}}
+
+\newcommand{\cmdC}{\aCmd_{\mathsf{C}}}
+\newcommand{\cmdR}{\aCmd_{\mathsf{R}}}
+\newcommand{\cmdW}{\aCmd_{\mathsf{W}}}
+\newcommand{\ps}{\textsc{ps}}
+\newcommand{\pc}{\textsc{pc}}
+\newcommand{\pcs}{\textsc{pc}s}
+
+\newcommand{\sem}[2][]{\llbracket#2\rrbracket}
+\NewDocumentCommand\PR{O{} O{} m m}{\ifnotempty{#4}{{#4} \GETS}{#3}^{#1}_{#2}}
+\NewDocumentCommand\PW{O{} O{} m m}{{#3}^{#1}_{#2} \GETS #4}
+\NewDocumentCommand\PWR{O{} O{} m O{} O{} m}{{#3}^{#1}_{#2} \GETS {#6}^{#4}_{#5}}
+\NewDocumentCommand\DR{O{} O{} m m}{\mathsf{R}^{#1}_{#2}\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DW{O{} O{} m m}{\mathsf{W}^{#1}_{#2}\ifnotempty{#3}{\mkern0mu#3\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand \PAR {O{} O{}}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}}\,}
+% \newcommand{\sem}[2][]{\llbracket#2\rrbracket_{#1}}
+% \NewDocumentCommand\DR{O{} O{} m m}{#2\mathsf{R}^{#1}\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}
+% \NewDocumentCommand\DW{O{} O{} m m}{#2\mathsf{W}^{#1}\ifnotempty{#3}{\mkern0mu#3\ifnotempty{#4}{\mkern1mu#4}}}
+% \NewDocumentCommand \PAR {O{} O{}}{\,\mathbin{{}_{#1}\mkern-2mu\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\mkern-1mu{}_{#2}}\,}
+
+%https://tex.stackexchange.com/questions/438876/how-to-cross-reference-text-with-a-custom-label-reference-text
+% \labeltext[optional short ref]{the labeled text}{label name}
+\newcommand{\labeltextsc}[3][]{%
+    \@bsphack%
+    \csname phantomsection\endcsname% in case hyperref is used
+    \def\tst{#1}%
+    \def\labelmarkup##1{\textnormal{\textsc{\lowercase{##1}}}}% How to markup the label itself
+    %\def\refmarkup{\labelmarkup}% How to markup the reference
+    \def\refmarkup##1{\textsc{\lowercase{##1}}}% How to markup the label itself
+    \ifx\tst\empty\def\@currentlabel{\refmarkup{#2}}{\label{#3}}%
+    \else\def\@currentlabel{\refmarkup{#1}}{\label{#3}}\fi%
+    \@esphack%
+    \labelmarkup{#2}% visible printed text.
+  }
+\newcommand{\labeltext}[3][]{%
+    \@bsphack%
+    \csname phantomsection\endcsname% in case hyperref is used
+    \def\tst{#1}%
+    \def\labelmarkup{}% How to markup the label itself
+    %\def\refmarkup{\labelmarkup}% How to markup the reference
+    \def\refmarkup{}%
+    \ifx\tst\empty\def\@currentlabel{\refmarkup{#2}}{\label{#3}}%
+    \else\def\@currentlabel{\refmarkup{#1}}{\label{#3}}\fi%
+    \@esphack%
+    \labelmarkup{#2}% visible printed text.
+  }
+\newcommand{\imm}{\restrict{\mathrm{imm}}}
+% \renewcommand{\@fnsymbol}[1]{\ensuremath{\ifcase#1\or
+%     \dagger\dagger\or
+%     **\or
+%     \P\P\or
+%     \P\else\@ctrerr\fi}}
+
+\newcommand{\DSTOP}[1][]{\checkmark_{#1}} 
+\newcommand{\stopPS}{\textsf{SKIP}}
+\newcommand{\taglabel}[2][]{\tag{$\textsc{\lowercase{#2}}_{\textsc{\lowercase{#1}}}$}\label{#2#1}}
+\newcommand{\taglabelp}[1]{\tag{\textsc{\lowercase{#1}}$'$}\label{#1p}}
+\newcommand{\taglabelpp}[1]{\tag{\textsc{\lowercase{#1}}$''$}\label{#1pp}}
+\newcommand{\ignore}[1]{}
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\tvalpom}{modal pomset}
+\newcommand{\tsem}[1]{\llbracket#1\rrbracket_{{\bf M}}}
+\newcommand{\tsemsc}[1]{\llbracket#1\rrbracket_{{\bf MSC}}}
+\newcommand{\tsemClosed}[1]{\closed\tsem{#1}}
+\newcommand{\readc}{{\mathsf{read}}}
+\newcommand{\readsem}[1]{\mathsf{read}\sem{#1}}
+
+\newcommand{\semRW}[2]{\sem{#1\mid#2}}
+\newcommand{\coverEnd}{\mathsf{endCover}\guard}
+\newcommand{\aSubC}{\aSub}
+\newcommand{\notonce}{}
+\newcommand{\weakestmo}{\textsc{weak\-est\-mo}}
+\newcommand{\semold}[1]{\mathsf{old}\ifnotempty{#1}{\sem{#1}}}
+\newcommand{\aCtxt}{\mathbb{C}}
+\newcommand{\bCtxt}{\mathbb{D}}
+\newcommand{\aLocLoc}{\aLoc_{{loc}}}
+\newcommand{\aRead}{\aLoc_{r}}
+\newcommand{\aChanged}{\aLoc_{c}}
+\newcommand{\linV}[1]{#1_{{\tt lin}}}
+
+
+\newcommand{\READS}{\mathsf{reads}}
+\newcommand{\drs}{\mathsf{mdrs}}
+\newcommand{\SUBDRS}[1]{\mathcal{R}({#1})}
+\newcommand{\DISJUNCT}{\mathsf{dpw}}
+\newcommand{\aLocReg}{\varkappa}
+\newcommand{\bLocReg}{\varkappa'}
+\newcommand{\SUBEMP}{\SUB{}}
+\newcommand{\SUB}[1]{\langle#1\rangle}
+\newcommand{\SUBPAR}[2]{\SUB{#1,\,#2}}
+\newcommand{\SUBAPP}{\mathbin{\ast}}
+\newcommand{\SUBSEQ}{\mathbin{;}}
+\newcommand{\emptypomset}{\emptyset}%\mathsf{empty}}
+\newcommand{\notdisjoint}[2]{#1\cap#2\neq\emptyset}
+\newcommand{\disjoint}[2]{#1\cap#2=\emptyset}
+\newcommand{\disjointsmall}[2]{#1{\cap}#2{=}\emptyset}
+\newcommand{\COMPAT}{\mathsf{compat}}
+\newcommand{\PRE}[1]{\nabla #1}%\mathsf{pre}}
+\newcommand{\POST}[2]{\Delta #1}%\mathsf{pre}}
+\newcommand{\CLOSE}[1]{\mathsf{close}\ifnotempty{#1}{\bigl(#1\bigr)}}
+\newcommand{\ORDER}{\lt'}%\lessdot}
+\newcommand{\killS}{\mathsf{kill}\guard}
+\newcommand{\nofootnote}[1]{}
+\newcommand{\pole}[1]{\lessdot_{#1}}
+
+\newcommand{\anexternal}{a }
+\newcommand{\external}{}
+\newcommand{\externally}{}
+
+\newcommand{\amode}{\mu}
+\newcommand{\fmode}{\nu}
+\newcommand{\mWK}{{\mathsf{wk}}}
+\newcommand{\mRA}{{\mathsf{ra}}}
+\newcommand{\mRLX}{{\mathsf{rlx}}}
+\newcommand{\mREL}{{\mathsf{rel}}}
+\newcommand{\mACQ}{{\mathsf{acq}}}
+\newcommand{\mSC}{{\mathsf{sc}}}
+
+\newcommand{\ascope}{\varsigma}
+\newcommand{\sCTA}{{\mathsf{cta}}}
+\newcommand{\sGPU}{{\mathsf{gpu}}}
+\newcommand{\sSYS}{{\mathsf{sys}}}
+
+%\newcommand{\amsqed}{\tag*{\QEDSYMBOL}\NoEndMark}
+
+\newcommand{\hole}[1]{\ifnotemptyelse{#1}{[{#1}]}{[\textnormal{--}]}}
+\newcommand{\fsat}{\mathsf{sat}}
+\newcommand{\freadsat}{\mathsf{readsat}}
+\newcommand{\ID}[1]{[#1]}
+\newcommand{\IDLoc}{[\Loc]}
+\newcommand{\IDAcq}{\ID{\Acq}}
+\newcommand{\IDRel}{\ID{\Rel}}
+\newcommand{\IDR}{\ID{\mathsf{R}}}
+\newcommand{\IDW}{\ID{\mathsf{W}}}
+
+
+\newcommand{\eqdef}{\mathrel{\smash{\overset{\scriptscriptstyle\vartriangle}{=}}}}
+%\newcommand{\eqdef}{=}
+\newcommand{\rel}{{\tt rel}}
+
+
+\newcommand{\acylic}{\mathit{acyclic}}
+\newcommand{\pomspace}{{\cal P}}
+
+\newcommand{\feco}{\mathit{eco}}
+
+\newcommand{\reads}{\mathit{Reads}}
+\newcommand{\Seq}{{\tt Sequential}}
+
+\newcommand{\writes}{\mathit{Writes}}
+\newcommand{\pomf}[1]{Fun_{#1}}
+\newcommand{\pomFn}{\mathit{PomFn}}
+\newcommand{\power}{\mathcal{P}}
+\newcommand{\aFn}{F}
+\newcommand{\aRSet}{R}
+\newcommand{\bRSet}{S}
+\newcommand{\aWSet}{U}
+\newcommand{\bWSet}{V}
+\newcommand{\aWrite}{\aAct_w}
+%\newcommand{\bPS}{\aPS'}
+\newcommand{\cPS}{\aPS_1}
+\newcommand{\dPS}{\aPS'_1}
+\newcommand{\after}{\mathrel{\mathsf{after}}}
+\newcommand{\size}{\mathsf{size}}
+
+\newcommand{\test}[1]{\overline{#1}}
+\newcommand{\testP}[2]{{\tt test}^{#1}_{#2}}
+\newcommand{\freshaval}{\aVal_{{\tt fr}}}
+
+\newcommand{\RMW}{{\sc rmw}}
+\newcommand{\RMWs}{{\sc rmw}s}
+\newcommand{\drf}{{\sc drf}}
+\newcommand{\drfsc}{{\sc sc-drf}}
+\newcommand{\rfub}{{\sc rfub}}
+\newcommand{\oota}{{\sc oota}}
+\newcommand{\jmm}{{\sc jmm}}
+\newcommand{\tso}{{\sc tso}}
+\newcommand{\armseven}{{\sc arm7}}
+\newcommand{\armeight}{{\sc arm8}}
+\newcommand{\ppc}{{\sc power}}
+\newcommand{\mca}{{\sc mca}}
+\newcommand{\iriw}{{\sc iriw}}
+
+
+
+
+
+\newcommand{\rar}{\mathrel{\mathsf{ar}}}
+\newcommand{\muIMM}{\ensuremath{\mu\text{IMM}}}
+\newcommand{\free}{\mathsf{id}}
+\newenvironment{displaymatharray}[1]{\begin{displaymath}\begin{array}{#1}\ignorespaces}{\end{array}\end{displaymath}\ignorespacesafterend}
+\newenvironment{displaymatharrayl}{\begin{displaymatharray}{l}\ignorespaces}{\end{displaymatharray}\ignorespacesafterend}
+\newenvironment{displaymatharrayrl}{\begin{displaymatharray}{r>{\ }l}\ignorespaces}{\end{displaymatharray}\ignorespacesafterend}
+\newenvironment{sdisplaymatharray}[1]{\small\begin{displaymatharray}{#1}\ignorespaces}{\end{displaymatharray}\ignorespacesafterend}
+\newenvironment{sdisplaymatharrayl}{\small\begin{displaymatharrayl}\ignorespaces}{\end{displaymatharrayl}\ignorespacesafterend}
+\newenvironment{sdisplaymatharrayrl}{\small\begin{displaymatharrayrl}\ignorespaces}{\end{displaymatharrayrl}\ignorespacesafterend}
+\newenvironment{displaymathsmall}{\bgroup\small\begin{displaymath}\ignorespaces}{\end{displaymath}\egroup\ignorespacesafterend}
+\newenvironment{equationsmall}{\bgroup\small\begin{equation}\ignorespaces}{\end{equation}\egroup\ignorespacesafterend}
+\newenvironment{scope}{\bgroup\ignorespaces}{\egroup\ignorespacesafterend}
+\newenvironment{tikzinline}[1][]{\bgroup\footnotesize\begin{math}\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}\end{math}\egroup}
+\newenvironment{tikzinlinesmall}[1][]{\bgroup\scriptsize\begin{math}\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}\end{math}\egroup}
+\newenvironment{tikzdisplaylabel}[2][]{\bgroup\footnotesize\begin{equation}\label{#2}\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}\end{equation}\egroup\ignorespacesafterend}
+\newenvironment{tikzdisplaylabeltag}[2][]{\bgroup\footnotesize\begin{equation}\label{#2}\tag{#2}\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}\end{equation}\egroup\ignorespacesafterend}
+\newenvironment{tikzdisplay}[1][]{\bgroup\footnotesize\begin{displaymath}\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}\end{displaymath}\egroup\ignorespacesafterend}
+\newenvironment{tikzdisplaysmall}[1][]{\bgroup\tiny\begin{displaymath}\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}\end{displaymath}\egroup\ignorespacesafterend}
+\newenvironment{tikzcenter}[1][]{\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}}
+\newcommand{\fdom}{\mathsf{dom}}
+\newcommand{\fcodom}{\mathsf{codom}}
+\newcommand{\semClosed}[1]{\closed\sem{#1}}
+\newcommand{\closed}{\mathsf{closed}}
+\newcommand{\addRead}{\mathsf{addRead}}
+\newcommand{\pLTL}{\textsf{PLTL}}
+\newcommand{\once}{\Diamond\mkern-10.1mu\text{-}\mkern4mu}
+\newcommand{\always}{\Box\mkern-8.8mu\text{-}\mkern3mu}
+\newcommand{\afo}{\varrho}
+\newcommand{\bfo}{\vartheta}
+\newcommand{\mods}{\mathsf{Models}}
+
+\newcommand{\eqorder}{\sim}
+%\newcommand{\suborder}{\sqsubseteq}
+\newcommand{\inj}{f}
+\newcommand{\hoare}[3]{\{#1\}\allowbreak\;#2\;\allowbreak\{#3\}}
+\newcommand{\fwp}{\textit{wp}}
+
+\newcommand{\aF}{\xi}
+\newcommand{\FA}{\mathsf{A}}
+\newcommand{\FR}{\mathsf{R}}
+\newcommand{\FF}{\mathsf{F}}
+%\newcommand{\FID}[1]{[\DF{#1}]}
+
+\newcommand{\xinit}{\mathsf{init}}
+\newcommand{\BNFSEP}{\ensuremath{\;\mathrel{|}\;}}
+\newcommand{\BNFDEF}{\ensuremath{\;\mathrel{\mathord{\vcentcolon}\mkern-1mu\mathord{\vcentcolon}\mathord{{=}}}\;}}
+
+\newcommand{\restrict}[1]{\mathbin{|}_{#1}}
+\newcommand{\textand}{\;\allowbreak\text{and}\allowbreak\;}
+\newcommand{\textif}{\;\allowbreak\text{if}\allowbreak\;}
+\newcommand{\textwhen}{\;\allowbreak\text{when}\allowbreak\;}
+\newcommand{\textotherwise}{\;\allowbreak\text{otherwise}\allowbreak\;}
+\newcommand{\textimplies}{\; \allowbreak\text{implies}\allowbreak\;}
+\newcommand{\textor}{\; \allowbreak\text{or}\allowbreak\;}
+
+\newcommand{\fpox}{\mathit{po}}
+\newcommand{\fird}{\mathit{ird}}
+\newcommand{\TIKZ}[2][]{\hbox{\footnotesize$\{\,\begin{tikzpicture}[baselinecenter,node distance=1em,#1]#2\end{tikzpicture}\,\}$}}
+\newcommand{\fork}{\setminus_{\mathsf{S}}}
+
+\newcommand{\refapp}[1]{Appendix~\ref{app:#1}}
+
+\newenvironment{noenv}{\ignorespaces}{\ignorespacesafterend}
+\newcommand{\aCmd}{C}
+\newcommand{\bCmd}{D}
+\newcommand{\eCmd}{E}
+\newcommand{\cCmd}{B}
+
+\newcommand{\ifnotempty}[2]{\ifx\relax#1\relax\else#2\fi}
+\newcommand{\ifnotemptyelse}[3]{\ifx\relax#1\relax#3\else#2\fi}
+\newcommand{\ifemptyelse}[3]{\ifx\relax#1\relax#2\else#3\fi}
+
+\newcommand{\dontcare}{\texttt{\_}}
+\newcommand{\pair}[2]{\langle#1,\,#2\rangle}
+% \newcommand{\freads}{\mathsf{reads}}
+% \newcommand{\fwrites}{\mathsf{writes}}
+\newcommand{\rreads}{\mathsf{Rd}}
+\newcommand{\rwrites}{\mathsf{Wr}}
+\newcommand{\finternalize}{\tau}%\mathsf{internalize}}
+
+\newcommand{\Sub}{\mathcal{S}}
+\newcommand{\beforeSub}{\sigma_1}
+\newcommand{\afterSub}{\sigma_2}
+\newcommand{\aSub}{\sigma}
+\newcommand{\bSub}{\pi}
+
+\newcommand{\Reg}{\mathcal{R}}
+\newcommand{\aReg}{r}
+\newcommand{\bReg}{s}
+\newcommand{\cReg}{t}
+
+\newcommand{\LR}{\mathcal{L}}
+\newcommand{\aLR}{\ell}
+
+\newcommand{\Loc}{\mathcal{X}}
+\newcommand{\aLoc}{x}
+\newcommand{\bLoc}{y}
+\newcommand{\cLoc}{z}
+\newcommand{\dLoc}{b}
+\newcommand{\aLocs}{X}
+\newcommand{\bLocs}{Y}
+\newcommand{\cLocs}{Z}
+
+\newcommand{\LVal}{\mathcal{L}}
+\newcommand{\aLV}{\ell}
+\newcommand{\bLV}{k}
+
+\newcommand{\Val}{\mathcal{V}}
+\newcommand{\aVal}{v}
+\newcommand{\bVal}{u}
+\newcommand{\cVal}{\ell}
+%\newcommand{\dVal}{u}
+
+\newcommand{\Exp}{\mathcal{M}}
+\newcommand{\aExp}{M}
+\newcommand{\bExp}{N}
+\newcommand{\cExp}{L}
+%\newcommand{\dExp}{K}
+\newcommand{\aEExp}{\mathbb{M}}
+\newcommand{\bEExp}{\mathbb{N}}
+
+\newcommand{\Formulae}{\Phi}
+\newcommand{\aForm}{\phi}
+\newcommand{\bForm}{\psi}
+\newcommand{\cForm}{\chi}
+\newcommand{\dForm}{\xi}
+\newcommand{\TRUE}{\mathsf{true}}
+\newcommand{\FALSE}{\mathsf{false}}
+
+\newcommand{\Int}{\mathsf{SilentAct}}
+\newcommand{\Ext}{\mathsf{Ext}}
+\newcommand{\Rel}{\mathsf{Rel}}
+\newcommand{\Acq}{\mathsf{Acq}}
+\newcommand{\Act}{\mathcal{A}}
+\newcommand{\aActSub}{\alpha}
+\newcommand{\bActSub}{\beta}
+
+\newcommand{\aAct}{a}
+%\newcommand{\bAct}{b}
+%\newcommand{\cAct}{c}
+%\newcommand{\dAct}{d}
+\newcommand{\DRSC}[2]{\smash{\mathsf{R^{sc}}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}}
+\newcommand{\DWSC}[2]{\smash{\mathsf{W^{sc}}\ifnotempty{#1}{\mkern0mu#1\ifnotempty{#2}{\mkern1mu#2}}}}
+\newcommand{\DRAcq}[2]{\smash{\mathsf{R\ACQ}}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}
+\newcommand{\DWRel}[2]{\smash{\mathsf{W\REL}}\ifnotempty{#1}{\mkern0mu#1\ifnotempty{#2}{\mkern1mu#2}}}
+\newcommand{\DRmode}[2]{\mathsf{R}^{\amode}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}
+\newcommand{\DWmode}[2]{\mathsf{W}^{\amode}\ifnotempty{#1}{\mkern0mu#1\ifnotempty{#2}{\mkern1mu#2}}}
+\newcommand{\DRreg}[4][]{\mathsf{R}^{#1}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}}
+\newcommand{\DF}[1][\mathsf{acqrel}]{\tau\mathsf{F}^{#1}}
+\newcommand{\DFS}[1]{\smash{\mathsf{F}^{#1}}}
+% \newcommand{\DFS}[1]{\smash{\mathsf{F}_{\mathsf{S}}^{#1}}}
+\newcommand{\DFR}[1]{\smash{\mathsf{F}_{\mathsf{R}}^{#1}}}
+\newcommand{\DFW}[2][]{\smash{\mathsf{F}_{\mathsf{W#1}}^{#2}}}
+\newcommand{\iDR}[3][]{\tau\DR[#1]{#2}{#3}}
+\newcommand{\iDW}[3][]{\tau\DW[#1]{#2}{#3}}
+% \newcommand{\iDRSC}[2]{\mathsf{R^{sc}}\ifnotempty{#1}{\mkern1mu#1\mkern1mu\bot}}
+% \newcommand{\iDWSC}[2]{\mathsf{W^{sc}}\ifnotempty{#1}{\mkern0mu#1\mkern1mu\bot}}
+% \newcommand{\iDRmode}[2]{\mathsf{R^{\amode}}\ifnotempty{#1}{\mkern1mu#1\mkern1mu\bot}}
+% \newcommand{\iDWmode}[2]{\mathsf{W^{\amode}}\ifnotempty{#1}{\mkern0mu#1\mkern1mu\bot}}
+% \newcommand{\iDRAcq}[2]{\mathsf{R\ACQ}\ifnotempty{#1}{\mkern1mu#1\mkern1mu\bot}}
+% \newcommand{\iDWRel}[2]{\mathsf{W\REL}\ifnotempty{#1}{\mkern0mu#1\mkern1mu\bot}}
+% \newcommand{\iDR}[2]{\mathsf{R}\ifnotempty{#1}{\mkern1mu#1\mkern1mu\bot}}
+% \newcommand{\iDW}[2]{\mathsf{W}\ifnotempty{#1}{\mkern0mu#1\mkern1mu\bot}}
+%% \newcommand{\iDRAcq}[2]{\mathsf{\tau R^{acq}}\ifnotempty{#1}{\,#1\ifnotempty{#2}{\,#2}}}
+%% \newcommand{\iDWRel}[2]{\mathsf{\tau W^{rel}}\ifnotempty{#1}{\,#1\ifnotempty{#2}{\,#2}}}
+%% \newcommand{\iDR}[2]{\mathsf{\tau R}\ifnotempty{#1}{\,#1\ifnotempty{#2}{\,#2}}}
+%% \newcommand{\iDW}[2]{\mathsf{\tau W}\ifnotempty{#1}{\,#1\ifnotempty{#2}{\,#2}}}
+%\newcommand{\iDF}[1]{\mathsf{\tau F}_{#1}}
+
+\newcommand{\DSB}{\mathsf{SB}}
+\newcommand{\DT}[1]{\mathsf{T}\ifnotempty{#1}{\,#1}}
+\newcommand{\DB}[1]{\mathsf{B}\ifnotempty{#1}{\,#1}}
+\newcommand{\DC}[1]{\mathsf{C}\ifnotempty{#1}{\,#1}}
+
+\newcommand{\aEvs}{E}
+\newcommand{\dEvs}{B}
+\newcommand{\bEvs}{D}
+\newcommand{\EAct}{A}
+\newcommand{\ESub}{S}
+\newcommand{\Event}{E}
+\newcommand{\aEv}{e}
+\newcommand{\bEv}{d}
+\newcommand{\cEv}{c}
+\newcommand{\dEv}{b}
+\newcommand{\cEvs}{C}
+\newcommand{\begEv}{b}
+\newcommand{\comEv}{c}
+\newcommand{\lessdoteq}{\mathrel{\raisebox{-.65ex}{$\mkern1mu\mathord{\relbar}$}\mkern-12mu\raisebox{.2ex}{$\mathord{\lessdot}$}\mkern1mu}}
+%\renewcommand{\le}{\mathrel{{\color{blue}\leq}}}
+%% \newcommand{\lt}{\mathrel{{\color{blue}<}}}
+%% \newcommand{\gtN}{\mathrel{{\color{red!50!black}\leq}}}
+%% \newcommand{\geN}{\mathrel{{\color{red!50!black}<}}}
+\newcommand{\lt}{<}
+\newcommand{\gt}{>}
+\newcommand{\gtN}{\leq}
+\newcommand{\gtNsp}{\mathrel{\,\mid\!\!\!>}}
+\newcommand{\ltNsp}{\mathrel{\,\mid\!\!\!<}}
+\newcommand{\geN}{<}
+%\newcommand{\le}{\le}%_\mathsf{w}}
+%\newcommand{\lt}{<}%_\mathsf{w}}
+\newcommand{\leloc}{\preceq}%\le_\mathsf{s}}
+\newcommand{\ltloc}{\prec}%<_\mathsf{s}}
+\newcommand{\lestrong}{\trianglelefteq}
+\newcommand{\ltstrong}{\vartriangleleft}
+\newcommand{\lesc}{\sqsubseteq}
+\newcommand{\ltsc}{\sqsubset}
+% \newcommand{\leobs}{\sqsubseteq_\mathsf{obs}}
+% \newcommand{\ltobs}{\sqsubset_\mathsf{obs}}
+% \newcommand{\lesc}{\sqsubseteq_\mathsf{sc}}
+% \newcommand{\ltsc}{\sqsubset_\mathsf{sc}}
+\newcommand{\moral}{\mathbin{\blacktriangle}}
+\newcommand{\conflict}{\mathbin{\vartriangle}}
+\newcommand{\concur}{\asymp}
+
+% \newcommand{\slt}{\vartriangleleft}
+% \newcommand{\sle}{\trianglelefteq}
+% \newcommand{\wlt}{\sqsubset}%\mathrel{\raisebox{.1ex}{$\lessdot$}}}
+% \newcommand{\wle}{\sqsubseteq}%\lessdoteq}
+% \newcommand{\wleLoc}{\mathrel{{\wle}\restrict{\Loc}}}
+% \newcommand{\leLoc}{\mathrel{{\le}\restrict{\Loc}}}
+% \newcommand{\wleaLoc}{\mathrel{{\wle}\restrict{\aLoc}}}
+% \newcommand{\leaLoc}{\mathrel{{\le}\restrict{\aLoc}}}
+% \newcommand{\gtN}{\mathrel{{\color{red!50!black}\lessdoteq}}}
+% \newcommand{\geN}{\mathrel{{\color{red!50!black}\lessdot}}}
+
+\newcommand{\Alphabet}{\Sigma}
+\newcommand{\labeling}{\lambda}
+\newcommand{\labelingForm}{\Formulae}%\lambda_{\Formulae}}
+\newcommand{\labelingAct}{\Act}%\lambda_{\Act}}
+\newcommand{\labelingSub}{\Sub}%\lambda_{\Act}}
+
+\newcommand{\RF}{\mathsf{RF}}
+
+\newcommand{\NEVER}[1]{\rlap{$\times$}#1}
+
+\newcommand{\partialfun}{\mathbin\rightharpoonup}
+\newcommand{\fun}{\mathbin\rightarrow}
+\newcommand{\prefix}{\mathbin\Rightarrow}
+\newcommand{\prefixsc}{\mathbin{{\xRightarrow{{\mathsf{sc}}}}}}
+\newcommand{\prefixsimp}{\mathbin{{\xRightarrow{{\mathsf{triv}}}}}}
+\newcommand{\sequence}{\mathbin;}
+\newcommand{\guard}{\mathbin\rhd}
+\newcommand{\relfilt}[2][\amode]{\mathsf{cover}\ifnotempty{#1}{^{#1}}\ifnotempty{#2}{_{#2}}}
+\newcommand{\DOT}{\mathbin.}
+
+\newcommand{\aPS}{P}
+\newcommand{\aPSS}{\mathcal{P}}
+\newcommand{\bPS}{Q}
+\newcommand{\bPSS}{\mathcal{Q}}
+
+\newcommand{\Term}{\mathsf{Term}}
+\newcommand{\SC}{\mathsf{SC}}
+\newcommand{\semmin}[1]{\textsf{gen}\llbracket#1\rrbracket}
+\newcommand{\semdown}[1]{\nabla\llbracket#1\rrbracket}
+\newcommand{\semsc}[1]{\llbracket#1\rrbracket_{\SC}}
+%\newcommand{\semsc}[1]{\textit{SC}\llbracket#1\rrbracket}
+\newcommand{\FENCE}{\texttt{F}}
+\newcommand{\FADD}{\texttt{FADD}}
+\newcommand{\CAS}{\texttt{CAS}}
+\newcommand{\BEGIN}{\texttt{begin}}
+\newcommand{\COMMIT}{\texttt{commit}}
+\newcommand{\RECOVERY}{\texttt{onabort}\texttt{\{}}
+\newcommand{\ENDREC}{\texttt{\}}}
+\newcommand{\NEW}{\texttt{new}\,}
+\newcommand{\NULL}{\texttt{null}}
+\newcommand{\BEGINVAL}{\BEGIN\,\aVal}
+\newcommand{\COMMITVAL}{\COMMIT\,\aVal}
+\newcommand{\RECOVERYVAL}{\texttt{onabort}\,\aVal\texttt{\{}}
+\newcommand{\END}{\texttt{end}}
+\newcommand{\SKIP}{\texttt{skip}}
+\newcommand{\BANG}{\texttt{!}\mkern-1mu}
+\newcommand{\GETS}{\texttt{:}\mkern-1mu\texttt{=}\,}
+\newcommand{\SEQ}{\texttt{;}\,\allowbreak}
+\newcommand{\SEMI}{\texttt{;}\,\allowbreak}
+\newcommand{\IF}[1]{\texttt{if}\allowbreak\texttt{(}#1\texttt{)}}
+\newcommand{\PASS}{\texttt{pass}}
+\newcommand{\WHILE}{\texttt{while}\,}
+\newcommand{\DO}[1]{\texttt{do}\texttt{\{}#1\texttt{\}}}
+\newcommand{\THEN}{\allowbreak\texttt{\{}}
+\newcommand{\ELSE}{\texttt{\}}\,\allowbreak\texttt{else}\allowbreak\,\texttt{\{}}
+\newcommand{\ELIF}[1]{\ELSE\IF{#1}}
+\newcommand{\brELSE}{\texttt{\}}\\\texttt{else}\,\texttt{\{}}
+\newcommand{\brELIF}[1]{\texttt{\}}\\\texttt{else}\,\IF{#1}}
+\newcommand{\FI}{\texttt{\}}}
+\newcommand{\RPAR}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\mkern-5mu\raisebox{.7ex}{\texttt{\textbf{-}}}\mkern-3mu}\,}
+\newcommand{\LPAR}{\,\mathbin{\rrceil}\,}
+\newcommand{\VAR}{\texttt{var}\,}
+\newcommand{\TOUCHED}{\texttt{touched}\,}
+\newcommand{\REF}[1]{\texttt{[}#1\texttt{]}}
+\newcommand{\REFAcq}[1]{\REF{#1}^{\texttt{acq}}}
+\newcommand{\REFRel}[1]{\REF{#1}^{\texttt{rel}}}
+
+\newcommand{\CANREAD}{\texttt{canRead}}
+\newcommand{\SEC}{\texttt{SECRET}}
+\newcommand{\RETURN}{\texttt{return}\,}
+\newcommand{\BARRIER}{\texttt{barrier}}
+
+\newcommand{\EQ}{{=}}%\,\texttt{=}\,}
+% \newcommand{\NOTEQ}{\,\texttt{!=}\,}
+\newcommand{\NOTEQ}{\ensuremath{{\neq}}}
+
+\newcommand{\GCC}{\texttt{gcc}}
+\newcommand{\CLANG}{\texttt{clang}}
+
+
+%% \wk[out=-30,in=-70,transform canvas={xshift=-1ex}]{wx0}{wx1}
+\usepackage{tikz}
+\usetikzlibrary{shapes}
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{topaths}
+\usetikzlibrary{arrows}
+\usetikzlibrary{positioning}
+\usetikzlibrary{matrix}
+\usetikzlibrary{fit}
+\usetikzlibrary{calc}
+\usetikzlibrary{matrix,fit,calc,positioning,backgrounds}
+\usetikzlibrary{arrows,patterns,decorations}
+\usetikzlibrary{decorations.pathreplacing}%,calligraphy}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{tikzmark}
+
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{topaths}
+\usetikzlibrary{arrows}
+\usetikzlibrary{positioning}
+\usetikzlibrary{matrix}
+\usetikzlibrary{fit}
+
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+
+\pgfsetlayers{background,main,foreground}
+
+\tikzstyle{oval} = [ellipse, inner xsep=#1]
+\newcommand{\bgoval}[3][gray!10]{\begin{pgfonlayer}{background}\node[oval= 4pt, fill=#1, fit=#2, label=$#3$]{};\end{pgfonlayer}}
+\newcommand{\bgellipse}[3][gray!10]{\begin{pgfonlayer}{background}\node[ellipse= 4pt, minimum width=8cm, fill=#1, fit=#2, label=$#3$]{};\end{pgfonlayer}}
+\newcommand{\bgellipsesmaller}[3][gray!10]{\begin{pgfonlayer}{background}\node[ellipse= 4pt, minimum width=7cm, fill=#1, fit=#2, label=$#3$]{};\end{pgfonlayer}}
+\newcommand{\bgovalright}[3][gray!10]{\begin{pgfonlayer}{background}\node[oval= 4pt, fill=#1, fit=#2, label={right:$#3$}]{};\end{pgfonlayer}}
+
+
+%\tikzset{baselinecenter/.style= {baseline=([yshift=-1ex]current bounding box.west)} }
+\tikzstyle{baselinecenter} = [baseline={([yshift=-.5ex]current bounding box.west)}]
+%\tikzstyle{baselinecenter} = [baseline=(current bounding box.west)]
+\tikzstyle{event} = [draw=black, fill=blue!10, rectangle, rounded corners, minimum size=3ex]
+\newcommand{\event}[3]{\node[event](#1)[#3]{$\mathstrut#2$};}
+\tikzstyle{zlbl} = [black]
+\newcommand{\@zz}[1]{\makebox[0ex]{\smash{\raisebox{-.5ex}{{${#1}{:}\;$}}}}}
+\newcommand{\@zzl}[1]{\makebox[0ex][r]{\smash{\raisebox{-.5ex}{{${#1}{:}$}}}}}
+\newcommand{\eventl}[4]{\node[event](#2)[#4,label={[zlbl]left:\@zzl{#1}}]{$\mathstrut#3$};}
+\newcommand{\eventr}[4]{\node[event](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
+\tikzstyle{internal} = [color=gray, draw=gray, dashed, fill=gray!10, rectangle, rounded corners, minimum size=3ex]
+\newcommand{\internal}[3]{\node[internal](#1)[#3]{$\mathstrut#2$};}
+\tikzstyle{cloudy} = [draw=black, fill=blue!10, cloud, aspect=2]
+\newcommand{\cloud}[3]{\node[cloudy](#1)[#3]{$\mathstrut#2$};}
+\tikzstyle{final} = [draw=black, fill=blue!10, rectangle, rounded corners, double, minimum size=3ex]
+\newcommand{\final}[3]{\node[final](#1)[#3]{$\mathstrut#2$};}
+\tikzset{nonevent/.style={
+        event, 
+        append after command={
+            node [
+                fit=(\tikzlastnode),
+                draw=red!50!black,
+                thick,
+                inner sep=-2\pgflinewidth,
+                cross out
+            ] {}
+        }
+    }
+}
+\tikzset{nonfinal/.style={
+        final, 
+        append after command={
+            node [
+                fit=(\tikzlastnode),
+                draw=red!50!black,
+                thick,
+                inner sep=-2\pgflinewidth,
+                cross out
+            ] {}
+        }
+    }
+}
+\newcommand{\nonevent}[3]{\node[nonevent](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\nonfinal}[3]{\node[nonfinal](#1)[#3]{$\mathstrut#2$};}
+\tikzstyle{race} = [-,thick,decorate,decoration={zigzag,segment length = 0.2cm, amplitude = 0.5mm},color=red!50!black]
+\newcommand{\race}[3][]{\begin{pgfonlayer}{background}\draw[race,#1](#2) to (#3);\end{pgfonlayer}}
+\newcommand{\xrace}{\xarrowtikz{race}{\;\;\;\;}}
+\newcommand{\lrace}[1]{\xarrowtikzmath{race}{\;\text{\textcolor{black}{\emph{#1}}}\;}}
+
+\tikzstyle{graypo} = [-latex,color=gray,]
+\tikzstyle{graywk} = [->,dashed,thick,color=gray]
+\newcommand{\graypo}[3][]{\draw[graypo,#1](#2)to(#3);}
+\newcommand{\graywk}[3][]{\draw[graywk,#1](#2)to(#3);}
+% \newcommand{\graypo}[3][]{}
+% \newcommand{\graywk}[3][]{}
+
+\tikzstyle{po} = [-latex,color=blue,]
+\newcommand{\po}[3][]{\draw[po,#1](#2)to(#3);}
+\newcommand{\xpo}{\xarrowtikz{po}{\;\;}}%
+\tikzstyle{sync} = [-latex,color=cyan,double]
+\newcommand{\sync}[3][]{\draw[sync,#1](#2)to(#3);}
+\newcommand{\xsync}{\xarrowtikz{sync}{\;\;}}%
+\tikzstyle{lift} = [-latex,double]
+\newcommand{\lift}[3][]{\draw[lift,#1](#2)to(#3);}
+\tikzstyle{wk} = [->,dashed,thick,color=red!50!black,]
+\newcommand{\wk}[3][]{\draw[wk,#1](#2)to(#3);}
+\newcommand{\xwk}{\xarrowtikz{wk}{\;\;}}%
+\tikzstyle{wkx} = [->,dashed,thick,color=red!70!black,]
+\newcommand{\wkx}[3][]{\draw[wkx,#1](#2)to(#3);}
+\newcommand{\xwkx}{\xarrowtikz{wkx}{\;\;}}%
+\tikzstyle{wky} = [->,dotted,thick,color=red!70!black,]
+\newcommand{\wky}[3][]{\draw[wky,#1](#2)to(#3);}
+\newcommand{\xwky}{\xarrowtikz{wky}{\;\;}}%
+\tikzstyle{wkz} = [->,dashdotted,thick,color=red!70!black,]
+\newcommand{\wkz}[3][]{\draw[wkz,#1](#2)to(#3);}
+\newcommand{\xwkz}{\xarrowtikz{wkz}{\;\;}}%
+
+\tikzstyle{rmw} = [-latex,thick]
+\NewDocumentCommand \rmw {O{} m O{} m} {\draw[rmw,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rmw}$}  (#4);}
+\newcommand{\rrmw}{\ensuremath{\mathrel{\mathsf{rmw}}}}%
+\newcommand{\xrmw}{\xarrowtikz{rmw}{rmw}}%
+\tikzstyle{si} = [-latex,thick]
+\NewDocumentCommand \si {O{} m O{} m} {\draw[si,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{si}$}  (#4);}
+\newcommand{\rsi}{\ensuremath{\mathrel{\mathsf{si}}}}%
+\newcommand{\xsi}{\xarrowtikz{si}{si}}%
+
+\tikzstyle{eco} = [-latex,color=red!50!black,thick,dashed]
+\NewDocumentCommand \eco {O{} m O{} m} {\draw[eco,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{eco}$}  (#4);}
+\newcommand{\reco}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{eco}}}}}%
+\newcommand{\recop}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{eco'}}}}}%
+\newcommand{\xeco}{\xarrowtikz{eco}{eco}}%
+\newcommand{\xecop}{\xarrowtikz{eco}{eco'}}%
+\tikzstyle{co} = [-latex,color=red!50!black,thick,dashed]
+\NewDocumentCommand \co {O{} m O{} m} {\draw[co,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{co}$}  (#4);}
+\newcommand{\rco}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{co}}}}}%
+\newcommand{\xco}{\xarrowtikz{co}{co}}%
+\tikzstyle{coi} = [-latex,color=red!50!black,thick,dashed]
+\NewDocumentCommand \coi {O{} m O{} m} {\draw[coi,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{coi}$}  (#4);}
+\newcommand{\rcoi}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{coi}}}}}%
+\newcommand{\xcoi}{\xarrowtikz{coi}{coi}}%
+\tikzstyle{coe} = [-latex,color=red!50!black,thick,dashed]
+\NewDocumentCommand \coe {O{} m O{} m} {\draw[coe,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{coe}$}  (#4);}
+\newcommand{\rcoe}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{coe}}}}}%
+\newcommand{\xcoe}{\xarrowtikz{coe}{coe}}%
+
+\tikzstyle{fr} = [-latex,color=red!90!black,thick,dashed]
+\NewDocumentCommand \fr {O{} m O{} m} {\draw[fr,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{fr}$}  (#4);}
+\newcommand{\rfr}{\ensuremath{\mathrel{\textcolor{red!90!black}{\mathsf{fr}}}}}%
+\newcommand{\xfr}{\xarrowtikz{fr}{fr}}%
+\tikzstyle{fre} = [-latex,color=red!90!black,thick,dashed]
+\NewDocumentCommand \fre {O{} m O{} m} {\draw[fre,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{fre}$}  (#4);}
+\newcommand{\rfre}{\ensuremath{\mathrel{\textcolor{red!90!black}{\mathsf{fre}}}}}%
+\newcommand{\xfre}{\xarrowtikz{fre}{fre}}%
+\tikzstyle{fri} = [-latex,color=red!90!black,thick,dashed]
+\NewDocumentCommand \fri {O{} m O{} m} {\draw[fri,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{fri}$}  (#4);}
+\newcommand{\rfri}{\ensuremath{\mathrel{\textcolor{red!90!black}{\mathsf{fri}}}}}%
+\newcommand{\xfri}{\xarrowtikz{fri}{fri}}%
+%\tikzstyle{rb} = [-latex,thick,dotted,color=red!90!black,]
+\NewDocumentCommand \rb {O{} m O{} m} {\draw[fr,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{fr}$}  (#4);}
+\newcommand{\rrb}{\ensuremath{\mathrel{\textcolor{red!90!black}{\mathsf{fr}}}}}%
+\newcommand{\xrb}{\xarrowtikz{rb}{fr}}%
+
+\tikzstyle{xw} = [-latex,color=red!50!black,thick,dashed]
+\NewDocumentCommand \xw {O{} m O{} m} {\draw[xw,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{xw}$}  (#4);}
+\newcommand{\rxw}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{xw}}}}}%
+\newcommand{\xxw}{\xarrowtikz{xw}{xw}}%
+
+\tikzstyle{rf} = [-latex,thick,color=green!50!black,]
+\newcommand{\rf}[3][]{\draw[rf,#1](#2)to(#3);}
+\newcommand{\rrf}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rf}}}}}%
+\newcommand{\xrf}{\xarrowtikz{rf}{\;\;}}%
+\tikzstyle{rfx} = [-latex,thick,color=green!50!black,]
+\NewDocumentCommand \rfx {O{} m O{} m} {\draw[rf,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rf}$}  (#4);}
+\newcommand{\rrfx}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rf}}}}}%
+\newcommand{\xrfx}{\xarrowtikz{rf}{rf}}%
+\tikzstyle{rfe} = [-latex,color=green!50!black,thick]
+\NewDocumentCommand \rfe {O{} m O{} m} {\draw[rfe,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{wr}$}  (#4);}
+\newcommand{\rrfe}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{wr}}}}}%
+\newcommand{\xrfe}{\xarrowtikz{rfe}{wr}}%
+\tikzstyle{rfex} = [-latex,color=green!50!black,thick]
+\NewDocumentCommand \rfex {O{} m O{} m} {\draw[rfe,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfe}$}  (#4);}
+\newcommand{\rrfex}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rfe}}}}}%
+\newcommand{\xrfex}{\xarrowtikz{rfe}{rfe}}%
+\tikzstyle{rfi} = [-latex,color=green!50!black,thick]
+\NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfi,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}
+\newcommand{\rrfi}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rfi}}}}}%
+\newcommand{\xrfi}{\xarrowtikz{rfi}{rfi}}%
+
+\tikzstyle{sw} = [-latex,color=blue,thick]
+\NewDocumentCommand \sw {O{} m O{} m} {\draw[sw,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{sw}$}  (#4);}
+\newcommand{\rsw}{\ensuremath{\mathrel{\textcolor{blue}{\mathsf{sw}}}}}%
+\newcommand{\xsw}{\xarrowtikz{sw}{sw}}%
+\tikzstyle{obs} = [-latex,color=blue,thick]
+\NewDocumentCommand \obs {O{} m O{} m} {\draw[obs,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{obs}$}  (#4);}
+\newcommand{\robs}{\ensuremath{\mathrel{\textcolor{blue}{\mathsf{obs}}}}}%
+\newcommand{\xobs}{\xarrowtikz{obs}{obs}}%
+
+\tikzstyle{hb} = [-latex,color=blue,thick]
+\NewDocumentCommand \hb {O{} m O{} m} {\draw[hb,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{hb}$}  (#4);}
+\newcommand{\rhb}{\ensuremath{\mathrel{\textcolor{blue}{\mathsf{hb}}}}}%
+\newcommand{\rhbp}{\ensuremath{\mathrel{\textcolor{blue}{\mathsf{hb'}}}}}%
+\newcommand{\xhb}{\xarrowtikz{hb}{hb}}%
+\newcommand{\xhbp}{\xarrowtikz{hb}{hb'}}%
+\tikzstyle{ob} = [-latex,color=blue,thick]
+\NewDocumentCommand \ob {O{} m O{} m} {\draw[ob,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{ob}$}  (#4);}
+\newcommand{\rob}{\ensuremath{\mathrel{\textcolor{blue}{\mathsf{ob}}}}}%
+\newcommand{\xob}{\xarrowtikz{ob}{ob}}%
+\tikzstyle{obi} = [-latex,color=blue,thick]
+\NewDocumentCommand \obi {O{} m O{} m} {\draw[obi,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{ob'}$}  (#4);}
+\newcommand{\robi}{\ensuremath{\mathrel{\textcolor{blue}{\mathsf{ob'}}}}}%
+\newcommand{\xobi}{\xarrowtikz{obi}{ob'}}%
+
+% \tikzstyle{ird} = [-latex,thick,color=green!50!black,]
+% \NewDocumentCommand \ird {O{} m O{} m} {\draw[ird,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{ird}$}  (#4);}
+% \newcommand{\rird}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{ird}}}}}%
+% \newcommand{\xird}{\xarrowtikz{ird}{ird}}%
+\tikzstyle{pox} = [-latex,thick,dotted,color=cyan!90!black,]
+\NewDocumentCommand \pox {O{} m O{} m} {\draw[pox,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{po}$}  (#4);}
+\newcommand{\rpox}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{po}}}}}%
+\newcommand{\xpox}{\xarrowtikz{pox}{po}}%
+\tikzstyle{poloc} = [-latex,thick,dotted,color=cyan!90!black,]
+\NewDocumentCommand \poloc {O{} m O{} m} {\draw[poloc,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{poloc}$}  (#4);}
+\newcommand{\rpoloc}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{poloc}}}}}%
+\newcommand{\xpoloc}{\xarrowtikz{poloc}{poloc}}%
+\tikzstyle{ppo} = [-latex,thick,color=cyan!90!black,]
+\NewDocumentCommand \ppo {O{} m O{} m} {\draw[ppo,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{ppo}$}  (#4);}
+\newcommand{\rppo}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{ppo}}}}}%
+\newcommand{\xppo}{\xarrowtikz{ppo}{ppo}}%
+\tikzstyle{addr} = [-latex,color=cyan!90!black,thick]
+\NewDocumentCommand \addr {O{} m O{} m} {\draw[addr,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{addr}$}  (#4);}
+\newcommand{\raddr}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{addr}}}}}%
+\newcommand{\xaddr}{\xarrowtikz{addr}{addr}}%
+\tikzstyle{ctrl} = [-latex,color=cyan!90!black,thick]
+\NewDocumentCommand \ctrl {O{} m O{} m} {\draw[ctrl,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{ctrl}$}  (#4);}
+\newcommand{\rctrl}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{ctrl}}}}}%
+\newcommand{\xctrl}{\xarrowtikz{ctrl}{ctrl}}%
+\tikzstyle{data} = [-latex,color=cyan!90!black,thick]
+\NewDocumentCommand \data {O{} m O{} m} {\draw[data,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{data}$}  (#4);}
+\newcommand{\rdata}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{data}}}}}%
+\newcommand{\xdata}{\xarrowtikz{data}{data}}%
+\tikzstyle{dob} = [-latex,thick,color=cyan!90!black,]
+\NewDocumentCommand \dob {O{} m O{} m} {\draw[dob,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{dob}$}  (#4);}
+\newcommand{\rdob}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{dob}}}}}%
+\newcommand{\xdob}{\xarrowtikz{dob}{dob}}%
+\tikzstyle{deps} = [-latex,thick,color=cyan!90!black,]
+\NewDocumentCommand \deps {O{} m O{} m} {\draw[deps,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{deps}$}  (#4);}
+\newcommand{\rdeps}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{deps}}}}}%
+\newcommand{\xdeps}{\xarrowtikz{deps}{deps}}%
+\tikzstyle{bob} = [-latex,thick,color=cyan!90!black,]
+\NewDocumentCommand \bob {O{} m O{} m} {\draw[bob,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{bob}$}  (#4);}
+\newcommand{\rbob}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{bob}}}}}%
+\newcommand{\xbob}{\xarrowtikz{bob}{bob}}%
+\tikzstyle{lob} = [-latex,thick,color=cyan!90!black,]
+\NewDocumentCommand \lob {O{} m O{} m} {\draw[lob,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{lob}$}  (#4);}
+\newcommand{\rlob}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{lob}}}}}%
+\newcommand{\xlob}{\xarrowtikz{lob}{lob}}%
+\tikzstyle{dobi} = [-latex,thick,color=cyan!90!black,]
+\NewDocumentCommand \dobi {O{} m O{} m} {\draw[dobi,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{dob'}$}  (#4);}
+\newcommand{\rdobi}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{dob'}}}}}%
+\newcommand{\xdobi}{\xarrowtikz{dobi}{dob'}}%
+\tikzstyle{aob} = [-latex,thick,color=cyan!90!black,]
+\NewDocumentCommand \aob {O{} m O{} m} {\draw[aob,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{aob}$}  (#4);}
+\newcommand{\raob}{\ensuremath{\mathrel{\textcolor{cyan!90!black}{\mathsf{aob}}}}}%
+\newcommand{\xaob}{\xarrowtikz{aob}{aob}}%
+
+\newsavebox{\mytempbox}
+\newcommand{\xarrowtikz}[3][above=-0.45ex]{\sbox{\mytempbox}{\hbox{\( \scriptstyle\mathsf{#3}\mkern17mu \)}}%
+  \mathrel{\smash{\tikz[baseline=-0.5ex]{\draw[#2] (0,0) -- node[midway,#1]{\(\scriptstyle\mathsf{#3}\)} (\wd\mytempbox,0);}}}}
+\newcommand{\xarrowtikzmath}[3][above=-0.45ex]{\sbox{\mytempbox}{\hbox{\( \scriptstyle\mathsf{#3}\mkern17mu \)}}%
+  \mathrel{\smash{\tikz[baseline=-0.5ex]{\draw[#2] (0,0) -- node[midway,#1]{\(\scriptstyle#3\)} (\wd\mytempbox,0);}}}}
+\newcommand{\xarrowtikzlong}[3][above=-0.45ex]{\sbox{\mytempbox}{\hbox{\( \scriptstyle\mathsf{#3}\mkern17mu \)}}%
+  \mathrel{\smash{\tikz[baseline=-0.5ex]{\draw[#2] (0,0) -- node[midway,#1]{\(\scriptstyle\mathsf{#3}\)} (\wd\mytempbox*1.5,0);}}}}
+\newcommand{\xarrowtikzrev}[3][above=-0.45ex]{\sbox{\mytempbox}{\hbox{\( \scriptstyle\mathsf{#3}\mkern17mu \)}}%
+  \mathrel{\smash{\tikz[baseline=-0.5ex]{\draw[#2] (\wd\mytempbox,0) -- node[pos=0.4,#1]{\(\scriptstyle\mathsf{#3}\)} (0,0);}}}}
+\newcommand{\xarrowtikzboth}[3][above=-0.45ex]{\sbox{\mytempbox}{\hbox{\( \scriptstyle\mathsf{#3}\mkern17mu \)}}%
+  \mathrel{\smash{\tikz[baseline=-0.5ex]{\draw[#2] (0,0) -- node[midway,#1]{\(\scriptstyle\mathsf{#3}\)} (\wd\mytempbox,0);
+        \draw[#2] (\wd\mytempbox,0) -- (0,0);
+      }}}}
+
+\newcommand{\xarrow}[1]{\xrightarrow{\smash{#1}}}
+%\newcommand{\xarrow}[1]{\xrightarrow{\raisebox{-1ex}{$\scriptstyle\smash{#1}$}}}
+\newcommand{\Xarrow}[1]{\xRightarrow{#1}}
+
+\def\@versim#1#2{\raise0.24ex\vbox{\baselineskip\z@skip\lineskip-2.4ex\ialign{$\m@th#1\hfil##\hfil$\crcr\sim\crcr#2\crcr}}}
+\def\@versime#1#2{\raise0\p@\vbox{\baselineskip\z@skip\lineskip-1.6ex\ialign{$\m@th#1\hfil##\hfil$\crcr\sim\crcr#2\crcr}}}
+\def\@verharpright#1#2{\raise0.24ex\vbox{\baselineskip\z@skip\lineskip-2.1ex\ialign{$\m@th#1\hfil##\hfil$\crcr{\scriptstyle\rightharpoondown}\crcr#2\crcr}}}
+\def\@verharpleft#1#2{\raise0.24ex\vbox{\baselineskip\z@skip\lineskip-2.1ex\ialign{$\m@th#1\hfil##\hfil$\crcr{\scriptstyle\leftharpoondown}\crcr#2\crcr}}}
+\def\@vernharpright#1#2{\raise0.24ex\vbox{\baselineskip\z@skip\lineskip-2.1ex\ialign{$\m@th#1\hfil##\hfil$\crcr{\scriptstyle\arrownot\rightharpoondown}\crcr#2\crcr}}}
+\def\@vereqqright#1#2{\raise0.24ex\vbox{\baselineskip\z@skip\lineskip-2.1ex\ialign{$\m@th#1\hfil##\hfil$\crcr{\scriptscriptstyle=}\crcr#2\crcr}}}
+\def\@vereqqleft#1#2{\raise0.24ex\vbox{\baselineskip\z@skip\lineskip-2.1ex\ialign{$\m@th#1\hfil##\hfil$\crcr{\scriptscriptstyle=}\crcr#2\crcr}}}
+\def\VDash{\mathrel{\rule{.08ex}{1.54ex}\mkern-2.4mu\vDash}}
+\newcommand{\sqsubseteqq}{\mathrel{\mathpalette\@vereqqright\sqsubset}}%eqq
+\newcommand{\sqsupseteqq}{\mathrel{\mathpalette\@vereqqleft\sqsupset}}%eqq
+\newcommand{\sqsubsetharp}{\mathrel{\mathpalette\@verharpright\sqsubset}}%harpoon
+\newcommand{\sqsupsetharp}{\mathrel{\mathpalette\@verharpleft\sqsupset}}%harpoon
+\newcommand{\sqsubsetnharp}{\mathrel{\mathpalette\@vernharpright\sqsubset}}%harpoon
+\newcommand{\sqsubsetsim}{\mathrel{\mathpalette\@versim\sqsubset}}%sim
+\newcommand{\sqsupsetsim}{\mathrel{\mathpalette\@versim\sqsupset}}%sim
+\newcommand{\eqqsim}{\mathrel{\mathpalette\@versime=}}%sim
+
+
+% Local Variables:
+% mode: latex
+% TeX-master: "paper"
+% End:
