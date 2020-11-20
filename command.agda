@@ -14,7 +14,7 @@ module command (DM : DataModel) where
 
     skip : Command
     _∙_ : Command → Command → Command
-    if_then_ : Formula → Command → Command
+    if_then_else_ : Formula → Command → Command → Command
     [_]:=_ : Address → Expression → Command
     _:=[_] : Register → Address → Command
     _:=_ : Register → Expression → Command

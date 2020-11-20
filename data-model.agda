@@ -13,9 +13,9 @@ module data-model where
     
     field _⊨_ : Formula → Formula → Set
 
-    field tt : Formula
     field ff : Formula
     field _∨_ : Formula → Formula → Formula
+    field ¬ : Formula → Formula
     field _==_ : Expression → Expression → Formula
 
     field ⊨-refl : ∀ {ϕ} → (ϕ ⊨ ϕ)
@@ -24,7 +24,14 @@ module data-model where
     field ⊨-left-∨ : ∀ {ϕ ψ} → (ϕ ⊨ (ϕ ∨ ψ))
     field ⊨-right-∨ : ∀ {ϕ ψ} → (ψ ⊨ (ϕ ∨ ψ))
     field ⊨-elim-∨ : ∀ {ϕ ψ χ} → (ϕ ⊨ χ) → (ψ ⊨ χ) → ((ϕ ∨ ψ) ⊨ χ)
-    
+    field ⊨-resp-¬ : ∀ {ϕ ψ} → (ϕ ⊨ ψ) → ((¬ ψ) ⊨ (¬ ϕ))
+
+    tt = ¬ ff
+    _∧_ = λ ϕ ψ → ¬((¬ ϕ) ∨ (¬ ψ))
+
+    ⊨-resp-∧ : ∀ {ϕ ψ ξ ζ} → (ϕ ⊨ ψ) → (ξ ⊨ ζ) → ((ϕ ∧ ξ) ⊨ (ψ ∧ ζ))
+    ⊨-resp-∧ ϕ⊨ψ ξ⊨ζ = ⊨-resp-¬ (⊨-resp-∨ (⊨-resp-¬ ϕ⊨ψ) (⊨-resp-¬ ξ⊨ζ))
+
     ⊨-assocl-∨ : ∀ {ϕ ψ χ} → ((ϕ ∨ (ψ ∨ χ)) ⊨ ((ϕ ∨ ψ) ∨ χ))
     ⊨-assocl-∨ = ⊨-elim-∨ (⊨-trans ⊨-left-∨ ⊨-left-∨) (⊨-elim-∨ (⊨-trans ⊨-right-∨ ⊨-left-∨) ⊨-right-∨)
 
