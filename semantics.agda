@@ -122,7 +122,17 @@ module semantics (DM : DataModel) (Event : Set) where
     field τϕ⊨ϕ[[a]/r] : ∀ ϕ C → (e ∉ C) → (τ(C)(ϕ) ⊨ (ϕ [[ a ]/ r ]))
     
   record STORE (a : Address) (M : Expression) (P : Pomset) : Set₁ where
-    -- TODO
+
+    open Pomset P
+
+    field e : Event
+    field v : Value
+
+    field e∈E : e ∈ E
+    field d=e : ∀ d → (d ∈ E) → (d ≡ e)
+    field act=Wav : act(e) ≡ (W a v)
+    field pre⊨M=v : pre(e) ⊨ (M == value v)
+    field τϕ⊨ϕ[v/[a]] : ∀ ϕ C → (τ(C)(ϕ) ⊨ (ϕ [ v /[ a ]]))
   
   record LET (r : Register) (M : Expression) (P : Pomset) : Set₁ where
     -- TODO

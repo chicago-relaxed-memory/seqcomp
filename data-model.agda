@@ -19,6 +19,7 @@ module data-model where
     field _==_ : Expression → Expression → Formula
     field _[_/_] : Formula → Value → Register → Formula
     field _[[_]/_] : Formula → Address → Register → Formula
+    field _[_/[_]] : Formula → Value → Address → Formula
 
     field ⊨-refl : ∀ {ϕ} → (ϕ ⊨ ϕ)
     field ⊨-trans : ∀ {ϕ ψ χ} → (ϕ ⊨ ψ) → (ψ ⊨ χ) → (ϕ ⊨ χ)
