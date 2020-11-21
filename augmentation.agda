@@ -141,10 +141,19 @@ module augmentation (DM : DataModel) (Event : Set) where
                 ; d=e = λ d d∈E′ → d=e d (E′⊆E d d∈E′)
                 ; act=Wav = ≡-trans (≡-symm (act=act′ e e∈E)) act=Wav
                 ; pre⊨M=v = ⊨-trans (pre′⊨pre e e∈E) pre⊨M=v
-                ; τϕ⊨ϕ[v/[a]] = λ C ϕ → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[v/[a]] C ϕ)
+                ; τϕ⊨ϕ[v/[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[v/[a]] C ϕ)
                 }
                 
-  sem-resp-≲ {P} {P′} (r := M) P≲P′ P∈LET = record {}
+  sem-resp-≲ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where
+    
+    open LET P∈LET
+    open _≲_ P≲P′
+
+    P′∈LET : P′ ∈ LET r M
+    P′∈LET = record
+              { E⊆∅ = ⊆-trans E′⊆E E⊆∅
+              ; τϕ⊨ϕ[M/r] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[M/r] C ϕ)
+              }
 
   sem-resp-≲ {P} {P′} (fork G join) P≲P′ P∈⟪G⟫ = sen-resp-≲ G P≲P′ P∈⟪G⟫
 
