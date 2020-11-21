@@ -1,0 +1,20 @@
+\section{Introduction}
+
+This paper builds on
+\cite{2019-sp} and
+\cite{10.1145/3428262}.
+
+
+Pomsets are a nice model of concurrent computation.
+Predicate transformers are a nice model of sequential computation.
+We show how these interact.
+
+We do this by attaching predicate transformers to \emph{configurations}.
+
+Thus the amount of transformation depends on which read events are seen in
+the configuration.
+
+We develop the theory of pomsets with predicate transformers, then apply the
+theory to model relaxed memory.
+
+Other things we could model include Map/Reduce and Fork/Join.
