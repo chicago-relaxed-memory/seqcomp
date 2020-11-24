@@ -1,0 +1,68 @@
+\section{Process Algebra}
+
+We begin with a warm-up exercise, presenting the key ideas of the
+model in the simplified setting of a process algebra.
+
+Process algebras were developed as a simple model of message-passing
+concurrency~\cite{CCS,CSP,ACP} and have been given many different
+semantics, notably traces~\cite{???}, labelled transition
+systems~\cite{???}, equational~\cite{???}, and event
+structures~\cite{???}.  In this section, we recap the \emph{pomset}
+semantics, and show how it can be used to model a simple process
+language based on the asynchronous $\pi$-calculus~\cite{???} and
+value-passing CCS~\cite{???}.
+
+The key idea of this paper is a relaxed treatment of sequential
+composition, where causality is not given by program order, but
+instead is given by control and data dependencies.
+
+\subsection{A pomset model of Asynchronous CCS}
+
+\begin{definition}
+  A \emph{pomset} is a tuple
+  $(\Event, {\le}, \labeling)$ where
+  \begin{itemize}
+  \item $\Event$ is a set of \emph{events}
+  \item
+    ${\le} \subseteq (\Event\times\Event)$ is the \emph{causality} partial order, and
+  \item
+    $\labeling: \Event \fun \Act$ is a \emph{labeling}.
+  \end{itemize}
+\end{definition}
+
+\begin{definition}
+  $\sSKIP$ contains just the empty pomset, that is if $\aPS_0\in\sSKIP$ then
+  $\aEvs_0 = \emptyset$.
+\end{definition}
+
+\begin{definition}
+  $\aPSS_1\sSEMI\aPSS_2$ contains pomset $\aPS_0$ whenever:
+  \begin{itemize}
+  \item there are pomsets $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$,
+  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
+  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
+  \item if $\aEv\in\aEvs_1$ then $\labeling_0(\aEv) = \labeling_1(\aEv)$, 
+  \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$.
+  \end{itemize}
+\end{definition}
+
+\begin{definition}
+  $\aPSS_1\sPAR\aPSS_2$ contains pomset $\aPS_0$ whenever:
+  \begin{itemize}
+  \item there are pomsets $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$,
+  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
+  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
+  \item if $\aEv\in\aEvs_1$ then $\labeling_0(\aEv) = \labeling_1(\aEv)$, 
+  \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$.
+  \end{itemize}
+\end{definition}
+  
+\subsection{A pomset and predicate transformer model of Value-passing Asynchronus CCS}
+
+\subsection{A pomset with predicate transformer model of Relaxed CCS}
+
