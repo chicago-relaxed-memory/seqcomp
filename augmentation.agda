@@ -13,8 +13,8 @@ module augmentation (DM : DataModel) (Event : Set) where
 
   record _≲_ (P P′ : Pomset) : Set₁ where
 
-    open Pomset P using (E ; act ; pre ; _≤_ ; τ ; RE ; WE ; ↓RW)
-    open Pomset P′ using () renaming (E to E′ ; act to act′ ; pre to pre′ ; _≤_ to _≤′_; ≤-refl to ≤′-refl ; τ to τ′ ; RE to RE′ ; WE to WE′ ; ↓RW to ↓RW′)
+    open Pomset P using (E ; act ; pre ; _≤_ ; τ ; ✓ ; RE ; WE ; ↓RW)
+    open Pomset P′ using () renaming (E to E′ ; act to act′ ; pre to pre′ ; _≤_ to _≤′_; ≤-refl to ≤′-refl ; τ to τ′ ; ✓ to ✓′ ; RE to RE′ ; WE to WE′ ; ↓RW to ↓RW′)
 
     field E′⊆E : (E′ ⊆ E)
     field E⊆E′ : (E ⊆ E′)
@@ -22,6 +22,7 @@ module augmentation (DM : DataModel) (Event : Set) where
     field pre′⊨pre : ∀ e → (e ∈ E) → (pre′(e) ⊨ pre(e))
     field ≤⊆≤′ : ∀ d e → (d ≤ e) → (d ≤′ e)
     field τ′⊨τ : ∀ C ϕ → (τ′(C)(ϕ) ⊨ τ(C)(ϕ))
+    field ✓′⊨✓ : ✓′ ⊨ ✓
     
     RE⊆RE′ : (RE ⊆ RE′)
     RE⊆RE′ e (e∈E , ae∈R) = (E⊆E′ e e∈E , ≡-subst Reads (act=act′ e e∈E) ae∈R)
@@ -58,7 +59,7 @@ module augmentation (DM : DataModel) (Event : Set) where
     open Pomset P₂ using () renaming (E to E₂ ; pre to pre₂)
     open Pomset P₀ using () renaming (↓RW to ↓RW₀)
     open Pomset P′₀ using () renaming (↓RW to ↓RW′₀)
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ↓RW⊆↓RW' to ↓RW₀⊆↓RW'₀) 
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀ ; ↓RW⊆↓RW' to ↓RW₀⊆↓RW'₀) 
 
     rhs′₀ : Event → Formula
     rhs′₀(e) = τ₁(↓RW′₀(e))(pre₂(e))
@@ -84,12 +85,14 @@ module augmentation (DM : DataModel) (Event : Set) where
                       ; act₀=act₁ = λ e e∈E₁ → ≡-trans (≡-symm (act₀=act′₀ e (E₁⊆E₀ e e∈E₁))) (act₀=act₁ e e∈E₁)
                       ; act₀=act₂ =  λ e e∈E₂ → ≡-trans (≡-symm (act₀=act′₀ e (E₂⊆E₀ e e∈E₂))) (act₀=act₂ e e∈E₂)
                       ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨τ₁τ₂ϕ C ϕ)
+                      ; ✓₀⊨✓₁ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨✓₁
+                      ; ✓₀⊨τ₁✓₂ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨τ₁✓₂
                       }
     
   sem-resp-≲ {P₀} {P′₀} (if ψ then C₁ else C₂) P₀≲P′₀ P₀∈IF = P′₀∈IF where
 
     open IF P₀∈IF
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀)
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀)
     
     P′₀∈IF : P′₀ ∈ (IF ψ ⟦ C₁ ⟧ ⟦ C₂ ⟧)
     P′₀∈IF = record
@@ -109,6 +112,8 @@ module augmentation (DM : DataModel) (Event : Set) where
                ; act₀=act₂ = λ e e∈E₂ → ≡-trans (≡-symm (act₀=act′₀ e (E₂⊆E₀ e e∈E₂))) (act₀=act₂ e e∈E₂)
                ; τ₀ϕ⊨τ₁ϕ = λ C ϕ → ⊨-trans (⊨-resp-∧ ⊨-refl (τ′₀⊨τ₀ C ϕ)) (τ₀ϕ⊨τ₁ϕ C ϕ)
                ; τ₀ϕ⊨τ₂ϕ =  λ C ϕ → ⊨-trans (⊨-resp-∧ ⊨-refl (τ′₀⊨τ₀ C ϕ)) (τ₀ϕ⊨τ₂ϕ C ϕ)
+               ; ✓₀⊨✓₁ = ⊨-trans (⊨-resp-∧ ⊨-refl ✓′₀⊨✓₀) ✓₀⊨✓₁
+               ; ✓₀⊨✓₂ = ⊨-trans (⊨-resp-∧ ⊨-refl ✓′₀⊨✓₀) ✓₀⊨✓₂
                }
 
 
@@ -119,13 +124,12 @@ module augmentation (DM : DataModel) (Event : Set) where
 
     P′∈LOAD : P′ ∈ LOAD r a
     P′∈LOAD = record
-                { e = e
-                ; v = v
-                ; e∈E = E⊆E′ e e∈E
-                ; d=e = λ d d∈E′ → d=e d (E′⊆E d d∈E′)
-                ; act=Rav = ≡-trans (≡-symm (act=act′ e e∈E)) act=Rav
+                { v = v
+                ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
+                ; act=Rav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Rav e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[v/r] = λ C ϕ → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[v/r] C ϕ)
-                ; τϕ⊨ϕ[[a]/r] = λ C ϕ e∉C → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[[a]/r] C ϕ e∉C)
+                ; τϕ⊨ϕ[[a]/r] = λ C ϕ C∩E⊆∅ → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[[a]/r] C ϕ (⊆-trans (⊆-resp-∩ ⊆-refl E⊆E′) C∩E⊆∅))
+                ; ✓⊨ff = λ E′⊆∅ → ⊨-trans ✓′⊨✓ (✓⊨ff (⊆-trans E⊆E′ E′⊆∅))
                 }
 
   sem-resp-≲ {P} {P′} ([ a ]:= M) P≲P′ P∈STORE = P′∈STORE where
@@ -135,13 +139,12 @@ module augmentation (DM : DataModel) (Event : Set) where
 
     P′∈STORE : P′ ∈ STORE a M
     P′∈STORE = record
-                { e = e
-                ; v = v
-                ; e∈E = E⊆E′ e e∈E
-                ; d=e = λ d d∈E′ → d=e d (E′⊆E d d∈E′)
-                ; act=Wav = ≡-trans (≡-symm (act=act′ e e∈E)) act=Wav
-                ; pre⊨M=v = ⊨-trans (pre′⊨pre e e∈E) pre⊨M=v
+                { v = v
+                ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
+                ; act=Wav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Wav e (E′⊆E e e∈E′))
+                ; pre⊨M=v = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨M=v e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[v/[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[v/[a]] C ϕ)
+                ; ✓⊨ff = λ E′⊆∅ → ⊨-trans ✓′⊨✓ (✓⊨ff (⊆-trans E⊆E′ E′⊆∅))
                 }
                 
   sem-resp-≲ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where
@@ -162,7 +165,7 @@ module augmentation (DM : DataModel) (Event : Set) where
   sen-resp-≲ {P₀} {P′₀} (thread C) P₀≲P′₀ P₀∈THREAD = P′₀∈THREAD where
 
     open THREAD P₀∈THREAD
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀) 
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀) 
     
     P′₀∈THREAD : P′₀ ∈ THREAD ⟦ C ⟧
     P′₀∈THREAD = record
@@ -174,13 +177,13 @@ module augmentation (DM : DataModel) (Event : Set) where
                   ; pre₀⊨pre₁ = λ e e∈E₁ → ⊨-trans (pre′₀⊨pre₀ e (E₁⊆E₀ e e∈E₁)) (pre₀⊨pre₁ e e∈E₁)
                   ; act₀=act₁ = λ e e∈E₁ → ≡-trans (≡-symm (act₀=act′₀ e (E₁⊆E₀ e e∈E₁))) (act₀=act₁ e e∈E₁)
                   ; τ₀ϕ⊨ϕ =  λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ϕ C ϕ)
-                  ; τ₀ϕ⊨ff = λ C ϕ e e∈C e∉E → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ff C ϕ e (E′₀⊆E₀ e e∈C) e∉E)
+                  ; ✓₀⊨✓₁ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨✓₁
                   }
     
   sen-resp-≲ {P₀} {P′₀} (G₁ ∥ G₂) P₀≲P′₀ P₀∈⟪G₁⟫|||⟪G₂⟫ = P′₀∈⟪G₁⟫|||⟪G₂⟫ where
 
     open _|||_ P₀∈⟪G₁⟫|||⟪G₂⟫
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀) 
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀) 
 
     P′₀∈⟪G₁⟫|||⟪G₂⟫ : P′₀ ∈ (⟪ G₁ ⟫ ||| ⟪ G₂ ⟫)
     P′₀∈⟪G₁⟫|||⟪G₂⟫ = record
@@ -200,6 +203,7 @@ module augmentation (DM : DataModel) (Event : Set) where
                         ; act₀=act₂ = λ e e∈E₂ → ≡-trans (≡-symm (act₀=act′₀ e (E₂⊆E₀ e e∈E₂))) (act₀=act₂ e e∈E₂)
                         ; τ₀ϕ⊨τ₁ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨τ₁ϕ C ϕ)
                         ; τ₀ϕ⊨τ₂ϕ =  λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨τ₂ϕ C ϕ)
-                        }
+                        ; ✓₀⊨✓₁ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨✓₁
+                        ; ✓₀⊨✓₂ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨✓₂                        }
     
     

@@ -33,6 +33,7 @@ module pomset (DM : DataModel) (Event : Set) where
     field _≤_ : Event → Event → Set
     field ℓ : Event → (Formula × Action)
     field τ : (Event → Set) → Formula → Formula
+    field ✓ : Formula
 
     pre : Event → Formula
     pre(e) = fst(ℓ(e))
@@ -57,6 +58,10 @@ module pomset (DM : DataModel) (Event : Set) where
     field τ-resp-⊨ : ∀ {C ϕ ψ} → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
     field τ-resp-∨ : ∀ {C ϕ ψ} → (τ(C)(ϕ ∨ ψ) ⊨ (τ(C)(ϕ) ∨ τ(C)(ψ)))
     field τ-refl-∨ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∨ τ(C)(ψ)) ⊨ τ(C)(ϕ ∨ ψ))
+
+    -- TODO: make these fields
+    postulate τ-refl-∧ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∧ τ(C)(ψ)) ⊨ τ(C)(ϕ ∧ ψ))
+    postulate ✓⊨τtt : ✓ ⊨ τ(E)(tt)
 
     τ-resp-⊆ : ∀ {C D ϕ} → (C ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     τ-resp-⊆ C⊆D = τ-resp-∩⊆ (λ{ e (e∈C , _) → C⊆D e e∈C})
