@@ -136,6 +136,7 @@ module semantics (DM : DataModel) (Event : Set) where
     field act=Wav :  ∀ e → (e ∈ E) → act(e) ≡ (W a v)
     field pre⊨M=v :  ∀ e → (e ∈ E) → pre(e) ⊨ (M == value v)
     field τϕ⊨ϕ[v/[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]])) 
+    field ✓⊨M=v : (✓ ⊨ (M == value v))
     field ✓⊨ff : (E ⊆ ∅) → (✓ ⊨ ff)
  
   record LET (r : Register) (M : Expression) (P : Pomset) : Set₁ where

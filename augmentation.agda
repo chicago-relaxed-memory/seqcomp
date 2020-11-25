@@ -144,6 +144,7 @@ module augmentation (DM : DataModel) (Event : Set) where
                 ; act=Wav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Wav e (E′⊆E e e∈E′))
                 ; pre⊨M=v = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨M=v e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[v/[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[v/[a]] C ϕ)
+                ; ✓⊨M=v = ⊨-trans ✓′⊨✓ ✓⊨M=v
                 ; ✓⊨ff = λ E′⊆∅ → ⊨-trans ✓′⊨✓ (✓⊨ff (⊆-trans E⊆E′ E′⊆∅))
                 }
                 
