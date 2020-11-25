@@ -356,6 +356,8 @@
 \newcommand{\dForm}{\xi}
 \newcommand{\TRUE}{\mathsf{true}}
 \newcommand{\FALSE}{\mathsf{false}}
+\newcommand{\Bool}{\mathsf{Bool}}
+\newcommand{\aTr}{\tau}
 
 \newcommand{\Int}{\mathsf{SilentAct}}
 \newcommand{\Ext}{\mathsf{Ext}}
@@ -364,6 +366,8 @@
 \newcommand{\Act}{\mathcal{A}}
 \newcommand{\aActSub}{\alpha}
 \newcommand{\bActSub}{\beta}
+
+\newcommand{\aVar}{x}
 
 \newcommand{\aAct}{a}
 %\newcommand{\bAct}{b}
@@ -455,6 +459,7 @@
 
 \newcommand{\Alphabet}{\Sigma}
 \newcommand{\labeling}{\lambda}
+\newcommand{\complete}{\checkmark}
 \newcommand{\labelingForm}{\Formulae}%\lambda_{\Formulae}}
 \newcommand{\labelingAct}{\Act}%\lambda_{\Act}}
 \newcommand{\labelingSub}{\Sub}%\lambda_{\Act}}
@@ -533,8 +538,19 @@
 \newcommand{\CLANG}{\texttt{clang}}
 
 \newcommand{\sSKIP}{\mathit{SKIP}}
+\newcommand{\sSTOP}{\mathit{STOP}}
 \newcommand{\sSEMI}{\mathbin{;}}
 \newcommand{\sPAR}{\mathbin{\mid}}
+\newcommand{\sSEND}[2]{#1!\ifnotempty{#2}{\langle#2\rangle}}
+\newcommand{\sRECV}[2]{#1?\ifnotempty{#2}{(#2)}}
+\newcommand{\sPREFIX}{\mathbin{\rightarrow}}
+\newcommand{\sGUARD}{\guard}
+
+\newcommand{\send}[2]{\bar{#1}_{#2}}
+\newcommand{\recv}[2]{{#1}_{#2}}
+
+\newcommand{\aChan}{a}
+\newcommand{\bChan}{b}
 
 %% \wk[out=-30,in=-70,transform canvas={xshift=-1ex}]{wx0}{wx1}
 \usepackage{tikz}

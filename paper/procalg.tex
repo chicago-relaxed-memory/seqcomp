@@ -16,53 +16,234 @@ The key idea of this paper is a relaxed treatment of sequential
 composition, where causality is not given by program order, but
 instead is given by control and data dependencies.
 
-\subsection{A pomset model of Asynchronous CCS}
+\subsection{Pomsets}
 
 \begin{definition}
-  A \emph{pomset} is a tuple
+  A \emph{pomset} with alphabet $\Alphabet$ is a tuple
   $(\Event, {\le}, \labeling)$ where
-  \begin{itemize}
+  \begin{enumerate}
   \item $\Event$ is a set of \emph{events}
   \item
     ${\le} \subseteq (\Event\times\Event)$ is the \emph{causality} partial order, and
   \item
-    $\labeling: \Event \fun \Act$ is a \emph{labeling}.
-  \end{itemize}
+    $\labeling: \Event \fun \Alphabet$ is a \emph{labeling}.
+  \end{enumerate}
 \end{definition}
 
 \begin{definition}
-  $\sSKIP$ contains just the empty pomset, that is if $\aPS_0\in\sSKIP$ then
+  A \emph{possibly incomplete} pomset is a pomset
+  together with $\complete\in\Bool$.
+\end{definition}
+
+The set of pomsets $\sSTOP$ contains just the empty incomplete pomset.
+\begin{definition}
+  If $\aPS_0\in\sSTOP$ then
+  $\aEvs_0 = \emptyset$ and $\complete$ is false.
+\end{definition}
+
+The set of pomsets $\sSKIP$ contains both the empty incomplete pomset
+and the empty complete pomset.
+\begin{definition}
+  If $\aPS_0\in\sSKIP$ then
   $\aEvs_0 = \emptyset$.
 \end{definition}
 
+The set of pomsets $(\aPSS_1\sPAR\aPSS_2)$ represents the \emph{parallel composition} of pomsets from
+$\aPSS_1$ and pomsets from $\aPSS_2$.
 \begin{definition}
-  $\aPSS_1\sSEMI\aPSS_2$ contains pomset $\aPS_0$ whenever:
-  \begin{itemize}
-  \item there are pomsets $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$,
-  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
+  \label{defn:pomset-par}
+  If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
+  \begin{enumerate}
   \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
+  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
   \item if $\aEv\in\aEvs_1$ then $\labeling_0(\aEv) = \labeling_1(\aEv)$, 
   \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
   \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
   \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$.
-  \end{itemize}
+  \item $\complete_0$ implies $\complete_1$ and $\complete_2$.
+    \newcounter{pomsetParCount}
+    \setcounter{pomsetParCount}{\value{enumi}}
+  \end{enumerate}
+\end{definition}
+ 
+The set of pomsets $(\aPSS_1\sSEMI\aPSS_2)$ represents the \emph{strong sequential composition} of pomsets from
+$\aPSS_1$ followed by pomsets from $\aPSS_2$.
+\begin{definition}
+  If $\aPS_0 \in (\aPSS_1\sSEMI\aPSS_2)$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
+  \begin{enumerate}
+    \setcounter{enumi}{\value{pomsetParCount}}
+  \item[1--\thepomsetParCount)] As in Definition~\ref{defn:pomset-par},
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$, and
+  \item if $\complete_1$ is false then $\aEvs_2=\emptyset$.
+  \end{enumerate}
+\end{definition}
+
+\subsection{A pomset model of Asynchronous CCS}
+
+[Define the alphabet of send and recv over channels.]
+
+The set of pomsets $\sSEND\aChan{}$ represents \emph{sending} on channel $\aChan$.
+\begin{definition}
+  If $\aPS_0 \in \sSEND\aChan{}$ then:
+  \begin{enumerate}
+  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
+  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \send\aChan{}$,
+  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is false.
+  \end{enumerate}
+\end{definition}
+
+The set of pomsets $\sRECV\aChan{}$ represents \emph{receiving} on channel $\aChan$.
+\begin{definition}
+  If $\aPS_0 \in \sRECV\aChan{}$ then:
+  \begin{enumerate}
+  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
+  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{}$,
+  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is false.
+  \end{enumerate}
 \end{definition}
 
 \begin{definition}
-  $\aPSS_1\sPAR\aPSS_2$ contains pomset $\aPS_0$ whenever:
-  \begin{itemize}
-  \item there are pomsets $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$,
-  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
-  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
-  \item if $\aEv\in\aEvs_1$ then $\labeling_0(\aEv) = \labeling_1(\aEv)$, 
-  \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$.
-  \end{itemize}
+  A pomset $\aPS$ is $\aChan$-closed if
+  there is a partial injective function $f: \aEvs \fun \aEvs$
+  such that:
+  \begin{enumerate}
+  \item if $\labeling(\aEv)=\recv\aChan{}$ then $\labeling(f(\aEv))=\send\aChan{}$, and
+  \item if $f(\aEv)=\bEv$ then $\bEv\le\aEv$.
+  \end{enumerate}
 \end{definition}
-  
-\subsection{A pomset and predicate transformer model of Value-passing Asynchronus CCS}
 
-\subsection{A pomset with predicate transformer model of Relaxed CCS}
+\subsection{A pomset with preconditions model of Value-passing Asynchronus CCS}
+
+This is essentially the model of \cite{10.1145/3428262}.
+
+[Define a data model. Define the alphabet of send and recv of values over channels.]
+
+\begin{definition}
+  A \emph{pomset with preconditions} is
+  a pomset with alphabet $(\Formulae \times \Act)$.
+\end{definition}
+
+\begin{definition}
+  A \emph{possibly incomplete} pomset with preconditions is a
+  pomset with preconditions, together with $\complete\in\Formulae$.
+\end{definition}
+
+The set of pomsets $\sSEND\aChan\aExp\sPREFIX\aPSS_1$ represents sending a value computed from expression $\aExp$ on channel $\aChan$,
+followed by a pomset from $\aPSS_1$.
+\begin{definition}
+  If $\aPS_0 \in (\sSEND\aChan\aExp\sPREFIX\aPSS_1)$ then either $\aEvs_0=\emptyset$ and $\complete_0$ is unsatisfiable, or there is $\aPS_1\in\aPSS_1$ such that:
+  \begin{enumerate}
+  \item $\aEvs_0 = \{\cEv\} \cup \aEvs_1$,
+  \item $\cEv\not\in\aEvs_1$,
+  \item $\labelingAct_0(\cEv) = \send\aChan\aVal$
+  \item $\labelingForm_0(\cEv)$ implies $(\aExp=\aVal)$
+  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
+  \item if $\aEv\in\aEvs_1$ then $\cEv\le_0\aEv$, and
+  \item $\complete_0$ implies $M=v$ and $\complete_1$.
+  \end{enumerate}
+\end{definition}
+
+The set of pomsets $\sRECV\aChan\aVar\sPREFIX\aPSS_1$ represents receiving a value bound to variable $\aVar$ on channel $\aChan$,
+fopllowed by a pomset from $\aPSS_1$.
+\begin{definition}
+  If $\aPS_0 \in (\sRECV\aChan\aVar\sPREFIX\aPSS_1)$ then either $\aEvs_0=\emptyset$ and $\complete_0$ is unsatisfiable, or there is $\aPS_1\in\aPSS_1$ such that:
+  \begin{enumerate}
+  \item $\aEvs_0 = \{\cEv\} \cup \aEvs_1$,
+  \item $\cEv\not\in\aEvs_1$,
+  \item $\labelingAct_0(\cEv) = \recv\aChan\aVal$
+  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)[\aVal/\aVar]$
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
+  \item if $\aEv\in\aEvs_1$ then $\cEv\le_0\aEv$, and
+  \item $\complete_0$ implies $\complete_1[\aVal/\aVar]$.
+  \end{enumerate}
+\end{definition}
+
+The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aPSS_1$ whenever $\aForm$ is satisfied.
+\begin{definition}
+  \label{defn:pomset-guard}
+  If $\aPS_0 \in (\aForm\sGUARD\aPSS_1)$ then:
+  \begin{enumerate}
+  \item $\aEvs_0 = \aEvs_1$,
+  \item $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
+  \item $\labelingForm_0(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
+  \item $\aForm\land\complete_0$ implies $\complete_1$.
+    \newcounter{pomsetGuardCount}
+    \setcounter{pomsetGuardCount}{\value{enumi}}
+  \end{enumerate}
+\end{definition}
+
+\subsection{A pomset with preconditions and predicate transformers model of Value-passing Asynchronus CCS}
+
+[The problem with the previous section is that yhrtr's no story for sequential composition.]
+
+\begin{definition}
+  A \emph{predicate transformer} is a function
+  $\aTr:\Formulae\fun\Formulae$ such that
+  $\aTr(\FALSE)$ is $\FALSE$,
+  $\aTr(\TRUE)$ is $\TRUE$,
+  $\aTr(\aForm\land\bForm)$ is $\aTr(\aForm)\land\aTr(\bForm)$, and
+  $\aTr(\aForm\lor\bForm)$ is $\aTr(\aForm)\lor\aTr(\bForm)$.
+\end{definition}
+
+\begin{definition}
+  A pomset with one predicate tansformer is a possibly incomplete
+  pomset with preconditions, together with a predicate transformer $\aTr$.
+\end{definition}
+
+\begin{definition}
+  If $\aPS_0 \in (\aPSS_1\sSEMI\aPSS_2)$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
+  \begin{enumerate}
+  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
+  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
+  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$, 
+  \item if $\aEv\in\aEvs_2$ then $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\aTr_1(\labelingForm_2(\aEv))$ and $\complete_1$,
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
+  \item $\complete_0$ implies $\complete_1$ and $\aTr_1(\complete_2)$, and
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  If $\aPS_0 \in (\aForm\sGUARD\aPSS_1)$ then:
+  \begin{enumerate}
+    \setcounter{enumi}{\value{pomsetGuardCount}}
+  \item[1--\thepomsetGuardCount)] As in Definition~\ref{defn:pomset-guard},
+  \item $\aForm\land\aTr_0(\aForm)$ implies $\aTr_1(\aForm)$.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  If $\aPS_0 \in \sSEND\aChan{\aExp}$ then:
+  \begin{enumerate}
+  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
+  \item if $\aEv\in\aEvs_0$ then $\labelingAct_0(\aEv) = \send\aChan{\aVal}$,
+  \item if $\aEv\in\aEvs_0$ then $\labelingForm_0(\aEv) = (M = v)$,
+  \item $\aTr_0(\aForm)$ implies $\aForm$,
+  \item $\complete_0$ implies $M = v$, and
+  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is unsatisfiable.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  If $\aPS_0 \in \sRECV\aChan{\aVar}$ then:
+  \begin{enumerate}
+  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
+  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{\aVal}$,
+  \item $\aTr_0(\aForm)$ implies $\phi[\aVal/\aVar]$,
+  \item if $\aEvs_0=\emptyset$ then $\aTr_0(\aForm)$ implies $\phi[\bVal/\aVar]$ for any $\bVal$, and
+  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is unsatisfiable,
+  \end{enumerate}
+\end{definition}
+
+\subsection{A pomset with preconditions and predicate transformers model of Value-passing Relaxed CCS}
 
