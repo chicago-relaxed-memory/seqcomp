@@ -183,7 +183,7 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
 [The problem with the previous section is that yhrtr's no story for sequential composition.]
 
 \begin{definition}
-  A \emph{predicate transformer} is a function
+  A \emph{predicate transformer} is a monotone function
   $\aTr:\Formulae\fun\Formulae$ such that
   $\aTr(\FALSE)$ is $\FALSE$,
   $\aTr(\TRUE)$ is $\TRUE$,
@@ -205,11 +205,13 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
   \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$, 
   \item if $\aEv\in\aEvs_2$ then $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
   \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
-  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\aTr_1(\labelingForm_2(\aEv))$ and $\complete_1$,
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\aTr_1(\labelingForm_2(\aEv))$,
   \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
-  \item $\complete_0$ implies $\complete_1$ and $\aTr_1(\complete_2)$, and
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$.
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$,
+  \item $\complete_0$ implies $\complete_1$,
+  \item $\complete_0$ implies $\aTr_1(\complete_2)$,
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$, and
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\complete_1$.
   \end{enumerate}
 \end{definition}
 
@@ -247,3 +249,59 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
 
 \subsection{A pomset with preconditions and predicate transformers model of Value-passing Relaxed CCS}
 
+[Introduce relaxed channels, call other channels release/acquire channels, lift relaxed/ra up to actions and events.]
+
+\begin{definition}
+  A \emph{family of predicate transformers}
+  indexed by subsets of $\aEvs$
+  consists of predicate transformers
+  $\aTr[\bEvs]$ for each set of events $\bEvs$,
+  such that if $(\cEvs\cap\aEvs) \subseteq \bEvs$
+  then $\aTr[\cEvs](\aForm)$ implies $\aTr[\bEvs](\aForm)$.
+\end{definition}
+
+\begin{definition}
+  A pomset with predicate tansformers is a possibly incomplete
+  pomset with preconditions, together with a family of predicate transformers $\aTr$
+  indexed by subsets of $\aEvs$.
+\end{definition}
+
+\begin{definition}
+  If $\aPS_0 \in (\aPSS_1\sSEMI\aPSS_2)$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
+  \begin{enumerate}
+  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
+  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
+  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$, 
+  \item if $\aEv\in\aEvs_2$ then $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\aTr[\downclose_0(e)]_1(\labelingForm_2(\aEv))$,
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$,
+  \item $\complete_0$ implies $\complete_1$, and
+  \item $\complete_0$ implies $\aTr[\aEvs_1]_1(\complete_2)$.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  If $\aPS_0 \in \sSEND\aChan{\aExp}$ then:
+  \begin{enumerate}
+  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
+  \item if $\aEv\in\aEvs_0$ then $\labelingAct_0(\aEv) = \send\aChan{\aVal}$,
+  \item if $\aEv\in\aEvs_0$ then $\labelingForm_0(\aEv) = (M = v)$,
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$,
+  \item $\complete_0$ implies $M = v$, and
+  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is unsatisfiable.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  If $\aPS_0 \in \sRECV\aChan{\aVar}$ then:
+  \begin{enumerate}
+  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
+  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{\aVal}$,
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\phi[\aVal/\aVar]$,
+  \item $\aTr[\emptyset]_0(\aForm)$ implies $\phi[\bVal/\aVar]$ for any $\bVal$, and
+  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is unsatisfiable.
+  \end{enumerate}
+\end{definition}

@@ -357,7 +357,7 @@
 \newcommand{\TRUE}{\mathsf{true}}
 \newcommand{\FALSE}{\mathsf{false}}
 \newcommand{\Bool}{\mathsf{Bool}}
-\newcommand{\aTr}{\tau}
+\newcommand{\aTr}[1][]{\tau^{#1}}
 
 \newcommand{\Int}{\mathsf{SilentAct}}
 \newcommand{\Ext}{\mathsf{Ext}}
@@ -475,6 +475,7 @@
 \newcommand{\prefixsimp}{\mathbin{{\xRightarrow{{\mathsf{triv}}}}}}
 \newcommand{\sequence}{\mathbin;}
 \newcommand{\guard}{\mathbin\rhd}
+\newcommand{\downclose}{{\downarrow}}
 \newcommand{\relfilt}[2][\amode]{\mathsf{cover}\ifnotempty{#1}{^{#1}}\ifnotempty{#2}{_{#2}}}
 \newcommand{\DOT}{\mathbin.}
 
