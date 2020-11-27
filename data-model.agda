@@ -74,15 +74,3 @@ module data-model where
 
     field R : Address → Value → Action
     field W : Address → Value → Action
-       
-    data Reads : Action → Set where
-      R∈R : ∀ {a v} → ((R a v) ∈ Reads)
-  
-    data Writes : Action → Set where
-      W∈W : ∀ {a v} → ((W a v) ∈ Writes)
-  
-    data Conflicts : Action → Action → Set where
-      RW : ∀ {x v w} → Conflicts (R x v) (W x w)
-      WR : ∀ {x v w} → Conflicts (W x v) (R x w)
-      WW : ∀ {x v w} → Conflicts (W x v) (W x w)
-  
