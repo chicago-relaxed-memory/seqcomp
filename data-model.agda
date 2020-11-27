@@ -24,7 +24,7 @@ module data-model where
     field ⊨-intro-¬¬ : ∀ {ϕ} → (ϕ ⊨ ¬(¬ ϕ)) 
     field ⊨-elim-ff : ∀ {ϕ} → (ff ⊨ ϕ)
 
-    field Causal : Action → Action → Set
+    field Conflict : Action → Action → Set
     
     tt = ¬ ff
     _∧_ = λ ϕ ψ → ¬((¬ ϕ) ∨ (¬ ψ))

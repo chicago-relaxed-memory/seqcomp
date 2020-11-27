@@ -45,7 +45,7 @@ module monoid (MM : MemoryModel) (Event : Set) where
                     ; E₂⊆E₀ = ⊆-elim-∅
                     ; ≤₁⊆≤₀ = λ d e d≤₀e → d≤₀e
                     ; ≤₂⊆≤₀ = λ { e .e refl → ≤₀-refl }
-                    ; causal = λ d e d∈E₀ ()
+                    ; coherence = λ d e d∈E₀ ()
                     ; pre₀⊨lhs₀ = λ e e∈E₀ e∉E₂ → ⊨-refl
                     ; pre₀⊨rhs₀ = λ e e∉E₀ ()
                     ; pre₀⊨lhs₀∨rhs₀ = λ e e∈E₀ () 
@@ -97,7 +97,7 @@ module monoid (MM : MemoryModel) (Event : Set) where
                     ; E₂⊆E₀ = ⊆-refl
                     ; ≤₁⊆≤₀ = λ { e .e refl → ≤₀-refl }
                     ; ≤₂⊆≤₀ = λ d e d≤₀e → d≤₀e
-                    ; causal = λ d e ()
+                    ; coherence = λ d e ()
                     ; pre₀⊨lhs₀ = λ e ()
                     ; pre₀⊨rhs₀ = λ e e∉E₁ e∈E₀ → ⊨-refl
                     ; pre₀⊨lhs₀∨rhs₀ = λ e ()
@@ -136,8 +136,8 @@ module monoid (MM : MemoryModel) (Event : Set) where
 
   ⟦C₁∙⟨C₂∙C₃⟩⟧⊆⟦⟨C₁∙C₂⟩∙C₃⟧ C₁ C₂ C₃ P₀ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ =  P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ where
 
-     open _●_ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ using (P₁ ; E₁⊆E₀ ; ≤₁⊆≤₀ ; act₀=act₁ ; rhs₀ ; pre₀⊨lhs₀ ; pre₀⊨rhs₀ ; pre₀⊨lhs₀∨rhs₀) renaming (P₂ to P₂₃ ; P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂₃∈⟦C₂∙C₃⟧ ; E₂⊆E₀ to E₂₃⊆E₀ ; E₀⊆E₁∪E₂ to E₀⊆E₁∪E₂₃ ; act₀=act₂ to act₀=act₂₃ ; ≤₂⊆≤₀ to ≤₂₃⊆≤₀ ; causal to causal₀ ; τ₀ϕ⊨τ₁τ₂ϕ to τ₀ϕ⊨τ₁τ₂₃ϕ)
-     open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (P₁ to P₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₂∈⟦C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; rhs₀ to rhs₂₃ ; E₁⊆E₀ to E₂⊆E₂₃ ; E₂⊆E₀ to E₃⊆E₂₃ ; E₀⊆E₁∪E₂ to E₂₃⊆E₂∪E₃ ; ≤₁⊆≤₀ to ≤₂⊆≤₂₃ ; ≤₂⊆≤₀ to ≤₃⊆≤₂₃ ; act₀=act₁ to act₂₃=act₂ ; act₀=act₂ to act₂₃=act₃ ; pre₀⊨lhs₀ to pre₂₃⊨lhs₂₃ ; pre₀⊨rhs₀ to pre₂₃⊨rhs₂₃ ; pre₀⊨lhs₀∨rhs₀ to pre₂₃⊨lhs₂₃∨rhs₂₃ ; causal to causal₂₃; τ₀ϕ⊨τ₁τ₂ϕ to τ₂₃ϕ⊨τ₂τ₃ϕ)
+     open _●_ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ using (P₁ ; E₁⊆E₀ ; ≤₁⊆≤₀ ; act₀=act₁ ; rhs₀ ; pre₀⊨lhs₀ ; pre₀⊨rhs₀ ; pre₀⊨lhs₀∨rhs₀) renaming (P₂ to P₂₃ ; P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂₃∈⟦C₂∙C₃⟧ ; E₂⊆E₀ to E₂₃⊆E₀ ; E₀⊆E₁∪E₂ to E₀⊆E₁∪E₂₃ ; act₀=act₂ to act₀=act₂₃ ; ≤₂⊆≤₀ to ≤₂₃⊆≤₀ ; coherence to coherence₀ ; τ₀ϕ⊨τ₁τ₂ϕ to τ₀ϕ⊨τ₁τ₂₃ϕ)
+     open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (P₁ to P₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₂∈⟦C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; rhs₀ to rhs₂₃ ; E₁⊆E₀ to E₂⊆E₂₃ ; E₂⊆E₀ to E₃⊆E₂₃ ; E₀⊆E₁∪E₂ to E₂₃⊆E₂∪E₃ ; ≤₁⊆≤₀ to ≤₂⊆≤₂₃ ; ≤₂⊆≤₀ to ≤₃⊆≤₂₃ ; act₀=act₁ to act₂₃=act₂ ; act₀=act₂ to act₂₃=act₃ ; pre₀⊨lhs₀ to pre₂₃⊨lhs₂₃ ; pre₀⊨rhs₀ to pre₂₃⊨rhs₂₃ ; pre₀⊨lhs₀∨rhs₀ to pre₂₃⊨lhs₂₃∨rhs₂₃ ; coherence to coherence₂₃; τ₀ϕ⊨τ₁τ₂ϕ to τ₂₃ϕ⊨τ₂τ₃ϕ)
      
      open PomsetWithPredicateTransformers P₀ using () renaming (PwP to PwP₀ ; E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; ↓ to ↓₀ ; PO to PO₀)
      open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨)
@@ -160,13 +160,13 @@ module monoid (MM : MemoryModel) (Event : Set) where
      act₀=act₃ : ∀ e → (e ∈ E₃) → (act₀(e) ≡ act₃(e))
      act₀=act₃ e e∈E₃ = ≡-trans (act₀=act₂₃ e (E₃⊆E₂₃ e e∈E₃)) (act₂₃=act₃ e e∈E₃)
 
-     causal₁₂ : ∀ d e → (d ∈ E₁) → (e ∈ E₂) → Causal (act₁ d) (act₂ e) → (d ≤₀ e)
-     causal₁₂ d e d∈E₁ e∈E₂ a₁#a₂ = causal₀ d e d∈E₁ (E₂⊆E₂₃ e e∈E₂) (≡-subst₂ Causal refl (≡-symm (act₂₃=act₂ e e∈E₂)) a₁#a₂)
+     coherence₁₂ : ∀ d e → (d ∈ E₁) → (e ∈ E₂) → Conflict (act₁ d) (act₂ e) → (d ≤₀ e)
+     coherence₁₂ d e d∈E₁ e∈E₂ a₁#a₂ = coherence₀ d e d∈E₁ (E₂⊆E₂₃ e e∈E₂) (≡-subst₂ Conflict refl (≡-symm (act₂₃=act₂ e e∈E₂)) a₁#a₂)
      
-     causal₁₂₃ : ∀ d e → (d ∈ E₁₂) → (e ∈ E₃) → Causal (act₀ d) (act₃ e) → (d ≤₀ e)
-     causal₁₂₃ d e (left d∈E₁ _) e∈E₃ a₁₂#a₃ = causal₀ d e d∈E₁ (E₃⊆E₂₃ e e∈E₃) (≡-subst₂ Causal (act₀=act₁ d d∈E₁) (≡-symm (act₂₃=act₃ e e∈E₃)) a₁₂#a₃)
-     causal₁₂₃ d e (right _ d∈E₂) e∈E₃ a₁₂#a₃ = ≤₂₃⊆≤₀ d e (causal₂₃ d e d∈E₂ e∈E₃ (≡-subst₂ Causal (act₀=act₂ d d∈E₂) refl a₁₂#a₃))
-     causal₁₂₃ d e (both d∈E₁ _) e∈E₃ a₁₂#a₃ = causal₀ d e d∈E₁ (E₃⊆E₂₃ e e∈E₃) (≡-subst₂ Causal (act₀=act₁ d d∈E₁) (≡-symm (act₂₃=act₃ e e∈E₃)) a₁₂#a₃)
+     coherence₁₂₃ : ∀ d e → (d ∈ E₁₂) → (e ∈ E₃) → Conflict (act₀ d) (act₃ e) → (d ≤₀ e)
+     coherence₁₂₃ d e (left d∈E₁ _) e∈E₃ a₁₂#a₃ = coherence₀ d e d∈E₁ (E₃⊆E₂₃ e e∈E₃) (≡-subst₂ Conflict (act₀=act₁ d d∈E₁) (≡-symm (act₂₃=act₃ e e∈E₃)) a₁₂#a₃)
+     coherence₁₂₃ d e (right _ d∈E₂) e∈E₃ a₁₂#a₃ = ≤₂₃⊆≤₀ d e (coherence₂₃ d e d∈E₂ e∈E₃ (≡-subst₂ Conflict (act₀=act₂ d d∈E₂) refl a₁₂#a₃))
+     coherence₁₂₃ d e (both d∈E₁ _) e∈E₃ a₁₂#a₃ = coherence₀ d e d∈E₁ (E₃⊆E₂₃ e e∈E₃) (≡-subst₂ Conflict (act₀=act₁ d d∈E₁) (≡-symm (act₂₃=act₃ e e∈E₃)) a₁₂#a₃)
      
      PO₀∈CompP₁P₂ : Compatible act₀ PO₀ P₁ P₂
      PO₀∈CompP₁P₂ = record
@@ -174,7 +174,7 @@ module monoid (MM : MemoryModel) (Event : Set) where
                       ; act₀=act₂ = act₀=act₂
                       ; ≤₁⊆≤₀ = ≤₁⊆≤₀
                       ; ≤₂⊆≤₀ = λ d e d≤₂e → ≤₂₃⊆≤₀ d e (≤₂⊆≤₂₃ d e d≤₂e)
-                      ; causal = causal₁₂ }
+                      ; coherence = coherence₁₂ }
      
      PO₀∈CompP₁₂P₃ : Compatible act₀ PO₀ P₁₂ P₃
      PO₀∈CompP₁₂P₃ = record
@@ -182,7 +182,7 @@ module monoid (MM : MemoryModel) (Event : Set) where
                        ; act₀=act₂ = act₀=act₃
                        ; ≤₁⊆≤₀ = λ d e d≤₀e → d≤₀e
                        ; ≤₂⊆≤₀ = λ d e d≤₃e → ≤₂₃⊆≤₀ d e (≤₃⊆≤₂₃ d e d≤₃e)
-                       ; causal = causal₁₂₃ }
+                       ; coherence = coherence₁₂₃ }
      
      P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
      P₁₂∈⟦C₁∙C₂⟧ = compP∈⟦C₁∙C₂⟧ C₁ C₂ act₀ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
@@ -273,8 +273,8 @@ module monoid (MM : MemoryModel) (Event : Set) where
      
   ⟦⟨C₁∙C₂⟩∙C₃⟧⊆⟦C₁∙⟨C₂∙C₃⟩⟧ C₁ C₂ C₃ P₀ P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ where
 
-     open _●_ P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ using (lhs₀ ; rhs₀ ; pre₀⊨lhs₀ ; pre₀⊨rhs₀ ; pre₀⊨lhs₀∨rhs₀) renaming (P₁ to P₁₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₁₂∈⟦C₁∙C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; E₁⊆E₀ to E₁₂⊆E₀ ; E₂⊆E₀ to E₃⊆E₀ ; E₀⊆E₁∪E₂ to E₀⊆E₁₂∪E₃ ; act₀=act₁ to act₀=act₁₂ ; act₀=act₂ to act₀=act₃ ; ≤₁⊆≤₀ to ≤₁₂⊆≤₀ ; ≤₂⊆≤₀ to ≤₃⊆≤₀ ; causal to causal₀ ; τ₀ϕ⊨τ₁τ₂ϕ to τ₀ϕ⊨τ₁₂τ₃ϕ) 
-     open _●_ P₁₂∈⟦C₁∙C₂⟧ using (P₁ ; P₂) renaming (P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂∈⟦C₂⟧ ; rhs₀ to rhs₁₂ ; E₁⊆E₀ to E₁⊆E₁₂ ; E₂⊆E₀ to E₂⊆E₁₂ ; E₀⊆E₁∪E₂ to E₁₂⊆E₁∪E₂ ; ≤₁⊆≤₀ to ≤₁⊆≤₁₂ ; ≤₂⊆≤₀ to ≤₂⊆≤₁₂ ; act₀=act₁ to act₁₂=act₁ ; act₀=act₂ to act₁₂=act₂ ; pre₀⊨lhs₀ to pre₁₂⊨lhs₁₂ ; pre₀⊨rhs₀ to pre₁₂⊨rhs₁₂ ; pre₀⊨lhs₀∨rhs₀ to pre₁₂⊨lhs₁₂∨rhs₁₂ ; causal to causal₁₂; τ₀ϕ⊨τ₁τ₂ϕ to τ₁₂ϕ⊨τ₁τ₂ϕ)
+     open _●_ P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ using (lhs₀ ; rhs₀ ; pre₀⊨lhs₀ ; pre₀⊨rhs₀ ; pre₀⊨lhs₀∨rhs₀) renaming (P₁ to P₁₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₁₂∈⟦C₁∙C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; E₁⊆E₀ to E₁₂⊆E₀ ; E₂⊆E₀ to E₃⊆E₀ ; E₀⊆E₁∪E₂ to E₀⊆E₁₂∪E₃ ; act₀=act₁ to act₀=act₁₂ ; act₀=act₂ to act₀=act₃ ; ≤₁⊆≤₀ to ≤₁₂⊆≤₀ ; ≤₂⊆≤₀ to ≤₃⊆≤₀ ; coherence to coherence₀ ; τ₀ϕ⊨τ₁τ₂ϕ to τ₀ϕ⊨τ₁₂τ₃ϕ) 
+     open _●_ P₁₂∈⟦C₁∙C₂⟧ using (P₁ ; P₂) renaming (P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂∈⟦C₂⟧ ; rhs₀ to rhs₁₂ ; E₁⊆E₀ to E₁⊆E₁₂ ; E₂⊆E₀ to E₂⊆E₁₂ ; E₀⊆E₁∪E₂ to E₁₂⊆E₁∪E₂ ; ≤₁⊆≤₀ to ≤₁⊆≤₁₂ ; ≤₂⊆≤₀ to ≤₂⊆≤₁₂ ; act₀=act₁ to act₁₂=act₁ ; act₀=act₂ to act₁₂=act₂ ; pre₀⊨lhs₀ to pre₁₂⊨lhs₁₂ ; pre₀⊨rhs₀ to pre₁₂⊨rhs₁₂ ; pre₀⊨lhs₀∨rhs₀ to pre₁₂⊨lhs₁₂∨rhs₁₂ ; coherence to coherence₁₂; τ₀ϕ⊨τ₁τ₂ϕ to τ₁₂ϕ⊨τ₁τ₂ϕ)
      
      open PomsetWithPredicateTransformers P₀ using () renaming (PwP to PwP₀ ; E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; ↓ to ↓₀ ; PO to PO₀)
      open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨; τ-refl-∨ to τ₁-refl-∨ ; τ-refl-∧ to τ₁-refl-∧)
@@ -297,13 +297,13 @@ module monoid (MM : MemoryModel) (Event : Set) where
      act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
      act₀=act₂ e e∈E₂ = ≡-trans (act₀=act₁₂ e (E₂⊆E₁₂ e e∈E₂)) (act₁₂=act₂ e e∈E₂)
 
-     causal₂₃ : ∀ d e → (d ∈ E₂) → (e ∈ E₃) → Causal (act₂ d) (act₃ e) → (d ≤₀ e)
-     causal₂₃ d e d∈E₂ e∈E₃ a₂#a₃ = causal₀ d e (E₂⊆E₁₂ d d∈E₂)  e∈E₃ (≡-subst₂ Causal (≡-symm (act₁₂=act₂ d d∈E₂)) refl a₂#a₃)
+     coherence₂₃ : ∀ d e → (d ∈ E₂) → (e ∈ E₃) → Conflict (act₂ d) (act₃ e) → (d ≤₀ e)
+     coherence₂₃ d e d∈E₂ e∈E₃ a₂#a₃ = coherence₀ d e (E₂⊆E₁₂ d d∈E₂)  e∈E₃ (≡-subst₂ Conflict (≡-symm (act₁₂=act₂ d d∈E₂)) refl a₂#a₃)
      
-     causal₁₂₃ : ∀ d e → (d ∈ E₁) → (e ∈ E₂₃) → Causal (act₁ d) (act₀ e) → (d ≤₀ e)
-     causal₁₂₃ d e d∈E₁ (left e∈E₂ _) a₁#a₂₃ = ≤₁₂⊆≤₀ d e (causal₁₂ d e d∈E₁ e∈E₂ (≡-subst₂ Causal refl (act₀=act₂ e e∈E₂) a₁#a₂₃))
-     causal₁₂₃ d e d∈E₁ (right _ e∈E₃) a₁#a₂₃ = causal₀ d e (E₁⊆E₁₂ d d∈E₁) e∈E₃ ((≡-subst₂ Causal (≡-symm (act₁₂=act₁ d d∈E₁)) (act₀=act₃ e e∈E₃) a₁#a₂₃))
-     causal₁₂₃ d e d∈E₁ (both _ e∈E₃) a₁#a₂₃ = causal₀ d e (E₁⊆E₁₂ d d∈E₁) e∈E₃ (≡-subst₂ Causal (≡-symm (act₁₂=act₁ d d∈E₁)) (act₀=act₃ e e∈E₃)  a₁#a₂₃)
+     coherence₁₂₃ : ∀ d e → (d ∈ E₁) → (e ∈ E₂₃) → Conflict (act₁ d) (act₀ e) → (d ≤₀ e)
+     coherence₁₂₃ d e d∈E₁ (left e∈E₂ _) a₁#a₂₃ = ≤₁₂⊆≤₀ d e (coherence₁₂ d e d∈E₁ e∈E₂ (≡-subst₂ Conflict refl (act₀=act₂ e e∈E₂) a₁#a₂₃))
+     coherence₁₂₃ d e d∈E₁ (right _ e∈E₃) a₁#a₂₃ = coherence₀ d e (E₁⊆E₁₂ d d∈E₁) e∈E₃ ((≡-subst₂ Conflict (≡-symm (act₁₂=act₁ d d∈E₁)) (act₀=act₃ e e∈E₃) a₁#a₂₃))
+     coherence₁₂₃ d e d∈E₁ (both _ e∈E₃) a₁#a₂₃ = coherence₀ d e (E₁⊆E₁₂ d d∈E₁) e∈E₃ (≡-subst₂ Conflict (≡-symm (act₁₂=act₁ d d∈E₁)) (act₀=act₃ e e∈E₃)  a₁#a₂₃)
      
      PO₀∈CompP₂P₃ : Compatible act₀ PO₀ P₂ P₃
      PO₀∈CompP₂P₃ = record
@@ -311,7 +311,7 @@ module monoid (MM : MemoryModel) (Event : Set) where
                       ; act₀=act₂ = act₀=act₃
                       ; ≤₁⊆≤₀ = λ d e d≤₂e → ≤₁₂⊆≤₀ d e (≤₂⊆≤₁₂ d e d≤₂e)
                       ; ≤₂⊆≤₀ = ≤₃⊆≤₀
-                      ; causal = causal₂₃ }
+                      ; coherence = coherence₂₃ }
      
      PO₀∈CompP₁P₂₃ : Compatible act₀ PO₀ P₁ P₂₃
      PO₀∈CompP₁P₂₃ = record
@@ -319,7 +319,7 @@ module monoid (MM : MemoryModel) (Event : Set) where
                        ; act₀=act₂ = λ e e∈E₂₃ → refl
                        ; ≤₁⊆≤₀ = λ d e d≤₁e → ≤₁₂⊆≤₀ d e (≤₁⊆≤₁₂ d e d≤₁e)
                        ; ≤₂⊆≤₀ = λ d e d≤₀e → d≤₀e
-                       ; causal = causal₁₂₃ }
+                       ; coherence = coherence₁₂₃ }
      
      P₂₃∈⟦C₂∙C₃⟧ : P₂₃ ∈ ⟦ C₂ ∙ C₃ ⟧
      P₂₃∈⟦C₂∙C₃⟧ = compP∈⟦C₁∙C₂⟧ C₂ C₃ act₀ PO₀ P₂ P₃ P₂∈⟦C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₂P₃
