@@ -7,6 +7,10 @@ module command (MM : MemoryModel) where
   
   open MemoryModel MM
 
+  data Ordering : Set where
+    relaxed : Ordering
+    rel/acq : Ordering
+
   data Command : Set
   data ThreadGroup : Set
 
@@ -15,8 +19,8 @@ module command (MM : MemoryModel) where
     skip : Command
     _∙_ : Command → Command → Command
     if_then_else_ : Formula → Command → Command → Command
-    [_]:=_ : Address → Expression → Command
-    _:=[_] : Register → Address → Command
+    [_]^_:=_ : Address → Ordering → Expression → Command
+    _:=[_]^_ : Register → Address → Ordering → Command
     _:=_ : Register → Expression → Command
     fork : ThreadGroup → Command
     

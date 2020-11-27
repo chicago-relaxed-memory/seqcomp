@@ -38,12 +38,6 @@ module parcomp (DM : DataModel) (Event : Set) where
    field act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
    field act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
 
-  record FORK (𝒫 : PomsetWithPreconditions → Set₁) (P : PomsetWithPredicateTransformers) : Set₁ where
-  
-   open PomsetWithPredicateTransformers P using (PwP ; τ)
-   field PwP∈𝒫 : PwP ∈ 𝒫
-   field τϕ⊨ϕ : ∀ C ϕ → τ(C)(ϕ) ⊨ ϕ
-
   record THREAD (𝒫 : PomsetWithPredicateTransformers → Set₁) (P₀ : PomsetWithPreconditions) : Set₁ where
 
    field P₁ : PomsetWithPredicateTransformers

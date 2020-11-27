@@ -113,32 +113,35 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                }
 
 
-  sem-resp-≲τ {P} {P′} (r :=[ a ]) P≲P′ P∈LOAD = P′∈LOAD where
+  sem-resp-≲τ {P} {P′} (r :=[ a ]^ μ) P≲P′ P∈LOAD = P′∈LOAD where
 
     open LOAD P∈LOAD
     open _≲τ_ P≲P′
 
-    P′∈LOAD : P′ ∈ LOAD r a
+    P′∈LOAD : P′ ∈ LOAD r a μ
     P′∈LOAD = record
                 { v = v
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
                 ; act=Rav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Rav e (E′⊆E e e∈E′))
-                ; τϕ⊨ϕ[v/r] = λ C ϕ → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[v/r] C ϕ)
-                ; τϕ⊨ϕ[[a]/r] = λ C ϕ C∩E⊆∅ → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[[a]/r] C ϕ (⊆-trans (⊆-resp-∩ ⊆-refl E⊆E′) C∩E⊆∅))
+                ; τϕ⊨ϕ[v/r] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[v/r] C ϕ)
+                ; τϕ⊨ϕ[[a]/r] = λ ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[[a]/r] ϕ)
+                ; τϕ⊨ff = λ μ=ra ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ff μ=ra ϕ)
                 }
 
-  sem-resp-≲τ {P} {P′} ([ a ]:= M) P≲P′ P∈STORE = P′∈STORE where
+  sem-resp-≲τ {P} {P′} ([ a ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where
 
     open STORE P∈STORE
     open _≲τ_ P≲P′
 
-    P′∈STORE : P′ ∈ STORE a M
+    P′∈STORE : P′ ∈ STORE a μ M
     P′∈STORE = record
                 { v = v
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
                 ; act=Wav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Wav e (E′⊆E e e∈E′))
                 ; pre⊨M=v = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨M=v e (E′⊆E e e∈E′))
-                ; τϕ⊨ϕ[v/[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[v/[a]] C ϕ)
+                ; τϕ⊨ϕ[M/[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[M/[a]] C ϕ)
+                ; pre⊨Q = λ μ=ra e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q μ=ra e (E′⊆E e e∈E′))
+                ; τϕ⊨ϕ[M/[a]][ff/Q] = λ μ=ra ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[M/[a]][ff/Q] μ=ra ϕ)
                 }
                 
   sem-resp-≲τ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where
@@ -152,16 +155,22 @@ module augmentation (MM : MemoryModel) (Event : Set) where
               ; τϕ⊨ϕ[M/r] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[M/r] C ϕ)
               }
 
-  sem-resp-≲τ {P} {P′} (fork G) P≲P′ P∈FORK = P′∈FORK where
+  sem-resp-≲τ {P₀} {P′₀} (fork G) P₀≲P′₀ P₀∈FORK = P′₀∈FORK where
 
-    open FORK P∈FORK
-    open _≲τ_ P≲P′
-
-    P′∈FORK : P′ ∈ FORK ⟪ G ⟫
-    P′∈FORK = record
-               { PwP∈𝒫 = sem-resp-≲p G PwP≲PwP′ PwP∈𝒫
-               ; τϕ⊨ϕ = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ C ϕ)
-               }
+    open FORK P₀∈FORK
+    open _≲τ_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀)
+    
+    P′₀∈FORK : P′₀ ∈ FORK ⟪ G ⟫
+    P′₀∈FORK = record
+                  { P₁ = P₁
+                  ; P₁∈𝒫 = P₁∈𝒫
+                  ; E₁⊆E₀ = ⊆-trans E₁⊆E₀ E₀⊆E′₀
+                  ; E₀⊆E₁ = ⊆-trans E′₀⊆E₀ E₀⊆E₁
+                  ; ≤₁⊆≤₀ = λ d e d≤₁e → ≤₀⊆≤′₀ d e (≤₁⊆≤₀ d e d≤₁e)
+                  ; pre₀⊨pre₁[tt/Q] = λ e e∈E₁ → ⊨-trans (pre′₀⊨pre₀ e (E₁⊆E₀ e e∈E₁)) (pre₀⊨pre₁[tt/Q] e e∈E₁)
+                  ; act₀=act₁ = λ e e∈E₁ → ≡-trans (≡-symm (act₀=act′₀ e (E₁⊆E₀ e e∈E₁))) (act₀=act₁ e e∈E₁)
+                  ; τ₀ϕ⊨ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ϕ C ϕ)
+                  }
 
   sem-resp-≲p {P} {P′} nil P≲P′ P∈NIL = P′∈NIL where
 

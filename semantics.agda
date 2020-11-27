@@ -13,7 +13,7 @@ module semantics (MM : MemoryModel) (Event : Set) where
   open seqcomp(DM)(Event)
   open parcomp(DM)(Event)
    
-  record LOAD (r : Register) (a : Address)  (P : PomsetWithPredicateTransformers) : Set₁ where
+  record LOAD (r : Register) (a : Address) (μ : Ordering) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
 
@@ -21,10 +21,12 @@ module semantics (MM : MemoryModel) (Event : Set) where
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
     field act=Rav : ∀ e → (e ∈ E) → act(e) ≡ (R a v)
-    field τϕ⊨ϕ[v/r] : ∀ ϕ C → (τ(C)(ϕ) ⊨ (ϕ [ value v / r ]))
-    field τϕ⊨ϕ[[a]/r] : ∀ ϕ C → ((C ∩ E) ⊆ ∅) → (τ(C)(ϕ) ⊨ (ϕ [[ a ]/ r ]))
-    
-  record STORE (a : Address) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
+    field τϕ⊨ϕ[v/r] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ value v / r ]))
+    field τϕ⊨ϕ[[a]/r] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (ϕ [[ a ]/ r ]))
+
+    field τϕ⊨ff : (μ ≡ rel/acq) → ∀ ϕ → (τ(∅)(ϕ) ⊨ ff)
+
+  record STORE (a : Address) (μ : Ordering) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
 
@@ -33,7 +35,10 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
     field act=Wav :  ∀ e → (e ∈ E) → act(e) ≡ (W a v)
     field pre⊨M=v :  ∀ e → (e ∈ E) → pre(e) ⊨ (M == value v)
-    field τϕ⊨ϕ[v/[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]])) 
+    field τϕ⊨ϕ[M/[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]])) 
+    
+    field pre⊨Q : (μ ≡ rel/acq) → ∀ e → (e ∈ E) → pre(e) ⊨ Q
+    field τϕ⊨ϕ[M/[a]][ff/Q] : (μ ≡ rel/acq) → ∀ ϕ → (τ(∅)(ϕ) ⊨ ((ϕ [ M /[ a ]])[ ff /Q]) )
  
   record LET (r : Register) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
   
@@ -42,14 +47,31 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field E⊆∅ :  (E ⊆ ∅)
     field τϕ⊨ϕ[M/r] : ∀ C ϕ → τ(C)(ϕ) ⊨ (ϕ [ M / r ])
    
+  record FORK (𝒫 : PomsetWithPreconditions → Set₁) (P₀ : PomsetWithPredicateTransformers) : Set₁ where
+  
+   field P₁ : PomsetWithPreconditions
+   field P₁∈𝒫 : P₁ ∈ 𝒫
+   
+   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; τ to τ₀)
+   open PomsetWithPreconditions P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_)
+
+   field E₁⊆E₀ : (E₁ ⊆ E₀)
+   field E₀⊆E₁ : (E₀ ⊆ E₁)
+   
+   field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
+   
+   field pre₀⊨pre₁[tt/Q] : ∀ e → (e ∈ E₁) → (pre₀(e) ⊨ (pre₁(e) [ tt /Q]))
+   field act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
+   field τ₀ϕ⊨ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ ϕ
+
   ⟦_⟧ : Command → PomsetWithPredicateTransformers → Set₁
   ⟪_⟫ : ThreadGroup → PomsetWithPreconditions → Set₁
   
   ⟦ skip ⟧ = SKIP
   ⟦ C₁ ∙ C₂ ⟧ = ⟦ C₁ ⟧ ● ⟦ C₂ ⟧
   ⟦ if ϕ then C₁ else C₂ ⟧ = IF ϕ ⟦ C₁ ⟧ ⟦ C₂ ⟧
-  ⟦ r :=[ a ] ⟧ = LOAD r a
-  ⟦ [ a ]:= M ⟧ = STORE a M
+  ⟦ r :=[ a ]^ μ ⟧ = LOAD r a μ
+  ⟦ [ a ]^ μ := M ⟧ = STORE a μ M
   ⟦ r := M ⟧ = LET r M
   ⟦ fork G ⟧ = FORK ⟪ G ⟫
 

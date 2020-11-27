@@ -72,5 +72,8 @@ module data-model where
     field _[[_]/_] : Formula → Address → Register → Formula
     field _[_/[_]] : Formula → Expression → Address → Formula
 
+    field Q : Formula
+    field _[_/Q] : Formula → Formula → Formula
+    
     field R : Address → Value → Action
     field W : Address → Value → Action
