@@ -2,6 +2,7 @@ open import prelude
 open import data-model
 import command
 import pomset
+import seqcomp
 import semantics
 
 module examples (MM : MemoryModel) (Event : Set) where
@@ -9,6 +10,7 @@ module examples (MM : MemoryModel) (Event : Set) where
   open MemoryModel MM
   open command(MM)
   open pomset(DM)(Event)
+  open seqcomp(DM)(Event)
   open semantics(MM)(Event)
 
   -- The canonical pomset in ⟪ nil ⟫

@@ -2,6 +2,8 @@ open import prelude
 open import data-model
 import command
 import pomset
+import seqcomp
+import parcomp
 import semantics
 
 module augmentation (MM : MemoryModel) (Event : Set) where
@@ -9,6 +11,8 @@ module augmentation (MM : MemoryModel) (Event : Set) where
   open MemoryModel MM
   open command(MM)
   open pomset(DM)(Event)
+  open seqcomp(DM)(Event)
+  open parcomp(DM)(Event)
   open semantics(MM)(Event)
 
   record _≲p_ (P P′ : PomsetWithPreconditions) : Set₁ where

@@ -2,6 +2,7 @@ open import prelude
 open import data-model
 import command
 import pomset
+import seqcomp
 import semantics
 import augmentation
 import examples
@@ -11,6 +12,7 @@ module monoid (MM : MemoryModel) (Event : Set) where
   open MemoryModel MM
   open command(MM)
   open pomset(DM)(Event)
+  open seqcomp(DM)(Event)
   open semantics(MM)(Event)
   open augmentation(MM)(Event)
   open examples(MM)(Event)
