@@ -18,7 +18,7 @@ module command (DM : DataModel) where
     [_]:=_ : Address → Expression → Command
     _:=[_] : Register → Address → Command
     _:=_ : Register → Expression → Command
-    fork_join : ThreadGroup → Command
+    fork : ThreadGroup → Command
     
   data ThreadGroup where
 

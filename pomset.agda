@@ -11,6 +11,9 @@ module pomset (DM : DataModel) (Event : Set) where
     field ≤-refl : ∀ {e} → (e ≤ e)
     field ≤-trans : ∀ {c d e} → (c ≤ d) → (d ≤ e) → (c ≤ e)
     field ≤-asym : ∀ {d e} → (e ≤ d) → (d ≤ e) → (d ≡ e)
+    
+    _<_ : Event → Event → Set
+    (d < e) = (d ≤ e) × (d ≢ e)
 
   ≡PO : PartialOrder
   ≡PO = record
@@ -20,14 +23,12 @@ module pomset (DM : DataModel) (Event : Set) where
           ; ≤-asym = λ d=e e=d → e=d
           }
           
-  record Pomset : Set₁ where
+  record PomsetWithPreconditions : Set₁ where
 
     field E : Event → Set
     field PO : PartialOrder
     field ℓ : Event → (Formula × Action)
-    field τ : (Event → Set) → Formula → Formula
-    field ✓ : Formula
-
+    
     open PartialOrder PO public
 
     pre : Event → Formula
@@ -35,9 +36,6 @@ module pomset (DM : DataModel) (Event : Set) where
     
     act : Event → Action
     act(e) = snd(ℓ(e))
-    
-    _<_ : Event → Event → Set
-    (d < e) = (d ≤ e) × (d ≢ e)
 
     RE : Event → Set
     RE = E ∩ (act ⁻¹[ Reads ])
@@ -45,16 +43,6 @@ module pomset (DM : DataModel) (Event : Set) where
     WE : Event → Set
     WE = E ∩ (act ⁻¹[ Writes ])
 
-    field τ-resp-∩⊆ : ∀ {C D ϕ} → ((C ∩ E) ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
-    field τ-resp-⊨ : ∀ {C ϕ ψ} → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
-    field τ-resp-∨ : ∀ {C ϕ ψ} → (τ(C)(ϕ ∨ ψ) ⊨ (τ(C)(ϕ) ∨ τ(C)(ψ)))
-    field τ-refl-∨ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∨ τ(C)(ψ)) ⊨ τ(C)(ϕ ∨ ψ))
-    field τ-refl-∧ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∧ τ(C)(ψ)) ⊨ τ(C)(ϕ ∧ ψ))
-    field ✓⊨τtt : ✓ ⊨ τ(E)(tt)
-
-    τ-resp-⊆ : ∀ {C D ϕ} → (C ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
-    τ-resp-⊆ C⊆D = τ-resp-∩⊆ (λ{ e (e∈C , _) → C⊆D e e∈C})
-    
     ↓RW : Event → Event → Set
     ↓RW(e) = E ∩ (λ d → (d ∈ RE) → (e ∈ WE) → (d ≤ e))
     
@@ -69,4 +57,22 @@ module pomset (DM : DataModel) (Event : Set) where
     
     dec-E : ∀ e → Dec(e ∈ E)
     dec-E e = EXCLUDED_MIDDLE(e ∈ E)
+    
+  record PomsetWithPredicateTransformers : Set₁ where
+
+    field PwP : PomsetWithPreconditions
+    open PomsetWithPreconditions PwP public
+
+    field τ : (Event → Set) → Formula → Formula
+    field ✓ : Formula
+
+    field τ-resp-∩⊆ : ∀ {C D ϕ} → ((C ∩ E) ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
+    field τ-resp-⊨ : ∀ {C ϕ ψ} → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
+    field τ-resp-∨ : ∀ {C ϕ ψ} → (τ(C)(ϕ ∨ ψ) ⊨ (τ(C)(ϕ) ∨ τ(C)(ψ)))
+    field τ-refl-∨ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∨ τ(C)(ψ)) ⊨ τ(C)(ϕ ∨ ψ))
+    field τ-refl-∧ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∧ τ(C)(ψ)) ⊨ τ(C)(ϕ ∧ ψ))
+    field ✓⊨τtt : ✓ ⊨ τ(E)(tt)
+
+    τ-resp-⊆ : ∀ {C D ϕ} → (C ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
+    τ-resp-⊆ C⊆D = τ-resp-∩⊆ (λ{ e (e∈C , _) → C⊆D e e∈C})
     

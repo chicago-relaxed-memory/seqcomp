@@ -9,23 +9,23 @@ module semantics (DM : DataModel) (Event : Set) where
   open command(DM)
   open pomset(DM)(Event)
 
-  record SKIP (P₀ : Pomset) : Set₁ where
-  
-   open Pomset P₀ using () renaming (E to E₀ ; τ to τ₀)
-   field E₀⊆∅ :  (E₀ ⊆ ∅)
-   field τ₀ϕ⊨ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ ϕ
+  record SKIP (P₀ : PomsetWithPredicateTransformers) : Set₁ where
+   
+    open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; τ to τ₀)
+    field E₀⊆∅ :  (E₀ ⊆ ∅)
+    field τ₀ϕ⊨ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ ϕ
 
-  record _●_ (𝒫₁ 𝒫₂ : Pomset → Set₁) (P₀ : Pomset) : Set₁ where
+  record _●_ (𝒫₁ 𝒫₂ : PomsetWithPredicateTransformers → Set₁) (P₀ : PomsetWithPredicateTransformers) : Set₁ where
 
-   field P₁ : Pomset
-   field P₂ : Pomset
+   field P₁ : PomsetWithPredicateTransformers
+   field P₂ : PomsetWithPredicateTransformers
 
    field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
-   open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ↓RW to ↓RW₀ ; RE to RE₀ ; WE to WE₀ ; RE⊆E to RE₀⊆E₀ ; τ to τ₀ ; ✓ to ✓₀)
-   open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; ↓RW to ↓RW₁ ; RE to RE₁ ; WE to WE₁ ; τ to τ₁ ; ✓ to ✓₁)
-   open Pomset P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; _≤_ to _≤₂_ ; ↓RW to ↓RW₂ ; RE to RE₂ ; WE to WE₂ ; τ to τ₂ ; ✓ to ✓₂)
+   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ↓RW to ↓RW₀ ; RE to RE₀ ; WE to WE₀ ; RE⊆E to RE₀⊆E₀ ; τ to τ₀ ; ✓ to ✓₀)
+   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; ↓RW to ↓RW₁ ; RE to RE₁ ; WE to WE₁ ; τ to τ₁ ; ✓ to ✓₁)
+   open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; _≤_ to _≤₂_ ; ↓RW to ↓RW₂ ; RE to RE₂ ; WE to WE₂ ; τ to τ₂ ; ✓ to ✓₂)
 
    field E₀⊆E₁∪E₂ : (E₀ ⊆ (E₁ ∪ E₂))
    field E₁⊆E₀ : (E₁ ⊆ E₀)
@@ -80,16 +80,16 @@ module semantics (DM : DataModel) (Event : Set) where
    WE₂⊆WE₀ : WE₂ ⊆ WE₀
    WE₂⊆WE₀ = ⊆-resp-∩⁻¹ act₀=act₂ E₂⊆E₀ Writes
 
-  record IF (ψ : Formula) (𝒫₁ 𝒫₂ : Pomset → Set₁) (P₀ : Pomset) : Set₁ where
+  record IF (ψ : Formula) (𝒫₁ 𝒫₂ : PomsetWithPredicateTransformers → Set₁) (P₀ : PomsetWithPredicateTransformers) : Set₁ where
 
-   field P₁ : Pomset
-   field P₂ : Pomset
+   field P₁ : PomsetWithPredicateTransformers
+   field P₂ : PomsetWithPredicateTransformers
    field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
-   open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; τ to τ₀ ; ✓ to ✓₀)
-   open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; τ to τ₁ ; ✓ to ✓₁)
-   open Pomset P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; _≤_ to _≤₂_ ; τ to τ₂ ; ✓ to ✓₂)
+   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; τ to τ₀ ; ✓ to ✓₀)
+   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; τ to τ₁ ; ✓ to ✓₁)
+   open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; _≤_ to _≤₂_ ; τ to τ₂ ; ✓ to ✓₂)
 
    field E₀⊆E₁∪E₂ : (E₀ ⊆ (E₁ ∪ E₂))
    field E₁⊆E₀ : (E₁ ⊆ E₀)
@@ -114,9 +114,9 @@ module semantics (DM : DataModel) (Event : Set) where
    field ✓₀⊨✓₁ : (ψ ∧ ✓₀) ⊨ ✓₁
    field ✓₀⊨✓₂ : (¬ ψ ∧ ✓₀) ⊨ ✓₂
    
-  record LOAD (r : Register) (a : Address)  (P : Pomset) : Set₁ where
+  record LOAD (r : Register) (a : Address)  (P : PomsetWithPredicateTransformers) : Set₁ where
 
-    open Pomset P
+    open PomsetWithPredicateTransformers P
 
     field v : Value
 
@@ -126,9 +126,9 @@ module semantics (DM : DataModel) (Event : Set) where
     field τϕ⊨ϕ[[a]/r] : ∀ ϕ C → ((C ∩ E) ⊆ ∅) → (τ(C)(ϕ) ⊨ (ϕ [[ a ]/ r ]))
     field ✓⊨ff : (E ⊆ ∅) → (✓ ⊨ ff)
     
-  record STORE (a : Address) (M : Expression) (P : Pomset) : Set₁ where
+  record STORE (a : Address) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
-    open Pomset P
+    open PomsetWithPredicateTransformers P
 
     field v : Value
 
@@ -139,20 +139,26 @@ module semantics (DM : DataModel) (Event : Set) where
     field ✓⊨M=v : (✓ ⊨ (M == value v))
     field ✓⊨ff : (E ⊆ ∅) → (✓ ⊨ ff)
  
-  record LET (r : Register) (M : Expression) (P : Pomset) : Set₁ where
+  record LET (r : Register) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
   
-    open Pomset P
+    open PomsetWithPredicateTransformers P
 
     field E⊆∅ :  (E ⊆ ∅)
     field τϕ⊨ϕ[M/r] : ∀ C ϕ → τ(C)(ϕ) ⊨ (ϕ [ M / r ])
 
-  record THREAD (𝒫 : Pomset → Set₁) (P₀ : Pomset) : Set₁ where
+  record FORK (𝒫 : PomsetWithPreconditions → Set₁) (P : PomsetWithPredicateTransformers) : Set₁ where
+  
+   open PomsetWithPredicateTransformers P using (PwP ; τ)
+   field PwP∈𝒫 : PwP ∈ 𝒫
+   field τϕ⊨ϕ : ∀ C ϕ → τ(C)(ϕ) ⊨ ϕ
 
-   field P₁ : Pomset
+  record THREAD (𝒫 : PomsetWithPredicateTransformers → Set₁) (P₀ : PomsetWithPreconditions) : Set₁ where
+
+   field P₁ : PomsetWithPredicateTransformers
    field P₁∈𝒫 : P₁ ∈ 𝒫
    
-   open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; τ to τ₀ ; ✓ to ✓₀)
-   open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; τ to τ₁ ; ✓ to ✓₁)
+   open PomsetWithPreconditions P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_)
+   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; τ to τ₁ ; ✓ to ✓₁)
 
    field E₁⊆E₀ : (E₁ ⊆ E₀)
    field E₀⊆E₁ : (E₀ ⊆ E₁)
@@ -162,20 +168,22 @@ module semantics (DM : DataModel) (Event : Set) where
    field pre₀⊨pre₁ : ∀ e → (e ∈ E₁) → (pre₀(e) ⊨ pre₁(e))
    field act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
    
-   field τ₀ϕ⊨ϕ : ∀ C ϕ → (τ₀(C)(ϕ) ⊨ ϕ) 
-   field ✓₀⊨✓₁ : ✓₀ ⊨ ✓₁
+  record NIL (P₀ : PomsetWithPreconditions) : Set₁ where
+  
+   open PomsetWithPreconditions P₀ using () renaming (E to E₀)
+   field E₀⊆∅ :  (E₀ ⊆ ∅)
 
-  record _|||_ (𝒫₁ 𝒫₂ : Pomset → Set₁) (P₀ : Pomset) : Set₁ where
+  record _|||_ (𝒫₁ 𝒫₂ : PomsetWithPreconditions → Set₁) (P₀ : PomsetWithPreconditions) : Set₁ where
 
-   field P₁ : Pomset
-   field P₂ : Pomset
+   field P₁ : PomsetWithPreconditions
+   field P₂ : PomsetWithPreconditions
 
    field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
-   open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; τ to τ₀ ; ✓ to ✓₀)
-   open Pomset P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_ ; τ to τ₁ ; ✓ to ✓₁)
-   open Pomset P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; _≤_ to _≤₂_ ; τ to τ₂ ; ✓ to ✓₂)
+   open PomsetWithPreconditions P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_)
+   open PomsetWithPreconditions P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_)
+   open PomsetWithPreconditions P₂ using () renaming (E to E₂ ; act to act₂ ; pre to pre₂ ; _≤_ to _≤₂_)
 
    field E₀⊆E₁⊎E₂ : (E₀ ⊆ (E₁ ⊎ E₂))
    field E₁⊆E₀ : (E₁ ⊆ E₀)
@@ -191,14 +199,8 @@ module semantics (DM : DataModel) (Event : Set) where
    field act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
    field act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
    
-   field τ₀ϕ⊨τ₁ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ τ₁(C)(ϕ)
-   field τ₀ϕ⊨τ₂ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ τ₂(C)(ϕ)
-
-   field ✓₀⊨✓₁ : ✓₀ ⊨ ✓₁
-   field ✓₀⊨✓₂ : ✓₀ ⊨ ✓₂
-
-  ⟦_⟧ : Command → Pomset → Set₁
-  ⟪_⟫ : ThreadGroup → Pomset → Set₁
+  ⟦_⟧ : Command → PomsetWithPredicateTransformers → Set₁
+  ⟪_⟫ : ThreadGroup → PomsetWithPreconditions → Set₁
   
   ⟦ skip ⟧ = SKIP
   ⟦ C₁ ∙ C₂ ⟧ = ⟦ C₁ ⟧ ● ⟦ C₂ ⟧
@@ -206,9 +208,9 @@ module semantics (DM : DataModel) (Event : Set) where
   ⟦ r :=[ a ] ⟧ = LOAD r a
   ⟦ [ a ]:= M ⟧ = STORE a M
   ⟦ r := M ⟧ = LET r M
-  ⟦ fork G join ⟧ = ⟪ G ⟫
+  ⟦ fork G ⟧ = FORK ⟪ G ⟫
 
-  ⟪ nil ⟫ = SKIP
+  ⟪ nil ⟫ = NIL
   ⟪ thread C ⟫ = THREAD ⟦ C ⟧
   ⟪ G₁ ∥ G₂ ⟫ = ⟪ G₁ ⟫ ||| ⟪ G₂ ⟫
   

@@ -30,7 +30,7 @@ module monoid (DM : DataModel) (Event : Set) where
   
   ⟦C⟧⊆⟦C∙skip⟧ C P₀ P₀∈⟦C⟧ = P₀∈⟦C∙skip⟧ where
 
-    open Pomset P₀ using () renaming (act to act₀ ; ≤-refl to ≤₀-refl ; ✓⊨τtt to ✓₀⊨τ₀tt)
+    open PomsetWithPredicateTransformers P₀ using () renaming (act to act₀ ; ≤-refl to ≤₀-refl ; ✓⊨τtt to ✓₀⊨τ₀tt)
 
     P₀∈⟦C∙skip⟧ : P₀ ∈ ⟦ C ∙ skip ⟧
     P₀∈⟦C∙skip⟧ = record
@@ -59,28 +59,33 @@ module monoid (DM : DataModel) (Event : Set) where
     open _●_ P₀∈⟦C∙skip⟧ using (P₁ ; P₂ ; E₀⊆E₁∪E₂ ; E₁⊆E₀ ; E₂⊆E₀ ; act₀=act₁ ; pre₀⊨lhs₀ ; ≤₁⊆≤₀ ; τ₀ϕ⊨τ₁τ₂ϕ ; ✓₀⊨✓₁) renaming (P₁∈𝒫₁ to P₁∈⟦C⟧ ; P₂∈𝒫₂ to P₂∈⟦skip⟧)
     open SKIP P₂∈⟦skip⟧ using () renaming (E₀⊆∅ to E₂⊆∅ ; τ₀ϕ⊨ϕ to τ₂ϕ⊨ϕ)
 
-    open Pomset P₀ using () renaming (E to E₀)
-    open Pomset P₁ using () renaming (E to E₁ ; τ-resp-⊨ to τ₁-resp-⊨)
-    open Pomset P₂ using () renaming (E to E₂)
+    open PomsetWithPredicateTransformers P₀ using () renaming (PwP to PwP₀ ; E to E₀)
+    open PomsetWithPredicateTransformers P₁ using () renaming (PwP to PwP₁ ; E to E₁ ; τ-resp-⊨ to τ₁-resp-⊨)
+    open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂)
 
-    P₁≲P₀ : P₁ ≲ P₀
-    P₁≲P₀ = record
+    PwP₁≲PwP₀ : PwP₁ ≲p PwP₀
+    PwP₁≲PwP₀ = record
               { E′⊆E = ⊆-trans E₀⊆E₁∪E₂ (⊆-elim-∪ ⊆-refl (⊆-trans E₂⊆∅ ⊆-elim-∅))
               ; E⊆E′ = E₁⊆E₀
               ; act=act′ = λ e e∈E₁ → ≡-symm (act₀=act₁ e e∈E₁)
               ; pre′⊨pre = λ e e∈E₁ → pre₀⊨lhs₀ e e∈E₁ (E₂⊆∅ e)
               ; ≤⊆≤′ = ≤₁⊆≤₀
+              }
+    
+    P₁≲P₀ : P₁ ≲τ P₀
+    P₁≲P₀ = record
+              { PwP≲PwP′ = PwP₁≲PwP₀
               ; τ′⊨τ = λ C ϕ → ⊨-trans (τ₀ϕ⊨τ₁τ₂ϕ C ϕ) (τ₁-resp-⊨ (τ₂ϕ⊨ϕ C ϕ))
               ; ✓′⊨✓ = ✓₀⊨✓₁
               }
     
-    P₀∈⟦C⟧ = sem-resp-≲ C P₁≲P₀ P₁∈⟦C⟧
+    P₀∈⟦C⟧ = sem-resp-≲τ C P₁≲P₀ P₁∈⟦C⟧
 
   -- PROOF that skip is a left unit
 
   ⟦C⟧⊆⟦skip∙C⟧ C P₀ P₀∈⟦C⟧ = P₀∈⟦skip∙C⟧ where
 
-    open Pomset P₀ using () renaming (act to act₀ ; ≤-refl to ≤₀-refl)
+    open PomsetWithPredicateTransformers P₀ using () renaming (act to act₀ ; ≤-refl to ≤₀-refl)
 
     P₀∈⟦skip∙C⟧ : P₀ ∈ ⟦ skip ∙ C ⟧
     P₀∈⟦skip∙C⟧ = record
@@ -109,22 +114,27 @@ module monoid (DM : DataModel) (Event : Set) where
     open _●_ P₀∈⟦skip∙C⟧ using (P₁ ; P₂ ; E₀⊆E₁∪E₂ ; E₁⊆E₀ ; E₂⊆E₀ ; act₀=act₂ ; rhs₀ ; pre₀⊨rhs₀ ; ≤₂⊆≤₀ ; τ₀ϕ⊨τ₁τ₂ϕ ; ✓₀⊨τ₁✓₂) renaming (P₁∈𝒫₁ to P₁∈⟦skip⟧ ; P₂∈𝒫₂ to P₂∈⟦C⟧)
     open SKIP P₁∈⟦skip⟧ using () renaming (E₀⊆∅ to E₁⊆∅ ; τ₀ϕ⊨ϕ to τ₁ϕ⊨ϕ)
 
-    open Pomset P₀ using () renaming (E to E₀ ; ↓RW to ↓RW₀)
-    open Pomset P₁ using () renaming (E to E₁)
-    open Pomset P₂ using () renaming (E to E₂ ; pre to pre₂ ; τ to τ₂ ; ✓ to ✓₂ ; τ-resp-⊨ to τ₂-resp-⊨)
+    open PomsetWithPredicateTransformers P₀ using () renaming (PwP to PwP₀ ; E to E₀ ; ↓RW to ↓RW₀)
+    open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁)
+    open PomsetWithPredicateTransformers P₂ using () renaming (PwP to PwP₂ ; E to E₂ ; pre to pre₂ ; τ to τ₂ ; ✓ to ✓₂ ; τ-resp-⊨ to τ₂-resp-⊨)
 
-    P₂≲P₀ : P₂ ≲ P₀
-    P₂≲P₀ = record
+    PwP₂≲PwP₀ : PwP₂ ≲p PwP₀
+    PwP₂≲PwP₀ = record
               { E′⊆E = ⊆-trans E₀⊆E₁∪E₂ (⊆-elim-∪ (⊆-trans E₁⊆∅ ⊆-elim-∅) ⊆-refl)
               ; E⊆E′ = E₂⊆E₀
               ; act=act′ = λ e e∈E₀ → ≡-symm (act₀=act₂ e e∈E₀)
               ; pre′⊨pre = λ e e∈E₂ → ⊨-trans (pre₀⊨rhs₀ e (E₁⊆∅ e) e∈E₂) (τ₁ϕ⊨ϕ (↓RW₀(e)) (pre₂(e)))
               ; ≤⊆≤′ =  ≤₂⊆≤₀
+              }
+    
+    P₂≲P₀ : P₂ ≲τ P₀
+    P₂≲P₀ = record
+              { PwP≲PwP′ = PwP₂≲PwP₀
               ; τ′⊨τ = λ C ϕ → ⊨-trans (τ₀ϕ⊨τ₁τ₂ϕ C ϕ) (τ₁ϕ⊨ϕ C (τ₂ C ϕ))
               ; ✓′⊨✓ = ⊨-trans ✓₀⊨τ₁✓₂ (τ₁ϕ⊨ϕ E₁ ✓₂)
               }
     
-    P₀∈⟦C⟧ = sem-resp-≲ C P₂≲P₀ P₂∈⟦C⟧
+    P₀∈⟦C⟧ = sem-resp-≲τ C P₂≲P₀ P₂∈⟦C⟧
   
   -- PROOF of associativity
 
@@ -133,20 +143,20 @@ module monoid (DM : DataModel) (Event : Set) where
      open _●_ P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ using (P₁ ; E₁⊆E₀ ; ≤₁⊆≤₀ ; act₀=act₁ ; rhs₀ ; pre₀⊨lhs₀ ; pre₀⊨rhs₀ ; pre₀⊨lhs₀∨rhs₀ ; ✓₀⊨✓₁) renaming (P₂ to P₂₃ ; P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂₃∈⟦C₂∙C₃⟧ ; E₂⊆E₀ to E₂₃⊆E₀ ; E₀⊆E₁∪E₂ to E₀⊆E₁∪E₂₃ ; RE₀∩E₂⊆RE₂ to RE₀∩E₂₃⊆RE₂₃ ; WE₀∩E₂⊆WE₂ to WE₀∩E₂₃⊆WE₂₃ ; act₀=act₂ to act₀=act₂₃ ; ≤₂⊆≤₀ to ≤₂₃⊆≤₀ ; coherence to coherence₀ ; τ₀ϕ⊨τ₁τ₂ϕ to τ₀ϕ⊨τ₁τ₂₃ϕ ; ✓₀⊨τ₁✓₂ to ✓₀⊨τ₁✓₂₃)
      open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (P₁ to P₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₂∈⟦C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; rhs₀ to rhs₂₃ ; E₁⊆E₀ to E₂⊆E₂₃ ; E₂⊆E₀ to E₃⊆E₂₃ ; E₀⊆E₁∪E₂ to E₂₃⊆E₂∪E₃ ; ≤₁⊆≤₀ to ≤₂⊆≤₂₃ ; ≤₂⊆≤₀ to ≤₃⊆≤₂₃ ; act₀=act₁ to act₂₃=act₂ ; act₀=act₂ to act₂₃=act₃ ; pre₀⊨lhs₀ to pre₂₃⊨lhs₂₃ ; pre₀⊨rhs₀ to pre₂₃⊨rhs₂₃ ; pre₀⊨lhs₀∨rhs₀ to pre₂₃⊨lhs₂₃∨rhs₂₃ ; coherence to coherence₂₃; τ₀ϕ⊨τ₁τ₂ϕ to τ₂₃ϕ⊨τ₂τ₃ϕ ; ✓₀⊨✓₁ to ✓₂₃⊨✓₂ ; ✓₀⊨τ₁✓₂ to ✓₂₃⊨τ₂✓₃)
      
-     open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; RE to RE₀ ; WE to WE₀ ; ↓RW to ↓RW₀ ; PO to PO₀)
-     open Pomset P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨)
-     open Pomset P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨)
-     open Pomset P₃ using () renaming (E to E₃ ; act to act₃ ; pre to pre₃ ; τ to τ₃)
-     open Pomset P₂₃ using () renaming (E to E₂₃ ; τ to τ₂₃ ; pre to pre₂₃; ↓RW to ↓RW₂₃ ; RE to RE₂₃ ; WE to WE₂₃)
+     open PomsetWithPredicateTransformers P₀ using () renaming (PwP to PwP₀ ; E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; RE to RE₀ ; WE to WE₀ ; ↓RW to ↓RW₀ ; PO to PO₀)
+     open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨)
+     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨)
+     open PomsetWithPredicateTransformers P₃ using () renaming (E to E₃ ; act to act₃ ; pre to pre₃ ; τ to τ₃)
+     open PomsetWithPredicateTransformers P₂₃ using () renaming (E to E₂₃ ; τ to τ₂₃ ; pre to pre₂₃; ↓RW to ↓RW₂₃ ; RE to RE₂₃ ; WE to WE₂₃)
 
-     P₁₂ : Pomset
+     P₁₂ : PomsetWithPredicateTransformers
      P₁₂ = compP act₀ PO₀ P₁ P₂
 
-     P₁₂₃ : Pomset
+     P₁₂₃ : PomsetWithPredicateTransformers
      P₁₂₃ = compP act₀ PO₀ P₁₂ P₃
 
-     open Pomset P₁₂ using () renaming (E to E₁₂ ; pre to pre₁₂ ; dec-E to dec-E₁₂ ; RE to RE₁₂ ; WE to WE₁₂ ; ↓RW to ↓RW₁₂)
-     open Pomset P₁₂₃ using () renaming (E to E₁₂₃ ; pre to pre₁₂₃ ; dec-E to dec-E₁₂₃ ; RE to RE₁₂₃ ; WE to WE₁₂₃ ; ↓RW to ↓RW₁₂₃)
+     open PomsetWithPredicateTransformers P₁₂ using () renaming (E to E₁₂ ; pre to pre₁₂ ; dec-E to dec-E₁₂ ; RE to RE₁₂ ; WE to WE₁₂ ; ↓RW to ↓RW₁₂)
+     open PomsetWithPredicateTransformers P₁₂₃ using () renaming (PwP to PwP₁₂₃ ; E to E₁₂₃ ; pre to pre₁₂₃ ; dec-E to dec-E₁₂₃ ; RE to RE₁₂₃ ; WE to WE₁₂₃ ; ↓RW to ↓RW₁₂₃)
      
      act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
      act₀=act₂ e e∈E₂ = ≡-trans (act₀=act₂₃ e (E₂⊆E₂₃ e e∈E₂)) (act₂₃=act₂ e e∈E₂)
@@ -265,39 +275,44 @@ module monoid (DM : DataModel) (Event : Set) where
      pre₀⊨pre₁₂₃ e (right e∉E₁₂ e∈E₃) = ⊨-trans (pre₀⊨rhs₁₂₃ e e∉E₁₂ e∈E₃) (rhs₁₂₃⊨pre₁₂₃ e e∉E₁₂ e∈E₃)
      pre₀⊨pre₁₂₃ e (both e∈E₁₂ e∈E₃)  = ⊨-trans (pre₀⊨lhs₁₂₃∨rhs₁₂₃ e e∈E₁₂ e∈E₃) (lhs₁₂₃∨rhs₁₂₃⊨pre₁₂₃ e e∈E₁₂ e∈E₃)
      
-     P₁₂₃≲P₀ : P₁₂₃ ≲ P₀
-     P₁₂₃≲P₀ = record
+     PwP₁₂₃≲PwP₀ : PwP₁₂₃ ≲p PwP₀
+     PwP₁₂₃≲PwP₀ = record
                  { E′⊆E = E₀⊆E₁₂₃
                  ; E⊆E′ = E₁₂₃⊆E₀
                  ; act=act′ = λ e e∈E₁₂₃ → refl
                  ; pre′⊨pre = pre₀⊨pre₁₂₃
                  ; ≤⊆≤′ = λ d e d≤₀e → d≤₀e
+                 }
+
+     P₁₂₃≲P₀ : P₁₂₃ ≲τ P₀
+     P₁₂₃≲P₀ = record
+                 { PwP≲PwP′ = PwP₁₂₃≲PwP₀
                  ; τ′⊨τ = λ C ϕ → ⊨-trans (τ₀ϕ⊨τ₁τ₂₃ϕ C ϕ) (τ₁-resp-⊨ (τ₂₃ϕ⊨τ₂τ₃ϕ C ϕ))
                  ; ✓′⊨✓ = ⊨-intro-∧ (⊨-intro-∧ ✓₀⊨✓₁ (⊨-trans ✓₀⊨τ₁✓₂₃ (τ₁-resp-⊨ ✓₂₃⊨✓₂))) (⊨-trans ✓₀⊨τ₁✓₂₃ (⊨-trans (τ₁-resp-⊆ E₁⊆E₁₂) (τ₁-resp-⊨ (⊨-trans ✓₂₃⊨τ₂✓₃ (τ₂-resp-⊆ E₂⊆E₁₂)))))
                  }
 
      P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₀ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
-     P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = sem-resp-≲ ((C₁ ∙ C₂) ∙ C₃) P₁₂₃≲P₀ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧
+     P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = sem-resp-≲τ ((C₁ ∙ C₂) ∙ C₃) P₁₂₃≲P₀ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧
      
   ⟦⟨C₁∙C₂⟩∙C₃⟧⊆⟦C₁∙⟨C₂∙C₃⟩⟧ C₁ C₂ C₃ P₀ P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ where
 
      open _●_ P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ using (lhs₀ ; rhs₀ ; pre₀⊨lhs₀ ; pre₀⊨rhs₀ ; pre₀⊨lhs₀∨rhs₀) renaming (P₁ to P₁₂ ; P₂ to P₃ ; P₁∈𝒫₁ to P₁₂∈⟦C₁∙C₂⟧ ; P₂∈𝒫₂ to P₃∈⟦C₃⟧ ; E₁⊆E₀ to E₁₂⊆E₀ ; E₂⊆E₀ to E₃⊆E₀ ; E₀⊆E₁∪E₂ to E₀⊆E₁₂∪E₃ ; RE₀∩E₁⊆RE₁ to RE₀∩E₁₂⊆RE₁₂ ; RE₀∩E₂⊆RE₂ to RE₀∩E₃⊆RE₃ ; WE₀∩E₁⊆WE₁ to WE₀∩E₁₂⊆WE₁₂ ; WE₀∩E₂⊆WE₂ to WE₀∩E₃⊆WE₃ ; act₀=act₁ to act₀=act₁₂ ; act₀=act₂ to act₀=act₃ ; ≤₁⊆≤₀ to ≤₁₂⊆≤₀ ; ≤₂⊆≤₀ to ≤₃⊆≤₀ ; coherence to coherence₀ ; τ₀ϕ⊨τ₁τ₂ϕ to τ₀ϕ⊨τ₁₂τ₃ϕ ; ✓₀⊨✓₁ to ✓₀⊨✓₁₂ ; ✓₀⊨τ₁✓₂ to ✓₀⊨τ₁₂✓₃) 
      open _●_ P₁₂∈⟦C₁∙C₂⟧ using (P₁ ; P₂) renaming (P₁∈𝒫₁ to P₁∈⟦C₁⟧ ; P₂∈𝒫₂ to P₂∈⟦C₂⟧ ; rhs₀ to rhs₁₂ ; E₁⊆E₀ to E₁⊆E₁₂ ; E₂⊆E₀ to E₂⊆E₁₂ ; E₀⊆E₁∪E₂ to E₁₂⊆E₁∪E₂ ; ≤₁⊆≤₀ to ≤₁⊆≤₁₂ ; ≤₂⊆≤₀ to ≤₂⊆≤₁₂ ; act₀=act₁ to act₁₂=act₁ ; act₀=act₂ to act₁₂=act₂ ; pre₀⊨lhs₀ to pre₁₂⊨lhs₁₂ ; pre₀⊨rhs₀ to pre₁₂⊨rhs₁₂ ; pre₀⊨lhs₀∨rhs₀ to pre₁₂⊨lhs₁₂∨rhs₁₂ ; coherence to coherence₁₂; τ₀ϕ⊨τ₁τ₂ϕ to τ₁₂ϕ⊨τ₁τ₂ϕ ; ✓₀⊨✓₁ to ✓₁₂⊨✓₁ ; ✓₀⊨τ₁✓₂ to ✓₁₂⊨τ₁✓₂)
      
-     open Pomset P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; RE to RE₀ ; WE to WE₀ ; ↓RW to ↓RW₀ ; PO to PO₀)
-     open Pomset P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨; τ-refl-∨ to τ₁-refl-∨ ; τ-refl-∧ to τ₁-refl-∧)
-     open Pomset P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨)
-     open Pomset P₃ using () renaming (E to E₃ ; act to act₃ ; pre to pre₃ ; τ to τ₃ ; ✓ to ✓₃)
-     open Pomset P₁₂ using () renaming (E to E₁₂ ; τ to τ₁₂ ; pre to pre₁₂; ↓RW to ↓RW₁₂ ; RE to RE₁₂ ; WE to WE₁₂ ; τ-resp-⊨ to τ₁₂-resp-⊨ ; τ-resp-∨ to τ₁₂-resp-∨)
+     open PomsetWithPredicateTransformers P₀ using () renaming (PwP to PwP₀ ; E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym ; RE to RE₀ ; WE to WE₀ ; ↓RW to ↓RW₀ ; PO to PO₀)
+     open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨; τ-refl-∨ to τ₁-refl-∨ ; τ-refl-∧ to τ₁-refl-∧)
+     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨)
+     open PomsetWithPredicateTransformers P₃ using () renaming (E to E₃ ; act to act₃ ; pre to pre₃ ; τ to τ₃ ; ✓ to ✓₃)
+     open PomsetWithPredicateTransformers P₁₂ using () renaming (E to E₁₂ ; τ to τ₁₂ ; pre to pre₁₂; ↓RW to ↓RW₁₂ ; RE to RE₁₂ ; WE to WE₁₂ ; τ-resp-⊨ to τ₁₂-resp-⊨ ; τ-resp-∨ to τ₁₂-resp-∨)
      
-     P₂₃ : Pomset
+     P₂₃ : PomsetWithPredicateTransformers
      P₂₃ = compP act₀ PO₀ P₂ P₃
 
-     P₁₂₃ : Pomset
+     P₁₂₃ : PomsetWithPredicateTransformers
      P₁₂₃ = compP act₀ PO₀ P₁ P₂₃
 
-     open Pomset P₂₃ using () renaming (E to E₂₃ ; pre to pre₂₃ ; dec-E to dec-E₂₃ ; RE to RE₂₃ ; WE to WE₂₃ ; ↓RW to ↓RW₂₃ ; τ-resp-⊨ to τ₂₃-resp-⊨)
-     open Pomset P₁₂₃ using () renaming (E to E₁₂₃ ; pre to pre₁₂₃ ; dec-E to dec-E₁₂₃ ; RE to RE₁₂₃ ; WE to WE₁₂₃ ; ↓RW to ↓RW₁₂₃)
+     open PomsetWithPredicateTransformers P₂₃ using () renaming (E to E₂₃ ; pre to pre₂₃ ; dec-E to dec-E₂₃ ; RE to RE₂₃ ; WE to WE₂₃ ; ↓RW to ↓RW₂₃ ; τ-resp-⊨ to τ₂₃-resp-⊨)
+     open PomsetWithPredicateTransformers P₁₂₃ using () renaming (PwP to PwP₁₂₃ ; E to E₁₂₃ ; pre to pre₁₂₃ ; dec-E to dec-E₁₂₃ ; RE to RE₁₂₃ ; WE to WE₁₂₃ ; ↓RW to ↓RW₁₂₃)
      
      act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
      act₀=act₁ e e∈E₁ = ≡-trans (act₀=act₁₂ e (E₁⊆E₁₂ e e∈E₁)) (act₁₂=act₁ e e∈E₁)
@@ -416,18 +431,24 @@ module monoid (DM : DataModel) (Event : Set) where
      pre₀⊨pre₁₂₃ e (right e∉E₁ e∈E₂₃) = ⊨-trans (pre₀⊨rhs₁₂₃ e e∉E₁ e∈E₂₃) (rhs₁₂₃⊨pre₁₂₃ e e∉E₁ e∈E₂₃)
      pre₀⊨pre₁₂₃ e (both e∈E₁ e∈E₂₃)  = ⊨-trans (pre₀⊨lhs₁₂₃∨rhs₁₂₃ e e∈E₁ e∈E₂₃) (lhs₁₂₃∨rhs₁₂₃⊨pre₁₂₃ e e∈E₁ e∈E₂₃)
 
-     P₁₂₃≲P₀ : P₁₂₃ ≲ P₀
-     P₁₂₃≲P₀ = record
+     PwP₁₂₃≲PwP₀ : PwP₁₂₃ ≲p PwP₀
+     PwP₁₂₃≲PwP₀ = record
                  { E′⊆E = E₀⊆E₁₂₃
                  ; E⊆E′ = E₁₂₃⊆E₀
                  ; act=act′ = λ e e∈E₁₂₃ → refl
                  ; pre′⊨pre = pre₀⊨pre₁₂₃
                  ; ≤⊆≤′ = λ d e d≤₀e → d≤₀e
+                }
+
+
+     P₁₂₃≲P₀ : P₁₂₃ ≲τ P₀
+     P₁₂₃≲P₀ = record
+                 { PwP≲PwP′ = PwP₁₂₃≲PwP₀
                  ; τ′⊨τ = λ C ϕ → ⊨-trans (τ₀ϕ⊨τ₁₂τ₃ϕ C ϕ) (τ₁₂ϕ⊨τ₁τ₂ϕ C (τ₃ C ϕ))
                  ; ✓′⊨✓ = ⊨-intro-∧ (⊨-trans ✓₀⊨✓₁₂ ✓₁₂⊨✓₁) (⊨-trans (⊨-intro-∧ (⊨-trans ✓₀⊨✓₁₂ ✓₁₂⊨τ₁✓₂) (⊨-trans ✓₀⊨τ₁₂✓₃ (⊨-trans (τ₁₂ϕ⊨τ₁τ₂ϕ E₁₂ ✓₃) (⊨-trans (τ₁-resp-∩⊆ ⊆-right-∩) (τ₁-resp-⊨ (τ₂-resp-∩⊆ ⊆-right-∩)))))) τ₁-refl-∧)
                 }
 
      P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ : P₀ ∈ ⟦ C₁ ∙ (C₂ ∙ C₃) ⟧
-     P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ = sem-resp-≲ (C₁ ∙ (C₂ ∙ C₃)) P₁₂₃≲P₀ P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧
+     P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ = sem-resp-≲τ (C₁ ∙ (C₂ ∙ C₃)) P₁₂₃≲P₀ P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧
      
   -- QED

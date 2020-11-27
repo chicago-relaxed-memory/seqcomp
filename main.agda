@@ -12,16 +12,18 @@ module main (DM : DataModel) (Event : Set) where
   open pomset(DM)(Event)
   open semantics(DM)(Event)
 
-  open import augmentation(DM)(Event) as augmentation using (_≲_)
+  open import augmentation(DM)(Event) as augmentation using (_≲p_ ; _≲τ_)
   import monoid(DM)(Event) as monoid
 
   -- PROPOSITION: semantics is augment-closed
 
-  sem-resp-≲ : ∀ {P P′} C → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
+  sem-resp-≲τ : ∀ {P P′} C → (P ≲τ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
+  sem-resp-≲p : ∀ {P P′} G → (P ≲p P′) → (P ∈ ⟪ G ⟫) → (P′ ∈ ⟪ G ⟫)
 
   -- PROOF in augmentation.agda  
 
-  sem-resp-≲ = augmentation.sem-resp-≲
+  sem-resp-≲τ = augmentation.sem-resp-≲τ
+  sem-resp-≲p = augmentation.sem-resp-≲p
 
   -- PROPOSITION: sequential composition forms a monoid
   
