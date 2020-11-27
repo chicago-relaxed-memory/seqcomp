@@ -16,13 +16,10 @@ module examples (DM : DataModel) (Event : Set) where
   skipP : (Event → Action) → Pomset
   skipP act = record
             { E = ∅
-            ; _≤_ = λ d e → (d ≡ e)
+            ; PO = ≡PO
             ; ℓ = λ e → (ff , act(e))
             ; τ = λ C ϕ → ϕ
             ; ✓ = tt
-            ; ≤-refl = refl
-            ; ≤-trans = ≡-trans
-            ; ≤-asym = λ d=e e=d → e=d
             ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-refl
             ; τ-resp-⊨ = λ ϕ⊨ψ → ϕ⊨ψ
             ; τ-resp-∨ = ⊨-refl
@@ -63,12 +60,9 @@ module examples (DM : DataModel) (Event : Set) where
      P₀ : Pomset
      P₀ = record
              { E = E₀
-             ; _≤_ = _≤₀_
+             ; PO = PO₀
              ; ℓ = λ e → (pre₀ e , act₀ e)
              ; τ = λ C ϕ → τ₁(C)(τ₂(C)(ϕ))
-             ; ≤-refl = ≤₀-refl
-             ; ≤-trans = ≤₀-trans
-             ; ≤-asym = ≤₀-asym
              ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-trans (τ₁-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-left-∪) C∩E⊆D)) (τ₁-resp-⊨ (τ₂-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-right-∪) C∩E⊆D)))
              ; τ-resp-⊨ = λ ϕ⊨ψ → τ₁-resp-⊨ (τ₂-resp-⊨ ϕ⊨ψ)
              ; τ-resp-∨ = ⊨-trans (τ₁-resp-⊨ τ₂-resp-∨) τ₁-resp-∨

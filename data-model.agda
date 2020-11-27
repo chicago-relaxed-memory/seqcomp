@@ -62,3 +62,19 @@ module data-model where
 
     ⊨-assocr-∨ : ∀ {ϕ ψ χ} → (((ϕ ∨ ψ) ∨ χ) ⊨ (ϕ ∨ (ψ ∨ χ)))
     ⊨-assocr-∨ = ⊨-elim-∨ (⊨-elim-∨ ⊨-left-∨ (⊨-trans ⊨-left-∨ ⊨-right-∨)) (⊨-trans ⊨-right-∨ ⊨-right-∨)
+
+    data Action : Set where
+       R : Address → Value → Action
+       W : Address → Value → Action
+       
+    data Reads : Action → Set where
+      R : ∀ {a v} → ((R a v) ∈ Reads)
+  
+    data Writes : Action → Set where
+      W : ∀ {a v} → ((W a v) ∈ Writes)
+  
+    data Conflicts : Action → Action → Set where
+      RW : ∀ {x v w} → Conflicts (R x v) (W x w)
+      WR : ∀ {x v w} → Conflicts (W x v) (R x w)
+      WW : ∀ {x v w} → Conflicts (W x v) (W x w)
+  
