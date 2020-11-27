@@ -64,14 +64,12 @@ module pomset (DM : DataModel) (Event : Set) where
     open PomsetWithPreconditions PwP public
 
     field τ : (Event → Set) → Formula → Formula
-    field ✓ : Formula
 
     field τ-resp-∩⊆ : ∀ {C D ϕ} → ((C ∩ E) ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     field τ-resp-⊨ : ∀ {C ϕ ψ} → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
     field τ-resp-∨ : ∀ {C ϕ ψ} → (τ(C)(ϕ ∨ ψ) ⊨ (τ(C)(ϕ) ∨ τ(C)(ψ)))
     field τ-refl-∨ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∨ τ(C)(ψ)) ⊨ τ(C)(ϕ ∨ ψ))
     field τ-refl-∧ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∧ τ(C)(ψ)) ⊨ τ(C)(ϕ ∧ ψ))
-    field ✓⊨τtt : ✓ ⊨ τ(E)(tt)
 
     τ-resp-⊆ : ∀ {C D ϕ} → (C ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     τ-resp-⊆ C⊆D = τ-resp-∩⊆ (λ{ e (e∈C , _) → C⊆D e e∈C})

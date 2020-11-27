@@ -31,13 +31,11 @@ module examples (DM : DataModel) (Event : Set) where
   skipP act = record
             { PwP = nilP act
             ; τ = λ C ϕ → ϕ
-            ; ✓ = tt
             ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-refl
             ; τ-resp-⊨ = λ ϕ⊨ψ → ϕ⊨ψ
             ; τ-resp-∨ = ⊨-refl
             ; τ-refl-∨ = ⊨-refl
             ; τ-refl-∧ = ⊨-refl
-            ; ✓⊨τtt = ⊨-refl
             }
 
   skipP∈⟦skip⟧ : ∀ act → skipP act ∈ ⟦ skip ⟧
@@ -51,8 +49,8 @@ module examples (DM : DataModel) (Event : Set) where
   compP act₀ PO₀ P₁ P₂ = P₀ where
 
      open PartialOrder PO₀ using () renaming (_≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym)
-     open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨ ; τ-refl-∨ to τ₁-refl-∨ ; τ-refl-∧ to τ₁-refl-∧ ; ✓ to ✓₁)
-     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨ ; τ-resp-∨ to τ₂-resp-∨ ; τ-refl-∨ to τ₂-refl-∨ ; τ-refl-∧ to τ₂-refl-∧ ; ✓ to ✓₂ ; ✓⊨τtt to ✓₂⊨τ₂tt)
+     open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨ ; τ-refl-∨ to τ₁-refl-∨ ; τ-refl-∧ to τ₁-refl-∧)
+     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨ ; τ-resp-∨ to τ₂-resp-∨ ; τ-refl-∨ to τ₂-refl-∨ ; τ-refl-∧ to τ₂-refl-∧)
 
      E₀ = E₁ ∪ E₂
      dec-E₀ = λ e → EXCLUDED_MIDDLE(e ∈ E₀)
@@ -84,9 +82,7 @@ module examples (DM : DataModel) (Event : Set) where
              ; τ-resp-⊨ = λ ϕ⊨ψ → τ₁-resp-⊨ (τ₂-resp-⊨ ϕ⊨ψ)
              ; τ-resp-∨ = ⊨-trans (τ₁-resp-⊨ τ₂-resp-∨) τ₁-resp-∨
              ; τ-refl-∨ = ⊨-trans τ₁-refl-∨ (τ₁-resp-⊨ τ₂-refl-∨)
-             ; ✓ = ✓₁ ∧ τ₁(E₁)(✓₂)
              ; τ-refl-∧ = ⊨-trans τ₁-refl-∧ (τ₁-resp-⊨ τ₂-refl-∧)
-             ; ✓⊨τtt = ⊨-trans ⊨-right-∧ (⊨-trans (τ₁-resp-⊆ ⊆-left-∪) (τ₁-resp-⊨ (⊨-trans ✓₂⊨τ₂tt (τ₂-resp-⊆ ⊆-right-∪))))
              }
 
   record Compatible (act₀ : Event → Action) (PO₀ : PartialOrder) (P₁ P₂ : PomsetWithPredicateTransformers) : Set₁ where
@@ -157,8 +153,6 @@ module examples (DM : DataModel) (Event : Set) where
                      ; act₀=act₁ = act₀=act₁
                      ; act₀=act₂ = act₀=act₂
                      ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-refl
-                     ; ✓₀⊨✓₁ = ⊨-left-∧
-                     ; ✓₀⊨τ₁✓₂ = ⊨-right-∧
                      }
 
   record compLemmas (C₁ C₂ : Command) (act₀ : Event → Action) (PO₀ : PartialOrder) (P₁ P₂ : PomsetWithPredicateTransformers) : Set₁ where

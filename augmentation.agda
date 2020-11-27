@@ -39,14 +39,13 @@ module augmentation (DM : DataModel) (Event : Set) where
     
   record _≲τ_ (P P′ : PomsetWithPredicateTransformers) : Set₁ where
 
-    open PomsetWithPredicateTransformers P using (PwP ; τ ; ✓)
-    open PomsetWithPredicateTransformers P′ using () renaming (PwP to PwP′ ; τ to τ′ ; ✓ to ✓′)
+    open PomsetWithPredicateTransformers P using (PwP ; τ)
+    open PomsetWithPredicateTransformers P′ using () renaming (PwP to PwP′ ; τ to τ′)
 
     field PwP≲PwP′ : (PwP ≲p PwP′)
     open _≲p_ PwP≲PwP′ public
     
     field τ′⊨τ : ∀ C ϕ → (τ′(C)(ϕ) ⊨ τ(C)(ϕ))
-    field ✓′⊨✓ : ✓′ ⊨ ✓
     
   sem-resp-≲τ : ∀ {P P′} C → (P ≲τ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
   sem-resp-≲p : ∀ {P P′} G → (P ≲p P′) → (P ∈ ⟪ G ⟫) → (P′ ∈ ⟪ G ⟫)
@@ -68,7 +67,7 @@ module augmentation (DM : DataModel) (Event : Set) where
     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; pre to pre₂)
     open PomsetWithPredicateTransformers P₀ using () renaming (↓RW to ↓RW₀)
     open PomsetWithPredicateTransformers P′₀ using () renaming (↓RW to ↓RW′₀)
-    open _≲τ_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀ ; ↓RW⊆↓RW' to ↓RW₀⊆↓RW'₀) 
+    open _≲τ_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ↓RW⊆↓RW' to ↓RW₀⊆↓RW'₀) 
 
     rhs′₀ : Event → Formula
     rhs′₀(e) = τ₁(↓RW′₀(e))(pre₂(e))
@@ -94,14 +93,12 @@ module augmentation (DM : DataModel) (Event : Set) where
                       ; act₀=act₁ = λ e e∈E₁ → ≡-trans (≡-symm (act₀=act′₀ e (E₁⊆E₀ e e∈E₁))) (act₀=act₁ e e∈E₁)
                       ; act₀=act₂ =  λ e e∈E₂ → ≡-trans (≡-symm (act₀=act′₀ e (E₂⊆E₀ e e∈E₂))) (act₀=act₂ e e∈E₂)
                       ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨τ₁τ₂ϕ C ϕ)
-                      ; ✓₀⊨✓₁ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨✓₁
-                      ; ✓₀⊨τ₁✓₂ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨τ₁✓₂
                       }
     
   sem-resp-≲τ {P₀} {P′₀} (if ψ then C₁ else C₂) P₀≲P′₀ P₀∈IF = P′₀∈IF where
 
     open IF P₀∈IF
-    open _≲τ_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀)
+    open _≲τ_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; act=act′ to act₀=act′₀ ; pre′⊨pre to pre′₀⊨pre₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀)
     
     P′₀∈IF : P′₀ ∈ (IF ψ ⟦ C₁ ⟧ ⟦ C₂ ⟧)
     P′₀∈IF = record
@@ -121,8 +118,6 @@ module augmentation (DM : DataModel) (Event : Set) where
                ; act₀=act₂ = λ e e∈E₂ → ≡-trans (≡-symm (act₀=act′₀ e (E₂⊆E₀ e e∈E₂))) (act₀=act₂ e e∈E₂)
                ; τ₀ϕ⊨τ₁ϕ = λ C ϕ → ⊨-trans (⊨-resp-∧ ⊨-refl (τ′₀⊨τ₀ C ϕ)) (τ₀ϕ⊨τ₁ϕ C ϕ)
                ; τ₀ϕ⊨τ₂ϕ =  λ C ϕ → ⊨-trans (⊨-resp-∧ ⊨-refl (τ′₀⊨τ₀ C ϕ)) (τ₀ϕ⊨τ₂ϕ C ϕ)
-               ; ✓₀⊨✓₁ = ⊨-trans (⊨-resp-∧ ⊨-refl ✓′₀⊨✓₀) ✓₀⊨✓₁
-               ; ✓₀⊨✓₂ = ⊨-trans (⊨-resp-∧ ⊨-refl ✓′₀⊨✓₀) ✓₀⊨✓₂
                }
 
 
@@ -138,7 +133,6 @@ module augmentation (DM : DataModel) (Event : Set) where
                 ; act=Rav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Rav e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[v/r] = λ C ϕ → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[v/r] C ϕ)
                 ; τϕ⊨ϕ[[a]/r] = λ C ϕ C∩E⊆∅ → ⊨-trans (τ′⊨τ ϕ C) (τϕ⊨ϕ[[a]/r] C ϕ (⊆-trans (⊆-resp-∩ ⊆-refl E⊆E′) C∩E⊆∅))
-                ; ✓⊨ff = λ E′⊆∅ → ⊨-trans ✓′⊨✓ (✓⊨ff (⊆-trans E⊆E′ E′⊆∅))
                 }
 
   sem-resp-≲τ {P} {P′} ([ a ]:= M) P≲P′ P∈STORE = P′∈STORE where
@@ -153,8 +147,6 @@ module augmentation (DM : DataModel) (Event : Set) where
                 ; act=Wav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Wav e (E′⊆E e e∈E′))
                 ; pre⊨M=v = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨M=v e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[v/[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[v/[a]] C ϕ)
-                ; ✓⊨M=v = ⊨-trans ✓′⊨✓ ✓⊨M=v
-                ; ✓⊨ff = λ E′⊆∅ → ⊨-trans ✓′⊨✓ (✓⊨ff (⊆-trans E⊆E′ E′⊆∅))
                 }
                 
   sem-resp-≲τ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where
