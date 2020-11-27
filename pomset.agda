@@ -37,23 +37,8 @@ module pomset (DM : DataModel) (Event : Set) where
     act : Event → Action
     act(e) = snd(ℓ(e))
 
-    RE : Event → Set
-    RE = E ∩ (act ⁻¹[ Reads ])
-
-    WE : Event → Set
-    WE = E ∩ (act ⁻¹[ Writes ])
-
-    ↓RW : Event → Event → Set
-    ↓RW(e) = E ∩ (λ d → (d ∈ RE) → (e ∈ WE) → (d ≤ e))
-    
-    RE⊆E : (RE ⊆ E)
-    RE⊆E = ⊆-left-∩
-
-    WE⊆E : (WE ⊆ E)
-    WE⊆E = ⊆-left-∩
-
-    ↓RW⊆E : ∀ e → (↓RW(e) ⊆ E)
-    ↓RW⊆E e = ⊆-left-∩
+    ↓ : Event → Event → Set
+    ↓(e) = E ∩ (λ d → (d ≤ e))
     
     dec-E : ∀ e → Dec(e ∈ E)
     dec-E e = EXCLUDED_MIDDLE(e ∈ E)

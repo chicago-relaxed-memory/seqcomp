@@ -1,15 +1,15 @@
 open import prelude
-open import data-model using ( DataModel )
+open import data-model
 import command
 import pomset
 import semantics
 
-module examples (DM : DataModel) (Event : Set) where
+module examples (MM : MemoryModel) (Event : Set) where
 
-  open DataModel DM
-  open command(DM)
+  open MemoryModel MM
+  open command(MM)
   open pomset(DM)(Event)
-  open semantics(DM)(Event)
+  open semantics(MM)(Event)
 
   -- The canonical pomset in ⟪ nil ⟫
   
@@ -54,11 +54,9 @@ module examples (DM : DataModel) (Event : Set) where
 
      E₀ = E₁ ∪ E₂
      dec-E₀ = λ e → EXCLUDED_MIDDLE(e ∈ E₀)
-     RE₀ = E₀ ∩ (act₀ ⁻¹[ Reads ])
-     WE₀ = E₀ ∩ (act₀ ⁻¹[ Writes ])
-     ↓RW₀ = λ e → E₀ ∩ (λ d → (d ∈ RE₀) → (e ∈ WE₀) → (d ≤₀ e))
+     ↓₀ = λ e → E₀ ∩ (λ d → (d ≤₀ e))
      lhs₀ = pre₁
-     rhs₀ = λ e → τ₁(↓RW₀(e))(pre₂(e))
+     rhs₀ = λ e → τ₁(↓₀(e))(pre₂(e))
 
      pre₀ : Event → Formula
      pre₀ e with dec-E₀(e)
@@ -95,7 +93,7 @@ module examples (DM : DataModel) (Event : Set) where
      field act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
      field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
      field ≤₂⊆≤₀ : ∀ d e → (d ≤₂ e) → (d ≤₀ e)
-     field coherence :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → (Conflicts (act₁(d)) (act₂(e))) → (d ≤₀ e)
+     field causal :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → (Causal (act₁(d)) (act₂(e))) → (d ≤₀ e)
             
   compP∈⟦C₁∙C₂⟧ : ∀ C₁ C₂ act₀ PO₀ P₁ P₂ →
       (P₁ ∈ ⟦ C₁ ⟧) → (P₂ ∈ ⟦ C₂ ⟧) →
@@ -107,12 +105,12 @@ module examples (DM : DataModel) (Event : Set) where
      
      P₀ = compP act₀ PO₀ P₁ P₂
 
-     open PomsetWithPredicateTransformers P₀ using () renaming (dec-E to dec-E₀ ; pre to pre₀ ; ↓RW to ↓RW₀)
+     open PomsetWithPredicateTransformers P₀ using () renaming (dec-E to dec-E₀ ; pre to pre₀ ; ↓ to ↓₀)
      open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; act to act₁ ; pre to pre₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-⊨ to τ₁-resp-⊨)
      open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; act to act₂ ; pre to pre₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-⊨ to τ₂-resp-⊨)
 
      lhs₀ = pre₁
-     rhs₀ = λ e → τ₁(↓RW₀(e))(pre₂(e))
+     rhs₀ = λ e → τ₁(↓₀(e))(pre₂(e))
      
      pre₀⊨lhs₀ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (pre₀(e) ⊨ lhs₀(e))
      pre₀⊨lhs₀ e e∈E₁ e∉E₂ with dec-E₀(e)
@@ -146,7 +144,7 @@ module examples (DM : DataModel) (Event : Set) where
                      ; E₂⊆E₀ = ⊆-right-∪
                      ; ≤₁⊆≤₀ = ≤₁⊆≤₀
                      ; ≤₂⊆≤₀ = ≤₂⊆≤₀
-                     ; coherence = coherence
+                     ; causal = causal
                      ; pre₀⊨lhs₀ = pre₀⊨lhs₀
                      ; pre₀⊨rhs₀ = pre₀⊨rhs₀
                      ; pre₀⊨lhs₀∨rhs₀ = pre₀⊨lhs₀∨rhs₀

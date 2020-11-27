@@ -3,27 +3,16 @@ open import prelude
 module data-model where
 
   record DataModel : Set₁ where
-  
-    field Value : Set
-    field Register : Set
-    field Expression : Set
-    field Formula : Set
-    field Address : Set
 
-    field value : Value → Expression
-    field register : Value → Expression
-    
+    field Action : Set
+    field Formula : Set
+
     field _⊨_ : Formula → Formula → Set
 
     field ff : Formula
     field _∨_ : Formula → Formula → Formula
     field ¬ : Formula → Formula
-    field _==_ : Expression → Expression → Formula
     
-    field _[_/_] : Formula → Expression → Register → Formula
-    field _[[_]/_] : Formula → Address → Register → Formula
-    field _[_/[_]] : Formula → Expression → Address → Formula
-
     field ⊨-refl : ∀ {ϕ} → (ϕ ⊨ ϕ)
     field ⊨-trans : ∀ {ϕ ψ χ} → (ϕ ⊨ ψ) → (ψ ⊨ χ) → (ϕ ⊨ χ)
     field ⊨-resp-∨ : ∀ {ϕ ψ ξ ζ} → (ϕ ⊨ ψ) → (ξ ⊨ ζ) → ((ϕ ∨ ξ) ⊨ (ψ ∨ ζ))
@@ -34,6 +23,8 @@ module data-model where
     field ⊨-elim-¬¬ : ∀ {ϕ} → (¬(¬ ϕ) ⊨ ϕ)
     field ⊨-intro-¬¬ : ∀ {ϕ} → (ϕ ⊨ ¬(¬ ϕ)) 
     field ⊨-elim-ff : ∀ {ϕ} → (ff ⊨ ϕ)
+
+    field Causal : Action → Action → Set
     
     tt = ¬ ff
     _∧_ = λ ϕ ψ → ¬((¬ ϕ) ∨ (¬ ψ))
@@ -63,15 +54,32 @@ module data-model where
     ⊨-assocr-∨ : ∀ {ϕ ψ χ} → (((ϕ ∨ ψ) ∨ χ) ⊨ (ϕ ∨ (ψ ∨ χ)))
     ⊨-assocr-∨ = ⊨-elim-∨ (⊨-elim-∨ ⊨-left-∨ (⊨-trans ⊨-left-∨ ⊨-right-∨)) (⊨-trans ⊨-right-∨ ⊨-right-∨)
 
-    data Action : Set where
-       R : Address → Value → Action
-       W : Address → Value → Action
+  record MemoryModel : Set₁ where
+  
+    field DM : DataModel
+    open DataModel DM public
+    
+    field Value : Set
+    field Register : Set
+    field Expression : Set
+    field Address : Set
+
+    field value : Value → Expression
+    field register : Value → Expression
+    
+    field _==_ : Expression → Expression → Formula
+    field _[_/_] : Formula → Expression → Register → Formula
+    field _[[_]/_] : Formula → Address → Register → Formula
+    field _[_/[_]] : Formula → Expression → Address → Formula
+
+    field R : Address → Value → Action
+    field W : Address → Value → Action
        
     data Reads : Action → Set where
-      R : ∀ {a v} → ((R a v) ∈ Reads)
+      R∈R : ∀ {a v} → ((R a v) ∈ Reads)
   
     data Writes : Action → Set where
-      W : ∀ {a v} → ((W a v) ∈ Writes)
+      W∈W : ∀ {a v} → ((W a v) ∈ Writes)
   
     data Conflicts : Action → Action → Set where
       RW : ∀ {x v w} → Conflicts (R x v) (W x w)

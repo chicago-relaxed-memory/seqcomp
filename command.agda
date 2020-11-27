@@ -1,11 +1,11 @@
 open import prelude
-open import data-model using ( DataModel )
+open import data-model
 
-module command (DM : DataModel) where
+module command (MM : MemoryModel) where
 
   infixr 10 _∙_ _∥_
   
-  open DataModel DM
+  open MemoryModel MM
 
   data Command : Set
   data ThreadGroup : Set
