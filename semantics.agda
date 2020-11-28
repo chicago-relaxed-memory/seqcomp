@@ -24,7 +24,7 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field τϕ⊨ϕ[v/r] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ value v / r ]))
     field τϕ⊨ϕ[[a]/r] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (ϕ [[ a ]/ r ]))
 
-    field τϕ⊨ff : (μ ≡ ra) → ∀ ϕ → (τ(∅)(ϕ) ⊨ ff)
+    field τϕ⊨ff : (μ ≡ ra) → ∀ ϕ → (τ(∅)(ϕ) ⊨ (μ[ a ]==rlx))
 
   record STORE (a : Address) (μ : AccessMode) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
@@ -35,7 +35,7 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
     field act=Wav :  ∀ e → (e ∈ E) → act(e) ≡ (W a v)
     field pre⊨M=v :  ∀ e → (e ∈ E) → pre(e) ⊨ (M == value v)
-    field τϕ⊨ϕ[M/[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]])) 
+    field τϕ⊨ϕ[M/[a]][μ/μ[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]] [ μ /μ[ a ]])) 
     
     field pre⊨Q : (μ ≡ ra) → ∀ e → (e ∈ E) → pre(e) ⊨ Q
     field τϕ⊨ϕ[M/[a]][ff/Q] : (μ ≡ ra) → ∀ ϕ → (τ(∅)(ϕ) ⊨ ((ϕ [ M /[ a ]])[ ff /Q]) )

@@ -7,10 +7,6 @@ module command (MM : MemoryModel) where
   
   open MemoryModel MM
 
-  data AccessMode : Set where
-    rlx : AccessMode
-    ra : AccessMode
-
   data Command : Set
   data ThreadGroup : Set
 

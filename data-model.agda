@@ -54,6 +54,10 @@ module data-model where
     ⊨-assocr-∨ : ∀ {ϕ ψ χ} → (((ϕ ∨ ψ) ∨ χ) ⊨ (ϕ ∨ (ψ ∨ χ)))
     ⊨-assocr-∨ = ⊨-elim-∨ (⊨-elim-∨ ⊨-left-∨ (⊨-trans ⊨-left-∨ ⊨-right-∨)) (⊨-trans ⊨-right-∨ ⊨-right-∨)
 
+  data AccessMode : Set where
+    rlx : AccessMode
+    ra : AccessMode
+    
   record MemoryModel : Set₁ where
   
     field DM : DataModel
@@ -74,6 +78,9 @@ module data-model where
 
     field Q : Formula
     field _[_/Q] : Formula → Formula → Formula
+
+    field μ[_]==rlx : Address → Formula
+    field _[_/μ[_]] : Formula → AccessMode → Address → Formula
     
     field R : Address → Value → Action
     field W : Address → Value → Action
