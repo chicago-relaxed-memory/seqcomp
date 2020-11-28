@@ -13,7 +13,7 @@ module semantics (MM : MemoryModel) (Event : Set) where
   open seqcomp(DM)(Event)
   open parcomp(DM)(Event)
    
-  record LOAD (r : Register) (a : Address) (μ : Ordering) (P : PomsetWithPredicateTransformers) : Set₁ where
+  record LOAD (r : Register) (a : Address) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
 
@@ -24,9 +24,9 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field τϕ⊨ϕ[v/r] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ value v / r ]))
     field τϕ⊨ϕ[[a]/r] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (ϕ [[ a ]/ r ]))
 
-    field τϕ⊨ff : (μ ≡ rel/acq) → ∀ ϕ → (τ(∅)(ϕ) ⊨ ff)
+    field τϕ⊨ff : (μ ≡ ra) → ∀ ϕ → (τ(∅)(ϕ) ⊨ ff)
 
-  record STORE (a : Address) (μ : Ordering) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
+  record STORE (a : Address) (μ : AccessMode) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
 
@@ -37,8 +37,8 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field pre⊨M=v :  ∀ e → (e ∈ E) → pre(e) ⊨ (M == value v)
     field τϕ⊨ϕ[M/[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]])) 
     
-    field pre⊨Q : (μ ≡ rel/acq) → ∀ e → (e ∈ E) → pre(e) ⊨ Q
-    field τϕ⊨ϕ[M/[a]][ff/Q] : (μ ≡ rel/acq) → ∀ ϕ → (τ(∅)(ϕ) ⊨ ((ϕ [ M /[ a ]])[ ff /Q]) )
+    field pre⊨Q : (μ ≡ ra) → ∀ e → (e ∈ E) → pre(e) ⊨ Q
+    field τϕ⊨ϕ[M/[a]][ff/Q] : (μ ≡ ra) → ∀ ϕ → (τ(∅)(ϕ) ⊨ ((ϕ [ M /[ a ]])[ ff /Q]) )
  
   record LET (r : Register) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
   
