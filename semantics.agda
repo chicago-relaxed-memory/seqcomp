@@ -21,9 +21,10 @@ module semantics (MM : MemoryModel) (Event : Set) where
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
     field act=Rav : ∀ e → (e ∈ E) → act(e) ≡ (R a v)
+    field pre⊨RO :  ∀ e → (e ∈ E) → pre(e) ⊨ RO
     field pre⊨Q[a] : ∀ e → (e ∈ E) → (pre(e) ⊨ Q[ a ])
     field τϕ⊨ϕ[v/r] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ value v / r ]))
-    field τϕ⊨ϕ[[a]/r][ff/Q] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (ϕ [[ a ]/ r ] [ff/Q]))
+    field τϕ⊨RO∨ϕ[[a]/r][ff/Q] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (RO ∨ (ϕ [[ a ]/ r ] [ff/Q])))
 
     field τϕ⊨μ[a]=rlx : (μ ≡ ra) → ∀ ϕ → (τ(∅)(ϕ) ⊨ (μ[ a ]==rlx))
 
@@ -36,6 +37,7 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
     field act=Wav :  ∀ e → (e ∈ E) → act(e) ≡ (W a v)
     field pre⊨M=v :  ∀ e → (e ∈ E) → pre(e) ⊨ (M == value v)
+    field pre⊨RW :  ∀ e → (e ∈ E) → pre(e) ⊨ RW
     field pre⊨Q[a] : ∀ e → (e ∈ E) → (pre(e) ⊨ Q[ a ])
     field τϕ⊨ϕ[M/[a]][μ/μ[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]] [ μ /μ[ a ]])) 
     field τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (ϕ [ M /[ a ]] [ μ /μ[ a ]] [ff/Q[ a ]])) 

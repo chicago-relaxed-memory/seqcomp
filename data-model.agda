@@ -26,6 +26,7 @@ module data-model where
 
     tt = ¬ ff
     _∧_ = λ ϕ ψ → ¬((¬ ϕ) ∨ (¬ ψ))
+    _⇒_ = λ ϕ ψ → (¬ ϕ) ∨ ψ
 
     _⊭_ = λ ϕ ψ → (ϕ ⊨ ψ) → FALSE
     Satisfiable = λ ϕ → (ϕ ⊭ ff)
@@ -83,6 +84,9 @@ module data-model where
 
     field μ[_]==rlx : Address → Formula
     field _[_/μ[_]] : Formula → AccessMode → Address → Formula
+    
+    field RO : Formula
+    RW = ¬ RO
     
     field R : Address → Value → Action
     field W : Address → Value → Action

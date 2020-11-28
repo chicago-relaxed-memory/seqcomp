@@ -122,9 +122,10 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                 { v = v
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
                 ; act=Rav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Rav e (E′⊆E e e∈E′))
+                ; pre⊨RO = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨RO e (E′⊆E e e∈E′))
                 ; pre⊨Q[a] = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q[a] e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[v/r] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[v/r] C ϕ)
-                ; τϕ⊨ϕ[[a]/r][ff/Q] = λ ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[[a]/r][ff/Q] ϕ)
+                ; τϕ⊨RO∨ϕ[[a]/r][ff/Q] = λ ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨RO∨ϕ[[a]/r][ff/Q] ϕ)
                 ; τϕ⊨μ[a]=rlx = λ μ=ra ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨μ[a]=rlx μ=ra ϕ)
                 }
 
@@ -138,8 +139,9 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                 { v = v
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
                 ; act=Wav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Wav e (E′⊆E e e∈E′))
-                ; pre⊨Q[a] = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q[a] e (E′⊆E e e∈E′))
                 ; pre⊨M=v = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨M=v e (E′⊆E e e∈E′))
+                ; pre⊨RW = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨RW e (E′⊆E e e∈E′))
+                ; pre⊨Q[a] = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q[a] e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[M/[a]][μ/μ[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[M/[a]][μ/μ[a]] C ϕ)
                 ; pre⊨Q = λ μ=ra e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q μ=ra e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] = λ ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] ϕ)
