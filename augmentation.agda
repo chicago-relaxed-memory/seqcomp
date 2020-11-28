@@ -78,7 +78,6 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                       ; E₂⊆E₀ = λ e e∈E₂ → E₀⊆E′₀ e (E₂⊆E₀ e e∈E₂)
                       ; ≤₁⊆≤₀ = λ d e d≤₁e → ≤₀⊆≤′₀ d e (≤₁⊆≤₀ d e d≤₁e)
                       ; ≤₂⊆≤₀ = λ d e d≤₂e → ≤₀⊆≤′₀ d e (≤₂⊆≤₀ d e d≤₂e)
-                      ; coherence = λ d e d∈E₁ e∈E₂ d#e → ≤₀⊆≤′₀ d e (coherence d e d∈E₁ e∈E₂ d#e)
                       ; pre₀⊨lhs₀ = λ e e∈E₁ e∉E₂ → ⊨-trans (pre′₀⊨pre₀ e (E₁⊆E₀ e e∈E₁)) (pre₀⊨lhs₀ e e∈E₁ e∉E₂)
                       ; pre₀⊨rhs₀ = λ e e∉E₁ e∈E₂ → ⊨-trans (pre′₀⊨pre₀ e (E₂⊆E₀ e e∈E₂)) (⊨-trans (pre₀⊨rhs₀ e e∉E₁ e∈E₂) (rhs₀⊨rhs′₀ e  e∈E₂))
                       ; pre₀⊨lhs₀∨rhs₀ = λ e e∈E₁ e∈E₂ → ⊨-trans (pre′₀⊨pre₀ e (E₂⊆E₀ e e∈E₂)) (⊨-trans (pre₀⊨lhs₀∨rhs₀ e e∈E₁ e∈E₂) (⊨-resp-∨ ⊨-refl (rhs₀⊨rhs′₀ e  e∈E₂)))
@@ -123,9 +122,10 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                 { v = v
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
                 ; act=Rav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Rav e (E′⊆E e e∈E′))
+                ; pre⊨Q[a] = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q[a] e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[v/r] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[v/r] C ϕ)
-                ; τϕ⊨ϕ[[a]/r] = λ ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[[a]/r] ϕ)
-                ; τϕ⊨ff = λ μ=ra ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ff μ=ra ϕ)
+                ; τϕ⊨ϕ[[a]/r][ff/Q] = λ ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[[a]/r][ff/Q] ϕ)
+                ; τϕ⊨μ[a]=rlx = λ μ=ra ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨μ[a]=rlx μ=ra ϕ)
                 }
 
   sem-resp-≲τ {P} {P′} ([ a ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where
@@ -138,10 +138,11 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                 { v = v
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
                 ; act=Wav = λ e e∈E′ → ≡-trans (≡-symm (act=act′ e (E′⊆E e e∈E′))) (act=Wav e (E′⊆E e e∈E′))
+                ; pre⊨Q[a] = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q[a] e (E′⊆E e e∈E′))
                 ; pre⊨M=v = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨M=v e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[M/[a]][μ/μ[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[M/[a]][μ/μ[a]] C ϕ)
                 ; pre⊨Q = λ μ=ra e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q μ=ra e (E′⊆E e e∈E′))
-                ; τϕ⊨ϕ[M/[a]][ff/Q] = λ μ=ra ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[M/[a]][ff/Q] μ=ra ϕ)
+                ; τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] = λ ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] ϕ)
                 }
                 
   sem-resp-≲τ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where

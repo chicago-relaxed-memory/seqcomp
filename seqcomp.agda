@@ -34,7 +34,6 @@ module seqcomp (DM : DataModel) (Event : Set) where
    
    field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
    field ≤₂⊆≤₀ : ∀ d e → (d ≤₂ e) → (d ≤₀ e)
-   field coherence :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → (Conflict (act₁(d)) (act₂(e))) → (d ≤₀ e)
 
    lhs₀ : Event → Formula
    lhs₀ = pre₁

@@ -95,7 +95,6 @@ module examples (MM : MemoryModel) (Event : Set) where
      field act₀=act₂ : ∀ e → (e ∈ E₂) → (act₀(e) ≡ act₂(e))
      field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
      field ≤₂⊆≤₀ : ∀ d e → (d ≤₂ e) → (d ≤₀ e)
-     field coherence :  ∀ d e → (d ∈ E₁) → (e ∈ E₂) → (Conflict (act₁(d)) (act₂(e))) → (d ≤₀ e)
             
   compP∈⟦C₁∙C₂⟧ : ∀ C₁ C₂ act₀ PO₀ P₁ P₂ →
       (P₁ ∈ ⟦ C₁ ⟧) → (P₂ ∈ ⟦ C₂ ⟧) →
@@ -146,7 +145,6 @@ module examples (MM : MemoryModel) (Event : Set) where
                      ; E₂⊆E₀ = ⊆-right-∪
                      ; ≤₁⊆≤₀ = ≤₁⊆≤₀
                      ; ≤₂⊆≤₀ = ≤₂⊆≤₀
-                     ; coherence = coherence
                      ; pre₀⊨lhs₀ = pre₀⊨lhs₀
                      ; pre₀⊨rhs₀ = pre₀⊨rhs₀
                      ; pre₀⊨lhs₀∨rhs₀ = pre₀⊨lhs₀∨rhs₀
