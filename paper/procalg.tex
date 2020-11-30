@@ -30,19 +30,8 @@ instead is given by control and data dependencies.
   \end{enumerate}
 \end{definition}
 
-\begin{definition}
-  A \emph{possibly incomplete} pomset is a pomset
-  together with $\complete\in\Bool$.
-\end{definition}
+The set of pomsets $\sSKIP$ contains just the empty pomset.
 
-The set of pomsets $\sSTOP$ contains just the empty incomplete pomset.
-\begin{definition}
-  If $\aPS_0\in\sSTOP$ then
-  $\aEvs_0 = \emptyset$ and $\complete$ is false.
-\end{definition}
-
-The set of pomsets $\sSKIP$ contains both the empty incomplete pomset
-and the empty complete pomset.
 \begin{definition}
   If $\aPS_0\in\sSKIP$ then
   $\aEvs_0 = \emptyset$.
@@ -59,9 +48,8 @@ $\aPSS_1$ and pomsets from $\aPSS_2$.
   \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
   \item if $\aEv\in\aEvs_1$ then $\labeling_0(\aEv) = \labeling_1(\aEv)$, 
   \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
-  \item $\complete_0$ implies $\complete_1$ and $\complete_2$.
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$.
     \newcounter{pomsetParCount}
     \setcounter{pomsetParCount}{\value{enumi}}
   \end{enumerate}
@@ -74,9 +62,8 @@ $\aPSS_1$ followed by pomsets from $\aPSS_2$.
   there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParCount}}
-  \item[1--\thepomsetParCount)] As in Definition~\ref{defn:pomset-par},
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$, and
-  \item if $\complete_1$ is false then $\aEvs_2=\emptyset$.
+  \item[1--\thepomsetParCount)] As in Definition~\ref{defn:pomset-par}, and
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$.
   \end{enumerate}
 \end{definition}
 
@@ -88,9 +75,8 @@ The set of pomsets $\sSEND\aChan{}$ represents \emph{sending} on channel $\aChan
 \begin{definition}
   If $\aPS_0 \in \sSEND\aChan{}$ then:
   \begin{enumerate}
-  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
-  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \send\aChan{}$,
-  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is false.
+  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$, and
+  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \send\aChan{}$.
   \end{enumerate}
 \end{definition}
 
@@ -98,9 +84,8 @@ The set of pomsets $\sRECV\aChan{}$ represents \emph{receiving} on channel $\aCh
 \begin{definition}
   If $\aPS_0 \in \sRECV\aChan{}$ then:
   \begin{enumerate}
-  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
-  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{}$,
-  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is false.
+  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$, and
+  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{}$.
   \end{enumerate}
 \end{definition}
 
@@ -125,15 +110,10 @@ This is essentially the model of \cite{10.1145/3428262}.
   a pomset with alphabet $(\Formulae \times \Act)$.
 \end{definition}
 
-\begin{definition}
-  A \emph{possibly incomplete} pomset with preconditions is a
-  pomset with preconditions, together with $\complete\in\Formulae$.
-\end{definition}
-
 The set of pomsets $\sSEND\aChan\aExp\sPREFIX\aPSS_1$ represents sending a value computed from expression $\aExp$ on channel $\aChan$,
 followed by a pomset from $\aPSS_1$.
 \begin{definition}
-  If $\aPS_0 \in (\sSEND\aChan\aExp\sPREFIX\aPSS_1)$ then either $\aEvs_0=\emptyset$ and $\complete_0$ is unsatisfiable, or there is $\aPS_1\in\aPSS_1$ such that:
+  If $\aPS_0 \in (\sSEND\aChan\aExp\sPREFIX\aPSS_1)$ then either $\aEvs_0=\emptyset$, or there is $\aPS_1\in\aPSS_1$ such that:
   \begin{enumerate}
   \item $\aEvs_0 = \{\cEv\} \cup \aEvs_1$,
   \item $\cEv\not\in\aEvs_1$,
@@ -141,25 +121,23 @@ followed by a pomset from $\aPSS_1$.
   \item $\labelingForm_0(\cEv)$ implies $(\aExp=\aVal)$
   \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
   \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$,
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
-  \item if $\aEv\in\aEvs_1$ then $\cEv\le_0\aEv$, and
-  \item $\complete_0$ implies $M=v$ and $\complete_1$.
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
+  \item if $\aEv\in\aEvs_1$ then $\cEv\le_0\aEv$.
   \end{enumerate}
 \end{definition}
 
 The set of pomsets $\sRECV\aChan\aVar\sPREFIX\aPSS_1$ represents receiving a value bound to variable $\aVar$ on channel $\aChan$,
 fopllowed by a pomset from $\aPSS_1$.
 \begin{definition}
-  If $\aPS_0 \in (\sRECV\aChan\aVar\sPREFIX\aPSS_1)$ then either $\aEvs_0=\emptyset$ and $\complete_0$ is unsatisfiable, or there is $\aPS_1\in\aPSS_1$ such that:
+  If $\aPS_0 \in (\sRECV\aChan\aVar\sPREFIX\aPSS_1)$ then either $\aEvs_0=\emptyset$, or there is $\aPS_1\in\aPSS_1$ such that:
   \begin{enumerate}
   \item $\aEvs_0 = \{\cEv\} \cup \aEvs_1$,
   \item $\cEv\not\in\aEvs_1$,
   \item $\labelingAct_0(\cEv) = \recv\aChan\aVal$
   \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
   \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)[\aVal/\aVar]$
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
-  \item if $\aEv\in\aEvs_1$ then $\cEv\le_0\aEv$, and
-  \item $\complete_0$ implies $\complete_1[\aVal/\aVar]$.
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
+  \item if $\aEv\in\aEvs_1$ then $\cEv\le_0\aEv$.
   \end{enumerate}
 \end{definition}
 
@@ -170,9 +148,8 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
   \begin{enumerate}
   \item $\aEvs_0 = \aEvs_1$,
   \item $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
-  \item $\labelingForm_0(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
-  \item $\aForm\land\complete_0$ implies $\complete_1$.
+  \item $\labelingForm_0(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$, and
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$.
     \newcounter{pomsetGuardCount}
     \setcounter{pomsetGuardCount}{\value{enumi}}
   \end{enumerate}
@@ -207,11 +184,8 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
   \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
   \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\aTr_1(\labelingForm_2(\aEv))$,
   \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$,
-  \item $\complete_0$ implies $\complete_1$,
-  \item $\complete_0$ implies $\aTr_1(\complete_2)$,
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$, and
-  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\complete_1$.
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$.
   \end{enumerate}
 \end{definition}
 
@@ -229,10 +203,8 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
   \begin{enumerate}
   \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
   \item if $\aEv\in\aEvs_0$ then $\labelingAct_0(\aEv) = \send\aChan{\aVal}$,
-  \item if $\aEv\in\aEvs_0$ then $\labelingForm_0(\aEv) = (M = v)$,
-  \item $\aTr_0(\aForm)$ implies $\aForm$,
-  \item $\complete_0$ implies $M = v$, and
-  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is unsatisfiable.
+  \item if $\aEv\in\aEvs_0$ then $\labelingForm_0(\aEv) = (M = v)$, and
+  \item $\aTr_0(\aForm)$ implies $\aForm$.
   \end{enumerate}
 \end{definition}
 
@@ -241,9 +213,8 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
   \begin{enumerate}
   \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
   \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{\aVal}$,
-  \item $\aTr_0(\aForm)$ implies $\phi[\aVal/\aVar]$,
-  \item if $\aEvs_0=\emptyset$ then $\aTr_0(\aForm)$ implies $\phi[\bVal/\aVar]$ for any $\bVal$, and
-  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is unsatisfiable,
+  \item $\aTr_0(\aForm)$ implies $\phi[\aVal/\aVar]$, and
+  \item if $\aEvs_0=\emptyset$ then $\aTr_0(\aForm)$ implies $\phi[\bVal/\aVar]$ for any $\bVal$.
   \end{enumerate}
 \end{definition}
 
@@ -276,10 +247,8 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
   \item if $\aEv\in\aEvs_2$ then $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
   \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
   \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\aTr[\downclose_0(e)]_1(\labelingForm_2(\aEv))$,
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$,
-  \item $\complete_0$ implies $\complete_1$, and
-  \item $\complete_0$ implies $\aTr[\aEvs_1]_1(\complete_2)$.
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$.
   \end{enumerate}
 \end{definition}
 
@@ -288,10 +257,8 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
   \begin{enumerate}
   \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
   \item if $\aEv\in\aEvs_0$ then $\labelingAct_0(\aEv) = \send\aChan{\aVal}$,
-  \item if $\aEv\in\aEvs_0$ then $\labelingForm_0(\aEv) = (M = v)$,
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$,
-  \item $\complete_0$ implies $M = v$, and
-  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is unsatisfiable.
+  \item if $\aEv\in\aEvs_0$ then $\labelingForm_0(\aEv) = (M = v)$, and
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$.
   \end{enumerate}
 \end{definition}
 
@@ -300,8 +267,7 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
   \begin{enumerate}
   \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
   \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{\aVal}$,
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\phi[\aVal/\aVar]$,
-  \item $\aTr[\emptyset]_0(\aForm)$ implies $\phi[\bVal/\aVar]$ for any $\bVal$, and
-  \item if $\aEvs_0=\emptyset$ then $\complete_0$ is unsatisfiable.
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\phi[\aVal/\aVar]$, and
+  \item $\aTr[\emptyset]_0(\aForm)$ implies $\phi[\bVal/\aVar]$ for any $\bVal$.
   \end{enumerate}
 \end{definition}
