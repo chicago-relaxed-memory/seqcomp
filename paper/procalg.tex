@@ -16,7 +16,7 @@ The key idea of this paper is a relaxed treatment of sequential
 composition, where causality is not given by program order, but
 instead is given by control and data dependencies.
 
-\subsection{Pomsets}
+\subsection{A pomset model of condition variables}
 
 \begin{definition}
   A \emph{pomset} with alphabet $\Alphabet$ is a tuple
@@ -67,35 +67,24 @@ $\aPSS_1$ followed by pomsets from $\aPSS_2$.
   \end{enumerate}
 \end{definition}
 
-\subsection{A pomset model of Asynchronous CCS}
-
-[Define the alphabet of send and recv over channels.]
-
-The set of pomsets $\sSEND\aChan{}$ represents \emph{sending} on channel $\aChan$.
+Write $\aAct$ for the set of pomsets where there at most one event, labelled $\aAct$
 \begin{definition}
-  If $\aPS_0 \in \sSEND\aChan{}$ then:
+  If $\aPS_0 \in \aAct$ then
   \begin{enumerate}
-  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$, and
-  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \send\aChan{}$.
+  \item if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+  \item if $\aEv\in\aEvs$ then $\labeling(\aEv)=\aAct$.
   \end{enumerate}
 \end{definition}
 
-The set of pomsets $\sRECV\aChan{}$ represents \emph{receiving} on channel $\aChan$.
-\begin{definition}
-  If $\aPS_0 \in \sRECV\aChan{}$ then:
-  \begin{enumerate}
-  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$, and
-  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{}$.
-  \end{enumerate}
-\end{definition}
+[Define the alphabet of set, unset and wait on condition variables.]
 
 \begin{definition}
   A pomset $\aPS$ is $\aChan$-closed if
-  there is a partial injective function $f: \aEvs \fun \aEvs$
-  such that:
+  for every $\aEv$ where $\labeling(\aEv)=(\wait\aChan)$:
   \begin{enumerate}
-  \item if $\labeling(\aEv)=\recv\aChan{}$ then $\labeling(f(\aEv))=\send\aChan{}$, and
-  \item if $f(\aEv)=\bEv$ then $\bEv\le\aEv$.
+  \item there is a $\bEv\le\aEv$ where $\labeling(\bEv)=(\set\aChan)$
+  \item for any $\cEv$ where $\labeling(\cEv)=(\unset\aChan)$,
+    either $\cEv\le\bEv$ or $\aEv\le\cEv$.
   \end{enumerate}
 \end{definition}
 
@@ -157,13 +146,12 @@ The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aP
 
 \subsection{A pomset with preconditions and predicate transformers model of Value-passing Asynchronus CCS}
 
-[The problem with the previous section is that yhrtr's no story for sequential composition.]
+[The problem with the previous section is that there's no story for sequential composition.]
 
 \begin{definition}
   A \emph{predicate transformer} is a monotone function
   $\aTr:\Formulae\fun\Formulae$ such that
   $\aTr(\FALSE)$ is $\FALSE$,
-  $\aTr(\TRUE)$ is $\TRUE$,
   $\aTr(\aForm\land\bForm)$ is $\aTr(\aForm)\land\aTr(\bForm)$, and
   $\aTr(\aForm\lor\bForm)$ is $\aTr(\aForm)\lor\aTr(\bForm)$.
 \end{definition}

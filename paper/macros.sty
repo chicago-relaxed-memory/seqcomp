@@ -543,11 +543,17 @@
 \newcommand{\sPAR}{\mathbin{\mid}}
 \newcommand{\sSEND}[2]{#1!\ifnotempty{#2}{\langle#2\rangle}}
 \newcommand{\sRECV}[2]{#1?\ifnotempty{#2}{(#2)}}
+\newcommand{\sSET}[1]{\set{#1}}
+\newcommand{\sUNSET}[1]{\unset{#1}}
+\newcommand{\sWAIT}[1]{\wait{#1}}
 \newcommand{\sPREFIX}{\mathbin{\rightarrow}}
 \newcommand{\sGUARD}{\guard}
 
 \newcommand{\send}[2]{\bar{#1}_{#2}}
 \newcommand{\recv}[2]{{#1}_{#2}}
+\newcommand{\set}[1]{\mathsf{set}\,#1}
+\newcommand{\unset}[1]{\mathsf{unset}\,#1}
+\newcommand{\wait}[1]{\mathsf{wait}\,#1}
 
 \newcommand{\aChan}{a}
 \newcommand{\bChan}{b}
