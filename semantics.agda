@@ -39,7 +39,7 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field pre⊨M=v :  ∀ e → (e ∈ E) → pre(e) ⊨ (M == value v)
     field pre⊨RW :  ∀ e → (e ∈ E) → pre(e) ⊨ RW
     field pre⊨Q[a] : ∀ e → (e ∈ E) → (pre(e) ⊨ Q[ a ])
-    field τϕ⊨ϕ[M/[a]][μ/μ[a]][M=v/Q[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]] [ μ /μ[ a ]] [ (M == value v) /Q[ a ]])) 
+    field τϕ⊨ϕ[M/[a]][μ/μ[a]][Q[a]∧M=v/Q[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]] [ μ /μ[ a ]] [ (Q[ a ] ∧ (M == value v)) /Q[ a ]])) 
     field τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (ϕ [ M /[ a ]] [ μ /μ[ a ]] [ ff /Q[ a ]])) 
     
     field pre⊨Q : (μ ≡ ra) → ∀ e → (e ∈ E) → (pre(e) ⊨ Q)

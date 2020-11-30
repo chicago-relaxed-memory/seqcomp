@@ -142,7 +142,7 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                 ; pre⊨M=v = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨M=v e (E′⊆E e e∈E′))
                 ; pre⊨RW = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨RW e (E′⊆E e e∈E′))
                 ; pre⊨Q[a] = λ e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q[a] e (E′⊆E e e∈E′))
-                ; τϕ⊨ϕ[M/[a]][μ/μ[a]][M=v/Q[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[M/[a]][μ/μ[a]][M=v/Q[a]] C ϕ)
+                ; τϕ⊨ϕ[M/[a]][μ/μ[a]][Q[a]∧M=v/Q[a]] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[M/[a]][μ/μ[a]][Q[a]∧M=v/Q[a]] C ϕ)
                 ; pre⊨Q = λ μ=ra e e∈E′ → ⊨-trans (pre′⊨pre e (E′⊆E e e∈E′)) (pre⊨Q μ=ra e (E′⊆E e e∈E′))
                 ; τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] = λ ϕ → ⊨-trans (τ′⊨τ ∅ ϕ) (τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] ϕ)
                 }
