@@ -30,21 +30,14 @@ instead is given by control and data dependencies.
   \end{enumerate}
 \end{definition}
 
-The set of pomsets $\sSTOP$ contains just the empty pomset.
-
-\begin{definition}
-  If $\aPS_0\in\sSTOP$ then
-  $\aEvs_0 = \emptyset$.
-\end{definition}
-
-The set of pomsets $(\aPSS_1\sPAR\aPSS_2)$ represents the \emph{parallel composition} of pomsets from
-$\aPSS_1$ and pomsets from $\aPSS_2$.
-\begin{definition}
-  \label{defn:pomset-par}
-  If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
-  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
+\begin{figure*}
+  If $\aPS_0\in\sSTOP$ then:
   \begin{enumerate}
-  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
+    \item $\aEvs_0 = \emptyset$.
+  \end{enumerate}
+  If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
+  \begin{enumerate}
   \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
   \item if $\aEv\in\aEvs_1$ then $\labeling_0(\aEv) = \labeling_1(\aEv)$, 
   \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
@@ -53,30 +46,36 @@ $\aPSS_1$ and pomsets from $\aPSS_2$.
     \newcounter{pomsetParCount}
     \setcounter{pomsetParCount}{\value{enumi}}
   \end{enumerate}
-\end{definition}
-
-\begin{definition}
-  \label{defn:pomset-prefix}
-  If $\aPS_0 \in (\aAct\sPREFIX\aPSS_1)$ then
-  either $\aEvs=\emptyset$ or there is $\aPS_1\in\aPS$ such that:
+  If $\aPS_0 \in (\aAct\wPREFIX\aPSS)$ then there is $\aPS_2\in\aPSS$ such that:
   \begin{enumerate}
-  \item $\aEvs_0=\{\cEv\} \cup \aEvs_1$,
-  \item $\labelingAct_0(\cEv) = \aAct$,
-  \item for any $\aEv\in\aEvs_1$ we have $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
-  \item for any $\aEv\in\aEvs_1$ we have $\cEv<_0\aEv$, and
-  \item for any $\bEv\le_1\aEv$ we have $\bEv\le_0\aEv$.
+  \item $\aEvs_0=(\aEvs_1 \cup \aEvs_2)$,
+  \item for any $\aEv\in\aEvs_1$, $\labelingAct_0(\aEv) = \aAct$,
+  \item for any $\aEv\in\aEvs_2$, $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
+  \item for any $\bEv,\aEv\in\aEvs_1$, $\bEv\le_0\aEv$,
+  \item for any $\bEv\le_2\aEv$, $\bEv\le_0\aEv$, and
+  \item for any $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, either $\bEv<_0\aEv$ or $a\reorder\labeling_2(\aEv)$.
     \newcounter{pomsetPrefixCount}
     \setcounter{pomsetPrefixCount}{\value{enumi}}
   \end{enumerate}
-\end{definition}
+\caption{Process algebra as sets of pomsets}
+\end{figure*}
 
 [No communication between threads, but this can be added as a condition on pomsets,
   for instance a simple model where every receive event has a matching send.]
 
+[Introduce ``blocker'', and ``fulfillment'' on $\Alphabet$, and lift up to events.]
+
+For example, for latches:
+\begin{itemize}
+\item $\send{\aChan}{}$ fulfills $\recv{\aChan}{}$, and
+\item there are no blockers.
+\end{itemize}
+  
 \begin{definition}
-  A pomset $\aPS$ is $\aChan$-closed if
-  for every $\aEv$ where $\labeling(\aEv)=(\recv\aChan{})$
-  there is a $\bEv\le\aEv$ where $\labeling(\bEv)=(\send\aChan{})$.
+  A pomset $\aPS$ is closed if
+  for every $\aEv$ which can be fulfilled,
+  there is a $\bEv\le\aEv$ which fulfills it,
+  and for any $\cEv$ which can block $\aEv$, either $\cEv\le\bEv$ or $\aEv\le\cEv$. 
 \end{definition}
 
 [Do some process algebra examples.]
@@ -246,7 +245,7 @@ and for acquire $\aAct$:
     \begin{enumerate}
     \item $\bEv\le_0\aEv$,
     \item $\labelingForm_0(\aEv)$ implies $\reorderDepForm_\aAct$, or
-    \item $\labelingForm_0(\aEv)$ implies $\reorderIndForm_\aAct\land\labelingForm_2(\aEv)[\vec\bVal/\vec\aVar]$ for every $\vec\bVal$.
+    \item $\labelingForm_0(\aEv)$ implies $\reorderIndForm_\aAct\land\forall\vec\aVar\DOT\labelingForm_2(\aEv)$.
     \end{enumerate}
   \end{enumerate}
 \end{definition}
