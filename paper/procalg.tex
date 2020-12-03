@@ -16,7 +16,7 @@ The key idea of this paper is a relaxed treatment of sequential
 composition, where causality is not given by program order, but
 instead is given by control and data dependencies.
 
-\subsection{A pomset model of condition variables}
+\subsection{Pomsets}
 
 \begin{definition}
   A \emph{pomset} with alphabet $\Alphabet$ is a tuple
@@ -30,10 +30,10 @@ instead is given by control and data dependencies.
   \end{enumerate}
 \end{definition}
 
-The set of pomsets $\sSKIP$ contains just the empty pomset.
+The set of pomsets $\sSTOP$ contains just the empty pomset.
 
 \begin{definition}
-  If $\aPS_0\in\sSKIP$ then
+  If $\aPS_0\in\sSTOP$ then
   $\aEvs_0 = \emptyset$.
 \end{definition}
 
@@ -44,8 +44,8 @@ $\aPSS_1$ and pomsets from $\aPSS_2$.
   If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
   there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
   \begin{enumerate}
-  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
   \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
+  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
   \item if $\aEv\in\aEvs_1$ then $\labeling_0(\aEv) = \labeling_1(\aEv)$, 
   \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
   \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
@@ -54,95 +54,214 @@ $\aPSS_1$ and pomsets from $\aPSS_2$.
     \setcounter{pomsetParCount}{\value{enumi}}
   \end{enumerate}
 \end{definition}
- 
-The set of pomsets $(\aPSS_1\sSEMI\aPSS_2)$ represents the \emph{strong sequential composition} of pomsets from
-$\aPSS_1$ followed by pomsets from $\aPSS_2$.
+
 \begin{definition}
-  If $\aPS_0 \in (\aPSS_1\sSEMI\aPSS_2)$ then
-  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
+  \label{defn:pomset-prefix}
+  If $\aPS_0 \in (\aAct\sPREFIX\aPSS_1)$ then
+  either $\aEvs=\emptyset$ or there is $\aPS_1\in\aPS$ such that:
   \begin{enumerate}
-    \setcounter{enumi}{\value{pomsetParCount}}
-  \item[1--\thepomsetParCount)] As in Definition~\ref{defn:pomset-par}, and
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$.
+  \item $\aEvs_0=\{\cEv\} \cup \aEvs_1$,
+  \item $\labelingAct_0(\cEv) = \aAct$,
+  \item for any $\aEv\in\aEvs_1$ we have $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
+  \item for any $\aEv\in\aEvs_1$ we have $\cEv<_0\aEv$, and
+  \item for any $\bEv\le_1\aEv$ we have $\bEv\le_0\aEv$.
+    \newcounter{pomsetPrefixCount}
+    \setcounter{pomsetPrefixCount}{\value{enumi}}
   \end{enumerate}
 \end{definition}
 
-Write $\aAct$ for the set of pomsets where there at most one event, labelled $\aAct$
-\begin{definition}
-  If $\aPS_0 \in \aAct$ then
-  \begin{enumerate}
-  \item if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-  \item if $\aEv\in\aEvs$ then $\labeling(\aEv)=\aAct$.
-  \end{enumerate}
-\end{definition}
-
-[Define the alphabet of set, unset and wait on condition variables.]
+[No communication between threads, but this can be added as a condition on pomsets,
+  for instance a simple model where every receive event has a matching send.]
 
 \begin{definition}
   A pomset $\aPS$ is $\aChan$-closed if
-  for every $\aEv$ where $\labeling(\aEv)=(\wait\aChan)$:
+  for every $\aEv$ where $\labeling(\aEv)=(\recv\aChan{})$
+  there is a $\bEv\le\aEv$ where $\labeling(\bEv)=(\send\aChan{})$.
+\end{definition}
+
+[Do some process algebra examples.]
+
+[Use refinement (that is subset order) as notion of compiler optimization.]
+
+The definition of prefixing may be too strong for some applications, for example
+reordering of actions is never allowed:
+\[
+  (\recv\aChan{} \sPREFIX \recv\bChan{} \sPREFIX \aPSS)
+\not\subseteq
+  (\recv\bChan{} \sPREFIX \recv\aChan{} \sPREFIX \aPSS)
+\]
+We can weaken prefixing to allow these reorderings,
+writing $\aAct\reorder\bAct$ when $\aAct$ and $\bAct$ can be reordered.
+
+[Talk about Mazurkiewicz traces.]
+
+\begin{definition}
+  \label{defn:pomset-wprefix}
+  If $\aPS_0 \in (\aAct\wPREFIX\aPSS_1)$ then there is $\aPS_1\in\aPS$ such that either:
   \begin{enumerate}
-  \item there is a $\bEv\le\aEv$ where $\labeling(\bEv)=(\set\aChan)$
-  \item for any $\cEv$ where $\labeling(\cEv)=(\unset\aChan)$,
-    either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+  \item $\aPSS_0=\aPSS_1$, and
+  \item for any $\aEv\in\aEvs_1$, $\aAct\reorder\labelingAct_1(\aEv)$.
+  \end{enumerate}
+  or:
+  \begin{enumerate}
+  \item $\aEvs_0=\{\cEv\} \cup \aEvs_1$,
+  \item $\labelingAct_0(\cEv) = \aAct$,
+  \item for any $\aEv\in\aEvs_1$, $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
+  \item for any $\aEv\in\aEvs_1$, either $\aAct\reorder\labelingAct_1(\aEv)$ or $\cEv<_0\aEv$, and
+  \item for any $\bEv\le_1\aEv$, $\bEv\le_0\aEv$.
   \end{enumerate}
 \end{definition}
 
-\subsection{A pomset with preconditions model of Value-passing Asynchronus CCS}
+As an example, devide channels into \emph{relaxed} and \emph{release/acquire}
+channels, and allow the reorderings:
+\[\begin{array}{cl}
+  \send{\aChan}{} \reorder \recv{\bChan}{} \\
+  \recv{\aChan}{} \reorder \recv{\bChan}{} & \mbox{when $\aChan$ is relaxed} \\
+  \send{\aChan}{} \reorder \send{\bChan}{} & \mbox{when $\bChan$ is relaxed} \\
+  \recv{\aChan}{} \reorder \send{\bChan}{} & \mbox{when both $\aChan$ and $\bChan$ are relaxed}
+\end{array}\]
+  
+\subsection{Pomsets with preconditions}
 
 This is essentially the model of \cite{10.1145/3428262}.
 
-[Define a data model. Define the alphabet of send and recv of values over channels.]
-
 \begin{definition}
   A \emph{pomset with preconditions} is
-  a pomset with alphabet $(\Formulae \times \Act)$.
+  a pomset together with $\labelingForm:\aEvs\fun\Formulae$.
 \end{definition}
 
-The set of pomsets $\sSEND\aChan\aExp\sPREFIX\aPSS_1$ represents sending a value computed from expression $\aExp$ on channel $\aChan$,
-followed by a pomset from $\aPSS_1$.
+[Introduce data models, with formulae.]
+
+We can lift definitions~\ref{defn:pomset-par}--\ref{defn:pomset-prefix} to pomsets with preconditions in
+the obvious way.
+
 \begin{definition}
-  If $\aPS_0 \in (\sSEND\aChan\aExp\sPREFIX\aPSS_1)$ then either $\aEvs_0=\emptyset$, or there is $\aPS_1\in\aPSS_1$ such that:
+  \label{defn:pomset-pre-par}
+  If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
   \begin{enumerate}
-  \item $\aEvs_0 = \{\cEv\} \cup \aEvs_1$,
-  \item $\cEv\not\in\aEvs_1$,
-  \item $\labelingAct_0(\cEv) = \send\aChan\aVal$
-  \item $\labelingForm_0(\cEv)$ implies $(\aExp=\aVal)$
-  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
-  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$,
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
-  \item if $\aEv\in\aEvs_1$ then $\cEv\le_0\aEv$.
+    \setcounter{enumi}{\value{pomsetParCount}}
+  \item[1--\thepomsetParCount)] As in Definition~\ref{defn:pomset-par},
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, and
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_2(\aEv)$.
   \end{enumerate}
 \end{definition}
 
-The set of pomsets $\sRECV\aChan\aVar\sPREFIX\aPSS_1$ represents receiving a value bound to variable $\aVar$ on channel $\aChan$,
-fopllowed by a pomset from $\aPSS_1$.
 \begin{definition}
-  If $\aPS_0 \in (\sRECV\aChan\aVar\sPREFIX\aPSS_1)$ then either $\aEvs_0=\emptyset$, or there is $\aPS_1\in\aPSS_1$ such that:
+  \label{defn:pomset-pre-prefix}
+  If $\aPS_0 \in \aAct\sPREFIX\aPSS_1$ then
+  either $\aEvs=\emptyset$ or there is $\aPS_1\in\aPS$ such that:
   \begin{enumerate}
-  \item $\aEvs_0 = \{\cEv\} \cup \aEvs_1$,
-  \item $\cEv\not\in\aEvs_1$,
-  \item $\labelingAct_0(\cEv) = \recv\aChan\aVal$
-  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
-  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)[\aVal/\aVar]$
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
-  \item if $\aEv\in\aEvs_1$ then $\cEv\le_0\aEv$.
+    \setcounter{enumi}{\value{pomsetPrefixCount}}
+  \item[1--\thepomsetPrefixCount)] As in Definition~\ref{defn:pomset-prefix}, and
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$.
   \end{enumerate}
 \end{definition}
 
 The set of pomsets $\aForm\sGUARD\aPSS_1$ represents a guarded execution of $\aPSS_1$ whenever $\aForm$ is satisfied.
 \begin{definition}
   \label{defn:pomset-guard}
-  If $\aPS_0 \in (\aForm\sGUARD\aPSS_1)$ then:
+  If $\aPS_0 \in (\aForm\sGUARD\aPSS_1)$ then there is $\aPS_1\in\aPS$ such that:
   \begin{enumerate}
   \item $\aEvs_0 = \aEvs_1$,
   \item $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
-  \item $\labelingForm_0(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$, and
+  \item $\labelingForm_0(\aEv)$ implies $\aForm$,
+  \item $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, and
   \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$.
     \newcounter{pomsetGuardCount}
     \setcounter{pomsetGuardCount}{\value{enumi}}
   \end{enumerate}
 \end{definition}
+
+The set of pomsets $\aPSS_1[\aExp/\aVar]$ represents an execution from $\aPSS_1$ with a substitution
+applied to every precondition.
+\begin{definition}
+  \label{defn:pomset-subst}
+  If $\aPS_0 \in \aPSS_1[\aExp/\aVar]$ then there is $\aPS_1\in\aPS$ such that:
+  \begin{enumerate}
+  \item $\aEvs_0 = \aEvs_1$,
+  \item $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
+  \item $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)[\aExp/\aVar]$, and
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$.
+  \end{enumerate}
+\end{definition}
+
+Example of value-passing on unordered channels which allow
+message duplication:
+\begin{eqnarray*}
+  \sSEND\aChan\aExp\sPREFIX\aPSS & = &
+  \bigcup_\aVal (\aExp=\aVal) \sGUARD \send\aChan{\aVal} \sPREFIX \aPSS
+\\
+  \sRECV\aChan\aVar\sPREFIX\aPSS & = &
+  \bigcup_\aVal \recv\aChan{\aVal} \sPREFIX \aPSS[\aVal/\aVar]
+\end{eqnarray*}
+
+Unfortunately we can't play the same trick with reordering based on
+label, since the label doesn't track control or data dependencies. But
+we can code up reorderings in the logic, Assume formulae
+$\preForm_\aAct$ (the precondition for $\aAct$)
+$\reorderDepForm_\aAct$ (applied to events which may be reordered with
+an $\aAct$ even if there's control or data depemdencies) and
+$\reorderIndForm_\aAct$ (applied to events which may be reordered with
+an $\aAct$ unless there's control or data depemdencies).
+
+For example, we introduce a new uninterpreted formula $\quietForm$
+and have for relaxed $\aAct$:
+\[
+  \preForm_{\aAct} = \TRUE
+\qquad
+  \reorderIndForm_{\aAct} = \neg\quietForm
+\qquad
+  \reorderDepForm_{\aAct} = \FALSE
+\]
+for release $\aAct$:
+\[
+  \preForm_{\aAct} = \quietForm
+\qquad
+  \reorderIndForm_{\aAct} = \neg\quietForm
+\qquad
+  \reorderDepForm_{\aAct} = \FALSE
+\]
+and for acquire $\aAct$:
+\[
+  \preForm_{\aAct} = \TRUE
+\qquad
+  \reorderIndForm_{\aAct} = \FALSE
+\qquad
+  \reorderDepForm_{\aAct} = \FALSE
+\]
+
+\begin{definition}
+  \label{defn:pomset-wprefix}
+  If $\aPS_0 \in (\aAct\wPREFIX\aPSS[\vec\aVal/\vec\aVar])$ then there is $\aPS_2\in\aPSS$ such that:
+  \begin{enumerate}
+  \item $\aEvs_0=\aEvs_1 \cup \aEvs_2$,
+  \item for any $\aEv\in\aEvs_1$, $\labelingAct_0(\aEv) = \aAct$,
+  \item for any $\aEv\in\aEvs_2$, $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
+  \item for any $\aEv\in\aEvs_1$, $\labelingForm_0(\aEv)$ implies $\preForm_\aAct$,
+  \item for any $\aEv\in\aEvs_2$, $\labelingForm_0(\aEv)$ implies $\labelingForm_2(\aEv)[\vec\aVal/\vec\aVar]$,
+  \item for any $\bEv,\aEv\in\aEvs_1$, $\bEv\le_0\aEv$.
+  \item for any $\bEv\le_2\aEv$, $\bEv\le_0\aEv$.
+  \item for any $\bEv\in\aEvs_1$ and $\bEv\in\aEvs_2$, either
+    \begin{enumerate}
+    \item $\bEv\le_0\aEv$,
+    \item $\labelingForm_0(\aEv)$ implies $\reorderDepForm_\aAct$, or
+    \item $\labelingForm_0(\aEv)$ implies $\reorderIndForm_\aAct\land\labelingForm_2(\aEv)[\vec\bVal/\vec\aVar]$ for every $\vec\bVal$.
+    \end{enumerate}
+  \end{enumerate}
+\end{definition}
+
+This is enough to model a relaxed value-passing process language:
+
+\begin{eqnarray*}
+  \sSEND\aChan\aExp\wPREFIX\aPSS & = &
+  \bigcup_\aVal (\aExp=\aVal) \sGUARD \send\aChan{\aVal} \wPREFIX \aPSS
+\\
+  \sRECV\aChan\aVar\wPREFIX\aPSS & = &
+  \bigcup_\aVal \recv\aChan{\aVal} \wPREFIX \aPSS[\aVal/\aVar]
+\end{eqnarray*}
+
+[Stuff about conditionals and merging events.]
 
 \subsection{A pomset with preconditions and predicate transformers model of Value-passing Asynchronus CCS}
 

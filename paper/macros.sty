@@ -370,7 +370,7 @@
 \newcommand{\aVar}{x}
 
 \newcommand{\aAct}{a}
-%\newcommand{\bAct}{b}
+\newcommand{\bAct}{b}
 %\newcommand{\cAct}{c}
 %\newcommand{\dAct}{d}
 \newcommand{\DRSC}[2]{\smash{\mathsf{R^{sc}}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}}
@@ -459,8 +459,8 @@
 
 \newcommand{\Alphabet}{\Sigma}
 \newcommand{\labeling}{\lambda}
-\newcommand{\labelingForm}{\Formulae}%\lambda_{\Formulae}}
-\newcommand{\labelingAct}{\Act}%\lambda_{\Act}}
+\newcommand{\labelingForm}{\kappa}%\lambda_{\Formulae}}
+\newcommand{\labelingAct}{\lambda}%\lambda_{\Act}}
 \newcommand{\labelingSub}{\Sub}%\lambda_{\Act}}
 
 \newcommand{\RF}{\mathsf{RF}}
@@ -539,24 +539,34 @@
 
 \newcommand{\sSKIP}{\mathit{SKIP}}
 \newcommand{\sSTOP}{\mathit{STOP}}
-\newcommand{\sSEMI}{\mathbin{;}}
-\newcommand{\sPAR}{\mathbin{\mid}}
+\newcommand{\sSEMI}{\mathbin{\dot{\rule{0em}{1.15ex};}}}
+\newcommand{\sPAR}{\mathbin{\parallel}}
 \newcommand{\sSEND}[2]{#1!\ifnotempty{#2}{\langle#2\rangle}}
 \newcommand{\sRECV}[2]{#1?\ifnotempty{#2}{(#2)}}
 \newcommand{\sSET}[1]{\set{#1}}
 \newcommand{\sUNSET}[1]{\unset{#1}}
 \newcommand{\sWAIT}[1]{\wait{#1}}
-\newcommand{\sPREFIX}{\mathbin{\rightarrow}}
+\newcommand{\sPREFIX}{\mathbin{\Rightarrow}}
 \newcommand{\sGUARD}{\guard}
+\newcommand{\sIF}{\mathit{IF}(}
+\newcommand{\sTHEN}{)\{}
+\newcommand{\sELSE}{\}\{}
+\newcommand{\sFI}{\}}
+\newcommand{\wPREFIX}{\mathbin{\rightarrow}}
 
 \newcommand{\send}[2]{\bar{#1}_{#2}}
 \newcommand{\recv}[2]{{#1}_{#2}}
-\newcommand{\set}[1]{\mathsf{set}\,#1}
-\newcommand{\unset}[1]{\mathsf{unset}\,#1}
+\newcommand{\notify}[1]{\mathsf{notify}\,#1}
+\newcommand{\notified}[1]{\mathsf{notified}\,#1}
 \newcommand{\wait}[1]{\mathsf{wait}\,#1}
+\newcommand{\reorder}{\mathrel\leftrightarrow}
+\newcommand{\quietForm}{\mathsf{Q}}
+\newcommand{\preForm} {\kappa}
+\newcommand{\reorderDepForm}{\rho}
+\newcommand{\reorderIndForm}{\iota}
 
-\newcommand{\aChan}{a}
-\newcommand{\bChan}{b}
+\newcommand{\aChan}{\alpha}
+\newcommand{\bChan}{\beta}
 
 %% \wk[out=-30,in=-70,transform canvas={xshift=-1ex}]{wx0}{wx1}
 \usepackage{tikz}
