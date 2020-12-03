@@ -46,12 +46,12 @@ instead is given by control and data dependencies.
     \newcounter{pomsetParCount}
     \setcounter{pomsetParCount}{\value{enumi}}
   \end{enumerate}
-  If $\aPS_0 \in (\aAct\wPREFIX\aPSS)$ then there is $\aPS_2\in\aPSS$ such that:
+  If $\aPS_0 \in (\aAct\wPREFIX\aPSS)$ then there is $\aPS_2\in\aPSS$ such that: [reword using if...then]
   \begin{enumerate}
   \item $\aEvs_0=(\aEvs_1 \cup \aEvs_2)$,
   \item for any $\aEv\in\aEvs_1$, $\labelingAct_0(\aEv) = \aAct$,
   \item for any $\aEv\in\aEvs_2$, $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
-  \item for any $\bEv,\aEv\in\aEvs_1$, $\bEv\le_0\aEv$,
+  \item for any $\bEv,\aEv\in\aEvs_1$, $\bEv=\aEv$,
   \item for any $\bEv\le_2\aEv$, $\bEv\le_0\aEv$, and
   \item for any $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, either $\bEv<_0\aEv$ or $a\reorder\labeling_2(\aEv)$.
     \newcounter{pomsetPrefixCount}
@@ -68,6 +68,11 @@ instead is given by control and data dependencies.
 For example, for latches:
 \begin{itemize}
 \item $\send{\aChan}{}$ fulfills $\recv{\aChan}{}$, and
+\item there are no blockers.
+\end{itemize}
+for condition variables
+\begin{itemize}
+\item $\notify{\aChan}{}$ fulfills $\notified{\aChan}{}$, and
 \item there are no blockers.
 \end{itemize}
   
