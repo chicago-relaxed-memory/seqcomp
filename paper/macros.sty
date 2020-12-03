@@ -553,7 +553,9 @@
 \newcommand{\sELSE}{\}\{}
 \newcommand{\sFI}{\}}
 \newcommand{\wPAR}{\mathbin{\mid}}
-\newcommand{\wPREFIX}{\mathbin{\rightarrow}}
+\newcommand{\wPREFIX}[1][]{\mathbin{\displaystyle\mathop{\ifx\relax#1\relax\rightarrow\else\longrightarrow\fi}^{#1}}}
+\newcommand{\wSEMI}{\mathbin{;}}
+\newcommand{\wFORK}{\mathit{FORK}\,}
 
 \newcommand{\init}[1]{\mathsf{init}\,#1}
 \newcommand{\release}[1]{\mathsf{release}\,#1}

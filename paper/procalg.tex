@@ -35,7 +35,7 @@ instead is given by control and data dependencies.
   \begin{enumerate}
     \item $\aEvs_0 = \emptyset$.
   \end{enumerate}
-  If $\aPS_0 \in (\aPSS_1\wPAR\aPSS_2)$ then
+  If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
   there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
   \begin{enumerate}
   \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
@@ -43,15 +43,11 @@ instead is given by control and data dependencies.
   \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
   \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
   \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$.
+    \newcounter{pomsetwParCount}
+    \setcounter{pomsetwParCount}{\value{enumi}}
+  \item $\aEvs_1$ and $\aEvs_2$ are disjoint.
     \newcounter{pomsetParCount}
     \setcounter{pomsetParCount}{\value{enumi}}
-  \end{enumerate}
-  If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
-  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
-  \begin{enumerate}
-        \setcounter{enumi}{\value{pomsetParCount}}
-  \item[1--\thepomsetParCount)] as above, and
-  \item $\aEvs_1$ and $\aEvs_2$ are disjoint.
   \end{enumerate}
   If $\aPS_0 \in (\aAct\wPREFIX\aPSS)$ then there is $\aPS_2\in\aPSS$ such that:
   \begin{enumerate}
@@ -65,7 +61,7 @@ instead is given by control and data dependencies.
   \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, either $\bEv<_0\aEv$ or $a\reorder\labeling_2(\aEv)$.
   \end{enumerate}
 \caption{Process algebra as sets of pomsets}
-\label{tab:pomsets},
+\label{tab:pomsets}
 \end{figure*}
 
 [No communication between threads, but this can be added as a condition on pomsets,
@@ -132,26 +128,19 @@ This is essentially the model of \cite{10.1145/3428262}.
 \begin{figure*}
   If $\aPS_0\in\sSTOP$ then:
   \begin{enumerate}
-    \item $\aEvs_0 = \emptyset$.
-  \end{enumerate}
-  If $\aPS_0 \in (\aPSS_1\wPAR\aPSS_2)$ then
-  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
-  \begin{enumerate}
-     \setcounter{enumi}{\value{pomsetParCount}}
-  \item[1--\thepomsetParCount)] as in Table~\ref{tab:pomsets},
-  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, and
-  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_2(\aEv)$.
-    \newcounter{pomsetPreParCount}
-    \setcounter{pomsetPreParCount}{\value{enumi}}
+  \item $\aEvs_0 = \emptyset$.
   \end{enumerate}
   If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
   there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
   \begin{enumerate}
-  \setcounter{enumi}{\value{pomsetPreParCount}}
-  \item[1--\thepomsetPreParCount)] as above, and
-  \item $\aEvs_1$ and $\aEvs_2$ are disjoint.
+     \setcounter{enumi}{\value{pomsetParCount}}
+  \item[1--\thepomsetParCount)] as in Table~\ref{tab:pomsets},
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_2(\aEv)$,
+    \newcounter{pomsetPreParCount}
+    \setcounter{pomsetPreParCount}{\value{enumi}}
   \end{enumerate}
-  If $\aPS_0 \in (\aAct\wPREFIX\aPSS[\vec\aVal/\vec\aVar])$ then there is $\aPS_2\in\aPSS$ such that:
+  If $\aPS_0 \in (\aAct\wPREFIX[\vec\aVal/\vec\aVar]\aPSS)$ then there is $\aPS_2\in\aPSS$ such that:
   \begin{enumerate}
      \setcounter{enumi}{\value{pomsetPrefixCount}}
   \item[1--\thepomsetPrefixCount)] as in Table~\ref{tab:pomsets},
@@ -160,16 +149,19 @@ This is essentially the model of \cite{10.1145/3428262}.
   \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv<_0\aEv$ or 
     $\labelingForm_0(\aEv)$ implies $\reorderIndForm_\aAct$ and $\forall\vec\aVar\DOT\labelingForm_2(\aEv)$.
   \end{enumerate}
-  If $\aPS_0 \in (\aForm\sGUARD\aPSS)$ then there is $\aPS_1\in\aPS$ such that:
+  If $\aPS_0 \in \sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
   \begin{enumerate}
-  \item $\aEvs_0 = \aEvs_1$,
-  \item $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
-  \item $\labelingForm_0(\aEv)$ implies $\aForm$ and  $\labelingForm_1(\aEv)$, and
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$.
-    \newcounter{pomsetPreGuardCount}
-    \setcounter{pomsetPreGuardCount}{\value{enumi}}
+  \setcounter{enumi}{\value{pomsetwParCount}}
+  \item[1--\thepomsetwParCount)] as in $(\aPSS_1\sPAR\aPSS_2)$  in Table~\ref{tab:pomsets},
+  \item if $\aEv\in\aEvs_1$ and $\aEv\not\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\bForm\land\labelingForm_1(\aEv)$,
+  \item if $\aEv\not\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\neg\bForm\land\labelingForm_2(\aEv)$, and
+  \item if $\aEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $(\bForm\land\labelingForm_1(\aEv))\lor(\neg\bForm\land\labelingForm_2(\aEv))$.
+    \newcounter{pomsetPreIfCount}
+    \setcounter{pomsetPreIfCount}{\value{enumi}}
   \end{enumerate}
 \caption{Process algebra as sets of pomsets with preconditions}
+\label{tab:pomsets-pre}
 \end{figure*}
 
 [Introduce data models, with formulae.]
@@ -177,11 +169,14 @@ This is essentially the model of \cite{10.1145/3428262}.
 Example of value-passing on unordered channels which allow
 message duplication:
 \begin{eqnarray*}
+  \aForm\sGUARD\aPSS & = &
+  \sIF{\aForm}\sTHEN\aPSS\sELSE\sSTOP\sFI
+\\
   \sSEND\aChan\aExp\wPREFIX\aPSS & = &
   \bigcup_\aVal (\aExp=\aVal) \sGUARD \send\aChan{\aVal} \wPREFIX \aPSS
 \\
   \sRECV\aChan\aVar\wPREFIX\aPSS & = &
-  \bigcup_\aVal \recv\aChan{\aVal} \wPREFIX \aPSS[\aVal/\aVar]
+  \bigcup_\aVal \recv\aChan{\aVal} \wPREFIX[\aVal/\aVar] \aPSS
 \end{eqnarray*}
 
 Unfortunately we can't play the same trick with reordering based on
@@ -212,9 +207,60 @@ and for acquire $\aAct$:
 
 [Stuff about conditionals and merging events.]
 
-\subsection{A pomset with preconditions and predicate transformers model of Value-passing Asynchronus CCS}
+\subsection{A pomset with preconditions and predicate transformers}
 
 [The problem with the previous section is that there's no story for sequential composition.]
+
+\begin{figure*}
+  If $\aPS_0\in\sSTOP$ then:
+  \begin{enumerate}
+    \item $\aEvs_0 = \emptyset$, and
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\FALSE$.
+  \end{enumerate}
+  If $\aPS_0\in\sSKIP$ then:
+  \begin{enumerate}
+  \item $\aEvs_0 = \emptyset$, and
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$.
+  \end{enumerate}
+  If $\aPS_0 \in (\aAct[\vec\aVal/\vec\aVar])$ then there is $\aPS_2\in\aPSS$ such that:
+  \begin{enumerate}
+  \item if $\bEv,\aEv\in\aEvs_0$ then $\bEv=\aEv$,
+  \item $\labelingAct_0(\aEv) = \aAct$,
+  \item $\labelingForm_0(\aEv)$ implies $\preForm_\aAct$,
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm[\vec\aVal/\vec\aVar]$, and
+  \item $\aTr[\emptyset]_0(\aForm)$ implies $\reorderIndForm_\aAct$ and $\forall\vec\aVar\DOT\aForm$.
+  \end{enumerate}
+  If $\aPS_0 \in \sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
+  \begin{enumerate}
+  \setcounter{enumi}{\value{pomsetPreIfCount}}
+  \item[1--\thepomsetPreIfCount)] as in Table~\ref{tab:pomsets-pre},
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $(\bForm\land\aTr[\bEvs]_1(\aEv))\lor(\neg\bForm\land\aTr[\bEvs]_2(\aForm))$.
+  \end{enumerate}
+  If $\aPS_0 \in (\aPSS_1\wSEMI\aPSS_2)$ then
+  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
+  \begin{enumerate}
+  \setcounter{enumi}{\value{pomsetwParCount}}
+  \item[1--\thepomsetwParCount)] as in $(\aPSS_1\sPAR\aPSS_2)$  in Table~\ref{tab:pomsets},
+  \item if $\aEv\in\aEvs_1$ and $\aEv\not\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item if $\aEv\not\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm'_2(\aEv)$,
+  \item if $\aEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$, and
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aTr[\bEvs]_2(\aTr[\bEvs]_1(\aForm))$.
+  \end{enumerate}
+  where we define $\labelingForm'_2(\aEv)$ to be $\aTr[\{ \bEv \mid \bEv <_0 \aEv \}]_1(\labelingForm_2(\aEv))$.
+\caption{Process algebra as sets of pomsets with preconditions and predicate transformers}
+\end{figure*}
+
+\begin{figure*}
+  If $\aPS_0 \in \wFORK\aPSS$ then there is $\aPS_1\in\aPSS$ such that:
+  \begin{enumerate}
+  \item $\aEvs_0=\aEvs_1$,
+  \item $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
+  \item $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, and
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$.
+  \end{enumerate}
+\caption{Embedding pomsets with precodnitions semantics in pomsets with preconditions and predicate transformers semantics}
+\end{figure*}
 
 \begin{definition}
   A \emph{predicate transformer} is a monotone function
@@ -223,60 +269,6 @@ and for acquire $\aAct$:
   $\aTr(\aForm\land\bForm)$ is $\aTr(\aForm)\land\aTr(\bForm)$, and
   $\aTr(\aForm\lor\bForm)$ is $\aTr(\aForm)\lor\aTr(\bForm)$.
 \end{definition}
-
-\begin{definition}
-  A pomset with one predicate tansformer is a possibly incomplete
-  pomset with preconditions, together with a predicate transformer $\aTr$.
-\end{definition}
-
-\begin{definition}
-  If $\aPS_0 \in (\aPSS_1\sSEMI\aPSS_2)$ then
-  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
-  \begin{enumerate}
-  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
-  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
-  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$, 
-  \item if $\aEv\in\aEvs_2$ then $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
-  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
-  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\aTr_1(\labelingForm_2(\aEv))$,
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$,
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv\le_0\aEv$.
-  \end{enumerate}
-\end{definition}
-
-\begin{definition}
-  If $\aPS_0 \in (\aForm\sGUARD\aPSS_1)$ then:
-  \begin{enumerate}
-    \setcounter{enumi}{\value{pomsetPreGuardCount}}
-  \item[1--\thepomsetPreGuardCount)] As in Definition~\ref{defn:pomset-guard},
-  \item $\aForm\land\aTr_0(\aForm)$ implies $\aTr_1(\aForm)$.
-  \end{enumerate}
-\end{definition}
-
-\begin{definition}
-  If $\aPS_0 \in \sSEND\aChan{\aExp}$ then:
-  \begin{enumerate}
-  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
-  \item if $\aEv\in\aEvs_0$ then $\labelingAct_0(\aEv) = \send\aChan{\aVal}$,
-  \item if $\aEv\in\aEvs_0$ then $\labelingForm_0(\aEv) = (M = v)$, and
-  \item $\aTr_0(\aForm)$ implies $\aForm$.
-  \end{enumerate}
-\end{definition}
-
-\begin{definition}
-  If $\aPS_0 \in \sRECV\aChan{\aVar}$ then:
-  \begin{enumerate}
-  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
-  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{\aVal}$,
-  \item $\aTr_0(\aForm)$ implies $\phi[\aVal/\aVar]$, and
-  \item if $\aEvs_0=\emptyset$ then $\aTr_0(\aForm)$ implies $\phi[\bVal/\aVar]$ for any $\bVal$.
-  \end{enumerate}
-\end{definition}
-
-\subsection{A pomset with preconditions and predicate transformers model of Value-passing Relaxed CCS}
-
-[Introduce relaxed channels, call other channels release/acquire channels, lift relaxed/ra up to actions and events.]
 
 \begin{definition}
   A \emph{family of predicate transformers}
@@ -288,42 +280,18 @@ and for acquire $\aAct$:
 \end{definition}
 
 \begin{definition}
-  A pomset with predicate tansformers is a possibly incomplete
+  A pomset with predicate tansformers is a
   pomset with preconditions, together with a family of predicate transformers $\aTr$
   indexed by subsets of $\aEvs$.
 \end{definition}
 
-\begin{definition}
-  If $\aPS_0 \in (\aPSS_1\sSEMI\aPSS_2)$ then
-  there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ where:
-  \begin{enumerate}
-  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
-  \item $\aEvs_1$ and  $\aEvs_2$ are disjoint,
-  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$, 
-  \item if $\aEv\in\aEvs_2$ then $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
-  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
-  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\aTr[\downclose_0(e)]_1(\labelingForm_2(\aEv))$,
-  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, and
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$.
-  \end{enumerate}
-\end{definition}
+[Examples.]
 
-\begin{definition}
-  If $\aPS_0 \in \sSEND\aChan{\aExp}$ then:
-  \begin{enumerate}
-  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
-  \item if $\aEv\in\aEvs_0$ then $\labelingAct_0(\aEv) = \send\aChan{\aVal}$,
-  \item if $\aEv\in\aEvs_0$ then $\labelingForm_0(\aEv) = (M = v)$, and
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$.
-  \end{enumerate}
-\end{definition}
+\begin{eqnarray*}
+  \sSEND\aChan\aExp & = &
+  \bigcup_\aVal (\aExp=\aVal) \sGUARD \send\aChan{\aVal}
+\\
+  \sRECV\aChan\aVar & = &
+  \bigcup_\aVal \recv\aChan{\aVal}[\aVal/\aVar]
+\end{eqnarray*}
 
-\begin{definition}
-  If $\aPS_0 \in \sRECV\aChan{\aVar}$ then:
-  \begin{enumerate}
-  \item if $\bEv\in\aEvs_0$ and $\aEv\in\aEvs_0$ then $\bEv=\aEv$,
-  \item if $\aEv\in\aEvs_0$ then $\labeling_0(\aEv) = \recv\aChan{\aVal}$,
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\phi[\aVal/\aVar]$, and
-  \item $\aTr[\emptyset]_0(\aForm)$ implies $\phi[\bVal/\aVar]$ for any $\bVal$.
-  \end{enumerate}
-\end{definition}
