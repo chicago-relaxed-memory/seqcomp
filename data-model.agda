@@ -77,10 +77,8 @@ module data-model where
     field _[_/[_]] : Formula → Expression → Address → Formula
     
     field Q : Formula
-    field _[_/Q] : Formula → Formula → Formula
-
     field Q[_] : Address → Formula
-    field _[_/Q[_]] : Formula → Formula → Address → Formula
+    field Qw[_] : Address → Formula
 
     field μ[_]==rlx : Address → Formula
     field _[_/μ[_]] : Formula → AccessMode → Address → Formula

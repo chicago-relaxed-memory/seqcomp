@@ -13,6 +13,16 @@ module semantics (MM : MemoryModel) (Event : Set) where
   open seqcomp(DM)(Event)
   open parcomp(DM)(Event)
 
+  κLOAD : Register → Address → AccessMode → Formula
+  κLOAD r a rlx = RO ∧ Qw[ a ]
+  κLOAD r a ra = (RO ∧ Qw[ a ]) ∧ (μ[ a ]==rlx)
+
+  τLOAD : Register → Address → Value → Formula → Formula
+  τLOAD r a v ϕ = (value v == register r) ⇒ (RW ⇒ ϕ)
+  
+  τLOAD∅ : Register → Address → Value → Formula → Formula
+  τLOAD∅ r a v ϕ = ¬ Q[ a ] ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ ϕ))
+  
   -- Note: this semantics assumes registers are fresh, otherwise we need to alpha-convert them.
   record LOAD (r : Register) (a : Address) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
 
@@ -22,13 +32,20 @@ module semantics (MM : MemoryModel) (Event : Set) where
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
     field act=Rav : ∀ e → (e ∈ E) → act(e) ≡ (R a v)
-    field pre⊨RO :  ∀ e → (e ∈ E) → pre(e) ⊨ RO
-    field pre⊨Q[a] : ∀ e → (e ∈ E) → (pre(e) ⊨ Q[ a ])
-    field τϕ⊨v=r⇒ϕ : ∀ C ϕ → (τ(C)(ϕ) ⊨ ((value v == register r) ⇒ ϕ))
-    field τϕ⊨v=r∨a=r⇒RO∨ϕ[ff/Q] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RO ∨ (ϕ [ ff /Q]))))
+    field pre⊨κLOAD :  ∀ e → (e ∈ E) → pre(e) ⊨ κLOAD r a μ
+    field τ⊨τLOAD : ∀ C ϕ → (τ(C)(ϕ) ⊨ τLOAD r a v ϕ)
+    field τ⊨τLOAD∅ : ∀ ϕ → (τ(∅)(ϕ) ⊨ τLOAD∅ r a v ϕ)
 
-    field τϕ⊨μ[a]=rlx : (μ ≡ ra) → ∀ ϕ → (τ(∅)(ϕ) ⊨ (μ[ a ]==rlx))
+  κSTORE : Address → Expression → AccessMode → Value → Formula
+  κSTORE a M rlx v = (RW ∧ Q[ a ]) ∧ (M == value v)
+  κSTORE a M ra v = (RW ∧ Q) ∧ (M == value v)
 
+  τSTORE : Address → Expression → AccessMode → Formula → Formula
+  τSTORE a M μ ϕ = ϕ [ M /[ a ]] [ μ /μ[ a ]] 
+
+  τSTORE∅ : Address → Expression → AccessMode → Formula → Formula
+  τSTORE∅ a M μ ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] [ μ /μ[ a ]] )
+  
   record STORE (a : Address) (μ : AccessMode) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
@@ -37,13 +54,9 @@ module semantics (MM : MemoryModel) (Event : Set) where
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
     field act=Wav :  ∀ e → (e ∈ E) → act(e) ≡ (W a v)
-    field pre⊨M=v :  ∀ e → (e ∈ E) → pre(e) ⊨ (M == value v)
-    field pre⊨RW :  ∀ e → (e ∈ E) → pre(e) ⊨ RW
-    field pre⊨Q[a] : ∀ e → (e ∈ E) → (pre(e) ⊨ Q[ a ])
-    field τϕ⊨ϕ[M/[a]][μ/μ[a]][Q[a]∧M=v/Q[a]] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ M /[ a ]] [ μ /μ[ a ]] [ (Q[ a ] ∧ (M == value v)) /Q[ a ]])) 
-    field τϕ⊨ϕ[M/[a]][μ/μ[a]][ff/Q[a]] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (ϕ [ M /[ a ]] [ μ /μ[ a ]] [ ff /Q[ a ]])) 
-    
-    field pre⊨Q : (μ ≡ ra) → ∀ e → (e ∈ E) → (pre(e) ⊨ Q)
+    field pre⊨κSTORE :  ∀ e → (e ∈ E) → pre(e) ⊨ κSTORE a M μ v
+    field τ⊨τSTORE :  ∀ C ϕ → (τ(C)(ϕ) ⊨ τSTORE a M μ ϕ)
+    field τ⊨τSTORE∅ : ∀ ϕ → (τ(∅)(ϕ) ⊨ τSTORE∅ a M μ ϕ)
  
   record LET (r : Register) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
   
