@@ -140,14 +140,14 @@ This is essentially the model of \cite{10.1145/3428262}.
     \newcounter{pomsetPreParCount}
     \setcounter{pomsetPreParCount}{\value{enumi}}
   \end{enumerate}
-  If $\aPS_0 \in (\aAct\wPREFIX[\vec\aVal/\vec\aVar]\aPSS)$ then there is $\aPS_2\in\aPSS$ such that:
+  If $\aPS_0 \in (\aAct[\vec\aVar=\vec\aVal]\wPREFIX\aPSS)$ then there is $\aPS_2\in\aPSS$ such that:
   \begin{enumerate}
      \setcounter{enumi}{\value{pomsetPrefixCount}}
   \item[1--\thepomsetPrefixCount)] as in Table~\ref{tab:pomsets},
   \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\preForm_\aAct$,
-  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_2(\aEv)[\vec\aVal/\vec\aVar]$,
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $(\vec\aVar=\vec\aVal) \Rightarrow \labelingForm_2(\aEv)$,
   \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv<_0\aEv$ or 
-    $\labelingForm_0(\aEv)$ implies $\reorderIndForm_\aAct$ and $\forall\vec\aVar\DOT\labelingForm_2(\aEv)$.
+    $\labelingForm_0(\aEv)$ implies $\reorderIndForm_\aAct\land\labelingForm_2(\aEv)$.
   \end{enumerate}
   If $\aPS_0 \in \sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
   there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
@@ -227,8 +227,8 @@ and for acquire $\aAct$:
   \item if $\bEv,\aEv\in\aEvs_0$ then $\bEv=\aEv$,
   \item $\labelingAct_0(\aEv) = \aAct$,
   \item $\labelingForm_0(\aEv)$ implies $\preForm_\aAct$,
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm[\vec\aVal/\vec\aVar]$, and
-  \item $\aTr[\emptyset]_0(\aForm)$ implies $\reorderIndForm_\aAct$ and $\forall\vec\aVar\DOT\aForm$.
+  \item $\aTr[\bEvs]_0(\aForm)$ implies $(\vec\aVar=\vec\aVal)\Rightarrow\aForm$, and
+  \item $\aTr[\emptyset]_0(\aForm)$ implies $\reorderIndForm_\aAct\land\aForm$.
   \end{enumerate}
   If $\aPS_0 \in \sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
   there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
