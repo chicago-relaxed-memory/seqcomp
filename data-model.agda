@@ -68,13 +68,14 @@ module data-model where
     field Address : Set
 
     field value : Value → Expression
-    field register : Value → Expression
+    field register : Register → Expression
     
     field _==_ : Expression → Expression → Formula
     field _[_/_] : Formula → Expression → Register → Formula
-    field _[[_]/_] : Formula → Address → Register → Formula
-    field _[_/[_]] : Formula → Expression → Address → Formula
 
+    field [_]==_ : Address → Expression → Formula
+    field _[_/[_]] : Formula → Expression → Address → Formula
+    
     field Q : Formula
     field _[_/Q] : Formula → Formula → Formula
 

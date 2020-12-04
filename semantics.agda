@@ -23,8 +23,8 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field act=Rav : ∀ e → (e ∈ E) → act(e) ≡ (R a v)
     field pre⊨RO :  ∀ e → (e ∈ E) → pre(e) ⊨ RO
     field pre⊨Q[a] : ∀ e → (e ∈ E) → (pre(e) ⊨ Q[ a ])
-    field τϕ⊨ϕ[v/r] : ∀ C ϕ → (τ(C)(ϕ) ⊨ (ϕ [ value v / r ]))
-    field τϕ⊨RO∨ϕ[[a]/r][ff/Q] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (RO ∨ (ϕ [[ a ]/ r ] [ ff /Q])))
+    field τϕ⊨v=r⇒ϕ : ∀ C ϕ → (τ(C)(ϕ) ⊨ ((value v == register r) ⇒ ϕ))
+    field τϕ⊨v=r∨a=r⇒RO∨ϕ[ff/Q] : ∀ ϕ → (τ(∅)(ϕ) ⊨ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RO ∨ (ϕ [ ff /Q]))))
 
     field τϕ⊨μ[a]=rlx : (μ ≡ ra) → ∀ ϕ → (τ(∅)(ϕ) ⊨ (μ[ a ]==rlx))
 
