@@ -27,15 +27,10 @@ module pomset (DM : DataModel) (Event : Set) where
 
     field E : Event → Set
     field PO : PartialOrder
-    field ℓ : Event → (Formula × Action)
+    field ℓ : Event → Action
+    field κ : Event → Formula
     
     open PartialOrder PO public
-
-    pre : Event → Formula
-    pre(e) = fst(ℓ(e))
-    
-    act : Event → Action
-    act(e) = snd(ℓ(e))
 
     ↓ : Event → Event → Set
     ↓(e) = E ∩ (λ d → (d ≤ e))
@@ -65,14 +60,14 @@ module pomset (DM : DataModel) (Event : Set) where
    field P₁ : PomsetWithPreconditions
    field P₁∈𝒫 : P₁ ∈ 𝒫
    
-   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; τ to τ₀)
-   open PomsetWithPreconditions P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_)
+   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; ℓ to ℓ₀ ; κ to κ₀ ; _≤_ to _≤₀_ ; τ to τ₀)
+   open PomsetWithPreconditions P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; _≤_ to _≤₁_)
 
    field E₁⊆E₀ : (E₁ ⊆ E₀)
    field E₀⊆E₁ : (E₀ ⊆ E₁)
    
    field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
    
-   field pre₀⊨pre₁ : ∀ e → (e ∈ E₁) → (pre₀(e) ⊨ pre₁(e))
-   field act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
+   field κ₀⊨κ₁ : ∀ e → (e ∈ E₁) → (κ₀(e) ⊨ κ₁(e))
+   field ℓ₀=ℓ₁ : ∀ e → (e ∈ E₁) → (ℓ₀(e) ≡ ℓ₁(e))
    field τ₀ϕ⊨ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ ϕ

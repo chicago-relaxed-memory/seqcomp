@@ -31,8 +31,8 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field v : Value
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
-    field act=Rav : ∀ e → (e ∈ E) → act(e) ≡ (R a v)
-    field pre⊨κLOAD :  ∀ e → (e ∈ E) → pre(e) ⊨ κLOAD r a μ
+    field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R a v)
+    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ κLOAD r a μ
     field τ⊨τLOAD : ∀ C ϕ → (τ(C)(ϕ) ⊨ τLOAD r a v ϕ)
     field τ⊨τLOAD∅ : ∀ ϕ → (τ(∅)(ϕ) ⊨ τLOAD∅ r a v ϕ)
 
@@ -53,8 +53,8 @@ module semantics (MM : MemoryModel) (Event : Set) where
     field v : Value
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
-    field act=Wav :  ∀ e → (e ∈ E) → act(e) ≡ (W a v)
-    field pre⊨κSTORE :  ∀ e → (e ∈ E) → pre(e) ⊨ κSTORE a M μ v
+    field ℓ=Wav :  ∀ e → (e ∈ E) → ℓ(e) ≡ (W a v)
+    field κ⊨κSTORE :  ∀ e → (e ∈ E) → κ(e) ⊨ κSTORE a M μ v
     field τ⊨τSTORE :  ∀ C ϕ → (τ(C)(ϕ) ⊨ τSTORE a M μ ϕ)
     field τ⊨τSTORE∅ : ∀ ϕ → (τ(∅)(ϕ) ⊨ τSTORE∅ a M μ ϕ)
  
