@@ -170,7 +170,7 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                   ; E₁⊆E₀ = ⊆-trans E₁⊆E₀ E₀⊆E′₀
                   ; E₀⊆E₁ = ⊆-trans E′₀⊆E₀ E₀⊆E₁
                   ; ≤₁⊆≤₀ = λ d e d≤₁e → ≤₀⊆≤′₀ d e (≤₁⊆≤₀ d e d≤₁e)
-                  ; pre₀⊨pre₁[tt/Q] = λ e e∈E₁ → ⊨-trans (pre′₀⊨pre₀ e (E₁⊆E₀ e e∈E₁)) (pre₀⊨pre₁[tt/Q] e e∈E₁)
+                  ; pre₀⊨pre₁ = λ e e∈E₁ → ⊨-trans (pre′₀⊨pre₀ e (E₁⊆E₀ e e∈E₁)) (pre₀⊨pre₁ e e∈E₁)
                   ; act₀=act₁ = λ e e∈E₁ → ≡-trans (≡-symm (act₀=act′₀ e (E₁⊆E₀ e e∈E₁))) (act₀=act₁ e e∈E₁)
                   ; τ₀ϕ⊨ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ϕ C ϕ)
                   }

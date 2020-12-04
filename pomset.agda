@@ -59,3 +59,20 @@ module pomset (DM : DataModel) (Event : Set) where
     
     τ-refl-∨ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∨ τ(C)(ψ)) ⊨ τ(C)(ϕ ∨ ψ))
     τ-refl-∨ = ⊨-elim-∨ (τ-resp-⊨ ⊨-left-∨) (τ-resp-⊨ ⊨-right-∨)
+   
+  record FORK (𝒫 : PomsetWithPreconditions → Set₁) (P₀ : PomsetWithPredicateTransformers) : Set₁ where
+  
+   field P₁ : PomsetWithPreconditions
+   field P₁∈𝒫 : P₁ ∈ 𝒫
+   
+   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; act to act₀ ; pre to pre₀ ; _≤_ to _≤₀_ ; τ to τ₀)
+   open PomsetWithPreconditions P₁ using () renaming (E to E₁ ; act to act₁ ; pre to pre₁ ; _≤_ to _≤₁_)
+
+   field E₁⊆E₀ : (E₁ ⊆ E₀)
+   field E₀⊆E₁ : (E₀ ⊆ E₁)
+   
+   field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
+   
+   field pre₀⊨pre₁ : ∀ e → (e ∈ E₁) → (pre₀(e) ⊨ pre₁(e))
+   field act₀=act₁ : ∀ e → (e ∈ E₁) → (act₀(e) ≡ act₁(e))
+   field τ₀ϕ⊨ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ ϕ
