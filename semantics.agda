@@ -12,7 +12,8 @@ module semantics (MM : MemoryModel) (Event : Set) where
   open pomset(DM)(Event)
   open seqcomp(DM)(Event)
   open parcomp(DM)(Event)
-   
+
+  -- Note: this semantics assumes registers are fresh, otherwise we need to alpha-convert them.
   record LOAD (r : Register) (a : Address) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
