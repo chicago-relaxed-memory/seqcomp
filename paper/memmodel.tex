@@ -2,31 +2,16 @@
 
 
 \begin{align*}
-  \amode \BNFDEF& \mWK &&\text{{(Weak)}}
-  \\[-1ex] \BNFSEP& \mRLX &&\text{{(Relaxed)}}
-  \\[-1ex] \BNFSEP& \mRA &&\text{{(Release/Acquire)}}
-  \\[-1ex] \BNFSEP& \mSC &&\text{{(Sequentially Consistent)}}    
+  \amode \BNFDEF& \mRLX &&\text{{(Relaxed)}}
+  \\ \BNFSEP& \mRA &&\text{{(Release/Acquire)}}
+  \\ \BNFSEP& \mSC &&\text{{(Sequentially Consistent)}}    
+\end{align*}
+\begin{align*}
+  \fmode \BNFDEF&\mREL  &&\text{(Release)} 
+  \\ \BNFSEP&\mACQ   &&\text{(Acquire)} 
+  \\ \BNFSEP&\mSC  &&\text{(Sequentially Consistent)} 
 \end{align*}
 
-\begin{definition}
-  A \emph{pomset with predicate transformers} is a tuple
-  $(\Event, {\le}, \labeling)$ where
-  \begin{description}
-  \item $\Event$ is a set of \emph{events}
-  \item
-    ${\le} \subseteq (\Event\times\Event)$ is a partial order
-  \item
-    $\labeling: \Event \fun (\Formulae\times\Act)$ is a \emph{labeling} from
-    which we derive functions
-    \begin{itemize}
-    \item $\labelingForm:\Event\fun\Formulae$
-      \emph{(formulae)} % include $r{=}v$ $x{=}v$
-    \item $\labelingAct:\Event\fun\Act$
-      \emph{(actions)} %include $\DW{x}{v}$, $\DR{x}{v}$, and $\DSTOP$
-    \end{itemize}
-  \end{description}
-\end{definition}
-We say $\bEv\lt\aEv$ when $\bEv\le\aEv$ and $\bEv\neq\aEv$.
 \begin{definition}
   We say $\labelingAct(\bEv)=(\DW[]{x}{v})$ \emph{fulfills}
   $\labelingAct(\aEv)=(\DR[]{x}{v})$ if
@@ -39,41 +24,6 @@ We say $\bEv\lt\aEv$ when $\bEv\le\aEv$ and $\bEv\neq\aEv$.
   \end{description}  
 \end{definition}
 
-\begin{definition}
-  Let $\aPS'\in(\aForm \mid \aAct) \prefix \aPSS$ when
-  $(\exists\aPS\in\aPSS)$ $(\forall\aEv\in\Event)$
-  \begin{description}
-  \item[{\labeltextsc[P1]{(P1)}{1}}] $\Event' = \Event \cup \{\bEv\}$
-  \item[{\labeltextsc[P2]{(P2)}{2}}] ${\le'}\supseteq{\le}$
-  \item[{\labeltextsc[P3]{(P3a)}{3a}\labeltextsc[P3]{}{3}}]%
-    $\labelingAct'(\aEv) = \labelingAct(\aEv)$
-  \item[{\labeltextsc[P3b]{(P3b)}{3b}}] $\labelingAct'(\bEv) = \aAct$
-  \item[{\labeltextsc[P4a]{(P4a)}{4a}\labeltextsc[P4]{}{4}}]%
-    $\labelingForm'(\bEv)$ implies
-    $\aForm\land(\bEv\not\in\Event\lor\labelingForm(\bEv))$
-  \item[{\labeltextsc[P4b]{(P4b)}{4b}}] if $\bEv\neq(\DR[]{..)}{}\mkern86mu$
-    then $\aEv=\bEv$ or $\labelingForm'(\aEv)$ implies $\labelingForm(\aEv)$
-  \item[{\labeltextsc[P4c]{(P4c)}{4c}}] if
-    $\bEv=(\DR[]{\aVal}{\aLoc})\mkern75mu$ then $\aEv=\bEv$ or
-    $\labelingForm'(\aEv)$ implies $\labelingForm(\aEv)[\aVal/\aLoc]$
-  \item[{\labeltextsc[P5a]{(P5a)}{5a}\labeltextsc[P5]{}{5}}]%
-    if $\bEv=(\DR[]{..)}{}$, $\aEv=(\DW[]{..)}{}$ then $\aEv=\bEv$ or
-    $\labelingForm'(\aEv)$ implies $\labelingForm(\aEv)$ or $\bEv\le'\aEv$
-  \item[{\labeltextsc[P5b]{(P5b)}{5b}}] if $\bEv$ conflicts with
-    $\aEv$ %$\bEv\conflict\aEv$
-    then $\bEv\le'\aEv$
-  \item[{\labeltextsc[P5c]{(P5c)}{5c}}] if $\bEv$ is an acquire or $\aEv$ is
-    a release then $\bEv \le' \aEv$
-  \item[{\labeltextsc[P5d]{(P5d)}{5d}}] if $\bEv$ is an SC write and $\aEv$
-    is an SC read then $\bEv \le' \aEv$
-    % \item[{\labeltextsc[P5e]{(P5e)}{5e}}] if $\bEv$ reads, and $\aEv$ is an
-    %   acquiring fence, then
-    %   $\bEv \le' \aEv$
-    % \item[{\labeltextsc[P5f]{(P5f)}{5f}}] if $\bEv$ is a releasing fence,
-    %   and $\aEv$ writes, then
-    %   $\bEv \le' \aEv$
-  \end{description}
-\end{definition}
 
 \section{Examples}
 Before fulfilling the read:
@@ -102,96 +52,4 @@ Before fulfilling the read:
 
 \section{More Model}
 
-\begin{definition}
-  A pomset is \emph{$\aLoc$-closed} if
-  \begin{itemize}
-  \item every $\labelingAct(\aEv)=(\DR{\aLoc}{..})$ is fulfilled
-  \item every $\labelingForm(\aEv)$ is independent of $x$:
-    $\bigl(\forall v.\;\labelingForm(\aEv) \vDash
-    \labelingForm(\aEv)[\aVal/\aLoc] \vDash \labelingForm(\aEv)\bigr)$
-  \end{itemize}
-\end{definition}
-
-\begin{definition}
-  Let $\aPS\phantom{'}\in(\nu\aLoc\!\DOT\!\aPSS) \mkern22mu$ when
-  $\phantom{(\exists}\aPS\in\aPSS$ and $\aPS$ is $\aLoc$-closed
-\end{definition}
-\begin{definition}
-  Let $\aPS\phantom{'}\in(\aForm \guard \aPSS)\mkern16mu$ when
-  $\phantom{(\exists}\aPS\in\aPSS$ and $(\forall\aEv\in\Event)$
-  $\labelingForm(\aEv)$ implies $\aForm$
-\end{definition}
-
-\begin{definition}
-  Let $\aPS'\in(\aPSS[M/x])\mkern2mu$ when $(\exists\aPS\in\aPSS$)\\\qquad
-  $\Event' = \Event$, ${\le'} = {\le}$, $\labelingAct' = \labelingAct$, and
-  $(\forall\aEv\in\Event')$ $\labelingForm'(\aEv) = \labelingForm(\aEv)[M/x]$
-\end{definition}
-\begin{definition}
-  Let $\aPS' \in (\aPSS^1 \parallel \aPSS^2)$ when
-  $(\exists\aPS^1 \in \aPSS^1)$ $(\exists\aPS^2 \in \aPSS^2)$
-  \\% $\aPS^1$ is completed exactly when $\aPS^2$ is completed, there is at most one termination in $\Event'$,
-  \qquad $\Event' = \Event^1 \cup \Event^2$,
-  ${\le'}\supseteq{\le^1}\cup{\le^2}$, and $(\forall\aEv\in\Event')$ either
-  \begin{gather*}
-    \begin{aligned}
-      \aEv \not\in \Event^2,\; \labelingAct'(\aEv) &= \labelingAct^1(\aEv)
-      \textand \labelingForm'(\aEv) \textimplies \labelingForm^1(\aEv),
-      \\[-1ex]
-      \aEv \not\in \Event^1,\; \labelingAct'(\aEv) &= \labelingAct^2(\aEv)
-      \textand \labelingForm'(\aEv) \textimplies
-      \labelingForm^2(\aEv),\textor
-      \\[-1ex]
-      \labelingAct'(\aEv) = \labelingAct^1(\aEv) &= \labelingAct^2(\aEv)
-      \textand \labelingForm'(\aEv) \textimplies \labelingForm^1(\aEv) \lor
-      \labelingForm^2(\aEv)
-    \end{aligned}
-  \end{gather*}
-\end{definition}
-
-Language
-\begin{gather*}
-  % \begin{aligned}
-  %   \aCmd,\,\bCmd
-  %   \BNFDEF& \SKIP
-  %   \BNFSEP \aReg\GETS\aExp\SEMI \aCmd
-  %   \BNFSEP \aReg\GETS\aLoc^{\amode}\SEMI \aCmd 
-  %   \BNFSEP \aLoc^{\amode}\GETS\aExp\SEMI \aCmd
-  %   \\[-.5ex]
-  %   \BNFSEP&\aCmd \PAR[\aThrd][\bThrd] \bCmd
-  %   \BNFSEP \VAR\aLoc\SEMI \aCmd
-  %   \BNFSEP \IF{\aExp} \THEN \aCmd \ELSE \bCmd \FI
-  % \end{aligned}
-  % \\
-  \begin{aligned}
-    \sem[\aThrd]{\SKIP} & \eqdef
-    \{ \DSTOP \}
-    \\
-    \sem[\aThrd]{\aReg\GETS\aExp\SEMI \aCmd} & \eqdef
-    \sem[\aThrd]{\aCmd}[\aExp/\aReg]
-    \\ 
-    \sem{\aReg\GETS\aLoc^{\amode}\SEMI \aCmd} & \eqdef \textstyle\bigcup_\aVal\;
-    (\DR[\amode]\aLoc\aVal)\prefix \sem{\aCmd} [\aLoc/\aReg]
-    \\
-    \sem{\aLoc^{\amode}\GETS\aExp\SEMI \aCmd} & \eqdef
-    \textstyle\bigcup_\aVal\; (\aExp=\aVal \mid \DW[\amode]\aLoc\aVal)\prefix \sem{\aCmd}[\aExp/\aLoc]
-    \\
-    \sem{\FENCE^{\fmode}\SEMI \aCmd} & \eqdef
-    (\DFS{\fmode}) \prefix \sem{\aCmd}
-    \\
-    \sem[\aThrd]{\IF{\aExp} \THEN \aCmd \ELSE \bCmd \FI} & \eqdef
-    \bigl(\aExp \guard \sem[\aThrd]{\aCmd}\bigr) \parallel \bigl(\lnot\aExp \guard \sem[\aThrd]{\bCmd}\bigr) 
-    \\
-    \sem[\aThrd]{\aCmd \PAR[\bThrd][\bThrd'] \bCmd} & \eqdef
-    \sem[\bThrd]{\aCmd} \parallel \sem[\bThrd']{\bCmd} 
-    \\
-    \sem[\aThrd]{\VAR\aLoc\SEMI \aCmd} & \eqdef
-    \nu \aLoc \DOT \sem[\aThrd]{\aCmd}  
-  \end{aligned}
-\end{gather*}
-\begin{align*}
-  \fmode \BNFDEF&\mREL  &&\text{(Release)} &\hbox{$\;\mkern60mu\;$}&
-  \\ \BNFSEP&\mACQ   &&\text{(Acquire)} 
-  \\      \BNFSEP&\mSC  &&\text{(SC)} 
-\end{align*}
 
