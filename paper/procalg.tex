@@ -215,6 +215,29 @@ and for acquire $\aAct$:
 
 [The problem with the previous section is that there's no story for sequential composition.]
 
+\begin{definition}
+  A \emph{predicate transformer} is a monotone function
+  $\aTr:\Formulae\fun\Formulae$ such that
+  $\aTr(\FALSE)$ is $\FALSE$,
+  $\aTr(\aForm\land\bForm)$ is $\aTr(\aForm)\land\aTr(\bForm)$, and
+  $\aTr(\aForm\lor\bForm)$ is $\aTr(\aForm)\lor\aTr(\bForm)$.
+\end{definition}
+
+\begin{definition}
+  A \emph{family of predicate transformers}
+  indexed by subsets of $\aEvs$
+  consists of predicate transformers
+  $\aTr[\bEvs]$ for each set of events $\bEvs$,
+  such that if $(\cEvs\cap\aEvs) \subseteq \bEvs$
+  then $\aTr[\cEvs](\aForm)$ implies $\aTr[\bEvs](\aForm)$.
+\end{definition}
+
+\begin{definition}
+  A pomset with predicate tansformers is a
+  pomset with preconditions, together with a family of predicate transformers $\aTr$
+  indexed by subsets of $\aEvs$.
+\end{definition}
+
 Process algebra as sets of pomsets with preconditions and predicate
 transformers
 \begin{definition}
@@ -268,29 +291,6 @@ Embedding pomsets with preconditions semantics in pomsets with preconditions and
   \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$.
   \end{enumerate}
 % \caption{Embedding pomsets with precodnitions semantics in pomsets with preconditions and predicate transformers semantics}
-\end{definition}
-
-\begin{definition}
-  A \emph{predicate transformer} is a monotone function
-  $\aTr:\Formulae\fun\Formulae$ such that
-  $\aTr(\FALSE)$ is $\FALSE$,
-  $\aTr(\aForm\land\bForm)$ is $\aTr(\aForm)\land\aTr(\bForm)$, and
-  $\aTr(\aForm\lor\bForm)$ is $\aTr(\aForm)\lor\aTr(\bForm)$.
-\end{definition}
-
-\begin{definition}
-  A \emph{family of predicate transformers}
-  indexed by subsets of $\aEvs$
-  consists of predicate transformers
-  $\aTr[\bEvs]$ for each set of events $\bEvs$,
-  such that if $(\cEvs\cap\aEvs) \subseteq \bEvs$
-  then $\aTr[\cEvs](\aForm)$ implies $\aTr[\bEvs](\aForm)$.
-\end{definition}
-
-\begin{definition}
-  A pomset with predicate tansformers is a
-  pomset with preconditions, together with a family of predicate transformers $\aTr$
-  indexed by subsets of $\aEvs$.
 \end{definition}
 
 [Examples.]

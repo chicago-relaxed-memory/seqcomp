@@ -14,7 +14,7 @@
 \usepackage{stmaryrd}
 \usepackage{soul}
 \newcommand{\hlfancy}[2]{\sethlcolor{#1}\hl{#2}}
-%\usepackage{alltt}
+\usepackage{alltt}
 %\usepackage{makecell}
 % \usepackage[defblank]{paralist}
 % \usepackage[caption=false]{subfig}
@@ -50,12 +50,16 @@
 \newcommand{\pcs}{\textsc{pc}s}
 
 \newcommand{\sem}[2][]{\llbracket#2\rrbracket}
-\NewDocumentCommand\PR{O{} O{} m m}{\ifnotempty{#4}{{#4} \GETS}{#3}^{#1}_{#2}}
-\NewDocumentCommand\PW{O{} O{} m m}{{#3}^{#1}_{#2} \GETS #4}
-\NewDocumentCommand\PWR{O{} O{} m O{} O{} m}{{#3}^{#1}_{#2} \GETS {#6}^{#4}_{#5}}
-\NewDocumentCommand\DR{O{} O{} m m}{\mathsf{R}^{#1}_{#2}\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}
-\NewDocumentCommand\DW{O{} O{} m m}{\mathsf{W}^{#1}_{#2}\ifnotempty{#3}{\mkern0mu#3\ifnotempty{#4}{\mkern1mu#4}}}
-\NewDocumentCommand \PAR {O{} O{}}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}}\,}
+\NewDocumentCommand\PF{O{} m}{\texttt{F}^{#2}_{#1}}
+\NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}_{#3}}
+\NewDocumentCommand\PW{O{} m O{} m}{{#2}^{#1}_{#3} \GETS #4}
+\NewDocumentCommand\DF{O{} m}{\mathsf{F}^{#2}_{#1}}
+\NewDocumentCommand\DR{O{} m O{} m}{\mathsf{R}^{#1}_{#3}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DW{O{} m O{} m}{\mathsf{W}^{#1}_{#3}\ifnotempty{#2}{\mkern0mu#2\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DFP{O{} m}{(\DF[#1]{#2})}
+\NewDocumentCommand\DRP{O{} m O{} m}{(\DR[#1]{#2}[#3]{#4})}
+\NewDocumentCommand\DWP{O{} m O{} m}{(\DW[#1]{#2}[#3]{#4})}
+\NewDocumentCommand\PAR{O{} O{}}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}}\,}
 % \newcommand{\sem}[2][]{\llbracket#2\rrbracket_{#1}}
 % \NewDocumentCommand\DR{O{} O{} m m}{#2\mathsf{R}^{#1}\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}
 % \NewDocumentCommand\DW{O{} O{} m m}{#2\mathsf{W}^{#1}\ifnotempty{#3}{\mkern0mu#3\ifnotempty{#4}{\mkern1mu#4}}}
@@ -380,7 +384,7 @@
 \newcommand{\DRmode}[2]{\mathsf{R}^{\amode}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}
 \newcommand{\DWmode}[2]{\mathsf{W}^{\amode}\ifnotempty{#1}{\mkern0mu#1\ifnotempty{#2}{\mkern1mu#2}}}
 \newcommand{\DRreg}[4][]{\mathsf{R}^{#1}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}}
-\newcommand{\DF}[1][\mathsf{acqrel}]{\tau\mathsf{F}^{#1}}
+% \newcommand{\DF}[1][\mathsf{acqrel}]{\tau\mathsf{F}^{#1}}
 \newcommand{\DFS}[1]{\smash{\mathsf{F}^{#1}}}
 % \newcommand{\DFS}[1]{\smash{\mathsf{F}_{\mathsf{S}}^{#1}}}
 \newcommand{\DFR}[1]{\smash{\mathsf{F}_{\mathsf{R}}^{#1}}}
@@ -709,6 +713,11 @@
 \NewDocumentCommand \co {O{} m O{} m} {\draw[co,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{co}$}  (#4);}
 \newcommand{\rco}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{co}}}}}%
 \newcommand{\xco}{\xarrowtikz{co}{co}}%
+\newcommand{\xcoinv}{\xarrowtikzrev{co}{co}}%
+\tikzstyle{ca} = [-latex,color=red!50!black,thick,dashed]
+\NewDocumentCommand \ca {O{} m O{} m} {\draw[ca,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{ca}$}  (#4);}
+\newcommand{\rca}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{ca}}}}}%
+\newcommand{\xca}{\xarrowtikz{ca}{ca}}%
 \tikzstyle{coi} = [-latex,color=red!50!black,thick,dashed]
 \NewDocumentCommand \coi {O{} m O{} m} {\draw[coi,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{coi}$}  (#4);}
 \newcommand{\rcoi}{\ensuremath{\mathrel{\textcolor{red!50!black}{\mathsf{coi}}}}}%
@@ -722,6 +731,7 @@
 \NewDocumentCommand \fr {O{} m O{} m} {\draw[fr,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{fr}$}  (#4);}
 \newcommand{\rfr}{\ensuremath{\mathrel{\textcolor{red!90!black}{\mathsf{fr}}}}}%
 \newcommand{\xfr}{\xarrowtikz{fr}{fr}}%
+\newcommand{\xfrinv}{\xarrowtikzrev{fr}{fr}}%
 \tikzstyle{fre} = [-latex,color=red!90!black,thick,dashed]
 \NewDocumentCommand \fre {O{} m O{} m} {\draw[fre,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{fre}$}  (#4);}
 \newcommand{\rfre}{\ensuremath{\mathrel{\textcolor{red!90!black}{\mathsf{fre}}}}}%
@@ -748,6 +758,7 @@
 \NewDocumentCommand \rfx {O{} m O{} m} {\draw[rf,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rf}$}  (#4);}
 \newcommand{\rrfx}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rf}}}}}%
 \newcommand{\xrfx}{\xarrowtikz{rf}{rf}}%
+\newcommand{\xrfxinv}{\xarrowtikzrev{rf}{rf}}%
 \tikzstyle{rfe} = [-latex,color=green!50!black,thick]
 \NewDocumentCommand \rfe {O{} m O{} m} {\draw[rfe,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{wr}$}  (#4);}
 \newcommand{\rrfe}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{wr}}}}}%

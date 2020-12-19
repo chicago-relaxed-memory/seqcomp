@@ -15,7 +15,10 @@ module semantics (MM : MemoryModel) (Event : Set) where
 
   κLOAD : Register → Address → AccessMode → Formula
   κLOAD r a rlx = RO ∧ Qw[ a ]
-  κLOAD r a ra = (RO ∧ Qw[ a ]) ∧ (μ[ a ]==rlx)
+  -- κLOAD r a ra = (RO ∧ Qw[ a ]) ∧ (μ[ a ]==rlx)
+  -- We also need to allow ra to have acquire semantics!
+  κLOAD r a ra = (RO ∧ Qw[ a ]) ∧ (Q ∨ μ[ a ]==rlx)
+  -- ARM only does this if the value can be read from, so we could very reasonably require that the matching write have the same value as the relaxed read
 
   τLOAD : Register → Address → Value → Formula → Formula
   τLOAD r a v ϕ = (value v == register r) ⇒ (RW ⇒ ϕ)
