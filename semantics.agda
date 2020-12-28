@@ -13,18 +13,46 @@ module semantics (MM : MemoryModel) (Event : Set) where
   open seqcomp(DM)(Event)
   open parcomp(DM)(Event)
 
-  κLOAD : Register → Address → AccessMode → Formula
-  κLOAD r a rlx = RO ∧ Qw[ a ]
-  -- κLOAD r a ra = (RO ∧ Qw[ a ]) ∧ (μ[ a ]==rlx)
-  -- We also need to allow ra to have acquire semantics!
-  κLOAD r a ra = (RO ∧ Qw[ a ]) ∧ (Q ∨ μ[ a ]==rlx)
+  -- initial model
+
+  -- κLOAD : Register → Address → Formula
+  -- κLOAD r a = Qw[ a ]
+
+  -- τLOAD : Register → Address → Value → Formula → Formula
+  -- τLOAD r a v ϕ = (value v == register r) ⇒ ϕ[r/x]
+  
+  -- τLOAD∅ : Register → Address → AccessMode → Value → Formula → Formula
+  -- τLOAD∅ r a rlx v ϕ =  ¬ Q[ a ]  ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ ϕ[r/x])
+  -- τLOAD∅ r a ra  v ϕ  = false
+
+
+  -- κSTORE : Address → Expression → AccessMode → Value → Formula
+  -- κSTORE a M rlx v = Q[ a ] ∧ (M == value v)
+  -- κSTORE a M ra v =  Q ∧ (M == value v)
+
+  -- τSTORE : Address → Expression → AccessMode → Formula → Formula
+  -- τSTORE a M μ ϕ = ϕ [ M /[ a ]]
+
+  -- τSTORE∅ : Address → Expression → AccessMode → Formula → Formula
+  -- τSTORE∅ a M μ ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] )
+
+
+
+
+
+
+
+
+  κLOAD : Register → Address → Formula
+  κLOAD r a = RO ∧ Qw[ a ]
   -- ARM only does this if the value can be read from, so we could very reasonably require that the matching write have the same value as the relaxed read
 
   τLOAD : Register → Address → Value → Formula → Formula
-  τLOAD r a v ϕ = (value v == register r) ⇒ (RW ⇒ ϕ)
+  τLOAD r a v ϕ = (value v == register r) ⇒ (RW ⇒ (ϕ [ register r /[ a ]]))
   
-  τLOAD∅ : Register → Address → Value → Formula → Formula
-  τLOAD∅ r a v ϕ = ¬ Q[ a ] ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ ϕ))
+  τLOAD∅ : Register → Address → AccessMode → Value → Formula → Formula
+  τLOAD∅ r a rlx v ϕ =                   ¬ Q[ a ]  ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]]))) -- only put dependency into write
+  τLOAD∅ r a ra  v ϕ  = (μ[ a ]==rlx) ∧ (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
   
   -- Note: this semantics assumes registers are fresh, otherwise we need to alpha-convert them.
   record LOAD (r : Register) (a : Address) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
@@ -32,12 +60,12 @@ module semantics (MM : MemoryModel) (Event : Set) where
     open PomsetWithPredicateTransformers P
 
     field v : Value
-
+  
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → (d ≡ e)
     field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R a v)
-    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ κLOAD r a μ
+    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ κLOAD r a
     field τ⊨τLOAD : ∀ C ϕ → (τ(C)(ϕ) ⊨ τLOAD r a v ϕ)
-    field τ⊨τLOAD∅ : ∀ ϕ → (τ(∅)(ϕ) ⊨ τLOAD∅ r a v ϕ)
+    field τ⊨τLOAD∅ : ∀ ϕ → (τ(∅)(ϕ) ⊨ τLOAD∅ r a μ v ϕ)
 
   κSTORE : Address → Expression → AccessMode → Value → Formula
   κSTORE a M rlx v = (RW ∧ Q[ a ]) ∧ (M == value v)

@@ -33,7 +33,7 @@ module pomset (DM : DataModel) (Event : Set) where
     open PartialOrder PO public
 
     ↓ : Event → Event → Set
-    ↓(e) = E ∩ (λ d → (d ≤ e))
+    ↓(e) = E ∩ (λ d → (d ≤ e)) -- should be <
     
     dec-E : ∀ e → Dec(e ∈ E)
     dec-E e = EXCLUDED_MIDDLE(e ∈ E)

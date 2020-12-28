@@ -4,6 +4,9 @@ module data-model where
 
   record DataModel : Set₁ where
 
+    infixr 10 _∧_
+    infixr 10 _∨_
+
     field Action : Set
     field Formula : Set
 
@@ -79,6 +82,9 @@ module data-model where
     field Q : Formula
     field Q[_] : Address → Formula
     field Qw[_] : Address → Formula
+
+    field Q⊨Q[a] : ∀ a → (Q ⊨ Q[ a ])
+    field Q[a]⊨Qw[a] : ∀ a → (Q[ a ] ⊨ Qw[ a ])
 
     field μ[_]==rlx : Address → Formula
     field _[_/μ[_]] : Formula → AccessMode → Address → Formula
