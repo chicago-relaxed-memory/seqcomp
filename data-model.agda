@@ -34,7 +34,7 @@ module data-model where
     _⊭_ = λ ϕ ψ → (ϕ ⊨ ψ) → FALSE
     Satisfiable = λ ϕ → (ϕ ⊭ ff)
     Tautology = λ ϕ → (tt ⊨ ϕ)
-    
+
     ⊨-resp-∧ : ∀ {ϕ ψ ξ ζ} → (ϕ ⊨ ψ) → (ξ ⊨ ζ) → ((ϕ ∧ ξ) ⊨ (ψ ∧ ζ))
     ⊨-resp-∧ ϕ⊨ψ ξ⊨ζ = ⊨-resp-¬ (⊨-resp-∨ (⊨-resp-¬ ϕ⊨ψ) (⊨-resp-¬ ξ⊨ζ))
 
