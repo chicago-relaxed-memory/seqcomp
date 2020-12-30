@@ -86,8 +86,8 @@ module data-model where
     field Q⊨Q[a] : ∀ a → (Q ⊨ Q[ a ])
     field Q[a]⊨Qw[a] : ∀ a → (Q[ a ] ⊨ Qw[ a ])
 
-    field μ[_]==rlx : Address → Formula
-    field _[_/μ[_]] : Formula → AccessMode → Address → Formula
+    field ↓[_] : Address → Formula
+    field _[_/↓[_]] : Formula → Formula → Address → Formula
     
     field RO : Formula
     RW = ¬ RO

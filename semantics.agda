@@ -51,8 +51,8 @@ module semantics (MM : MemoryModel) (Event : Set) where
   τLOAD r a v ϕ = (value v == register r) ⇒ (RW ⇒ (ϕ [ register r /[ a ]]))
   
   τLOAD∅ : Register → Address → AccessMode → Value → Formula → Formula
-  τLOAD∅ r a rlx v ϕ =                   ¬ Q[ a ]  ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]]))) -- only put dependency into write
-  τLOAD∅ r a ra  v ϕ  = (μ[ a ]==rlx) ∧ (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
+  τLOAD∅ r a rlx v ϕ  =            (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
+  τLOAD∅ r a ra  v ϕ  = (↓[ a ]) ∧ (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
   
   -- Note: this semantics assumes registers are fresh, otherwise we need to alpha-convert them.
   record LOAD (r : Register) (a : Address) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
@@ -72,10 +72,12 @@ module semantics (MM : MemoryModel) (Event : Set) where
   κSTORE a M ra v = (RW ∧ Q) ∧ (M == value v)
 
   τSTORE : Address → Expression → AccessMode → Formula → Formula
-  τSTORE a M μ ϕ = ϕ [ M /[ a ]] [ μ /μ[ a ]] 
+  τSTORE a M rlx ϕ = ϕ [ M /[ a ]] [ tt /↓[ a ]] 
+  τSTORE a M ra  ϕ = ϕ [ M /[ a ]] [ ff /↓[ a ]] 
 
   τSTORE∅ : Address → Expression → AccessMode → Formula → Formula
-  τSTORE∅ a M μ ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] [ μ /μ[ a ]] )
+  τSTORE∅ a M rlx ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] [ tt /↓[ a ]])
+  τSTORE∅ a M ra  ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] [ ff /↓[ a ]])
   
   record STORE (a : Address) (μ : AccessMode) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
