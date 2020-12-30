@@ -55,18 +55,19 @@ module semantics (MM : MemoryModel) (Event : Set) where
   τLOAD∅ r a ra  v ϕ  = (↓[ a ]) ∧ (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
 
   -- Note: this semantics assumes registers are fresh, otherwise we need to alpha-convert them.
-  record LOAD (r : Register) (a : Address) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
+  record LOAD (r : Register) (L : Expression) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
 
+    field a : Event → Address
     field v : Event → Value
     field ψ : Event → Formula
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → ((ψ(d) ∧ ψ(e)) ∈ Satisfiable) → (d ≡ e)
-    field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R a (v(e)))
-    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κLOAD r a)
-    field τ⊨τLOAD : ∀ C ϕ e → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOAD r a (v(e)) ϕ))
-    field τ⊨τLOAD∅ : ∀ ϕ e → (τ(∅)(ϕ) ⊨ (ψ(e) ⇒ τLOAD∅ r a μ (v(e)) ϕ))
+    field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R (a(e)) (v(e)))
+    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κLOAD r (a(e)))
+    field τ⊨τLOAD : ∀ C ϕ e → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOAD r (a(e)) (v(e)) ϕ))
+    field τ⊨τLOAD∅ : ∀ ϕ e → (τ(∅)(ϕ) ⊨ (ψ(e) ⇒ τLOAD∅ r (a(e)) μ (v(e)) ϕ))
 
   κSTORE : Address → Expression → AccessMode → Value → Formula
   κSTORE a M rlx v = (RW ∧ Q[ a ]) ∧ (M == value v)
@@ -80,18 +81,19 @@ module semantics (MM : MemoryModel) (Event : Set) where
   τSTORE∅ a M rlx ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] [ tt /↓[ a ]])
   τSTORE∅ a M ra  ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] [ ff /↓[ a ]])
 
-  record STORE (a : Address) (μ : AccessMode) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
+  record STORE (L : Expression) (μ : AccessMode) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
 
+    field a : Event → Address
     field v : Event → Value
     field ψ : Event → Formula
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → ((ψ(d) ∧ ψ(e)) ∈ Satisfiable) → (d ≡ e)
-    field ℓ=Wav : ∀ e → (e ∈ E) → ℓ(e) ≡ (W a (v(e)))
-    field κ⊨κSTORE :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κSTORE a M μ (v(e)))
-    field τ⊨τSTORE : ∀ C ϕ e → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τSTORE a M μ ϕ))
-    field τ⊨τSTORE∅ : ∀ ϕ e → (τ(∅)(ϕ) ⊨ (ψ(e) ⇒ τSTORE∅ a M μ ϕ))
+    field ℓ=Wav : ∀ e → (e ∈ E) → ℓ(e) ≡ (W (a(e)) (v(e)))
+    field κ⊨κSTORE :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κSTORE (a(e)) M μ (v(e)))
+    field τ⊨τSTORE : ∀ C ϕ e → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τSTORE (a(e)) M μ ϕ))
+    field τ⊨τSTORE∅ : ∀ ϕ e → (τ(∅)(ϕ) ⊨ (ψ(e) ⇒ τSTORE∅ (a(e)) M μ ϕ))
 
   record LET (r : Register) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
@@ -106,8 +108,8 @@ module semantics (MM : MemoryModel) (Event : Set) where
   ⟦ skip ⟧ = SKIP
   ⟦ C₁ ∙ C₂ ⟧ = ⟦ C₁ ⟧ ● ⟦ C₂ ⟧
   ⟦ if ϕ then C₁ else C₂ ⟧ = IF ϕ ⟦ C₁ ⟧ ⟦ C₂ ⟧
-  ⟦ r :=[ a ]^ μ ⟧ = LOAD r a μ
-  ⟦ [ a ]^ μ := M ⟧ = STORE a μ M
+  ⟦ r :=[ L ]^ μ ⟧ = LOAD r L μ
+  ⟦ [ L ]^ μ := M ⟧ = STORE L μ M
   ⟦ r := M ⟧ = LET r M
   ⟦ fork G ⟧ = FORK ⟪ G ⟫
 

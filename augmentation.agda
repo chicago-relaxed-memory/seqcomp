@@ -112,12 +112,12 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                }
 
 
-  sem-resp-≲τ {P} {P′} (r :=[ a ]^ μ) P≲P′ P∈LOAD = P′∈LOAD where
+  sem-resp-≲τ {P} {P′} (r :=[ L ]^ μ) P≲P′ P∈LOAD = P′∈LOAD where
 
     open LOAD P∈LOAD
     open _≲τ_ P≲P′
 
-    P′∈LOAD : P′ ∈ LOAD r a μ
+    P′∈LOAD : P′ ∈ LOAD r L μ
     P′∈LOAD = record
                 { v = v
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
@@ -127,12 +127,12 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                 ; τ⊨τLOAD∅ = λ ϕ e → ⊨-trans (τ′⊨τ ∅ ϕ) (τ⊨τLOAD∅ ϕ e)
                 }
 
-  sem-resp-≲τ {P} {P′} ([ a ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where
+  sem-resp-≲τ {P} {P′} ([ L ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where
 
     open STORE P∈STORE
     open _≲τ_ P≲P′
 
-    P′∈STORE : P′ ∈ STORE a μ M
+    P′∈STORE : P′ ∈ STORE L μ M
     P′∈STORE = record
                 { v = v
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)

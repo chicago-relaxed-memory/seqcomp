@@ -15,8 +15,8 @@ module command (MM : MemoryModel) where
     skip : Command
     _∙_ : Command → Command → Command
     if_then_else_ : Formula → Command → Command → Command
-    [_]^_:=_ : Address → AccessMode → Expression → Command
-    _:=[_]^_ : Register → Address → AccessMode → Command
+    [_]^_:=_ : Expression → AccessMode → Expression → Command
+    _:=[_]^_ : Register → Expression → AccessMode → Command
     _:=_ : Register → Expression → Command
     fork : ThreadGroup → Command
     
