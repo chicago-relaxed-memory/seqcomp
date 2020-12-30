@@ -59,7 +59,11 @@ module data-model where
   data AccessMode : Set where
     rlx : AccessMode
     ra : AccessMode
-    
+
+  data Cached : Set where
+    hit : Cached
+    miss : Cached
+
   record MemoryModel : Set₁ where
   
     field DM : DataModel
@@ -92,5 +96,5 @@ module data-model where
     field RO : Formula
     RW = ¬ RO
     
-    field R : Address → Value → Action
+    field R : Cached → Address → Value → Action
     field W : Address → Value → Action

@@ -43,16 +43,20 @@ module semantics (MM : MemoryModel) (Event : Set) where
 
 
 
-  κLOAD : Register → Address → Formula
-  κLOAD r a = RO ∧ Qw[ a ]
+  κLOAD : Register → Cached → Address → Value → Formula
+  κLOAD r hit  a v = RO ∧ Qw[ a ] ∧ ([ a ]== value v)
+  κLOAD r miss a v = RO ∧ Qw[ a ]
   -- ARM only does this if the value can be read from, so we could very reasonably require that the matching write have the same value as the relaxed read
 
-  τLOAD : Register → Address → Value → Formula → Formula
-  τLOAD r a v ϕ = (value v == register r) ⇒ (RW ⇒ (ϕ [ register r /[ a ]]))
+  τLOAD : Register → Cached → Address → Value → Formula → Formula
+  τLOAD r hit  a v ϕ = (([ a ]== register r) ∧ (value v == register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]]))
+  τLOAD r miss a v ϕ =                         (value v == register r)  ⇒ (RW ⇒ (ϕ [ register r /[ a ]]))
 
-  τLOAD∅ : Register → Address → AccessMode → Value → Formula → Formula
-  τLOAD∅ r a rlx v ϕ  =            (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
-  τLOAD∅ r a ra  v ϕ  = (↓[ a ]) ∧ (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
+  τLOAD∅ : Register → Cached → Address → AccessMode → Value → Formula → Formula
+  τLOAD∅ r hit  a rlx v ϕ =            (¬ Q[ a ]) ∧                            (([ a ]== register r)  ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
+  τLOAD∅ r miss a rlx v ϕ =            (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
+  τLOAD∅ r hit  a ra v ϕ =  (↓[ a ]) ∧ (¬ Q[ a ]) ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ (RW ⇒ (ϕ [ register r /[ a ]])))
+  τLOAD∅ r miss a ra v ϕ = ff 
 
   -- Note: this semantics assumes registers are fresh, otherwise we need to alpha-convert them.
   record LOAD (r : Register) (L : Expression) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
@@ -60,14 +64,15 @@ module semantics (MM : MemoryModel) (Event : Set) where
     open PomsetWithPredicateTransformers P
 
     field a : Event → Address
+    field c : Event → Cached
     field v : Event → Value
     field ψ : Event → Formula
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → ((ψ(d) ∧ ψ(e)) ∈ Satisfiable) → (d ≡ e)
-    field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R (a(e)) (v(e)))
-    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κLOAD r (a(e)))
-    field τ⊨τLOAD : ∀ C ϕ e → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOAD r (a(e)) (v(e)) ϕ))
-    field τ⊨τLOAD∅ : ∀ ϕ e → (τ(∅)(ϕ) ⊨ (ψ(e) ⇒ τLOAD∅ r (a(e)) μ (v(e)) ϕ))
+    field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R (c(e)) (a(e)) (v(e)))
+    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κLOAD r (c(e)) (a(e)) (v(e)))
+    field τ⊨τLOAD : ∀ C ϕ e → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOAD r (c(e)) (a(e)) (v(e)) ϕ))
+    field τ⊨τLOAD∅ : ∀ ϕ e → (τ(∅)(ϕ) ⊨ (ψ(e) ⇒ τLOAD∅ r (c(e)) (a(e)) μ (v(e)) ϕ))
 
   κSTORE : Address → Expression → AccessMode → Value → Formula
   κSTORE a M rlx v = (RW ∧ Q[ a ]) ∧ (M == value v)
