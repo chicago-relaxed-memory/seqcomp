@@ -6,6 +6,7 @@ module data-model where
 
     infixr 10 _∧_
     infixr 10 _∨_
+    infixr 10 _⇒_
 
     field Action : Set
     field Formula : Set
@@ -76,6 +77,7 @@ module data-model where
 
     field value : Value → Expression
     field register : Register → Expression
+    field address : Address → Expression
     
     field _==_ : Expression → Expression → Formula
     field _[_/_] : Formula → Expression → Register → Formula
