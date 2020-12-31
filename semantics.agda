@@ -50,11 +50,11 @@ module semantics (MM : MemoryModel) (Event : Set) where
 
   τLOADD : Register → Expression → Cached → Address → Value → Formula → Formula
   τLOADD r L hit  a v ϕ = (L == address a) ⇒ RW ⇒ (([ a ]== register r) ∧ (value v == register r)) ⇒ (ϕ [ register r /[ a ]])
-  τLOADD r L miss a v ϕ = (L == address a) ⇒ RW ⇒                         (value v == register r)  ⇒ (ϕ [ register r /[ a ]])
+  τLOADD r L miss a v ϕ = (L == address a) ⇒ RW ⇒                         (value v == register r)  ⇒ (ϕ [ register r /[ a ]] [ ff /↓[ a ]])
 
   τLOADI : Register → Expression → Cached → Address → AccessMode → Value → Formula → Formula
   τLOADI r L hit  a rlx v ϕ =            ¬ Q[ a ] ∧ ((L == address a) ⇒ RW ⇒ (([ a ]== register r)                          ) ⇒ (ϕ [ register r /[ a ]]))
-  τLOADI r L miss a rlx v ϕ =            ¬ Q[ a ] ∧ ((L == address a) ⇒ RW ⇒ (([ a ]== register r) ∨ (value v == register r)) ⇒ (ϕ [ register r /[ a ]]))
+  τLOADI r L miss a rlx v ϕ =            ¬ Q[ a ] ∧ ((L == address a) ⇒ RW ⇒ (([ a ]== register r) ∨ (value v == register r)) ⇒ (ϕ [ register r /[ a ]] [ ff /↓[ a ]]))
   τLOADI r L hit  a ra  v ϕ = (↓[ a ]) ∧ ¬ Q[ a ] ∧ ((L == address a) ⇒ RW ⇒ (([ a ]== register r)                          ) ⇒ (ϕ [ register r /[ a ]]))
   τLOADI r L miss a ra  v ϕ = ff 
 
