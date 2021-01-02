@@ -1,11 +1,11 @@
 open import prelude
-open import data-model
+open import data-model using (DataModel)
 import pomset
 
-module parcomp (DM : DataModel) (Event : Set) where
+module parcomp (Event : Set) (DM : DataModel(Event)) where
 
   open DataModel DM
-  open pomset(DM)(Event)
+  open pomset(Event)(DM)
    
   record NIL (P₀ : PomsetWithPreconditions) : Set₁ where
   

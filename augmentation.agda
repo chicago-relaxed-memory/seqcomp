@@ -6,14 +6,14 @@ import seqcomp
 import parcomp
 import semantics
 
-module augmentation (MM : MemoryModel) (Event : Set) where
+module augmentation (Event : Set) (MM : MemoryModel(Event)) where
 
   open MemoryModel MM
-  open command(MM)
-  open pomset(DM)(Event)
-  open seqcomp(DM)(Event)
-  open parcomp(DM)(Event)
-  open semantics(MM)(Event)
+  open command(Event)(MM)
+  open pomset(Event)(DM)
+  open seqcomp(Event)(DM)
+  open parcomp(Event)(DM)
+  open semantics(Event)(MM)
 
   record _≲p_ (P P′ : PomsetWithPreconditions) : Set₁ where
 
@@ -123,9 +123,9 @@ module augmentation (MM : MemoryModel) (Event : Set) where
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
                 ; ℓ=Rav = λ e e∈E′ → ≡-trans (≡-symm (ℓ=ℓ′ e (E′⊆E e e∈E′))) (ℓ=Rav e (E′⊆E e e∈E′))
                 ; κ⊨κLOAD = λ e e∈E′ → ⊨-trans (κ′⊨κ e (E′⊆E e e∈E′)) (κ⊨κLOAD e (E′⊆E e e∈E′))
-                ; τC⊨τLOADD = λ C ϕ a e e∈E′ e∈C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADD C ϕ a e (E′⊆E e e∈E′) e∈C)
+                ; τC⊨τLOADD = λ C ϕ e e∈E′ e∈C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADD C ϕ e (E′⊆E e e∈E′) e∈C)
                 ; τC⊨τLOADI = λ C ϕ a e e∈E′ e∉C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADI C ϕ a e (E′⊆E e e∈E′) e∉C)
-                ; τ∅⊨τLOADI = λ ϕ a v → ⊨-trans (τ′⊨τ ∅ ϕ) (τ∅⊨τLOADI ϕ a v)
+                -- TODO ; τ∅⊨τLOADI = λ ϕ a v → ⊨-trans (τ′⊨τ ∅ ϕ) (τ∅⊨τLOADI ϕ a v)
                 }
 
   sem-resp-≲τ {P} {P′} ([ L ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where

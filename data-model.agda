@@ -1,6 +1,6 @@
 open import prelude
 
-module data-model where
+module data-model (Event : Set) where
 
   record DataModel : Set₁ where
 
@@ -61,10 +61,6 @@ module data-model where
     rlx : AccessMode
     ra : AccessMode
 
-  data Cached : Set where
-    hit : Cached
-    miss : Cached
-
   record MemoryModel : Set₁ where
   
     field DM : DataModel
@@ -78,7 +74,11 @@ module data-model where
     field value : Value → Expression
     field register : Register → Expression
     field address : Address → Expression
-    
+
+    field r[_] : Event → Register
+
+    field ∃_∙_ : Register → Formula → Formula
+
     field _==_ : Expression → Expression → Formula
     field _[_/_] : Formula → Expression → Register → Formula
 
@@ -93,10 +93,12 @@ module data-model where
     field Q[a]⊨Qw[a] : ∀ a → (Q[ a ] ⊨ Qw[ a ])
 
     field ↓[_] : Address → Formula
+    field ↓[*] : Formula
     field _[_/↓[_]] : Formula → Formula → Address → Formula
+    field _[_/↓[*]] : Formula → Formula → Formula
     
     field RO : Formula
     RW = ¬ RO
     
-    field R : Cached → Address → Value → Action
+    field R : Address → Value → Action
     field W : Address → Value → Action

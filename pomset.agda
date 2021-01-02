@@ -1,7 +1,7 @@
 open import prelude
 open import data-model using ( DataModel )
 
-module pomset (DM : DataModel) (Event : Set) where
+module pomset (Event : Set) (DM : DataModel(Event)) where
 
   open DataModel DM
 

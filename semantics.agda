@@ -1,17 +1,18 @@
 open import prelude
-open import data-model
+open import data-model using (MemoryModel)
 import command
 import pomset
 import seqcomp
 import parcomp
 
-module semantics (MM : MemoryModel) (Event : Set) where
+module semantics (Event : Set) (MM : MemoryModel(Event)) where
 
   open MemoryModel MM
-  open command(MM)
-  open pomset(DM)(Event)
-  open seqcomp(DM)(Event)
-  open parcomp(DM)(Event)
+  open data-model(Event)
+  open command(Event)(MM)
+  open pomset(Event)(DM)
+  open seqcomp(Event)(DM)
+  open parcomp(Event)(DM)
 
   -- initial model
 
@@ -36,44 +37,30 @@ module semantics (MM : MemoryModel) (Event : Set) where
   -- τSTORE∅ : Address → Expression → AccessMode → Formula → Formula
   -- τSTORE∅ a M μ ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] )
 
+  κLOAD : Expression → Address → Value → Formula
+  κLOAD L a v = (L == address a) ∧ RO ∧ Qw[ a ]
 
+  τLOADD : Register → Event → Value → Formula → Formula
+  τLOADD r e v ϕ = (value v == register r[ e ]) ⇒ (ϕ [ register r[ e ] / r ])
 
+  τLOADI : Register → Expression → Event → Address → AccessMode → Formula → Formula
+  τLOADI r L e a rlx ϕ =          ¬ Q[ a ] ∧ (RW ⇒ (L == address a) ⇒ ([ a ]== register r[ e ]) ⇒ (ϕ [ register r[ e ] / r ]))
+  τLOADI r L e a ra  ϕ = ↓[ a ] ∧ ¬ Q[ a ] ∧ (RW ⇒ (L == address a) ⇒ ([ a ]== register r[ e ]) ⇒ (ϕ [ register r[ e ] / r ]))
 
-
-
-
-
-  κLOAD : Expression → Cached → Address → Value → Formula
-  κLOAD L hit  a v = (L == address a) ∧ RO ∧ Qw[ a ] ∧ ([ a ]== value v)
-  κLOAD L miss a v = (L == address a) ∧ RO ∧ Qw[ a ]
-  -- ARM only does this if the value can be read from, so we could very reasonably require that the matching write have the same value as the relaxed read
-
-  τLOADD : Register → Expression → Cached → Address → Value → Formula → Formula
-  τLOADD r L hit  a v ϕ = (L == address a) ⇒ RW ⇒ (([ a ]== register r) ∧ (value v == register r)) ⇒ (ϕ [ register r /[ a ]])
-  τLOADD r L miss a v ϕ = (L == address a) ⇒ RW ⇒                         (value v == register r)  ⇒ (ϕ [ register r /[ a ]] [ ff /↓[ a ]])
-
-  τLOADI : Register → Expression → Cached → Address → AccessMode → Value → Formula → Formula
-  τLOADI r L hit  a rlx v ϕ =            ¬ Q[ a ] ∧ ((L == address a) ⇒ RW ⇒ (([ a ]== register r)                          ) ⇒ (ϕ [ register r /[ a ]]))
-  τLOADI r L miss a rlx v ϕ =            ¬ Q[ a ] ∧ ((L == address a) ⇒ RW ⇒ (([ a ]== register r) ∨ (value v == register r)) ⇒ (ϕ [ register r /[ a ]] [ ff /↓[ a ]]))
-  τLOADI r L hit  a ra  v ϕ = (↓[ a ]) ∧ ¬ Q[ a ] ∧ ((L == address a) ⇒ RW ⇒ (([ a ]== register r)                          ) ⇒ (ϕ [ register r /[ a ]]))
-  τLOADI r L miss a ra  v ϕ = ff 
-
-  -- Note: this semantics assumes registers are fresh, otherwise we need to alpha-convert them.
   record LOAD (r : Register) (L : Expression) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
 
     open PomsetWithPredicateTransformers P
 
     field a : Event → Address
-    field c : Event → Cached
     field v : Event → Value
     field ψ : Event → Formula
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → ((ψ(d) ∧ ψ(e)) ∈ Satisfiable) → (d ≡ e)
-    field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R (c(e)) (a(e)) (v(e)))
-    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κLOAD L (c(e)) (a(e)) (v(e)))
-    field τC⊨τLOADD : ∀ C ϕ a e → (e ∈ E) → (e ∈ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOADD r L (c(e)) a (v(e)) ϕ))
-    field τC⊨τLOADI : ∀ C ϕ a e → (e ∈ E) → (e ∉ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOADI r L (c(e)) a μ (v(e)) ϕ))
-    field τ∅⊨τLOADI : ∀ ϕ a v → (τ(∅)(ϕ) ⊨ τLOADI r L hit a rlx v ϕ)
+    field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R (a(e)) (v(e)))
+    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κLOAD L (a(e)) (v(e)))
+    field τC⊨τLOADD : ∀ C ϕ e → (e ∈ E) → (e ∈ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOADD r e (v(e)) ϕ))
+    field τC⊨τLOADI : ∀ C ϕ a e → (e ∈ E) → (e ∉ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOADI r L e a μ ϕ))
+    -- TODO field τ∅⊨τLOADI : ∀ ϕ a v → (τ(∅)(ϕ) ⊨ τLOADI r L a rlx v ϕ)
 
   κSTORE : Expression → AccessMode → Expression → Address → Value → Formula
   κSTORE L rlx M a v = (L == address a) ∧ (M == value v) ∧ RW ∧ Q[ a ]
@@ -81,11 +68,11 @@ module semantics (MM : MemoryModel) (Event : Set) where
 
   τSTORED : Expression → AccessMode → Expression → Address → Formula → Formula
   τSTORED L rlx M a ϕ = (L == address a) ⇒ (ϕ [ M /[ a ]] [ tt /↓[ a ]])
-  τSTORED L ra  M a ϕ = (L == address a) ⇒ (ϕ [ M /[ a ]] [ ff /↓[ a ]])
+  τSTORED L ra  M a ϕ = (L == address a) ⇒ (ϕ [ M /[ a ]] [ ff /↓[*]])
 
   τSTOREI : Expression → AccessMode → Expression → Address → Formula → Formula
   τSTOREI L rlx M a ϕ = (L == address a) ⇒ ((ϕ [ M /[ a ]] [ tt /↓[ a ]]) ∧ ¬ Qw[ a ])
-  τSTOREI L ra  M a ϕ = (L == address a) ⇒ ((ϕ [ M /[ a ]] [ ff /↓[ a ]]) ∧ ¬ Qw[ a ])
+  τSTOREI L ra  M a ϕ = (L == address a) ⇒ ((ϕ [ M /[ a ]] [ ff /↓[*]]) ∧ ¬ Qw[ a ])
 
   record STORE (L : Expression) (μ : AccessMode) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 

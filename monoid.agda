@@ -7,15 +7,15 @@ import semantics
 import augmentation
 import examples
 
-module monoid (MM : MemoryModel) (Event : Set) where
+module monoid (Event : Set) (MM : MemoryModel(Event)) where
 
   open MemoryModel MM
-  open command(MM)
-  open pomset(DM)(Event)
-  open seqcomp(DM)(Event)
-  open semantics(MM)(Event)
-  open augmentation(MM)(Event)
-  open examples(MM)(Event)
+  open command(Event)(MM)
+  open pomset(Event)(DM)
+  open seqcomp(Event)(DM)
+  open semantics(Event)(MM)
+  open augmentation(Event)(MM)
+  open examples(Event)(MM)
 
   -- PROPOSITION: sequential composition forms a monoid
   

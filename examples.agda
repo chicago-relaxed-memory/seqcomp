@@ -1,17 +1,17 @@
 open import prelude
-open import data-model
+open import data-model using (MemoryModel)
 import command
 import pomset
 import seqcomp
 import semantics
 
-module examples (MM : MemoryModel) (Event : Set) where
+module examples (Event : Set) (MM : MemoryModel(Event)) where
 
   open MemoryModel MM
-  open command(MM)
-  open pomset(DM)(Event)
-  open seqcomp(DM)(Event)
-  open semantics(MM)(Event)
+  open command(Event)(MM)
+  open pomset(Event)(DM)
+  open seqcomp(Event)(DM)
+  open semantics(Event)(MM)
 
   -- The canonical pomset in ⟪ nil ⟫
   
