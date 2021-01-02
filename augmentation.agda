@@ -125,7 +125,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                 ; κ⊨κLOAD = λ e e∈E′ → ⊨-trans (κ′⊨κ e (E′⊆E e e∈E′)) (κ⊨κLOAD e (E′⊆E e e∈E′))
                 ; τC⊨τLOADD = λ C ϕ e e∈E′ e∈C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADD C ϕ e (E′⊆E e e∈E′) e∈C)
                 ; τC⊨τLOADI = λ C ϕ a e e∈E′ e∉C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADI C ϕ a e (E′⊆E e e∈E′) e∉C)
-                -- TODO ; τ∅⊨τLOADI = λ ϕ a v → ⊨-trans (τ′⊨τ ∅ ϕ) (τ∅⊨τLOADI ϕ a v)
+                ; τC⊨τLOAD∅ = λ C ϕ a s χ χ⊨¬ψ → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOAD∅ C ϕ a s χ (λ e e∈E e∉C → χ⊨¬ψ e (E⊆E′ e e∈E) e∉C))
                 }
 
   sem-resp-≲τ {P} {P′} ([ L ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where
@@ -140,8 +140,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                 ; ℓ=Wav = λ e e∈E′ → ≡-trans (≡-symm (ℓ=ℓ′ e (E′⊆E e e∈E′))) (ℓ=Wav e (E′⊆E e e∈E′))
                 ; κ⊨κSTORE = λ e e∈E′ → ⊨-trans (κ′⊨κ e (E′⊆E e e∈E′)) (κ⊨κSTORE e (E′⊆E e e∈E′))
                 ; τC⊨τSTORED = λ C ϕ a e e∈E′ e∈C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τSTORED C ϕ a e (E′⊆E e e∈E′) e∈C)
-                ; τC⊨τSTOREI = λ C ϕ a e e∈E′ e∉C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τSTOREI C ϕ a e (E′⊆E e e∈E′) e∉C)
-                ; τ∅⊨τSTOREI = λ ϕ e → ⊨-trans (τ′⊨τ ∅ ϕ) (τ∅⊨τSTOREI ϕ e)
+                ; τC⊨τSTOREI = λ C ϕ a χ χ⊨¬ψ → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τSTOREI C ϕ a χ (λ e e∈E e∉C → χ⊨¬ψ e (E⊆E′ e e∈E) e∉C))
                 }
                 
   sem-resp-≲τ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where

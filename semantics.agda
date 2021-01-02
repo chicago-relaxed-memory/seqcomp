@@ -37,8 +37,8 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
   -- τSTORE∅ : Address → Expression → AccessMode → Formula → Formula
   -- τSTORE∅ a M μ ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] )
 
-  κLOAD : Expression → Address → Value → Formula
-  κLOAD L a v = (L == address a) ∧ RO ∧ Qw[ a ]
+  κLOAD : Address → Value → Formula
+  κLOAD a v = RO ∧ Qw[ a ]
 
   τLOADD : Register → Register → Value → Formula → Formula
   τLOADD r s v ϕ = (value v == register s) ⇒ (ϕ [ register s / r ])
@@ -61,22 +61,22 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → ((ψ(d) ∧ ψ(e)) ∈ Satisfiable) → (d ≡ e)
     field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R (a(e)) (v(e)))
-    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ κLOAD L (a(e)) (v(e)))
+    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ (L == address (a(e))) ∧ κLOAD (a(e)) (v(e)))
     field τC⊨τLOADD : ∀ C ϕ e → (e ∈ E) → (e ∈ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOADD r (r[ e ]) (v(e)) ϕ))
     field τC⊨τLOADI : ∀ C ϕ a e → (e ∈ E) → (e ∉ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ (L == address a) ⇒ τLOADI r (r[ e ]) a μ ϕ))
     field τC⊨τLOAD∅ : ∀ C ϕ a s χ → (∀ e → (e ∈ E) → (e ∈ C) → (χ ⊨ ¬(ψ(e)))) → (τ(C)(ϕ) ⊨ (χ ⇒ (L == address a) ⇒ τLOAD∅ r s a μ ϕ))
 
-  κSTORE : Expression → AccessMode → Expression → Address → Value → Formula
-  κSTORE L rlx M a v = (L == address a) ∧ (M == value v) ∧ RW ∧ Q[ a ]
-  κSTORE L ra  M a v = (L == address a) ∧ (M == value v) ∧ RW ∧ Q
+  κSTORE : AccessMode → Expression → Address → Value → Formula
+  κSTORE rlx M a v = (M == value v) ∧ RW ∧ Q[ a ]
+  κSTORE ra  M a v = (M == value v) ∧ RW ∧ Q
 
-  τSTORED : Expression → AccessMode → Expression → Address → Formula → Formula
-  τSTORED L rlx M a ϕ = (L == address a) ⇒ (ϕ [ M /[ a ]] [ tt /↓[ a ]])
-  τSTORED L ra  M a ϕ = (L == address a) ⇒ (ϕ [ M /[ a ]] [ ff /↓[*]])
+  τSTORED : AccessMode → Expression → Address → Value → Formula → Formula
+  τSTORED rlx M a v ϕ = (Qw[ a ] ⇒ (M == value v)) ∧ (ϕ [ M /[ a ]] [ tt /↓[ a ]])
+  τSTORED ra  M a v ϕ = (Qw[ a ] ⇒ (M == value v)) ∧ (ϕ [ M /[ a ]] [ ff /↓[*]])
 
-  τSTOREI : Expression → AccessMode → Expression → Address → Formula → Formula
-  τSTOREI L rlx M a ϕ = (L == address a) ⇒ ((ϕ [ M /[ a ]] [ tt /↓[ a ]]) ∧ ¬ Qw[ a ])
-  τSTOREI L ra  M a ϕ = (L == address a) ⇒ ((ϕ [ M /[ a ]] [ ff /↓[*]]) ∧ ¬ Qw[ a ])
+  τSTOREI : AccessMode → Expression → Address → Formula → Formula
+  τSTOREI rlx M a ϕ = (¬ Qw[ a ]) ∧ (ϕ [ M /[ a ]] [ tt /↓[ a ]])
+  τSTOREI ra  M a ϕ = (¬ Qw[ a ]) ∧ (ϕ [ M /[ a ]] [ ff /↓[*]])
 
   record STORE (L : Expression) (μ : AccessMode) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
@@ -88,10 +88,9 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → ((ψ(d) ∧ ψ(e)) ∈ Satisfiable) → (d ≡ e)
     field ℓ=Wav : ∀ e → (e ∈ E) → ℓ(e) ≡ (W (a(e)) (v(e)))
-    field κ⊨κSTORE :  ∀ e → (e ∈ E) → (κ(e) ⊨ (ψ(e) ∧ κSTORE L μ M (a(e)) (v(e))))
-    field τC⊨τSTORED : ∀ C ϕ a e → (e ∈ E) → (e ∈ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τSTORED L μ M a ϕ))
-    field τC⊨τSTOREI : ∀ C ϕ a e → (e ∈ E) → (e ∉ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τSTOREI L μ M a ϕ))
-    field τ∅⊨τSTOREI : ∀ ϕ a → (τ(∅)(ϕ) ⊨ τSTOREI L μ M a ϕ)
+    field κ⊨κSTORE :  ∀ e → (e ∈ E) → (κ(e) ⊨ (ψ(e) ∧ (L == address (a(e))) ∧ κSTORE μ M (a(e)) (v(e))))
+    field τC⊨τSTORED : ∀ C ϕ a e → (e ∈ E) → (e ∈ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ (L == address a) ⇒ τSTORED μ M a (v(e)) ϕ))
+    field τC⊨τSTOREI : ∀ C ϕ a χ → (∀ e → (e ∈ E) → (e ∈ C) → (χ ⊨ ¬(ψ(e)))) → (τ(C)(ϕ) ⊨ (χ ⇒ (L == address a) ⇒ τSTOREI μ M a ϕ))
 
   record LET (r : Register) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 
