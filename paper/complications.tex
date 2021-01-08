@@ -1,3 +1,6 @@
+alan notes:
+-
+
 \section{Complications}
 
 [Very drafty.  These are just notes.]
@@ -8,9 +11,43 @@
 \end{itemize}
 
 \subsection{Address Calculation}
+ 
+\begin{definition}
+  \noindent
+  If $\aPS\SB0 \in \sSTORE{\cExp}{\aExp}$ then
+  $(\exists\aVal,\,\cVal\in\Val)$
+  \begin{enumerate}
+  \item $\labelingAct\SB0(\aEv) = \DWP{\REF\cVal}{\aVal}$,
+  \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal \land \aExp{=}\aVal)$,
+  \item $\aTr[\emptyset]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies \aForm[\aExp/\REF{\cVal}]$,
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies (\aExp{=}\aVal) \land \aForm[\aExp/\REF{\cVal}]$, 
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in \sLOAD{\cExp}{\aReg}$ then
+  $(\exists\aVal,\,\cVal\in\Val)$
+  \begin{enumerate}
+  \item $\labelingAct\SB0(\aEv) = \DRP{\REF{\cVal}}{\aVal}$,
+  \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal)$,
+  \item $\aTr[\emptyset]\SB0(\aForm)$ implies
+    $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal\lor\aReg{=}\REF{\cVal})\limplies\aForm[\aReg/\REF{\cVal}]$,
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies
+    $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal)\limplies\aForm[\aReg/\REF{\cVal}]$, 
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
+  \end{enumerate}  
+\end{definition}
 
 \subsection{Coherence}
 Can be encoded in independency, or logic.
+
+If you put in independency then you add this to $\sSTORE{}{}$:
+\begin{itemize}
+\item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
+\end{itemize}
+This does not do the right thing with fork however.  If you want to enforce
+coherence this way then you need to use fork-join as the sequential
+combinator, rather than fork.
 
 \begin{itemize}
 \item Coherence respects program order: $\mathsf{Q}_{x}$

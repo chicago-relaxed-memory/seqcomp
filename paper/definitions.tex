@@ -69,9 +69,9 @@ The semantics is built from the following.
 We require that
 \begin{itemize}
 \item actions include writes $\DWP{\aLoc}{\aVal}$ and reads $\DRP{\aLoc}{\aVal}$,
-\item formulae include equalities $(\aExp{=}\aVal)$ and $(\aExp{=}\aLoc)$,
+\item formulae include equalities $(\aExp{=}\bExp)$ and $(\aExp{=}\aLoc)$,
 \item formulae are closed under negation, conjunction, disjunction, and
-  substitutions $[\aLoc/\aReg]$ and $[\aExp/\aLoc]$, 
+  substitutions $[\aExp/\aReg]$ and $[\aExp/\aLoc]$, 
 \item there is an entailment relation $\vDash$ between formulae, with the
   expected semantics.
 \end{itemize}
@@ -84,10 +84,7 @@ We require that
 Logical formulae include equations over locations and registers, such
 $(\aLoc{=}1)$ and $(\aReg{=}\bReg{+}1)$.
 We use expressions as formulae, coercing $\aExp$ to $\aExp\neq 0$.
-
-Formulae are \emph{open}, in that occurrences of register names and memory
-locations are subject to substitutions of the form $\aForm[\aLoc/\aReg]$ and
-$\aForm[\bExp/\aLoc]$.  Actions are not subject to substitution.
+Formulae are subject to substitutions of the form $[\aExp/\aLoc]$; actions are not.
 
 %\begin{definition}
   %\label{def:independent}
@@ -130,7 +127,7 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
 
 \begin{definition}
   Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
-  Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$ when $\aVal\neq \bVal$.
+  Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$.
   
   % A pomset $\aPS$ is \emph{closed} if for every $\aEv$ which can be
   % fulfilled, there is a $\bEv\le\aEv$ which fulfills it, and for any $\cEv$
@@ -462,8 +459,8 @@ For the reverse embedding, $\sFORK{}$ adopts the identity transformer.
   \item if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm'_2(\aEv)$,
   \item if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
   \\ where $\labelingForm'_2(\aEv)=\aTr[\cEvs]_1(\labelingForm_2(\aEv))$, where $\cEvs=\{ \cEv \mid \cEv <\SB0 \aEv \}$,
-  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $\aTr[\bEvs]_2(\aTr[\bEvs]_1(\aForm))$,
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $\aTr[\bEvs]_2(\aTr[\bEvs]_1(\aForm))$.
+  %\item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
   \end{enumerate}
   % where we define $\labelingForm'_2(\aEv)$ to be $\aTr[\{ \bEv \mid \bEv <\SB0 \aEv \}]_1(\labelingForm_2(\aEv))$.
 
@@ -491,29 +488,31 @@ For the reverse embedding, $\sFORK{}$ adopts the identity transformer.
     $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aReg{=}\aVal)\limplies\aForm[\aReg/\aLoc]$, if $\bEvs\neq\emptyset$,
   \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
   \end{enumerate}
-
 \end{definition}
+[$(\aExp{=}\aVal)$ appears in $\aTr[\bEvs]$ for $\sSTORE{}{}$ in order to
+ensure that anything ordered after this is in a compatible world. ?]
+
 The complete semantics is as follows.
 \begin{align*}
-  \sem{\NIL} &= \sSTOP
-  \\
   \sem{\SKIP} &= \sSKIP
   \\
   \sem{\PR{\aLoc}{\aReg}} &= \sLOAD{\aLoc}{\aReg}
   \\
   \sem{\PW{\aLoc}{\aExp}} &= \sSTORE{\aLoc}{\aExp}
   \\
-  \sem{\LET{\aReg}{\aExp}} &= \sem{\aCmd}[\aExp/\aReg]
-  \\
-  \sem{\aCmd \SEMI \bCmd} &= \sem{\aCmd}\sSEMI\sem{\bCmd}
-  \\
-  \sem{\aGrp \PAR \bGrp} &= \sem{\aGrp}\sPAR\sem{\bGrp}
-  \\
-  \sem{\IF{\bForm}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\bForm}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
+  \sem{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
   \\
   \sem{\FORK{\aGrp}} &= \sFORK{}\sem{\aGrp}
   \\
+  \sem{\aCmd \SEMI \bCmd} &= \sem{\aCmd}\sSEMI\sem{\bCmd}
+  \\
+  \sem{\IF{\bForm}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\bForm}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
+  \\
+  \sem{\NIL} &= \sSTOP
+  \\
   \sem{\THREAD{\aCmd}} &= \sTHREAD{}\sem{\aCmd}
+  \\
+  \sem{\aGrp \PAR \bGrp} &= \sem{\aGrp}\sPAR\sem{\bGrp}
 \end{align*}
 [Examples.]
 

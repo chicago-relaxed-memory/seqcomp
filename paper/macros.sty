@@ -93,17 +93,17 @@
 \NewDocumentCommand\DR{O{} m O{} m}{\mathsf{R}^{#1}_{#3}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}
 \NewDocumentCommand\DRP{O{} m O{} m}{\PBR{\DR[#1]{#2}[#3]{#4}}}
 
-\NewDocumentCommand\PWREF{O{} m O{} m}{{\REF{#2}}^{#1}_{#3} \GETS #4}
-\NewDocumentCommand\DWREF{O{} m O{} m}{\mathsf{W}^{#1}_{#3}\ifnotempty{#2}{\mkern0mu\REF{#2}\ifnotempty{#4}{\mkern1mu#4}}}
-\NewDocumentCommand\DWREFP{O{} m O{} m}{\PBR{\DWREF[#1]{#2}[#3]{#4}}}
+\NewDocumentCommand\PW{O{} m O{} m}{{#2}^{#1}_{#3} \GETS #4}
+\NewDocumentCommand\DW{O{} m O{} m}{\mathsf{W}^{#1}_{#3}\ifnotempty{#2}{\mkern0mu#2\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DWP{O{} m O{} m}{\PBR{\DW[#1]{#2}[#3]{#4}}}
 
 \NewDocumentCommand\PRREF{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{\REF{#2}}^{#1}_{#3}}
 \NewDocumentCommand\DRREF{O{} m O{} m}{\mathsf{R}^{#1}_{#3}\ifnotempty{#2}{\mkern1mu\REF{#2}\ifnotempty{#4}{\mkern1mu#4}}}
 \NewDocumentCommand\DRREFP{O{} m O{} m}{\PBR{\DRREF[#1]{#2}[#3]{#4}}}
 
-\NewDocumentCommand\PW{O{} m O{} m}{{#2}^{#1}_{#3} \GETS #4}
-\NewDocumentCommand\DW{O{} m O{} m}{\mathsf{W}^{#1}_{#3}\ifnotempty{#2}{\mkern0mu#2\ifnotempty{#4}{\mkern1mu#4}}}
-\NewDocumentCommand\DWP{O{} m O{} m}{\PBR{\DW[#1]{#2}[#3]{#4}}}
+\NewDocumentCommand\PWREF{O{} m O{} m}{{\REF{#2}}^{#1}_{#3} \GETS #4}
+\NewDocumentCommand\DWREF{O{} m O{} m}{\mathsf{W}^{#1}_{#3}\ifnotempty{#2}{\mkern0mu\REF{#2}\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DWREFP{O{} m O{} m}{\PBR{\DWREF[#1]{#2}[#3]{#4}}}
 
 \NewDocumentCommand\PA{m m}{\mathtt{await}\,#1\,\EQ\,#2}
 \NewDocumentCommand\DA{m m}{\mathsf{A}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}
@@ -572,21 +572,21 @@
 \newcommand{\GETS}{\mathtt{:}\mkern-1mu\mathtt{=}\,}
 \newcommand{\SEQ}{\mathtt{;}\,\allowbreak}
 \newcommand{\SEMI}{\mathtt{;}\,\allowbreak}
-\newcommand{\IF}[1]{\mathtt{if}\allowbreak\mathtt{(}#1\mathtt{)}}
 \newcommand{\PASS}{\mathtt{pass}}
 \newcommand{\WHILE}{\mathtt{while}\,}
 \newcommand{\DO}[1]{\mathtt{do}\mathtt{\{}#1\mathtt{\}}}
-\newcommand{\THEN}{\allowbreak\mathtt{\{}}
-\newcommand{\ELSE}{\mathtt{\}}\,\allowbreak\mathtt{else}\allowbreak\,\mathtt{\{}}
+\newcommand{\IF}[1]{\mathtt{if}\allowbreak\texttt{(}#1\texttt{)}}
+\newcommand{\THEN}{\allowbreak\texttt{\{}}
+\newcommand{\ELSE}{\texttt{\}}\,\allowbreak\mathtt{else}\allowbreak\,\texttt{\{}}
 \newcommand{\ELIF}[1]{\ELSE\IF{#1}}
-\newcommand{\brELSE}{\mathtt{\}}\\\mathtt{else}\,\mathtt{\{}}
-\newcommand{\brELIF}[1]{\mathtt{\}}\\\mathtt{else}\,\IF{#1}}
-\newcommand{\FI}{\mathtt{\}}}
+\newcommand{\brELSE}{\texttt{\}}\\\mathtt{else}\,\texttt{\{}}
+\newcommand{\brELIF}[1]{\texttt{\}}\\\mathtt{else}\,\IF{#1}}
+\newcommand{\FI}{\texttt{\}}}
 \newcommand{\RPAR}{\,\mathbin{\mathtt{\textbf{|}}\mkern-6mu\mathtt{\textbf{|}}\mkern-5mu\raisebox{.7ex}{\mathtt{\textbf{-}}}\mkern-3mu}\,}
 \newcommand{\LPAR}{\,\mathbin{\rrceil}\,}
 \newcommand{\VAR}{\mathtt{var}\,}
 \newcommand{\TOUCHED}{\mathtt{touched}\,}
-\newcommand{\REF}[1]{\mathtt{[}#1\mathtt{]}}
+\newcommand{\REF}[1]{\mkern-1mu\texttt{[}\mkern-1mu#1 \mkern-1mu\texttt{]}\mkern-1mu}
 \newcommand{\REFAcq}[1]{\REF{#1}^{\mathtt{acq}}}
 \newcommand{\REFRel}[1]{\REF{#1}^{\mathtt{rel}}}
 
