@@ -2,70 +2,38 @@
 
 [Very drafty.  These are just notes.]
 
-Complications:
 \begin{itemize}
 \item Dependency: preconditions
 \item TC1: Track local state
-\item Release/Acquire: $\mathsf{Q}$
+\end{itemize}
+
+\subsection{Address Calculation}
+
+\subsection{Coherence}
+Can be encoded in independency, or logic.
+
+\begin{itemize}
 \item Coherence respects program order: $\mathsf{Q}_{x}$
 \item Drop read-read coherence: $\mathsf{QW}_{x}$ (Required for CSE without
   alias analysis over read only code, not required by hardware)
-\item Address calculation...
-\item No read-read dependency (for arm): $\mathsf{RW}$/$\mathsf{RO}$ (control
-  dependencies into reads as in MP with release on right and control
-  dependency on left)
-\item Downgrading acquires/Anton example: ${\downarrow} x$
-\end{itemize}
-Require indexing by event:
-\begin{itemize}
-\item IF closure/case analysis: $\psi_e$
-\item Redundant read elimination/TC2, to get determinism of value per event
 \end{itemize}
 
+\subsection{Release Acquire}
+$\mathsf{Q}$
 
+Can be encoded in independency, or logic, but logic is more flexible, and we
+need that for \armeight.
 
-\subsection{Triangle Races}
+\subsection{ARM Compilation: Internal Acquires}
+Downgrading acquires/Anton example: ${\downarrow} x$
 
+\subsection{ARM Compilation: Read-read dependencies}
+$\mathsf{RW}$/$\mathsf{RO}$ (control dependencies into reads as in MP with
+release on right and control dependency on left)
 
-\begin{gather*}
-  \PW{x}{1}\SEMI
-  \PW[\mRA]{y}{1}\SEMI
-  \PR[\mRA]{x}{r}
-  \PAR
-  \IF{\PR[\mRA]{y}{}}\THEN \PW[\mRA]{x}{2}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \event{a2}{\DW[\mRA]{y}{1}}{right=of a1}
-      \event{a3}{\DR[\mRA]{x}{1}}{right=of a2}
-      \event{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
-      \event{b2}{\DW[\mRA]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
-      \sync{b1}{b2}
-    \end{tikzinline}}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \event{a2}{\DW[\mRA]{y}{1}}{right=of a1}
-      \event{a3}{\DR[\mRA]{x}{2}}{right=of a2}
-      \event{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
-      \event{b2}{\DW[\mRA]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      \rf[out=20,in=160]{a2}{b1}
-      \rf[out=160,in=20]{b2}{a3}
-      \sync{b1}{b2}
-    \end{tikzinline}}
-\end{gather*}
-Bug is in \citep[Lemma A.4]{DBLP:conf/ppopp/DongolJR19}.  It assumes that
-$\DRP[\mRA]{x}{1}$ and $\DWP[\mRA]{x}{2}$ are racing in the first execution
-because they are not ordered by happens-before.  But this is false since
-neither is plain.
+\subsection{Redundant Read Elimination}
 
-
-
-\subsection{TC2}
+Requires indexing to resolve nondeterminism.
 
 \begin{gather*}
   \taglabel{TC2}
@@ -144,12 +112,10 @@ The semantics here allows this by coalescing:
     \end{tikzinline}}
 \end{gather*}
 
-\subsection{Coherence}
-Can be encoded in independency, or logic.
+\subsection{If Closure}
+Requires indexing to resolve nondeterminism.
 
-\subsection{Release Acquire}
-Can be encoded in independency, or logic, but logic is more flexible, and we
-need that for \armeight.
+IF closure/case analysis: $\psi_e$
 
 
 \subsection{Agda}

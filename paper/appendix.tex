@@ -5,11 +5,15 @@
 This paper addresses several errors in \citep{10.1145/3428262}, which we
 henceforth refer to as \jjr{}.
 
+\subsection{Parallel Composition}
+
 In \jjr{\textsection2.4}, parallel composition is defined allowing coalescing
 of events.  Here we have forbidden coalescing.  This difference appears to be
 arbitrary.  In \jjr{}, however, there is a mistake in the handling of
 termination actions.  The predicates should be joined using $\land$, not
 $\lor$.
+
+\subsection{Redundant Read Elimination}
 
 In \jjr{\textsection2.6} the semantics of read is defined as follows:
 \begin{align*}
@@ -183,6 +187,7 @@ read-read coherence.  But this is not the case.  Consider the following example:
 But this is not a problem, since fulfillment requires that $\DWP{x}{1}$
 precede both reads of $x$.
 
+\subsection{Internal Acquiring Reads}
 
 The second issue concerns acquiring reads.  Shortly after publication,
 \citet{anton} noticed a shortcoming of the implementation on \armeight{} in
@@ -219,6 +224,43 @@ The solution we have adopted is to allow an acquiring read to be downgraded
 to a relaxed read when it is preceded (sequentially) by a relaxed write that
 could fulfill it.  Back-porting this solution to \jjr{} requires that we add
 access predicates to the logic and allow
+
+The notion of data-race is incorrect in \jjr{}.
+\begin{gather*}
+  \PW{x}{1}\SEMI
+  \PW[\mRA]{y}{1}\SEMI
+  \PR[\mRA]{x}{r}
+  \PAR
+  \IF{\PR[\mRA]{y}{}}\THEN \PW[\mRA]{x}{2}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \event{a2}{\DW[\mRA]{y}{1}}{right=of a1}
+      \event{a3}{\DR[\mRA]{x}{1}}{right=of a2}
+      \event{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
+      \event{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      \rf[out=20,in=160]{a1}{a3}
+      \rf[out=20,in=160]{a2}{b1}
+      \sync{b1}{b2}
+    \end{tikzinline}}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \event{a2}{\DW[\mRA]{y}{1}}{right=of a1}
+      \event{a3}{\DR[\mRA]{x}{2}}{right=of a2}
+      \event{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
+      \event{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      \rf[out=20,in=160]{a2}{b1}
+      \rf[out=160,in=20]{b2}{a3}
+      \sync{b1}{b2}
+    \end{tikzinline}}
+\end{gather*}
+Bug is in \citep[Lemma A.4]{DBLP:conf/ppopp/DongolJR19}.  It assumes that
+$\DRP[\mRA]{x}{1}$ and $\DWP[\mRA]{x}{2}$ are racing in the first execution
+because they are not ordered by happens-before.  But this is false since
+neither is plain.
 
 In addition, the \armeight{} implementation result given here does not rely
 on read elimination.  Instead we use a recent alternative characterization of

@@ -1,5 +1,9 @@
 \section{Model}
 
+Batty suggest example where dependencies are added and also go away, perhaps
+by store forwarding. Something like:
+\texttt{(r=x; y=1); (s=y; z=s+r)}
+
 \subsection{Preliminaries}
 The syntax is built from
 \begin{itemize}
@@ -290,9 +294,9 @@ execution.
   \item if $\bEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm\SB0(\bEv)$ implies $(\aExp{=}\aVal)$,
   % \item if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$,
   % \item if $\bEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\bEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\bEv)$.
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either\\
-    $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\aEv)$ and $\bEv=\aEv$ or \\
-    $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$.
+  \item if $\aEv\in\aEvs_2$ then either
+    $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$ or\\
+    $\aEv\in\aEvs_1$ and $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\aEv)$.
   \end{enumerate}
 
   \noindent
@@ -304,9 +308,10 @@ execution.
      \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[1--\thepomsetPrefixOrderCount)] as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPS_2$ in
     Definition~\ref{tab:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv=\aEv$ or\\
+  \item if $\aEv\in\aEvs_2$ then either $\aEv\in\aEvs_1$ or\\
     $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal\lor\aReg{=}\aLoc)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ or\\
-    $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ and $\bEv<\SB0\aEv$.
+    $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ and $\bEv<\SB0\aEv$ \\
+    \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
   \end{enumerate}  
 \end{definition}
 Note that when $\bEv\in\aEvs_1\setminus\aEvs_2$, $\sLOADPRE{}{}{}$ does not
