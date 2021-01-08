@@ -14,31 +14,8 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
   open seqcomp(Event)(DM)
   open parcomp(Event)(DM)
 
-  -- initial model
-
-  -- κLOAD : Register → Address → Formula
-  -- κLOAD r a = Qw[ a ]
-
-  -- τLOAD : Register → Address → Value → Formula → Formula
-  -- τLOAD r a v ϕ = (value v == register r) ⇒ ϕ[r/x]
-
-  -- τLOAD∅ : Register → Address → AccessMode → Value → Formula → Formula
-  -- τLOAD∅ r a rlx v ϕ =  ¬ Q[ a ]  ∧ (((value v == register r) ∨ ([ a ]== register r)) ⇒ ϕ[r/x])
-  -- τLOAD∅ r a ra  v ϕ  = false
-
-
-  -- κSTORE : Address → Expression → AccessMode → Value → Formula
-  -- κSTORE a M rlx v = Q[ a ] ∧ (M == value v)
-  -- κSTORE a M ra v =  Q ∧ (M == value v)
-
-  -- τSTORE : Address → Expression → AccessMode → Formula → Formula
-  -- τSTORE a M μ ϕ = ϕ [ M /[ a ]]
-
-  -- τSTORE∅ : Address → Expression → AccessMode → Formula → Formula
-  -- τSTORE∅ a M μ ϕ = ¬ Qw[ a ] ∧ (ϕ [ M /[ a ]] )
-
-  κLOAD : Address → Value → Formula
-  κLOAD a v = RO ∧ Qw[ a ]
+  κLOAD : Address → Formula
+  κLOAD a = RO ∧ Qw[ a ]
 
   τLOADD : Register → Register → Address → Value → Formula → Formula
   τLOADD r s a v ϕ = (value v == register s) ⇒ (ϕ [ register s / r ] [ register s /[ a ]])
@@ -61,7 +38,7 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
 
     field d=e : ∀ d e → (d ∈ E) → (e ∈ E) → ((ψ(d) ∧ ψ(e)) ∈ Satisfiable) → (d ≡ e)
     field ℓ=Rav : ∀ e → (e ∈ E) → ℓ(e) ≡ (R (a(e)) (v(e)))
-    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ (L == address (a(e))) ∧ κLOAD (a(e)) (v(e)))
+    field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ (L == address (a(e))) ∧ κLOAD (a(e)))
     field τC⊨τLOADD : ∀ C ϕ e → (e ∈ E) → (e ∈ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ τLOADD r (r[ e ]) (a(e)) (v(e)) ϕ))
     field τC⊨τLOADI : ∀ C ϕ a e → (e ∈ E) → (e ∉ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ (L == address a) ⇒ τLOADI r (r[ e ]) a μ ϕ))
     field τC⊨τLOAD∅ : ∀ C ϕ a s χ → (∀ e → (e ∈ E) → (e ∈ C) → (χ ⊨ ¬(ψ(e)))) → (τ(C)(ϕ) ⊨ (χ ⇒ (L == address a) ⇒ τLOAD∅ r s a μ ϕ))

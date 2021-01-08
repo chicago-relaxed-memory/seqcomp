@@ -1,10 +1,45 @@
+\newcommand{\SB}[1]{}%_{#1}}
+\newcommand{\limplies}{\Rightarrow}
+% get ams to ignore tag in spacing
+\renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{(\ignorespaces#1\unskip\@@italiccorr)}}}
+\newcommand{\spacetag}[2][3em]{\makebox[#1]{}\tag{#2}}
+\newcommand{\notagparens}{\renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{\ignorespaces##1\unskip\@@italiccorr}}}}
+
+\usepackage{pifont}
+\newcommand{\qmark}{{\color{blue!80!black}\text{?}}}
+\newcommand{\cmark}{{\color{green!80!black}\text{\ding{51}}}}
+\newcommand{\xmark}{{\color{red!80!black}\text{\ding{55}}}}
+\newcommand{\QMARK}{\makebox[0pt][l]{\;\;\;\;\qmark}}
+\newcommand{\CMARK}{\makebox[0pt][l]{\;\;\;\;\cmark}}
+\newcommand{\XMARK}{\makebox[0pt][l]{\;\;\;\;\xmark}}
+
 % recommended by ACM
-% \usepackage[T1]{fontenc}
-% \usepackage[utf8]{inputenc}
-% \usepackage{microtype}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage{microtype}
+
+% % To get agda, use xelatex or luatex
+% % Translation of unicode to latex: 
+% \usepackage{ucs}
+% \usepackage[utf8x]{inputenc}
+% \usepackage{autofe}
+% % Targets of unicode translation:
+% \usepackage{amssymb}
+% \usepackage{bbm}
+% \usepackage[greek,english]{babel}
+% % Additional unicode
+% \DeclareUnicodeCharacter{8988}{\ensuremath{\ulcorner}}
+% \DeclareUnicodeCharacter{8989}{\ensuremath{\urcorner}}
+% \DeclareUnicodeCharacter{8803}{\ensuremath{\overline{\equiv}}}
+% % for code
+% \usepackage{fancyvrb}
+% \DefineVerbatimEnvironment{code}{Verbatim}{fontfamily=helvetica,fontsize=\small} % Add fancy options here if you like.
 
 %\usepackage{anyfontsize}
 \usepackage{mathtools}
+\usepackage{enumitem}
+\setlist[enumerate,1]{leftmargin = 1.6\parindent, topsep = 0.5\baselineskip}
+\setlist[itemize,1]{leftmargin = 1.6\parindent, topsep = 0.5\baselineskip}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{cleveref}
@@ -50,20 +85,41 @@
 \newcommand{\pcs}{\textsc{pc}s}
 
 \newcommand{\sem}[2][]{\llbracket#2\rrbracket}
-\NewDocumentCommand\PF{O{} m}{\texttt{F}^{#2}_{#1}}
-\NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}_{#3}}
-\NewDocumentCommand\PW{O{} m O{} m}{{#2}^{#1}_{#3} \GETS #4}
+\NewDocumentCommand\PF{O{} m}{\mathtt{F}^{#2}_{#1}}
 \NewDocumentCommand\DF{O{} m}{\mathsf{F}^{#2}_{#1}}
+\NewDocumentCommand\DFP{O{} m}{\PBR{\DF[#1]{#2}}}
+
+\NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}_{#3}}
 \NewDocumentCommand\DR{O{} m O{} m}{\mathsf{R}^{#1}_{#3}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DRP{O{} m O{} m}{\PBR{\DR[#1]{#2}[#3]{#4}}}
+
+\NewDocumentCommand\PWREF{O{} m O{} m}{{\REF{#2}}^{#1}_{#3} \GETS #4}
+\NewDocumentCommand\DWREF{O{} m O{} m}{\mathsf{W}^{#1}_{#3}\ifnotempty{#2}{\mkern0mu\REF{#2}\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DWREFP{O{} m O{} m}{\PBR{\DWREF[#1]{#2}[#3]{#4}}}
+
+\NewDocumentCommand\PRREF{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{\REF{#2}}^{#1}_{#3}}
+\NewDocumentCommand\DRREF{O{} m O{} m}{\mathsf{R}^{#1}_{#3}\ifnotempty{#2}{\mkern1mu\REF{#2}\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DRREFP{O{} m O{} m}{\PBR{\DRREF[#1]{#2}[#3]{#4}}}
+
+\NewDocumentCommand\PW{O{} m O{} m}{{#2}^{#1}_{#3} \GETS #4}
 \NewDocumentCommand\DW{O{} m O{} m}{\mathsf{W}^{#1}_{#3}\ifnotempty{#2}{\mkern0mu#2\ifnotempty{#4}{\mkern1mu#4}}}
-\NewDocumentCommand\DFP{O{} m}{(\DF[#1]{#2})}
-\NewDocumentCommand\DRP{O{} m O{} m}{(\DR[#1]{#2}[#3]{#4})}
-\NewDocumentCommand\DWP{O{} m O{} m}{(\DW[#1]{#2}[#3]{#4})}
-\NewDocumentCommand\PAR{O{} O{}}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}}\,}
+\NewDocumentCommand\DWP{O{} m O{} m}{\PBR{\DW[#1]{#2}[#3]{#4}}}
+
+\NewDocumentCommand\PA{m m}{\mathtt{await}\,#1\,\EQ\,#2}
+\NewDocumentCommand\DA{m m}{\mathsf{A}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}
+\NewDocumentCommand\DAP{m m}{\PBR{\DA{#1}{#2}}}
+
+\NewDocumentCommand\PAR{O{} O{}}{\,\mathbin{\mathtt{\textbf{|}}\mkern-6mu\mathtt{\textbf{|}}}\,}
+\newcommand{\LET}[2]{#1\GETS#2}
+\newcommand{\PRED}[2][\aForm]{#2 \mid #1}
+\newcommand{\PREDP}[2][\aForm]{\ABR{\PRED[#1]{#2}}}
+\newcommand{\ABR}[1]{\langle#1\rangle}
+\newcommand{\PBR}[1]{(#1)}
+
 % \newcommand{\sem}[2][]{\llbracket#2\rrbracket_{#1}}
 % \NewDocumentCommand\DR{O{} O{} m m}{#2\mathsf{R}^{#1}\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}
 % \NewDocumentCommand\DW{O{} O{} m m}{#2\mathsf{W}^{#1}\ifnotempty{#3}{\mkern0mu#3\ifnotempty{#4}{\mkern1mu#4}}}
-% \NewDocumentCommand \PAR {O{} O{}}{\,\mathbin{{}_{#1}\mkern-2mu\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\mkern-1mu{}_{#2}}\,}
+% \NewDocumentCommand \PAR {O{} O{}}{\,\mathbin{{}_{#1}\mkern-2mu\mathtt{\textbf{|}}\mkern-6mu\mathtt{\textbf{|}}\mkern-1mu{}_{#2}}\,}
 
 %https://tex.stackexchange.com/questions/438876/how-to-cross-reference-text-with-a-custom-label-reference-text
 % \labeltext[optional short ref]{the labeled text}{label name}
@@ -214,6 +270,7 @@
 \newcommand{\testP}[2]{{\tt test}^{#1}_{#2}}
 \newcommand{\freshaval}{\aVal_{{\tt fr}}}
 
+\newcommand{\jjr}[1]{[JJR\ifnotempty{#1}{, #1}]}
 \newcommand{\RMW}{{\sc rmw}}
 \newcommand{\RMWs}{{\sc rmw}s}
 \newcommand{\drf}{{\sc drf}}
@@ -295,6 +352,8 @@
 \newcommand{\refapp}[1]{Appendix~\ref{app:#1}}
 
 \newenvironment{noenv}{\ignorespaces}{\ignorespacesafterend}
+\newcommand{\aGrp}{G}
+\newcommand{\bGrp}{H}
 \newcommand{\aCmd}{C}
 \newcommand{\bCmd}{D}
 \newcommand{\eCmd}{E}
@@ -304,7 +363,7 @@
 \newcommand{\ifnotemptyelse}[3]{\ifx\relax#1\relax#3\else#2\fi}
 \newcommand{\ifemptyelse}[3]{\ifx\relax#1\relax#2\else#3\fi}
 
-\newcommand{\dontcare}{\texttt{\_}}
+\newcommand{\dontcare}{\mathtt{\_}}
 \newcommand{\pair}[2]{\langle#1,\,#2\rangle}
 % \newcommand{\freads}{\mathsf{reads}}
 % \newcommand{\fwrites}{\mathsf{writes}}
@@ -341,7 +400,7 @@
 
 \newcommand{\Val}{\mathcal{V}}
 \newcommand{\aVal}{v}
-\newcommand{\bVal}{u}
+\newcommand{\bVal}{w}
 \newcommand{\cVal}{\ell}
 %\newcommand{\dVal}{u}
 
@@ -370,8 +429,6 @@
 \newcommand{\Act}{\mathcal{A}}
 \newcommand{\aActSub}{\alpha}
 \newcommand{\bActSub}{\beta}
-
-\newcommand{\aVar}{x}
 
 \newcommand{\aAct}{a}
 \newcommand{\bAct}{b}
@@ -478,7 +535,7 @@
 \newcommand{\prefixsimp}{\mathbin{{\xRightarrow{{\mathsf{triv}}}}}}
 \newcommand{\sequence}{\mathbin;}
 \newcommand{\guard}{\mathbin\rhd}
-\newcommand{\downclose}{{\downarrow}}
+\newcommand{\downclose}[2][]{{\downarrow}_{#1}(#2)}
 \newcommand{\relfilt}[2][\amode]{\mathsf{cover}\ifnotempty{#1}{^{#1}}\ifnotempty{#2}{_{#2}}}
 \newcommand{\DOT}{\mathbin.}
 
@@ -493,73 +550,82 @@
 \newcommand{\semdown}[1]{\nabla\llbracket#1\rrbracket}
 \newcommand{\semsc}[1]{\llbracket#1\rrbracket_{\SC}}
 %\newcommand{\semsc}[1]{\textit{SC}\llbracket#1\rrbracket}
-\newcommand{\FENCE}{\texttt{F}}
-\newcommand{\FADD}{\texttt{FADD}}
-\newcommand{\CAS}{\texttt{CAS}}
-\newcommand{\BEGIN}{\texttt{begin}}
-\newcommand{\COMMIT}{\texttt{commit}}
-\newcommand{\RECOVERY}{\texttt{onabort}\texttt{\{}}
-\newcommand{\ENDREC}{\texttt{\}}}
-\newcommand{\NEW}{\texttt{new}\,}
-\newcommand{\NULL}{\texttt{null}}
+\newcommand{\FENCE}{\mathtt{F}}
+\newcommand{\FADD}{\mathtt{FADD}}
+\newcommand{\CAS}{\mathtt{CAS}}
+\newcommand{\BEGIN}{\mathtt{begin}}
+\newcommand{\COMMIT}{\mathtt{commit}}
+\newcommand{\RECOVERY}{\mathtt{onabort}\mathtt{\{}}
+\newcommand{\ENDREC}{\mathtt{\}}}
+\newcommand{\NEW}{\mathtt{new}\,}
+\newcommand{\NULL}{\mathtt{null}}
 \newcommand{\BEGINVAL}{\BEGIN\,\aVal}
 \newcommand{\COMMITVAL}{\COMMIT\,\aVal}
-\newcommand{\RECOVERYVAL}{\texttt{onabort}\,\aVal\texttt{\{}}
-\newcommand{\END}{\texttt{end}}
-\newcommand{\SKIP}{\texttt{skip}}
-\newcommand{\BANG}{\texttt{!}\mkern-1mu}
-\newcommand{\GETS}{\texttt{:}\mkern-1mu\texttt{=}\,}
-\newcommand{\SEQ}{\texttt{;}\,\allowbreak}
-\newcommand{\SEMI}{\texttt{;}\,\allowbreak}
-\newcommand{\IF}[1]{\texttt{if}\allowbreak\texttt{(}#1\texttt{)}}
-\newcommand{\PASS}{\texttt{pass}}
-\newcommand{\WHILE}{\texttt{while}\,}
-\newcommand{\DO}[1]{\texttt{do}\texttt{\{}#1\texttt{\}}}
-\newcommand{\THEN}{\allowbreak\texttt{\{}}
-\newcommand{\ELSE}{\texttt{\}}\,\allowbreak\texttt{else}\allowbreak\,\texttt{\{}}
+\newcommand{\RECOVERYVAL}{\mathtt{onabort}\,\aVal\mathtt{\{}}
+\newcommand{\END}{\mathtt{end}}
+\newcommand{\SKIP}{\mathtt{skip}}
+\newcommand{\NIL}{\mathsf{0}}
+\newcommand{\THREAD}[1]{\mathtt{thread}\ifnotempty{#1}{\;#1}}
+\newcommand{\FORK}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}}
+\newcommand{\STOP}{\mathtt{stop}}
+\newcommand{\BANG}{\mathtt{!}\mkern-1mu}
+\newcommand{\GETS}{\mathtt{:}\mkern-1mu\mathtt{=}\,}
+\newcommand{\SEQ}{\mathtt{;}\,\allowbreak}
+\newcommand{\SEMI}{\mathtt{;}\,\allowbreak}
+\newcommand{\IF}[1]{\mathtt{if}\allowbreak\mathtt{(}#1\mathtt{)}}
+\newcommand{\PASS}{\mathtt{pass}}
+\newcommand{\WHILE}{\mathtt{while}\,}
+\newcommand{\DO}[1]{\mathtt{do}\mathtt{\{}#1\mathtt{\}}}
+\newcommand{\THEN}{\allowbreak\mathtt{\{}}
+\newcommand{\ELSE}{\mathtt{\}}\,\allowbreak\mathtt{else}\allowbreak\,\mathtt{\{}}
 \newcommand{\ELIF}[1]{\ELSE\IF{#1}}
-\newcommand{\brELSE}{\texttt{\}}\\\texttt{else}\,\texttt{\{}}
-\newcommand{\brELIF}[1]{\texttt{\}}\\\texttt{else}\,\IF{#1}}
-\newcommand{\FI}{\texttt{\}}}
-\newcommand{\RPAR}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\mkern-5mu\raisebox{.7ex}{\texttt{\textbf{-}}}\mkern-3mu}\,}
+\newcommand{\brELSE}{\mathtt{\}}\\\mathtt{else}\,\mathtt{\{}}
+\newcommand{\brELIF}[1]{\mathtt{\}}\\\mathtt{else}\,\IF{#1}}
+\newcommand{\FI}{\mathtt{\}}}
+\newcommand{\RPAR}{\,\mathbin{\mathtt{\textbf{|}}\mkern-6mu\mathtt{\textbf{|}}\mkern-5mu\raisebox{.7ex}{\mathtt{\textbf{-}}}\mkern-3mu}\,}
 \newcommand{\LPAR}{\,\mathbin{\rrceil}\,}
-\newcommand{\VAR}{\texttt{var}\,}
-\newcommand{\TOUCHED}{\texttt{touched}\,}
-\newcommand{\REF}[1]{\texttt{[}#1\texttt{]}}
-\newcommand{\REFAcq}[1]{\REF{#1}^{\texttt{acq}}}
-\newcommand{\REFRel}[1]{\REF{#1}^{\texttt{rel}}}
+\newcommand{\VAR}{\mathtt{var}\,}
+\newcommand{\TOUCHED}{\mathtt{touched}\,}
+\newcommand{\REF}[1]{\mathtt{[}#1\mathtt{]}}
+\newcommand{\REFAcq}[1]{\REF{#1}^{\mathtt{acq}}}
+\newcommand{\REFRel}[1]{\REF{#1}^{\mathtt{rel}}}
 
-\newcommand{\CANREAD}{\texttt{canRead}}
-\newcommand{\SEC}{\texttt{SECRET}}
-\newcommand{\RETURN}{\texttt{return}\,}
-\newcommand{\BARRIER}{\texttt{barrier}}
+\newcommand{\CANREAD}{\mathtt{canRead}}
+\newcommand{\SEC}{\mathtt{SECRET}}
+\newcommand{\RETURN}{\mathtt{return}\,}
+\newcommand{\BARRIER}{\mathtt{barrier}}
 
-\newcommand{\EQ}{{=}}%\,\texttt{=}\,}
-% \newcommand{\NOTEQ}{\,\texttt{!=}\,}
+\newcommand{\EQ}{{=}}%\,\mathtt{=}\,}
+% \newcommand{\NOTEQ}{\,\mathtt{!=}\,}
 \newcommand{\NOTEQ}{\ensuremath{{\neq}}}
 
-\newcommand{\GCC}{\texttt{gcc}}
-\newcommand{\CLANG}{\texttt{clang}}
+\newcommand{\GCC}{\ensuremath{\mathtt{gcc}}}
+\newcommand{\CLANG}{\ensuremath{\mathtt{clang}}}
 
-\newcommand{\sSKIP}{\mathit{SKIP}}
-\newcommand{\sSTOP}{\mathit{STOP}}
-\newcommand{\sSEMI}{\mathbin{\dot{\rule{0em}{1.15ex};}}}
+%\newcommand{\sSEMI}{\mathbin{\dot{\rule{0em}{1.15ex};}}}
+\newcommand{\sSEMI}{\mathbin{;}}
 \newcommand{\sPAR}{\mathbin{\parallel}}
 \newcommand{\sSEND}[2]{#1!\ifnotempty{#2}{\langle#2\rangle}}
 \newcommand{\sRECV}[2]{#1?\ifnotempty{#2}{(#2)}}
 \newcommand{\sSET}[1]{\set{#1}}
 \newcommand{\sUNSET}[1]{\unset{#1}}
 \newcommand{\sWAIT}[1]{\wait{#1}}
-\newcommand{\sPREFIX}{\mathbin{\Rightarrow}}
 \newcommand{\sGUARD}{\guard}
-\newcommand{\sIF}{\mathit{IF}(}
-\newcommand{\sTHEN}{)\{}
-\newcommand{\sELSE}{\}\{}
-\newcommand{\sFI}{\}}
-\newcommand{\wPAR}{\mathbin{\mid}}
-\newcommand{\wPREFIX}[1][]{\mathbin{\displaystyle\mathop{\ifx\relax#1\relax\rightarrow\else\longrightarrow\fi}^{#1}}}
+\newcommand{\sPREFIX}[1][]{\mathbin{\displaystyle\mathop{\ifx\relax#1\relax\rightarrow\else\longrightarrow\fi}^{#1}}}
 \newcommand{\wSEMI}{\mathbin{;}}
-\newcommand{\wFORK}{\mathit{FORK}\,}
+\newcommand{\sTHEN}{\allowbreak,\,}
+\newcommand{\sELSE}{\allowbreak,\,}
+\newcommand{\sFI}{)}
+\newcommand{\sIF}[1]{\textnormal{\textit{IF}}\ifnotempty{#1}{\allowbreak(#1}}
+\newcommand{\sLET}[2]{\textnormal{\textit{LET}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)}}
+\newcommand{\sFORK}[1]{\textnormal{\textit{FORK}}\ifnotempty{#1}{\allowbreak(#1)}}
+\newcommand{\sTHREAD}[1]{\textnormal{\textit{THREAD}}\ifnotempty{#1}{\allowbreak(#1)}}
+\newcommand{\sLOAD}[3][]{\textnormal{\textit{LOAD}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1})}}
+\newcommand{\sSTORE}[3][]{\textnormal{\textit{STORE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1})}}
+\newcommand{\sLOADPRE}[4][]{\textnormal{\textit{LOADPRE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
+\newcommand{\sSTOREPRE}[4][]{\textnormal{\textit{STOREPRE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
+\newcommand{\sSKIP}{\textnormal{\textit{SKIP}}}
+\newcommand{\sSTOP}{\textnormal{\textit{STOP}}}
 
 \newcommand{\init}[1]{\mathsf{init}\,#1}
 \newcommand{\release}[1]{\mathsf{release}\,#1}
@@ -572,6 +638,8 @@
 \newcommand{\notified}[1]{\mathsf{notified}\,#1}
 \newcommand{\wait}[1]{\mathsf{wait}\,#1}
 \newcommand{\reorder}{\mathrel\leftrightarrow}
+\newcommand{\reorderRLX}{\mathrel{\smash{\overset{\mRLX}{\leftrightarrow}}}}
+\newcommand{\reorderSC}{\mathrel{\smash{\overset{\mSC}{\leftrightarrow}}}}
 \newcommand{\quietForm}{\mathsf{Q}}
 \newcommand{\preForm} {\kappa}
 \newcommand{\reorderDepForm}{xxx}

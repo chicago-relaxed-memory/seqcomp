@@ -55,11 +55,35 @@
 % ICFP deadline March 2.  Committee unknown.
 % POPL deadline June (adding UB)
 \documentclass[conference,compsoc]{IEEEtran}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Missing includes
+\usepackage{graphicx}
+\usepackage[prologue]{xcolor}
+\definecolor[named]{ACMBlue}{cmyk}{1,0.1,0,0.1}
+\definecolor[named]{ACMYellow}{cmyk}{0,0.16,1,0}
+\definecolor[named]{ACMOrange}{cmyk}{0,0.42,1,0.01}
+\definecolor[named]{ACMRed}{cmyk}{0,0.90,0.86,0}
+\definecolor[named]{ACMLightBlue}{cmyk}{0.49,0.01,0,0}
+\definecolor[named]{ACMGreen}{cmyk}{0.20,0,1,0.19}
+\definecolor[named]{ACMPurple}{cmyk}{0.55,1,0,0.15}
+\definecolor[named]{ACMDarkBlue}{cmyk}{1,0.58,0,0.21}
+\usepackage[bookmarksnumbered,unicode]{hyperref}
+\hypersetup{colorlinks,
+  linkcolor=ACMPurple,
+  citecolor=ACMPurple,
+  urlcolor=ACMDarkBlue,
+  filecolor=ACMDarkBlue}
+\usepackage{amsmath}
 \usepackage{amsthm}
-\newtheorem{definition}{Definition}
+\theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
 \newtheorem{remark}{Remark}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
 \author{\IEEEauthorblockN{%
     Alan Jeffrey\IEEEauthorrefmark{1} and
     James Riely\IEEEauthorrefmark{2}
@@ -67,7 +91,7 @@
 \IEEEauthorblockA{\IEEEauthorrefmark{1}The Servo Project and Roblox}
 \IEEEauthorblockA{\IEEEauthorrefmark{2}DePaul University}}
 
-\title{Understanding Sequential Composition under Relaxed Memory Semantics}
+\title{Sequential Composition for Relaxed Memory}
 %Pomsets with Preconditions and Predicate Transformers}
 
 \usepackage{macros}
@@ -75,13 +99,17 @@
 
 \begin{document} 
 \maketitle
-\begin{abstract}\input{abstract}\end{abstract}
-\input{intro}
-\input{procalg}
-\input{memmodel}
-\input{outro}
-\input{arm}
+%\begin{abstract}\input{abstract}\end{abstract}
+%\input{intro}
+%\input{procalg}
+\input{definitions}
+\input{complications}
+% \input{outro}
+% \input{arm}
 
+% \clearpage
+% \input{appendix}
+% \clearpage
 %\bibliographystyle{IEEEtranSA}
 \bibliographystyle{abbrvnat}
 \bibliography{bib}

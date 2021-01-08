@@ -1,0 +1,518 @@
+\section{Model}
+
+\subsection{Preliminaries}
+The syntax is built from
+\begin{itemize}
+\item a set of \emph{values} $\Val$, ranged over by
+  $\aVal$, $\bVal$, $\cVal$,
+\item a set of \emph{registers} $\Reg$, ranged over by
+  $\aReg$, $\bReg$,
+\item a set of \emph{expressions} $\Exp$, ranged over by
+  $\aExp$, $\bExp$,  $\cExp$.
+\end{itemize}
+\emph{Memory locations} are tagged values, written $\REF{\cVal}$.  Let $\Loc$
+be the set of memory locations, ranged over by $\aLoc$, $\bLoc$, $\cLoc$.
+
+We require that
+\begin{itemize}
+\item values and registers are disjoint,
+\item values include at least the constants $0$ and $1$,
+\item expressions include at least registers and values, 
+\item expressions do \emph{not} include memory locations.
+\end{itemize}
+We model the following language.
+\begin{align*}
+  \amode \BNFDEF& \mRLX
+  \BNFSEP \mRA 
+  \BNFSEP \mSC
+  \\
+  \aCmd,\,\bCmd
+  \BNFDEF& \SKIP
+  \BNFSEP \LET{\aReg}{\aExp}
+  % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
+  % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
+  \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
+  \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
+  %\BNFSEP \PA{\aLoc}{\aExp} 
+  \\[-.5ex]
+  \BNFSEP& \FORK{\aGrp}
+  \BNFSEP \aCmd \SEMI \bCmd
+  \BNFSEP \IF{\aExp} \THEN \aCmd \ELSE \bCmd \FI
+  \\
+  \aGrp ,\,\bGrp
+  \BNFDEF& \NIL
+  \BNFSEP\THREAD{\aCmd}
+  \BNFSEP\aGrp \PAR \bGrp
+\end{align*}
+\emph{Memory modes}, $\amode$, are {relaxed} ($\mRLX$), {release-acquire}
+($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed is the default.
+%
+\emph{Commands}, $\aCmd$, include reads from and writes to memory at a given
+mode, as well as the usual structural constructs.
+%
+\emph{Thread groups}, $\aGrp$, include commands and $\NIL$, which denotes
+inaction. %, or deadlock.
+%
+The $\FORK{}$ command spawns a thread group.  We often drop the words
+$\FORK{}$ and $\THREAD{}$.
+
+The semantics is built from the following.
+\begin{itemize}
+\item a set of \emph{actions} $\Act$, ranged over by $\aAct$, 
+\item a set of \emph{logical formulae} $\Formulae$, ranged over by $\aForm$,
+  $\bForm$.
+\end{itemize}
+We require that
+\begin{itemize}
+\item actions include writes $\DWP{\aLoc}{\aVal}$ and reads $\DRP{\aLoc}{\aVal}$,
+\item formulae include equalities $(\aExp{=}\aVal)$ and $(\aExp{=}\aLoc)$,
+\item formulae are closed under negation, conjunction, disjunction, and
+  substitutions $[\aLoc/\aReg]$ and $[\aExp/\aLoc]$, 
+\item there is an entailment relation $\vDash$ between formulae, with the
+  expected semantics.
+\end{itemize}
+
+% Action $\DWP{\aLoc}{\aVal}$ models a write of $\aVal$ to $\aLoc$, and
+% $\DRP{\aLoc}{\aVal}$ models a read of $\aVal$ from $\aLoc$.
+% We use $\DAP{\aLoc}{\aVal}$ to indicate a generic access, which could be
+% either a read or a write.
+
+Logical formulae include equations over locations and registers, such
+$(\aLoc{=}1)$ and $(\aReg{=}\bReg{+}1)$.
+We use expressions as formulae, coercing $\aExp$ to $\aExp\neq 0$.
+
+Formulae are \emph{open}, in that occurrences of register names and memory
+locations are subject to substitutions of the form $\aForm[\aLoc/\aReg]$ and
+$\aForm[\bExp/\aLoc]$.  Actions are not subject to substitution.
+
+%\begin{definition}
+  %\label{def:independent}
+  % We say $\aForm$ is \emph{independent of $\aLoc$} if, for every
+  % $\aVal$, $\aForm \vDash \aForm[\aVal/\aLoc] \vDash \aForm$; it is
+  % \emph{dependent} otherwise.
+  % We say $\aForm$ is \emph{location independent} if it is independent of
+  % every location.
+  We say
+  $\aForm$ \emph{implies} $\bForm$ if $\aForm\vDash\bForm$.
+  % We say that
+  We say
+  $\aForm$ is a \emph{tautology} if $\TRUE\vDash\aForm$.
+  % We say that
+  We say
+  $\aForm$ is \emph{unsatisfiable} if $\aForm\vDash\FALSE$.
+%\end{definition}
+
+\subsection{Pomsets}
+
+We first consider a fragment of our language that can be modeled using simple
+pomsets.
+\begin{definition}
+  A \emph{pomset} over $\Act$ is a tuple
+  $(\Event, {\le}, \labeling)$ where
+  \begin{itemize}
+  \item $\Event$ is a set of \emph{events},
+  \item
+    ${\le} \subseteq (\Event\times\Event)$ is the \emph{causality} partial order, 
+  \item
+    $\labeling: \Event \fun \Act$ is a \emph{labeling}.
+  \end{itemize}
+\end{definition}
+Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
+
+We lift terminology from actions to events.  For example, we say that $\aEv$
+writes $\aLoc$ if $\labeling(\aEv)$ writes $\aLoc$.  We also drop quantifiers
+when clear from context, such as
+$(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
+
+\begin{definition}
+  Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
+  Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$ when $\aVal\neq \bVal$.
+  
+  % A pomset $\aPS$ is \emph{closed} if for every $\aEv$ which can be
+  % fulfilled, there is a $\bEv\le\aEv$ which fulfills it, and for any $\cEv$
+  % which can block $\aEv$, either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+
+  We say that $\aEv$ is \emph{fulfilled} if there is a $\bEv\le\aEv$ which
+  matches it and, for any $\cEv$ which can block $\aEv$, either $\cEv\le\bEv$
+  or $\aEv\le\cEv$.
+
+  We say that $\aPS$ is \emph{fulfilled} if every read in $\aPS$ is fulfilled.
+
+  We define \emph{independency} (${\reorder}\subseteq\Act\times\Act$) as follows.
+  \begin{align*}
+    % {\reorderSC} &= \emptyset
+    % \\
+    % {\reorderRLX} &=
+    \reorder &=
+    \{(\DR{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \}
+    \\[-.5ex]&\mkern2mu\cup\mkern2mu
+    \{(\DW{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc \lor \aVal=\bVal\}
+    \\[-.5ex]&\mkern2mu\cup\mkern2mu
+    \{(\DR{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc\}
+  \end{align*}
+\end{definition}
+
+In order to give the semantics, we define several operators over sets of
+pomsets.
+
+\begin{definition} $\phantom{\;}$\par
+\label{tab:pomsets}
+  %Let $\aPSS$ range over sets of pomsets.
+
+  \noindent
+  If $\aPS\SB0\in\sSTOP$ then $\aEvs\SB0 = \emptyset$.
+
+  \noindent
+  If $\aPS\SB0 \in (\aPSS_1\sPAR\aPSS_2)$ then  
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+  \begin{enumerate}
+  \item $\aEvs\SB0 = (\aEvs_1\cup\aEvs_2)$,
+  \item if $\aEv\in\aEvs_1$ then $\labeling\SB0(\aEv) = \labeling_1(\aEv)$, 
+  \item if $\aEv\in\aEvs_2$ then $\labeling\SB0(\aEv) = \labeling_2(\aEv)$,
+  \item if $\bEv\le_1\aEv$ then $\bEv\le\SB0\aEv$, 
+  \item if $\bEv\le_2\aEv$ then $\bEv\le\SB0\aEv$, 
+    \newcounter{pomsetParCount}
+    \setcounter{pomsetParCount}{\value{enumi}}
+  \item $\aEvs_1$ and $\aEvs_2$ are disjoint.
+    \newcounter{pomsetParDisjointCount}
+    \setcounter{pomsetParDisjointCount}{\value{enumi}}
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in (\aAct\sPREFIX\aPSS)$ then
+  $(\exists\aPS_2\in\aPSS)$
+  %there is $\aPS_2\in\aPSS$ such that
+  \begin{enumerate}
+  \item $\aEvs\SB0=(\aEvs_1 \cup \aEvs_2)$,
+  \item if $\aEv\in\aEvs_1$ then $\labelingAct\SB0(\aEv) = \aAct$,
+  \item if $\aEv\in\aEvs_2$ then $\labelingAct\SB0(\aEv) = \labelingAct_2(\aEv)$,
+  \item if $\bEv,\aEv\in\aEvs_1$ then $\bEv=\aEv$,
+  \item if $\bEv\le_2\aEv$ then $\bEv\le\SB0\aEv$, 
+    % \newcounter{pomsetPrefixCount}
+    % \setcounter{pomsetPrefixCount}{\value{enumi}}
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
+    \newcounter{pomsetPrefixOrderCount}
+    \setcounter{pomsetPrefixOrderCount}{\value{enumi}}
+  \end{enumerate}
+\end{definition}
+Using these operators, we can give the semantics for a simple fragment of our
+language.
+% To allow interesting examples, we add the operator
+% ``$\PA{\aLoc}{\aVal}$.''
+\begin{align*}
+  \sem{\NIL} &= \sSTOP
+  \\
+  % \sem{\THREAD{\aCmd} \PAR \THREAD{\bCmd}} &= \sem{\aCmd}\sPAR\sem{\bCmd}
+  % \\
+  \sem{\aGrp \PAR \bGrp} &= \sem{\aGrp}\sPAR\sem{\bGrp}
+  \\
+  % \sem{{\aCmd} \PAR {\bCmd}} &= \sem{\aCmd}\sPAR\sem{\bCmd}
+  % \\
+  \sem{\PW{\aLoc}{\aVal}\SEMI \aCmd} &= \textstyle\DWP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
+  \\
+  \sem{\PR{\aLoc}{\aReg}\SEMI \aCmd} &= \textstyle\bigcup_{\aVal}\DRP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
+  % \\
+  % \sem{\PA{\aLoc}{\aVal}\SEMI \aCmd} &= \textstyle\DRP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
+\end{align*}
+
+If we take ${\reorder} = \emptyset$, then we have sequentially consistent
+execution.
+
+[Do Examples.]
+
+[Do examples with coherence.]
+
+[Note that this allows mumbling for reads and writes.]
+
+[Use refinement (that is subset order) as notion of compiler optimization.]
+
+[Talk about Mazurkiewicz traces.]
+
+\subsection{Pomsets with Preconditions}
+
+[Problem with previous section is that  notion of dependency is impoverished]
+
+\begin{definition}
+  A \emph{pomset with preconditions} is
+  a pomset together with $\labelingForm:\aEvs\fun\Formulae$.
+\end{definition}
+
+\begin{definition}
+  A pomset with preconditions is \emph{top level} if it is fulfilled and
+  every precondition is a tautology.
+\end{definition}
+
+\begin{definition}$\phantom{\;}$\par
+  \label{tab:pomsets-pre}
+  
+  \noindent
+  If $\aPS\SB0\in\sSTOP$ then $\aEvs\SB0 = \emptyset$.
+
+
+  \noindent
+  If $\aPS\SB0 \in (\aPSS_1\sPAR\aPSS_2)$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+\begin{enumerate}
+     \setcounter{enumi}{\value{pomsetParDisjointCount}}
+  \item[1--\thepomsetParDisjointCount)] as for $\sPAR$ in Definition~\ref{tab:pomsets},
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$.
+    \newcounter{pomsetPreParCount}
+    \setcounter{pomsetPreParCount}{\value{enumi}}
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in \sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+  \begin{enumerate}
+  \setcounter{enumi}{\value{pomsetParCount}}
+  \item[1--\thepomsetParCount)] as for $\sPAR$  in
+    Definition~\ref{tab:pomsets} (ignoring disjointness),
+  \item if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $\bForm\land\labelingForm_1(\aEv)$,
+  \item if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\neg\bForm\land\labelingForm_2(\aEv)$, 
+  \item if $\aEv\in\aEvs_1\cap\aEvs_2$ then\\ $\labelingForm\SB0(\aEv)$ implies $(\bForm\land\labelingForm_1(\aEv))\lor(\neg\bForm\land\labelingForm_2(\aEv))$.
+    \newcounter{pomsetPreIfCount}
+    \setcounter{pomsetPreIfCount}{\value{enumi}}
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in \sSTOREPRE{\aLoc}{\aExp}{\aPSS_2}$ then
+  $(\exists\aPS_2\in\aPSS_2)$
+  $(\exists\aVal\in\Val)$
+  %there is $\aPS_2\in\aPSS$ such that
+  \begin{enumerate}
+     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
+  \item[1--\thepomsetPrefixOrderCount)] as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPS_2$ in
+    Definition~\ref{tab:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
+  \item if $\bEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm\SB0(\bEv)$ implies $(\aExp{=}\aVal)$,
+  % \item if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$,
+  % \item if $\bEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\bEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\bEv)$.
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either\\
+    $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\aEv)$ and $\bEv=\aEv$ or \\
+    $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in \sLOADPRE{\aLoc}{\aReg}{\aPSS_2}$ then
+  $(\exists\aPS_2\in\aPSS_2)$
+  $(\exists\aVal\in\Val)$
+  %there is $\aPS_2\in\aPSS$ such that
+  \begin{enumerate}
+     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
+  \item[1--\thepomsetPrefixOrderCount)] as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPS_2$ in
+    Definition~\ref{tab:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv=\aEv$ or\\
+    $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal\lor\aReg{=}\aLoc)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ or\\
+    $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ and $\bEv<\SB0\aEv$.
+  \end{enumerate}  
+\end{definition}
+Note that when $\bEv\in\aEvs_1\setminus\aEvs_2$, $\sLOADPRE{}{}{}$ does not
+constrain $\labelingForm\SB0(\bEv)$.
+
+The semantics of $\NIL$ and $\PAR$ are as before.
+\begin{align*}
+  % \sem{\NIL} &= \sSTOP
+  % \\
+  % \sem{\aCmd \PAR \bCmd} &= \sem{\aCmd}\sPAR\sem{\bCmd}
+  % \\
+  \sem{\IF{\bForm}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\bForm}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
+  \\
+  \sem{\LET{\aReg}{\aExp}\SEMI \aCmd} &= \sem{\aCmd}[\aExp/\aReg]
+  \\
+  \sem{\PW{\aLoc}{\aExp}\SEMI \aCmd} &= \sSTOREPRE{\aLoc}{\aExp}{\sem{\aCmd}}
+  \\
+  \sem{\PR{\aLoc}{\aReg}\SEMI \aCmd} &= \sLOADPRE{\aLoc}{\aReg}{\sem{\aReg}}
+\end{align*}
+
+This is essentially the model of \cite{DBLP:journals/pacmpl/JagadeesanJR20}, restricted to
+relaxed access.  There are only two substantial differences.  First, for
+simplicity, we enforce read-read dependencies.  Second, in the rule for read
+prefixing we have substituted $[r/x]$, rather than $[x/r]$.  This means that
+reads clobber local state.  We assume registers are only used
+once---otherwise, one needs to generate a fresh register for the
+substitution.
+
+
+With read-read dependencies, the second difference can be seen.  For example,
+the following execution is allowed with $[x/r]$, but not $[r/x]$.
+\begin{gather*}
+  \PW{x}{0}\SEMI
+  \PR{x}{r}\SEMI
+  \IF{r}\THEN \PR{x}{s}\FI\SEMI
+  \PW{y}{s{+}1}
+  \PAR
+  \PW{x}{\PR{y}{}}
+  \\[-1ex]
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{0}}{}
+      \event{a2}{\DW{x}{1}}{right=of a1}
+      \event{a3}{\DR{x}{0}}{right=of a2}
+      \event{a4}{\DW{y}{1}}{right=of a3}
+      \event{b1}{\DR{y}{1}}{right=3em of a4}
+      \event{b2}{\DW{x}{1}}{right=of b1}
+      \wk{a1}{a2}
+      \po{a2}{a3}
+      \po{b1}{b2}
+      \rf{a4}{b1}
+      \rf[out=165,in=15]{b2}{a2}
+    \end{tikzinline}}
+\end{gather*}
+[Is there a difference w/o read-read dependencies?]
+
+
+
+[Stuff about conditionals and merging events.]
+
+
+
+\subsection{Pomsets with Predicate Transformers}
+
+[The problem with the previous section is that there's no story for sequential composition.]
+
+\begin{definition}
+  A \emph{predicate transformer} is a monotone function
+  $\aTr:\Formulae\fun\Formulae$ such that
+  $\aTr(\FALSE)$ is $\FALSE$,
+  $\aTr(\aForm\land\bForm)$ is $\aTr(\aForm)\land\aTr(\bForm)$, and
+  $\aTr(\aForm\lor\bForm)$ is $\aTr(\aForm)\lor\aTr(\bForm)$.
+\end{definition}
+
+\begin{definition}
+  A \emph{family of predicate transformers}
+  indexed by subsets of $\aEvs$
+  consists of predicate transformers
+  $\aTr[\bEvs]$ for each set of events $\bEvs$,
+  such that if $\cEvs \subseteq \bEvs$
+  then $\aTr[\cEvs](\aForm)$ implies $\aTr[\bEvs](\aForm)$.
+\end{definition}
+
+\begin{definition}
+  A pomset with predicate tansformers is a pomset with preconditions,
+  together with a family of predicate transformers $\aTr$ indexed by subsets
+  of $\aEvs$.
+\end{definition}
+
+% \begin{definition}
+%   For pomset $\aPS\SB0$ and $\aEv\in\aEvs\SB0$, let
+%   $\downclose[0]{\aEv} = \{ \bEv\in\aEvs\SB0 \mid \bEv <\SB0 \aEv \}$.
+% \end{definition}
+
+Define $\sTHREAD{}$ to embed pomsets with predicate transformers into pomsets with preconditions
+simply by dropping the predicate transformer.
+For the reverse embedding, $\sFORK{}$ adopts the identity transformer.
+\begin{definition}
+  If $\aPS\SB0 \in \sFORK{\aPSS}$ then
+  $(\exists\aPS_1\in\aPSS)$
+  %there is $\aPS_1\in\aPSS$ such that
+  \begin{enumerate}
+  \item $\aEvs\SB0=\aEvs_1$,
+  \item $\labelingAct\SB0(\aEv) = \labelingAct_1(\aEv)$,
+  \item $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm$.
+  \end{enumerate}  
+\end{definition}
+
+\begin{definition}
+  If $\aPS\SB0\in\sSTOP$ then $\aEvs\SB0 = \emptyset$ and
+  \begin{enumerate}
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $\FALSE$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0\in\sSKIP$ then $\aEvs\SB0 = \emptyset$ and
+  \begin{enumerate}
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0\in\sLET{\aReg}{\aExp}$ then $\aEvs\SB0 = \emptyset$ and
+  \begin{enumerate}
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aExp/\aReg]$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in \sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+  \begin{enumerate}
+  \setcounter{enumi}{\value{pomsetPreIfCount}}
+  \item[1--\thepomsetPreIfCount)] as for $\sIF{}$ in Definition~\ref{tab:pomsets-pre},
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $(\bForm\land\aTr[\bEvs]_1(\aEv))\lor(\neg\bForm\land\aTr[\bEvs]_2(\aForm))$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in (\aPSS_1\sSEMI\aPSS_2)$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$,
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+  %let $\labelingForm'_2(\aEv)=\aTr[{\downclose[0]{\aEv}}]_1(\labelingForm_2(\aEv))$  
+  %let $\labelingForm'_2(\aEv)=\aTr[\{ \bEv \mid \bEv <\SB0 \aEv \}]_1(\labelingForm_2(\aEv))$  
+  \begin{enumerate}
+  \setcounter{enumi}{\value{pomsetParCount}}
+  \item[1--\thepomsetParCount)] as for $\sPAR$  in
+    Definition~\ref{tab:pomsets} (ignoring disjointness),
+  \item if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm'_2(\aEv)$,
+  \item if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
+  \\ where $\labelingForm'_2(\aEv)=\aTr[\cEvs]_1(\labelingForm_2(\aEv))$, where $\cEvs=\{ \cEv \mid \cEv <\SB0 \aEv \}$,
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $\aTr[\bEvs]_2(\aTr[\bEvs]_1(\aForm))$,
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
+  \end{enumerate}
+  % where we define $\labelingForm'_2(\aEv)$ to be $\aTr[\{ \bEv \mid \bEv <\SB0 \aEv \}]_1(\labelingForm_2(\aEv))$.
+
+  \noindent
+  If $\aPS\SB0 \in \sSTORE{\aLoc}{\aExp}$ then
+  $(\exists\aVal\in\Val)$
+  \begin{enumerate}
+  \item $\labelingAct\SB0(\aEv) = \DWP{\aLoc}{\aVal}$,
+  \item $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)$,
+  \item %if $\bEvs=\emptyset$ then
+    $\aTr[\emptyset]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc]$,
+  \item %if $\bEvs\neq\emptyset$ then
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aExp{=}\aVal) \land \aForm[\aExp/\aLoc]$, if $\bEvs\neq\emptyset$,
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in \sLOAD{\aLoc}{\aReg}$ then
+  $(\exists\aVal\in\Val)$
+  \begin{enumerate}
+  \item $\labelingAct\SB0(\aEv) = \DRP{\aLoc}{\aVal}$,
+  \item %if $\bEvs=\emptyset$ then
+    $\aTr[\emptyset]\SB0(\aForm)$ implies $(\aReg{=}\aVal\lor\aReg{=}\aLoc)\limplies\aForm[\aReg/\aLoc]$,
+  \item %if $\bEvs\neq\emptyset$ then
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aReg{=}\aVal)\limplies\aForm[\aReg/\aLoc]$, if $\bEvs\neq\emptyset$,
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
+  \end{enumerate}
+
+\end{definition}
+The complete semantics is as follows.
+\begin{align*}
+  \sem{\NIL} &= \sSTOP
+  \\
+  \sem{\SKIP} &= \sSKIP
+  \\
+  \sem{\PR{\aLoc}{\aReg}} &= \sLOAD{\aLoc}{\aReg}
+  \\
+  \sem{\PW{\aLoc}{\aExp}} &= \sSTORE{\aLoc}{\aExp}
+  \\
+  \sem{\LET{\aReg}{\aExp}} &= \sem{\aCmd}[\aExp/\aReg]
+  \\
+  \sem{\aCmd \SEMI \bCmd} &= \sem{\aCmd}\sSEMI\sem{\bCmd}
+  \\
+  \sem{\aGrp \PAR \bGrp} &= \sem{\aGrp}\sPAR\sem{\bGrp}
+  \\
+  \sem{\IF{\bForm}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\bForm}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
+  \\
+  \sem{\FORK{\aGrp}} &= \sFORK{}\sem{\aGrp}
+  \\
+  \sem{\THREAD{\aCmd}} &= \sTHREAD{}\sem{\aCmd}
+\end{align*}
+[Examples.]
+
+
+[Skolemization ensures disjunction closure, which is necessary
+for associativity. Show example.]
+

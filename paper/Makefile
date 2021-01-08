@@ -1,6 +1,6 @@
 paper:
 	rm  -f paper.pdf
-	latexmk --pvc --pdf --halt-on-error paper.tex
+	latexmk -xelatex --pvc --pdf --halt-on-error paper.tex
 	killall Skim
 x:
 	rm  -f x.pdf
