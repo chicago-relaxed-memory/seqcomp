@@ -123,7 +123,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                 ; d=e = λ d e d∈E′ e∈E′ → d=e d e (E′⊆E d d∈E′) (E′⊆E e e∈E′)
                 ; ℓ=Rav = λ e e∈E′ → ≡-trans (≡-symm (ℓ=ℓ′ e (E′⊆E e e∈E′))) (ℓ=Rav e (E′⊆E e e∈E′))
                 ; κ⊨κLOAD = λ e e∈E′ → ⊨-trans (κ′⊨κ e (E′⊆E e e∈E′)) (κ⊨κLOAD e (E′⊆E e e∈E′))
-                ; τC⊨τLOADD = λ C ϕ e e∈E′ e∈C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADD C ϕ e (E′⊆E e e∈E′) e∈C)
+                ; τC⊨τLOADD = λ C ϕ a e e∈E′ e∈C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADD C ϕ a e (E′⊆E e e∈E′) e∈C)
                 ; τC⊨τLOADI = λ C ϕ a e e∈E′ e∉C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADI C ϕ a e (E′⊆E e e∈E′) e∉C)
                 ; τC⊨τLOAD∅ = λ C ϕ a s χ χ⊨¬ψ → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOAD∅ C ϕ a s χ (λ e e∈E e∉C → χ⊨¬ψ e (E⊆E′ e e∈E) e∉C))
                 }
