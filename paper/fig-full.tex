@@ -1,6 +1,6 @@
 \begin{figure*}
   \begin{center}
-  \begin{minipage}{1.0\textwidth}
+  \begin{minipage}{0.88\textwidth}
   \noindent
   If $\aPS \in \sSTORE[\amode]{\cExp}{\aExp}$ then
   $(\exists\cVal:\aEvs\fun\Val)$
@@ -18,6 +18,8 @@
       \land \RW
       \land \Qmode{\amode}
     \end{math},
+    where
+    $\Qmode{\mRLX}=\QxREF{\cVal_\aEv}$ and $\Qmode{\mRA}=\Q$, % for $\amode\neq\mRLX$,
   \item if
     $\bEv\in\bEvs$
     then
@@ -51,8 +53,8 @@
         \land \aForm \Dmode{\amode}[\aExp/\REF{\dVal}]
       }
     \end{math}
-    \\ where $\Qmode{\mRLX}=\QxREF{\cVal_\aEv}$, $\Qmode{\mRA}=\Q$, % for $\amode\neq\mRLX$,
-      $\aForm\Dmode{\mRLX}=\aForm[\TRUE/\DxREF{\dVal}]$, and
+    \\ where 
+      $\aForm\Dmode{\mRLX}=\aForm[\TRUE/\DxREF{\dVal}]$ and
       $\aForm\Dmode{\mRA}=\aForm[\FALSE/\DREF]$. % for $\amode\neq\mRLX$.
   \end{enumerate}
   % \item if $\amode=\mRLX$ then
@@ -168,9 +170,10 @@
     \begin{math}
       \bForm_\bEv
       \limplies (\cExp{=}\dVal)
-      \limplies (\aVal{=}\bReg_\aEv)
-      \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+      \limplies (\aVal{=}\bReg_\bEv)
+      \limplies \aForm[\bReg_\bEv/\aReg][\bReg_\bEv/\REF{\dVal}]
     \end{math}
+    \makebox[4.4cm]{}
   \item if $\bEv\notin\bEvs$ then
     \begin{math}
       (\forall\dVal)
@@ -184,8 +187,8 @@
         \land \lnot\QxREF{\dVal}
         \land
         (\RW
-         \limplies (\aVal{=}\bReg_\aEv\lor\aLoc{=}\bReg_\aEv) 
-         \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+         \limplies (\aVal{=}\bReg_\bEv\lor\aLoc{=}\bReg_\bEv) 
+         \limplies \aForm[\bReg_\bEv/\aReg][\bReg_\bEv/\REF{\dVal}]
         )
       }      
     \end{math}
@@ -206,7 +209,7 @@
         \Dmode{\amode}
         \land \lnot\QxREF{\dVal}
         \land
-        \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+        \limplies \aForm[\bReg_\bEv/\aReg][\bReg_\bEv/\REF{\dVal}]
       }      
     \end{math}
     \\ where $\Dmode{\mRLX}=\TRUE$ and $\Dmode{\mRA}=\Dx{\dVal}$
@@ -222,8 +225,8 @@
   %     \limplies \PBRbig{
   %       (
   %       \RW
-  %       \limplies (\aVal{=}\bReg_\aEv\lor\aLoc{=}\bReg_\aEv) 
-  %       \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+  %       \limplies (\aVal{=}\bReg_\bEv\lor\aLoc{=}\bReg_\bEv) 
+  %       \limplies \aForm[\bReg_\bEv/\aReg][\bReg_\bEv/\REF{\dVal}]
   %       )
   %       \land \lnot\QxREF{\dVal}
   %     }
@@ -240,8 +243,8 @@
   %     \limplies \PBRbig{
   %       (
   %       \RW
-  %       \limplies (\aVal{=}\bReg_\aEv\lor\aLoc{=}\bReg_\aEv) 
-  %       \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+  %       \limplies (\aVal{=}\bReg_\bEv\lor\aLoc{=}\bReg_\bEv) 
+  %       \limplies \aForm[\bReg_\bEv/\aReg][\bReg_\bEv/\REF{\dVal}]
   %       )
   %       \land \lnot\QxREF{\dVal}
   %       \land \Dx{\dVal}
