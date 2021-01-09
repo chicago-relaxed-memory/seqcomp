@@ -20,12 +20,13 @@
     \end{math},
     where
     $\Qmode{\mRLX}=\QxREF{\cVal_\aEv}$ and $\Qmode{\mRA}=\Q$, % for $\amode\neq\mRLX$,
-  \item if
-    $\bEv\in\bEvs$
-    then
+  \item
     \begin{math}
       (\forall\dVal)
     \end{math}
+    if
+    $\bEv\in\bEvs$
+    then
     $\aTr[\bEvs](\aForm)$ implies 
     \begin{math}
       \bForm_\bEv
@@ -35,18 +36,18 @@
         \land \aForm \Dmode{\amode}[\aExp/\REF{\dVal}]
       }
     \end{math},
-  \item if 
-    \begin{math}
-      (\forall\bEv\in\bEvs)(\cForm \textimplies
-      \lnot\bForm_\bEv)
-    \end{math}
-    then
+  \item %if 
+    % \begin{math}
+    %   (\forall\bEv\in\bEvs)(\cForm \textimplies
+    %   \lnot\bForm_\bEv)
+    % \end{math}
+    % then
     \begin{math}
       (\forall\dVal)
     \end{math}
     $\aTr[\bEvs](\aForm)$ implies 
     \begin{math}
-      \cForm
+      (\not\exists\bEv\in\bEvs.\; \bForm_\bEv)
       \limplies (\cExp{=}\dVal)
       \limplies \PBR{
         \lnot\QwREF{\dVal}
@@ -151,7 +152,7 @@
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\bForm:\aEvs\fun\Formulae)$
-  $(\exists\bReg:\aEvs\fun\Reg)$
+  We assume $(\bReg:\aEvs\fun\Reg)$
   \begin{enumerate}
   \item if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
   \item $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
@@ -162,10 +163,11 @@
       \land \RO
       \land \QwREF{\cVal_\aEv}
     \end{math},
-  \item if $\bEv\in\bEvs$ then
+  \item
     \begin{math}
       (\forall\dVal)
     \end{math}
+    if $\bEv\in\bEvs$ then
     $\aTr[\bEvs](\aForm)$ implies
     \begin{math}
       \bForm_\bEv
@@ -174,10 +176,11 @@
       \limplies \aForm[\bReg_\bEv/\aReg][\bReg_\bEv/\REF{\dVal}]
     \end{math}
     \makebox[4.4cm]{}
-  \item if $\bEv\notin\bEvs$ then
+  \item 
     \begin{math}
       (\forall\dVal)
     \end{math}
+    if $\bEv\notin\bEvs$ then
     $\aTr[\bEvs](\aForm)$ implies
     \begin{math}
       \bForm_\bEv
@@ -192,24 +195,25 @@
         )
       }      
     \end{math}
-  \item if 
-    \begin{math}
-      (\forall\bEv\in\bEvs)(\cForm \textimplies
-      \lnot\bForm_\bEv)
-    \end{math}
-    then
+  \item % if 
+    % \begin{math}
+    %   (\forall\bEv\in\bEvs)(\cForm \textimplies
+    %   \lnot\bForm_\bEv)
+    % \end{math}
+    % then
     \begin{math}
       (\forall\dVal)
+      (\forall\bReg)
     \end{math}
     $\aTr[\bEvs](\aForm)$ implies 
     \begin{math}
-      \bForm_\bEv
+      (\not\exists\bEv\in\bEvs.\; \bForm_\bEv)
       \limplies (\cExp{=}\dVal)
       \limplies \PBR{        
         \Dmode{\amode}
         \land \lnot\QxREF{\dVal}
         \land
-        \limplies \aForm[\bReg_\bEv/\aReg][\bReg_\bEv/\REF{\dVal}]
+        \limplies \aForm[\bReg/\aReg][\bReg/\REF{\dVal}]
       }      
     \end{math}
     \\ where $\Dmode{\mRLX}=\TRUE$ and $\Dmode{\mRA}=\Dx{\dVal}$
