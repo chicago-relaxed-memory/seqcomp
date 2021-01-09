@@ -1,0 +1,254 @@
+\begin{figure*}
+  \begin{center}
+  \begin{minipage}{1.0\textwidth}
+  \noindent
+  If $\aPS \in \sSTORE[\amode]{\cExp}{\aExp}$ then
+  $(\exists\cVal:\aEvs\fun\Val)$
+  $(\exists\aVal:\aEvs\fun\Val)$
+  $(\exists\bForm:\aEvs\fun\Formulae)$
+  \begin{enumerate}
+  \item if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+  \item $\labelingAct(\aEv) = \DWREFP{\cVal_\aEv}{\aVal_\aEv}$,
+  \item 
+    $\labelingForm(\aEv)$ implies
+    \begin{math}
+      \bForm_\aEv
+      \land \cExp{=}\cVal_\aEv
+      \land \aExp{=}\aVal_\aEv
+      \land \RW
+      \land \Qmode{\amode}
+    \end{math},
+  \item if
+    $\bEv\in\bEvs$
+    then
+    \begin{math}
+      (\forall\dVal)
+    \end{math}
+    $\aTr[\bEvs](\aForm)$ implies 
+    \begin{math}
+      \bForm_\bEv
+      \limplies (\cExp{=}\dVal)
+      \limplies \PBRbig{
+        (\QwREF{\dVal} \limplies \aExp{=}\aVal_\bEv)
+        \land \aForm \Dmode{\amode}[\aExp/\REF{\dVal}]
+      }
+    \end{math},
+  \item if 
+    \begin{math}
+      (\forall\bEv\in\bEvs)(\cForm \textimplies
+      \lnot\bForm_\bEv)
+    \end{math}
+    then
+    \begin{math}
+      (\forall\dVal)
+    \end{math}
+    $\aTr[\bEvs](\aForm)$ implies 
+    \begin{math}
+      \cForm
+      \limplies (\cExp{=}\dVal)
+      \limplies \PBR{
+        \lnot\QwREF{\dVal}
+        \land \aForm \Dmode{\amode}[\aExp/\REF{\dVal}]
+      }
+    \end{math}
+    \\ where $\Qmode{\mRLX}=\QxREF{\cVal_\aEv}$, $\Qmode{\mRA}=\Q$, % for $\amode\neq\mRLX$,
+      $\aForm\Dmode{\mRLX}=\aForm[\TRUE/\DxREF{\dVal}]$, and
+      $\aForm\Dmode{\mRA}=\aForm[\FALSE/\DREF]$. % for $\amode\neq\mRLX$.
+  \end{enumerate}
+  % \item if $\amode=\mRLX$ then
+  %   $\labelingForm(\aEv)$ implies
+  %   \begin{math}
+  %     \bForm_\aEv
+  %     \land \cExp{=}\cVal_\aEv
+  %     \land \aExp{=}\aVal_\aEv
+  %     \land \RW
+  %     \land \QxREF{\cVal_\aEv},
+  %   \end{math}
+  % \item if $\amode\neq\mRLX$ then
+  %   $\labelingForm(\aEv)$ implies
+  %   \begin{math}
+  %     \bForm_\aEv
+  %     \land \cExp{=}\cVal_\aEv
+  %     \land \aExp{=}\aVal_\aEv
+  %     \land \RW
+  %     \land \Q,
+  %   \end{math}
+  % \item if
+  %   $\bEv\in\bEvs$
+  %   and
+  %   $\amode=\mRLX$ then
+  %   \begin{math}
+  %     (\forall\dVal)
+  %   \end{math}
+  %   $\aTr[\bEvs](\aForm)$ implies 
+  %   \begin{math}
+  %     \bForm_\bEv
+  %     \limplies (\cExp{=}\dVal)
+  %     \limplies \PBRbig{
+  %       (\QwREF{\dVal} \limplies \aExp{=}\aVal_\bEv)
+  %       \land \aForm[\aExp/\REF{\dVal}][\TRUE/\DxREF{\dVal}]
+  %     }
+  %   \end{math}
+  % \item if
+  %   $\bEv\in\bEvs$
+  %   and
+  %   $\amode\neq\mRLX$ then
+  %   \begin{math}
+  %     (\forall\dVal)
+  %   \end{math}
+  %   $\aTr[\bEvs](\aForm)$ implies 
+  %   \begin{math}
+  %     \bForm_\bEv
+  %     \limplies (\cExp{=}\dVal)
+  %     \limplies \PBRbig{
+  %       (\QwREF{\dVal} \limplies \aExp{=}\aVal_\bEv)
+  %       \land \aForm[\aExp/\REF{\dVal}][\FALSE/\DREF]
+  %     }
+  %   \end{math}
+  % \item if 
+  %   \begin{math}
+  %     (\forall\bEv\in\bEvs)(\cForm \textimplies
+  %     \lnot\bForm_\bEv)
+  %   \end{math}
+  %   and $\amode=\mRLX$ 
+  %   then
+  %   \begin{math}
+  %     (\forall\dVal)
+  %   \end{math}
+  %   $\aTr[\bEvs](\aForm)$ implies 
+  %   \begin{math}
+  %     \cForm
+  %     \limplies (\cExp{=}\dVal)
+  %     \limplies \PBRbig{
+  %       \lnot\QwREF{\dVal}
+  %       \land \aForm[\aExp/\REF{\dVal}][\TRUE/\DxREF{\dVal}]
+  %     }
+  %   \end{math}
+  % \item if 
+  %   \begin{math}
+  %     (\forall\bEv\in\bEvs)
+  %     (\cForm \textimplies \lnot\bForm_\bEv)
+  %   \end{math}
+  %   and $\amode\neq\mRLX$ 
+  %   then
+  %   \begin{math}
+  %     (\forall\dVal)
+  %   \end{math}
+  %   $\aTr[\bEvs](\aForm)$ implies 
+  %   \begin{math}
+  %     \cForm
+  %     \limplies (\cExp{=}\dVal)
+  %     \limplies \PBRbig{
+  %       \lnot\QwREF{\dVal}
+  %       \land \aForm[\aExp/\REF{\dVal}][\FALSE/\DREF]
+  %     }
+  %   \end{math}
+
+  \noindent
+  If $\aPS \in \sLOAD[\amode]{\cExp}{\aReg}$ then
+  $(\exists\cVal:\aEvs\fun\Val)$
+  $(\exists\aVal:\aEvs\fun\Val)$
+  $(\exists\bForm:\aEvs\fun\Formulae)$
+  $(\exists\bReg:\aEvs\fun\Reg)$
+  \begin{enumerate}
+  \item if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+  \item $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
+  \item $\labelingForm(\aEv)$ implies
+    \begin{math}
+      \bForm_\aEv
+      \land \cExp{=}\cVal_\aEv
+      \land \RO
+      \land \QwREF{\cVal_\aEv}
+    \end{math},
+  \item if $\bEv\in\bEvs$ then
+    \begin{math}
+      (\forall\dVal)
+    \end{math}
+    $\aTr[\bEvs](\aForm)$ implies
+    \begin{math}
+      \bForm_\bEv
+      \limplies (\cExp{=}\dVal)
+      \limplies (\aVal{=}\bReg_\aEv)
+      \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+    \end{math}
+  \item if $\bEv\notin\bEvs$ then
+    \begin{math}
+      (\forall\dVal)
+    \end{math}
+    $\aTr[\bEvs](\aForm)$ implies
+    \begin{math}
+      \bForm_\bEv
+      \limplies (\cExp{=}\dVal)
+      \limplies \PBRbig{        
+        \Dmode{\amode}
+        \land \lnot\QxREF{\dVal}
+        \land
+        (\RW
+         \limplies (\aVal{=}\bReg_\aEv\lor\aLoc{=}\bReg_\aEv) 
+         \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+        )
+      }      
+    \end{math}
+  \item if 
+    \begin{math}
+      (\forall\bEv\in\bEvs)(\cForm \textimplies
+      \lnot\bForm_\bEv)
+    \end{math}
+    then
+    \begin{math}
+      (\forall\dVal)
+    \end{math}
+    $\aTr[\bEvs](\aForm)$ implies 
+    \begin{math}
+      \bForm_\bEv
+      \limplies (\cExp{=}\dVal)
+      \limplies \PBR{        
+        \Dmode{\amode}
+        \land \lnot\QxREF{\dVal}
+        \land
+        \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+      }      
+    \end{math}
+    \\ where $\Dmode{\mRLX}=\TRUE$ and $\Dmode{\mRA}=\Dx{\dVal}$
+  \end{enumerate}  
+  % \item if $\amode=\mRLX$ and $\bEv\notin\bEvs$ then
+  %   \begin{math}
+  %     (\forall\dVal)
+  %   \end{math}
+  %   $\aTr[\bEvs](\aForm)$ implies
+  %   \begin{math}
+  %     \bForm_\bEv
+  %     \limplies (\cExp{=}\dVal)
+  %     \limplies \PBRbig{
+  %       (
+  %       \RW
+  %       \limplies (\aVal{=}\bReg_\aEv\lor\aLoc{=}\bReg_\aEv) 
+  %       \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+  %       )
+  %       \land \lnot\QxREF{\dVal}
+  %     }
+  %     \phantom{\land\; \Dx{\dVal}}
+  %   \end{math}
+  % \item if $\amode\neq\mRLX$ and $\bEv\notin\bEvs$ then
+  %   \begin{math}
+  %     (\forall\dVal)
+  %   \end{math}
+  %   $\aTr[\bEvs](\aForm)$ implies
+  %   \begin{math}
+  %     \bForm_\bEv
+  %     \limplies (\cExp{=}\dVal)
+  %     \limplies \PBRbig{
+  %       (
+  %       \RW
+  %       \limplies (\aVal{=}\bReg_\aEv\lor\aLoc{=}\bReg_\aEv) 
+  %       \limplies \aForm[\bReg_\aEv/\aReg][\bReg_\aEv/\REF{\dVal}]
+  %       )
+  %       \land \lnot\QxREF{\dVal}
+  %       \land \Dx{\dVal}
+  %     }
+  %   \end{math}
+  \end{minipage}
+  \end{center}
+  \caption{Full Semantics of Load and Store}
+  \label{fig:full}
+\end{figure*}

@@ -5,6 +5,39 @@
 This paper addresses several errors in \citep{10.1145/3428262}, which we
 henceforth refer to as \jjr{}.
 
+\subsection{Reads Update Local State}
+In the rule for read prefixing we have substituted $[r/x]$, rather than
+$[x/r]$.  This means that reads clobber local state.  We assume registers are
+only used once---otherwise, one needs to generate a fresh register for the
+substitution.
+
+With read-read dependencies, this difference can be seen.  For example, the
+following execution is allowed with $[x/r]$, but not $[r/x]$.
+\begin{gather*}
+  \PW{x}{0}\SEMI
+  \PR{x}{r}\SEMI
+  \IF{r}\THEN \PR{x}{s}\FI\SEMI
+  \PW{y}{s{+}1}
+  \PAR
+  \PW{x}{\PR{y}{}}
+  \\[-1ex]
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{0}}{}
+      \event{a2}{\DW{x}{1}}{right=of a1}
+      \event{a3}{\DR{x}{0}}{right=of a2}
+      \event{a4}{\DW{y}{1}}{right=of a3}
+      \event{b1}{\DR{y}{1}}{right=3em of a4}
+      \event{b2}{\DW{x}{1}}{right=of b1}
+      \wk{a1}{a2}
+      \po{a2}{a3}
+      \po{b1}{b2}
+      \rf{a4}{b1}
+      \rf[out=165,in=15]{b2}{a2}
+    \end{tikzinline}}
+\end{gather*}
+[Is there a difference w/o read-read dependencies?]
+  
+
 \subsection{Parallel Composition}
 
 In \jjr{\textsection2.4}, parallel composition is defined allowing coalescing

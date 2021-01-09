@@ -8,7 +8,7 @@ by store forwarding. Something like:
 The syntax is built from
 \begin{itemize}
 \item a set of \emph{values} $\Val$, ranged over by
-  $\aVal$, $\bVal$, $\cVal$,
+  $\aVal$, $\bVal$, $\cVal$, $\dVal$,
 \item a set of \emph{registers} $\Reg$, ranged over by
   $\aReg$, $\bReg$,
 \item a set of \emph{expressions} $\Exp$, ranged over by
@@ -64,7 +64,7 @@ The semantics is built from the following.
 \begin{itemize}
 \item a set of \emph{actions} $\Act$, ranged over by $\aAct$, 
 \item a set of \emph{logical formulae} $\Formulae$, ranged over by $\aForm$,
-  $\bForm$.
+  $\bForm$, $\cForm$.
 \end{itemize}
 We require that
 \begin{itemize}
@@ -127,29 +127,32 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
 
 \begin{definition}
   Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
-  Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$.
+  Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any
+  $\aVal$, $\bVal$.
   
   % A pomset $\aPS$ is \emph{closed} if for every $\aEv$ which can be
   % fulfilled, there is a $\bEv\le\aEv$ which fulfills it, and for any $\cEv$
   % which can block $\aEv$, either $\cEv\le\bEv$ or $\aEv\le\cEv$.
 
-  We say that $\aEv$ is \emph{fulfilled} if there is a $\bEv\le\aEv$ which
+  Event $\aEv$ is \emph{fulfilled} if there is a $\bEv\le\aEv$ which
   matches it and, for any $\cEv$ which can block $\aEv$, either $\cEv\le\bEv$
   or $\aEv\le\cEv$.
 
-  We say that $\aPS$ is \emph{fulfilled} if every read in $\aPS$ is fulfilled.
+  Pomset $\aPS$ is \emph{fulfilled} if every read in $\aPS$ is fulfilled.
 
-  We define \emph{independency} (${\reorder}\subseteq\Act\times\Act$) as follows.
+  \emph{Independency} (${\reorder}\subseteq\Act\times\Act$) is defined as follows.
   \begin{align*}
     % {\reorderSC} &= \emptyset
     % \\
     % {\reorderRLX} &=
     \reorder &=
+    \{(\DR{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc\}
+    \\[-.5ex]&\mkern2mu\cup\mkern2mu
     \{(\DR{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \}
-    \\[-.5ex]&\mkern2mu\cup\mkern2mu
-    \{(\DW{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc \lor \aVal=\bVal\}
-    \\[-.5ex]&\mkern2mu\cup\mkern2mu
-    \{(\DR{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc\}
+    % \\[-.5ex]&\mkern2mu\cup\mkern2mu
+    % \{(\DW{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc \lor \aVal=\bVal\}
+    % \\[-.5ex]&\mkern2mu\cup\mkern2mu
+    % \{(\DR{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc\}
   \end{align*}
 \end{definition}
 
@@ -192,7 +195,7 @@ pomsets.
   \item if $\bEv\le_2\aEv$ then $\bEv\le\SB0\aEv$, 
     % \newcounter{pomsetPrefixCount}
     % \setcounter{pomsetPrefixCount}{\value{enumi}}
-  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, either $\bEv\leq\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
     \newcounter{pomsetPrefixOrderCount}
     \setcounter{pomsetPrefixOrderCount}{\value{enumi}}
   \end{enumerate}
@@ -232,7 +235,11 @@ execution.
 
 \subsection{Pomsets with Preconditions}
 
-[Problem with previous section is that  notion of dependency is impoverished]
+[Problem with previous section is that notion of dependency is impoverished]
+
+The model described here is essentially the model of
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}, restricted to relaxed access.  We
+discuss differences in the appendix.
 
 \begin{definition}
   A \emph{pomset with preconditions} is
@@ -288,12 +295,12 @@ execution.
      \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[1--\thepomsetPrefixOrderCount)] as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPS_2$ in
     Definition~\ref{tab:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
-  \item if $\bEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm\SB0(\bEv)$ implies $(\aExp{=}\aVal)$,
-  % \item if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$,
-  % \item if $\bEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\bEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\bEv)$.
-  \item if $\aEv\in\aEvs_2$ then either
-    $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$ or\\
-    $\aEv\in\aEvs_1$ and $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\aEv)$.
+  \item if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)$,
+  \item if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$,
+  \item if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\aEv)$.
+  % \item if $\aEv\in\aEvs_2$ then either
+  %   $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)$ or\\
+  %   $\aEv\in\aEvs_1$ and $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\aEv)$.
   \end{enumerate}
 
   \noindent
@@ -305,14 +312,18 @@ execution.
      \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[1--\thepomsetPrefixOrderCount)] as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPS_2$ in
     Definition~\ref{tab:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
-  \item if $\aEv\in\aEvs_2$ then either $\aEv\in\aEvs_1$ or\\
+  \item if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
     $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal\lor\aReg{=}\aLoc)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ or\\
     $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ and $\bEv<\SB0\aEv$ \\
     \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
   \end{enumerate}  
 \end{definition}
-Note that when $\bEv\in\aEvs_1\setminus\aEvs_2$, $\sLOADPRE{}{}{}$ does not
-constrain $\labelingForm\SB0(\bEv)$.
+Following our convention for subscripts, in the final clause of
+$\sLOADPRE{}{}{}$, $<$ refers to the order of $\aPS$.  Also note that
+$\sLOADPRE{}{}{}$ does not constrain $\labelingForm\SB0(\aEv)$ if
+$\aEv\in\aEvs_1$.
+
+[Define substitution.]
 
 The semantics of $\NIL$ and $\PAR$ are as before.
 \begin{align*}
@@ -329,50 +340,15 @@ The semantics of $\NIL$ and $\PAR$ are as before.
   \sem{\PR{\aLoc}{\aReg}\SEMI \aCmd} &= \sLOADPRE{\aLoc}{\aReg}{\sem{\aReg}}
 \end{align*}
 
-This is essentially the model of \cite{DBLP:journals/pacmpl/JagadeesanJR20}, restricted to
-relaxed access.  There are only two substantial differences.  First, for
-simplicity, we enforce read-read dependencies.  Second, in the rule for read
-prefixing we have substituted $[r/x]$, rather than $[x/r]$.  This means that
-reads clobber local state.  We assume registers are only used
-once---otherwise, one needs to generate a fresh register for the
-substitution.
-
-
-With read-read dependencies, the second difference can be seen.  For example,
-the following execution is allowed with $[x/r]$, but not $[r/x]$.
-\begin{gather*}
-  \PW{x}{0}\SEMI
-  \PR{x}{r}\SEMI
-  \IF{r}\THEN \PR{x}{s}\FI\SEMI
-  \PW{y}{s{+}1}
-  \PAR
-  \PW{x}{\PR{y}{}}
-  \\[-1ex]
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{0}}{}
-      \event{a2}{\DW{x}{1}}{right=of a1}
-      \event{a3}{\DR{x}{0}}{right=of a2}
-      \event{a4}{\DW{y}{1}}{right=of a3}
-      \event{b1}{\DR{y}{1}}{right=3em of a4}
-      \event{b2}{\DW{x}{1}}{right=of b1}
-      \wk{a1}{a2}
-      \po{a2}{a3}
-      \po{b1}{b2}
-      \rf{a4}{b1}
-      \rf[out=165,in=15]{b2}{a2}
-    \end{tikzinline}}
-\end{gather*}
-[Is there a difference w/o read-read dependencies?]
-
-
-
 [Stuff about conditionals and merging events.]
-
 
 
 \subsection{Pomsets with Predicate Transformers}
 
-[The problem with the previous section is that there's no story for sequential composition.]
+\input{fig-full}
+
+[The problem with the previous section is that there's no story for
+sequential composition.]
 
 \begin{definition}
   A \emph{predicate transformer} is a monotone function
@@ -384,17 +360,18 @@ the following execution is allowed with $[x/r]$, but not $[r/x]$.
 
 \begin{definition}
   A \emph{family of predicate transformers}
-  indexed by subsets of $\aEvs$
-  consists of predicate transformers
+  for $\aEvs$
+  consists of a predicate transformer
   $\aTr[\bEvs]$ for each set of events $\bEvs$,
-  such that if $\cEvs \subseteq \bEvs$
+  such that if $\cEvs \cap \aEvs \subseteq \bEvs$
   then $\aTr[\cEvs](\aForm)$ implies $\aTr[\bEvs](\aForm)$.
 \end{definition}
 
+[Predicates with smaller subsets of $\aEvs$ are stronger.]
+
 \begin{definition}
   A pomset with predicate tansformers is a pomset with preconditions,
-  together with a family of predicate transformers $\aTr$ indexed by subsets
-  of $\aEvs$.
+  together with a family of predicate transformers for $\aEvs$.
 \end{definition}
 
 % \begin{definition}
@@ -468,31 +445,41 @@ For the reverse embedding, $\sFORK{}$ adopts the identity transformer.
   If $\aPS\SB0 \in \sSTORE{\aLoc}{\aExp}$ then
   $(\exists\aVal\in\Val)$
   \begin{enumerate}
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
   \item $\labelingAct\SB0(\aEv) = \DWP{\aLoc}{\aVal}$,
   \item $\labelingForm\SB0(\aEv)$ implies $(\aExp{=}\aVal)$,
   \item %if $\bEvs=\emptyset$ then
-    $\aTr[\emptyset]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc]$,
-  \item %if $\bEvs\neq\emptyset$ then
-    $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aExp{=}\aVal) \land \aForm[\aExp/\aLoc]$, if $\bEvs\neq\emptyset$,
-  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc]$,
+  % \item %if $\bEvs\neq\emptyset$ then
+  %   $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aExp{=}\aVal) \land \aForm[\aExp/\aLoc]$, if $\bEvs\neq\emptyset$,
   \end{enumerate}
 
   \noindent
   If $\aPS\SB0 \in \sLOAD{\aLoc}{\aReg}$ then
   $(\exists\aVal\in\Val)$
   \begin{enumerate}
-  \item $\labelingAct\SB0(\aEv) = \DRP{\aLoc}{\aVal}$,
-  \item %if $\bEvs=\emptyset$ then
-    $\aTr[\emptyset]\SB0(\aForm)$ implies $(\aReg{=}\aVal\lor\aReg{=}\aLoc)\limplies\aForm[\aReg/\aLoc]$,
-  \item %if $\bEvs\neq\emptyset$ then
-    $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aReg{=}\aVal)\limplies\aForm[\aReg/\aLoc]$, if $\bEvs\neq\emptyset$,
   \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
+  \item $\labelingAct\SB0(\aEv) = \DRP{\aLoc}{\aVal}$,
+  \item %if $\bEvs\neq\emptyset$ then
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]$, if $\bEvs\neq\emptyset$,
+  \item %if $\bEvs=\emptyset$ then
+    $\aTr[\emptyset]\SB0(\aForm)$ implies $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\aForm[\aReg/\aLoc]$,
   \end{enumerate}
 \end{definition}
-[$(\aExp{=}\aVal)$ appears in $\aTr[\bEvs]$ for $\sSTORE{}{}$ in order to
-ensure that anything ordered after this is in a compatible world. ?]
+[Note that we could change the premise of $\aTr[\emptyset]$ in $\sLOAD{}{}$
+from $(\aVal{=}\aReg\lor\aLoc{=}\aReg)$ to $(\aLoc{=}\aReg)$. The
+requirements of a family of predicate transforms effectively adds the
+additional requirement.]
+
+[We drop $\reorder$ because incompatible with $\sFORK{}$.  If you want to use
+$\reorder$, then you need to use fork-join as the sequential combinator,
+rather than fork.]
+
+
 
 The complete semantics is as follows.
+\begin{scope}
+  \allowdisplaybreaks
 \begin{align*}
   \sem{\SKIP} &= \sSKIP
   \\
@@ -514,7 +501,9 @@ The complete semantics is as follows.
   \\
   \sem{\aGrp \PAR \bGrp} &= \sem{\aGrp}\sPAR\sem{\bGrp}
 \end{align*}
+\end{scope}
 [Examples.]
+
 
 
 [Skolemization ensures disjunction closure, which is necessary

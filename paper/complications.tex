@@ -1,44 +1,21 @@
-alan notes:
--
-
 \section{Complications}
 
-[Very drafty.  These are just notes.]
+[I have a note: TC1: Track local state ???]
 
-\begin{itemize}
-\item Dependency: preconditions
-\item TC1: Track local state
-\end{itemize}
+\subsection{Release Acquire}
 
-\subsection{Address Calculation}
- 
-\begin{definition}
-  \noindent
-  If $\aPS\SB0 \in \sSTORE{\cExp}{\aExp}$ then
-  $(\exists\aVal,\,\cVal\in\Val)$
-  \begin{enumerate}
-  \item $\labelingAct\SB0(\aEv) = \DWP{\REF\cVal}{\aVal}$,
-  \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal \land \aExp{=}\aVal)$,
-  \item $\aTr[\emptyset]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies \aForm[\aExp/\REF{\cVal}]$,
-  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies (\aExp{=}\aVal) \land \aForm[\aExp/\REF{\cVal}]$, 
-  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
-  \end{enumerate}
+Can be encoded in independency, or logic, but logic is compatible with fork.
 
-  \noindent
-  If $\aPS\SB0 \in \sLOAD{\cExp}{\aReg}$ then
-  $(\exists\aVal,\,\cVal\in\Val)$
-  \begin{enumerate}
-  \item $\labelingAct\SB0(\aEv) = \DRP{\REF{\cVal}}{\aVal}$,
-  \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal)$,
-  \item $\aTr[\emptyset]\SB0(\aForm)$ implies
-    $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal\lor\aReg{=}\REF{\cVal})\limplies\aForm[\aReg/\REF{\cVal}]$,
-  \item $\aTr[\bEvs]\SB0(\aForm)$ implies
-    $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal)\limplies\aForm[\aReg/\REF{\cVal}]$, 
-  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
-  \end{enumerate}  
-\end{definition}
+Logic is also more flexible, and we need that for \armeight.
+
+We use $\Q$.
 
 \subsection{Coherence}
+
+$\Q$ implies $\Qx{\aLoc}$
+and
+$\Qx{\aLoc}$ implies $\Qw{\aLoc}$
+
 Can be encoded in independency, or logic.
 
 If you put in independency then you add this to $\sSTORE{}{}$:
@@ -49,23 +26,21 @@ This does not do the right thing with fork however.  If you want to enforce
 coherence this way then you need to use fork-join as the sequential
 combinator, rather than fork.
 
+Instead we put it in the logic, using 
+
 \begin{itemize}
-\item Coherence respects program order: $\mathsf{Q}_{x}$
-\item Drop read-read coherence: $\mathsf{QW}_{x}$ (Required for CSE without
+\item Coherence respects program order: $\Qx{\aLoc}$
+\item Drop read-read coherence: $\Qw{\aLoc}$ (Required for CSE without
   alias analysis over read only code, not required by hardware)
 \end{itemize}
 
-\subsection{Release Acquire}
-$\mathsf{Q}$
 
-Can be encoded in independency, or logic, but logic is more flexible, and we
-need that for \armeight.
 
 \subsection{ARM Compilation: Internal Acquires}
-Downgrading acquires/Anton example: ${\downarrow} x$
+Downgrading acquires/Anton example: $\Dx{\aLoc}$
 
 \subsection{ARM Compilation: Read-read dependencies}
-$\mathsf{RW}$/$\mathsf{RO}$ (control dependencies into reads as in MP with
+$\RW$/$\RO$ (control dependencies into reads as in MP with
 release on right and control dependency on left)
 
 \subsection{Redundant Read Elimination}
@@ -154,9 +129,39 @@ Requires indexing to resolve nondeterminism.
 
 IF closure/case analysis: $\psi_e$
 
+\subsection{Address Calculation}
 
-\subsection{Agda}
+Do this after if closure, because problem with punning badly.
 
-\begin{figure*}
-  \includegraphics[width=\textwidth]{agda.png}
-\end{figure*}
+\begin{definition}
+  \noindent
+  If $\aPS\SB0 \in \sSTORE{\cExp}{\aExp}$ then
+  $(\exists\aVal,\,\cVal\in\Val)$
+  \begin{enumerate}
+  \item $\labelingAct\SB0(\aEv) = \DWP{\REF\cVal}{\aVal}$,
+  \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal \land \aExp{=}\aVal)$,
+  \item $\aTr[\emptyset]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies \aForm[\aExp/\REF{\cVal}]$,
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies (\aExp{=}\aVal) \land \aForm[\aExp/\REF{\cVal}]$, 
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS\SB0 \in \sLOAD{\cExp}{\aReg}$ then
+  $(\exists\aVal,\,\cVal\in\Val)$
+  \begin{enumerate}
+  \item $\labelingAct\SB0(\aEv) = \DRP{\REF{\cVal}}{\aVal}$,
+  \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal)$,
+  \item $\aTr[\emptyset]\SB0(\aForm)$ implies
+    $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal\lor\aReg{=}\REF{\cVal})\limplies\aForm[\aReg/\REF{\cVal}]$,
+  \item $\aTr[\bEvs]\SB0(\aForm)$ implies
+    $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal)\limplies\aForm[\aReg/\REF{\cVal}]$, 
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
+  \end{enumerate}  
+\end{definition}
+
+
+% \subsection{Agda}
+
+% \begin{figure*}
+%   \includegraphics[width=\textwidth]{agda.png}
+% \end{figure*}

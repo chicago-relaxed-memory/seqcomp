@@ -1,3 +1,16 @@
+\newcommand{\Qmode}[1]{\mathsf{Q}_{#1}}
+\newcommand{\Dmode}[1]{\mathord{\downarrow_{#1}}}
+\newcommand{\RW}{\mathsf{RW}}
+\newcommand{\RO}{\mathsf{RO}}
+\newcommand{\Q}{\mathsf{Q}}
+\newcommand{\D}{\mathord{\downarrow_{\star}}}
+\newcommand{\DREF}{\mathord{\downarrow_{\REF{\star}}}}
+\newcommand{\Dx}[1]{\mathord{\downarrow_{#1}}}
+\newcommand{\Qx}[1]{\mathsf{Q}_{#1}}
+\newcommand{\Qw}[1]{\mathsf{QW}_{#1}}
+\newcommand{\DxREF}[1]{\Dx{\REF{#1}}}
+\newcommand{\QxREF}[1]{\Qx{\REF{#1}}}
+\newcommand{\QwREF}[1]{\Qw{\REF{#1}}}
 \newcommand{\SB}[1]{}%_{#1}}
 \newcommand{\limplies}{\Rightarrow}
 % get ams to ignore tag in spacing
@@ -115,6 +128,7 @@
 \newcommand{\PREDP}[2][\aForm]{\ABR{\PRED[#1]{#2}}}
 \newcommand{\ABR}[1]{\langle#1\rangle}
 \newcommand{\PBR}[1]{(#1)}
+\newcommand{\PBRbig}[1]{\bigl(#1\bigr)}
 
 % \newcommand{\sem}[2][]{\llbracket#2\rrbracket_{#1}}
 % \NewDocumentCommand\DR{O{} O{} m m}{#2\mathsf{R}^{#1}\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}
@@ -402,7 +416,7 @@
 \newcommand{\aVal}{v}
 \newcommand{\bVal}{w}
 \newcommand{\cVal}{\ell}
-%\newcommand{\dVal}{u}
+\newcommand{\dVal}{k}
 
 \newcommand{\Exp}{\mathcal{M}}
 \newcommand{\aExp}{M}
@@ -417,8 +431,8 @@
 \newcommand{\bForm}{\psi}
 \newcommand{\cForm}{\chi}
 \newcommand{\dForm}{\xi}
-\newcommand{\TRUE}{\mathsf{true}}
-\newcommand{\FALSE}{\mathsf{false}}
+\newcommand{\TRUE}{\mathsf{tt}}
+\newcommand{\FALSE}{\mkern.6mu\mathsf{ff}\mkern.6mu}
 \newcommand{\Bool}{\mathsf{Bool}}
 \newcommand{\aTr}[1][]{\tau^{#1}}
 
@@ -586,7 +600,7 @@
 \newcommand{\LPAR}{\,\mathbin{\rrceil}\,}
 \newcommand{\VAR}{\mathtt{var}\,}
 \newcommand{\TOUCHED}{\mathtt{touched}\,}
-\newcommand{\REF}[1]{\mkern-1mu\texttt{[}\mkern-1mu#1 \mkern-1mu\texttt{]}\mkern-1mu}
+\newcommand{\REF}[1]{\mkern-2mu\texttt{[}\mkern-2mu#1 \mkern-2mu\texttt{]}\mkern-2mu}
 \newcommand{\REFAcq}[1]{\REF{#1}^{\mathtt{acq}}}
 \newcommand{\REFRel}[1]{\REF{#1}^{\mathtt{rel}}}
 
