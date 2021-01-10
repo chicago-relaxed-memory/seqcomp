@@ -62,6 +62,11 @@ sequential combinator, rather than fork.
 \label{sec:internal}
 Downgrading acquires/Anton example: $\Dx{\aLoc}$
 
+%$\D$ implies $\Dx{\aLoc}$
+
+We write $[\aForm/\D]$ for the substitution that performs
+$[\aForm/\Dx{\aLoc}]$ for every $\aLoc$.
+
 \subsection{ARM Compilation: Read-read dependencies}
 $\RW$/$\RO$ (control dependencies into reads as in MP with
 release on right and control dependency on left)
@@ -82,8 +87,8 @@ each register occurs at most once.
 
   $\QL{\aLoc}{\mSC}=\Q{\mSC}$ and otherwise $\QL{\aLoc}{\amode}=\Qw{\aLoc}$.
 
-  $\DS{\aLoc}{\mRLX}=[\TRUE/\Dx{\aLoc}]$ and otherwise
-  $\DS{\aLoc}{\amode}=[\FALSE/\D]$. 
+  $\DS{\aLoc}{\mRLX}{\aForm}=\aForm[\TRUE/\Dx{\aLoc}]$ and otherwise
+  $\DS{\aLoc}{\amode}{\aForm}=\aForm[\FALSE/\D]$. 
 
   $\DL{\aLoc}{\mRLX}=\TRUE$ and otherwise $\DL{\aLoc}{\amode}=\Dx{\aLoc}$.
   \smallskip

@@ -30,7 +30,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
     \limplies (\cExp{=}\dVal)
     \limplies \PBRbig{
       (\QwREF{\dVal} \limplies \aExp{=}\aVal_\bEv)
-      \land \aForm[\aExp/\REF{\dVal}] \DS{}{\amode}
+      \land \DS{\REF{\dVal}}{\amode}{\aForm[\aExp/\REF{\dVal}]}
     }
   \end{math},
 \item %if 
@@ -48,12 +48,12 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
     \limplies (\cExp{=}\dVal)
     \limplies \PBR{
       \lnot\QwREF{\dVal}
-      \land \aForm[\aExp/\REF{\dVal}] \DS{\REF{\dVal}}{\amode}
+      \land \DS{\REF{\dVal}}{\amode}{\aForm[\aExp/\REF{\dVal}]}
     }.
   \end{math}
   % \\ where 
-  % $\DS{}{\mRLX}=[\TRUE/\DxREF{\dVal}]$ and otherwise
-  % $\DS{}{\amode}=[\FALSE/\DREF]$. % for $\amode\neq\mRLX$.
+  % $\DS{}{\mRLX}{}=[\TRUE/\DxREF{\dVal}]$ and otherwise
+  % $\DS{}{\amode}{}=[\FALSE/\D]$. % for $\amode\neq\mRLX$.
 \end{enumerate}
 % \item if $\amode=\mRLX$ then
 %   $\labelingForm(\aEv)$ implies
@@ -102,7 +102,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 %     \limplies (\cExp{=}\dVal)
 %     \limplies \PBRbig{
 %     (\QwREF{\dVal} \limplies \aExp{=}\aVal_\bEv)
-%     \land \aForm[\aExp/\REF{\dVal}][\FALSE/\DREF]
+%     \land \aForm[\aExp/\REF{\dVal}][\FALSE/\D]
 %   }
 %   \end{math}
 % \item if 
@@ -140,7 +140,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 %     \limplies (\cExp{=}\dVal)
 %     \limplies \PBRbig{
 %     \lnot\QwREF{\dVal}
-%     \land \aForm[\aExp/\REF{\dVal}][\FALSE/\DREF]
+%     \land \aForm[\aExp/\REF{\dVal}][\FALSE/\D]
 %   }
 %   \end{math}
 
