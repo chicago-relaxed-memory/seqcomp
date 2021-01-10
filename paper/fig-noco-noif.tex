@@ -1,0 +1,54 @@
+\noindent
+If $\aPS \in \sSTORE[\amode]{\aLoc}{\aExp}$ then
+\begin{enumerate}
+\item if $\bEv\in\aEvs$ and $\aEv\in\aEvs$ then $\bEv=\aEv$,
+\item $\labelingAct(\aEv) = \DWP{\aLoc}{\aVal}$,
+\item 
+  $\labelingForm(\aEv)$ implies
+  \begin{math}
+    \aExp{=}\aVal
+    \land \RW
+    \land \QS{}{\amode}
+  \end{math},
+\item
+  $\aTr[\bEvs](\aForm)$ implies 
+  \begin{math}
+    \aExp{=}\aVal
+    \land \DS{\aLoc}{\amode}{\aForm[\aExp/{\aLoc}]}
+  \end{math},
+\item 
+  $\aTr[\emptyset](\aForm)$ implies 
+  \begin{math}
+    \lnot\Q{\mRA}
+    \land \DS{\aLoc}{\amode}{\aForm[\aExp/{\aLoc}]}
+  \end{math}
+\end{enumerate}
+
+\noindent
+If $\aPS \in \sLOAD[\amode]{\aLoc}{\aReg}$ then
+\begin{enumerate}
+\item if $\bEv\in\aEvs$ and $\aEv\in\aEvs$ then $\bEv=\aEv$,
+\item $\labelingAct(\aEv) = \DRP{\aLoc}{\aVal}$,
+\item $\labelingForm(\aEv)$ implies
+  \begin{math}
+    \RO
+    \land \QL{}{\amode}
+  \end{math},
+\item
+  $\aTr[\bEvs](\aForm)$ implies
+  \begin{math}
+    (\aVal{=}\aReg)
+    \limplies \aForm[\aReg/{\aLoc}]
+  \end{math}
+\item 
+  $\aTr[\emptyset](\aForm)$ implies
+  \begin{math}
+    \DL{\aLoc}{\amode}
+    \land \lnot\Q{\mRA}
+    \land
+    (\RW
+    \limplies (\aVal{=}\aReg\lor\aLoc{=}\aReg) 
+    \limplies \aForm[\aReg/{\aLoc}]
+    ).
+  \end{math}
+\end{enumerate}  
