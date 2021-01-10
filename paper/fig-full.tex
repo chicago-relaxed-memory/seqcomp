@@ -19,7 +19,7 @@
       \land \Qmode{\amode}
     \end{math},
     where
-    $\Qmode{\mRLX}=\QxREF{\cVal_\aEv}$ and $\Qmode{\mRA}=\Q$, % for $\amode\neq\mRLX$,
+    $\Qmode{\mRLX}=\QxREF{\cVal_\aEv}$ and otherwise $\Qmode{\amode}=\Q[\amode]$, % for $\amode\neq\mRLX$,
   \item
     \begin{math}
       (\forall\dVal)
@@ -55,8 +55,8 @@
       }
     \end{math}
     \\ where 
-      $\aForm\Dmode{\mRLX}=\aForm[\TRUE/\DxREF{\dVal}]$ and
-      $\aForm\Dmode{\mRA}=\aForm[\FALSE/\DREF]$. % for $\amode\neq\mRLX$.
+      $\aForm\Dmode{\mRLX}=\aForm[\TRUE/\DxREF{\dVal}]$ and otherwise
+      $\aForm\Dmode{\amode}=\aForm[\FALSE/\DREF]$. % for $\amode\neq\mRLX$.
   \end{enumerate}
   % \item if $\amode=\mRLX$ then
   %   $\labelingForm(\aEv)$ implies
@@ -152,7 +152,6 @@
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\bForm:\aEvs\fun\Formulae)$
-  We assume $(\bReg:\aEvs\fun\Reg)$
   \begin{enumerate}
   \item if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
   \item $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
@@ -161,8 +160,10 @@
       \bForm_\aEv
       \land \cExp{=}\cVal_\aEv
       \land \RO
-      \land \QwREF{\cVal_\aEv}
+      \land \Qmode{\amode}
     \end{math},
+    where    
+    $\Qmode{\mSC}=\Q[\mSC]$ and otherwise $\Qmode{\amode}=\QwREF{\cVal_\aEv}$, % for $\amode\neq\mRLX$,
   \item
     \begin{math}
       (\forall\dVal)
@@ -216,7 +217,7 @@
         \limplies \aForm[\bReg/\aReg][\bReg/\REF{\dVal}]
       }      
     \end{math}
-    \\ where $\Dmode{\mRLX}=\TRUE$ and $\Dmode{\mRA}=\Dx{\dVal}$
+    \\ where $\Dmode{\mRLX}=\TRUE$ and otherwise $\Dmode{\amode}=\Dx{\dVal}$
   \end{enumerate}  
   % \item if $\amode=\mRLX$ and $\bEv\notin\bEvs$ then
   %   \begin{math}

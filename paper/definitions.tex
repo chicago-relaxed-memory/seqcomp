@@ -103,6 +103,10 @@ Formulae are subject to substitutions of the form $[\aExp/\aLoc]$; actions are n
   $\aForm$ is \emph{unsatisfiable} if $\aForm\vDash\FALSE$.
 %\end{definition}
 
+
+[We assume $(\bReg:\aEvs\fun\Reg)$]
+
+
 \subsection{Pomsets}
 
 We first consider a fragment of our language that can be modeled using simple
@@ -331,7 +335,7 @@ The semantics of $\NIL$ and $\PAR$ are as before.
   % \\
   % \sem{\aCmd \PAR \bCmd} &= \sem{\aCmd}\sPAR\sem{\bCmd}
   % \\
-  \sem{\IF{\bForm}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\bForm}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
+  \sem{\IF{\aExp}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
   \\
   \sem{\LET{\aReg}{\aExp}\SEMI \aCmd} &= \sem{\aCmd}[\aExp/\aReg]
   \\
@@ -493,7 +497,7 @@ The complete semantics is as follows.
   \\
   \sem{\aCmd \SEMI \bCmd} &= \sem{\aCmd}\sSEMI\sem{\bCmd}
   \\
-  \sem{\IF{\bForm}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\bForm}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
+  \sem{\IF{\aExp}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
   \\
   \sem{\NIL} &= \sSTOP
   \\
