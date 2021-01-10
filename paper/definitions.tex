@@ -19,10 +19,12 @@ be the set of memory locations, ranged over by $\aLoc$, $\bLoc$, $\cLoc$.
 
 We require that
 \begin{itemize}
-\item values and registers are disjoint,
-\item values include at least the constants $0$ and $1$,
+\item values and registers are disjoint, 
+\item values include at least the constants $0$ and $1$,  
+\item for any set $\aEvs$ there are registers $\uRegs{\aEvs}=\{\uReg{\aEv}\mid\aEv\in\aEvs\}$,
 \item expressions include at least registers and values, 
-\item expressions do \emph{not} include memory locations.
+\item expressions do \emph{not} include memory locations or registers in
+  $\uRegs{\aEvs}$, for any set $\aEvs$.
 \end{itemize}
 We model the following language.
 \begin{align*}
@@ -104,7 +106,6 @@ Formulae are subject to substitutions of the form $[\aExp/\aLoc]$; actions are n
 %\end{definition}
 
 
-[We assume $(\bReg:\aEvs\fun\Reg)$]
 
 
 \subsection{Pomsets}
@@ -242,8 +243,9 @@ execution.
 [Problem with previous section is that notion of dependency is impoverished]
 
 The model described here is essentially the model of
-\cite{DBLP:journals/pacmpl/JagadeesanJR20}, restricted to relaxed access.  We
-discuss differences in the appendix.
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}, removing the requirements for
+\emph{consistency} and \emph{causal strengthening}, and restricting attention
+to relaxed access.  We discuss differences in the appendix.
 
 \begin{definition}
   A \emph{pomset with preconditions} is
@@ -349,8 +351,6 @@ The semantics of $\NIL$ and $\PAR$ are as before.
 
 \subsection{Pomsets with Predicate Transformers}
 
-\input{fig-full}
-
 [The problem with the previous section is that there's no story for
 sequential composition.]
 
@@ -441,6 +441,8 @@ For the reverse embedding, $\sFORK{}$ adopts the identity transformer.
   \item if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
   \\ where $\labelingForm'_2(\aEv)=\aTr[\cEvs]_1(\labelingForm_2(\aEv))$, where $\cEvs=\{ \cEv \mid \cEv <\SB0 \aEv \}$,
   \item $\aTr[\bEvs]\SB0(\aForm)$ implies $\aTr[\bEvs]_2(\aTr[\bEvs]_1(\aForm))$.
+    \newcounter{pomsetXSemiCount}
+    \setcounter{pomsetXSemiCount}{\value{enumi}}
   %\item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
   \end{enumerate}
   % where we define $\labelingForm'_2(\aEv)$ to be $\aTr[\{ \bEv \mid \bEv <\SB0 \aEv \}]_1(\labelingForm_2(\aEv))$.

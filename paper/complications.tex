@@ -2,34 +2,28 @@
 
 [I have a note: TC1: Track local state ???]
 
-\subsection{Release Acquire}
+\subsection{Must Allow Inconsistent Preconditions}
 
-Can be encoded in independency, or logic, but logic is compatible with fork.
+\subsection{Release, Acquire, and Sequentially Consistent Access}
 
-Logic is also more flexible, and we need that for \armeight.
+We use $\Q{\mRA}$ and $\Q{\mSC}$.
 
-We use $\Q$.
+$\Q{\mSC}$ implies $\Q{\mRA}$.
 
 \begin{definition}
-  $\aPS$ is \emph{completed} if $\aTr[\aEvs](\Q)$ implies $\Q$.
+  $\aPS$ is \emph{completed} if $\aTr[\aEvs](\Q{\mSC})$ implies $\Q{\mSC}$.
 \end{definition}
 
+Access modes can be encoded in the independency relation, indexing labels by
+$\amode$, but the extra flexibility of the logic is necessary for \armeight{}
+(see \textsection\ref{sec:internal}).  Using independency, one would also
+need another way to define completed pomsets.  Finally, this use of
+independency is incompatible with fork (see \textsection\ref{sec:co}).
 
 \subsection{Coherence}
+\label{sec:co}
 
-$\Q[\mSC]$ implies $\Q[\mRA]$ implies $\Qx{\aLoc}$ implies $\Qw{\aLoc}$
-
-Can be encoded in independency, or logic.
-
-If you put in independency then you add this to $\sSTORE{}{}$:
-\begin{itemize}
-\item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
-\end{itemize}
-This does not do the right thing with fork however.  If you want to enforce
-coherence this way then you need to use fork-join as the sequential
-combinator, rather than fork.
-
-Instead we put it in the logic, using 
+$\Q{\mSC}$ implies $\Q{\mRA}$ implies $\Qx{\aLoc}$ implies $\Qw{\aLoc}$
 
 \begin{itemize}
 \item Coherence respects program order: $\Qx{\aLoc}$
@@ -37,14 +31,81 @@ Instead we put it in the logic, using
   alias analysis over read only code, not required by hardware)
 \end{itemize}
 
+It is also possible to put coherence in the independency relation, in which
+case, the semantics of $;$ includes the following.
+\begin{enumerate}
+  \setcounter{enumi}{\value{pomsetXSemiCount}}
+\item
+  \label{seq-reorder} if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
+\end{enumerate}
+One must be careful, however, due to \emph{inconsistency}.
+
+Consider
+
+\eqref{seq-reorder} does not do the right thing with fork either.  If you
+want to enforce coherence this way then you need to use fork-join as the
+sequential combinator, rather than fork.
+
+\begin{figure*}
+  \begin{center}
+  \begin{minipage}{0.905\textwidth}
+    \input{fig-full}
+    % \input{fig-full-where}
+  \end{minipage}
+  \end{center}
+  \caption{Full Semantics of Load and Store}
+  \label{fig:full}
+\end{figure*}    
 
 
 \subsection{ARM Compilation: Internal Acquires}
+\label{sec:internal}
 Downgrading acquires/Anton example: $\Dx{\aLoc}$
 
 \subsection{ARM Compilation: Read-read dependencies}
 $\RW$/$\RO$ (control dependencies into reads as in MP with
 release on right and control dependency on left)
+
+$\RW$ implies $\lnot\RO$ and 
+$\RO$ implies $\lnot\RW$.
+
+
+\subsection{Putting it together}
+
+
+Combining the features defined thus far, we have the following, assuming that
+each register occurs at most once.
+
+\begin{definition}$\phantom{\;}$\par
+  
+  $\QS{\aLoc}{\mRLX}=\Qx{\aLoc}$ and otherwise $\QS{\aLoc}{\amode}=\Q{\amode}$.
+
+  $\QL{\aLoc}{\mSC}=\Q{\mSC}$ and otherwise $\QL{\aLoc}{\amode}=\Qw{\aLoc}$.
+
+  $\DS{\aLoc}{\mRLX}=[\TRUE/\Dx{\aLoc}]$ and otherwise
+  $\DS{\aLoc}{\amode}=[\FALSE/\D]$. 
+
+  $\DL{\aLoc}{\mRLX}=\TRUE$ and otherwise $\DL{\aLoc}{\amode}=\Dx{\aLoc}$.
+  \smallskip
+  
+  \input{fig-noif}
+\end{definition}
+
+If we move coherence to independency (and use fork-join), we have the
+following, assuming that each register occurs at most once.
+\begin{definition}$\phantom{\;}$\par
+  $\QS{}{\mRLX}=\TRUE$ and otherwise $\QS{}{\amode}=\Q{\amode}$.
+
+  $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\TRUE$.
+
+  \smallskip
+
+  \input{fig-noco-noif}
+\end{definition}
+
+
+
+\section{Further Complications}
 
 \subsection{Redundant Read Elimination}
 
@@ -141,30 +202,33 @@ Do this after if closure, because problem with punning badly.
   If $\aPS\SB0 \in \sSTORE{\cExp}{\aExp}$ then
   $(\exists\aVal,\,\cVal\in\Val)$
   \begin{enumerate}
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
   \item $\labelingAct\SB0(\aEv) = \DWP{\REF\cVal}{\aVal}$,
   \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal \land \aExp{=}\aVal)$,
   \item $\aTr[\emptyset]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies \aForm[\aExp/\REF{\cVal}]$,
   \item $\aTr[\bEvs]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies (\aExp{=}\aVal) \land \aForm[\aExp/\REF{\cVal}]$, 
-  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
   \end{enumerate}
 
   \noindent
   If $\aPS\SB0 \in \sLOAD{\cExp}{\aReg}$ then
   $(\exists\aVal,\,\cVal\in\Val)$
   \begin{enumerate}
+  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
   \item $\labelingAct\SB0(\aEv) = \DRP{\REF{\cVal}}{\aVal}$,
   \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal)$,
   \item $\aTr[\emptyset]\SB0(\aForm)$ implies
     $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal\lor\aReg{=}\REF{\cVal})\limplies\aForm[\aReg/\REF{\cVal}]$,
   \item $\aTr[\bEvs]\SB0(\aForm)$ implies
     $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal)\limplies\aForm[\aReg/\REF{\cVal}]$, 
-  \item if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$.
   \end{enumerate}  
 \end{definition}
 
+\subsection{Putting it together}
+
+The full semantics of load and store is given in Figure \ref{fig:full}.
+Recall that $\uRegs{\bEvs}=\{\uReg{\bEv}\mid\bEv\in\bEvs\}$.
 
 % \subsection{Agda}
-
 % \begin{figure*}
 %   \includegraphics[width=\textwidth]{agda.png}
 % \end{figure*}

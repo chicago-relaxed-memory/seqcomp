@@ -1,13 +1,17 @@
+\newcommand{\QL}[2]{\mathsf{LQ}_{#2}^{#1}}
+\newcommand{\DL}[2]{\mathsf{LD}_{#2}^{#1}}
+\newcommand{\QS}[2]{\mathsf{SQ}_{#2}^{#1}}
+\newcommand{\DS}[2]{\mathsf{SD}_{#2}^{#1}}
 \newcommand{\Qmode}[1]{\mathsf{Q}^{#1}}
 \newcommand{\Dmode}[1]{\mathord{\downarrow^{#1}}}
 \newcommand{\RW}{\mathsf{RW}}
 \newcommand{\RO}{\mathsf{RO}}
-\newcommand{\Q}[1][]{\mathsf{Q}_{#1}}
+\newcommand{\Q}[1]{\mathsf{Q}_{#1}}
 \newcommand{\D}{\mathord{\downarrow_{\star}}}
 \newcommand{\DREF}{\mathord{\downarrow_{\REF{\star}}}}
 \newcommand{\Dx}[1]{\mathord{\downarrow_{#1}}}
-\newcommand{\Qx}[1]{\mathsf{Q}_{#1}}
-\newcommand{\Qw}[1]{\mathsf{QW}_{#1}}
+\newcommand{\Qx}[1]{\mathsf{Q}_\mRLX^{#1}}
+\newcommand{\Qw}[1]{\mathsf{Q}_\mathsf{w}^{#1}}
 \newcommand{\DxREF}[1]{\Dx{\REF{#1}}}
 \newcommand{\QxREF}[1]{\Qx{\REF{#1}}}
 \newcommand{\QwREF}[1]{\Qw{\REF{#1}}}
@@ -395,6 +399,8 @@
 \newcommand{\aReg}{r}
 \newcommand{\bReg}{s}
 \newcommand{\cReg}{t}
+\newcommand{\uReg}[1]{\mathit{s}_{#1}}
+\newcommand{\uRegs}[1]{\mathcal{S}_{#1}}
 
 \newcommand{\LR}{\mathcal{L}}
 \newcommand{\aLR}{\ell}
