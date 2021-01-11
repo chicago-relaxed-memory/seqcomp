@@ -650,10 +650,25 @@ Simplifying:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-Putting these together:
+Putting these together unordered:
 \begin{gather*}
   \PW{x}{1}\SEMI \PW{x}{2}
   \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \xform{xdi}{\aForm[1/x]\land \lnot\Q{}}{}
+      \xform{xdd}{\aForm[1/x]}{right=of xdi}
+      \xform{xid}{\aForm[1/x]\land \lnot\Q{}}{right=of xdd}
+      \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
+      \event{a2}{\lnot\Q{}\mid\DW{x}{2}}{above right=.5em and -1em of xdd}
+      \xform{xii}{\aForm[1/x]\land \lnot\Q{}}{below=of xdd}
+      \xo{a1}{xdi}
+      \xo{a2}{xid}
+      \xo{a1}{xdd}
+      \xo{a2}{xdd}
+    \end{tikzinline}}
+\end{gather*}
+Putting these together with order:
+\begin{gather*}
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
       \xform{xdi}{\aForm[1/x]\land \lnot\Q{}}{}
       \xform{xdd}{\aForm[1/x]}{right=of xdi}
@@ -665,6 +680,7 @@ Putting these together:
       \xo{a2}{xid}
       \xo{a1}{xdd}
       \xo{a2}{xdd}
+      \po{a1}{a2}
     \end{tikzinline}}
 \end{gather*}
 
@@ -692,7 +708,7 @@ Read to write dependency, first separately:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-Putting these together:
+Putting these together without order:
 \begin{gather*}
   \PR{x}{r} \SEMI
   \PW{y}{r}
@@ -701,7 +717,7 @@ Putting these together:
       \xform{xdi}{((1{=}r)\limplies\aForm[r/x])[1/y]\land \lnot\Q{}}{}
       \xform{xid}{(((x{=}r\lor1{=}r)\limplies\aForm[r/x])\land \lnot\Q{})[1/y]\land (\Q{} \limplies r{=}1)}{below right=.5em and -10em of xdi}
       \event{a1}{\DR{x}{1}}{above=of xdi}
-      \event{a2}{\DW{y}{1}}{above=2em of xid}
+      \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above right=2.7em and -16em of xid}
       \xform{xdd}{((1{=}r)\limplies\aForm[r/x])[1/y]\land (\Q{} \limplies r{=}1)}{above right=.5em and -1em of a1}
       \xform{xii}{(((x{=}r\lor1{=}r)\limplies\aForm[r/x])\land \lnot\Q{})[1/y]\land \lnot\Q{}}{below=of xid}
       \xo{a1}{xdi}
@@ -719,13 +735,32 @@ simplifying:
       \xform{xdi}{((1{=}r)\limplies\aForm[r/x][1/y])\land \lnot\Q{}}{}
       \xform{xid}{((x{=}r\lor1{=}r)\limplies\aForm[r/x][1/y])\land \lnot\Q{}}{below right=.5em and -4em of xdi}
       \event{a1}{\DR{x}{1}}{above=of xdi}
-      \event{a2}{\DW{y}{1}}{above=2em of xid}
+      \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above=2.7em of xid}
       \xform{xdd}{((1{=}r)\limplies\aForm[r/x][1/y])\land (\Q{} \limplies r{=}1)}{above right=.5em and -1em of a1}
       \xform{xii}{((x{=}r\lor1{=}r)\limplies\aForm[r/x][1/y])\land \lnot\Q{}}{below=of xid}
       \xo{a1}{xdi}
       \xo{a2}{xid}
       \xo{a1}{xdd}
       \xo{a2}{xdd}
+    \end{tikzinline}}
+\end{gather*}
+With order:
+\begin{gather*}
+  \PR{x}{r} \SEMI
+  \PW{y}{r}
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \xform{xdi}{((1{=}r)\limplies\aForm[r/x][1/y])\land \lnot\Q{}}{}
+      \xform{xid}{((x{=}r\lor1{=}r)\limplies\aForm[r/x][1/y])\land \lnot\Q{}}{below right=.5em and -4em of xdi}
+      \event{a1}{\DR{x}{1}}{above=of xdi}
+      \event{a2}{(1{=}r\limplies r{=}1\mid\DW{y}{1}}{above=2.7em of xid}
+      \xform{xdd}{((1{=}r)\limplies\aForm[r/x][1/y])\land (\Q{} \limplies r{=}1)}{above right=.5em and -1em of a1}
+      \xform{xii}{((x{=}r\lor1{=}r)\limplies\aForm[r/x][1/y])\land \lnot\Q{}}{below=of xid}
+      \xo{a1}{xdi}
+      \xo{a2}{xid}
+      \xo{a1}{xdd}
+      \xo{a2}{xdd}
+      \po{a1}{a2}
     \end{tikzinline}}
 \end{gather*}
 
