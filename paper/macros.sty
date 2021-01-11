@@ -1,14 +1,15 @@
+\newcommand{\TICK}{\checkmark\!}
 \newcommand{\QL}[2]{\mathsf{ql}_{#2}^{#1}}
 \newcommand{\DL}[2]{\mathsf{dl}_{#2}^{#1}}
 \newcommand{\QS}[2]{\mathsf{qs}_{#2}^{#1}}
-\newcommand{\DS}[3]{#3\mathsf{ds}_{#2}^{#1}}
+\newcommand{\DS}[3]{\mathsf{ds}_{#2}^{#1}#3}
 \newcommand{\Qmode}[1]{\mathsf{Q}^{#1}}
-\newcommand{\Dmode}[1]{\mathord{\downarrow^{#1}}}
+\newcommand{\Dmode}[1]{\Dx{#1}}
 \newcommand{\RW}{\mathsf{RW}}
 \newcommand{\RO}{\mathsf{RO}}
 \newcommand{\Q}[1]{\mathsf{Q}_{#1}}
-\newcommand{\D}{\mathord{\downarrow_{\Loc}}}
-\newcommand{\Dx}[1]{\mathord{\downarrow_{#1}}}
+\newcommand{\D}{\Dx{\mathtt{*}}}
+\newcommand{\Dx}[1]{\mathord{\downarrow^{#1}}}
 \newcommand{\Qx}[1]{\mathsf{Q}_\mRLX^{#1}}
 \newcommand{\Qw}[1]{\mathsf{Q}_\mathsf{w}^{#1}}
 \newcommand{\DxREF}[1]{\Dx{\REF{#1}}}
@@ -17,9 +18,9 @@
 \newcommand{\SB}[1]{}%_{#1}}
 \newcommand{\limplies}{\Rightarrow}
 % get ams to ignore tag in spacing
-\renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{(\ignorespaces#1\unskip\@@italiccorr)}}}
-\newcommand{\spacetag}[2][3em]{\makebox[#1]{}\tag{#2}}
-\newcommand{\notagparens}{\renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{\ignorespaces##1\unskip\@@italiccorr}}}}
+% \renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{(\ignorespaces#1\unskip\@@italiccorr)}}}
+% \newcommand{\spacetag}[2][3em]{\makebox[#1]{}\tag{#2}}
+% \newcommand{\notagparens}{\renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{\ignorespaces##1\unskip\@@italiccorr}}}}
 
 \usepackage{pifont}
 \newcommand{\qmark}{{\color{blue!80!black}\text{?}}}
@@ -100,17 +101,19 @@
 \newcommand{\pc}{\textsc{pc}}
 \newcommand{\pcs}{\textsc{pc}s}
 
+\newif\ifshowRA
+\showRAtrue
 \newcommand{\sem}[2][]{\llbracket#2\rrbracket}
 \NewDocumentCommand\PF{O{} m}{\mathtt{F}^{#2}_{#1}}
 \NewDocumentCommand\DF{O{} m}{\mathsf{F}^{#2}_{#1}}
 \NewDocumentCommand\DFP{O{} m}{\PBR{\DF[#1]{#2}}}
 
 \NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}_{#3}}
-\NewDocumentCommand\DR{O{} m O{} m}{\mathsf{R}^{#1}_{#3}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DR{O{} m O{} m}{\mathsf{R}^{\ifshowRA#1\fi}_{#3}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}
 \NewDocumentCommand\DRP{O{} m O{} m}{\PBR{\DR[#1]{#2}[#3]{#4}}}
 
 \NewDocumentCommand\PW{O{} m O{} m}{{#2}^{#1}_{#3} \GETS #4}
-\NewDocumentCommand\DW{O{} m O{} m}{\mathsf{W}^{#1}_{#3}\ifnotempty{#2}{\mkern0mu#2\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DW{O{} m O{} m}{\mathsf{W}^{\ifshowRA#1\fi}_{#3}\ifnotempty{#2}{\mkern0mu#2\ifnotempty{#4}{\mkern1mu#4}}}
 \NewDocumentCommand\DWP{O{} m O{} m}{\PBR{\DW[#1]{#2}[#3]{#4}}}
 
 \NewDocumentCommand\PRREF{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{\REF{#2}}^{#1}_{#3}}
@@ -586,6 +589,7 @@
 \newcommand{\NIL}{\mathsf{0}}
 \newcommand{\THREAD}[1]{\mathtt{thread}\ifnotempty{#1}{\;#1}}
 \newcommand{\FORK}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}}
+\newcommand{\FORKJOIN}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}\SEMI\mathtt{join}}
 \newcommand{\STOP}{\mathtt{stop}}
 \newcommand{\BANG}{\mathtt{!}\mkern-1mu}
 \newcommand{\GETS}{\mathtt{:}\mkern-1mu\mathtt{=}\,}
@@ -638,11 +642,13 @@
 \newcommand{\sIF}[1]{\textnormal{\textit{IF}}\ifnotempty{#1}{\allowbreak(#1}}
 \newcommand{\sLET}[2]{\textnormal{\textit{LET}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)}}
 \newcommand{\sFORK}[1]{\textnormal{\textit{FORK}}\ifnotempty{#1}{\allowbreak(#1)}}
+\newcommand{\sFORKJOIN}[1]{\textnormal{\textit{FORKJOIN}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sTHREAD}[1]{\textnormal{\textit{THREAD}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sLOAD}[3][]{\textnormal{\textit{LOAD}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1})}}
 \newcommand{\sSTORE}[3][]{\textnormal{\textit{STORE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1})}}
 \newcommand{\sLOADPRE}[4][]{\textnormal{\textit{LOADPRE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
 \newcommand{\sSTOREPRE}[4][]{\textnormal{\textit{STOREPRE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
+\newcommand{\sSKIPPRE}{\textnormal{\textit{SKIPPRE}}}
 \newcommand{\sSKIP}{\textnormal{\textit{SKIP}}}
 \newcommand{\sSTOP}{\textnormal{\textit{STOP}}}
 
@@ -707,8 +713,14 @@
 %\tikzset{baselinecenter/.style= {baseline=([yshift=-1ex]current bounding box.west)} }
 \tikzstyle{baselinecenter} = [baseline={([yshift=-.5ex]current bounding box.west)}]
 %\tikzstyle{baselinecenter} = [baseline=(current bounding box.west)]
-\tikzstyle{event} = [draw=black, fill=blue!10, rectangle, rounded corners, minimum size=3ex]
+\tikzstyle{event} = [draw=black, fill=blue!8, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\event}[3]{\node[event](#1)[#3]{$\mathstrut#2$};}
+\tikzstyle{raevent} = [draw=black, fill=red!5, double, rectangle, rounded corners, minimum size=3ex]
+\newcommand{\raevent}[3]{\node[raevent](#1)[#3]{$\mathstrut#2$};}
+\tikzstyle{scevent} = [draw=black, fill=red!5, double, thick, rectangle, rounded corners, minimum size=3ex]
+\newcommand{\scevent}[3]{\node[scevent](#1)[#3]{$\mathstrut#2$};}
+\tikzstyle{xform} = [draw=gray!80!black, fill=gray!10, rectangle, minimum size=3ex]
+\newcommand{\xform}[3]{\node[xform](#1)[#3]{$\mathstrut#2$};}%\mid\aForm$};}
 \tikzstyle{zlbl} = [black]
 \newcommand{\@zz}[1]{\makebox[0ex]{\smash{\raisebox{-.5ex}{{${#1}{:}\;$}}}}}
 \newcommand{\@zzl}[1]{\makebox[0ex][r]{\smash{\raisebox{-.5ex}{{${#1}{:}$}}}}}
@@ -760,15 +772,18 @@
 % \newcommand{\graypo}[3][]{}
 % \newcommand{\graywk}[3][]{}
 
+\tikzstyle{xo} = [->,dotted,thick,color=gray!80!black,]
+\newcommand{\xo}[3][]{\draw[xo,#1](#2)to(#3);}
+\newcommand{\xxo}{\xarrowtikz{xo}{\;\;}}%
 \tikzstyle{po} = [-latex,color=blue,]
 \newcommand{\po}[3][]{\draw[po,#1](#2)to(#3);}
 \newcommand{\xpo}{\xarrowtikz{po}{\;\;}}%
-\tikzstyle{sync} = [-latex,color=cyan,double]
+\tikzstyle{sync} = [-latex,color=red!40!black,double]
 \newcommand{\sync}[3][]{\draw[sync,#1](#2)to(#3);}
 \newcommand{\xsync}{\xarrowtikz{sync}{\;\;}}%
 \tikzstyle{lift} = [-latex,double]
 \newcommand{\lift}[3][]{\draw[lift,#1](#2)to(#3);}
-\tikzstyle{wk} = [->,dashed,thick,color=red!50!black,]
+\tikzstyle{wk} = [-stealth,dashed,color=cyan!80!black,]
 \newcommand{\wk}[3][]{\draw[wk,#1](#2)to(#3);}
 \newcommand{\xwk}{\xarrowtikz{wk}{\;\;}}%
 \tikzstyle{wkx} = [->,dashed,thick,color=red!70!black,]

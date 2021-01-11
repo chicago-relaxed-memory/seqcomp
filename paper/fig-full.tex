@@ -4,9 +4,9 @@ $(\exists\cVal:\aEvs\fun\Val)$
 $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\bForm:\aEvs\fun\Formulae)$
 \begin{enumerate}
-\item if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-\item $\labelingAct(\aEv) = \DWREFP{\cVal_\aEv}{\aVal_\aEv}$,
-\item 
+\item[S1)] if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item[S2)] $\labelingAct(\aEv) = \DWREFP{\cVal_\aEv}{\aVal_\aEv}$,
+\item[S3)] 
   $\labelingForm(\aEv)$ implies
   \begin{math}
     \bForm_\aEv
@@ -17,7 +17,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
   \end{math},
   % where
   % $\QS{}{\mRLX}=\QxREF{\cVal_\aEv}$ and otherwise $\QS{}{\amode}=\Q{\amode}$, % for $\amode\neq\mRLX$,
-\item
+\item[S4)]
   \begin{math}
     (\forall\dVal)
   \end{math}
@@ -33,7 +33,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
       \land \DS{\REF{\dVal}}{\amode}{\aForm[\aExp/\REF{\dVal}]}
     }
   \end{math},
-\item %if 
+\item[S5)] %if 
   % \begin{math}
   %   (\forall\bEv\in\bEvs)(\cForm \textimplies
   %   \lnot\bForm_\bEv)
@@ -145,15 +145,15 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 %   \end{math}
 
 \noindent
-If $\aPS \in \sLOAD[\amode]{\cExp}{\aReg}$ then
+If $\aPS \in \sLOAD[\amode]{\aReg}{\cExp}$ then
 $(\exists\cVal:\aEvs\fun\Val)$
 $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\bForm:\aEvs\fun\Formulae)$
 % $(\forall\uReg{\aEv}\in\uRegs{\aEvs})$
 \begin{enumerate}
-\item if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-\item $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
-\item $\labelingForm(\aEv)$ implies
+\item[L1)] if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item[L2)] $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
+\item[L3)] $\labelingForm(\aEv)$ implies
   \begin{math}
     \bForm_\aEv
     \land \cExp{=}\cVal_\aEv
@@ -162,7 +162,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
   \end{math},
   % where    
   % $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\QwREF{\cVal_\aEv}$, % for $\amode\neq\mRLX$,
-\item
+\item[L4)]
   \begin{math}
     (\forall\dVal)
   \end{math}
@@ -175,7 +175,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
     \limplies \aForm[\uReg{\bEv}/\aReg][\uReg{\bEv}/\REF{\dVal}]
   \end{math},
   \makebox[4.8cm]{}
-\item 
+\item[L5)] 
   \begin{math}
     (\forall\dVal)
   \end{math}
@@ -194,7 +194,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
       )
     }      
   \end{math},
-\item % if 
+\item[L6)] % if 
   % \begin{math}
   %   (\forall\bEv\in\bEvs)(\cForm \textimplies
   %   \lnot\bForm_\bEv)

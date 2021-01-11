@@ -1,9 +1,16 @@
-\appendix
-% \appendices
-% \section{}
+\appendices
+\section{Differences from the OOPSLA Model}
 
-This paper addresses several errors in \citep{10.1145/3428262}, which we
-henceforth refer to as \jjr{}.
+\subsection{Must Allow Inconsistent Preconditions}
+
+Removing the requirements for
+\emph{consistency} and \emph{causal strengthening}, and
+
+[The definition does not give a sensible notion of completed execution
+without consistency and causal strengthening.]
+
+%Item \ref{pre-reorder} does not impose coherence.
+  
 
 \subsection{Reads Update Local State}
 In the rule for read prefixing we have substituted $[r/x]$, rather than
@@ -36,7 +43,14 @@ following execution is allowed with $[x/r]$, but not $[r/x]$.
     \end{tikzinline}}
 \end{gather*}
 [Is there a difference w/o read-read dependencies?]
-  
+
+[Don't need extended expressions anymore, since never substituting with $x$
+for anything.]
+
+\section{Errors in the OOPSLA Model}
+
+This paper addresses several errors in \citep{10.1145/3428262}, which we
+henceforth refer to as \jjr{}.
 
 \subsection{Parallel Composition}
 
@@ -237,10 +251,10 @@ example, \jjr{} disallows the following execution, which is allowed by
   \\
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a}{\DW{x}{2}}{}
-      \event{b}{\DR[\mRA]{x}{2}}{right=of a}
+      \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
       \event{c}{\DR{y}{0}}{right=of b}
       \event{d}{\DW{y}{2}}{right=2.5em of c}
-      \event{e}{\DW[\mRA]{x}{1}}{right=of d}
+      \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
       \rf{a}{b}
       \sync{b}{c}
       \wk{c}{d}
@@ -258,6 +272,8 @@ to a relaxed read when it is preceded (sequentially) by a relaxed write that
 could fulfill it.  Back-porting this solution to \jjr{} requires that we add
 access predicates to the logic and allow
 
+\subsection{Triangular Races}
+
 The notion of data-race is incorrect in \jjr{}.
 \begin{gather*}
   \PW{x}{1}\SEMI
@@ -268,10 +284,10 @@ The notion of data-race is incorrect in \jjr{}.
   \\
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
-      \event{a2}{\DW[\mRA]{y}{1}}{right=of a1}
-      \event{a3}{\DR[\mRA]{x}{1}}{right=of a2}
-      \event{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
-      \event{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mRA]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
+      \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       \rf[out=20,in=160]{a1}{a3}
       \rf[out=20,in=160]{a2}{b1}
@@ -280,10 +296,10 @@ The notion of data-race is incorrect in \jjr{}.
   \\
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
-      \event{a2}{\DW[\mRA]{y}{1}}{right=of a1}
-      \event{a3}{\DR[\mRA]{x}{2}}{right=of a2}
-      \event{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
-      \event{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mRA]{x}{2}}{right=of a2}
+      \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
+      \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       \rf[out=20,in=160]{a2}{b1}
       \rf[out=160,in=20]{b2}{a3}
