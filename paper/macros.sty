@@ -344,7 +344,9 @@
 %\newcommand{\suborder}{\sqsubseteq}
 \newcommand{\inj}{f}
 \newcommand{\hoare}[3]{\{#1\}\allowbreak\;#2\;\allowbreak\{#3\}}
+\newcommand{\fwlp}{\textit{wlp}}
 \newcommand{\fwp}{\textit{wp}}
+\newcommand{\fsp}{\textit{sp}}
 
 \newcommand{\aF}{\xi}
 \newcommand{\FA}{\mathsf{A}}
@@ -359,6 +361,7 @@
 \newcommand{\restrict}[1]{\mathbin{|}_{#1}}
 \newcommand{\textand}{\;\allowbreak\text{and}\allowbreak\;}
 \newcommand{\textif}{\;\allowbreak\text{if}\allowbreak\;}
+\newcommand{\textiff}{\;\allowbreak\text{iff}\allowbreak\;}
 \newcommand{\textwhen}{\;\allowbreak\text{when}\allowbreak\;}
 \newcommand{\textotherwise}{\;\allowbreak\text{otherwise}\allowbreak\;}
 \newcommand{\textimplies}{\; \allowbreak\text{implies}\allowbreak\;}
@@ -586,6 +589,7 @@
 \newcommand{\RECOVERYVAL}{\mathtt{onabort}\,\aVal\mathtt{\{}}
 \newcommand{\END}{\mathtt{end}}
 \newcommand{\SKIP}{\mathtt{skip}}
+\newcommand{\ABORT}{\mathtt{abort}}
 \newcommand{\NIL}{\mathsf{0}}
 \newcommand{\THREAD}[1]{\mathtt{thread}\ifnotempty{#1}{\;#1}}
 \newcommand{\FORK}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}}
@@ -651,6 +655,8 @@
 \newcommand{\sSKIPPRE}{\textnormal{\textit{SKIPPRE}}}
 \newcommand{\sSKIP}{\textnormal{\textit{SKIP}}}
 \newcommand{\sSTOP}{\textnormal{\textit{STOP}}}
+\newcommand{\sABORT}{\textnormal{\textit{ABORT}}}
+\newcommand{\sNIL}{\textnormal{\textit{NIL}}}
 
 \newcommand{\init}[1]{\mathsf{init}\,#1}
 \newcommand{\release}[1]{\mathsf{release}\,#1}
@@ -709,7 +715,6 @@
 \newcommand{\bgellipsesmaller}[3][gray!10]{\begin{pgfonlayer}{background}\node[ellipse= 4pt, minimum width=7cm, fill=#1, fit=#2, label=$#3$]{};\end{pgfonlayer}}
 \newcommand{\bgovalright}[3][gray!10]{\begin{pgfonlayer}{background}\node[oval= 4pt, fill=#1, fit=#2, label={right:$#3$}]{};\end{pgfonlayer}}
 
-
 %\tikzset{baselinecenter/.style= {baseline=([yshift=-1ex]current bounding box.west)} }
 \tikzstyle{baselinecenter} = [baseline={([yshift=-.5ex]current bounding box.west)}]
 %\tikzstyle{baselinecenter} = [baseline=(current bounding box.west)]
@@ -721,10 +726,11 @@
 \newcommand{\scevent}[3]{\node[scevent](#1)[#3]{$\mathstrut#2$};}
 \tikzstyle{xform} = [draw=gray!80!black, fill=gray!10, rectangle, minimum size=3ex]
 \newcommand{\xform}[3]{\node[xform](#1)[#3]{$\mathstrut#2$};}%\mid\aForm$};}
-\tikzstyle{zlbl} = [black]
-\newcommand{\@zz}[1]{\makebox[0ex]{\smash{\raisebox{-.5ex}{{${#1}{:}\;$}}}}}
+\tikzstyle{zlbl} = [gray!70!black]
+%\newcommand{\@zz}[1]{\makebox[0ex]{\smash{\raisebox{-.5ex}{{${#1}{:}\;$}}}}}
+\newcommand{\@zz}[1]{\makebox[0ex]{\smash{{${}^{#1}$}}}}
 \newcommand{\@zzl}[1]{\makebox[0ex][r]{\smash{\raisebox{-.5ex}{{${#1}{:}$}}}}}
-\newcommand{\eventl}[4]{\node[event](#2)[#4,label={[zlbl]left:\@zzl{#1}}]{$\mathstrut#3$};}
+\newcommand{\eventl}[4]{\node[event](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
 \newcommand{\eventr}[4]{\node[event](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
 \tikzstyle{internal} = [color=gray, draw=gray, dashed, fill=gray!10, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\internal}[3]{\node[internal](#1)[#3]{$\mathstrut#2$};}

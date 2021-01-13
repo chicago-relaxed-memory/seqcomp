@@ -1,5 +1,27 @@
 \section{Introduction}
 
+Our approach is only vaguely related to the theories of
+\citet{DBLP:journals/cacm/Dijkstra75}, which provide an alternative
+characterization of Hoare logic by mapping postconditions to preconditions
+($\fwp$ and $\fwlp$) or preconditions to postconditions ($\fsp$).  Instead
+our transformers $\aTr$ map preconditions to preconditions. The relation to
+Hoare triples is that
+\begin{align*}
+  \hoare{\aForm}{\bCmd}{\bForm}
+  \;\;\Leftrightarrow\;\;
+  \hoare{\aTr(\aCmd,\aForm)}{\aCmd\SEMI\bCmd}{\bForm}
+  .
+\end{align*}
+For example
+\begin{gather*}
+  \hoare{r{=}1}{\PW{y}{r}}{y{=}1}
+  \\
+  \hoare{x{=}1}{\PR{x}{r}\SEMI\PW{y}{r}}{y{=}1}
+\end{gather*}
+
+
+\endinput
+
 This paper builds on
 \cite{2019-sp} and
 \cite{10.1145/3428262}.
