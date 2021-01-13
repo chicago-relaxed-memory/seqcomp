@@ -461,7 +461,7 @@ sequential composition.]
     if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
     \\ where $\labelingForm'_2(\aEv)=\aTr[\cEvs]_1(\labelingForm_2(\aEv))$, where $\cEvs=\{ \cEv \mid \cEv <\SB0 \aEv \}$,
   \item \label{seq-tau}
-    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aTr[\bEvs]_2(\aTr[\bEvs]_1(\aForm))$.
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aTr[\bEvs]_1(\aTr[\bEvs]_2(\aForm))$.
     \newcounter{pomsetXSemiCount}
     \setcounter{pomsetXSemiCount}{\value{enumi}}
     % \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\SB0\aEv$ or $a\reorder\labeling_2(\aEv)$.
@@ -502,12 +502,16 @@ sequential composition.]
     $\labelingForm\SB0(\aEv)$ implies $\TRUE$,
   \item[{\labeltext[L4]{L4)}{L4}}]
     % if $\bEvs\neq\emptyset$ then
-    $\aTr[\bEvs]\SB0(\aForm)$ implies $\phantom{(\aLoc{=}\aReg\lor{}}(\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]$, 
+    $\aTr[\bEvs]\SB0(\aForm)$ implies %$\phantom{(\aLoc{=}\aReg\lor{}}
+    $(\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
     % if $\bEvs=\emptyset$ then
     $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]) \land \lnot\Q{}$.
     % \newcounter{pomsetXLoadCount}
     % \setcounter{pomsetXLoadCount}{\value{enumi}}
+  \item[{\labeltext[L6]{L6)}{L6}}]
+     if $\aEvs=\emptyset$ then
+    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aReg/\aLoc] \land \lnot\Q{}$.
   \end{enumerate}
 \end{definition}
 % [Note that we could change the premise of $\aTr[\emptyset]$ in $\sLOAD{}{}$

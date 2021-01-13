@@ -5,8 +5,10 @@
   \\
   \fwlp(x\GETS \aExp,\bForm) &= (\forall y)\; y{=}\aExp \limplies \bForm[y/x] \text{, where $y$ is fresh}
   \\
-  % \fwlp(x\GETS \aExp,\bForm) &= \bForm[\aExp/x] 
-  % \\
+  \fwlp(x\GETS \aExp,\bForm) &= \bForm[\aExp/x] 
+  \\
+  \fwlp(r\GETS \aLoc,\bForm) &= \bForm[x/r] 
+  \\
   \fwlp(\aCmd;\bCmd,\bForm) &= \fwlp(\aCmd,\fwlp(\bCmd,\bForm))
   \\
   \fwlp(\IF{\aExp}\THEN \aCmd\ELSE \bCmd\FI,\bForm) &=
