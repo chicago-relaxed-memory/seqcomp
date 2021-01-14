@@ -3,14 +3,14 @@
 Our approach is only vaguely related to the theories of
 \citet{DBLP:journals/cacm/Dijkstra75}, which provide an alternative
 characterization of Hoare logic by mapping postconditions to preconditions
-($\fwp$ and $\fwlp$) or preconditions to postconditions ($\fsp$).  Instead
-our transformers $\aTr$ map preconditions to preconditions. The relation to
-Hoare triples is that
+($\fwp$ and $\fwlp$) or preconditions to postconditions ($\fsp$).
+
+Our transformers $\aTr$ map preconditions to postconditions, in order to
+apply to preconditions.
 \begin{align*}
   \hoare{\aForm}{\bCmd}{\bForm}
   \;\;\Leftrightarrow\;\;
   \hoare{\aTr(\aCmd,\aForm)}{\aCmd\SEMI\bCmd}{\bForm}
-  .
 \end{align*}
 For example
 \begin{gather*}

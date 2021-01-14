@@ -480,19 +480,43 @@ sequential composition.]
   \item[{\labeltext[S3]{S3)}{S3}}]
     $\labelingForm\SB0(\aEv)$ implies $\aExp{=}\aVal$,
   \item[{\labeltext[S4]{S4)}{S4}}]
-    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc] \land (\Q{}\limplies\aExp{=}\aVal)$,
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc]$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
   \item[{\labeltext[S5]{S5)}{S5}}]
-    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aExp/\aLoc] \land \lnot\Q{}$.
+    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aExp/\aLoc]$. % \land \lnot\Q{}$.
     % \item %if $\bEvs\neq\emptyset$ then
     %   $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aExp{=}\aVal) \land \aForm[\aExp/\aLoc]$, if $\bEvs\neq\emptyset$,
     %   \newcounter{pomsetXStoreCount}
     %   \setcounter{pomsetXStoreCount}{\value{enumi}}
   \end{enumerate}
 
+  % \noindent
+  % If $\aPS\SB0 \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
+  % $(\exists\aVal\in\Val)$
+  % $(\forall\bEvs\neq\emptyset)$
+  % \begin{enumerate}
+  % \item[{\labeltext[L1]{L1)}{L1}}] 
+  %   if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$,
+  % \item[{\labeltext[L2]{L2)}{L2}}]
+  %   $\labelingAct\SB0(\aEv) = \DRP{\aLoc}{\aVal}$,
+  % \item[{\labeltext[L3]{L3)}{L3}}]
+  %   $\labelingForm\SB0(\aEv)$ implies $\TRUE$,
+  % \item[{\labeltext[L4]{L4)}{L4}}]
+  %   % if $\bEvs\neq\emptyset$ then
+  %   $\aTr[\bEvs]\SB0(\aForm)$ implies %$\phantom{(\aLoc{=}\aReg\lor{}}
+  %   $\aVal{=}\aReg\limplies\aForm[\aReg/\aLoc]$, 
+  % \item[{\labeltext[L5]{L5)}{L5}}]
+  %   % if $\bEvs=\emptyset$ then
+  %   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]) \land \lnot\Q{}$.
+  % \item[{\labeltext[L6]{L6)}{L6}}]
+  %    if $\aEvs=\emptyset$ then
+  %   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aReg/\aLoc] \land \lnot\Q{}$.
+  % \end{enumerate}
+
   \noindent
-  If $\aPS\SB0 \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
-  $(\exists\aVal\in\Val)$
-  $(\forall\bEvs\neq\emptyset)$
+  If $\aPS\SB0 \in \sLOAD[\amode]{\aReg}{\aLoc}$ then either
+  $\aEvs{\neq}\emptyset$
+  $(\exists\aVal{\in}\Val)$
+  $(\forall\bEvs{\neq}\emptyset)$
   \begin{enumerate}
   \item[{\labeltext[L1]{L1)}{L1}}] 
     if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$,
@@ -501,17 +525,15 @@ sequential composition.]
   \item[{\labeltext[L3]{L3)}{L3}}]
     $\labelingForm\SB0(\aEv)$ implies $\TRUE$,
   \item[{\labeltext[L4]{L4)}{L4}}]
-    % if $\bEvs\neq\emptyset$ then
-    $\aTr[\bEvs]\SB0(\aForm)$ implies %$\phantom{(\aLoc{=}\aReg\lor{}}
-    $(\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]$, 
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aVal{=}\aReg\limplies\aForm[\aReg/\aLoc]$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
-    % if $\bEvs=\emptyset$ then
-    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]) \land \lnot\Q{}$.
-    % \newcounter{pomsetXLoadCount}
-    % \setcounter{pomsetXLoadCount}{\value{enumi}}
-  \item[{\labeltext[L6]{L6)}{L6}}]
-     if $\aEvs=\emptyset$ then
-    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aReg/\aLoc] \land \lnot\Q{}$.
+    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc])$, % \land \lnot\Q{}$,
+  \end{enumerate}
+  or
+  $\aEvs=\emptyset$ and 
+  \begin{enumerate}
+  \item[{\labeltext[E1]{E1)}{E1}}] 
+    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aReg/\aLoc]$. % \land \lnot\Q{}$.
   \end{enumerate}
 \end{definition}
 % [Note that we could change the premise of $\aTr[\emptyset]$ in $\sLOAD{}{}$
@@ -519,16 +541,29 @@ sequential composition.]
 % requirements of a family of predicate transforms effectively adds the
 % additional requirement.]
 
-\subsubsection{Examples without Q}
+OOPSLA is non-skolemized---with $[x/r]$ rather than $[r/x]$:
+\begin{enumerate}
+\item[\ref{L4})]
+  $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aLoc/\aReg][\aVal/\aLoc]$, 
+\item[\ref{L5})]
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aLoc/\aReg][\aVal/\aLoc]\land\aForm[\aLoc/\aReg]$,
+\item[\ref{E1})]
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aLoc/\aReg]$.
+\end{enumerate}
 
-\begin{example} Merging left.
+[Skolemization ensures disjunction closure, which is necessary
+for associativity. Show example.]
+
+
+
+\begin{example} Consider the following executions.
 \begin{align*}
 \begin{gathered}
   \PW{x}{1}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
       \event{a1}{1{=}1\mid\DW{x}{1}}{}
-      \xform{x1d}{\aForm[1/x]\land 1{=}1}{right=of a1}
+      \xform{x1d}{\aForm[1/x]}{right=of a1}
       \xform{x1i}{\aForm[1/x]}{below=of x1d}
       \xo{a1}{x1d}
     \end{tikzinline}}
@@ -539,43 +574,43 @@ sequential composition.]
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
       \event{a1}{2{=}1\mid\DW{x}{1}}{}
-      \xform{x1d}{\aForm[2/x]\land 2{=}1}{right=of a1}
+      \xform{x1d}{\aForm[2/x]}{right=of a1}
       \xform{x1i}{\aForm[2/x]}{below=of x1d}
       \xo{a1}{x1d}
     \end{tikzinline}}
 \end{gathered}
 \end{align*}
-Simplifying:
-\begin{align*}
-\begin{gathered}
-  % \PW{x}{1}
-  % \\
-  \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \xform{x1d}{\aForm[1/x]}{right=of a1}
-      \xform{x1i}{\aForm[1/x]}{right=of x1d}
-      \xo{a1}{x1d}
-    \end{tikzinline}}
-\end{gathered}
-&&
-\begin{gathered}
-  % \PW{x}{2}
-  % \\
-  \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \event{a1}{\FALSE\mid\DW{x}{1}}{}
-      \xform{x1d}{\FALSE}{right=of a1}
-      \xform{x1i}{\aForm[2/x]}{right=of x1d}
-      \xo{a1}{x1d}
-    \end{tikzinline}}
-\end{gathered}
-\end{align*}
+% Simplifying:
+% \begin{align*}
+% \begin{gathered}
+%   % \PW{x}{1}
+%   % \\
+%   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%       \event{a1}{\DW{x}{1}}{}
+%       \xform{x1d}{\aForm[1/x]}{right=of a1}
+%       \xform{x1i}{\aForm[1/x]}{right=of x1d}
+%       \xo{a1}{x1d}
+%     \end{tikzinline}}
+% \end{gathered}
+% &&
+% \begin{gathered}
+%   % \PW{x}{2}
+%   % \\
+%   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%       \event{a1}{\FALSE\mid\DW{x}{1}}{}
+%       \xform{x1d}{\FALSE}{right=of a1}
+%       \xform{x1i}{\aForm[2/x]}{right=of x1d}
+%       \xo{a1}{x1d}
+%     \end{tikzinline}}
+% \end{gathered}
+% \end{align*}
 Merging the actions, we have:
 % \begin{gather*}
 %   \PW{x}{1}\SEMI \PW{x}{2}
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
 %       \event{a1}{1{=}1\lor2{=}1\mid\DW{x}{1}}{}
-%       \xform{x1d}{(\aForm[1/x]\land 1{=}1)[2/x]\land 2{=}1}{below=of a1}
+%       \xform{x1d}{(\aForm[1/x])[2/x]}{below=of a1}
 %       \xform{x1i}{(\aForm[1/x])[2/x]}{below=of x1d}
 %       \xo{a1}{x1d}
 %     \end{tikzinline}}
@@ -586,7 +621,7 @@ Merging the actions, we have:
 %   % \\
 %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
 %       \event{a1}{\DW{x}{1}}{}
-%       \xform{x1d}{\aForm[1/x]\land 1{=}1 \land 2{=}1}{right=of a1}
+%       \xform{x1d}{\aForm[1/x] }{right=of a1}
 %       \xform{x1i}{\aForm[1/x]}{right=of x1d}
 %       \xo{a1}{x1d}
 %     \end{tikzinline}}
@@ -596,9 +631,9 @@ Merging the actions, we have:
   \PW{x}{1}\SEMI \PW{x}{2}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \xform{x1d}{\FALSE}{right=of a1}
-      \xform{x1i}{(\aForm[1/x])[2/x]}{right=of x1d}
+      \event{a1}{1{=}1\lor2{=}1\mid\DW{x}{1}}{}
+      \xform{x1d}{(\aForm[2/x])[1/x]}{right=of a1}
+      \xform{x1i}{(\aForm[2/x])[1/x]}{right=of x1d}
       \xo{a1}{x1d}
     \end{tikzinline}}
 \end{gather*}
@@ -608,21 +643,20 @@ which simplifies to
   % \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
       \event{a1}{\DW{x}{1}}{}
-      \xform{x1d}{\FALSE}{right=of a1}
-      \xform{x1i}{\aForm[1/x]}{right=of x1d}
+      \xform{x1d}{\aForm[2/x]}{right=of a1}
+      \xform{x1i}{\aForm[2/x]}{right=of x1d}
       \xo{a1}{x1d}
     \end{tikzinline}}
 \end{gather*}
-\end{example}
-
-\begin{example} Merging right.
+% \end{example}
+% \begin{example} Merging right.
 % \begin{align*}
 % \begin{gathered}
 %   \PW{x}{1}
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
 %       \event{a1}{1{=}2\mid\DW{x}{1}}{}
-%       \xform{x1d}{\aForm[1/x]\land 1{=}2}{right=of a1}
+%       \xform{x1d}{\aForm[1/x]}{right=of a1}
 %       \xform{x1i}{\aForm[1/x]}{below=of x1d}
 %       \xo{a1}{x1d}
 %     \end{tikzinline}}
@@ -633,21 +667,46 @@ which simplifies to
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
 %       \event{a1}{2{=}2\mid\DW{x}{1}}{}
-%       \xform{x1d}{\aForm[2/x]\land 2{=}2}{right=of a1}
+%       \xform{x1d}{\aForm[2/x]}{right=of a1}
 %       \xform{x1i}{\aForm[2/x]}{below=of x1d}
 %       \xo{a1}{x1d}
 %     \end{tikzinline}}
 % \end{gathered}
 % \end{align*}
 % Simplifying:
+% \begin{align*}
+% \begin{gathered}
+%   \PW{x}{1}
+%   \\
+%   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%       \event{a1}{\FALSE\mid\DW{x}{2}}{}
+%       \xform{x1d}{\FALSE}{right=of a1}
+%       \xform{x1i}{\aForm[1/x]}{right=of x1d}
+%       \xo{a1}{x1d}
+%     \end{tikzinline}}
+% \end{gathered}
+% &&
+% \begin{gathered}
+%   \PW{x}{2}
+%   \\
+%   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%       \event{a1}{\DW{x}{2}}{}
+%       \xform{x1d}{\aForm[2/x]}{right=of a1}
+%       \xform{x1i}{\aForm[2/x]}{right=of x1d}
+%       \xo{a1}{x1d}
+%     \end{tikzinline}}
+% \end{gathered}
+% \end{align*}
+% Merging the actions, we have:
+The programs are also capable of writing 2.
 \begin{align*}
 \begin{gathered}
   \PW{x}{1}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \event{a1}{\FALSE\mid\DW{x}{2}}{}
-      \xform{x1d}{\FALSE}{right=of a1}
-      \xform{x1i}{\aForm[1/x]}{right=of x1d}
+      \event{a1}{1{=}2\mid\DW{x}{2}}{}
+      \xform{x1d}{\aForm[1/x]}{right=of a1}
+      \xform{x1i}{\aForm[1/x]}{below=of x1d}
       \xo{a1}{x1d}
     \end{tikzinline}}
 \end{gathered}
@@ -656,21 +715,21 @@ which simplifies to
   \PW{x}{2}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \event{a1}{\DW{x}{2}}{}
+      \event{a1}{2{=}2\mid\DW{x}{2}}{}
       \xform{x1d}{\aForm[2/x]}{right=of a1}
-      \xform{x1i}{\aForm[2/x]}{right=of x1d}
+      \xform{x1i}{\aForm[2/x]}{below=of x1d}
       \xo{a1}{x1d}
     \end{tikzinline}}
 \end{gathered}
 \end{align*}
-Merging the actions, we have:
+Merging right.
 \begin{gather*}
-  \PW{x}{1}\SEMI \PW{x}{2}
-  \\
+  % \PW{x}{1}\SEMI \PW{x}{2}
+  % \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \xform{x1d}{\FALSE}{right=of a1}
-      \xform{x1i}{\aForm[1/x]}{right=of x1d}
+      \event{a1}{\DW{x}{2}}{}
+      \xform{x1d}{\aForm[2/x]}{right=of a1}
+      \xform{x1i}{\aForm[2/x]}{right=of x1d}
       \xo{a1}{x1d}
     \end{tikzinline}}
 \end{gather*}
@@ -683,7 +742,7 @@ Separate actions:
     \PW{x}{1} 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{\aForm[1/x]\land 1{=}1}{}
+        \xform{xd}{\aForm[1/x]}{}
         \xform{xi}{\aForm[1/x]}{below=of xd}
         \event{a1}{1{=}1\mid\DW{x}{1}}{left=of xd}
         \xo{a1}{xd}
@@ -694,7 +753,7 @@ Separate actions:
     \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{\aForm[2/x]\land 2{=}2}{}
+        \xform{xd}{\aForm[2/x]}{}
         \xform{xi}{\aForm[2/x]}{below=of xd}
         \event{a2}{2{=}2\mid\DW{x}{2}}{left=of xd}      
         \xo{a2}{xd}
@@ -730,12 +789,12 @@ Putting these together unordered:
   \PW{x}{1}\SEMI \PW{x}{2}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \xform{xdi}{\aForm[1/x]}{}
-      \xform{xdd}{\aForm[1/x]}{right=of xdi}
-      \xform{xid}{\aForm[1/x]}{right=of xdd}
+      \xform{xdi}{\aForm[2/x]}{}
+      \xform{xdd}{\aForm[2/x]}{right=of xdi}
+      \xform{xid}{\aForm[2/x]}{right=of xdd}
       \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
       \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
-      \xform{xii}{\aForm[1/x]}{right=of xid}
+      \xform{xii}{\aForm[2/x]}{right=of xid}
       \xo{a1}{xdi}
       \xo{a2}{xid}
       \xo{a1}{xdd}
@@ -835,7 +894,123 @@ can be weakened: % to
 \end{gather*}
 \end{example}
 
-\subsubsection{Examples with Q}
+
+We have not given a semantics for parallel composition with predicate transformers.
+Define $\sTHREAD{}$ to embed pomsets with predicate transformers into pomsets with preconditions
+simply by dropping the predicate transformer.
+For the reverse embedding, $\sFORK{}$ adopts the identity transformer.
+\begin{definition} $\phantom{\;}$\par
+  \label{def:thread}
+  \noindent
+  If $\aPS\SB0 \in \sTHREAD{\aPSS}$ then
+  $(\exists\aPS_1\in\aPSS)$
+  \begin{enumerate}
+  \item \label{thread-E}
+    $\aEvs\SB0=\aEvs_1$,
+  \item \label{thread-lambda}
+    $\labelingAct\SB0(\aEv) = \labelingAct_1(\aEv)$,
+  \item \label{thread-kappa}
+    $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)$.
+    \newcounter{pomsetXThreadCount}
+    \setcounter{pomsetXThreadCount}{\value{enumi}}
+  \end{enumerate}  
+
+  \label{def:fork}
+  \noindent
+  If $\aPS\SB0 \in \sFORK{\aPSS}$ then
+  $(\exists\aPS_1\in\aPSS)$
+  \begin{enumerate}
+  \item[{\labeltext[F1]{F1)}{F1}\labeltext[1]{}{F1x}}]
+    $\aEvs\SB0=\aEvs_1$,
+  \item[{\labeltext[F2]{F2)}{F2}}]
+    $\labelingAct\SB0(\aEv) = \labelingAct_1(\aEv)$,
+  \item[{\labeltext[F3]{F3)}{F3}}]
+    $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)$, 
+  \item[{\labeltext[F4]{F4)}{F4}\labeltext[4]{}{F4x}}]
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm$.
+    \newcounter{pomsetXForkCount}
+    \setcounter{pomsetXForkCount}{\value{enumi}}
+  \end{enumerate}  
+\end{definition}
+
+
+
+The complete semantics is as follows.
+\begin{scope}
+  \allowdisplaybreaks
+  \begin{align*}
+    \sem{\ABORT} &= \sABORT
+    \\
+    \sem{\SKIP} &= \sSKIP
+    \\
+    \sem{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}{\aLoc}
+    \\
+    \sem{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}{\aExp}
+    \\
+    \sem{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
+    \\
+    \sem{\FORK{\aGrp}} &= \sFORK{}\sem{\aGrp}
+    \\
+    \sem{\aCmd \SEMI \bCmd} &= \sem{\aCmd}\sSEMI\sem{\bCmd}
+    \\
+    \sem{\IF{\aExp}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
+    \\
+    \sem{\NIL} &= \sNIL
+    \\
+    \sem{\THREAD{\aCmd}} &= \sTHREAD{}\sem{\aCmd}
+    \\
+    \sem{\aGrp \PAR \bGrp} &= \sem{\aGrp}\sPAR\sem{\bGrp}
+  \end{align*}
+\end{scope}
+[Examples.]
+
+
+
+
+
+
+
+
+
+
+\subsection{Quiescence}
+
+Strengthen the transformers as follow.
+\begin{enumerate}
+\item[\ref{S4})]
+  $\aTr[\bEvs]\SB0(\aForm)$ implies $\Q{}\limplies\aExp{=}\aVal$,
+  % $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc] \land (\Q{}\limplies\aExp{=}\aVal)$,
+\item[\ref{S5})]
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
+  % $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aExp/\aLoc] \land \lnot\Q{}$.
+\item[\ref{L5})]
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
+  % $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]) \land \lnot\Q{}$,
+\item[\ref{E1})]
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
+  % $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aReg/\aLoc] \land \lnot\Q{}$.
+\end{enumerate}
+Update fork as follows
+\begin{enumerate}
+\item[\ref{F3})]
+  $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$, 
+\end{enumerate}
+% or
+% \begin{enumerate}
+% \item[{\labeltext[S6]{S6)}{S6}}] 
+%   $\aTr[\bEvs]\SB0(\aForm)$ implies $\Q{}\limplies\aExp{=}\aVal$,
+% \item[{\labeltext[S7]{S7)}{S7}}] 
+%   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
+% \item[{\labeltext[L6]{L6)}{L6}}] 
+%   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
+% \item[{\labeltext[E2]{E2)}{E2}}] 
+%   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$.
+% \end{enumerate}
+
+\begin{definition}
+  $\aPS$ is \emph{quiescent} if $\aTr[\aEvs](\Q{})$ implies $\Q{}$.
+\end{definition}
+
 
 \begin{example}
   Merging left.
@@ -1016,7 +1191,7 @@ Adding order does nothing since the preconditions are tautologies.
 % \end{gather*}
 \end{example}
 
-\begin{example}
+\begin{comment}
 Read to write dependency, first separately:
 \begin{align*}
   \begin{gathered}
@@ -1095,92 +1270,9 @@ With order:
       \po{a1}{a2}
     \end{tikzinline}}
 \end{gather*}
-\end{example}
-
-\subsubsection{Continuing}
-
-We have not given a semantics for parallel composition with predicate transformers.
-Define $\sTHREAD{}$ to embed pomsets with predicate transformers into pomsets with preconditions
-simply by dropping the predicate transformer.
-For the reverse embedding, $\sFORK{}$ adopts the identity transformer.
-\begin{definition} $\phantom{\;}$\par
-  \label{def:thread}
-  \noindent
-  If $\aPS\SB0 \in \sTHREAD{\aPSS}$ then
-  $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
-  \item \label{thread-E}
-    $\aEvs\SB0=\aEvs_1$,
-  \item \label{thread-lambda}
-    $\labelingAct\SB0(\aEv) = \labelingAct_1(\aEv)$,
-  \item \label{thread-kappa}
-    $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)$.
-    \newcounter{pomsetXThreadCount}
-    \setcounter{pomsetXThreadCount}{\value{enumi}}
-  \end{enumerate}  
-
-  \label{def:fork}
-  \noindent
-  If $\aPS\SB0 \in \sFORK{\aPSS}$ then
-  $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
-  \item[{\labeltext[F1]{F1)}{F1}\labeltext[1]{}{F1x}}]
-    $\aEvs\SB0=\aEvs_1$,
-  \item[{\labeltext[F2]{F2)}{F2}}]
-    $\labelingAct\SB0(\aEv) = \labelingAct_1(\aEv)$,
-  \item[{\labeltext[F3]{F3)}{F3}}]
-    $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$, 
-  \item[{\labeltext[F4]{F4)}{F4}\labeltext[4]{}{F4x}}]
-    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm$.
-    \newcounter{pomsetXForkCount}
-    \setcounter{pomsetXForkCount}{\value{enumi}}
-  \end{enumerate}  
-\end{definition}
+\end{comment}
 
 
-
-The complete semantics is as follows.
-\begin{scope}
-  \allowdisplaybreaks
-  \begin{align*}
-    \sem{\ABORT} &= \sABORT
-    \\
-    \sem{\SKIP} &= \sSKIP
-    \\
-    \sem{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}{\aLoc}
-    \\
-    \sem{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}{\aExp}
-    \\
-    \sem{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
-    \\
-    \sem{\FORK{\aGrp}} &= \sFORK{}\sem{\aGrp}
-    \\
-    \sem{\aCmd \SEMI \bCmd} &= \sem{\aCmd}\sSEMI\sem{\bCmd}
-    \\
-    \sem{\IF{\aExp}\THEN\aCmd\ELSE\bCmd\FI} &= \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd}\sELSE\sem{\bCmd}\sFI
-    \\
-    \sem{\NIL} &= \sNIL
-    \\
-    \sem{\THREAD{\aCmd}} &= \sTHREAD{}\sem{\aCmd}
-    \\
-    \sem{\aGrp \PAR \bGrp} &= \sem{\aGrp}\sPAR\sem{\bGrp}
-  \end{align*}
-\end{scope}
-[Examples.]
-
-
-
-
-
-
-
-
-[Skolemization ensures disjunction closure, which is necessary
-for associativity. Show example.]
-
-\begin{definition}
-  $\aPS$ is \emph{completed} if $\aTr[\aEvs](\Q{})$ implies $\Q{}$.
-\end{definition}
 
 \subsection{Fork-Join}
 
