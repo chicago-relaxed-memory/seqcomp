@@ -18,15 +18,15 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
   κLOAD a = RO ∧ Qw[ a ]
 
   τLOADD : Register → Register → Address → Value → Formula → Formula
-  τLOADD r s a v ϕ = (value v == register s) ⇒ (ϕ [ register s / r ] [ register s /[ a ]])
+  τLOADD r s a v ϕ = (value v == register s) ⇒ (ϕ [ register s / r ])
 
   τLOADI : Register → Register → Address → AccessMode → Formula → Formula
-  τLOADI r s a rlx ϕ =          ¬ Q[ a ] ∧ (RW ⇒ ([ a ]== register s) ⇒ (ϕ [ register s / r ] [ register s /[ a ]]))
-  τLOADI r s a ra  ϕ = ↓[ a ] ∧ ¬ Q[ a ] ∧ (RW ⇒ ([ a ]== register s) ⇒ (ϕ [ register s / r ] [ register s /[ a ]]))
+  τLOADI r s a rlx ϕ =          ¬ Q[ a ] ∧ (RW ⇒ ([ a ]== register s) ⇒ (ϕ [ register s / r ]))
+  τLOADI r s a ra  ϕ = ↓[ a ] ∧ ¬ Q[ a ] ∧ (RW ⇒ ([ a ]== register s) ⇒ (ϕ [ register s / r ]))
 
   τLOAD∅ : Register → Register → Address → AccessMode → Formula → Formula
-  τLOAD∅ r s a rlx ϕ =          ¬ Q[ a ] ∧ (ϕ [ register s / r ] [ register s /[ a ]])
-  τLOAD∅ r s a ra  ϕ = ↓[ a ] ∧ ¬ Q[ a ] ∧ (ϕ [ register s / r ] [ register s /[ a ]])
+  τLOAD∅ r s a rlx ϕ =          ¬ Q[ a ] ∧ (ϕ [ register s / r ])
+  τLOAD∅ r s a ra  ϕ = ↓[ a ] ∧ ¬ Q[ a ] ∧ (ϕ [ register s / r ])
 
   record LOAD (r : Register) (L : Expression) (μ : AccessMode) (P : PomsetWithPredicateTransformers) : Set₁ where
 

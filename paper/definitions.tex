@@ -525,15 +525,15 @@ sequential composition.]
   \item[{\labeltext[L3]{L3)}{L3}}]
     $\labelingForm\SB0(\aEv)$ implies $\TRUE$,
   \item[{\labeltext[L4]{L4)}{L4}}]
-    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aVal{=}\aReg\limplies\aForm[\aReg/\aLoc]$, 
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $\aVal{=}\aReg\limplies\aForm$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
-    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc])$, % \land \lnot\Q{}$,
+    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm)$, % \land \lnot\Q{}$,
   \end{enumerate}
   or
   $\aEvs=\emptyset$ and 
   \begin{enumerate}
-  \item[{\labeltext[E1]{E1)}{E1}}] 
-    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aReg/\aLoc]$. % \land \lnot\Q{}$.
+  \item[{\labeltext[L6]{L6)}{L6}}] 
+    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm$. % \land \lnot\Q{}$.
   \end{enumerate}
 \end{definition}
 % [Note that we could change the premise of $\aTr[\emptyset]$ in $\sLOAD{}{}$
@@ -541,15 +541,159 @@ sequential composition.]
 % requirements of a family of predicate transforms effectively adds the
 % additional requirement.]
 
-OOPSLA is non-skolemized---with $[x/r]$ rather than $[r/x]$:
+OOPSLA is non-skolemized---with $[x/r]$ rather than no substitution (or $[r/x]$).
+Example is
+\begin{verbatim}
+x=1; r=x; s=x
+\end{verbatim}
+in case where second read is independent of first read,
+
 \begin{enumerate}
 \item[\ref{L4})]
   $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aLoc/\aReg][\aVal/\aLoc]$, 
 \item[\ref{L5})]
   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aLoc/\aReg][\aVal/\aLoc]\land\aForm[\aLoc/\aReg]$,
-\item[\ref{E1})]
+\item[\ref{L6})]
   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aLoc/\aReg]$.
 \end{enumerate}
+
+\begin{gather*}
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a2}{\DR{x}{2}}{}
+      \event{a3}{(x{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
+      \event{a4}{(x{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+    \end{tikzinline}}
+\end{gather*}
+Without substitution:
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{2}}{below=of a1}
+      \event{a3}{1{=}r\limplies  (x{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
+      \event{a4}{1{=}r\limplies  (x{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+      \po{a1}{a3}
+      \po[out=-20,in=177]{a1}{a4}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PW{x}{0}$
+\begin{gather*}
+  % \PW{x}{0}\SEMI
+  % \PR{x}{r}\SEMI
+  % \PR{x}{s}\SEMI
+  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  % \IF{r\land s}\THEN \PW{z}{1}\FI
+  % \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a0}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=of a0}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \wk{a0}{a1}
+      % \wk[out=-20,in=-160]{a0}{a2}
+      \po[out=20,in=160]{a1}{a3}
+      \po[out=20,in=160]{a1}{a4}
+      \po[out=-20,in=-160]{a2}{a4}
+    \end{tikzinline}}
+\end{gather*}
+ With the substitution $[r/x]$:
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{2}}{below=of a1}
+      \event{a3}{1{=}r\limplies  (r{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
+      \event{a4}{1{=}r\limplies  (r{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+      \po{a1}{a3}
+      \po[out=-20,in=177]{a1}{a4}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PW{x}{0}$
+\begin{gather*}
+  % \PW{x}{0}\SEMI
+  % \PR{x}{r}\SEMI
+  % \PR{x}{s}\SEMI
+  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  % \IF{r\land s}\THEN \PW{z}{1}\FI
+  % \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a0}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=of a0}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \wk{a0}{a1}
+      % \wk[out=-20,in=-160]{a0}{a2}
+      \po[out=20,in=160]{a1}{a3}
+      \po[out=20,in=160]{a1}{a4}
+      \po{a2}{a3}
+    \end{tikzinline}}
+\end{gather*}
+
+
+if in L6 we said [x/r], that says we know read the local version...  ignoring
+the value read...  Perhaps there is some intervening stuff that stops you
+from seeing the local state, such as release-acquire
+
+We could potentially get rid of [x/r] If you do two reads, your not allowed
+to be independent of the second based on the value that was read in the first
+read.
+
+x=0; r=x; if (r=1) { s=x; if (s=?) {y=1}}
+read 1 then 2.
+
+
+In order for the write to be independent of second read what does its
+precondition have to be.
+[r/x] then s==1
+no sub then s==0
+
+(s=? | Wy1)
+
+if (phi) z=1
+phi = s is even
+phi = s < 2
+
+With substitution you are saying you know that the ``local copy'' of x is the
+same as r.  Sitting in the local cache.  Read might have gone to main
+memory, but if it did it has updated the cache line so that the local copy is
+what I just read.
+
+If second read is a cache hit, then I know that I am seeing the same value.
+
+If we take substitution out then 
+
+
+
+Conjecture:
+
+C if P is top-level and quiescent then predicate transformer may be wp(C,phi).
+Only thing is we are substituting v/r, rather than x/r.
+
+$tau_E$(phi) implies wp(C,phi)
+
+C any substitution/valuation sigma giving values for register, can find a
+pomset P such that when you apply the substitution to all the preconditions
+are tautologies and if the substitution validates the wp, then the
+substitution validates the $tau_E$
+
+substitution validates the wp: wp(C,phi)sigma is a tautology
+
+
+
 
 [Skolemization ensures disjunction closure, which is necessary
 for associativity. Show example.]
@@ -979,19 +1123,20 @@ Strengthen the transformers as follow.
 \begin{enumerate}
 \item[\ref{S4})]
   %$\aTr[\bEvs]\SB0(\aForm)$ implies $\Q{}\limplies\aExp{=}\aVal$,
-  $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc] \land (\Q{}\limplies\aExp{=}\aVal)$,
+  $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aExp{\neq}\aVal\limplies\Q{})\land\aForm[\aExp/\aLoc]$,
 \item[\ref{S5})]
   %$\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
-  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aExp/\aLoc] \land \lnot\Q{}$.
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}\land \aForm[\aExp/\aLoc]$.
 \item[\ref{L5})]
   %$\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
-  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]) \land \lnot\Q{}$,
-\item[\ref{E1})]
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{} \land((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc])$,
+\item[\ref{L6})]
   %$\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
-  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aReg/\aLoc] \land \lnot\Q{}$.
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{} \land\aForm[\aReg/\aLoc]$.
 \end{enumerate}
-Update fork as follows
+Update thread as follows
 \begin{enumerate}
+\item[\ref{T3})]
 \item[\ref{F3})]
   $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$, 
 \end{enumerate}
