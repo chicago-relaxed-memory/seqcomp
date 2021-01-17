@@ -1,18 +1,18 @@
 \begin{align*}
-  \fwlp(\SKIP,\bForm) &= \bForm
+  \fwp(\SKIP,\bForm) &= \bForm
   \\
-  \fwlp(\ABORT,\bForm) &= \FALSE
+  \fwp(\ABORT,\bForm) &= \FALSE
   \\
-  \fwlp(x\GETS \aExp,\bForm) &= (\forall y)\; y{=}\aExp \limplies \bForm[y/x] \text{, where $y$ is fresh}
+  \fwp(x\GETS \aExp,\bForm) &= (\forall y)\; y{=}\aExp \limplies \bForm[y/x] \text{, where $y$ is fresh}
   \\
-  \fwlp(x\GETS \aExp,\bForm) &= \bForm[\aExp/x] 
+  \fwp(x\GETS \aExp,\bForm) &= \bForm[\aExp/x] 
   \\
-  \fwlp(r\GETS \aLoc,\bForm) &= \bForm[x/r] 
+  \fwp(r\GETS \aLoc,\bForm) &= \bForm[x/r] 
   \\
-  \fwlp(\aCmd;\bCmd,\bForm) &= \fwlp(\aCmd,\fwlp(\bCmd,\bForm))
+  \fwp(\aCmd;\bCmd,\bForm) &= \fwp(\aCmd,\fwp(\bCmd,\bForm))
   \\
-  \fwlp(\IF{\aExp}\THEN \aCmd\ELSE \bCmd\FI,\bForm) &=
-  (\aExp{\neq}0\limplies \fwlp(\aCmd,\bForm)) \land (\aExp{=}0\limplies \fwlp(\bCmd,\bForm))
+  \fwp(\IF{\aExp}\THEN \aCmd\ELSE \bCmd\FI,\bForm) &=
+  (\aExp\limplies \fwp(\aCmd,\bForm)) \land (\lnot\aExp\limplies \fwp(\bCmd,\bForm))
 \end{align*}
 
 \begin{align*}
@@ -23,7 +23,7 @@
   \fsp(\aCmd;\bCmd,\aForm) &= \fsp(\bCmd,\fsp(\aCmd,\aForm))
   \\
   \fsp(\IF{\aExp}\THEN \aCmd\ELSE \bCmd\FI,\aForm) &=
-  \fsp(\aCmd, (\aExp{\neq}0\land \aForm)) \land \fsp(\bCmd, (\aExp{=}0\land \aForm))
+  \fsp(\aCmd, (\aExp\land \aForm)) \land \fsp(\bCmd, (\lnot\aExp\land \aForm))
 \end{align*}
 
 \begin{align*}
@@ -34,8 +34,8 @@
   \aForm \textimplies \fwlp(\aCmd,\bForm)
 \end{align*}
 
-\begin{align*}
-  \hoare{\aTr(\aCmd,\aForm)}{\bCmd}{\bForm} %\;\text{is provable}
-  \;\;\Leftrightarrow\;\;
-  \hoare{\aForm}{\aCmd\SEMI\bCmd}{\bForm} %\;\text{is provable}
-\end{align*}
+% \begin{align*}
+%   \hoare{\aTr(\aCmd,\aForm)}{\bCmd}{\bForm} %\;\text{is provable}
+%   \;\;\Leftrightarrow\;\;
+%   \hoare{\aForm}{\aCmd\SEMI\bCmd}{\bForm} %\;\text{is provable}
+% \end{align*}

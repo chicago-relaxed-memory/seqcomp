@@ -381,18 +381,18 @@ In $\sSTORE{}{}$:
 \begin{enumerate}
 \item[\ref{S1})] $\labelingAct\SB0(\aEv) = \DWP{\REF\cVal}{\aVal}$,
 \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal \land \aExp{=}\aVal)$,
-\item $\aTr[\emptyset]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies \aForm[\aExp/\REF{\cVal}]$,
-\item $\aTr[\bEvs]\SB0(\aForm)$ implies $(\cExp{=}\cVal) \limplies (\aExp{=}\aVal) \land \aForm[\aExp/\REF{\cVal}]$, 
+\item $(\forall\dVal)$ $\aTr[\emptyset]\SB0(\aForm)$ implies $(\cExp{=}\dVal) \limplies \aForm[\aExp/\REF{\dVal}]$,
+\item $(\forall\dVal)$ $\aTr[\bEvs]\SB0(\aForm)$ implies $(\cExp{=}\dVal) \limplies (\aExp{=}\aVal) \land \aForm[\aExp/\REF{\dVal}]$, 
 \end{enumerate}
 
 In $\sLOAD{}{}$:
 \begin{enumerate}
 \item $\labelingAct\SB0(\aEv) = \DRP{\REF{\cVal}}{\aVal}$,
 \item $\labelingForm\SB0(\aEv)$ implies $(\cExp{=}\cVal)$,
-\item $\aTr[\emptyset]\SB0(\aForm)$ implies
-  $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal\lor\aReg{=}\REF{\cVal})\limplies\aForm[\aReg/\REF{\cVal}]$,
-\item $\aTr[\bEvs]\SB0(\aForm)$ implies
-  $(\cExp{=}\cVal) \limplies (\aReg{=}\aVal)\limplies\aForm[\aReg/\REF{\cVal}]$, 
+\item $(\forall\dVal)$ $\aTr[\emptyset]\SB0(\aForm)$ implies
+  $(\cExp{=}\dVal) \limplies (\aReg{=}\aVal\lor\aReg{=}\REF{\dVal})\limplies\aForm$,
+\item $(\forall\dVal)$ $\aTr[\bEvs]\SB0(\aForm)$ implies
+  $(\cExp{=}\dVal) \limplies (\aReg{=}\aVal)\limplies\aForm$, 
 \end{enumerate}  
 
 \subsection{Putting it together}

@@ -347,15 +347,27 @@ to relaxed access.  We discuss the differences in the appendix.
     as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in Definition~\ref{tab:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{loadpre-kappa2}
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-    $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal\lor\aReg{=}\aLoc)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ or\\
-    $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal)\limplies\labelingForm_2(\aEv)[\aReg/\aLoc]$ and $\bEv<\SB0\aEv$ \\
-    \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
+    $\labelingForm\SB0(\aEv)$ implies $\aReg{=}\aVal\limplies\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv<\SB0\aEv$, or \\
+    $\labelingForm\SB0(\aEv)$ implies $(\aReg{=}\aVal\lor\aReg{=}\aLoc)\limplies\labelingForm_2(\aEv)$.
+    %\\ \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
   \end{enumerate}  
 \end{definition}
 Following our convention for subscripts, in the final clause of
 $\sLOADPRE{}{}{}$, $<$ refers to the order of $\aPS$.  Also note that
 $\sLOADPRE{}{}{}$ does not constrain $\labelingForm\SB0(\aEv)$ if
 $\aEv\in\aEvs_1$.
+
+OOPSLA is non-skolemized, using substitution instead, and collapsing $\aLoc$
+and $\aReg$.
+There, item \ref{loadpre-kappa2}  of $\sLOADPRE{}{}{}$ is written 
+\begin{enumerate}
+\item[] %[\ref{loadpre-kappa2})]
+  if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
+  $\labelingForm\SB0(\aEv)$ implies $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\SB0\aEv$, or \\
+  $\labelingForm\SB0(\aEv)$ implies
+  $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
+\end{enumerate}
+
 
 The semantics of $\SKIP$, $\NIL$, and $\PAR$ are as before.
 \begin{align*}
@@ -440,7 +452,9 @@ sequential composition.]
     \setcounter{enumi}{\value{pomsetPreIfCount}}
   \item[1--\ref{if-kappa12})] as for $\sIF{}$ in Definition~\ref{tab:pomsets-pre},
   \item \label{if-tau}
-    $\aTr[\bEvs]\SB0(\aForm)$ implies $(\bForm\land\aTr[\bEvs]_1(\aForm))\lor(\neg\bForm\land\aTr[\bEvs]_2(\aForm))$.
+    $\aTr[\bEvs]\SB0(\aForm)$ implies $(\bForm\land\aTr[\bEvs%\cap\aEvs_1
+    ]_1(\aForm))\lor(\neg\bForm\land\aTr[\bEvs%\cap\aEvs_2
+    ]_2(\aForm))$.
   \end{enumerate}
 
   \noindent
@@ -459,7 +473,8 @@ sequential composition.]
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm'_2(\aEv)$,
   \item \label{seq-kappa12}
     if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm\SB0(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
-    \\ where $\labelingForm'_2(\aEv)=\aTr[\cEvs]_1(\labelingForm_2(\aEv))$, where $\cEvs=\{ \cEv \mid \cEv <\SB0 \aEv \}$,
+    \\ where $\labelingForm'_2(\aEv)=\aTr[\cEvs%\cap\aEvs_1
+    ]_1(\labelingForm_2(\aEv))$, where $\cEvs=\{ \cEv \mid \cEv <\SB0 \aEv \}$,
   \item \label{seq-tau}
     $\aTr[\bEvs]\SB0(\aForm)$ implies $\aTr[\bEvs]_1(\aTr[\bEvs]_2(\aForm))$.
     \newcounter{pomsetXSemiCount}
@@ -471,7 +486,7 @@ sequential composition.]
   \noindent
   If $\aPS\SB0 \in \sSTORE[\amode]{\aLoc}{\aExp}$ then
   $(\exists\aVal\in\Val)$
-  $(\forall\bEvs\neq\emptyset)$
+  % $(\forall\bEvs\neq\emptyset)$
   \begin{enumerate}
   \item[{\labeltext[S1]{S1)}{S1}}]
     if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$,
@@ -482,7 +497,8 @@ sequential composition.]
   \item[{\labeltext[S4]{S4)}{S4}}]
     $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc]$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
   \item[{\labeltext[S5]{S5)}{S5}}]
-    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aExp/\aLoc]$. % \land \lnot\Q{}$.
+    $\aTr[\cEvs]\SB0(\aForm)$ implies $\aForm[\aExp/\aLoc]$, % \land % \lnot\Q{}$.
+    \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$.
     % \item %if $\bEvs\neq\emptyset$ then
     %   $\aTr[\bEvs]\SB0(\aForm)$ implies $(\aExp{=}\aVal) \land \aForm[\aExp/\aLoc]$, if $\bEvs\neq\emptyset$,
     %   \newcounter{pomsetXStoreCount}
@@ -503,20 +519,20 @@ sequential composition.]
   % \item[{\labeltext[L4]{L4)}{L4}}]
   %   % if $\bEvs\neq\emptyset$ then
   %   $\aTr[\bEvs]\SB0(\aForm)$ implies %$\phantom{(\aLoc{=}\aReg\lor{}}
-  %   $\aVal{=}\aReg\limplies\aForm[\aReg/\aLoc]$, 
+  %   $\aVal{=}\aReg\limplies\aForm$, 
   % \item[{\labeltext[L5]{L5)}{L5}}]
   %   % if $\bEvs=\emptyset$ then
-  %   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc]) \land \lnot\Q{}$.
+  %   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm) \land \lnot\Q{}$.
   % \item[{\labeltext[L6]{L6)}{L6}}]
   %    if $\aEvs=\emptyset$ then
-  %   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aReg/\aLoc] \land \lnot\Q{}$.
+  %   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm \land \lnot\Q{}$.
   % \end{enumerate}
 
   \noindent
   If $\aPS\SB0 \in \sLOAD[\amode]{\aReg}{\aLoc}$ then either
-  $\aEvs{\neq}\emptyset$
-  $(\exists\aVal{\in}\Val)$
-  $(\forall\bEvs{\neq}\emptyset)$
+  $\aEvs\neq\emptyset$ and
+  $(\exists\aVal\in\Val)$
+  % $(\forall\bEvs{\neq}\emptyset)$
   \begin{enumerate}
   \item[{\labeltext[L1]{L1)}{L1}}] 
     if $\bEv,\aEv\in\aEvs\SB0$ then $\bEv=\aEv$,
@@ -527,13 +543,14 @@ sequential composition.]
   \item[{\labeltext[L4]{L4)}{L4}}]
     $\aTr[\bEvs]\SB0(\aForm)$ implies $\aVal{=}\aReg\limplies\aForm$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
-    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm)$, % \land \lnot\Q{}$,
+    $\aTr[\cEvs]\SB0(\aForm)$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm)$, % \land \lnot\Q{}$,
+    \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$,
   \end{enumerate}
   or
   $\aEvs=\emptyset$ and 
   \begin{enumerate}
   \item[{\labeltext[L6]{L6)}{L6}}] 
-    $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm$. % \land \lnot\Q{}$.
+    $\aTr[\cEvs]\SB0(\aForm)\;$ implies $\aForm$. % \land \lnot\Q{}$.
   \end{enumerate}
 \end{definition}
 % [Note that we could change the premise of $\aTr[\emptyset]$ in $\sLOAD{}{}$
@@ -541,13 +558,7 @@ sequential composition.]
 % requirements of a family of predicate transforms effectively adds the
 % additional requirement.]
 
-OOPSLA is non-skolemized---with $[x/r]$ rather than no substitution (or $[r/x]$).
-Example is
-\begin{verbatim}
-x=1; r=x; s=x
-\end{verbatim}
-in case where second read is independent of first read,
-
+OOPSLA is non-skolemized---with $[x/r]$ rather than no substitution.
 \begin{enumerate}
 \item[\ref{L4})]
   $\aTr[\bEvs]\SB0(\aForm)$ implies $\aForm[\aLoc/\aReg][\aVal/\aLoc]$, 
@@ -557,133 +568,16 @@ in case where second read is independent of first read,
   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\aForm[\aLoc/\aReg]$.
 \end{enumerate}
 
-\begin{gather*}
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a2}{\DR{x}{2}}{}
-      \event{a3}{(x{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{(x{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-    \end{tikzinline}}
-\end{gather*}
-Without substitution:
-\begin{gather*}
-  \PR{x}{r}\SEMI
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{2}}{below=of a1}
-      \event{a3}{1{=}r\limplies  (x{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
-      \event{a4}{1{=}r\limplies  (x{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-      \po{a1}{a3}
-      \po[out=-20,in=177]{a1}{a4}
-    \end{tikzinline}}
-\end{gather*}
-Prepending $\PW{x}{0}$
-\begin{gather*}
-  % \PW{x}{0}\SEMI
-  % \PR{x}{r}\SEMI
-  % \PR{x}{s}\SEMI
-  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  % \IF{r\land s}\THEN \PW{z}{1}\FI
-  % \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a0}{\DW{x}{0}}{}
-      \event{a1}{\DR{x}{1}}{right=of a0}
-      \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      \event{a4}{\DW{z}{1}}{right=of a3}
-      % \wk{a0}{a1}
-      % \wk[out=-20,in=-160]{a0}{a2}
-      \po[out=20,in=160]{a1}{a3}
-      \po[out=20,in=160]{a1}{a4}
-      \po[out=-20,in=-160]{a2}{a4}
-    \end{tikzinline}}
-\end{gather*}
- With the substitution $[r/x]$:
-\begin{gather*}
-  \PR{x}{r}\SEMI
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{2}}{below=of a1}
-      \event{a3}{1{=}r\limplies  (r{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
-      \event{a4}{1{=}r\limplies  (r{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-      \po{a1}{a3}
-      \po[out=-20,in=177]{a1}{a4}
-    \end{tikzinline}}
-\end{gather*}
-Prepending $\PW{x}{0}$
-\begin{gather*}
-  % \PW{x}{0}\SEMI
-  % \PR{x}{r}\SEMI
-  % \PR{x}{s}\SEMI
-  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  % \IF{r\land s}\THEN \PW{z}{1}\FI
-  % \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a0}{\DW{x}{0}}{}
-      \event{a1}{\DR{x}{1}}{right=of a0}
-      \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      \event{a4}{\DW{z}{1}}{right=of a3}
-      % \wk{a0}{a1}
-      % \wk[out=-20,in=-160]{a0}{a2}
-      \po[out=20,in=160]{a1}{a3}
-      \po[out=20,in=160]{a1}{a4}
-      \po{a2}{a3}
-    \end{tikzinline}}
-\end{gather*}
 
 
-if in L6 we said [x/r], that says we know read the local version...  ignoring
-the value read...  Perhaps there is some intervening stuff that stops you
-from seeing the local state, such as release-acquire
-
-We could potentially get rid of [x/r] If you do two reads, your not allowed
-to be independent of the second based on the value that was read in the first
-read.
-
-x=0; r=x; if (r=1) { s=x; if (s=?) {y=1}}
-read 1 then 2.
-
-
-In order for the write to be independent of second read what does its
-precondition have to be.
-[r/x] then s==1
-no sub then s==0
-
-(s=? | Wy1)
-
-if (phi) z=1
-phi = s is even
-phi = s < 2
-
-With substitution you are saying you know that the ``local copy'' of x is the
-same as r.  Sitting in the local cache.  Read might have gone to main
-memory, but if it did it has updated the cache line so that the local copy is
-what I just read.
-
-If second read is a cache hit, then I know that I am seeing the same value.
-
-If we take substitution out then 
-
-
-
-Conjecture:
+\begin{proposition}
+  If $\aPS\in\sem{\aCmd}$ is top-level and quiescent then 
+  $\aTr[\aEvs](\aForm)$ implies $\wp(\aCmd,\aForm)$
+\end{proposition}
 
 C if P is top-level and quiescent then predicate transformer may be wp(C,phi).
 Only thing is we are substituting v/r, rather than x/r.
 
-$tau_E$(phi) implies wp(C,phi)
 
 C any substitution/valuation sigma giving values for register, can find a
 pomset P such that when you apply the substitution to all the preconditions
@@ -700,7 +594,7 @@ for associativity. Show example.]
 
 
 
-\begin{example} Consider the following executions.
+\begin{comment} Consider the following executions.
 \begin{align*}
 \begin{gathered}
   \PW{x}{1}
@@ -877,9 +771,9 @@ Merging right.
       \xo{a1}{x1d}
     \end{tikzinline}}
 \end{gather*}
-\end{example}
+\end{comment}
 
-\begin{example}
+\begin{comment}
 Separate actions:
 \begin{align*}
   \begin{gathered}
@@ -961,7 +855,7 @@ Adding order does nothing since the preconditions are tautologies.
 %       \po{a1}{a2}
 %     \end{tikzinline}}
 % \end{gather*}
-\end{example}
+\end{comment}
 
 \begin{example}
 Read to write dependency, first separately:
@@ -970,8 +864,8 @@ Read to write dependency, first separately:
     \PR{x}{r} 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{(1{=}r)\limplies\aForm[r/x]}{}
-        \xform{xi}{((x{=}r\lor1{=}r)\limplies\aForm[r/x])}{below=of xd}
+        \xform{xd}{(1{=}r)\limplies\aForm}{}
+        \xform{xi}{(x{=}r\lor1{=}r)\limplies\aForm}{below=of xd}
         \event{a1}{\DR{x}{1}}{above=of xd}
         \xo{a1}{xd}
       \end{tikzinline}}    
@@ -981,7 +875,7 @@ Read to write dependency, first separately:
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{\aForm[r/y]\land r{=}1}{}
+        \xform{xd}{\aForm[r/y]}{}
         \xform{xi}{\aForm[r/y]}{below=of xd}
         \event{a2}{r{=}1\mid\DW{y}{1}}{above=of xd}      
         \xo{a2}{xd}
@@ -994,12 +888,12 @@ Putting these together without order:
 %   \PW{y}{r}
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%       \xform{xdi}{((1{=}r)\limplies\aForm[r/x])[r/y]}{}
-%       \xform{xid}{(((x{=}r\lor1{=}r)\limplies\aForm[r/x]))[r/y]\land r{=}1}{right=of xdi}
+%       \xform{xdi}{((1{=}r)\limplies\aForm)[r/y]}{}
+%       \xform{xid}{(((x{=}r\lor1{=}r)\limplies\aForm))[r/y]\land r{=}1}{right=of xdi}
 %       \event{a1}{\DR{x}{1}}{above=of xdi}
 %       \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1)\mid\DW{y}{1}}{right=of a1}
-%       \xform{xdd}{((1{=}r)\limplies\aForm[r/x])[r/y]\land r{=}1}{above right=.5em and -1em of a1}
-%       \xform{xii}{(((x{=}r\lor1{=}r)\limplies\aForm[r/x]))[r/y]}{below=2.7em of a2}
+%       \xform{xdd}{((1{=}r)\limplies\aForm)[r/y]\land r{=}1}{above right=.5em and -1em of a1}
+%       \xform{xii}{(((x{=}r\lor1{=}r)\limplies\aForm))[r/y]}{below=2.7em of a2}
 %       \xo{a1}{xdi}
 %       \xo{a2}{xid}
 %       \xo{a1}{xdd}
@@ -1012,12 +906,12 @@ Putting these together without order:
   \PW{y}{r}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \xform{xdi}{(1{=}r)\limplies\aForm[r/x][r/y]}{}
-      \xform{xid}{((x{=}r\lor1{=}r)\limplies\aForm[r/x][r/y]) \land r{=}1}{right=of xdi}
+      \xform{xdi}{(1{=}r)\limplies\aForm[r/y]}{}
+      \xform{xid}{(x{=}r\lor1{=}r)\limplies\aForm[r/y]}{right=of xdi}
       \event{a1}{\DR{x}{1}}{above=of xdi}
-      \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1)\mid\DW{y}{1}}{right=of a1}
-      \xform{xdd}{((1{=}r)\limplies\aForm[r/x][r/y])\land r{=}1}{above right=.5em and -1em of a1}
-      \xform{xii}{(x{=}r\lor1{=}r)\limplies\aForm[r/x][r/y]}{below=2.7em of a2}
+      \event{a2}{(x{=}r\lor1{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+      \xform{xdd}{1{=}r\limplies\aForm[r/y]}{above right=.5em and -1em of a1}
+      \xform{xii}{(x{=}r\lor1{=}r)\limplies\aForm[r/y]}{below=2.7em of a2}
       \xo{a1}{xdi}
       \xo{a2}{xid}
       \xo{a1}{xdd}
@@ -1129,10 +1023,10 @@ Strengthen the transformers as follow.
   $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}\land \aForm[\aExp/\aLoc]$.
 \item[\ref{L5})]
   %$\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
-  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{} \land((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm[\aReg/\aLoc])$,
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{} \land((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\aForm)$,
 \item[\ref{L6})]
   %$\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{}$,
-  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{} \land\aForm[\aReg/\aLoc]$.
+  $\aTr[\emptyset]\SB0(\aForm)\;$ implies $\lnot\Q{} \land\aForm$.
 \end{enumerate}
 Update thread as follows
 \begin{enumerate}
@@ -1343,8 +1237,8 @@ Read to write dependency, first separately:
     \PR{x}{r} 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{(1{=}r)\limplies\aForm[r/x]}{}
-        \xform{xi}{((x{=}r\lor1{=}r)\limplies\aForm[r/x])\land \lnot\Q{}}{below=of xd}
+        \xform{xd}{(1{=}r)\limplies\aForm}{}
+        \xform{xi}{((x{=}r\lor1{=}r)\limplies\aForm)\land \lnot\Q{}}{below=of xd}
         \event{a1}{\DR{x}{1}}{above=of xd}
         \xo{a1}{xd}
       \end{tikzinline}}    
@@ -1367,12 +1261,12 @@ Putting these together without order:
   \PW{y}{r}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \xform{xdi}{((1{=}r)\limplies\aForm[r/x])[r/y]\land \lnot\Q{}}{}
-      \xform{xid}{(((x{=}r\lor1{=}r)\limplies\aForm[r/x])\land \lnot\Q{})[r/y]\land (\Q{}\limplies r{=}1)}{below right=.5em and -10em of xdi}
+      \xform{xdi}{((1{=}r)\limplies\aForm)[r/y]\land \lnot\Q{}}{}
+      \xform{xid}{(((x{=}r\lor1{=}r)\limplies\aForm)\land \lnot\Q{})[r/y]\land (\Q{}\limplies r{=}1)}{below right=.5em and -10em of xdi}
       \event{a1}{\DR{x}{1}}{above=of xdi}
       \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above right=2.7em and -16em of xid}
-      \xform{xdd}{((1{=}r)\limplies\aForm[r/x])[r/y]\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
-      \xform{xii}{(((x{=}r\lor1{=}r)\limplies\aForm[r/x])\land \lnot\Q{})[r/y]\land \lnot\Q{}}{below=of xid}
+      \xform{xdd}{((1{=}r)\limplies\aForm)[r/y]\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
+      \xform{xii}{(((x{=}r\lor1{=}r)\limplies\aForm)\land \lnot\Q{})[r/y]\land \lnot\Q{}}{below=of xid}
       \xo{a1}{xdi}
       \xo{a2}{xid}
       \xo{a1}{xdd}
@@ -1392,12 +1286,12 @@ simplifies to
   \PW{y}{r}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-      \xform{xdi}{((1{=}r)\limplies\aForm[r/x][r/y])\land \lnot\Q{}}{}
-      \xform{xid}{((x{=}r\lor1{=}r)\limplies\aForm[r/x][r/y])\land \lnot\Q{}}{below right=.5em and -4em of xdi}
+      \xform{xdi}{((1{=}r)\limplies\aForm[r/y])\land \lnot\Q{}}{}
+      \xform{xid}{((x{=}r\lor1{=}r)\limplies\aForm[r/y])\land \lnot\Q{}}{below right=.5em and -4em of xdi}
       \event{a1}{\DR{x}{1}}{above=of xdi}
       \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above=2.7em of xid}
-      \xform{xdd}{((1{=}r)\limplies\aForm[r/x][r/y])\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
-      \xform{xii}{((x{=}r\lor1{=}r)\limplies\aForm[r/x][r/y])\land \lnot\Q{}}{below=of xid}
+      \xform{xdd}{((1{=}r)\limplies\aForm[r/y])\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
+      \xform{xii}{((x{=}r\lor1{=}r)\limplies\aForm[r/y])\land \lnot\Q{}}{below=of xid}
       \xo{a1}{xdi}
       \xo{a2}{xid}
       \xo{a1}{xdd}

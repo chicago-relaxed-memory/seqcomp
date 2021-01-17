@@ -41,7 +41,7 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
     field κ⊨κLOAD :  ∀ e → (e ∈ E) → κ(e) ⊨ (ψ(e) ∧ (L == address (a(e))) ∧ κLOAD (a(e)))
     field τC⊨τLOADD : ∀ C ϕ a e → (e ∈ E) → (e ∈ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ (L == address a) ⇒ τLOADD r (r[ e ]) a (v(e)) ϕ))
     field τC⊨τLOADI : ∀ C ϕ a e → (e ∈ E) → (e ∉ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ (L == address a) ⇒ τLOADI r (r[ e ]) a μ ϕ))
-    field τC⊨τLOAD∅ : ∀ C ϕ a s χ → (∀ e → (e ∈ E) → (e ∈ C) → (χ ⊨ ¬(ψ(e)))) → (τ(C)(ϕ) ⊨ (χ ⇒ (L == address a) ⇒ τLOAD∅ r s a μ ϕ))
+    field τC⊨τLOAD∅ : ∀ C ϕ a s χ → (∀ e → (e ∈ E) → (χ ⊨ ¬(ψ(e)))) → (τ(C)(ϕ) ⊨ (χ ⇒ (L == address a) ⇒ τLOAD∅ r s a μ ϕ))
 
   κSTORE : AccessMode → Expression → Address → Value → Formula
   κSTORE rlx M a v = (M == value v) ∧ RW ∧ Q[ a ]
