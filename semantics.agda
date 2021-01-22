@@ -15,7 +15,7 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
   open parcomp(Event)(DM)
 
   κLOAD : Address → Formula
-  κLOAD a = RO ∧ Qw[ a ]
+  κLOAD a = Qw[ a ]
 
   τLOADD : Register → Register → Address → Value → Formula → Formula
   τLOADD r s a v ϕ = (value v == register s) ⇒ (ϕ [ register s / r ])
@@ -44,8 +44,8 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
     field τC⊨τLOAD∅ : ∀ C ϕ a s χ → (∀ e → (e ∈ E) → (χ ⊨ ¬(ψ(e)))) → (τ(C)(ϕ) ⊨ (χ ⇒ (L == address a) ⇒ τLOAD∅ r s a μ ϕ))
 
   κSTORE : AccessMode → Expression → Address → Value → Formula
-  κSTORE rlx M a v = (M == value v) ∧ RW ∧ Q[ a ]
-  κSTORE ra  M a v = (M == value v) ∧ RW ∧ Q
+  κSTORE rlx M a v = (M == value v) ∧ Q[ a ]
+  κSTORE ra  M a v = (M == value v) ∧ Q
 
   τSTORED : AccessMode → Expression → Address → Value → Formula → Formula
   τSTORED rlx M a v ϕ = (Qw[ a ] ⇒ (M == value v)) ∧ (ϕ [ M /[ a ]] [ tt /↓[ a ]])

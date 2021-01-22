@@ -1,3 +1,5 @@
+\newcommand{\aState}{\sigma}
+\newcommand{\bState}{\rho}
 \newcommand{\suchthat}{\mid}
 \newcommand{\TICK}{\checkmark\!}
 \newcommand{\QL}[2]{\mathsf{ql}_{#2}^{#1}}
@@ -6,13 +8,13 @@
 \newcommand{\DS}[3]{\mathsf{ds}_{#2}^{#1}#3}
 \newcommand{\Qmode}[1]{\mathsf{Q}^{#1}}
 \newcommand{\Dmode}[1]{\Dx{#1}}
-\newcommand{\RW}{\mathsf{RW}}
-\newcommand{\RO}{\mathsf{RO}}
+\newcommand{\RW}{\mathsf{W}}
+\newcommand{\RO}{\lnot\mathsf{W}}
 \newcommand{\Q}[1]{\mathsf{Q}_{#1}}
 \newcommand{\D}{\Dx{\mathtt{*}}}
 \newcommand{\Dx}[1]{\mathord{\downarrow^{#1}}}
-\newcommand{\Qx}[1]{\mathsf{Q}_\mRLX^{#1}}
-\newcommand{\Qw}[1]{\mathsf{Q}_\mathsf{w}^{#1}}
+\newcommand{\Qx}[1]{\mathsf{Q}_{\mathsf{rw}}^{#1}}
+\newcommand{\Qw}[1]{\mathsf{Q}_{\mathsf{wo}}^{#1}}
 \newcommand{\DxREF}[1]{\Dx{\REF{#1}}}
 \newcommand{\QxREF}[1]{\Qx{\REF{#1}}}
 \newcommand{\QwREF}[1]{\Qw{\REF{#1}}}
@@ -95,9 +97,6 @@
 \newcommand{\Rdis}[2]{\mathsf{weaken}_{\mathsf{R}#1#2}}
 \newcommand{\Wdis}[2]{\mathsf{weaken}_{\mathsf{W}#1#2}}
 
-\newcommand{\cmdC}{\aCmd_{\mathsf{C}}}
-\newcommand{\cmdR}{\aCmd_{\mathsf{R}}}
-\newcommand{\cmdW}{\aCmd_{\mathsf{W}}}
 \newcommand{\ps}{\textsc{ps}}
 \newcommand{\pc}{\textsc{pc}}
 \newcommand{\pcs}{\textsc{pc}s}
@@ -231,6 +230,19 @@
 \newcommand{\external}{}
 \newcommand{\externally}{}
 
+\newcommand{\xDGA}{{\textsc{dga}}}
+\newcommand{\xRRD}{{\textsc{rrd}}}
+\newcommand{\xIF}{{\textsc{if}}}
+\newcommand{\xADDR}{{\textsc{addr}}}
+\newcommand{\xCO}{{\textsc{co}}}
+\newcommand{\xRASC}{{\textsc{rasc}}}
+% \newcommand{\xDGA}{{\text{DGA}}}
+% \newcommand{\xRRD}{{\text{RRD}}}
+% \newcommand{\xIF}{{\text{If}}}
+% \newcommand{\xADDR}{{\text{Addr}}}
+% \newcommand{\xCO}{{\text{Co}}}
+% \newcommand{\xRASC}{{\text{RASC}}}
+
 \newcommand{\amode}{\mu}
 \newcommand{\fmode}{\nu}
 \newcommand{\mWK}{{\mathsf{wk}}}
@@ -291,7 +303,7 @@
 \newcommand{\testP}[2]{{\tt test}^{#1}_{#2}}
 \newcommand{\freshaval}{\aVal_{{\tt fr}}}
 
-\newcommand{\jjr}[1]{[JJR\ifnotempty{#1}{, #1}]}
+\newcommand{\jjr}[1]{\cite[#1]{DBLP:journals/pacmpl/JagadeesanJR20}}%[JJR\ifnotempty{#1}{, #1}]}
 \newcommand{\RMW}{{\sc rmw}}
 \newcommand{\RMWs}{{\sc rmw}s}
 \newcommand{\drf}{{\sc drf}}
@@ -346,7 +358,7 @@
 \newcommand{\inj}{f}
 \newcommand{\hoare}[3]{\{#1\}\allowbreak\;#2\;\allowbreak\{#3\}}
 \newcommand{\fwlp}{\textit{wlp}}
-\newcommand{\fwp}{\textit{wp}}
+\newcommand{\fwp}[2]{\ensuremath{\textit{wp}_{#1}\ifnotempty{#2}{(#2)}}}
 \newcommand{\fsp}{\textit{sp}}
 
 \newcommand{\aF}{\xi}
@@ -377,9 +389,13 @@
 
 \newenvironment{noenv}{\ignorespaces}{\ignorespacesafterend}
 \newcommand{\aGrp}{G}
-\newcommand{\bGrp}{H}
-\newcommand{\aCmd}{C}
-\newcommand{\bCmd}{D}
+%\newcommand{\bGrp}{H}
+\newcommand{\aCmd}{S}
+\newcommand{\cmdI}{\aCmd_{\mathrm{I}}}
+\newcommand{\cmdC}{\aCmd_{\mathsf{C}}}
+\newcommand{\cmdR}{\aCmd_{\mathsf{R}}}
+\newcommand{\cmdW}{\aCmd_{\mathsf{W}}}
+%\newcommand{\bCmd}{T}
 \newcommand{\eCmd}{E}
 \newcommand{\cCmd}{B}
 
@@ -441,12 +457,12 @@
 \newcommand{\Formulae}{\Phi}
 \newcommand{\aForm}{\phi}
 \newcommand{\bForm}{\psi}
-\newcommand{\cForm}{\chi}
+\newcommand{\cForm}{\theta}
 \newcommand{\dForm}{\xi}
 \newcommand{\TRUE}{\mathsf{tt}}
 \newcommand{\FALSE}{\mkern.6mu\mathsf{ff}\mkern.6mu}
 \newcommand{\Bool}{\mathsf{Bool}}
-\newcommand{\aTr}[1][]{\tau^{#1}}
+\newcommand{\aTr}[3][]{\tau^{#2}_{#1}\ifnotempty{#3}{(#3)}}
 
 \newcommand{\Int}{\mathsf{SilentAct}}
 \newcommand{\Ext}{\mathsf{Ext}}
@@ -498,6 +514,7 @@
 \newcommand{\bEvs}{D}
 \newcommand{\EAct}{A}
 \newcommand{\ESub}{S}
+\newcommand{\AllEvents}{\mathcal{E}}
 \newcommand{\Event}{E}
 \newcommand{\aEv}{e}
 \newcommand{\bEv}{d}
@@ -592,12 +609,12 @@
 \newcommand{\SKIP}{\mathtt{skip}}
 \newcommand{\ABORT}{\mathtt{abort}}
 \newcommand{\NIL}{\mathsf{0}}
-\newcommand{\THREAD}[1]{\mathtt{thread}\ifnotempty{#1}{\;#1}}
+\newcommand{\THREAD}[1]{#1}%\mathtt{thread}\ifnotempty{#1}{\;#1}}
 \newcommand{\FORK}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}}
 \newcommand{\FORKJOIN}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}\SEMI\mathtt{join}}
 \newcommand{\STOP}{\mathtt{stop}}
 \newcommand{\BANG}{\mathtt{!}\mkern-1mu}
-\newcommand{\GETS}{\mathtt{:}\mkern-1mu\mathtt{=}\,}
+\newcommand{\GETS}{\mkern1mu\mathtt{:}\mkern-1mu\mathtt{=}\,}
 \newcommand{\SEQ}{\mathtt{;}\,\allowbreak}
 \newcommand{\SEMI}{\mathtt{;}\,\allowbreak}
 \newcommand{\PASS}{\mathtt{pass}}
@@ -648,11 +665,12 @@
 \newcommand{\sLET}[2]{\textnormal{\textit{LET}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)}}
 \newcommand{\sFORK}[1]{\textnormal{\textit{FORK}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sFORKJOIN}[1]{\textnormal{\textit{FORKJOIN}}\ifnotempty{#1}{\allowbreak(#1)}}
-\newcommand{\sTHREAD}[1]{\textnormal{\textit{THREAD}}\ifnotempty{#1}{\allowbreak(#1)}}
+\newcommand{\sTHREAD}[1]{\textnormal{\textit{THRD}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sLOAD}[3][]{\textnormal{\textit{LOAD}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1})}}
 \newcommand{\sSTORE}[3][]{\textnormal{\textit{STORE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1})}}
-\newcommand{\sLOADPRE}[4][]{\textnormal{\textit{LOADPRE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
-\newcommand{\sSTOREPRE}[4][]{\textnormal{\textit{STOREPRE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
+\newcommand{\sSTOREtight}[3][]{\textnormal{\textit{STORE}}\ifnotempty{#2}{\allowbreak(#2,#3\ifnotempty{#1}{,#1})}}
+\newcommand{\sLOADPRE}[4][]{\textnormal{\textit{LD}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
+\newcommand{\sSTOREPRE}[4][]{\textnormal{\textit{ST}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
 \newcommand{\sSKIPPRE}{\textnormal{\textit{SKIPPRE}}}
 \newcommand{\sSKIP}{\textnormal{\textit{SKIP}}}
 \newcommand{\sSTOP}{\textnormal{\textit{STOP}}}

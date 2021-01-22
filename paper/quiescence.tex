@@ -1,0 +1,463 @@
+\section{Quiescence}
+\label{sec:q}
+
+Quiescence is used to capture termination, coherence, release-acquire access,
+and SC access.
+
+
+\subsection{Coherence ($\xCO$)}
+\label{sec:co}
+
+% \begin{itemize}
+% \item Coherence respects program order: $\Qx{\aLoc}$
+% \item Drop read-read coherence: $\Qw{\aLoc}$ (Required for CSE without
+%   alias analysis over read only code, not required by hardware)
+% \end{itemize}
+
+In order to describe coherence, we use the uninterpreted logical symbols
+$\Qx{\aLoc}$ and $\Qw{\aLoc}$, for each location $\aLoc$, with the
+interpretation that
+\begin{math}
+  \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc.
+\end{math}
+
+When $\Qx{\aLoc}$ is discharged in the precondition of event $\aEv$, we
+expect that all reads and writes of $\aLoc$ that precede $\aEv$ in program
+order also precede $\aEv$ in pomset order.
+$\Qw{\aLoc}$ is similar, but applies only to preceding writes.
+
+\begin{definition}
+  Let $[\TRUE/\Q{}]$ be the substitution that replaces all quiescence
+  symbols replaced by $\TRUE$.
+\end{definition}
+
+We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
+\begin{definition}[$\xCO$]
+  \label{def:pomsets-co}
+  Update Def.~\ref{def:pomsets-trans} to:
+  \begin{enumerate}
+  \item[\ref{S3})]
+    $\labelingForm(\aEv)$ implies $\Qx{\aLoc}\land\aExp{=}\aVal$,
+  \item[\ref{L3})]
+    $\labelingForm(\aEv)$ implies $\Qw{\aLoc}$,
+  \item[\ref{T3})]
+    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$,
+  \end{enumerate}
+  \begin{enumerate}
+  \item[\ref{S4})]
+    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land\bForm[\aExp/\aLoc]$,
+  \item[\ref{S5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \bForm[\aExp/\aLoc]$.
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
+  \item[\ref{L6})]
+    $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land\bForm$.
+    % \end{enumerate}
+    % Update thread as follows
+    % \begin{enumerate}
+  \end{enumerate}
+\end{definition}
+% or
+% \begin{enumerate}
+% \item[{\labeltext[S6]{S6)}{S6}}] 
+%   $\aTr{\bEvs}{\bForm}$ implies $\Q{}\limplies\aExp{=}\aVal$,
+% \item[{\labeltext[S7]{S7)}{S7}}] 
+%   $\aTr{\emptyset}{\bForm}\;$ implies $\lnot\Q{}$,
+% \item[{\labeltext[L6]{L6)}{L6}}] 
+%   $\aTr{\emptyset}{\bForm}\;$ implies $\lnot\Q{}$,
+% \item[{\labeltext[E2]{E2)}{E2}}] 
+%   $\aTr{\emptyset}{\bForm}\;$ implies $\lnot\Q{}$.
+% \end{enumerate}
+
+\begin{definition}
+  $\aPS$ is \emph{quiescent} if $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
+\end{definition}
+
+
+\begin{example}
+  Merging left.
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{1{=}1\land\Qx{x}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm[1/x]\land (\Qw{x}\limplies 1{=}1)}{below=of a1}
+          \xform{x1i}{\bForm[1/x]\land \lnot\Qw{x}}{below=of x1d}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{2{=}1\land\Qx{x}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm[2/x]\land (\Qw{x}\limplies 2{=}1)}{below=of a1}
+          \xform{x1i}{\bForm[2/x]\land \lnot\Qw{x}}{below=of x1d}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Simplifying:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\DW{x}{1}}{}
+          \xform{x1d}{\bForm[1/x]}{right=of a1}
+          \xform{x1i}{\bForm[1/x]\land \lnot\Q{}}{below=of x1d}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\FALSE\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm[2/x]\land \lnot\Q{}}{right=of a1}
+          \xform{x1i}{\bForm[2/x]\land \lnot\Q{}}{below=of x1d}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Merging the actions, we have:
+  % \begin{gather*}
+  %   \PW{x}{1}\SEMI \PW{x}{2}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \event{a1}{1{=}1\lor2{=}1\mid\DW{x}{1}}{}
+  %     \xform{x1d}{(\bForm[1/x]\land (\Q{}\limplies 1{=}1))[2/x]\land (\Q{}\limplies 2{=}1)}{below=of a1}
+  %     \xform{x1i}{(\bForm[1/x]\land \lnot\Q{})[2/x]\land \lnot\Q{}}{below=of x1d}
+  %     \xo{a1}{x1d}
+  %   \end{tikzinline}}
+  % \end{gather*}
+  % which simplifies to
+  % \begin{gather*}
+  %   %   \PW{x}{1}\SEMI \PW{x}{2}
+  %   %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \event{a1}{\DW{x}{1}}{}
+  %     \xform{x1d}{\bForm[1/x]\land (\Q{}\limplies 1{=}1 \land 2{=}1)}{right=of a1}
+  %     \xform{x1i}{\bForm[1/x]\land \lnot\Q{}}{right=of x1d}
+  %     \xo{a1}{x1d}
+  %   \end{tikzinline}}
+  % \end{gather*}
+  % which simplifies to
+  \begin{gather*}
+    % \PW{x}{1}\SEMI \PW{x}{2}
+    % \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \xform{x1d}{(\bForm[1/x])[2/x]\land \lnot\Q{}}{right=of a1}
+        \xform{x1i}{(\bForm[1/x]\land \lnot\Q{})[2/x]\land \lnot\Q{}}{below=of x1d}
+        \xo{a1}{x1d}
+      \end{tikzinline}}
+  \end{gather*}
+  which simplifies to
+  \begin{gather*}
+    % \PW{x}{1}\SEMI \PW{x}{2}
+    % \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \xform{x1d}{\bForm[1/x]\land \lnot\Q{}}{right=of a1}
+        \xform{x1i}{\bForm[1/x]\land \lnot\Q{}}{right=of x1d}
+        \xo{a1}{x1d}
+      \end{tikzinline}}
+  \end{gather*}
+\end{example}
+
+\begin{example}
+  Separate actions:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[1/x]\land (\Q{}\limplies 1{=}1)}{}
+          \xform{xi}{\bForm[1/x]\land \lnot\Q{}}{below=of xd}
+          \event{a1}{1{=}1\mid\DW{x}{1}}{above=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[2/x]\land (\Q{}\limplies 2{=}2)}{}
+          \xform{xi}{\bForm[2/x]\land \lnot\Q{}}{below=of xd}
+          \event{a2}{2{=}2\mid\DW{x}{2}}{above=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Simplifying:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[1/x]}{}
+          \xform{xi}{\bForm[1/x]\land \lnot\Q{}}{below=of xd}
+          \event{a1}{\DW{x}{1}}{left=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[2/x]}{}
+          \xform{xi}{\bForm[2/x]\land \lnot\Q{}}{below=of xd}
+          \event{a2}{\DW{x}{2}}{left=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Putting these together unordered:
+  \begin{gather*}
+    \PW{x}{1}\SEMI \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdi}{\bForm[1/x]\land \lnot\Q{}}{}
+        \xform{xdd}{\bForm[1/x]}{right=of xdi}
+        \xform{xid}{\bForm[1/x]\land \lnot\Q{}}{right=of xdd}
+        \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
+        \event{a2}{\lnot\Q{}\mid\DW{x}{2}}{above right=.5em and -1em of xdd}
+        \xform{xii}{\bForm[1/x]\land \lnot\Q{}}{below=of xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+      \end{tikzinline}}
+  \end{gather*}
+  Adding order does nothing since the preconditions are tautologies.
+  % \begin{gather*}
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \xform{xdi}{\bForm[1/x]\land \lnot\Q{}}{}
+  %     \xform{xdd}{\bForm[1/x]}{right=of xdi}
+  %     \xform{xid}{\bForm[1/x]\land \lnot\Q{}}{right=of xdd}
+  %     \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
+  %     \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
+  %     \xform{xii}{\bForm[1/x]\land \lnot\Q{}}{below=of xdd}
+  %     \xo{a1}{xdi}
+  %     \xo{a2}{xid}
+  %     \xo{a1}{xdd}
+  %     \xo{a2}{xdd}
+  %     \po{a1}{a2}
+  %   \end{tikzinline}}
+  % \end{gather*}
+\end{example}
+
+\begin{comment}
+  Read to write dependency, first separately:
+  \begin{align*}
+    \begin{gathered}
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{(1{=}r)\limplies\bForm}{}
+          \xform{xi}{((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{}}{below=of xd}
+          \event{a1}{\DR{x}{1}}{above=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[r/y]\land (\Q{}\limplies r{=}1)}{}
+          \xform{xi}{\bForm[r/y]\land \lnot\Q{}}{below=of xd}
+          \event{a2}{r{=}1\mid\DW{y}{1}}{above=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Putting these together without order:
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdi}{((1{=}r)\limplies\bForm)[r/y]\land \lnot\Q{}}{}
+        \xform{xid}{(((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{})[r/y]\land (\Q{}\limplies r{=}1)}{below right=.5em and -10em of xdi}
+        \event{a1}{\DR{x}{1}}{above=of xdi}
+        \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above right=2.7em and -16em of xid}
+        \xform{xdd}{((1{=}r)\limplies\bForm)[r/y]\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
+        \xform{xii}{(((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{})[r/y]\land \lnot\Q{}}{below=of xid}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+      \end{tikzinline}}
+  \end{gather*}
+  Note that
+  \begin{math}
+    \lnot\Q{}\land (\Q{}\limplies r{=}1)
+  \end{math}
+  simplifies to 
+  \begin{math}
+    \lnot\Q{}.
+  \end{math}
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdi}{((1{=}r)\limplies\bForm[r/y])\land \lnot\Q{}}{}
+        \xform{xid}{((x{=}r\lor1{=}r)\limplies\bForm[r/y])\land \lnot\Q{}}{below right=.5em and -4em of xdi}
+        \event{a1}{\DR{x}{1}}{above=of xdi}
+        \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above=2.7em of xid}
+        \xform{xdd}{((1{=}r)\limplies\bForm[r/y])\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
+        \xform{xii}{((x{=}r\lor1{=}r)\limplies\bForm[r/y])\land \lnot\Q{}}{below=of xid}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+      \end{tikzinline}}
+  \end{gather*}
+  With order:
+  \begin{gather*}
+    % \PR{x}{r} \SEMI
+    % \PW{y}{r}
+    % \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+        \po{a1}{a2}
+      \end{tikzinline}}
+  \end{gather*}
+\end{comment}
+
+
+
+\subsection{RA and SC Access (\xRASC)}
+% Write $\Q{}$ as $\Q{\mSC}$ and introduce $\Q{\mRA}$.
+
+% $\Q{\mSC}$ implies $\Q{\mRA}$.
+
+In order to describe $\mRA$/$\mSC$ access, we use the uninterpreted logical
+symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
+\begin{math}
+  \Q{\mSC} \textimplies \Q{\mRA} \textimplies \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc.
+\end{math}
+
+[visualization.  Labels to be turned off later in macros]
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{0}}{}
+      \raevent{a2}{\DW[\mRA]{x}{1}}{right=of a1}
+      \scevent{a3}{\DR[\mSC]{x}{0}}{right=of a2}
+      \xform{a4}{\bForm}{right=of a3}
+      \sync{a2}{a3}
+      \xo{a3}{a4}
+      \wk{a1}{a2}
+    \end{tikzinline}}
+\end{gather*}
+
+
+
+\begin{definition}
+  \label{def:QS}
+  Let $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ be defined:
+  \begin{align*}
+    \QS{\aLoc}{\mRLX}&=\Qx{\aLoc}
+    &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
+    \\
+    \QS{\aLoc}{\mRA}&=\Q{\mRA}
+    &\QL{\aLoc}{\mRA}&=\Qw{\aLoc}
+    \\
+    \QS{\aLoc}{\mSC}&=\Q{\mSC}
+    &\QL{\aLoc}{\mSC}&=\Q{\mSC}
+  \end{align*}
+\end{definition}
+
+\begin{definition}[$\xCO$/$\xRASC$]
+  \label{def:pomsets-ra}
+  Update Def.~\ref{def:pomsets-co} to:
+  \begin{enumerate}
+  \item[\ref{S3})]
+    $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
+  \item[\ref{L3})]
+    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$.
+  \end{enumerate}
+\end{definition}
+
+% $\QS{\aLoc}{\mRLX}=\Qx{\aLoc}$ and otherwise $\QS{\aLoc}{\amode}=\Q{\amode}$.
+
+% $\QL{\aLoc}{\mSC}=\Q{\mSC}$ and otherwise $\QL{\aLoc}{\amode}=\Qw{\aLoc}$.
+
+% $\DS{\aLoc}{\mRLX}{\bForm}=\bForm[\TRUE/\Dx{\aLoc}]$ and otherwise
+% $\DS{\aLoc}{\amode}{\bForm}=\bForm[\FALSE/\D]$. 
+
+% $\DL{\aLoc}{\mRLX}=\TRUE$ and otherwise $\DL{\aLoc}{\amode}=\Dx{\aLoc}$.
+
+% \begin{definition}$\phantom{\;}$\par
+%   \noindent
+%   If $\aPS \in \sSTORE[\amode]{\aLoc}{\aExp}$ then
+%   \begin{enumerate}
+%   \item[\ref{S1}--\ref{S2})] as before,
+%   \item[\ref{S3})]
+%     $\labelingForm(\aEv)$ implies
+%     \begin{math}
+%       \aExp{=}\aVal
+%       \land \RW
+%       \land \QS{\aLoc}{\amode}
+%     \end{math},
+%   \item[\ref{S4})]
+%     $\aTr{\bEvs}{\bForm}$ implies 
+%     \begin{math}
+%       (\Qw{\aLoc} \limplies \aExp{=}\aVal)
+%       \land \DS{\aLoc}{\amode}{\bForm[\aExp/{\aLoc}]}
+%     \end{math},
+%   \item[\ref{S5})]
+%     $\aTr{\emptyset}{\bForm}$ implies 
+%     \begin{math}
+%       \lnot\Qw{\aLoc}
+%       \land \DS{\aLoc}{\amode}{\bForm[\aExp/{\aLoc}]}.
+%     \end{math}
+%   \end{enumerate}
+
+%   \noindent
+%   If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
+%   \begin{enumerate}
+%   \item[\ref{L1}--\ref{L2})] as before,
+%   \item[\ref{L3})]
+%     $\labelingForm(\aEv)$ implies
+%     \begin{math}
+%       \RO
+%       \land \QL{\aLoc}{\amode}
+%     \end{math},
+%   \item[\ref{L4})]
+%     $\aTr{\bEvs}{\bForm}$ implies
+%     \begin{math}
+%       (\aVal{=}\aReg)
+%       \limplies \bForm[\aReg/{\aLoc}]
+%     \end{math}
+%   \item[\ref{L5})] 
+%     $\aTr{\emptyset}{\bForm}$ implies
+%     \begin{math}
+%       \DL{\aLoc}{\amode}
+%       \land \lnot\Qx{\aLoc}
+%       %     \end{math}
+%       %     \\
+%       %     \begin{math}
+%       %       {}
+%       \land 
+%       (\RW
+%       \limplies (\aVal{=}\aReg\lor\aLoc{=}\aReg) 
+%       \limplies \bForm[\aReg/{\aLoc}]
+%       ).
+%     \end{math}
+%   \end{enumerate}  
+% \end{definition}
+
+
+

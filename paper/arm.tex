@@ -1,44 +1,164 @@
 \section{Efficient Implementation on ARMv8}
 \label{sec:arm}
 
+\subsection{Down-Grading Acquires ($\xDGA$)}
+\label{sec:internal}
+
+We use the uninterpreted symbols $\Dx{\aLoc}$.
+
+\begin{definition}
+  \label{def:DS}
+  Let $[\FALSE/\D]$ be the substitution that performs $[\FALSE/\Dx{\aLoc}]$
+  for every $\aLoc$.
+  Let $\DS{\aLoc}{\amode}$ and $\DL{\aLoc}{\amode}$ be defined:
+  \begin{align*}
+    \DS{\aLoc}{\mRLX}{\bForm}&=\bForm[\TRUE/\Dx{\aLoc}] 
+    &\DL{\aLoc}{\mRLX}&=\TRUE
+    \\
+    \DS{\aLoc}{\mRA}{\bForm}&=\bForm[\FALSE/\D]
+    &\DL{\aLoc}{\mRA}&=\Dx{\aLoc}
+    \\
+    \DS{\aLoc}{\mSC}{\bForm}&=\bForm[\FALSE/\D]
+    &\DL{\aLoc}{\mSC}&=\Dx{\aLoc}
+  \end{align*}
+\end{definition}
+
+\begin{definition}[$\xCO$/$\xRASC$/$\xDGA$]
+  \label{def:pomsets-down}
+  Update Def.~\ref{def:pomsets-ra} to:
+  \begin{enumerate}
+  \item[\ref{S4})]
+    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$,
+  \item[\ref{S5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$.
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
+  \item[\ref{L6})]
+    $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land\bForm$.
+  \end{enumerate}
+\end{definition}
+
+
+\subsection{Read-Read dependencies ($\xRRD$)}
+
+We use the uninterpreted symbol $\RW$.
+
+\begin{definition}[$\xRRD$]
+  \label{def:pomsets-rr}
+  Update Def.~\ref{def:pomsets-trans} to:
+  \begin{enumerate}
+  \item[\ref{T3})]
+    $\labelingForm(\aEv)$ implies
+    $\labelingForm_1(\aEv)[\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
+    \\
+    $\labelingForm(\aEv)$ implies
+    $\labelingForm_1(\aEv)[\FALSE/\RW]$ otherwise.
+  \end{enumerate}
+  \begin{enumerate}
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$,
+  \end{enumerate}  
+\end{definition}
+
+
+
+We repeat all of the rules for preconditions and transformers,
+Only \ref{L5} and \ref{T3} are changed from Def.~\ref{def:pomsets-down}.
+We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
+
+\begin{definition}[$\xCO$/$\xRASC$/$\xDGA$/$\xRRD$]
+  \label{def:pomsets-down-rr}
+  Update Def.~\ref{def:pomsets-trans} to:
+  \begin{enumerate}
+  \item[\ref{S3})]
+    $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
+  \item[\ref{L3})]
+    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$.
+  \item[\ref{T3})]
+    $\labelingForm(\aEv)$ implies
+    $\labelingForm_1(\aEv)[\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
+    \\
+    $\labelingForm(\aEv)$ implies
+    $\labelingForm_1(\aEv)[\TRUE/\Q{}][\FALSE/\RW]$ otherwise.
+  \end{enumerate}
+  \begin{enumerate}
+  \item[\ref{S4})]
+    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$,
+  \item[\ref{S5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$.
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land(\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
+  \item[\ref{L6})]
+    $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land\bForm$.
+  \end{enumerate}  
+\end{definition}
+
+[Control dependencies into reads as in MP with release on right and control
+dependency on left.]
+
+% \begin{definition}
+%   Let $[\aForm/\RW{}]$ be the substitution that replaces $\RW{}$ by $\aForm$.
+% \end{definition}
+
+
+\subsection{Proof Strategy}
+
 Alternate characterization of ARM:
 \cite[\textsection B2.3.6]{arm-reference-manual}
 \cite{alglave-git-alternate}
 \cite{armed-cats}
 
-Internal visibility:
-If $\bEv\xpoloc\aEv$ then either
-\begin{itemize}
-\item %$\bEv\xca\aEv$:
-  $\bEv:\DWP{x}{1}\xco\aEv:\DWP{x}{2}$ 
-\item %$\bEv\xrfx\aEv$:
-  $\bEv:\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
-\item %$\bEv\mathrel{\xco\xrfx}\aEv$:
-  $\bEv:\DWP{x}{1}\xco\DWP{x}{2}\xrfx\aEv:\DRP{x}{2}$
-\item
-  $\bEv:\DRP{x}{0}\xfr\aEv:\DWP{x}{1}$\\
-  $\bEv:\DRP{x}{0}\xrfxinv\DWP{x}{0}\xco\aEv:\DWP{x}{1}$
-\item %$\bEv\mathrel{\xfr\xrfx}\aEv$:
-  $\bEv:\DRP{x}{0}\xfr\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$\\
-  $\bEv:\DRP{x}{0}\xrfxinv\DWP{x}{0}\xco\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
-\item %$\bEv\mathrel{\xrfxinv\xrfx}\aEv$:
-  $\bEv:\DRP{x}{1}\xrfxinv\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
-  % \begin{tikzinline}
-  %   \node(a){$\DWP{x}{1}$};
-  %   \node(b)[right=1.5em of a]{$\DRP{x}{1}$};
-  %   \node(c)[right=1.5em of b]{$\DRP{x}{1}$};
-  %   \rfx{a}{b}
-  %   \rfx[out=15,in=165]{a}{c}
-  % \end{tikzinline}
-\end{itemize}
-If $\bEv\xpoloc\aEv$ then the following are impossible:
-\begin{itemize}
-\item $\bEv:\DWP{x}{2}\xcoinv\aEv:\DWP{x}{1}$ 
-\item $\bEv:\DWP{x}{1}\xfrinv\aEv:\DRP{x}{0}$ 
-\item $\bEv:\DRP{x}{1}\xrfxinv\aEv:\DWP{x}{1}$ 
-\item $\bEv:\DRP{x}{2}\xrfxinv\DWP{x}{2}\xcoinv\aEv:\DWP{x}{1}$
-\item $\bEv:\DRP{x}{1}\xrfxinv\DWP{x}{1}\xfrinv\aEv:\DRP{x}{0}$
-\end{itemize}
+\begin{comment}
+  Internal visibility:
+  If $\bEv\xpoloc\aEv$ then either
+  \begin{itemize}
+  \item %$\bEv\xca\aEv$:
+    $\bEv:\DWP{x}{1}\xco\aEv:\DWP{x}{2}$ 
+  \item %$\bEv\xrfx\aEv$:
+    $\bEv:\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
+  \item %$\bEv\mathrel{\xco\xrfx}\aEv$:
+    $\bEv:\DWP{x}{1}\xco\DWP{x}{2}\xrfx\aEv:\DRP{x}{2}$
+  \item
+    $\bEv:\DRP{x}{0}\xfr\aEv:\DWP{x}{1}$\\
+    $\bEv:\DRP{x}{0}\xrfxinv\DWP{x}{0}\xco\aEv:\DWP{x}{1}$
+  \item %$\bEv\mathrel{\xfr\xrfx}\aEv$:
+    $\bEv:\DRP{x}{0}\xfr\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$\\
+    $\bEv:\DRP{x}{0}\xrfxinv\DWP{x}{0}\xco\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
+  \item %$\bEv\mathrel{\xrfxinv\xrfx}\aEv$:
+    $\bEv:\DRP{x}{1}\xrfxinv\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
+    % \begin{tikzinline}
+    %   \node(a){$\DWP{x}{1}$};
+    %   \node(b)[right=1.5em of a]{$\DRP{x}{1}$};
+    %   \node(c)[right=1.5em of b]{$\DRP{x}{1}$};
+    %   \rfx{a}{b}
+    %   \rfx[out=15,in=165]{a}{c}
+    % \end{tikzinline}
+  \end{itemize}
+  If $\bEv\xpoloc\aEv$ then the following are impossible:
+  \begin{itemize}
+  \item $\bEv:\DWP{x}{2}\xcoinv\aEv:\DWP{x}{1}$ 
+  \item $\bEv:\DWP{x}{1}\xfrinv\aEv:\DRP{x}{0}$ 
+  \item $\bEv:\DRP{x}{1}\xrfxinv\aEv:\DWP{x}{1}$ 
+  \item $\bEv:\DRP{x}{2}\xrfxinv\DWP{x}{2}\xcoinv\aEv:\DWP{x}{1}$
+  \item $\bEv:\DRP{x}{1}\xrfxinv\DWP{x}{1}\xfrinv\aEv:\DRP{x}{0}$
+  \end{itemize}
+\end{comment}
+
+
+
+
+
+
+
+
+
+
+
+
+\endinput
+
 
 \begin{figure*}
 \begin{verbatim}
@@ -124,14 +244,14 @@ fences\footnote{We leave out fences for simplicity.  Following
 
 We show that any ARM-consistent execution graph for this sublanguage can be
 considered an execution of our semantics.  
-%
+% 
 % Syntactically, we drop the superscript \textsf{rlx} on relaxed reads and
 % writes; in addition, we use structured conditionals rather than the more
 % general \textsf{goto}.  We refer to this sublanguage as $\muIMM$.
 % (Because the source language lacks RMW operations, the ``is
 % exclusive'' flag on every read will be \textsf{not-ex} and the RMW mode on
 % every write will be \textsf{normal}.)
-%
+% 
 Due to space limitations, we do not include a full description ARM
 consistency in the main text .
 Here we provide a birds eye view of the details, drawing on the intuitions gleaned from~\citep{DBLP:journals/pacmpl/PulteFDFSS18}.  
@@ -148,7 +268,7 @@ orders.  From these are derived:
 \item $\reco$, with the requirement that ${\rpoloc}\cup{\reco}$ be acyclic (\ref{sc-per-loc}).
 \end{itemize}
 % Let $G$ be an execution graph satisfying the ARM consistency 
-%requirements.
+% requirements.
 Given an execution graph $G$, we say that $\aEv$ is an \emph{internal read} if $\aEv\in\fcodom({\rpox}\cap {\rrfx})$.
 
 The ${\rob}$ order is an acyclic global order on events, agreed upon by all threads, reflecting the progress of time in an \armeight\ execution.  The cross thread component of the ordering is induced by the ordering on conflicting actions on the same location from different threads.    The intra thread component of the ordering is induced by barrier ordering and data ordering.  Notably, these dependencies  are determined syntactically.  In particular, $\rob$
@@ -164,7 +284,7 @@ Formally, from $G$ we construct a candidate pomset $\aPS$ as follows:
 \item $\labelingAct(\aEv)=\mathsf{lab}(e)$, if $\aEv$ is not a relaxed
   internal read,
 \item $\labelingForm(\aEv)=\TRUE$,
-% \item ${\le} = {\rob}^?$, where $?$ denotes reflexive closure, and
+  % \item ${\le} = {\rob}^?$, where $?$ denotes reflexive closure, and
 \item ${\gtN} = ({\rob} \cup {\reco})^*$, where $*$ denotes reflexive and transitive closure.
 \end{itemize}
 
@@ -176,7 +296,7 @@ Any $\lt$-ordering imposed in our model
 is enforced by \armeight, since our notion of semantic dependency is more
 permissive than \armeight 's syntactic dependency.  So, the heart of the proof is showing the acyclicity of $({\rob} \cup {\reco})^*$ for the events under consideration.  Since the cross thread portion of $\reco$ ($\rcoe,\rfre,\rrfe$) is included in $\rob$, this result is really about the influence of $\reco \cap \rpox$.  Our translation of \armeight 's \rrfi\  as silent internal actions removes them from order considerations.   Consequently, we only have to consider the suborder of ${\rob}$ derived without ever using  $\rrfi$ for the following key property demonstrated in \textsection\ref{sec:arm:proof}.
 \begin{lemma}\label{extendob}
-Let $\aEv, \bEv$ be distinct events and $\bEv'\ (\xob\cap \xpox) \ \bEv\ ((\xeco\cap \xpox) \setminus \xrfi) \  \aEv\ (\xob \cap \xpox)  \ \aEv'$.  Then $\bEv' \xob \aEv'$.
+  Let $\aEv, \bEv$ be distinct events and $\bEv'\ (\xob\cap \xpox) \ \bEv\ ((\xeco\cap \xpox) \setminus \xrfi) \  \aEv\ (\xob \cap \xpox)  \ \aEv'$.  Then $\bEv' \xob \aEv'$.
 \end{lemma}
 
 
@@ -203,10 +323,10 @@ The ARMv8 model is described using the following relations.
 \begin{itemize}
 \item $\IDR$, $\IDW$, $\IDAcq$, $\IDRel$: identity on reads, writes, acquires
   and releases.
-% \item $\IDR$ identity on reads
-% \item $\IDW$: identity on writes
-% \item $\IDAcq$: identity on acquires
-% \item $\IDRel$: identity on releases
+  % \item $\IDR$ identity on reads
+  % \item $\IDW$: identity on writes
+  % \item $\IDAcq$: identity on acquires
+  % \item $\IDRel$: identity on releases
 \item $\IDLoc$: relates any two events that touch the same location.
 \item $\rpox$: program order.
 \item $\rdata$, $\rctrl$, $\raddr$: data, control and address dependencies.
@@ -270,10 +390,10 @@ In our presentation, we have elided rules concerning fences and RMW operations.
 \end{definition}
 
 % Use these to refer to the rules in text:
-%\ref{rf-comp} 
-%\ref{co-tot}
-%\ref{sc-per-loc}
-%\ref{external}
+% \ref{rf-comp} 
+% \ref{co-tot}
+% \ref{sc-per-loc}
+% \ref{external}
 
 
 Given an execution graph $G$, we say that $\aEv$ is an \emph{internal read} if
@@ -287,7 +407,7 @@ From $G$ we construct a candidate pomset $\aPS$ as follows:
 \item $\labelingAct(\aEv)=\mathsf{lab}(e)$, if $\aEv$ is not a relaxed
   internal read,
 \item $\labelingForm(\aEv)=\TRUE$,
-%\item ${\le} = {\rob}$, and
+  % \item ${\le} = {\rob}$, and
 \item ${\gtN} = ({\rob} \cup {\reco})^*$
 \end{itemize}
 To reempphasize, in this candidate pomset, $\rob$ is calculated by considering the definition of $\rob$ without $\rrfi$, ie.:
@@ -316,23 +436,23 @@ We show that $\aPS$ is a top-level pomset, reasoning as follows.
 % We establish the criteria for a top-level memory-model pomset:
 \begin{itemize}
 \item ${\le}$ is a partial order.  This holds since $G.{\rar}$ is acyclic.
-% \item If $\bEv \le \aEv$ then $\bEv \gtN \aEv$.  By construction.
-% \item If $\bEv \le \aEv$ and $\aEv \gtN \bEv$ then $\bEv = \aEv$.  Proved below.
-% \item If $\cEv \le \bEv \gtN \aEv$ or $\cEv \gtN \bEv \le \aEv$ then
-%   $\cEv \gtN \aEv$. By construction.
-% \end{itemize}
+  % \item If $\bEv \le \aEv$ then $\bEv \gtN \aEv$.  By construction.
+  % \item If $\bEv \le \aEv$ and $\aEv \gtN \bEv$ then $\bEv = \aEv$.  Proved below.
+  % \item If $\cEv \le \bEv \gtN \aEv$ or $\cEv \gtN \bEv \le \aEv$ then
+  %   $\cEv \gtN \aEv$. By construction.
+  % \end{itemize}
 
-% Next, we establish the criteria for a 3-valued pomset with preconditions (Definition~\ref{def:3pre}).
-% \begin{itemize}
+  % Next, we establish the criteria for a 3-valued pomset with preconditions (Definition~\ref{def:3pre}).
+  % \begin{itemize}
 \item $\labelingForm(\aEv)$ implies $\labelingForm(\bEv)$ whenever
   $\bEv\le\aEv$.   Trivial, since every formula is $\TRUE$.
-% \item $\aPS$ is $\aLoc$-coherent; that is, when restricted to events that
-%   read or write $\aLoc$, $\gtN$ forms a partial order.
-% \end{itemize}
+  % \item $\aPS$ is $\aLoc$-coherent; that is, when restricted to events that
+  %   read or write $\aLoc$, $\gtN$ forms a partial order.
+  % \end{itemize}
 
-% Finally, we establish the criteria for a top-level pomset
-% (Definition~\ref{def:x-closed}).
-% \begin{itemize}
+  % Finally, we establish the criteria for a top-level pomset
+  % (Definition~\ref{def:x-closed}).
+  % \begin{itemize}
 \item $\aEv$ is location independent. Trivial, since every formula is $\TRUE$.
 \item If $\aEv$ reads $\aVal$ from $\aLoc$, then there is some $\bEv$ such that
   \begin{itemize}
@@ -351,131 +471,131 @@ We show that $\aPS$ is a top-level pomset, reasoning as follows.
 Let $\aEv, \bEv$ be distinct events and $\bEv'\ (\xob\cap \xpox) \ \bEv\ ((\xeco\cap \xpox) \setminus \xrfi) \  \aEv\ (\xob \cap \xpox)  \ \aEv'$.  Then $\bEv' \xob \aEv'$.
 
 \begin{proof}
-If $\bEv'$ is an acquire,  or $\aEv$ is an release, or $\aEv'$ is a release, result is immediate.
+  If $\bEv'$ is an acquire,  or $\aEv$ is an release, or $\aEv'$ is a release, result is immediate.
 
-We next consider the case where $\aEv$ is a read.  In this case,  $\bEv$ is a write.  Since $\bEv\ ((\xeco\cap \xpox) \setminus \xrfi) \  \aEv$, there is a write $\bEv_1$ such that $ \bEv \xcoe\ \bEv_1 \ \xrfe\ \aEv' $.  So, $\bEv \xob \aEv$ and result follows in this case. 
-
-
-So, it suffices to prove the following assuming that $\bEv'$ is not an acquire and $\aEv'$ is not a release and $\aEv$ is not a release or a read and $\aEv, \bEv$ are distinct.
-\begin{itemize}
-\item If $\bEv'\ (\xob\cap \xpox)  \ \bEv(\xeco\cap\xpox)\aEv$ then $\bEv'\xob\aEv$.
-\item If $\bEv\ (\xeco\cap\xpox) \ \aEv(\xob\cap\xpox)\aEv'$ then $\bEv\xob\aEv'$.
-\end{itemize}
+  We next consider the case where $\aEv$ is a read.  In this case,  $\bEv$ is a write.  Since $\bEv\ ((\xeco\cap \xpox) \setminus \xrfi) \  \aEv$, there is a write $\bEv_1$ such that $ \bEv \xcoe\ \bEv_1 \ \xrfe\ \aEv' $.  So, $\bEv \xob \aEv$ and result follows in this case. 
 
 
-We first prove that if $\bEv'\ (\xob \cap \xpox) \ \bEv\ (\xeco \cap \xpox) \ \aEv$ then $\bEv'\xob\aEv$.   Proof proceeds by cases on the witness for $\bEv'\ (\xob\cap \xpox) \ \bEv$. 
-\begin{itemize}
-\item  If $\bEv' \xbob  \bEv$, then: 
-\[ \bEv'\ (\smash{
-    {\IDAcq}; {\rpox}
-    \cup {\rpox};{\IDRel}; {\rcoi}^?) \ 
-  }
-\bEv
-\]
-Since $\bEv'$ is not an acquire, $\bEv' ({\rpox};{\IDRel}; {\rcoi}^?) \bEv$, so $\bEv$ is a write.  Since $\aEv$ is not a read,  $\bEv \xcoi\ \aEv$. Thus, result follows.
-
-\item If $\bEv' \xdob  \bEv$, then: 
-\[ \bEv'\ 
-\smash{
-    ( ({\rctrl}\cup{\rdata}); {\IDW}; {\rcoi}^?
-    \cup {\raddr}; {\rpox}; {\IDW}
-  } \
-\bEv
-\]
-So, $\bEv$ is a write.  Since $\aEv$ is also a write, we deduce that 
-\[ \bEv'\ 
-\smash{
-    ( ({\rctrl}\cup{\rdata}); {\IDW}; {\rcoi}^?
-    \cup {\raddr}; {\rpox}; {\IDW}
-  } \
-\aEv
-\]
-\end{itemize}
+  So, it suffices to prove the following assuming that $\bEv'$ is not an acquire and $\aEv'$ is not a release and $\aEv$ is not a release or a read and $\aEv, \bEv$ are distinct.
+  \begin{itemize}
+  \item If $\bEv'\ (\xob\cap \xpox)  \ \bEv(\xeco\cap\xpox)\aEv$ then $\bEv'\xob\aEv$.
+  \item If $\bEv\ (\xeco\cap\xpox) \ \aEv(\xob\cap\xpox)\aEv'$ then $\bEv\xob\aEv'$.
+  \end{itemize}
 
 
-We next prove  that if $\bEv\ (\xeco \cap \xpox) \ \aEv\ (\xob\cap \xpox) \ \aEv'$ then $\bEv\xob\aEv'$, under the assumptions that  $\aEv'$ is not a release and $\aEv$ is not a release or a read and $\aEv, \bEv$ are distinct.
+  We first prove that if $\bEv'\ (\xob \cap \xpox) \ \bEv\ (\xeco \cap \xpox) \ \aEv$ then $\bEv'\xob\aEv$.   Proof proceeds by cases on the witness for $\bEv'\ (\xob\cap \xpox) \ \bEv$. 
+  \begin{itemize}
+  \item  If $\bEv' \xbob  \bEv$, then: 
+    \[ \bEv'\ (\smash{
+        {\IDAcq}; {\rpox}
+        \cup {\rpox};{\IDRel}; {\rcoi}^?) \ 
+      }
+      \bEv
+    \]
+    Since $\bEv'$ is not an acquire, $\bEv' ({\rpox};{\IDRel}; {\rcoi}^?) \bEv$, so $\bEv$ is a write.  Since $\aEv$ is not a read,  $\bEv \xcoi\ \aEv$. Thus, result follows.
+
+  \item If $\bEv' \xdob  \bEv$, then: 
+    \[ \bEv'\ 
+      \smash{
+        ( ({\rctrl}\cup{\rdata}); {\IDW}; {\rcoi}^?
+        \cup {\raddr}; {\rpox}; {\IDW}
+      } \
+      \bEv
+    \]
+    So, $\bEv$ is a write.  Since $\aEv$ is also a write, we deduce that 
+    \[ \bEv'\ 
+      \smash{
+        ( ({\rctrl}\cup{\rdata}); {\IDW}; {\rcoi}^?
+        \cup {\raddr}; {\rpox}; {\IDW}
+      } \
+      \aEv
+    \]
+  \end{itemize}
 
 
- Proof proceeds by cases on the witness for $\aEv (\xob\cap \xpox) \aEv'$.  
-
-\begin{itemize}
-\item  If $\aEv \xbob  \aEv'$, then: 
-\[ \aEv\ (\smash{
-    {\IDAcq}; {\rpox}
-    \cup {\rpox};{\IDRel}; {\rcoi}^?) \ 
-  }
-\aEv'
-\]
-Since $\aEv$ is not a read, $\aEv ({\rpox};{\IDRel}; {\rcoi}^?) \aEv'$.  Result follows since  $\bEv \xpox\ \aEv$.
+  We next prove  that if $\bEv\ (\xeco \cap \xpox) \ \aEv\ (\xob\cap \xpox) \ \aEv'$ then $\bEv\xob\aEv'$, under the assumptions that  $\aEv'$ is not a release and $\aEv$ is not a release or a read and $\aEv, \bEv$ are distinct.
 
 
-\item If $\aEv \xdob  \aEv'$, then $\aEv$ is a read.  \qedhere
+  Proof proceeds by cases on the witness for $\aEv (\xob\cap \xpox) \aEv'$.  
 
-\end{itemize}
+  \begin{itemize}
+  \item  If $\aEv \xbob  \aEv'$, then: 
+    \[ \aEv\ (\smash{
+        {\IDAcq}; {\rpox}
+        \cup {\rpox};{\IDRel}; {\rcoi}^?) \ 
+      }
+      \aEv'
+    \]
+    Since $\aEv$ is not a read, $\aEv ({\rpox};{\IDRel}; {\rcoi}^?) \aEv'$.  Result follows since  $\bEv \xpox\ \aEv$.
+
+
+  \item If $\aEv \xdob  \aEv'$, then $\aEv$ is a read.  \qedhere
+
+  \end{itemize}
 \end{proof}
 
 
 \begin{lemma}\label{obeco1}
-If $\bEv\xob\aEv$ then $\lnot(\aEv\xeco\bEv)$.
+  If $\bEv\xob\aEv$ then $\lnot(\aEv\xeco\bEv)$.
 
-\begin{proof}
-Proof by contradiction.  Let 
-\[ \aEv \xob \aEv' \xeco \bEv' \xob \bEv \xob \cEv \xob \cEv' \xob \aEv \]
-where $\aEv' \xpox \bEv'$.
+  \begin{proof}
+    Proof by contradiction.  Let 
+    \[ \aEv \xob \aEv' \xeco \bEv' \xob \bEv \xob \cEv \xob \cEv' \xob \aEv \]
+    where $\aEv' \xpox \bEv'$.
 
-By lemma~\ref{extendob}, if $\aEv \not=\aEv'$, we deduce $\aEv \xob \bEv'$, and thus $\aEv \xob \bEv$.  If $\bEv \not=\bEv'$, we deduce $\aEv' \xob \bEv$ and thus $\aEv \xob \bEv$.
+    By lemma~\ref{extendob}, if $\aEv \not=\aEv'$, we deduce $\aEv \xob \bEv'$, and thus $\aEv \xob \bEv$.  If $\bEv \not=\bEv'$, we deduce $\aEv' \xob \bEv$ and thus $\aEv \xob \bEv$.
 
-Thus, if $\aEv \not=\aEv'$ or $\bEv \not=\bEv'$, then there is a cycle $\aEv \xob \bEv \xob \cEv \xob \cEv' \xob \aEv$.  
+    Thus, if $\aEv \not=\aEv'$ or $\bEv \not=\bEv'$, then there is a cycle $\aEv \xob \bEv \xob \cEv \xob \cEv' \xob \aEv$.  
 
-So we can assume that  $\aEv' = \aEv$, $\bEv' = \bEv$ and 
-\[ \aEv  \xeco \bEv \xob \cEv \xob \cEv' \xeco \aEv \]
-where all of $\aEv, \bEv, \cEv, \cEv'$ access the same location and at least one of $\aEv,\bEv$ is a write, at least one of $\aEv,\cEv'$ is a write, and at least one of $\bEv,\cEv$ is a write.
+    So we can assume that  $\aEv' = \aEv$, $\bEv' = \bEv$ and 
+    \[ \aEv  \xeco \bEv \xob \cEv \xob \cEv' \xeco \aEv \]
+    where all of $\aEv, \bEv, \cEv, \cEv'$ access the same location and at least one of $\aEv,\bEv$ is a write, at least one of $\aEv,\cEv'$ is a write, and at least one of $\bEv,\cEv$ is a write.
 
-We reason by cases.
-\begin{itemize}
-\item If $\cEv'$ is a write or both $(\aEv, \bEv)$ are writes.
+    We reason by cases.
+    \begin{itemize}
+    \item If $\cEv'$ is a write or both $(\aEv, \bEv)$ are writes.
 
-We deduce that $\bEv \xeco \cEv' \xeco \aEv$ and thus $\bEv \xeco \aEv$.
+      We deduce that $\bEv \xeco \cEv' \xeco \aEv$ and thus $\bEv \xeco \aEv$.
 
-\item $\cEv'$ is a read.  $\aEv$ is a write.  $\bEv$ is a read.
+    \item $\cEv'$ is a read.  $\aEv$ is a write.  $\bEv$ is a read.
 
-In this case $\cEv$ is a write.  From $\cEv \xob \aEv$, we deduce $\cEv \xeco \aEv$. Combining with $\bEv \xeco \cEv$, we deduce that $\bEv \xeco \aEv$.  
+      In this case $\cEv$ is a write.  From $\cEv \xob \aEv$, we deduce $\cEv \xeco \aEv$. Combining with $\bEv \xeco \cEv$, we deduce that $\bEv \xeco \aEv$.  
 
 
-\end{itemize}
-In either case, there is a contradiction $\aEv \xeco \bEv \xeco \aEv$.
-\end{proof}
+    \end{itemize}
+    In either case, there is a contradiction $\aEv \xeco \bEv \xeco \aEv$.
+  \end{proof}
 \end{lemma}
 
 
 \begin{lemma}\label{obeco2}
-$({\rob} \cup {\reco})^*$ is irrreflexive.
+  $({\rob} \cup {\reco})^*$ is irrreflexive.
 \end{lemma}
 \begin{proof}
-The simple case that $\rob; \reco$ is irreflexive is proved above.  The full proof by contradiction.  
+  The simple case that $\rob; \reco$ is irreflexive is proved above.  The full proof by contradiction.  
 
-Let $n \geq 1$ be the minimum such that:
-\begin{align*} 
-&\aEv^0_0 \xob \aEv^0_1 \xeco \bEv^0_0 \xob \bEv^0_1  \\
-(\xeco \cap \xob) &  \   \aEv^1_0 \xob \aEv^1_1 \xeco \bEv^1_0 \xob \bEv^1_1 \\
-(\xeco \cap \xob) & \ \ldots \\
-& \ldots \bEv^n_1 \\
- (\xeco \cap \xob) & \  \aEv^0_0
-\end{align*}
-where  for all $i$, we have:
-\[ \aEv^i_0 \xpox \aEv^i_1 (\xeco \cap \xpox) \bEv^i_0 \xpox \bEv^i_1\] and 
-\[ \neg (\bEv^i_1 \xpox (\aEv^{(i+1) \mod n}_0 \]
+  Let $n \geq 1$ be the minimum such that:
+  \begin{align*} 
+    &\aEv^0_0 \xob \aEv^0_1 \xeco \bEv^0_0 \xob \bEv^0_1  \\
+    (\xeco \cap \xob) &  \   \aEv^1_0 \xob \aEv^1_1 \xeco \bEv^1_0 \xob \bEv^1_1 \\
+    (\xeco \cap \xob) & \ \ldots \\
+    & \ldots \bEv^n_1 \\
+    (\xeco \cap \xob) & \  \aEv^0_0
+  \end{align*}
+  where  for all $i$, we have:
+  \[ \aEv^i_0 \xpox \aEv^i_1 (\xeco \cap \xpox) \bEv^i_0 \xpox \bEv^i_1\] and 
+  \[ \neg (\bEv^i_1 \xpox (\aEv^{(i+1) \mod n}_0 \]
 
-For any $i$, if $\aEv^i_0 \not= \aEv^i_1$ or $\bEv^i_0 \xpox \bEv^i_1$, via lemma~\ref{extendob}, we deduce that $\aEv^i_0  \xob \bEv^i_1$, contradicting minimality of $n$.  
+  For any $i$, if $\aEv^i_0 \not= \aEv^i_1$ or $\bEv^i_0 \xpox \bEv^i_1$, via lemma~\ref{extendob}, we deduce that $\aEv^i_0  \xob \bEv^i_1$, contradicting minimality of $n$.  
 
-So, we can assume that $n \geq 1$ is such that:
-\begin{align*} 
-&\ \aEv^0 \xeco  \bEv^0 \\
-(\xeco \cap \xob) &  \   \aEv^1  \xeco \bEv^1 \\
-(\xeco \cap \xob) & \ \ldots \\
-& \ldots \bEv^n \\
- (\xeco \cap \xob) & \ \aEv^0
-\end{align*}
-which is a contradiction since it is a cycle in $\xeco$ and since at least one of $\aEv^i ,\bEv^i$ is a write for all $i$. 
+  So, we can assume that $n \geq 1$ is such that:
+  \begin{align*} 
+    &\ \aEv^0 \xeco  \bEv^0 \\
+    (\xeco \cap \xob) &  \   \aEv^1  \xeco \bEv^1 \\
+    (\xeco \cap \xob) & \ \ldots \\
+    & \ldots \bEv^n \\
+    (\xeco \cap \xob) & \ \aEv^0
+  \end{align*}
+  which is a contradiction since it is a cycle in $\xeco$ and since at least one of $\aEv^i ,\bEv^i$ is a write for all $i$. 
 \end{proof}
 

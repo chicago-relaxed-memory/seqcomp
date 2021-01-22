@@ -2,53 +2,51 @@
 If $\aPS \in \sSTORE[\amode]{\cExp}{\aExp}$ then
 $(\exists\cVal:\aEvs\fun\Val)$
 $(\exists\aVal:\aEvs\fun\Val)$
-$(\exists\bForm:\aEvs\fun\Formulae)$
+$(\exists\cForm:\aEvs\fun\Formulae)$
 \begin{enumerate}
-\item[S1)] if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-\item[S2)] $\labelingAct(\aEv) = \DWREFP{\cVal_\aEv}{\aVal_\aEv}$,
-\item[S3)] 
+\item[\ref{S1})] if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item[\ref{S2})] $\labelingAct(\aEv) = \DWREFP{\cVal_\aEv}{\aVal_\aEv}$,
+\item[\ref{S3})] 
   $\labelingForm(\aEv)$ implies
   \begin{math}
-    \bForm_\aEv
+    \cForm_\aEv
+    \land \QS{\REF{\cVal_\aEv}}{\amode}
+    % \land \RW
     \land \cExp{=}\cVal_\aEv
     \land \aExp{=}\aVal_\aEv
-    \land \RW
-    \land \QS{\REF{\cVal_\aEv}}{\amode}
   \end{math},
   % where
   % $\QS{}{\mRLX}=\QxREF{\cVal_\aEv}$ and otherwise $\QS{}{\amode}=\Q{\amode}$, % for $\amode\neq\mRLX$,
-\item[S4)]
+\item[\ref{S4})]
   \begin{math}
     (\forall\dVal)
+    (\forall\aEv\in\aEvs\cap\bEvs)
   \end{math}
-  if
-  $\aEv\in\aEvs\cap\bEvs$
-  then
-  $\aTr[\bEvs](\aForm)$ implies 
+  $\aTr{\bEvs}{\bForm}$ implies 
   \begin{math}
-    \bForm_\aEv
+    \cForm_\aEv
     \limplies (\cExp{=}\dVal)
-    \limplies \PBRbig{
+    \limplies \PBR{
       (\QwREF{\dVal} \limplies \aExp{=}\aVal_\aEv)
-      \land \DS{\REF{\dVal}}{\amode}{\aForm[\aExp/\REF{\dVal}]}
+      \land \DS{\REF{\dVal}}{\amode}{\bForm[\aExp/\REF{\dVal}]}
     }
   \end{math},
-\item[S5)] %if 
+\item[\ref{S5})] %if 
   % \begin{math}
   %   (\forall\aEv\in\bEvs)(\cForm \textimplies
-  %   \lnot\bForm_\aEv)
+  %   \lnot\cForm_\aEv)
   % \end{math}
   % then
   \begin{math}
     (\forall\dVal)
   \end{math}
-  $\aTr[\bEvs](\aForm)$ implies 
+  $\aTr{\cEvs}{\bForm}$ implies
   \begin{math}
-    (\not\exists\aEv\in\aEvs\cap\bEvs \suchthat \bForm_\aEv)
+    (\!\not\exists\aEv\in\aEvs\cap\cEvs \suchthat \cForm_\aEv)
     \limplies (\cExp{=}\dVal)
     \limplies \PBR{
       \lnot\QwREF{\dVal}
-      \land \DS{\REF{\dVal}}{\amode}{\aForm[\aExp/\REF{\dVal}]}
+      \land \DS{\REF{\dVal}}{\amode}{\bForm[\aExp/\REF{\dVal}]}
     }.
   \end{math}
   % \\ where 
@@ -58,7 +56,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 % \item if $\amode=\mRLX$ then
 %   $\labelingForm(\aEv)$ implies
 %   \begin{math}
-%     \bForm_\aEv
+%     \cForm_\aEv
 %     \land \cExp{=}\cVal_\aEv
 %     \land \aExp{=}\aVal_\aEv
 %     \land \RW
@@ -67,7 +65,7 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 % \item if $\amode\neq\mRLX$ then
 %   $\labelingForm(\aEv)$ implies
 %   \begin{math}
-%     \bForm_\aEv
+%     \cForm_\aEv
 %     \land \cExp{=}\cVal_\aEv
 %     \land \aExp{=}\aVal_\aEv
 %     \land \RW
@@ -80,13 +78,13 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 %   \begin{math}
 %     (\forall\dVal)
 %   \end{math}
-%   $\aTr[\bEvs](\aForm)$ implies 
+%   $\aTr{\bEvs}{\bForm}$ implies 
 %   \begin{math}
-%     \bForm_\aEv
+%     \cForm_\aEv
 %     \limplies (\cExp{=}\dVal)
 %     \limplies \PBRbig{
 %     (\QwREF{\dVal} \limplies \aExp{=}\aVal_\aEv)
-%     \land \aForm[\aExp/\REF{\dVal}][\TRUE/\DxREF{\dVal}]
+%     \land \bForm[\aExp/\REF{\dVal}][\TRUE/\DxREF{\dVal}]
 %   }
 %   \end{math}
 % \item if
@@ -96,51 +94,51 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 %   \begin{math}
 %     (\forall\dVal)
 %   \end{math}
-%   $\aTr[\bEvs](\aForm)$ implies 
+%   $\aTr{\bEvs}{\bForm}$ implies 
 %   \begin{math}
-%     \bForm_\aEv
+%     \cForm_\aEv
 %     \limplies (\cExp{=}\dVal)
 %     \limplies \PBRbig{
 %     (\QwREF{\dVal} \limplies \aExp{=}\aVal_\aEv)
-%     \land \aForm[\aExp/\REF{\dVal}][\FALSE/\D]
+%     \land \bForm[\aExp/\REF{\dVal}][\FALSE/\D]
 %   }
 %   \end{math}
 % \item if 
 %   \begin{math}
 %     (\forall\aEv\in\bEvs)(\cForm \textimplies
-%     \lnot\bForm_\aEv)
+%     \lnot\cForm_\aEv)
 %   \end{math}
 %   and $\amode=\mRLX$ 
 %   then
 %   \begin{math}
 %     (\forall\dVal)
 %   \end{math}
-%   $\aTr[\bEvs](\aForm)$ implies 
+%   $\aTr{\bEvs}{\bForm}$ implies 
 %   \begin{math}
 %     \cForm
 %     \limplies (\cExp{=}\dVal)
 %     \limplies \PBRbig{
 %     \lnot\QwREF{\dVal}
-%     \land \aForm[\aExp/\REF{\dVal}][\TRUE/\DxREF{\dVal}]
+%     \land \bForm[\aExp/\REF{\dVal}][\TRUE/\DxREF{\dVal}]
 %   }
 %   \end{math}
 % \item if 
 %   \begin{math}
 %     (\forall\aEv\in\bEvs)
-%     (\cForm \textimplies \lnot\bForm_\aEv)
+%     (\cForm \textimplies \lnot\cForm_\aEv)
 %   \end{math}
 %   and $\amode\neq\mRLX$ 
 %   then
 %   \begin{math}
 %     (\forall\dVal)
 %   \end{math}
-%   $\aTr[\bEvs](\aForm)$ implies 
+%   $\aTr{\bEvs}{\bForm}$ implies 
 %   \begin{math}
 %     \cForm
 %     \limplies (\cExp{=}\dVal)
 %     \limplies \PBRbig{
 %     \lnot\QwREF{\dVal}
-%     \land \aForm[\aExp/\REF{\dVal}][\FALSE/\D]
+%     \land \bForm[\aExp/\REF{\dVal}][\FALSE/\D]
 %   }
 %   \end{math}
 
@@ -148,71 +146,70 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 If $\aPS \in \sLOAD[\amode]{\aReg}{\cExp}$ then
 $(\exists\cVal:\aEvs\fun\Val)$
 $(\exists\aVal:\aEvs\fun\Val)$
-$(\exists\bForm:\aEvs\fun\Formulae)$
+$(\exists\cForm:\aEvs\fun\Formulae)$
 % $(\forall\uReg{\aEv}\in\uRegs{\aEvs})$
 \begin{enumerate}
-\item[L1)] if $\bForm_\bEv\land\bForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-\item[L2)] $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
-\item[L3)] $\labelingForm(\aEv)$ implies
+\item[\ref{L1})] if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item[\ref{L2})] $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
+\item[\ref{L3})] $\labelingForm(\aEv)$ implies
   \begin{math}
-    \bForm_\aEv
-    \land \cExp{=}\cVal_\aEv
-    \land \RO
+    \cForm_\aEv
     \land \QL{\REF{\cVal_\aEv}}{\amode}
+    % \land \RO
+    \land \cExp{=}\cVal_\aEv
   \end{math},
   % where    
   % $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\QwREF{\cVal_\aEv}$, % for $\amode\neq\mRLX$,
-\item[L4)]
+\item[\ref{L4})]
   \begin{math}
     (\forall\dVal)
+    (\forall\aEv\in\aEvs\cap\bEvs)
   \end{math}
-  if $\aEv\in\aEvs\cap\bEvs$ then
-  $\aTr[\bEvs](\aForm)$ implies
+  $\aTr{\bEvs}{\bForm}$ implies
   \begin{math}
-    \bForm_\aEv
+    \cForm_\aEv
     \limplies (\cExp{=}\dVal)
-    \limplies (\aVal{=}\uReg{\aEv})
-    \limplies \aForm[\uReg{\aEv}/\aReg]%[\uReg{\aEv}/\REF{\dVal}]
+    \limplies (\aVal_\aEv{=}\uReg{\aEv})
+    \limplies \bForm[\uReg{\aEv}/\aReg]%[\uReg{\aEv}/\REF{\dVal}]
   \end{math},
-  \makebox[4.8cm]{}
-\item[L5)] 
+  \makebox[5.75cm]{}
+\item[\ref{L5})] 
   \begin{math}
     (\forall\dVal)
+    (\forall\aEv\in\aEvs\setminus\cEvs)
   \end{math}
-  if $\aEv\in\aEvs\setminus\bEvs$ then
-  $\aTr[\bEvs](\aForm)$ implies
+  $\aTr{\cEvs}{\bForm}$ implies
   \begin{math}
-    \bForm_\aEv
+    \cForm_\aEv
     \limplies (\cExp{=}\dVal)
-    \limplies \PBRbig{        
-      \DL{\REF{\dVal}}{\amode}
-      \land \lnot\QxREF{\dVal}
+    \limplies \PBR{        
+      \lnot\QxREF{\dVal}
+      \land\DL{\REF{\dVal}}{\amode}
       \land
       (\RW
-      \limplies (\aVal{=}\uReg{\aEv}\lor\aLoc{=}\uReg{\aEv}) 
-      \limplies \aForm[\uReg{\aEv}/\aReg]%[\uReg{\aEv}/\REF{\dVal}]
+      \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor\REF{\dVal}{=}\uReg{\aEv}) 
+      \limplies \bForm[\uReg{\aEv}/\aReg]%[\uReg{\aEv}/\REF{\dVal}]
       )
     }      
   \end{math},
-\item[L6)] % if 
+\item[\ref{L6})] % if 
   % \begin{math}
   %   (\forall\aEv\in\bEvs)(\cForm \textimplies
-  %   \lnot\bForm_\aEv)
+  %   \lnot\cForm_\aEv)
   % \end{math}
   % then
   \begin{math}
     (\forall\dVal)
     (\forall\bReg)
   \end{math}
-  $\aTr[\bEvs](\aForm)$ implies 
+  $\aTr{\dEvs}{\bForm}$  implies 
   \begin{math}
-    (\not\exists\aEv\in\aEvs \suchthat \bForm_\aEv)
+    (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
     \limplies (\cExp{=}\dVal)
     \limplies \PBR{        
-      \DL{\REF{\dVal}}{\amode}
-      \land \lnot\QxREF{\dVal}
-      \land
-      \limplies \aForm[\bReg/\aReg]%[\bReg/\REF{\dVal}]
+      \lnot\QxREF{\dVal}
+      \land \DL{\REF{\dVal}}{\amode}
+      \land \bForm[\bReg/\aReg]%[\bReg/\REF{\dVal}]
     }.
   \end{math}
   % \\ where $\DL{}{\mRLX}=\TRUE$ and otherwise $\DL{}{\amode}=\DxREF{\dVal}$.
@@ -222,15 +219,15 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 %   \begin{math}
 %     (\forall\dVal)
 %   \end{math}
-%   $\aTr[\bEvs](\aForm)$ implies
+%   $\aTr{\bEvs}{\bForm}$ implies
 %   \begin{math}
-%     \bForm_\bEv
+%     \cForm_\bEv
 %     \limplies (\cExp{=}\dVal)
 %     \limplies \PBRbig{
 %     (
 %     \RW
 %     \limplies (\aVal{=}\uReg{\bEv}\lor\aLoc{=}\uReg{\bEv}) 
-%     \limplies \aForm[\uReg{\bEv}/\aReg][\uReg{\bEv}/\REF{\dVal}]
+%     \limplies \bForm[\uReg{\bEv}/\aReg][\uReg{\bEv}/\REF{\dVal}]
 %     )
 %     \land \lnot\QxREF{\dVal}
 %   }
@@ -240,17 +237,33 @@ $(\exists\bForm:\aEvs\fun\Formulae)$
 %   \begin{math}
 %     (\forall\dVal)
 %   \end{math}
-%   $\aTr[\bEvs](\aForm)$ implies
+%   $\aTr{\bEvs}{\bForm}$ implies
 %   \begin{math}
-%     \bForm_\bEv
+%     \cForm_\bEv
 %     \limplies (\cExp{=}\dVal)
 %     \limplies \PBRbig{
 %     (
 %     \RW
 %     \limplies (\aVal{=}\uReg{\bEv}\lor\aLoc{=}\uReg{\bEv}) 
-%     \limplies \aForm[\uReg{\bEv}/\aReg][\uReg{\bEv}/\REF{\dVal}]
+%     \limplies \bForm[\uReg{\bEv}/\aReg][\uReg{\bEv}/\REF{\dVal}]
 %     )
 %     \land \lnot\QxREF{\dVal}
 %     \land \Dx{\dVal}
 %   }
 %   \end{math}
+
+\noindent
+If $\aPS \in \sTHREAD{\aPSS}$ then
+$(\exists\aPS_1\in\aPSS)$
+\begin{enumerate}
+\item[\ref{T1})]
+  $\aEvs=\aEvs_1$,
+\item[\ref{T2})]
+  $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
+\item[\ref{T3})]
+  $\labelingForm(\aEv)$ implies
+  $\labelingForm_1(\aEv)[\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
+  \\
+  $\labelingForm(\aEv)$ implies
+  $\labelingForm_1(\aEv)[\TRUE/\Q{}][\FALSE/\RW]$ otherwise.
+\end{enumerate}  

@@ -97,8 +97,7 @@ module data-model (Event : Set) where
     field _[_/↓[_]] : Formula → Formula → Address → Formula
     field _[_/↓[*]] : Formula → Formula → Formula
     
-    field RO : Formula
-    RW = ¬ RO
+    field RW : Formula
     
     field R : Address → Value → Action
     field W : Address → Value → Action

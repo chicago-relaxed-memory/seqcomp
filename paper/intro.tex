@@ -1,23 +1,29 @@
 \section{Introduction}
 
-Our approach is only vaguely related to the theories of
-\citet{DBLP:journals/cacm/Dijkstra75}, which provide an alternative
-characterization of Hoare logic by mapping postconditions to preconditions
-($\fwp$ and $\fwlp$) or preconditions to postconditions ($\fsp$).
+% \begin{figure*}
+%   \input{fig-sp}
+%   \caption{Weakest Precondition and Strongest Postcondition \cite{}}
+% \end{figure*}
 
-Our transformers $\aTr$ map preconditions to postconditions, in order to
-apply to preconditions.
-\begin{align*}
-  \hoare{\aForm}{\bCmd}{\bForm}
-  \;\;\Leftrightarrow\;\;
-  \hoare{\aTr(\aCmd,\aForm)}{\aCmd\SEMI\bCmd}{\bForm}
-\end{align*}
-For example
-\begin{gather*}
-  \hoare{r{=}1}{\PW{y}{r}}{y{=}1}
-  \\
-  \hoare{x{=}1}{\PR{x}{r}\SEMI\PW{y}{r}}{y{=}1}
-\end{gather*}
+
+Our approach follows that of weakest precondition semantics of
+\citet{DBLP:journals/cacm/Dijkstra75}, which provides an alternative
+characterization of Hoare logic \citep{Hoare:1969:ABC:363235.363259} by
+mapping postconditions to preconditions.
+
+% Our transformers $\aTr$ map preconditions to postconditions, in order to
+% apply to preconditions.
+% \begin{align*}
+%   \hoare{\aForm}{\bCmd}{\bForm}
+%   \;\;\Leftrightarrow\;\;
+%   \hoare{\aTr(\aCmd,\aForm)}{\aCmd\SEMI\bCmd}{\bForm}
+% \end{align*}
+% For example
+% \begin{gather*}
+%   \hoare{r{=}1}{\PW{y}{r}}{y{=}1}
+%   \\
+%   \hoare{x{=}1}{\PR{x}{r}\SEMI\PW{y}{r}}{y{=}1}
+% \end{gather*}
 
 
 \endinput

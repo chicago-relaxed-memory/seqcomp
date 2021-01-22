@@ -298,9 +298,9 @@ and for acquire $\aAct$:
   A \emph{family of predicate transformers}
   indexed by subsets of $\aEvs$
   consists of predicate transformers
-  $\aTr[\bEvs]$ for each set of events $\bEvs$,
+  $\aTr{\bEvs}{}$ for each set of events $\bEvs$,
   such that if $(\cEvs\cap\aEvs) \subseteq \bEvs$
-  then $\aTr[\cEvs](\aForm)$ implies $\aTr[\bEvs](\aForm)$.
+  then $\aTr{\cEvs}{\aForm}$ implies $\aTr{\bEvs}{\aForm}$.
 \end{definition}
 
 \begin{definition}
@@ -320,14 +320,14 @@ transformers
   If $\aPS_0\in\sSTOP$ then:
   \begin{enumerate}
     \item $\aEvs_0 = \emptyset$, and
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\FALSE$.
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $\FALSE$.
   \end{enumerate}
 
   \noindent
   If $\aPS_0\in\sSKIP$ then:
   \begin{enumerate}
   \item $\aEvs_0 = \emptyset$, and
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$.
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $\aForm$.
   \end{enumerate}
 
   \noindent
@@ -337,16 +337,16 @@ transformers
   \begin{enumerate}
   \setcounter{enumi}{\value{pomsetPreIfXount}}
   \item[1--\thepomsetPreIfXount)] as for $(\sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI)$ in Definition~\ref{tab:pomsets-pre},
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $(\bForm\land\aTr[\bEvs]_1(\aEv))\lor(\neg\bForm\land\aTr[\bEvs]_2(\aForm))$.
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $(\bForm\land\aTr[1]{\bEvs}{\aEv})\lor(\neg\bForm\land\aTr[2]{\bEvs}{\aForm})$.
   \end{enumerate}
 
   \noindent
   If $\aPS_0 \in (\aPSS_1\wSEMI\aPSS_2)$ then
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$,\\
   %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
-  %let $\labelingForm'_2(\aEv)=\aTr[{\downclose[0]{\aEv}}]_1(\labelingForm_2(\aEv))$:  
-  %let $\labelingForm'_2(\aEv)=\aTr[\{ \bEv \mid \bEv <_0 \aEv \}]_1(\labelingForm_2(\aEv))$:  
-  let $\labelingForm'_2(\aEv)=\aTr[\cEvs]_1(\labelingForm_2(\aEv))$, where $\cEvs=\{ \cEv \mid \cEv <_0 \aEv \}$:
+  %let $\labelingForm'_2(\aEv)=\aTr[1]{\downclose[0]{\aEv}}{\labelingForm_2(\aEv)}$:  
+  %let $\labelingForm'_2(\aEv)=\aTr[1]{\{ \bEv \mid \bEv <_0 \aEv \}}{\labelingForm_2(\aEv})$:  
+  let $\labelingForm'_2(\aEv)=\aTr[1]{\cEvs}{\labelingForm_2(\aEv})$, where $\cEvs=\{ \cEv \mid \cEv <_0 \aEv \}$:
   \begin{enumerate}  
   \setcounter{enumi}{\value{pomsetParXount}}
   \item[1--\thepomsetParXount)] as for $(\aPSS_1\sPAR\aPSS_2)$  in
@@ -354,9 +354,9 @@ transformers
   \item if $\aEv\in\aEvs_1$ and $\aEv\not\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$,
   \item if $\aEv\not\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm'_2(\aEv)$,
   \item if $\aEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then\\ $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$, and
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aTr[\bEvs]_2(\aTr[\bEvs]_1(\aForm))$.
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $\aTr[2]{\bEvs}{\aTr[1]{\bEvs}{\aForm}}$.
   \end{enumerate}
-  % where we define $\labelingForm'_2(\aEv)$ to be $\aTr[\{ \bEv \mid \bEv <_0 \aEv \}]_1(\labelingForm_2(\aEv))$.
+  % where we define $\labelingForm'_2(\aEv)$ to be $\aTr[1]{\{ \bEv \mid \bEv <_0 \aEv \}}{\labelingForm_2(\aEv})$.
 
   \noindent
   If $\aPS_0 \in (\aAct[\aVal/\aLoc])$ then:
@@ -364,8 +364,8 @@ transformers
   \item if $\bEv,\aEv\in\aEvs_0$ then $\bEv=\aEv$,
   \item $\labelingAct_0(\aEv) = \aAct$,
   \item $\labelingForm_0(\aEv)$ implies $\preForm_\aAct$,
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $(\aLoc=\aVal)\limplies\aForm$, and
-  \item $\aTr[\emptyset]_0(\aForm)$ implies $\reorderIndForm_\aAct\land\aForm$.
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $(\aLoc=\aVal)\limplies\aForm$, and
+  \item $\aTr[0]{\emptyset}{\aForm}$ implies $\reorderIndForm_\aAct\land\aForm$.
   \end{enumerate}
 % \caption{Process algebra as sets of pomsets with preconditions and predicate transformers}
 \end{definition}
@@ -379,7 +379,7 @@ Embedding pomsets with preconditions semantics in pomsets with preconditions and
   \item $\aEvs_0=\aEvs_1$,
   \item $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
   \item $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, and
-  \item $\aTr[\bEvs]_0(\aForm)$ implies $\aForm$.
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $\aForm$.
   \end{enumerate}
 % \caption{Embedding pomsets with precodnitions semantics in pomsets with preconditions and predicate transformers semantics}
 \end{definition}
