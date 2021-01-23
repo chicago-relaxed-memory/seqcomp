@@ -9,8 +9,8 @@ symbols $\Q{\mSC}$, $\Q{\mRA}$, $\Qx{\aLoc}$, and $\Qw{\aLoc}$ such that
   \Q{\mSC}\textimplies\Q{\mRA}\textimplies\Qx{\aLoc}\textimplies\Qw{\bLoc}, \textwhen \aLoc=\bLoc.
 \end{displaymath}
 We refer to these collectively as \emph{quiescence symbols}.  The memory
-locations associated with quiescence symbols are indices that are not subject
-to substitution; thus, $\Qx{\aLoc}[\aExp/\aLoc]$ is $\Qx{\aLoc}$.
+references associated with quiescence symbols are indices that are not
+subject to substitution; thus, $\Qx{\aLoc}[\aExp/\aLoc]$ is $\Qx{\aLoc}$.
 
 
 \subsection{Coherence ($\xCO$)}
@@ -54,7 +54,7 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land\bForm[\aExp/\aLoc]$,
+    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{=}\aVal)\land\bForm[\aExp/\aLoc]$,
   \item[\ref{S5})]
     $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \bForm[\aExp/\aLoc]$.
   \item[\ref{L4})]

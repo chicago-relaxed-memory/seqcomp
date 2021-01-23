@@ -5,58 +5,58 @@ We discuss \armeight{} using \emph{external global completion} (\EGC{})
 \cite{alglave-git-alternate,armed-cats}, which is very close to our model;
 see also \cite[\textsection B2.3.6]{arm-reference-manual}.
 
-\subsection{Down-Grading Acquires ($\xDGA$)}
+\subsection{Downgraded Reads ($\xDGR$)}
 \label{sec:internal}
 
 
 \begin{example}
-The following execution is allowed by \armeight{}, but disallowed by
-\refdef{def:pomsets-ra}.  The coherence order between the writes can be
-witnessed by a separate thread, which we have elided.
-\begin{gather*}
-  \PW{x}{2}\SEMI 
-  \PR[\mRA]{x}{r}\SEMI
-  \PW{y}{1} \PAR
-  \PW{y}{2}\SEMI
-  \PW[\mRA]{x}{1}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DW{x}{2}}{}
-      \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
-      \event{c}{\DW{y}{1}}{right=of b}
-      \event{d}{\DW{y}{2}}{right=2.5em of c}
-      \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
-      \rf{a}{b}
-      \sync{b}{c}
-      \wk{c}{d}
-      \sync{d}{e}
-      \wk[out=-165,in=-15]{e}{a}
-    \end{tikzinline}}
-\end{gather*}
-Under \EGC{}, this is explained by dropping the order
-$\DRP[\mRA]{x}{2}\xsync\DWP{y}{1}$, because $\DRP[\mRA]{x}{2}$ is fulfilled
-by a relaxed write in the same thread.
-\begin{gather*}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DW{x}{2}}{}
-      \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
-      \event{c}{\DW{y}{1}}{right=of b}
-      \event{d}{\DW{y}{2}}{right=2.5em of c}
-      \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
-      \rf{a}{b}
-      %\sync{b}{c}
-      \wk{c}{d}
-      \sync{d}{e}
-      \wk[out=-165,in=-15]{e}{a}
-    \end{tikzinline}}  
-\end{gather*}
+  The following execution is allowed by \armeight{}, but disallowed by
+  \refdef{def:pomsets-ra}.  The coherence order between the writes can be
+  witnessed by a separate thread, which we have elided.
+  \begin{gather*}
+    \PW{x}{2}\SEMI 
+    \PR[\mRA]{x}{r}\SEMI
+    \PW{y}{1} \PAR
+    \PW{y}{2}\SEMI
+    \PW[\mRA]{x}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a}{\DW{x}{2}}{}
+        \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+        \event{c}{\DW{y}{1}}{right=of b}
+        \event{d}{\DW{y}{2}}{right=2.5em of c}
+        \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+        \rf{a}{b}
+        \sync{b}{c}
+        \wk{c}{d}
+        \sync{d}{e}
+        \wk[out=-165,in=-15]{e}{a}
+      \end{tikzinline}}
+  \end{gather*}
+  Under \EGC{}, this is explained by dropping the order
+  $\DRP[\mRA]{x}{2}\xsync\DWP{y}{1}$, because $\DRP[\mRA]{x}{2}$ is fulfilled
+  by a relaxed write in the same thread.
+  \begin{gather*}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a}{\DW{x}{2}}{}
+        \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+        \event{c}{\DW{y}{1}}{right=of b}
+        \event{d}{\DW{y}{2}}{right=2.5em of c}
+        \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+        \rf{a}{b}
+        % \sync{b}{c}
+        \wk{c}{d}
+        \sync{d}{e}
+        \wk[out=-165,in=-15]{e}{a}
+      \end{tikzinline}}  
+  \end{gather*}
 
-More generally, this can be understood as a compiler optimization that
-downgrades a read from $\mRA$ to $\mRLX$ when it read can be fulfilled by a
-relaxed write in the same thread.
+  More generally, this can be understood as a compiler optimization that
+  downgrades a read from $\mRA$ to $\mRLX$ when it can be fulfilled by a
+  relaxed write in the same thread.
 \end{example}
 
-To model such \emph{downgraded acquires}, we use the uninterpreted symbols
+To model such \emph{downgraded reads}, we use the uninterpreted symbols
 $\Dx{\aLoc}$.
 
 \begin{definition}
@@ -76,7 +76,7 @@ $\Dx{\aLoc}$.
   \end{align*}
 \end{definition}
 
-\begin{definition}[$\xCO$/$\xRASC$/$\xDGA$]
+\begin{definition}[$\xCO$/$\xRASC$/$\xDGR$]
   \label{def:pomsets-down}
   Update \refdef{def:pomsets-ra} to:
   \begin{enumerate}
@@ -102,91 +102,94 @@ $\Dx{\aLoc}$.
 %   \PW[\mRA]{x}{1}
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=1.5em]
-%       \event{a}{\DW{x}{2}}{}
-%       \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
-%       \event{c}{\DR{y}{0}}{right=of b}
-%       \event{d}{\DW{y}{2}}{right=2.5em of c}
-%       \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
-%       \rf{a}{b}
-%       \sync{b}{c}
-%       \wk{c}{d}
-%       \sync{d}{e}
-%       \wk[out=-165,in=-15]{e}{a}
-%     \end{tikzinline}}
+%     \event{a}{\DW{x}{2}}{}
+%     \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+%     \event{c}{\DR{y}{0}}{right=of b}
+%     \event{d}{\DW{y}{2}}{right=2.5em of c}
+%     \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+%     \rf{a}{b}
+%     \sync{b}{c}
+%     \wk{c}{d}
+%     \sync{d}{e}
+%     \wk[out=-165,in=-15]{e}{a}
+%   \end{tikzinline}}
 % \end{gather*}
 
 \begin{example}
-One might worry that our model is too permissive for $\mSC$ access, but
-\armeight{} allows some counterintuitive results for SC access.  In the
-following execution we elide the initializing write $\DWP{y}{0}$.
-\begin{gather*}
-  \IF{\PR{x}{}}\THEN \PW{x}{2} \FI\SEMI
-  \PR[\mSC]{x}{r}\SEMI
-  \PR[\mSC]{y}{s} \PAR
-  \PW[\mSC]{y}{2}\SEMI
-  \PW[\mSC]{x}{1}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DR{x}{1}}{}
-      \event{b}{\DW{x}{2}}{right=of a}
-      \scevent{c}{\DR[\mSC]{x}{2}}{right=of b}
-      \scevent{d}{\DR[\mSC]{y}{0}}{right=of c}
-      \scevent{e}{\DW[\mSC]{y}{2}}{right=2.5em of d}
-      \scevent{f}{\DW[\mSC]{x}{1}}{right=of e}
-      \po{a}{b}
-      \rf{b}{c}
-      %\sync{c}{d}
-      \sync{e}{f}
-      \wk{d}{e}
-      \rf[out=-165,in=-15]{f}{a}
-    \end{tikzinline}}
-\end{gather*}
-Under \EGC{}, this is explained by dropping the order
-$\DRP[\mSC]{x}{2}\xsync\DRP{y}{0}$, because $\DRP[\mSC]{x}{2}$ is fulfilled
-by a relaxed write in the same thread.
+  One might worry that our model is too permissive for $\mSC$ access, but
+  \armeight{} itself allows some very counterintuitive results for $\mSC$
+  access.  In the following execution we elide the initializing write
+  $\DWP{y}{0}$.
+  \begin{gather*}
+    \IF{\PR{x}{}}\THEN \PW{x}{2} \FI\SEMI
+    \PR[\mSC]{x}{r}\SEMI
+    \PR[\mSC]{y}{s} \PAR
+    \PW[\mSC]{y}{2}\SEMI
+    \PW[\mSC]{x}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{x}{2}}{right=of a}
+        \scevent{c}{\DR[\mSC]{x}{2}}{right=of b}
+        \scevent{d}{\DR[\mSC]{y}{0}}{right=of c}
+        \scevent{e}{\DW[\mSC]{y}{2}}{right=2.5em of d}
+        \scevent{f}{\DW[\mSC]{x}{1}}{right=of e}
+        \po{a}{b}
+        \rf{b}{c}
+        % \sync{c}{d}
+        \sync{e}{f}
+        \wk{d}{e}
+        \rf[out=-165,in=-15]{f}{a}
+      \end{tikzinline}}
+  \end{gather*}
+  Under \EGC{}, this is explained by dropping the order
+  $\DRP[\mSC]{x}{2}\xsync\DRP{y}{0}$, because $\DRP[\mSC]{x}{2}$ is fulfilled
+  by a relaxed write in the same thread.
 \end{example}
 
 \subsection{Removing Read-Read dependencies ($\xRRD$)}
 
 \begin{example}
-The following execution is allowed by \armeight{}, but disallowed by
-\refdef{def:pomsets-ra}.  
-\begin{gather*}
-  \begin{gathered}
-  x\GETS0\SEMI 
-  x\GETS 1\SEMI y^\mRA\GETS1 \PAR r\GETS y\SEMI \IF{r}\THEN s\GETS x\FI
-  \\[-.4ex]
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{wx0}{\DW{x}{0}}{}
-      \event{wx1}{\DW{x}{1}}{right=of wx0}
-      \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
-      \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
-      \event{rx0}{\DR{x}{0}}{right=of ry1}
-      \sync{wx1}{wy1}
-      \po{ry1}{rx0}
-      \rf{wy1}{ry1}
-      \wk[in=-15,out=-165]{rx0}{wx1}
-      \wk{wx0}{wx1}
-    \end{tikzinline}}
-\end{gathered}
-\end{gather*}
-Under \EGC{}, this is explained by dropping the order
-$\DRP{y}{1}\xpo\DRP{x}{0}$, because \armeight{} does not include control
-dependencies between reads in the locally-ordered-before relation.
-\begin{gather*}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{wx0}{\DW{x}{0}}{}
-      \event{wx1}{\DW{x}{1}}{right=of wx0}
-      \raevent{wy1}{\DWRel{y}{1}}{right=of wx1}
-      \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
-      \event{rx0}{\DR{x}{0}}{right=of ry1}
-      \sync{wx1}{wy1}
-      %\po{ry1}{rx0}
-      \rf{wy1}{ry1}
-      \wk[in=-15,out=-165]{rx0}{wx1}
-      \wk{wx0}{wx1}
-    \end{tikzinline}}  
-\end{gather*}
+  \label{ex:rrd1}
+  The following execution is allowed by \armeight{}, but disallowed by
+  \refdef{def:pomsets-ra}.  
+  \begin{gather*}
+    \begin{gathered}
+      x\GETS0\SEMI x\GETS 1\SEMI y^\mRA\GETS1
+      \PAR
+      r\GETS y\SEMI \IF{r}\THEN s\GETS x\FI
+      \\[-.4ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{wx0}{\DW{x}{0}}{}
+          \event{wx1}{\DW{x}{1}}{right=of wx0}
+          \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
+          \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
+          \event{rx0}{\DR{x}{0}}{right=of ry1}
+          \sync{wx1}{wy1}
+          \po{ry1}{rx0}
+          \rf{wy1}{ry1}
+          \wk[in=-15,out=-165]{rx0}{wx1}
+          \wk{wx0}{wx1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  Under \EGC{}, this is explained by dropping the order
+  $\DRP{y}{1}\xpo\DRP{x}{0}$, because \armeight{} does not include control
+  dependencies between reads in the locally-ordered-before relation.
+  \begin{gather*}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \raevent{wy1}{\DWRel{y}{1}}{right=of wx1}
+        \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
+        \event{rx0}{\DR{x}{0}}{right=of ry1}
+        \sync{wx1}{wy1}
+        % \po{ry1}{rx0}
+        \rf{wy1}{ry1}
+        \wk[in=-15,out=-165]{rx0}{wx1}
+        \wk{wx0}{wx1}
+      \end{tikzinline}}  
+  \end{gather*}
 \end{example}
 
 Since we do not distinguish control dependencies from other dependencies, we
@@ -211,12 +214,33 @@ the uninterpreted symbol $\RW$.
 \end{definition}
 
 
+\begin{example}
+  Revisiting \refex{ex:rrd1}
+  \begin{align*}
+    \begin{gathered}
+      r\GETS y
+      \\[-.4ex]
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+          \xform{xd}{1{=}r\limplies\bForm}{below=of a}
+          \xform{xi}{(y{=}r\lor1{=}r)\limplies\bForm}{below=of xd}
+          \xo{a}{xd}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{r}\THEN s\GETS x\FI
+      \\[-.4ex]
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \event{b}{r\mid\DR{x}{0}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+\end{example}
 
-We repeat all of the rules for preconditions and transformers,
-Only \ref{L5} and \ref{T3} are changed from \refdef{def:pomsets-down}.
-We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
-
-\begin{definition}[$\xCO$/$\xRASC$/$\xDGA$/$\xRRD$]
+\refdef{def:pomsets-down-rr} combines all of the features of
+\textsection\ref{sec:q}--\ref{sec:arm}:
+\begin{definition}[$\xCO$/$\xRASC$/$\xDGR$/$\xRRD$]
   \label{def:pomsets-down-rr}
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
@@ -244,6 +268,9 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
     $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land\bForm$.
   \end{enumerate}  
 \end{definition}
+Here, we have repeated all of the rules for preconditions and transformers,
+including \ref{L4}, which is unchanged from \refdef{def:pomsets-trans}.
+Only \ref{L5} and \ref{T3} are changed from \refdef{def:pomsets-down}.
 
 
 % \begin{definition}
@@ -251,7 +278,7 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
 % \end{definition}
 
 
-%\subsection{Proof Strategy}
+% \subsection{Proof Strategy}
 
 
 \begin{comment}

@@ -232,13 +232,14 @@
 \newcommand{\external}{}
 \newcommand{\externally}{}
 
-\newcommand{\xDGA}{{\textsc{dga}}}
+\newcommand{\xRecycle}{{\textsc{alpha}}}
+\newcommand{\xDGR}{{\textsc{dgr}}}
 \newcommand{\xRRD}{{\textsc{rrd}}}
 \newcommand{\xIF}{{\textsc{if}}}
 \newcommand{\xADDR}{{\textsc{addr}}}
 \newcommand{\xCO}{{\textsc{co}}}
 \newcommand{\xRASC}{{\textsc{sync}}}
-% \newcommand{\xDGA}{{\text{DGA}}}
+% \newcommand{\xDGR}{{\text{DGR}}}
 % \newcommand{\xRRD}{{\text{RRD}}}
 % \newcommand{\xIF}{{\text{If}}}
 % \newcommand{\xADDR}{{\text{Addr}}}
@@ -616,7 +617,7 @@
 \newcommand{\FORK}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}}
 \newcommand{\FORKJOIN}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}\SEMI\mathtt{join}}
 \newcommand{\STOP}{\mathtt{stop}}
-\newcommand{\BANG}{\mathtt{!}\mkern-1mu}
+\newcommand{\BANG}{\lnot}%\mathtt{!!}\mkern-1mu}
 \newcommand{\GETS}{\mkern1mu\mathtt{:}\mkern-1mu\mathtt{=}\,}
 \newcommand{\SEQ}{\mathtt{;}\,\allowbreak}
 \newcommand{\SEMI}{\mathtt{;}\,\allowbreak}

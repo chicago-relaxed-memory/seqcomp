@@ -55,16 +55,16 @@ a total \emph{causal order} between read and write events, for example:
       \end{tikzinline}}
   \end{gather*}
 Unfortunately, this model does not compile efficiently to commodity
-hardware, resulting in a X\% increase in CPU time~\cite{???}, and
+hardware, resulting in a 37--73\% increase in CPU time~\cite{Liu:2019:ASC:3314221.3314611} on ARM, and
 hence power consumption.  Developers of software and compilers have
 therefore been faced with a difficult trade-off, between an elegant
 model of memory, and its impact on resource usage (such as size of
-data centres, electricity bills and carbon footprint). Unsurprisingly,
+data centers, electricity bills and carbon footprint). Unsurprisingly,
 many have chosen to prioritize efficiency over elegance.
 
 This has led to \emph{relaxed memory models}, in which the requirement of
 sequential consistency is weakened to only apply \emph{per-location} and not globally
-over the whole progfram. This allows executions which
+over the whole program. This allows executions which
 are inconsistent with program order, such as:
   \begin{gather*}
     \THREAD{x\GETS0\SEMI x\GETS1\SEMI y\GETS2}
@@ -128,9 +128,9 @@ results in:
   \end{gather*}
 Unfortunately, while a simple syntactic approach to dependency calculation
 suffices for hardware models, it is not preserved by common compiler
-optimizarions. For example, if we calculate control dependencies syntactically,
+optimizations. For example, if we calculate control dependencies syntactically,
 then there is a dependency from $(\DR{x}{1})$ to $(\DW{y}{1})$, and therefore a cycle in, the candidate execution:
-`  \begin{gather*}
+  \begin{gather*}
     \THREAD{r\GETS x\SEMI \IF r \THEN y\GETS1 \ELSE y\GETS1 \FI}
     \PAR
     \THREAD{s\GETS y\SEMI x\GETS s}
@@ -154,23 +154,24 @@ Prominent solutions to the problem of dependency calculation include:
 \begin{itemize}
 
 \item \emph{syntactic} methods used in hardware models
-  such as ARM~\cite{???} or x86-TSO~\cite{???},
+  such as ARM or x86-TSO \cite{alglave},
 \item \emph{alternate universe} methods (which give a semantics based on multiple speculative executions
-  of the same program) such as the Java Memory Model~\cite{???},
-  the speculative operational semantics of~\cite{???},
-  the promising semantics of~\cite{???},
-  or the event structures semantics of~\cite{???},
+  of the same program) such as the Java Memory Model~\cite{Manson:2005:JMM:1047659.1040336} 
+  and related models \cite{Jagadeesan:2010:GOS:2175486.2175503, DBLP:conf/popl/KangHLVD17, DBLP:journals/pacmpl/ChakrabortyV19},
+  % the speculative operational semantics of~\cite{Jagadeesan:2010:GOS:2175486.2175503},
+  % the promising semantics of~\cite{DBLP:conf/popl/KangHLVD17},
+  % or the event structures semantics of~\cite{DBLP:journals/pacmpl/ChakrabortyV19},
 \item \emph{rewriting} methods, which give an operational model
-  up to syntactic rewrites, such as~\cite{???}, and
+  up to syntactic rewrites, such as~\cite{Pichon-Pharabod:2016:CSR:2837614.2837616}, and
 \item \emph{logical} methods, such as the pomsets with preconditions
-  model of~\cite{???}.
+  model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
   
 \end{itemize}
 In this paper, we will focus on logical models, as those are compositional,
 and align well with existing models of sequential composition.
-The heart of the model of~\cite{???} is to add logical preconditions
-to events, which are introduced by store (modelling data dependencies)
-or conditionals (modelling control dependencies):
+The heart of the model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20} is to add logical preconditions
+to events, which are introduced by store actions (modeling data dependencies)
+and conditionals (modeling control dependencies):
   \begin{gather*}
     \IF{s{<}1} \THEN z\GETS r\&s \FI
     \\
@@ -179,7 +180,7 @@ or conditionals (modelling control dependencies):
         \event{wz0}{(s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{}
       \end{tikzinline}}
   \end{gather*}
-and are discharged by being ordered with a read event:
+Preconditions are discharged by being ordered after a read:
   \begin{gather*}
     r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
     \\
@@ -193,9 +194,9 @@ and are discharged by being ordered with a read event:
   \end{gather*}
 Note that there is dependency order from $(\DR{y}{0})$ to $(\DW{z}{0})$
 so the precondition for $(\DW{z}{0})$ only has to be satisfied assuming the hypothesis
-$(s=0)$. There is no matching order from $(\DR{x}{0})$ to $(\DW{z}{0})$
-which is why we do not assume the hypothesis $(r=0)$. The precondition on
-$(\DW{z}{0})$ is a tautology, and so can be elided:
+$(s{=}0)$. There is no matching order from $(\DR{x}{0})$ to $(\DW{z}{0})$
+which is why we do not assume the hypothesis $(r{=}0)$. The precondition on
+$(\DW{z}{0})$ is a tautology, and so can be elided in the diagram:
   \begin{gather*}
     r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
     \\
@@ -208,7 +209,7 @@ $(\DW{z}{0})$ is a tautology, and so can be elided:
       \end{tikzinline}}
   \end{gather*}
 While existing models of relaxed memory have detailed treatmenmts of parallel composition,
-they pften give sequential composition little attention, either ignoring it altogether,
+they often give sequential composition little attention, either ignoring it altogether,
 or treating it operationally with its usual small-step semantics. This paper
 investigates how existing models of sequential composition interact with relaxed memory.
   

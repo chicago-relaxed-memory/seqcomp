@@ -17,8 +17,8 @@ The syntax is built from
   $\aExp$, $\bExp$,  $\cExp$.
 \end{itemize}
 
-\emph{Memory locations} are tagged values, written $\REF{\cVal}$.  Let $\Loc$
-be the set of memory locations, ranged over by $\aLoc$, $\bLoc$, $\cLoc$.
+\emph{Memory references} are tagged values, written $\REF{\cVal}$.  Let $\Loc$
+be the set of memory references, ranged over by $\aLoc$, $\bLoc$, $\cLoc$.
 
 We require that
 \begin{itemize}
@@ -26,7 +26,7 @@ We require that
 \item values include at least the constants $0$ and $1$,  
   % \item for any set $\aEvs$ there are registers $\uRegs{\aEvs}=\{\uReg{\aEv}\mid\aEv\in\aEvs\}$,
 \item expressions include at least registers and values, 
-\item expressions do \emph{not} include memory locations.
+\item expressions do \emph{not} include references: $\aExp[\bExp/\aLoc]=\aExp$.
   % or registers in
   % $\uRegs{\aEvs}$, for any set $\aEvs$.
 \end{itemize}
@@ -104,7 +104,7 @@ We require that:
 % We use $\DAP{\aLoc}{\aVal}$ to indicate a generic access, which could be
 % either a read or a write.
 
-Logical formulae include equations over locations and registers, such
+Logical formulae include equations over memory references and registers, such
 $(\aLoc{=}1)$ and $(\aReg{=}\bReg{+}1)$.
 We use expressions as formulae, coercing $\aExp$ to $\aExp{\neq}0$.
 Formulae are subject to substitutions of the form $[\aExp/\aReg]$ and $[\aExp/\aLoc]$; actions are not.
@@ -127,21 +127,25 @@ $\aForm$ is \emph{unsatisfiable} if $\aForm\vDash\FALSE$.
 % \end{definition}
 
 
-We additionally assume that either:
-% In \textsection\ref{sec:model}--\ref{sec:arm} we 
-% additionally require that
+Throughout \textsection\ref{sec:model}--\ref{sec:arm} we 
+additionally require that
 \begin{itemize}
-\item each register appears at most once in a program, or
+\item each register appears at most once in a program.
   % \end{itemize}
   % In \textsection\ref{sec:complications} and following, we
   % require instead that
   % \begin{itemize}
-\item there are registers
-  $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$ that do not
-  appear in programs.
+  % \end{itemize}
 \end{itemize}
-In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
-assumption.
+In \textsection\ref{sec:complications}, we drop this restriction, requiring
+instead that
+\begin{itemize}
+\item there are registers
+  $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$,
+\item registers in $\uRegs{\AllEvents}$ do not appear in programs.
+\end{itemize}
+% In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
+% assumption.
 
 \subsection{Pomsets}
 

@@ -1,12 +1,74 @@
-\section{If Closure and Address Calculation}
+\section{Register Recycling, If-Closure and Address Calculation}
 \label{sec:complications}
 
-\subsection{If Closure ($\xIF$)}
-Requires indexing to resolve nondeterminism.
+\subsection{Register Recycling}
 
-IF closure/case analysis: $\psi_e$
+The semantics considered thus far assume that each register is assigned at
+most once in a program.  We relax this by renaming in the usual way.  Rather
+than renaming using arbitrary fresh registers, we use the set
+$\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$, which are banned
+from source programs, as per \textsection\ref{sec:prelim}.  This allows us to
+resolve nondeterminism in loads when merging (see
+\textsection\ref{sec:redundant}).
 
-\begin{definition}[$\xIF$]
+
+\begin{definition}[$\xRecycle$]
+  \label{def:pomsets-if}
+  Update \refdef{def:pomsets-trans} to:
+  \begin{enumerate}
+  \item[\ref{L4})] 
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal_\aEv{=}\uReg{\aEv}\limplies\bForm[\uReg{\aEv}/\aReg]$, 
+  \item[\ref{L5})] 
+    $\aTr{\cEvs}{\bForm}$ implies $(\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
+  \item[\ref{L6})] 
+    $(\forall\bReg)$ $\aTr{\dEvs}{\bForm}$ implies $\bForm[\bReg/\aReg]$. 
+  \end{enumerate}
+\end{definition}
+
+\subsection{If-Closure ($\xIF$)}
+\label{sec:if}
+
+% x+0 = x
+% if (y==0) { x+y 
+
+% Requires indexing to resolve nondeterminism.
+
+% IF closure/case analysis: $\psi_e$
+
+\begin{example}
+  \label{ex:if1}
+  \refdef{def:pomsets-trans} does \emph{not} allow:
+  \begin{gather*}
+    \aCmd=\PBR{
+      \PW{x}{0}\SEMI
+      \PW{x}{\BANG\BANG r}\SEMI
+      \PW{x}{1}
+    }
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a}{\DW{x}{0}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \wk{a}{b}
+      \end{tikzinline}}
+  \end{gather*}
+  However, for any $\aForm$, \refdef{def:pomsets-trans} \emph{does} allow:
+  \begin{gather*}
+    \IF{\aForm}\THEN\aCmd\ELSE\aCmd\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a}{\DW{x}{0}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \wk{a}{b}
+      \end{tikzinline}}
+  \end{gather*}
+  If $r=0$, the middle store can merge left; otherwise, it can merge right.
+\end{example}
+
+The difficulty is that any pomset can contain at most one event for the
+middle store.  Our solution is to allow a pomset to contain many events for a
+single action, as long as the events have disjoint preconditions.
+
+\begin{definition}[$\xRecycle$/$\xIF$]
   \label{def:pomsets-if}
   Update \refdef{def:pomsets-trans} to:
 
@@ -39,6 +101,102 @@ IF closure/case analysis: $\psi_e$
   \end{enumerate}  
 \end{definition}
 
+\begin{example}
+  Revisiting \refex{ex:if1}, we can split the middle store:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{0}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[0/x]}{}
+          \event{a}{\DW{x}{0}}{above=of xd}      
+          \xform{xi}{\bForm[0/x]}{above=of a}
+          \xo{a}{xd}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{\BANG\BANG r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xdi}{r{=}0\limplies\bForm[\BANG\BANG r/x]}{}
+          \xform{xid}{r{\neq}0\limplies\bForm[\BANG\BANG r/x]}{right=.5em of xdi}
+          \event{a}{r{=}0\mid\DW{x}{0}}{above=of xdi}      
+          \xo{a}{xdi}
+          \event{b}{r{\neq}0\mid\DW{x}{1}}{above=of xid}      
+          \xo{b}{xid}
+          \xform{xdd}{\bForm[\BANG\BANG r/x]}{above=of a}
+          \xform{xii}{\bForm[\BANG\BANG r/x]}{above=of b}
+          \xo{a}{xdd}
+          \xo{b}{xdd}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[1/x]}{}
+          \event{a}{\DW{x}{1}}{above=of xd}      
+          \xform{xi}{\bForm[1/x]}{above=of a}
+          \xo{a}{xd}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Associating to the left and merging, we have:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{0}\SEMI
+      \PW{x}{\BANG\BANG r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xdi}{r{=}0\limplies\bForm[\BANG\BANG r/x]}{}
+          \xform{xid}{r{\neq}0\limplies\bForm[\BANG\BANG r/x]}{right=.5em of xdi}
+          \event{a}{\DW{x}{0}}{above=of xdi}      
+          \xo{a}{xdi}
+          \event{b}{r{\neq}0\mid\DW{x}{1}}{above=of xid}      
+          \xo{b}{xid}
+          \xform{xdd}{\bForm[\BANG\BANG r/x]}{above=of a}
+          \xform{xii}{\bForm[\BANG\BANG r/x]}{above=of b}
+          \xo{a}{xdd}
+          \xo{b}{xdd}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[1/x]}{}
+          \event{a}{\DW{x}{1}}{above=of xd}      
+          \xform{xi}{\bForm[1/x]}{above=of a}
+          \xo{a}{xd}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  The merging right, we have, as desired:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{0}\SEMI
+      \PW{x}{\BANG\BANG r}\SEMI
+      \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xdi}{r{=}0\limplies\bForm[1/x]}{}
+          \xform{xid}{r{\neq}0\limplies\bForm[1/x]}{right=of xdi}
+          \event{a}{\DW{x}{0}}{above=of xdi}      
+          \xo{a}{xdi}
+          \event{b}{\DW{x}{1}}{above=of xid}      
+          \xo{b}{xid}
+          \xform{xdd}{\bForm[1/x]}{above=of a}
+          \xform{xii}{\bForm[1/x]}{above=of b}
+          \xo{a}{xdd}
+          \xo{b}{xdd}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+\end{example}
+
 \subsection{Address Calculation ($\xADDR$)}
 
 \begin{definition}[$\xADDR$]
@@ -70,9 +228,10 @@ IF closure/case analysis: $\psi_e$
   \begin{math}
     \sem{\REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r}
   \end{math}
-  includes both of the following pomsets (``$\BANG$'' is logical
-  negation---``$\BANG \aExp$'' evaluates to $1$ if
-  $\aExp$ is $0$, and $0$ otherwise):
+  includes both of the following pomsets
+  % (``$\BANG$'' is logical
+  % negation---``$\BANG \aExp$'' evaluates to $1$ if
+  % $\aExp$ is $0$, and $0$ otherwise):
   \begin{align*}
     \begin{gathered}
       \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
