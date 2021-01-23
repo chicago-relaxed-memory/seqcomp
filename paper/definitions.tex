@@ -521,6 +521,39 @@ $\aEv\in\aEvs_1$.
   Conditional merging events
 \end{example}
 
+\begin{gather*}
+  \begin{gathered}
+  x\GETS 0 \SEMI
+  (r\GETS x\SEMI\IF{r\geq0}\THEN y\GETS1 \FI
+  \PAR
+  x\GETS y)
+  \\[-1ex]
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+  \event{wx0}{\DW{x}{0}}{}
+  \event{rx1}{\DR{x}{1}}{right=3em of wx0}
+  \event{wy1}{0\geq0\mid\DW{y}{1}}{right=of rx1}
+  \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+  \event{wx1}{\DW{x}{1}}{right=of ry1}
+  \po{ry1}{wx1}
+  \rf[out=-168,in=-12]{wx1}{rx1}
+  \rf{wy1}{ry1}
+  \wk[out=10,in=170]{wx0}{wx1}
+  \wk{wx0}{rx1}
+    \end{tikzinline}}
+  % \hbox{\begin{tikzinline}[node distance=1.5em and 2em]
+  % \event{wy1}{0\geq0\mid\DW{y}{1}}{}
+  % \event{rx1}{\DR{x}{1}}{left=of wy1}
+  % \event{wx0}{\DW{x}{0}}{below left=-.2em and 2em of rx1}
+  % \event{ry1}{\DR{y}{1}}{below=of rx1}
+  % \event{wx1}{\DW{x}{1}}{right=of ry1}
+  % \po{ry1}{wx1}
+  % \rf[out=140,in=-20]{wx1}{rx1}
+  % \rf{wy1}{ry1}
+  % \wk[out=10,in=155]{wx0}{wx1}
+  % \wk{wx0}{rx1}
+  %   \end{tikzinline}}
+\end{gathered}
+\end{gather*}
 
 \subsection{Pomsets with Predicate Transformers}
 
