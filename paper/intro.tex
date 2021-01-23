@@ -172,39 +172,39 @@ The heart of the model of~\cite{???} is to add logical preconditions
 to events, which are introduced by store (modelling data dependencies)
 or conditionals (modelling control dependencies):
   \begin{gather*}
-    \IF{q \le r} \THEN z\GETS s \FI
+    \IF{s{<}1} \THEN z\GETS r\&s \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wz1}{(q {\le} r) \land (s{=}1) \mid \DW{z}{1}}{}
+        \event{wz0}{(s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{}
       \end{tikzinline}}
   \end{gather*}
 and are discharged by being ordered with a read event:
   \begin{gather*}
-    r\GETS x\SEMI s\GETS y\SEMI \IF{r\le r} \THEN z\GETS s \FI
+    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx1}{\DR{x}{1}}{}
-        \event{ry1}{\DR{y}{1}}{right=of rx1 }
-        \event{wz1}{(s{=}1) \limplies (r {\le} r) \land (s{=}1) \mid \DW{z}{1}}{right=of ry1}
-        \po{ry1}{wz1}
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \po{ry0}{wz0}
       \end{tikzinline}}
   \end{gather*}
-Note that there is dependency order from $(\DR{y}{1})$ to $(\DW{z}{1})$
-so the precondition for $(\DW{z}{1})$ only has to be satisfied assuming the hypothesis
-$(s=1)$. There is no matching order from $(\DR{x}{1})$ to $(\DW{z}{1})$
-which is why we do not assume the hypothesis $(r=1)$. The precondition on
-$(\DW{z}{1})$ is a tautology, and so can be elided:
+Note that there is dependency order from $(\DR{y}{0})$ to $(\DW{z}{0})$
+so the precondition for $(\DW{z}{0})$ only has to be satisfied assuming the hypothesis
+$(s=0)$. There is no matching order from $(\DR{x}{0})$ to $(\DW{z}{0})$
+which is why we do not assume the hypothesis $(r=0)$. The precondition on
+$(\DW{z}{0})$ is a tautology, and so can be elided:
   \begin{gather*}
-    r\GETS x\SEMI s\GETS y\SEMI \IF{r\le r} \THEN z\GETS s \FI
+    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx1}{\DR{x}{1}}{}
-        \event{ry1}{\DR{y}{1}}{right=of rx1 }
-        \event{wz1}{\DW{z}{1}}{right=of ry1}
-        \po{ry1}{wz1}
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \event{wz0}{\DW{z}{0}}{right=of ry0}
+        \po{ry0}{wz0}
       \end{tikzinline}}
   \end{gather*}
 While existing models of relaxed memory have detailed treatmenmts of parallel composition,
