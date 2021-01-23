@@ -155,7 +155,7 @@ Prominent solutions to the problem of dependency calculation include:
 
 \item \emph{syntactic} methods used in hardware models
   such as ARM or x86-TSO \cite{alglave},
-\item \emph{alternate universe} methods (which give a semantics based on multiple speculative executions
+\item \emph{speculative execution} methods (which give a semantics based on multiple executions
   of the same program) such as the Java Memory Model~\cite{Manson:2005:JMM:1047659.1040336} 
   and related models \cite{Jagadeesan:2010:GOS:2175486.2175503, DBLP:conf/popl/KangHLVD17, DBLP:journals/pacmpl/ChakrabortyV19},
   % the speculative operational semantics of~\cite{Jagadeesan:2010:GOS:2175486.2175503},
@@ -173,33 +173,33 @@ The heart of the model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20} is to add l
 to events, which are introduced by store actions (modeling data dependencies)
 and conditionals (modeling control dependencies):
   \begin{gather*}
-    \IF{s{<}1} \THEN z\GETS r\&s \FI
+    \IF{s{<}1} \THEN z\GETS r{*}s \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wz0}{(s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{}
+        \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
       \end{tikzinline}}
   \end{gather*}
 Preconditions are discharged by being ordered after a read:
   \begin{gather*}
-    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
+    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{rx0}{\DR{x}{0}}{}
         \event{ry0}{\DR{y}{0}}{right=of rx0}
-        \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
         \po{ry0}{wz0}
       \end{tikzinline}}
   \end{gather*}
 Note that there is dependency order from $(\DR{y}{0})$ to $(\DW{z}{0})$
 so the precondition for $(\DW{z}{0})$ only has to be satisfied assuming the hypothesis
 $(s{=}0)$. There is no matching order from $(\DR{x}{0})$ to $(\DW{z}{0})$
-which is why we do not assume the hypothesis $(r{=}0)$. The precondition on
+which is why we do not assume the hypothesis $(r{=}0)$. Nonetheless, the precondition on
 $(\DW{z}{0})$ is a tautology, and so can be elided in the diagram:
   \begin{gather*}
-    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
-    \\
+    % r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    % \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{rx0}{\DR{x}{0}}{}
@@ -208,7 +208,8 @@ $(\DW{z}{0})$ is a tautology, and so can be elided in the diagram:
         \po{ry0}{wz0}
       \end{tikzinline}}
   \end{gather*}
-While existing models of relaxed memory have detailed treatmenmts of parallel composition,
+
+While existing models of relaxed memory have detailed treatments of parallel composition,
 they often give sequential composition little attention, either ignoring it altogether,
 or treating it operationally with its usual small-step semantics. This paper
 investigates how existing models of sequential composition interact with relaxed memory.
