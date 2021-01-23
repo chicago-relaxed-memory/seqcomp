@@ -130,7 +130,7 @@ Unfortunately, while a simple syntactic approach to dependency calculation
 suffices for hardware models, it is not preserved by common compiler
 optimizarions. For example, if we calculate control dependencies syntactically,
 then there is a dependency from $(\DR{x}{1})$ to $(\DW{y}{1})$, and therefore a cycle in, the candidate execution:
-  \begin{gather*}
+`  \begin{gather*}
     \THREAD{r\GETS x\SEMI \IF r \THEN y\GETS1 \ELSE y\GETS1 \FI}
     \PAR
     \THREAD{s\GETS y\SEMI x\GETS s}
@@ -168,7 +168,45 @@ Prominent solutions to the problem of dependency calculation include:
 \end{itemize}
 In this paper, we will focus on logical models, as those are compositional,
 and align well with existing models of sequential composition.
-
+The heart of the model of~\cite{???} is to add logical preconditions
+to events, which are introduced by store (modelling data dependencies)
+or conditionals (modelling control dependencies):
+  \begin{gather*}
+    \IF{q \le r} \THEN z\GETS s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wz1}{(q {\le} r) \land (s{=}1) \mid \DW{z}{1}}{}
+      \end{tikzinline}}
+  \end{gather*}
+and are discharged by being ordered with a read event:
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y\SEMI \IF{r\le r} \THEN z\GETS s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{ry1}{\DR{y}{1}}{right=of rx1 }
+        \event{wz1}{(s{=}1) \limplies (r {\le} r) \land (s{=}1) \mid \DW{z}{1}}{right=of ry1}
+        \po{ry1}{wz1}
+      \end{tikzinline}}
+  \end{gather*}
+Note that there is dependency order from $(\DR{y}{1})$ to $(\DW{z}{1})$
+so the precondition for $(\DW{z}{1})$ only has to be satisfied assuming the hypothesis
+$(s=1)$. There is no matching order from $(\DR{x}{1})$ to $(\DW{z}{1})$
+which is why we do not assume the hypothesis $(r=1)$. The precondition on
+$(\DW{z}{1})$ is a tautology, and so can be elided:
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y\SEMI \IF{r\le r} \THEN z\GETS s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{ry1}{\DR{y}{1}}{right=of rx1 }
+        \event{wz1}{\DW{z}{1}}{right=of ry1}
+        \po{ry1}{wz1}
+      \end{tikzinline}}
+  \end{gather*}
 \subsection{Sequential composition}
 
 %% Program logics and semantics tell us that when executing ((S1; S2), state0),
