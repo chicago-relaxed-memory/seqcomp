@@ -6,6 +6,7 @@ by store forwarding. Something like:
 \texttt{(r=x; y=1); (s=y; z=s+r)}
 
 \subsection{Preliminaries}
+\label{sec:prelim}
 The syntax is built from
 \begin{itemize}
 \item a set of \emph{values} $\Val$, ranged over by
@@ -55,9 +56,12 @@ We model the following language.
   \BNFSEP\THREAD{\aCmd}
   \BNFSEP\aGrp_1 \PAR \aGrp_2
 \end{align*}
+
 \emph{Memory modes}, $\amode$, are {relaxed} ($\mRLX$), {release-acquire}
-($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed is the default.
-% 
+($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed mode is the
+default; we regularly elide it from examples.  $\mRA$/$\mSC$ accesses are
+collectively known as \emph{synchronized accesses}.
+ 
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs.
 % 
@@ -82,10 +86,10 @@ We require that:
 \begin{itemize}
 \item actions include writes $\DWP{\aLoc}{\aVal}$ and reads $\DRP{\aLoc}{\aVal}$,
 \item formulae include equalities $(\aExp{=}\bExp)$ and $(\aExp{=}\aLoc)$,
-\item formulae include symbols $\RW$, % for all $\aLoc$,
+\item formulae include symbols % for all $\aLoc$,
   % \item formulae include the symbols
   $\Q{\mSC}$, $\Q{\mRA}$, $\Qx{\aLoc}$, 
-  $\Qw{\aLoc}$, $\Dx{\aLoc}$, % for all $\aLoc$,
+  $\Qw{\aLoc}$, $\Dx{\aLoc}$, $\RW$, % for all $\aLoc$,
 \item formulae are closed under negation, conjunction, disjunction, and
   substitutions $[\aExp/\aReg]$ and $[\aExp/\aLoc]$, 
 \item there is an entailment relation $\vDash$ between formulae,
@@ -128,10 +132,10 @@ We additionally assume that either:
 % additionally require that
 \begin{itemize}
 \item each register appears at most once in a program, or
-% \end{itemize}
-% In \textsection\ref{sec:complications} and following, we
-% require instead that
-% \begin{itemize}
+  % \end{itemize}
+  % In \textsection\ref{sec:complications} and following, we
+  % require instead that
+  % \begin{itemize}
 \item there are registers
   $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$ that do not
   appear in programs.
@@ -185,7 +189,7 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
     {\reorder} = \{(\DR{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \}
     \cup\{(\DR{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc\}.
   \end{math}
-  %\emph{Independency} (${\reorder}\subseteq\Act\times\Act$), is defined:
+  % \emph{Independency} (${\reorder}\subseteq\Act\times\Act$), is defined:
   \begin{comment}
     % {\reorderSC} &= \emptyset
     % \\
@@ -199,7 +203,16 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
     % \\[-.5ex]&\mkern2mu\cup\mkern2mu
     % \{(\DR{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc\}
   \end{comment}
+
+  Actions that are not independent are in \emph{conflict}.
 \end{definition}
+
+This use of independency is inspired by
+\citet{DBLP:books/ws/95/Mazurkiewicz95}.  It is worth noting that if
+${\reorder}$ is taken to be the empty relation, then fulfilled pomsets in the
+following semantics correspond to sequentially consistent executions
+\cite{Lamport:1979:MMC:1311099.1311750} up to mumbling
+\cite{DBLP:journals/iandc/Brookes96}.
 
 % Definition \ref{def:pomsets} describes operators over sets of pomsets
 % sufficient to give the semantics for the following fragment of our language:
@@ -260,32 +273,103 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
   \noindent
   For a language fragment, the semantics is:
   \begin{align*}
-    \sem{\PW{\aLoc}{\aVal}\SEMI \aCmd} &= \textstyle\DWP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
+    \sem{\PW[\amode]{\aLoc}{\aVal}\SEMI \aCmd} &= \textstyle\DWP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
     &
     \sem{\SKIP} &= \sem{\NIL} = \sNIL 
     \\
-    \sem{\PR{\aLoc}{\aReg}\SEMI \aCmd} &= \textstyle\bigcup_{\aVal}\DRP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
+    \sem{\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd} &= \textstyle\bigcup_{\aVal}\DRP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
     &
     \sem{\aGrp_1 \PAR \aGrp_2} &= \sem{\aGrp_1}\sPAR\sem{\aGrp_2}
     % \\
     % \sem{\PA{\aLoc}{\aVal}\SEMI \aCmd} &= \textstyle\DRP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
   \end{align*}
   % Let $\aPSS$ range over sets of pomsets.
-
 \end{definition}
 
-If we take ${\reorder} = \emptyset$, then we have sequentially consistent
-execution.
+In this semantics, both $\SKIP$ and $\NIL$ map to the empty pomset.  Parallel
+composition is disjoint union, inheriting labeling and order from the two
+side.  Prefixing may add a new action (on the left) to an existing pomset
+(on the right), inheriting labeling and order from the right.  
 
-[Do Examples.]
+\begin{example}
+  \label{ex:mumble1}
+  Mumbling is allowed, since there is no requirement that left and right be
+  disjoint in the definition of prefixing.  Both of the pomsets below are
+  allowed.
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1} \SEMI \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\DW{x}{1}}{}
+          \event{a2}{\DW{x}{1}}{right=of a1}
+          \wk{a1}{a2}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{1} \SEMI \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\DW{x}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  In the left pomset, the order between the events is enforced by clause
+  \ref{pre-reorder}, since the actions are in conflict.
+\end{example}
 
-[Do examples with coherence.]
+\begin{example}
+  \label{ex:pub1}
+  Although this model enforces coherence, it is very weak.  For example, it
+  makes no distinction between synchronizing and relaxed access, thus
+  allowing:
+  \begin{gather*}
+    x\GETS0\SEMI %y\GETS0\SEMI
+    x\GETS 1\SEMI y^\mRA\GETS1 \PAR r\GETS y^\mRA\SEMI s\GETS x
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
+        \raevent{ry1}{\DR[\mRA]{y}{1}}{right=2.5em of wy1}
+        \event{rx0}{\DR{x}{0}}{right=of ry1}
+        % \sync{wx1}{wy1}
+        % \sync{ry1}{rx0}
+        \rf{wy1}{ry1}
+        \wk[in=-15,out=-165]{rx0}{wx1}
+        \wk{wx0}{wx1}
+        \rf[out=15,in=165]{wx0}{rx0}
+      \end{tikzinline}}
+  \end{gather*}  
+  We show how to enforce the intended semantics, where $\DWP[\mRA]{y}{1}$
+  \emph{publishes} $\DWP{x}{1}$ in \refex{ex:pub2}.
+\end{example}
+In diagrams, we use different shapes and colors for arrows and events.  These
+are included only to help the reader understand why order is included.  We
+adopt the following conventions (dependency and synchronization order will
+appear later in the paper):
+\begin{itemize}  
+\item relaxed accesses are blue, with a single border,
+\item synchronized accesses are red, with a double border,
+% \item sequentially-consistent accesses are orange, with a bold double
+%   border,
+\item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
+\item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
+  \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
+  $\bEv$ and their actions \emph{conflict},
+\item \makebox{$\aEv\xpo\bEv$} arises from control/data/address \emph{dependency},% (eg, control),
+\item \makebox{$\aEv\xsync\bEv$} arises from \emph{synchronized access}.
+\end{itemize}
 
-[Note that this allows mumbling.]
+\begin{definition}
+  $\aPSS_1$ \emph{refines} $\aPSS_2$ if $\aPSS_1\subseteq\aPSS_2$.
+\end{definition}
 
-[Use refinement (that is subset order) as notion of compiler optimization.]
-
-[Talk about Mazurkiewicz traces.]
+\begin{example}
+  \refex{ex:mumble1} shows that $\sem{\PW{x}{1}}$ refines $\sem{\PW{x}{1}\SEMI\PW{x}{1}}$.
+\end{example}
 
 \subsection{Pomsets with Preconditions}
 \label{sec:pomsets-pre}
@@ -328,7 +412,7 @@ to relaxed access.  We discuss the differences in the appendix.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParDisjointCount}}
   \item[\ref{par-E}--\ref{par-disjoint})]
-    as for $\sPAR$ in Def.~\ref{def:pomsets},
+    as for $\sPAR$ in \refdef{def:pomsets},
   \item \label{par-kappa1}
     if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
   \item \label{par-kappa2}
@@ -344,7 +428,7 @@ to relaxed access.  We discuss the differences in the appendix.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParCount}}
   \item[\ref{par-E}--\ref{par-le2})] 
-    as for $\sPAR$  in Def.~\ref{def:pomsets} (ignoring disjointness),
+    as for $\sPAR$  in \refdef{def:pomsets} (ignoring disjointness),
   \item \label{if-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
   \item \label{if-kappa2}
@@ -365,7 +449,7 @@ to relaxed access.  We discuss the differences in the appendix.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[\ref{pre-E}--\ref{pre-reorder})]
-    as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in Def.~\ref{def:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
+    as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{storepre-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aExp{=}\aVal$,
   \item \label{storepre-kappa2}
@@ -385,7 +469,7 @@ to relaxed access.  We discuss the differences in the appendix.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[\ref{pre-E}--\ref{pre-reorder})]
-    as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in Def.~\ref{def:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
+    as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{loadpre-kappa2}
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
     $\labelingForm(\aEv)$ implies $\aReg{=}\aVal\limplies\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv<\aEv$, or \\
@@ -400,12 +484,12 @@ to relaxed access.  We discuss the differences in the appendix.
     \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd_1}\sELSE\sem{\aCmd_2}\sFI
     \\
     \begin{aligned}
-      \sem{\PW{\aLoc}{\aExp}\SEMI \aCmd} &=
+      \sem{\PW[\amode]{\aLoc}{\aExp}\SEMI \aCmd} &=
       \sSTOREPRE{\aLoc}{\aExp}{\sem{\aCmd}}
       &
       \sem{\SKIP} &= \sem{\NIL} = \sNIL 
       \\
-      \sem{\PR{\aLoc}{\aReg}\SEMI \aCmd} &=
+      \sem{\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd} &=
       \sLOADPRE{\aReg}{\aLoc}{\sem{\aCmd}}
       &
       \makebox[3.5em][r]{$\sem{\aGrp_1 \PAR \aGrp_2}$} &= \sem{\aGrp_1}\sPAR\sem{\aGrp_2}
@@ -417,10 +501,17 @@ $\sLOADPRE{}{}{}$, $<$ refers to the order of $\aPS$.  Also note that
 $\sLOADPRE{}{}{}$ does not constrain $\labelingForm(\aEv)$ if
 $\aEv\in\aEvs_1$.
 
+\begin{example}
+  Dependency
+\end{example}
 
+\begin{example}
+  Independency
+\end{example}
 
-
-[Stuff about conditionals and merging events.]
+\begin{example}
+  Conditional merging events
+\end{example}
 
 
 \subsection{Pomsets with Predicate Transformers}
@@ -431,7 +522,7 @@ sequential composition.]
 The final semantic functions for load and store, given in
 Figure~\ref{fig:full}, are quite complex.  We explain the definition by
 looking at its constituent parts, starting with
-Def.~\ref{def:pomsets-trans}, below, which captures dependency.  In
+\refdef{def:pomsets-trans}, below, which captures dependency.  In
 \textsection\ref{sec:q}, we add \emph{quiescence}, which encodes coherence,
 release-acquire and SC access, and termination.  In
 \textsection\ref{sec:arm}, we add peculiarities that are necessary for
@@ -446,18 +537,22 @@ to validate if-closure and to allow address calculation.
       % \input{fig-full-noco}
     \end{minipage}
   \end{center}
-  \caption{Full Semantics of Loads, Stores and Threads (See Def.~\ref{def:QS}
-    for $\QS{}{}$/$\QL{}{}$ and Def.~\ref{def:DS} for $\DS{}{}$/$\DL{}{}$)}
+  \caption{Full Semantics of Loads, Stores and Threads (See \refdef{def:QS}
+    for $\QS{}{}$/$\QL{}{}$ and \refdef{def:DS} for $\DS{}{}$/$\DL{}{}$)}
   \label{fig:full}
 \end{figure*}    
 
 
 \begin{definition}
-  A \emph{predicate transformer} is a monotone function
+  A \emph{predicate transformer} is a %monotone
+  function
   $\aTr{}{}:\Formulae\fun\Formulae$ such that
-  $\aTr{}{\FALSE}$ is $\FALSE$,
-  $\aTr{}{\bForm_1\land\bForm_2}$ is $\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$, and
-  $\aTr{}{\bForm_1\lor\bForm_2}$ is $\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$.
+  \begin{itemize}
+  \item $\aTr{}{\FALSE}$ is $\FALSE$,    
+  \item $\aTr{}{\bForm_1\land\bForm_2}$ is $\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
+  \item $\aTr{}{\bForm_1\lor\bForm_2}$ is $\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$, 
+  \item if $\aForm$ implies $\bForm$, then $\aTr{}{\aForm}$ implies $\aTr{}{\bForm}$.
+  \end{itemize}
 \end{definition}
 
 \begin{definition}
@@ -467,7 +562,8 @@ to validate if-closure and to allow address calculation.
   implies $\aTr{\bEvs}{\bForm}$.
 \end{definition}
 
-[Predicates with smaller subsets of $\aEvs$ are stronger.]
+Note that in a family of predicate transformers for $\aEvs$, transformers for
+smaller subsets of $\aEvs$ are stronger.
 
 \begin{definition}
   A pomset with predicate tansformers is a pomset with preconditions,
@@ -503,13 +599,13 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   If $\aPS \in \sFORK{\aPSS}$ then
   $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}
-  \item \label{fork-E}
+  \item[{\labeltext[F1]{F1)}{F1}}] %\label{fork-E}
     $\aEvs=\aEvs_1$,
-  \item \label{fork-lambda}
+  \item[{\labeltext[F2]{F2)}{F2}}] % \label{fork-lambda}
     $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
-  \item \label{fork-kappa} 
+  \item[{\labeltext[F3]{F3)}{F3}}] % \label{fork-kappa} 
     $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$, 
-  \item \label{fork-tau} 
+  \item[{\labeltext[F4]{F4)}{F4}}] % \label{fork-tau} 
     $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
     \newcounter{pomsetXForkCount}
     \setcounter{pomsetXForkCount}{\value{enumi}}
@@ -517,7 +613,7 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
 \end{definition}
 \begin{definition}
   \noindent
-  Adopting $\sNIL$ and $\sPAR$ from Def.~\ref{def:pomsets-pre},
+  Adopting $\sNIL$ and $\sPAR$ from \refdef{def:pomsets-pre},
   the semantics of thread groups is:
   \begin{align*}
     \sem{\THREAD{\aCmd}} &= \sTHREAD{}\sem{\aCmd}
@@ -558,7 +654,7 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPreIfCount}}
-  \item[1--\ref{if-kappa12})] as for $\sIF{}$ in Def.~\ref{def:pomsets-pre},
+  \item[1--\ref{if-kappa12})] as for $\sIF{}$ in \refdef{def:pomsets-pre},
   \item \label{if-tau}
     $\aTr{\bEvs}{\bForm}$ implies
     $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$.
@@ -576,7 +672,7 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParCount}}
   \item[1--\ref{par-le2})]
-    as for $\sPAR$  in Def.~\ref{def:pomsets} (ignoring disjointness),
+    as for $\sPAR$  in \refdef{def:pomsets} (ignoring disjointness),
   \item \label{seq-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
   \item \label{seq-kappa2}
@@ -688,9 +784,29 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
       \end{aligned}
     \end{gather*}
   \end{scope}
-
 \end{definition}
 
+[Chat about abort, skip, let and if.]
+
+[Chat about semicolon.]
+
+In the predicate transformers for store and load, \ref{S4} and \ref{L4}
+denote the \emph{dependent case}, whereas \ref{S5} and \ref{L5}
+denote the \emph{independent case}.  For stores, the dependent and
+independent cases are the same; this will change in the next section, where
+we introduce quiescence.  In the dependent case for load, we can assume that
+$\aReg$ is the value $\aVal$, which has appears in the read action, when
+proving $\bForm$.  In the independent case for load, we can only make the
+weaker assumption that either $\aReg$ is $\aVal$ or it is value defined by
+preceding code for $\aLoc$.  That is, we do not know whether subsequent code
+sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
+
+We include \ref{L6} in order to ensure prefix closure on sets of pomsets.  If
+we choose a pomset with no events, what should the predicate transformer do
+for load?  In this case, we have no value $\aVal$ to mention, and therefore
+the best we can do is to emulate skip.  In order to eventually arrive at a
+top-level pomset, this means that subsequent code must be independent of
+$\aReg$.
 
 % Recall that $\uRegs{\bEvs}=\{\uReg{\bEv}\mid\bEv\in\bEvs\}$.
 
@@ -987,7 +1103,7 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
       \PR{x}{r} 
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{(1{=}r)\limplies\bForm}{}
+          \xform{xd}{1{=}r\limplies\bForm}{}
           \xform{xi}{(x{=}r\lor1{=}r)\limplies\bForm}{below=of xd}
           \event{a1}{\DR{x}{1}}{above=of xd}
           \xo{a1}{xd}
@@ -1029,30 +1145,177 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdi}{(1{=}r)\limplies\bForm[r/y]}{}
-        \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdi}
-        \event{a1}{\DR{x}{1}}{above=of xdi}
-        \event{a2}{(x{=}r\lor1{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
-        \xform{xdd}{1{=}r\limplies\bForm[r/y]}{above right=.5em and -1em of a1}
-        \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=2.7em of a2}
-        \xo{a1}{xdi}
+        \xform{xdd}{1{=}r\limplies\bForm[r/y]}{}
+        \xform{xdi}{1{=}r\limplies\bForm[r/y]}{below=of xdd}
+        \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdd}
+        \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=of xid}
+        \event{a1}{\DR{x}{1}}{above=of xdd}
+        \event{a2}{(x{=}r\lor1{=}r)\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
+        \xo[out=-170,in=170]{a1}{xdi}
         \xo{a2}{xid}
         \xo{a1}{xdd}
         \xo{a2}{xdd}
       \end{tikzinline}}
   \end{gather*}
-  If the read is ordered before the write, then the precondition of the write
-  can be weakened: % to
-  % \begin{math}
-  %   1{=}r\limplies r{=}1.
-  % \end{math}
+  The precondition of $\DWP{y}{1}$ can be simplified to
+  $(x{=}r\limplies r{=}1)$, which is only a tautology when $x{=}1$.  If we choose a pomset that orders
+  $\DRP{x}{1}\xpo\DWP{y}{1}$, then the predicate transformers are the same,
+  but the precondition of $\DWP{y}{1}$ can be weakened to
+  $(1{=}r\limplies r{=}1)$, which is a tautology.
   \begin{gather*}
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+        \xform{xdd}{1{=}r\limplies\bForm[r/y]}{}
+        \xform{xdi}{1{=}r\limplies\bForm[r/y]}{below=of xdd}
+        \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdd}
+        \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=of xid}
+        \event{a1}{\DR{x}{1}}{above=of xdd}
+        \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
+        \xo[out=-170,in=170]{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}        
+        % \event{a1}{\DR{x}{1}}{}
+        % \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
 \end{example}
 
+\begin{example}
+  If the read and write choose different values:
+  \begin{align*}
+    \begin{gathered}
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{1{=}r\limplies\bForm}{}
+          \xform{xi}{(x{=}r\lor1{=}r)\limplies\bForm}{below=of xd}
+          \event{a1}{\DR{x}{1}}{above=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[r/y]}{}
+          \xform{xi}{\bForm[r/y]}{below=of xd}
+          \event{a2}{r{=}2\mid\DW{y}{2}}{above=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Putting these together without order:
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdd}{1{=}r\limplies\bForm[r/y]}{}
+        \xform{xdi}{1{=}r\limplies\bForm[r/y]}{below=of xdd}
+        \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdd}
+        \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=of xid}
+        \event{a1}{\DR{x}{1}}{above=of xdd}
+        \event{a2}{(x{=}r\lor1{=}r)\limplies r{=}2\mid\DW{y}{2}}{above=of xid}
+        \xo[out=-170,in=170]{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+      \end{tikzinline}}
+  \end{gather*}
+  The precondition of $\DWP{y}{2}$ is unsatisfiable if no further assumptions
+  can be made on $r$; that is the case here, since we assume each register
+  occurs at most once in source programs. If we choose a pomset that orders
+  $\DRP{x}{1}\xpo\DWP{y}{2}$, then the predicate transformers are the same,
+  but the precondition of $\DWP{y}{1}$ is weakened to
+  $(1{=}r\limplies r{=}2)$; this is also unsatisfiable without further
+  assumptions on $r$.
+  % \begin{gather*}
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \xform{xdd}{1{=}r\limplies\bForm[r/y]}{}
+  %     \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdd}
+  %     \event{a1}{\DR{x}{1}}{above=of xdd}
+  %     \event{a2}{1{=}r\limplies r{=}2\mid\DW{y}{2}}{above=of xid}
+  %     \xform{xdi}{1{=}r\limplies\bForm[r/y]}{below=of xdd}
+  %     \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=of xid}
+  %     \xo[out=-170,in=170]{a1}{xdi}
+  %     \xo{a2}{xid}
+  %     \xo{a1}{xdd}
+  %     \xo{a2}{xdd}        
+  %       %     \event{a1}{\DR{x}{1}}{}
+  %       %     \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+  %     \po{a1}{a2}
+  %   \end{tikzinline}}
+  % \end{gather*}
+\end{example}
 
+
+\begin{example}
+  The JMM causality test cases \citep{PughWebsite} are justified via compiler
+  analysis, possibly in collusion with the scheduler: If every observed value
+  can be shown to satisfy a precondition, then the precondition can be
+  dropped.  
+
+  For example, Test Case 1 determines that the following execution
+  should be allowed:
+  \begin{gather*}
+    x\GETS 0 \SEMI
+    \FORK{\!
+      (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+      \PAR
+      x\GETS y)
+    }
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{rx1}{\DR{x}{1}}{right=3em of wx0}
+        \event{wy1}{0{\geq}0\mid\DW{y}{1}}{right=of rx1}
+        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+        \event{wx1}{\DW{x}{1}}{right=of ry1}
+        \po{ry1}{wx1}
+        \rf[out=-168,in=-12]{wx1}{rx1}
+        \rf{wy1}{ry1}
+        \wk[out=10,in=170]{wx0}{wx1}
+        \wk{wx0}{rx1}
+      \end{tikzinline}}
+  \end{gather*}
+  Looking at the first forked thread:
+  \begin{align*}
+    \begin{gathered}
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{1{=}r\limplies\bForm}{}
+          \xform{xi}{(x{=}r\lor1{=}r)\limplies\bForm}{below=of xd}
+          \event{a1}{\DR{x}{1}}{above=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{r{\geq}0}\THEN y\GETS1 \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{(r{\geq}0\limplies\bForm[r/y]) \land (r{<}0\limplies\bForm)}{}
+          \xform{xi}{(r{\geq}0\limplies\bForm[r/y]) \land (r{<}0\limplies\bForm)}{below=of xd}
+          \event{a2}{r{\geq}0\mid\DW{y}{1}}{above=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Putting these together without order, and dropping the predicate transformers:
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \IF{r{\geq}0}\THEN y\GETS1 \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{(x{=}r\lor1{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}
+      \end{tikzinline}}
+  \end{gather*}
+  The precondition of $\DWP{y}{1}$ can be simplified to
+  $(x{=}r\limplies r{\geq}0$.
+  $\DWP{x}{0}$ has predicate transformer $(\bForm[0/x])$, both in the
+  dependent and independent cases.
+\end{example}

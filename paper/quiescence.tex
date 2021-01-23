@@ -1,8 +1,16 @@
 \section{Quiescence}
 \label{sec:q}
 
-Quiescence is used to capture termination, coherence, release-acquire access,
-and SC access.
+We introduce \emph{quiescence}, which captures \emph{coherence},
+\emph{synchronized access}, and \emph{completion}.  Recall from
+\textsection\ref{sec:prelim} that formulae include symbols formulae include
+symbols $\Q{\mSC}$, $\Q{\mRA}$, $\Qx{\aLoc}$, and $\Qw{\aLoc}$ such that
+\begin{displaymath}
+  \Q{\mSC}\textimplies\Q{\mRA}\textimplies\Qx{\aLoc}\textimplies\Qw{\bLoc}, \textwhen \aLoc=\bLoc.
+\end{displaymath}
+We refer to these collectively as \emph{quiescence symbols}.  The memory
+locations associated with quiescence symbols are indices that are not subject
+to substitution; thus, $\Qx{\aLoc}[\aExp/\aLoc]$ is $\Qx{\aLoc}$.
 
 
 \subsection{Coherence ($\xCO$)}
@@ -14,12 +22,13 @@ and SC access.
 %   alias analysis over read only code, not required by hardware)
 % \end{itemize}
 
-In order to describe coherence, we use the uninterpreted logical symbols
-$\Qx{\aLoc}$ and $\Qw{\aLoc}$, for each location $\aLoc$, with the
-interpretation that
-\begin{math}
-  \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc.
-\end{math}
+% In order to describe coherence, we use the uninterpreted logical symbols
+% $\Qx{\aLoc}$ and $\Qw{\aLoc}$, for each location $\aLoc$, with the
+% interpretation that
+% \begin{math}
+%   \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc
+% \end{math}
+% (and therefore $\lnot\Qw{\aLoc} \textimplies \lnot\Qx{\aLoc}$.)
 
 When $\Qx{\aLoc}$ is discharged in the precondition of event $\aEv$, we
 expect that all reads and writes of $\aLoc$ that precede $\aEv$ in program
@@ -28,13 +37,13 @@ $\Qw{\aLoc}$ is similar, but applies only to preceding writes.
 
 \begin{definition}
   Let $[\TRUE/\Q{}]$ be the substitution that replaces all quiescence
-  symbols replaced by $\TRUE$.
+  symbols by $\TRUE$.
 \end{definition}
 
-We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
+We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
 \begin{definition}[$\xCO$]
   \label{def:pomsets-co}
-  Update Def.~\ref{def:pomsets-trans} to:
+  Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
   \item[\ref{S3})]
     $\labelingForm(\aEv)$ implies $\Qx{\aLoc}\land\aExp{=}\aVal$,
@@ -71,13 +80,104 @@ We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
 %   $\aTr{\emptyset}{\bForm}\;$ implies $\lnot\Q{}$.
 % \end{enumerate}
 
-\begin{definition}
-  $\aPS$ is \emph{quiescent} if $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
-\end{definition}
 
 
 \begin{example}
-  Merging left.
+  \refdef{def:pomsets-co} enforces coherence.  Consider:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[1/x]\land (\Qw{x}\limplies 1{=}1)}{}
+          \xform{xi}{\bForm[1/x]\land \lnot\Qw{x}}{below=of xd}
+          \event{a1}{1{=}1\land \Qx{x}\mid\DW{x}{1}}{above=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[2/x]\land (\Qw{x}\limplies 2{=}2)}{}
+          \xform{xi}{\bForm[2/x]\land \lnot\Qw{x}}{below=of xd}
+          \event{a2}{2{=}2\land\Qx{x}\mid\DW{x}{2}}{above=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Simplifying, we have:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[1/x]}{}
+          \xform{xi}{\bForm[1/x]\land \lnot\Qw{x}}{below=of xd}
+          \event{a1}{\Qx{x}\mid\DW{x}{1}}{left=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm[2/x]}{}
+          \xform{xi}{\bForm[2/x]\land \lnot\Qw{x}}{below=of xd}
+          \event{a2}{\Qx{x}\mid\DW{x}{2}}{left=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  If we attempt to put these together unordered, the precondition of
+  $\DWP{x}{2}$ will be
+  \begin{math}
+    (\Qx{x})[1/x]\land \lnot\Qw{x}, 
+  \end{math}
+  which is unsatisfiable: $\Qx{x}\land \lnot\Qx{x}$.
+  % 
+  In order to get a satisfiable precondition for $\DWP{x}{2}$, we must
+  introduce order:
+  \begin{gather*}
+    \PW{x}{1}\SEMI \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdi}{\bForm[2/x]\land \lnot\Qw{x}}{}
+        \xform{xdd}{\bForm[2/x]}{right=of xdi}
+        \xform{xid}{\bForm[2/x]\land \lnot\Qw{x}}{right=of xdd}
+        \xform{xii}{\bForm[2/x]\land \lnot\Qw{x}}{below=of xdd}
+        \event{a1}{\Qx{x}\mid\DW{x}{1}}{above left=.5em and -1em of xdd}
+        \event{a2}{\Qx{x}\mid\DW{x}{2}}{above right=.5em and -1em of xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+        \po{a1}{a2}
+      \end{tikzinline}}
+  \end{gather*}
+  % Adding order does nothing since the preconditions are tautologies.
+  % \begin{gather*}
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \xform{xdi}{\bForm[1/x]\land \lnot\Q{}}{}
+  %     \xform{xdd}{\bForm[1/x]}{right=of xdi}
+  %     \xform{xid}{\bForm[1/x]\land \lnot\Q{}}{right=of xdd}
+  %     \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
+  %     \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
+  %     \xform{xii}{\bForm[1/x]\land \lnot\Q{}}{below=of xdd}
+  %     \xo{a1}{xdi}
+  %     \xo{a2}{xid}
+  %     \xo{a1}{xdd}
+  %     \xo{a2}{xdd}
+  %     \po{a1}{a2}
+  %   \end{tikzinline}}
+  % \end{gather*}
+\end{example}
+
+\begin{example}
+  \ref{S4} includes $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)$ in order to
+  prevent \emph{left merges}.  Consider the following.  
   \begin{align*}
     \begin{gathered}
       \PW{x}{1}
@@ -107,7 +207,7 @@ We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
       \PW{x}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a1}{\DW{x}{1}}{}
+          \event{a1}{\Qx{x}\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm[1/x]}{right=of a1}
           \xform{x1i}{\bForm[1/x]\land \lnot\Q{}}{below=of x1d}
           \xo{a1}{x1d}
@@ -148,112 +248,29 @@ We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
   %   \end{tikzinline}}
   % \end{gather*}
   % which simplifies to
+  % \begin{gather*}
+  %   %   \PW{x}{1}\SEMI \PW{x}{2}
+  %   %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \event{a1}{\DW{x}{1}}{}
+  %     \xform{x1d}{(\bForm[1/x])[2/x]\land \lnot\Q{}}{right=of a1}
+  %     \xform{x1i}{(\bForm[1/x]\land \lnot\Q{})[2/x]\land \lnot\Q{}}{below=of x1d}
+  %     \xo{a1}{x1d}
+  %   \end{tikzinline}}
+  % \end{gather*}
+  % which simplifies to
   \begin{gather*}
     % \PW{x}{1}\SEMI \PW{x}{2}
     % \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{\DW{x}{1}}{}
-        \xform{x1d}{(\bForm[1/x])[2/x]\land \lnot\Q{}}{right=of a1}
-        \xform{x1i}{(\bForm[1/x]\land \lnot\Q{})[2/x]\land \lnot\Q{}}{below=of x1d}
-        \xo{a1}{x1d}
-      \end{tikzinline}}
-  \end{gather*}
-  which simplifies to
-  \begin{gather*}
-    % \PW{x}{1}\SEMI \PW{x}{2}
-    % \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{\DW{x}{1}}{}
-        \xform{x1d}{\bForm[1/x]\land \lnot\Q{}}{right=of a1}
-        \xform{x1i}{\bForm[1/x]\land \lnot\Q{}}{right=of x1d}
+        \event{a1}{\Qx{x}\mid\DW{x}{1}}{}
+        \xform{x1d}{\bForm[2/x]\land \lnot\Q{}}{right=of a1}
+        \xform{x1i}{\bForm[2/x]\land \lnot\Q{}}{right=of x1d}
         \xo{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
 \end{example}
 
-\begin{example}
-  Separate actions:
-  \begin{align*}
-    \begin{gathered}
-      \PW{x}{1} 
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[1/x]\land (\Q{}\limplies 1{=}1)}{}
-          \xform{xi}{\bForm[1/x]\land \lnot\Q{}}{below=of xd}
-          \event{a1}{1{=}1\mid\DW{x}{1}}{above=of xd}
-          \xo{a1}{xd}
-        \end{tikzinline}}    
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \PW{x}{2}
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[2/x]\land (\Q{}\limplies 2{=}2)}{}
-          \xform{xi}{\bForm[2/x]\land \lnot\Q{}}{below=of xd}
-          \event{a2}{2{=}2\mid\DW{x}{2}}{above=of xd}      
-          \xo{a2}{xd}
-        \end{tikzinline}}    
-    \end{gathered}
-  \end{align*}
-  Simplifying:
-  \begin{align*}
-    \begin{gathered}
-      \PW{x}{1} 
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[1/x]}{}
-          \xform{xi}{\bForm[1/x]\land \lnot\Q{}}{below=of xd}
-          \event{a1}{\DW{x}{1}}{left=of xd}
-          \xo{a1}{xd}
-        \end{tikzinline}}    
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \PW{x}{2}
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[2/x]}{}
-          \xform{xi}{\bForm[2/x]\land \lnot\Q{}}{below=of xd}
-          \event{a2}{\DW{x}{2}}{left=of xd}      
-          \xo{a2}{xd}
-        \end{tikzinline}}    
-    \end{gathered}
-  \end{align*}
-  Putting these together unordered:
-  \begin{gather*}
-    \PW{x}{1}\SEMI \PW{x}{2}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdi}{\bForm[1/x]\land \lnot\Q{}}{}
-        \xform{xdd}{\bForm[1/x]}{right=of xdi}
-        \xform{xid}{\bForm[1/x]\land \lnot\Q{}}{right=of xdd}
-        \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
-        \event{a2}{\lnot\Q{}\mid\DW{x}{2}}{above right=.5em and -1em of xdd}
-        \xform{xii}{\bForm[1/x]\land \lnot\Q{}}{below=of xdd}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}
-      \end{tikzinline}}
-  \end{gather*}
-  Adding order does nothing since the preconditions are tautologies.
-  % \begin{gather*}
-  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %     \xform{xdi}{\bForm[1/x]\land \lnot\Q{}}{}
-  %     \xform{xdd}{\bForm[1/x]}{right=of xdi}
-  %     \xform{xid}{\bForm[1/x]\land \lnot\Q{}}{right=of xdd}
-  %     \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
-  %     \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
-  %     \xform{xii}{\bForm[1/x]\land \lnot\Q{}}{below=of xdd}
-  %     \xo{a1}{xdi}
-  %     \xo{a2}{xid}
-  %     \xo{a1}{xdd}
-  %     \xo{a2}{xdd}
-  %     \po{a1}{a2}
-  %   \end{tikzinline}}
-  % \end{gather*}
-\end{example}
 
 \begin{comment}
   Read to write dependency, first separately:
@@ -338,31 +355,62 @@ We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
 
 
 
-\subsection{RA and SC Access (\xRASC)}
+\subsection{Synchronized Access (\xRASC)}
 % Write $\Q{}$ as $\Q{\mSC}$ and introduce $\Q{\mRA}$.
 
 % $\Q{\mSC}$ implies $\Q{\mRA}$.
+
+\begin{example}
+  \label{ex:pub2}
+  The publication idiom requires that we disallow the execution below, which is
+  allowed by \refdef{def:pomsets-co}.
+  \begin{gather*}
+    \begin{gathered}
+      x\GETS0\SEMI %y\GETS0\SEMI
+      x\GETS 1\SEMI y^\mRA\GETS1 \PAR r\GETS y^\mRA\SEMI s\GETS x
+      \\[-.4ex]
+      \nonumber
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{wx0}{\DW{x}{0}}{}
+          \event{wx1}{\DW{x}{1}}{right=of wx0}
+          \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
+          \raevent{ry1}{\DR[\mRA]{y}{1}}{right=2.5em of wy1}
+          \event{rx0}{\DR{x}{0}}{right=of ry1}
+          % \sync{wx1}{wy1}
+          % \sync{ry1}{rx0}
+          \rf{wy1}{ry1}
+          \wk[in=-15,out=-165]{rx0}{wx1}
+          \wk{wx0}{wx1}
+          \rf[out=15,in=165]{wx0}{rx0}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  We disallow this by introducing order
+  $\DWP{x}{1}\xsync \DWP[\mRA]{y}{1}$
+  and
+  $\DRP[\mRA]{y}{1}\xsync \DRP{x}{0}$.
+  \begin{gather*}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
+        \raevent{ry1}{\DR[\mRA]{y}{1}}{right=2.5em of wy1}
+        \event{rx0}{\DR{x}{0}}{right=of ry1}
+        \sync{wx1}{wy1}
+        \sync{ry1}{rx0}
+        \rf{wy1}{ry1}
+        \wk[in=-15,out=-165]{rx0}{wx1}
+        \wk{wx0}{wx1}
+        % \rf[out=15,in=165]{wx0}{rx0}
+      \end{tikzinline}}  
+  \end{gather*}
+\end{example}
 
 In order to describe $\mRA$/$\mSC$ access, we use the uninterpreted logical
 symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
 \begin{math}
   \Q{\mSC} \textimplies \Q{\mRA} \textimplies \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc.
 \end{math}
-
-[visualization.  Labels to be turned off later in macros]
-\begin{gather*}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{0}}{}
-      \raevent{a2}{\DW[\mRA]{x}{1}}{right=of a1}
-      \scevent{a3}{\DR[\mSC]{x}{0}}{right=of a2}
-      \xform{a4}{\bForm}{right=of a3}
-      \sync{a2}{a3}
-      \xo{a3}{a4}
-      \wk{a1}{a2}
-    \end{tikzinline}}
-\end{gather*}
-
-
 
 \begin{definition}
   \label{def:QS}
@@ -381,7 +429,7 @@ symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
 
 \begin{definition}[$\xCO$/$\xRASC$]
   \label{def:pomsets-ra}
-  Update Def.~\ref{def:pomsets-co} to:
+  Update \refdef{def:pomsets-co} to:
   \begin{enumerate}
   \item[\ref{S3})]
     $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
@@ -389,6 +437,8 @@ symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
     $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$.
   \end{enumerate}
 \end{definition}
+
+
 
 % $\QS{\aLoc}{\mRLX}=\Qx{\aLoc}$ and otherwise $\QS{\aLoc}{\amode}=\Q{\amode}$.
 
@@ -459,5 +509,12 @@ symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
 %   \end{enumerate}  
 % \end{definition}
 
+
+\subsection{Completed Pomsets}
+
+\begin{definition}
+  A pomset with predicate transformers $\aPS$ is \emph{completed} if
+  $\aTr{\aEvs}{\Q{\mSC}}$ implies $\Q{\mSC}$.
+\end{definition}
 
 

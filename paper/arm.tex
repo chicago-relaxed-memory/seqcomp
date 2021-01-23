@@ -1,10 +1,63 @@
 \section{Efficient Implementation on ARMv8}
 \label{sec:arm}
 
+We discuss \armeight{} using \emph{external global completion} (\EGC{})
+\cite{alglave-git-alternate,armed-cats}, which is very close to our model;
+see also \cite[\textsection B2.3.6]{arm-reference-manual}.
+
 \subsection{Down-Grading Acquires ($\xDGA$)}
 \label{sec:internal}
 
-We use the uninterpreted symbols $\Dx{\aLoc}$.
+
+\begin{example}
+The following execution is allowed by \armeight{}, but disallowed by
+\refdef{def:pomsets-ra}.  The coherence order between the writes can be
+witnessed by a separate thread, which we have elided.
+\begin{gather*}
+  \PW{x}{2}\SEMI 
+  \PR[\mRA]{x}{r}\SEMI
+  \PW{y}{1} \PAR
+  \PW{y}{2}\SEMI
+  \PW[\mRA]{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+      \rf{a}{b}
+      \sync{b}{c}
+      \wk{c}{d}
+      \sync{d}{e}
+      \wk[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+\end{gather*}
+Under \EGC{}, this is explained by dropping the order
+$\DRP[\mRA]{x}{2}\xsync\DWP{y}{1}$, because $\DRP[\mRA]{x}{2}$ is fulfilled
+by a relaxed write in the same thread.
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+      \rf{a}{b}
+      %\sync{b}{c}
+      \wk{c}{d}
+      \sync{d}{e}
+      \wk[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}  
+\end{gather*}
+
+More generally, this can be understood as a compiler optimization that
+downgrades a read from $\mRA$ to $\mRLX$ when it read can be fulfilled by a
+relaxed write in the same thread.
+\end{example}
+
+To model such \emph{downgraded acquires}, we use the uninterpreted symbols
+$\Dx{\aLoc}$.
 
 \begin{definition}
   \label{def:DS}
@@ -25,7 +78,7 @@ We use the uninterpreted symbols $\Dx{\aLoc}$.
 
 \begin{definition}[$\xCO$/$\xRASC$/$\xDGA$]
   \label{def:pomsets-down}
-  Update Def.~\ref{def:pomsets-ra} to:
+  Update \refdef{def:pomsets-ra} to:
   \begin{enumerate}
   \item[\ref{S4})]
     $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$,
@@ -39,13 +92,110 @@ We use the uninterpreted symbols $\Dx{\aLoc}$.
 \end{definition}
 
 
-\subsection{Read-Read dependencies ($\xRRD$)}
+% The following execution is allowed both by \armeight{} and \tso{}, but
+% disallowed by \refdef{def:pomsets-ra}.
+% \begin{gather*}
+%   \PW{x}{2}\SEMI 
+%   \PR[\mRA]{x}{r}\SEMI
+%   \PR{y}{s} \PAR
+%   \PW{y}{2}\SEMI
+%   \PW[\mRA]{x}{1}
+%   \\
+%   \hbox{\begin{tikzinline}[node distance=1.5em]
+%       \event{a}{\DW{x}{2}}{}
+%       \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+%       \event{c}{\DR{y}{0}}{right=of b}
+%       \event{d}{\DW{y}{2}}{right=2.5em of c}
+%       \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+%       \rf{a}{b}
+%       \sync{b}{c}
+%       \wk{c}{d}
+%       \sync{d}{e}
+%       \wk[out=-165,in=-15]{e}{a}
+%     \end{tikzinline}}
+% \end{gather*}
 
-We use the uninterpreted symbol $\RW$.
+\begin{example}
+One might worry that our model is too permissive for $\mSC$ access, but
+\armeight{} allows some counterintuitive results for SC access.  In the
+following execution we elide the initializing write $\DWP{y}{0}$.
+\begin{gather*}
+  \IF{\PR{x}{}}\THEN \PW{x}{2} \FI\SEMI
+  \PR[\mSC]{x}{r}\SEMI
+  \PR[\mSC]{y}{s} \PAR
+  \PW[\mSC]{y}{2}\SEMI
+  \PW[\mSC]{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DR{x}{1}}{}
+      \event{b}{\DW{x}{2}}{right=of a}
+      \scevent{c}{\DR[\mSC]{x}{2}}{right=of b}
+      \scevent{d}{\DR[\mSC]{y}{0}}{right=of c}
+      \scevent{e}{\DW[\mSC]{y}{2}}{right=2.5em of d}
+      \scevent{f}{\DW[\mSC]{x}{1}}{right=of e}
+      \po{a}{b}
+      \rf{b}{c}
+      %\sync{c}{d}
+      \sync{e}{f}
+      \wk{d}{e}
+      \rf[out=-165,in=-15]{f}{a}
+    \end{tikzinline}}
+\end{gather*}
+Under \EGC{}, this is explained by dropping the order
+$\DRP[\mSC]{x}{2}\xsync\DRP{y}{0}$, because $\DRP[\mSC]{x}{2}$ is fulfilled
+by a relaxed write in the same thread.
+\end{example}
+
+\subsection{Removing Read-Read dependencies ($\xRRD$)}
+
+\begin{example}
+The following execution is allowed by \armeight{}, but disallowed by
+\refdef{def:pomsets-ra}.  
+\begin{gather*}
+  \begin{gathered}
+  x\GETS0\SEMI 
+  x\GETS 1\SEMI y^\mRA\GETS1 \PAR r\GETS y\SEMI \IF{r}\THEN s\GETS x\FI
+  \\[-.4ex]
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{wx0}{\DW{x}{0}}{}
+      \event{wx1}{\DW{x}{1}}{right=of wx0}
+      \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
+      \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
+      \event{rx0}{\DR{x}{0}}{right=of ry1}
+      \sync{wx1}{wy1}
+      \po{ry1}{rx0}
+      \rf{wy1}{ry1}
+      \wk[in=-15,out=-165]{rx0}{wx1}
+      \wk{wx0}{wx1}
+    \end{tikzinline}}
+\end{gathered}
+\end{gather*}
+Under \EGC{}, this is explained by dropping the order
+$\DRP{y}{1}\xpo\DRP{x}{0}$, because \armeight{} does not include control
+dependencies between reads in the locally-ordered-before relation.
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{wx0}{\DW{x}{0}}{}
+      \event{wx1}{\DW{x}{1}}{right=of wx0}
+      \raevent{wy1}{\DWRel{y}{1}}{right=of wx1}
+      \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
+      \event{rx0}{\DR{x}{0}}{right=of ry1}
+      \sync{wx1}{wy1}
+      %\po{ry1}{rx0}
+      \rf{wy1}{ry1}
+      \wk[in=-15,out=-165]{rx0}{wx1}
+      \wk{wx0}{wx1}
+    \end{tikzinline}}  
+\end{gather*}
+\end{example}
+
+Since we do not distinguish control dependencies from other dependencies, we
+are forced to drop all dependencies between reads.  In order to do so, we use
+the uninterpreted symbol $\RW$.
 
 \begin{definition}[$\xRRD$]
   \label{def:pomsets-rr}
-  Update Def.~\ref{def:pomsets-trans} to:
+  Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
   \item[\ref{T3})]
     $\labelingForm(\aEv)$ implies
@@ -63,12 +213,12 @@ We use the uninterpreted symbol $\RW$.
 
 
 We repeat all of the rules for preconditions and transformers,
-Only \ref{L5} and \ref{T3} are changed from Def.~\ref{def:pomsets-down}.
-We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
+Only \ref{L5} and \ref{T3} are changed from \refdef{def:pomsets-down}.
+We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
 
 \begin{definition}[$\xCO$/$\xRASC$/$\xDGA$/$\xRRD$]
   \label{def:pomsets-down-rr}
-  Update Def.~\ref{def:pomsets-trans} to:
+  Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
   \item[\ref{S3})]
     $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
@@ -95,20 +245,14 @@ We repeat \ref{L4}, although it is unchanged from Def.~\ref{def:pomsets-trans}.
   \end{enumerate}  
 \end{definition}
 
-[Control dependencies into reads as in MP with release on right and control
-dependency on left.]
 
 % \begin{definition}
 %   Let $[\aForm/\RW{}]$ be the substitution that replaces $\RW{}$ by $\aForm$.
 % \end{definition}
 
 
-\subsection{Proof Strategy}
+%\subsection{Proof Strategy}
 
-Alternate characterization of ARM:
-\cite[\textsection B2.3.6]{arm-reference-manual}
-\cite{alglave-git-alternate}
-\cite{armed-cats}
 
 \begin{comment}
   Internal visibility:

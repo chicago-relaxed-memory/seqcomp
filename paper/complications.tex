@@ -1,7 +1,5 @@
-\section{Further Complications}
+\section{If Closure and Address Calculation}
 \label{sec:complications}
-
-[I have a note: TC1: Track local state ???]
 
 \subsection{If Closure ($\xIF$)}
 Requires indexing to resolve nondeterminism.
@@ -10,7 +8,7 @@ IF closure/case analysis: $\psi_e$
 
 \begin{definition}[$\xIF$]
   \label{def:pomsets-if}
-  Update Def.~\ref{def:pomsets-trans} to:
+  Update \refdef{def:pomsets-trans} to:
 
   If $\aPS \in \sSTOREtight[\amode]{\aLoc}{\aExp}$ then
   $(\exists\aVal:\aEvs\fun\Val)$
@@ -43,11 +41,10 @@ IF closure/case analysis: $\psi_e$
 
 \subsection{Address Calculation ($\xADDR$)}
 
-Do this after if closure, because problem with punning badly.
-
 \begin{definition}[$\xADDR$]
   \label{def:pomsets-addr}
-  Update Def.~\ref{def:pomsets-trans} to:
+  Update \refdef{def:pomsets-trans} to existentially quantify over $\cVal$
+  in $\sSTORE{}{}$ and $\sLOAD{}{}$:
   \begin{enumerate}
   \item[\ref{S2})] $\labelingAct(\aEv) = \DW{\REF\cVal}{\aVal}$,
   \item[\ref{L2})] $\labelingAct(\aEv) = \DR{\REF{\cVal}}{\aVal}$.
@@ -66,6 +63,52 @@ Do this after if closure, because problem with punning badly.
   \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
   \end{enumerate}  
 \end{definition}
+
+\begin{example}
+  punning badly:
+  Consider that
+  \begin{math}
+    \sem{\REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r}
+  \end{math}
+  includes both of the following pomsets (``$\BANG$'' is logical
+  negation---``$\BANG \aExp$'' evaluates to $1$ if
+  $\aExp$ is $0$, and $0$ otherwise):
+  \begin{align*}
+    \begin{gathered}
+      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \eventl{d}{a}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{}
+          \eventl{e}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{below=of a}
+          \wk{a}{b}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
+          \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{below=of a}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Thus, the disjunction closure also includes both of the following: % By using \!$\PAR$\!, it also includes:
+  \begin{align*}
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \eventl{d}{a}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{}
+        \eventl{e}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{below=of a}
+        \wk{a}{b}
+      \end{tikzinline}}
+    &&
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
+        \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{below=of a}
+      \end{tikzinline}}
+  \end{align*}
+  In this example, the $d$ events that coalesce come from inconsistent executions.
+  This is possible because the $d$ events originate from different commands.
+\end{example}
 
 % \subsection{Agda}
 % \begin{figure*}

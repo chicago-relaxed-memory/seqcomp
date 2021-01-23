@@ -1,3 +1,5 @@
+\newcommand{\refdef}[1]{Def~\ref{#1}}
+\newcommand{\refex}[1]{Ex~\ref{#1}}
 \newcommand{\aState}{\sigma}
 \newcommand{\bState}{\rho}
 \newcommand{\suchthat}{\mid}
@@ -102,7 +104,7 @@
 \newcommand{\pcs}{\textsc{pc}s}
 
 \newif\ifshowRA
-\showRAtrue
+\showRAfalse
 \newcommand{\sem}[2][]{\llbracket#2\rrbracket}
 \NewDocumentCommand\PF{O{} m}{\mathtt{F}^{#2}_{#1}}
 \NewDocumentCommand\DF{O{} m}{\mathsf{F}^{#2}_{#1}}
@@ -235,7 +237,7 @@
 \newcommand{\xIF}{{\textsc{if}}}
 \newcommand{\xADDR}{{\textsc{addr}}}
 \newcommand{\xCO}{{\textsc{co}}}
-\newcommand{\xRASC}{{\textsc{rasc}}}
+\newcommand{\xRASC}{{\textsc{sync}}}
 % \newcommand{\xDGA}{{\text{DGA}}}
 % \newcommand{\xRRD}{{\text{RRD}}}
 % \newcommand{\xIF}{{\text{If}}}
@@ -313,6 +315,7 @@
 \newcommand{\jmm}{{\sc jmm}}
 \newcommand{\tso}{{\sc tso}}
 \newcommand{\armseven}{{\sc arm7}}
+\newcommand{\EGC}{{\sc egc}}
 \newcommand{\armeight}{{\sc arm8}}
 \newcommand{\ppc}{{\sc power}}
 \newcommand{\mca}{{\sc mca}}
@@ -476,13 +479,13 @@
 \newcommand{\bAct}{b}
 %\newcommand{\cAct}{c}
 %\newcommand{\dAct}{d}
-\newcommand{\DRSC}[2]{\smash{\mathsf{R^{sc}}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}}
-\newcommand{\DWSC}[2]{\smash{\mathsf{W^{sc}}\ifnotempty{#1}{\mkern0mu#1\ifnotempty{#2}{\mkern1mu#2}}}}
-\newcommand{\DRAcq}[2]{\smash{\mathsf{R\ACQ}}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}
-\newcommand{\DWRel}[2]{\smash{\mathsf{W\REL}}\ifnotempty{#1}{\mkern0mu#1\ifnotempty{#2}{\mkern1mu#2}}}
-\newcommand{\DRmode}[2]{\mathsf{R}^{\amode}\ifnotempty{#1}{\mkern1mu#1\ifnotempty{#2}{\mkern1mu#2}}}
-\newcommand{\DWmode}[2]{\mathsf{W}^{\amode}\ifnotempty{#1}{\mkern0mu#1\ifnotempty{#2}{\mkern1mu#2}}}
-\newcommand{\DRreg}[4][]{\mathsf{R}^{#1}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}}
+\newcommand{\DRSC}[2]{\DR[\mSC]{#1}{#2}}
+\newcommand{\DWSC}[2]{\DW[\mSC]{#1}{#2}}
+\newcommand{\DRAcq}[2]{\DR[\mRA]{#1}{#2}}
+\newcommand{\DWRel}[2]{\DW[\mRA]{#1}{#2}}
+\newcommand{\DRmode}[2]{\DR[\amode]{#1}{#2}}
+\newcommand{\DWmode}[2]{\DW[\amode]{#1}{#2}}
+%\newcommand{\DRreg}[4][]{\mathsf{R}^{#1}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}}
 % \newcommand{\DF}[1][\mathsf{acqrel}]{\tau\mathsf{F}^{#1}}
 \newcommand{\DFS}[1]{\smash{\mathsf{F}^{#1}}}
 % \newcommand{\DFS}[1]{\smash{\mathsf{F}_{\mathsf{S}}^{#1}}}
@@ -620,9 +623,9 @@
 \newcommand{\PASS}{\mathtt{pass}}
 \newcommand{\WHILE}{\mathtt{while}\,}
 \newcommand{\DO}[1]{\mathtt{do}\mathtt{\{}#1\mathtt{\}}}
-\newcommand{\IF}[1]{\mathtt{if}\allowbreak\texttt{(}#1\texttt{)}}
-\newcommand{\THEN}{\allowbreak\texttt{\{}}
-\newcommand{\ELSE}{\texttt{\}}\,\allowbreak\mathtt{else}\allowbreak\,\texttt{\{}}
+\newcommand{\IF}[1]{\mathtt{if}\allowbreak\!\texttt{(}#1\texttt{)}\!}
+\newcommand{\THEN}{\!\allowbreak\texttt{\{}}
+\newcommand{\ELSE}{\texttt{\}}\allowbreak\mathtt{else}\allowbreak\texttt{\{}}
 \newcommand{\ELIF}[1]{\ELSE\IF{#1}}
 \newcommand{\brELSE}{\texttt{\}}\\\mathtt{else}\,\texttt{\{}}
 \newcommand{\brELIF}[1]{\texttt{\}}\\\mathtt{else}\,\IF{#1}}
@@ -739,9 +742,9 @@
 %\tikzstyle{baselinecenter} = [baseline=(current bounding box.west)]
 \tikzstyle{event} = [draw=black, fill=blue!8, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\event}[3]{\node[event](#1)[#3]{$\mathstrut#2$};}
-\tikzstyle{raevent} = [draw=black, fill=red!5, double, rectangle, rounded corners, minimum size=3ex]
+\tikzstyle{raevent} = [draw=black, fill=red!7, double, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\raevent}[3]{\node[raevent](#1)[#3]{$\mathstrut#2$};}
-\tikzstyle{scevent} = [draw=black, fill=red!5, double, thick, rectangle, rounded corners, minimum size=3ex]
+\tikzstyle{scevent} = [draw=black, fill=orange!20, double, thick, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\scevent}[3]{\node[scevent](#1)[#3]{$\mathstrut#2$};}
 \tikzstyle{xform} = [draw=gray!80!black, fill=gray!10, rectangle, minimum size=3ex]
 \newcommand{\xform}[3]{\node[xform](#1)[#3]{$\mathstrut#2$};}%\mid\aForm$};}
@@ -751,6 +754,10 @@
 \newcommand{\@zzl}[1]{\makebox[0ex][r]{\smash{\raisebox{-.5ex}{{${#1}{:}$}}}}}
 \newcommand{\eventl}[4]{\node[event](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
 \newcommand{\eventr}[4]{\node[event](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
+\newcommand{\raeventl}[4]{\node[raevent](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
+\newcommand{\raeventr}[4]{\node[raevent](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
+\newcommand{\sceventl}[4]{\node[scevent](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
+\newcommand{\sceventr}[4]{\node[scevent](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
 \tikzstyle{internal} = [color=gray, draw=gray, dashed, fill=gray!10, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\internal}[3]{\node[internal](#1)[#3]{$\mathstrut#2$};}
 \tikzstyle{cloudy} = [draw=black, fill=blue!10, cloud, aspect=2]
@@ -808,7 +815,7 @@
 \newcommand{\xsync}{\xarrowtikz{sync}{\;\;}}%
 \tikzstyle{lift} = [-latex,double]
 \newcommand{\lift}[3][]{\draw[lift,#1](#2)to(#3);}
-\tikzstyle{wk} = [-stealth,dashed,color=cyan!80!black,]
+\tikzstyle{wk} = [-stealth,dashed,thick,color=cyan!80!black,]
 \newcommand{\wk}[3][]{\draw[wk,#1](#2)to(#3);}
 \newcommand{\xwk}{\xarrowtikz{wk}{\;\;}}%
 \tikzstyle{wkx} = [->,dashed,thick,color=red!70!black,]
