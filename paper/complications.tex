@@ -3,40 +3,60 @@
 
 \subsection{Local Invariant Reasoning}
 
-\begin{gather*}
-  \begin{gathered}
-  x\GETS 0 \SEMI
-  (r\GETS x\SEMI\IF{r\geq0}\THEN y\GETS1 \FI
-  \PAR
-  x\GETS y)
-  \\[-1ex]
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-  \event{wx0}{\DW{x}{0}}{}
-  \event{rx1}{\DR{x}{1}}{right=3em of wx0}
-  \event{wy1}{0\geq0\mid\DW{y}{1}}{right=of rx1}
-  \event{ry1}{\DR{y}{1}}{right=3em of wy1}
-  \event{wx1}{\DW{x}{1}}{right=of ry1}
-  \po{ry1}{wx1}
-  \rf[out=-168,in=-12]{wx1}{rx1}
-  \rf{wy1}{ry1}
-  \wk[out=10,in=170]{wx0}{wx1}
-  \wk{wx0}{rx1}
-    \end{tikzinline}}
-  % \hbox{\begin{tikzinline}[node distance=1.5em and 2em]
-  % \event{wy1}{0\geq0\mid\DW{y}{1}}{}
-  % \event{rx1}{\DR{x}{1}}{left=of wy1}
-  % \event{wx0}{\DW{x}{0}}{below left=-.2em and 2em of rx1}
-  % \event{ry1}{\DR{y}{1}}{below=of rx1}
-  % \event{wx1}{\DW{x}{1}}{right=of ry1}
-  % \po{ry1}{wx1}
-  % \rf[out=140,in=-20]{wx1}{rx1}
-  % \rf{wy1}{ry1}
-  % \wk[out=10,in=155]{wx0}{wx1}
-  % \wk{wx0}{rx1}
-  %   \end{tikzinline}}
-\end{gathered}
-\end{gather*}
+\begin{example}
+  Test case 1
+  \begin{gather*}
+    \begin{gathered}
+      x\GETS 0 \SEMI
+      (r\GETS x\SEMI\IF{r\geq0}\THEN y\GETS1 \FI
+      \PAR
+      x\GETS y)
+      \\[-1ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{wx0}{\DW{x}{0}}{}
+          \event{rx1}{\DR{x}{1}}{right=3em of wx0}
+          \event{wy1}{0\geq0\mid\DW{y}{1}}{right=of rx1}
+          \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+          \event{wx1}{\DW{x}{1}}{right=of ry1}
+          \po{ry1}{wx1}
+          \rf[out=-168,in=-12]{wx1}{rx1}
+          \rf{wy1}{ry1}
+          \wk[out=10,in=170]{wx0}{wx1}
+          \wk{wx0}{rx1}
+        \end{tikzinline}}
+      % \hbox{\begin{tikzinline}[node distance=1.5em and 2em]
+      %   \event{wy1}{0\geq0\mid\DW{y}{1}}{}
+      %   \event{rx1}{\DR{x}{1}}{left=of wy1}
+      %   \event{wx0}{\DW{x}{0}}{below left=-.2em and 2em of rx1}
+      %   \event{ry1}{\DR{y}{1}}{below=of rx1}
+      %   \event{wx1}{\DW{x}{1}}{right=of ry1}
+      %   \po{ry1}{wx1}
+      %   \rf[out=140,in=-20]{wx1}{rx1}
+      %   \rf{wy1}{ry1}
+      %   \wk[out=10,in=155]{wx0}{wx1}
+      %   \wk{wx0}{rx1}
+      % \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+\end{example}
 
+\begin{definition}
+  Update \refdef{def:pomsets-trans} to:
+  \begin{enumerate}
+  \item[{\labeltext[L5]{L5)}{L5}}]
+    $\aTr{\cEvs}{\bForm}$ implies
+    $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+  \item[{\labeltext[L6]{L6)}{L6}}] 
+    $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, $\aEvs=\emptyset$.
+  \end{enumerate}
+\end{definition}
+
+We include \ref{L6} in order to ensure prefix closure on sets of pomsets.  If
+we choose a pomset with no events, what should the predicate transformer do
+for load?  In this case, we have no value $\aVal$ to mention, and therefore
+the best we can do is to emulate skip.  In order to eventually arrive at a
+top-level pomset, this means that subsequent code must be independent of
+$\aReg$.
 
 \subsection{Register Recycling}
 
@@ -56,9 +76,9 @@ resolve nondeterminism in loads when merging (see
   \item[\ref{L4})] 
     $\aTr{\bEvs}{\bForm}$ implies $\aVal_\aEv{=}\uReg{\aEv}\limplies\bForm[\uReg{\aEv}/\aReg]$, 
   \item[\ref{L5})] 
-    $\aTr{\cEvs}{\bForm}$ implies $(\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
-  \item[\ref{L6})] 
-    $(\forall\bReg)$ $\aTr{\dEvs}{\bForm}$ implies $\bForm[\bReg/\aReg]$. 
+  %   $\aTr{\cEvs}{\bForm}$ implies $(\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
+  % \item[\ref{L6})] 
+    $(\forall\bReg)$ $\aTr{\cEvs}{\bForm}$ implies $\bForm[\bReg/\aReg]$. 
   \end{enumerate}
 \end{definition}
 
@@ -126,15 +146,21 @@ single action, as long as the events have disjoint preconditions.
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
   \begin{enumerate}
-  \item[\ref{L1})] if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-  \item[\ref{L2})] $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
-  \item[\ref{L3})] $\labelingForm(\aEv)$ implies $\cForm_\aEv$.
-  \item[\ref{L4})] $(\forall\aEv\in\aEvs\cap\bEvs)$
+  \item[\ref{L1})] 
+    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+  \item[\ref{L2})] 
+    $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
+  \item[\ref{L3})] 
+    $\labelingForm(\aEv)$ implies $\cForm_\aEv$.
+  \item[\ref{L4})] 
+    $(\forall\aEv\in\aEvs\cap\bEvs)$
     $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies \aVal_\aEv{=}\uReg{\aEv}\limplies\bForm[\uReg{\aEv}/\aReg]$, 
-  \item[\ref{L5})] $(\forall\aEv\in\aEvs\setminus\cEvs)$
-    $\aTr{\cEvs}{\bForm}$ implies $\cForm_\aEv \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
-  \item[\ref{L6})] $(\forall\bReg)$
-    $\aTr{\dEvs}{\bForm}$ implies $(\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv) \limplies \bForm[\bReg/\aReg]$. 
+  \item[\ref{L5})]
+  %   $(\forall\aEv\in\aEvs\setminus\cEvs)$
+  %   $\aTr{\cEvs}{\bForm}$ implies $\cForm_\aEv \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
+  % \item[\ref{L6})]
+    $(\forall\bReg)$
+    $\aTr{\cEvs}{\bForm}$ implies $(\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv) \limplies \bForm[\bReg/\aReg]$. 
   \end{enumerate}  
 \end{definition}
 
@@ -254,8 +280,9 @@ single action, as long as the events have disjoint preconditions.
   \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm[\aExp/\REF{\dVal}]$,
   \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm[\aExp/\REF{\dVal}]$,
   \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \aVal{=}\aReg\limplies\bForm$, 
-  \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
-  \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
+  % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
+  % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
+  \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
   \end{enumerate}  
 \end{definition}
 

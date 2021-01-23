@@ -521,40 +521,6 @@ $\aEv\in\aEvs_1$.
   Conditional merging events
 \end{example}
 
-\begin{gather*}
-  \begin{gathered}
-  x\GETS 0 \SEMI
-  (r\GETS x\SEMI\IF{r\geq0}\THEN y\GETS1 \FI
-  \PAR
-  x\GETS y)
-  \\[-1ex]
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-  \event{wx0}{\DW{x}{0}}{}
-  \event{rx1}{\DR{x}{1}}{right=3em of wx0}
-  \event{wy1}{0\geq0\mid\DW{y}{1}}{right=of rx1}
-  \event{ry1}{\DR{y}{1}}{right=3em of wy1}
-  \event{wx1}{\DW{x}{1}}{right=of ry1}
-  \po{ry1}{wx1}
-  \rf[out=-168,in=-12]{wx1}{rx1}
-  \rf{wy1}{ry1}
-  \wk[out=10,in=170]{wx0}{wx1}
-  \wk{wx0}{rx1}
-    \end{tikzinline}}
-  % \hbox{\begin{tikzinline}[node distance=1.5em and 2em]
-  % \event{wy1}{0\geq0\mid\DW{y}{1}}{}
-  % \event{rx1}{\DR{x}{1}}{left=of wy1}
-  % \event{wx0}{\DW{x}{0}}{below left=-.2em and 2em of rx1}
-  % \event{ry1}{\DR{y}{1}}{below=of rx1}
-  % \event{wx1}{\DW{x}{1}}{right=of ry1}
-  % \po{ry1}{wx1}
-  % \rf[out=140,in=-20]{wx1}{rx1}
-  % \rf{wy1}{ry1}
-  % \wk[out=10,in=155]{wx0}{wx1}
-  % \wk{wx0}{rx1}
-  %   \end{tikzinline}}
-\end{gathered}
-\end{gather*}
-
 \subsection{Pomsets with Predicate Transformers}
 
 [The problem with the previous section is that there's no story for
@@ -790,15 +756,16 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   \item[{\labeltext[L4]{L4)}{L4}}]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
-    $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, % \land \lnot\Q{}$,
+    %$\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, % \land \lnot\Q{}$,
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm$, % \land \lnot\Q{}$,
     \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$,
   \end{enumerate}
-  or
-  $\aEvs=\emptyset$ and 
-  \begin{enumerate}
-  \item[{\labeltext[L6]{L6)}{L6}}] 
-    $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$. % \land \lnot\Q{}$.
-  \end{enumerate}
+  % or
+  % $\aEvs=\emptyset$ and 
+  % \begin{enumerate}
+  % \item[{\labeltext[L6]{L6)}{L6}}] 
+  %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$. % \land \lnot\Q{}$.
+  % \end{enumerate}
 \end{definition}
 \begin{definition}
   \noindent
@@ -842,12 +809,6 @@ weaker assumption that either $\aReg$ is $\aVal$ or it is value defined by
 preceding code for $\aLoc$.  That is, we do not know whether subsequent code
 sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
 
-We include \ref{L6} in order to ensure prefix closure on sets of pomsets.  If
-we choose a pomset with no events, what should the predicate transformer do
-for load?  In this case, we have no value $\aVal$ to mention, and therefore
-the best we can do is to emulate skip.  In order to eventually arrive at a
-top-level pomset, this means that subsequent code must be independent of
-$\aReg$.
 
 % Recall that $\uRegs{\bEvs}=\{\uReg{\bEv}\mid\bEv\in\bEvs\}$.
 
