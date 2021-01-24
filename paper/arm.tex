@@ -85,14 +85,20 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
   \label{def:pomsets-down}
   Update \refdef{def:pomsets-ra} to:
   \begin{enumerate}
+  % \item[\ref{S4})]
+  %   $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$,
+  % \item[\ref{S5})]
+  %   $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$.
+  % \item[\ref{L5})]
+  %   % $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
+  %   % \item[\ref{L6})]
+  %   $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land\bForm$.
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$,
+    $\aTr{\bEvs}{\bForm}$ implies $\DS{\aLoc}{\amode}\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$.
+    $\aTr{\cEvs}{\bForm}$ implies $\DS{\aLoc}{\amode}\bForm[\FALSE/\Qw{\aLoc}]$.
   \item[\ref{L5})]
-    % $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
-    % \item[\ref{L6})]
-    $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land\bForm$.
+    $\aTr{\dEvs}{\bForm}$ implies $\DL{\aLoc}{\amode} \land\bForm[\FALSE/\Qw{\aLoc}]$.
   \end{enumerate}
 \end{definition}
 
@@ -116,7 +122,7 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \raevent{b}{\DR[\mRA]{x}{2}}{}
           % \xform{x1d}{2{=}r\limplies\bForm}{below=of b}
-          \xform{x1i}{\lnot\Qx{x} \land \Dx{x} \land\bForm}{below=of b} %x1d}
+          \xform{x1i}{\Dx{x} \land\bForm[\FALSE/\Qx{x}]}{below=of b} %x1d}
           % \xo{b}{x1d}
         \end{tikzinline}}  
     \end{gathered}  
@@ -152,7 +158,7 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \raevent{b}{\DR[\mRA]{x}{2}}{}
-          \event{c}{\lnot\Qx{x} \land \Dx{x}\mid\DW{y}{1}}{right=.7em of b}
+          \event{c}{\Dx{x}\mid\DW{y}{1}}{right=.7em of b}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
@@ -168,7 +174,7 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{a}{\DW{x}{2}}{}
           \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
-          \event{c}{\lnot\Qx{x}\mid\DW{y}{1}}{right=of b}
+          \event{c}{\DW{y}{1}}{right=of b}
           \rf{a}{b}
         \end{tikzinline}}  
     \end{gathered}  
