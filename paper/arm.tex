@@ -97,21 +97,82 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
 \end{definition}
 
 \begin{example}
-  Revisiting \refex{ex:dgr1}.
-  \begin{gather*}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a}{\DW{x}{2}}{}
-        \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
-        \event{c}{\DW{y}{1}}{right=of b}
-        \event{d}{\DW{y}{2}}{right=2.5em of c}
-        \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
-        \rf{a}{b}
-        % \sync{b}{c}
-        \wk{c}{d}
-        \sync{d}{e}
-        \wk[out=-165,in=-15]{e}{a}
-      \end{tikzinline}}  
-  \end{gather*}  
+  Revisiting \refex{ex:dgr1} and eliding irrelevant transformers:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \event{a}{\DW{x}{2}}{}
+          \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of a}
+          %\xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
+          \xo{a}{x1d}
+        \end{tikzinline}}  
+    \end{gathered}  
+    &&
+    \begin{gathered}[t]
+      \PR[\mRA]{x}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \raevent{b}{\DR[\mRA]{x}{2}}{}
+          %\xform{x1d}{2{=}r\limplies\bForm}{below=of b}
+          \xform{x1i}{\lnot\Qx{x} \land \Dx{x} \land\bForm}{below=of b} %x1d}
+          %\xo{b}{x1d}
+        \end{tikzinline}}  
+    \end{gathered}  
+    &&
+    \begin{gathered}[t]
+      \PW{y}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \event{c}{\DW{y}{1}}{}
+          % \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of c}
+          % \xform{x1i}{\lnot\Qw{y}\land\bForm[\TRUE/\Dx{y}]}{below=of x1d}
+          % \xo{c}{x1d}
+        \end{tikzinline}}  
+    \end{gathered}  
+  \end{align*}
+  Associating right:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \event{a}{\DW{x}{2}}{}
+          \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{right=.7em of a}
+          %\xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
+          \xo{a}{x1d}
+        \end{tikzinline}}  
+    \end{gathered}  
+    &&
+    \begin{gathered}[t]
+      \PR[\mRA]{x}{r}
+      \SEMI
+      \PW{y}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \raevent{b}{\DR[\mRA]{x}{2}}{}
+          \event{c}{\lnot\Qx{x} \land \Dx{x}\mid\DW{y}{1}}{right=.7em of b}
+        \end{tikzinline}}  
+    \end{gathered}  
+  \end{align*}
+  Composing, we have, as desired:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PW{x}{2}
+      \SEMI
+      \PR[\mRA]{x}{r}
+      \SEMI
+      \PW{y}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \event{a}{\DW{x}{2}}{}
+          \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+          \event{c}{\lnot\Qx{x}\mid\DW{y}{1}}{right=of b}
+          \rf{a}{b}
+        \end{tikzinline}}  
+    \end{gathered}  
+  \end{align*}
 \end{example}
 
 % The following execution is allowed both by \armeight{} and \tso{}, but
