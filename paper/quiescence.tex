@@ -35,10 +35,10 @@ expect that all reads and writes of $\aLoc$ that precede $\aEv$ in program
 order also precede $\aEv$ in pomset order.
 $\Qw{\aLoc}$ is similar, but applies only to preceding writes.
 
-\begin{definition}
-  Let $[\TRUE/\Q{}]$ be the substitution that replaces all quiescence
-  symbols by $\TRUE$.
-\end{definition}
+% \begin{definition}
+%   Let $[\TRUE/\Q{}]$ be the substitution that replaces all quiescence
+%   symbols by $\TRUE$.
+% \end{definition}
 
 We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
 \begin{definition}[$\xCO$]
@@ -50,7 +50,7 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
   \item[\ref{L3})]
     $\labelingForm(\aEv)$ implies $\Qw{\aLoc}$,
   \item[\ref{T3})]
-    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$,
+    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{\mSC}]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]

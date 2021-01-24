@@ -1,7 +1,7 @@
 \section{Other Features} %Local Invariant Reasoning, Register Recycling, If-Closure and Address Calculation}
 \label{sec:complications}
 
-\subsection{Local Invariant Reasoning}
+\subsection{Local Invariant Reasoning ($\xLIR$)}
 \label{sec:tc1}
 
 \begin{example}
@@ -34,40 +34,10 @@
   \end{gather*}
   Under the definitions given thus far, the precondition on $\DWP{y}{1}$ can
   only be satisfied by the read of $x$, disallowing this execution.
-  %This execution is not allowed under \refdef{def:pomsets-down-rr}
-\end{example}
 
-In order to allow such executions, we include memory references in formula.
-\ref{L4} is unchanged in \refdef{def:pomsets-lir}.
-
-\begin{definition}[\xLIR]
-  \label{def:pomsets-lir}
-  Update \refdef{def:pomsets-trans} to:
-  \begin{enumerate}
-  \item[{\labeltext[S4]{S4)}{S4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
-  \item[{\labeltext[S5]{S5)}{S5}}]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
-  \item[{\labeltext[L4]{L4)}{L4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
-  \item[{\labeltext[L5]{L5)}{L5}}]
-    $\aTr{\cEvs}{\bForm}$ implies
-    $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
-  \item[{\labeltext[L6]{L6)}{L6}}] 
-    $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, $\aEvs=\emptyset$.
-  \end{enumerate}
-\end{definition}
-
-We include \ref{L6} in order to ensure prefix closure on sets of pomsets.  If
-we choose a pomset with no events, what should the predicate transformer do
-for load?  In this case, we have no value $\aVal$ to mention, and therefore
-the best we can do is to emulate skip.  In order to eventually arrive at a
-top-level pomset, this means that subsequent code must be independent of
-$\aReg$.
-
-\begin{example}
-  Let us revisit \refex{ex:tc1-1}.
-    \begin{gather*}
+  In order to allow such executions, we include memory references in formula,
+  resulting in:
+  \begin{gather*}
     x\GETS 0 \SEMI
     \FORK{\!
       (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
@@ -88,27 +58,72 @@ $\aReg$.
         \wk{wx0}{rx1}
       \end{tikzinline}}
   \end{gather*}
-  Looking at the first forked thread:
+\end{example}
+
+% In order to allow such executions, we include memory references in formula.
+% (\ref{L4} is unchanged in \refdef{def:pomsets-lir}.)
+
+\begin{definition}[\xLIR]
+  \label{def:pomsets-lir}
+  Update \refdef{def:pomsets-trans} to (repeating \ref{L4} unchanged):
+  \begin{enumerate}
+  \item[{\labeltext[S4]{S4)}{S4}}]
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+  \item[{\labeltext[S5]{S5)}{S5}}]
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+  \item[{\labeltext[L4]{L4)}{L4}}]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  \item[{\labeltext[L5]{L5)}{L5}}]
+    $\aTr{\cEvs}{\bForm}$ implies
+    $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+  \item[{\labeltext[L6]{L6)}{L6}}] 
+    $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, $\aEvs=\emptyset$.
+  \end{enumerate}
+\end{definition}
+
+\ref{L5} introduces memory references.  It states that to be independent of
+the read, we establish both $\bForm[\aVal/\aReg]$ and $\bForm[\aLoc/\aReg]$.
+If a precondition holds in both circumstances, \ref{S5} allows a local write
+to satisfy the precondition without introducing dependence.
+
+One reading of \ref{L5} is that it is safe to ignore a read as long as the
+value of the read is compatible with a precondition and the precondition can
+be satisfied by a local write.
+This begs the question: what value should we ignore in the case of
+
+
+If we choose a pomset with no events for load, what should the predicate
+transformer do?  In this case, we have no value $\aVal$ to mention, and
+therefore the best we can do is to emulate skip, as in \ref{L6}.  In order to
+eventually arrive at a top-level pomset, this means that subsequent code must
+be independent of $\aReg$.
+
+\begin{example}
+  Revisiting \refex{ex:tc1-1} and eliding irrelevant transformers:
   \begin{align*}
-    \begin{gathered}
-      \PR{x}{r} 
+    \begin{gathered}[t]
+      \PW{x}{0} 
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{1{=}r\limplies\bForm}{}
-          \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{below=of xd}
-          \event{a1}{\DR{x}{1}}{above=of xd}
-          \xo{a1}{xd}
+          \event{a0}{\DW{x}{0}}{}
+          \xform{xi}{\bForm[0/x]}{below=of a0}
         \end{tikzinline}}    
     \end{gathered}
     &&
-    \begin{gathered}
+    \begin{gathered}[t]
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\DR{x}{1}}{}
+          \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{below=of xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
       \IF{r{\geq}0}\THEN y\GETS1 \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{(r{\geq}0\limplies\bForm\noSUB{[r/y]}) \land (r{<}0\limplies\bForm)}{}
-          \xform{xi}{(r{\geq}0\limplies\bForm\noSUB{[r/y]}) \land (r{<}0\limplies\bForm)}{below=of xd}
-          \event{a2}{r{\geq}0\mid\DW{y}{1}}{above=of xd}      
-          \xo{a2}{xd}
+          \event{a2}{r{\geq}0\mid\DW{y}{1}}{}      
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}

@@ -68,16 +68,16 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
   \label{def:DS}
   Let $[\FALSE/\D]$ be the substitution that performs $[\FALSE/\Dx{\aLoc}]$
   for every $\aLoc$.
-  Let $\DS{\aLoc}{\amode}$ and $\DL{\aLoc}{\amode}$ be defined:
+  Let $\DS{\aLoc}{\amode}{}$ and $\DL{\aLoc}{\amode}{}$ be defined:
   \begin{align*}
     \DS{\aLoc}{\mRLX}{\bForm}&=\bForm[\TRUE/\Dx{\aLoc}] 
-    &\DL{\aLoc}{\mRLX}&=\TRUE
+    &\DL{\aLoc}{\mRLX}{\bForm}&=\bForm%\TRUE
     \\
     \DS{\aLoc}{\mRA}{\bForm}&=\bForm[\FALSE/\D]
-    &\DL{\aLoc}{\mRA}&=\Dx{\aLoc}
+    &\DL{\aLoc}{\mRA}{\bForm}&=\bForm\land\Dx{\aLoc}
     \\
     \DS{\aLoc}{\mSC}{\bForm}&=\bForm[\FALSE/\D]
-    &\DL{\aLoc}{\mSC}&=\Dx{\aLoc}
+    &\DL{\aLoc}{\mSC}{\bForm}&=\bForm\land\Dx{\aLoc}
   \end{align*}
 \end{definition}
 
@@ -90,15 +90,15 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
   % \item[\ref{S5})]
   %   $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$.
   % \item[\ref{L5})]
-  %   % $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
+  %   % $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode}{} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
   %   % \item[\ref{L6})]
-  %   $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land\bForm$.
+  %   $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode}{} \land\bForm$.
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\DS{\aLoc}{\amode}\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]$,
+    $\aTr{\bEvs}{\bForm}$ implies $\DS{\aLoc}{\amode}{\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]}$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\DS{\aLoc}{\amode}\bForm[\FALSE/\Qw{\aLoc}]$.
+    $\aTr{\cEvs}{\bForm}$ implies $\DS{\aLoc}{\amode}{\bForm[\FALSE/\Qw{\aLoc}]}$.
   \item[\ref{L5})]
-    $\aTr{\dEvs}{\bForm}$ implies $\DL{\aLoc}{\amode} \land\bForm[\FALSE/\Qw{\aLoc}]$.
+    $\aTr{\dEvs}{\bForm}$ implies $\DL{\aLoc}{\amode}{\bForm[\FALSE/\Qx{\aLoc}]}$.
   \end{enumerate}
 \end{definition}
 
@@ -303,62 +303,56 @@ the uninterpreted symbol $\RW$.
   \end{enumerate}  
 \end{definition}
 
-
 \begin{example}
   Revisiting \refex{ex:rrd1} and eliding irrelevant transformers:
   \begin{align*}
     \begin{gathered}[t]
-      \PW{x}{2}
+      \PR{y}{r}
       \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{a}{\DW{x}{2}}{}
-          \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of a}
-          % \xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
-          \xo{a}{x1d}
+      \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
+          \event{b}{\DR{y}{1}}{}
+          \xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  
     &&
     \begin{gathered}[t]
-      \PR[\mRA]{x}{r}
+      \IF{r}\THEN s\GETS x\FI
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\DR[\mRA]{x}{2}}{}
-          % \xform{x1d}{2{=}r\limplies\bForm}{below=of b}
-          \xform{x1i}{\lnot\Qx{x} \land \Dx{x} \land\bForm}{below=of b} %x1d}
-          % \xo{b}{x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-    &&
-    \begin{gathered}[t]
-      \PW{y}{1}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{c}{\DW{y}{1}}{}
+          \event{c}{r\mid\DW{x}{0}}{}
           % \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of c}
           % \xform{x1i}{\lnot\Qw{y}\land\bForm[\TRUE/\Dx{y}]}{below=of x1d}
           % \xo{c}{x1d}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
+  Composing sequentially:
   \begin{align*}
-    \begin{gathered}
-      r\GETS y
-      \\[-.4ex]
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{a}{\DR{y}{1}}{}
-          \xform{xd}{1{=}r\limplies\bForm}{below=of a}
-          \xform{xi}{(y{=}r\lor1{=}r)\limplies\bForm}{below=of xd}
-          \xo{a}{xd}
-        \end{tikzinline}}
-    \end{gathered}
-    &&
-    \begin{gathered}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI
       \IF{r}\THEN s\GETS x\FI
-      \\[-.4ex]
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{b}{r\mid\DR{x}{0}}{}
-        \end{tikzinline}}
-    \end{gathered}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
+          \event{b}{\DR{y}{1}}{}
+          \event{c}{\RW\limplies r\mid\DW{x}{0}}{right=of b}
+          %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
+        \end{tikzinline}}  
+    \end{gathered}  
+  \end{align*}
+  Embedding the thread in thread group, we have, as desired:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI
+      \IF{r}\THEN s\GETS x\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
+          \event{b}{\DR{y}{1}}{}
+          \event{c}{\FALSE\limplies r\mid\DW{x}{0}}{right=of b}
+          %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
+        \end{tikzinline}}  
+    \end{gathered}  
   \end{align*}
 \end{example}
 
@@ -394,7 +388,7 @@ the uninterpreted symbol $\RW$.
   \item[\ref{L5})]
     % $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land(\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
     % \item[\ref{L6})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode}
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode}{}
     \land (\RW\limplies\bForm)$.
   \end{enumerate}  
 \end{definition}
