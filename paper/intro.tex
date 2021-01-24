@@ -5,6 +5,9 @@ blocks of computing: memory and sequential composition. One would like
 to think that these are well-worn topics, where every issue has been
 settled, but this is sadly not the case.
 
+Let $\aReg$--$\bReg$ range over thread-local registers and $\aLoc$-$\cLoc$
+range over shared memory references.
+
 \subsection{Memory}
 
 For single-threaded programs, memory can be thought of as you might
@@ -25,12 +28,13 @@ for example:
         \event{rx1}{\DR{x}{1}}{right=of ry2}
         \rf[out=20,in=160]{wy2}{ry2}
         \rf[out=20,in=160]{wx1}{rx1}
-        \wk{wx0}{wx1}
-        \wk{wx1}{wy2}
-        \wk{wy2}{ry2}
-        \wk{ry2}{rx1}
+        \po{wx0}{wx1}
+        \po{wx1}{wy2}
+        \po{wy2}{ry2}
+        \po{ry2}{rx1}
       \end{tikzinline}}
   \end{gather*}
+
 This model naturally extends to the case of shared-memory concurrency
 in a natural way, leading to a \emph{sequentially consistent}
 semantics, in which \emph{program order} inside a thread implies
@@ -49,11 +53,12 @@ a total \emph{causal order} between read and write events, for example:
         \event{rx1}{\DR{x}{1}}{right=of ry2}
         \rf[out=20,in=160]{wy2}{ry2}
         \rf[out=20,in=160]{wx1}{rx1}
-        \wk{wx0}{wx1}
-        \wk{wx1}{wy2}
-        \wk{ry2}{rx1}
+        \po{wx0}{wx1}
+        \po{wx1}{wy2}
+        \po{ry2}{rx1}
       \end{tikzinline}}
   \end{gather*}
+
 Unfortunately, this model does not compile efficiently to commodity
 hardware, resulting in a 37--73\% increase in CPU time~\cite{Liu:2019:ASC:3314221.3314611} on ARM, and
 hence power consumption.  Developers of software and compilers have
@@ -80,10 +85,11 @@ are inconsistent with program order, such as:
         \event{rx0}{\DR{x}{0}}{right=of ry2}
         \rf[out=20,in=160]{wy2}{ry2}
         \rf[out=15,in=165]{wx0}{rx0}
-        \wk{wx0}{wx1}
-        \wk[out=200,in=340]{rx0}{wx1}
+        \po{wx0}{wx1}
+        \po[out=200,in=340]{rx0}{wx1}
       \end{tikzinline}}
   \end{gather*}
+
 In such models, the causal order between events is important,
 and includes control and data dependencies, to avoid
 paradoxical ``out of thin air'' examples such as:
@@ -126,6 +132,7 @@ results in:
         \po{ry1}{wx1}
       \end{tikzinline}}
   \end{gather*}
+
 Unfortunately, while a simple syntactic approach to dependency calculation
 suffices for hardware models, it is not preserved by common compiler
 optimizations. For example, if we calculate control dependencies syntactically,
@@ -167,6 +174,7 @@ Prominent solutions to the problem of dependency calculation include:
   model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
   
 \end{itemize}
+
 In this paper, we will focus on logical models, as those are compositional,
 and align well with existing models of sequential composition.
 The heart of the model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20} is to add logical preconditions
@@ -255,18 +263,46 @@ investigates how existing models of sequential composition interact with relaxed
 %% optimizations, support for logics that prove the absence of thin-air
 %% behaviors, and a local data race freedom theorem.
 
-\begin{figure*}
-  \input{fig-sp}
-  \caption{Weakest precondition semantics}
-  \label{fig:sp}
-\end{figure*}
+% \begin{figure*}
+%   \input{fig-sp}
+%   \caption{Weakest precondition semantics}
+%   \label{fig:sp}
+% \end{figure*}
 
 Our approach follows that of weakest precondition semantics of
 \citet{DBLP:journals/cacm/Dijkstra75}, which provides an alternative
 characterization of Hoare logic \citep{Hoare:1969:ABC:363235.363259} by
 mapping postconditions to preconditions. We recall the definition of
-$\fwp{\aCmd}{\bForm}$ in Figure~\ref{fig:sp}. The rule we are most interested
-in is the one for sequential composition, which maps seqential composition of programs
+$\fwp{\aCmd}{\bForm}$ for loop-free code below. % in Figure~\ref{fig:sp}
+\begin{itemize}
+\item
+  \begin{math}
+    \fwp{\SKIP}{\bForm} = \bForm
+  \end{math}
+\item 
+  \begin{math}
+    \fwp{\ABORT}{\bForm} = \FALSE
+  \end{math}
+\item
+  \begin{math}
+    \fwp{r\GETS \aExp}{\bForm} = \bForm[\aExp/r]
+  \end{math}
+\item
+  \begin{math}
+    \fwp{\aCmd_1;\aCmd_2}{\bForm} = \fwp{\aCmd_1}{\fwp{\aCmd_2}{\bForm}}
+  \end{math}
+\item
+  \begin{math}
+    \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm}= {}
+  \end{math}
+  \\
+  \begin{math}
+    ((\aExp{\ne}0) \limplies \fwp{\aCmd_1}{\bForm}) \land
+    ((\aExp{=}0) \limplies \fwp{\aCmd_2}{\bForm})
+  \end{math}
+\end{itemize}
+The rule we are most interested
+in is the one for sequential composition, which maps sequential composition of programs
 to function composition of predicate transformers.
 
 Predicate transformers are a good fit to logical models of dependency calculation,
@@ -305,7 +341,10 @@ for example:
       \end{tikzinline}}
     \end{gathered}
   \end{align*}
-For the sequentially consistent semantics, sequential composition composition
+In the rightmost program above, the write to $z$ affects the shared store, not the
+local state of the thread, therefore we assign it the identity transformer.
+
+For the sequentially consistent semantics, sequential composition 
 is straightforward: we apply each predicate transformer to the preconditions
 of subsequent events, and compose the predicate transformers:
   \begin{gather*}
@@ -332,7 +371,7 @@ of events.
 
 For example, for single-event pomsets, there are two predicate
 transformers, since there are two subsets of any one-element set.
-We call the predicate transfomer for $\emptyset$ the \emph{independent}
+We call the predicate transformer for $\emptyset$ the \emph{independent}
 transformer, and the one indexed by $\{e\}$ the \emph{dependent} transformer.
 We visualize this by including more than one transformed predicate,
 with an edge leading to the dependent one. For example:
@@ -440,10 +479,10 @@ as one would hope.
 This paper is the first model of relaxed memory with a compositional
 semantics for sequential composition.  It shows how the pomsets with
 preconditions model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined
-with the predicate transformer model of~\cite{???}.
+with the predicate transformer model of~\cite{DBLP:journals/cacm/Dijkstra75}.
 \begin{itemize}
 \item \S\ref{sec:model} presents the basic model, with few features
-  required of the logic of preconditions, but a resulting laack of fidelity
+  required of the logic of preconditions, but a resulting lack of fidelity
   to exiting models,
 \item \S\ref{sec:q} adds a model of \emph{quiescence} to the logic,
   required to model coherence (accessing $x$ has a precondition that $x$ is quiescent)

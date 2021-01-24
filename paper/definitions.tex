@@ -503,7 +503,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{loadpre-kappa2}
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-    $\labelingForm(\aEv)$ implies $(\aReg{=}\aVal)\limplies\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv<\aEv$, or \\
+    $\labelingForm(\aEv)$ implies $(\aReg{=}\aVal){\limplies}\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv{<}\aEv$, or \\
     $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$.
     % \\ \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
   \end{enumerate}  
@@ -542,10 +542,10 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{(r{=}1)\mid\DW{y}{1}}{}
+        \event{wy1}{r{=}1\mid\DW{y}{1}}{}
       \end{tikzinline}}
     \end{gather*}
-  If $\aVal$ is chosen badly, we have a pomset with a precodition
+  If $\aVal$ is chosen badly, we have a pomset with a precondition
   that cannot be part of a top-level pomset such as:
     \begin{gather*}
       r\GETS x\SEMI y\GETS r
@@ -553,7 +553,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx0}{\DR{x}{0}}{}
-        \event{wy1}{(r{=}0)\limplies(r{=}1) \mid \DW{y}{1}}{right=of rx0}
+        \event{wy1}{r{=}0\limplies r{=}1 \mid \DW{y}{1}}{right=of rx0}
         \po{rx0}{wy1}
       \end{tikzinline}}
     \end{gather*}
@@ -565,7 +565,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx1}{\DR{x}{1}}{}
-        \event{wy1}{(r{=}1) \mid \DW{y}{1}}{right=of rx1}
+        \event{wy1}{r{=}1 \mid \DW{y}{1}}{right=of rx1}
       \end{tikzinline}}
     \end{gather*}
   or the dependent case:
@@ -575,7 +575,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx1}{\DR{x}{1}}{}
-        \event{wy1}{(r{=}1)\limplies(r{=}1) \mid \DW{y}{1}}{right=of rx1}
+        \event{wy1}{r{=}1\limplies(r{=}1) \mid \DW{y}{1}}{right=of rx1}
         \po{rx1}{wy1}
       \end{tikzinline}}
     \end{gather*}
@@ -593,7 +593,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{(r{\ne}0)\mid\DW{y}{1}}{}
+        \event{wy1}{r{\ne}0\mid\DW{y}{1}}{}
       \end{tikzinline}}
     \end{gather*}
   The rest of the reasoning is the same as for a data dependency.
@@ -609,7 +609,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{(1{=}1)\mid\DW{y}{1}}{}
+        \event{wy1}{1{=}1\mid\DW{y}{1}}{}
       \end{tikzinline}}
     \end{gather*}
   In this case it doesn't matter what $\aVal$ is, for example:
@@ -619,7 +619,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx0}{\DR{x}{0}}{}
-        \event{wy1}{(1{=}1) \mid \DW{y}{1}}{right=of rx0}
+        \event{wy1}{1{=}1 \mid \DW{y}{1}}{right=of rx0}
       \end{tikzinline}}
     \end{gather*}
   Since $(1{=}1)$ is a tautology, this can be part of
@@ -635,7 +635,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
       y \GETS r
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{wy1}{(r{=}1) \mid \DW{y}{1}}{}
+          \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -643,12 +643,12 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
       y \GETS 1
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{wy1}{(1{=}1) \mid \DW{y}{1}}{}
+          \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
-  Since there is no requirement for disjointnessin the semantics of conditionals,
-  we can can consider the case where the pomsets share their event,
+  Since there is no requirement for disjointness in the semantics of conditionals,
+  we can consider the case where the pomsets share their event,
   in which case:
     \begin{gather*}
       \IF{r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI
@@ -658,7 +658,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
           \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
       \end{tikzinline}}
     \end{gather*}
-  where the precondition on $(\DW{y}{1})$ is a tautlogy, and so is independent of $r$.
+  where the precondition on $(\DW{y}{1})$ is a tautology, and so is independent of $r$.
 \end{example}
 
 \subsection{Pomsets with Predicate Transformers}
@@ -713,7 +713,7 @@ Note that in a family of predicate transformers for $\aEvs$, transformers for
 smaller subsets of $\aEvs$ are stronger.
 
 \begin{definition}
-  A pomset with predicate tansformers is a pomset with preconditions (\refdef{def:pomsets-pre}),
+  A pomset with predicate transformers is a pomset with preconditions (\refdef{def:pomsets-pre}),
   together with a family of predicate transformers for $\aEvs$.
 \end{definition}
 
