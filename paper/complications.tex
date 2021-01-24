@@ -144,13 +144,39 @@ resolve nondeterminism in loads when merging (see
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
   \item[\ref{L4})] 
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal_\aEv{=}\uReg{\aEv}\limplies\bForm[\uReg{\aEv}/\aReg]$, 
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\uReg{\aEv}\limplies\bForm[\uReg{\aEv}/\aReg]$, 
   \item[\ref{L5})] 
   %   $\aTr{\cEvs}{\bForm}$ implies $(\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
   % \item[\ref{L6})] 
     $(\forall\bReg)$ $\aTr{\cEvs}{\bForm}$ implies $\bForm[\bReg/\aReg]$. 
   \end{enumerate}
 \end{definition}
+
+Requires indexing to resolve nondeterminism.
+
+\begin{gather*}
+  \taglabel{TC2}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r{=}s}\THEN \PW{y}{1}\FI
+  \PAR
+  x\GETS y
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{1}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      % \po{a2}{a3}
+      % \po[out=-20,in=-160]{a1}{a3}
+      \event{b1}{\DR{y}{1}}{right=3em of a3}
+      \event{b2}{\DW{x}{1}}{right=of b1}
+      \rf{a3}{b1}
+      \po{b1}{b2}
+      \rf[out=169,in=11]{b2}{a2}
+      \rf[out=169,in=11]{b2}{a1}
+    \end{tikzinline}}
+\end{gather*}
+
 
 \subsection{If-Closure ($\xIF$)}
 \label{sec:if}

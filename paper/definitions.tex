@@ -628,8 +628,8 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \event{wy1}{1{=}1 \mid \DW{y}{1}}{right=of rx0}
       \end{tikzinline}}
     \end{gather*}
-  Since $1{=}1$ is a tautology, this can be part of
-  a top-level pomset.
+  % Since $1{=}1$ is a tautology, this can be part of
+  % a top-level pomset.
 \end{example}
 
 \begin{example}
@@ -818,7 +818,7 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
 
   \noindent
   If $\aPS \in (\aPSS_1\sSEMI\aPSS_2)$ then
-  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$,
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
   % let $\labelingForm'_2(\aEv)=\aTr[1]{{\downclose[0]{\aEv}}}{\labelingForm_2(\aEv)}$  
   % let $\labelingForm'_2(\aEv)=\aTr[1]{\{ \bEv \mid \bEv < \aEv \}}{\labelingForm_2(\aEv})$  
@@ -888,8 +888,7 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   % \end{enumerate}
 
   \noindent
-  If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then either
-  $\aEvs\neq\emptyset$ and
+  If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then %either $\aEvs\neq\emptyset$ and
   $(\exists\aVal\in\Val)$
   % $(\forall\bEvs{\neq}\emptyset)$
   \begin{enumerate}
@@ -1292,23 +1291,23 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
   $\DRP{x}{1}\xpo\DWP{y}{1}$, then the predicate transformers are the same,
   but the precondition of $\DWP{y}{1}$ can be weakened to
   $(1{=}r\limplies r{=}1)$, which is a tautology.
-  \begin{gather*}
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
-        \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
-        \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
-        \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
-        \event{a1}{\DR{x}{1}}{above=of xdi}
-        \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}        
-        % \event{a1}{\DR{x}{1}}{}
-        % \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
-        \po{a1}{a2}
-      \end{tikzinline}}
-  \end{gather*}
+  % \begin{gather*}
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %       \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
+  %       \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
+  %       \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+  %       \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
+  %       \event{a1}{\DR{x}{1}}{above=of xdi}
+  %       \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
+  %       \xo{a1}{xdi}
+  %       \xo{a2}{xid}
+  %       \xo{a1}{xdd}
+  %       \xo{a2}{xdd}        
+  %       % \event{a1}{\DR{x}{1}}{}
+  %       % \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+  %       \po{a1}{a2}
+  %     \end{tikzinline}}
+  % \end{gather*}
 \end{example}
 
 \begin{example}
@@ -1336,7 +1335,8 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
-  Putting these together with order:
+  Putting these together with order, we have the following, which cannot be
+  part of a top-level pomset:
   \begin{gather*}
     \PR{x}{r} \SEMI
     \PW{y}{r}
@@ -1355,12 +1355,13 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
-  The precondition of $\DWP{y}{2}$ is unsatisfiable if no further assumptions
-  can be made on $r$; that is the case here, since we assume each register
-  occurs at most once in source programs. If we choose a pomset that without
-  the order $\DRP{x}{1}\xpo\DWP{y}{2}$, the precondition of $\DWP{y}{1}$ is
-  strengthened to $(r{=}2)$, which is also unsatisfiable without further
-  assumptions on $r$; the predicate transformers are unchanged.
+
+  % The precondition of $\DWP{y}{2}$ is unsatisfiable if no further assumptions
+  % can be made on $r$; that is the case here, since we assume each register
+  % occurs at most once in source programs. If we choose a pomset that without
+  % the order $\DRP{x}{1}\xpo\DWP{y}{2}$, the precondition of $\DWP{y}{1}$ is
+  % strengthened to $(r{=}2)$, which is also unsatisfiable without further
+  % assumptions on $r$; the predicate transformers are unchanged.
 \end{example}
 
 
