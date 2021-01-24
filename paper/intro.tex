@@ -398,3 +398,39 @@ which maps $\bForm$ to $(s{=}0) \limplies \bForm$.
         \xo{ry0}{rx0ry0d}
       \end{tikzinline}}
   \end{gather*}
+As a sanity check, we can see that sequential composition is
+associative in this case, since it does not matter whether we
+associate to the left, with intermediate step:
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{below=of ry0}
+        \xform{rx0d}{(r{=}0) \limplies \bForm}{above=of rx0}
+        \xform{ry0d}{(s{=}0) \limplies \bForm}{right=of rx0d}
+        \xform{wz0i}{\bForm}{right=of ry0d}
+        \xo{rx0}{rx0d}
+        \xo{ry0}{ry0d}
+        \xo{rx0}{rx0ry0d}
+        \xo{ry0}{rx0ry0d}
+      \end{tikzinline}}
+  \end{gather*}
+or to the right, with intermediate step:
+    \begin{gather*}
+    s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{ry0}{\DR{y}{0}}{}
+        \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \xform{ry0d}{(s{=}0) \limplies \bForm}{above=of ry0}
+        \xform{wz0i}{\bForm}{above=of wz0}
+        \po{ry0}{wz0}
+        \xo{ry0}{ry0d}
+      \end{tikzinline}}
+  \end{gather*}
+This is an instance of a general result that sequential composition forms a monoid,
+as one would hope.
