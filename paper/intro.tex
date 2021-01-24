@@ -434,3 +434,24 @@ or to the right, with intermediate step:
   \end{gather*}
 This is an instance of a general result that sequential composition forms a monoid,
 as one would hope.
+
+\subsection{Contributions}
+
+This paper is the first model of relaxed memory with a compositional
+semantics for sequential composition.  It shows how the pomsets with
+preconditions model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined
+with the predicate transformer model of~\cite{???}.
+\begin{itemize}
+\item \S\ref{sec:model} presents the basic model, with few features
+  required of the logic of preconditions, but a resulting laack of fidelity
+  to exiting models,
+\item \S\ref{sec:q} adds a model of \emph{quiescence} to the logic,
+  required to model coherence (accessing $x$ has a precondition that $x$ is quiescent)
+  and synchronization (a releasing write requires all locations to be quiescent),
+\item \S\ref{sec:arm} adds the features required for efficient compilation
+  to modern architectures: downgrading some synchronized accesses to relaxed,
+  and removing read-read dependencies,
+\item \S\ref{sec:complications} show how to address common litmus tests, and
+\item \S\ref{sec:discussion} is a discussion of the design space.
+\end{itemize}
+% Acknowledgements go here, once we're not double-blinded.
