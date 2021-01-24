@@ -105,10 +105,11 @@ We require that:
   $\Qw{\aLoc}$, $\Dx{\aLoc}$, $\RW$, % for all $\aLoc$,
   (which are used in \textsection\ref{sec:q}--\ref{sec:arm}),
 \item formulae are closed under negation, conjunction, disjunction, and
-  substitutions $[\aExp/\aReg]$ and $[\aExp/\aLoc]$, 
+  substitutions $[\aExp/\aReg]$ ,$[\aExp/\aLoc]$, and $[\aForm/\aSym]$
+  for each symbol $\aSym$,
 \item there is an entailment relation $\vDash$ between formulae,
 \item $\vDash$ has the expected semantics for $=$, $\lnot$, $\land$, $\lor$,
-  $\limplies$,
+  $\limplies$ and substitution,
 \item $\Q{\mSC}\vDash\Q{\mRA}\vDash\Qx{\aLoc}\vDash\Qw{\bLoc}$ when $\aLoc=\bLoc$.  
 \end{itemize}
 
