@@ -118,14 +118,15 @@ We require that:
 % We use $\DAP{\aLoc}{\aVal}$ to indicate a generic access, which could be
 % either a read or a write.
 
-Logical formulae include equations over memory references and registers, such
-$(\aLoc{=}1)$ and $(\aReg{=}\bReg{+}1)$.
+Logical formulae include equations over registers, such as
+$(\aReg{=}\bReg{+}1)$.
+For use in \textsection\ref{sec:tc1}, we also include equations over memory references, such as $(\aLoc{=}1)$.
 % I would like to drop this, an be careful about program vs logical syntax
-We use expressions as formulae, coercing $\aExp$ to $\aExp{\neq}0$.
 Formulae are subject to substitutions of the form $[\aExp/\aReg]$ and $[\aExp/\aLoc]$; actions are not.
+We use expressions as formulae, coercing $\aExp$ to $\aExp{\neq}0$.
 Equations have precedence over logical operators; thus
 $\aReg{=}\aVal\limplies\bReg{>}\bVal$ is read
-$(\aReg{=}\aVal)\limplies(\bReg{>}\bVal)$.  Implication associates to the
+$(\aReg{=}\aVal)\limplies(\bReg{>}\bVal)$.  As usual, implication associates to the
 right; thus $\aForm\limplies\bForm\limplies\cForm$ is read
 $\aForm\limplies(\bForm\limplies\cForm)$.
 
