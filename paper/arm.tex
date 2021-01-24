@@ -81,9 +81,9 @@ $\Dx{\aLoc}$.
   Update \refdef{def:pomsets-ra} to:
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$,
+    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$.
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$.
   \item[\ref{L5})]
   %   $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
   % \item[\ref{L6})]
@@ -239,10 +239,15 @@ the uninterpreted symbol $\RW$.
   \end{align*}
 \end{example}
 
-\refdef{def:pomsets-down-rr} combines all of the features of
-\textsection\ref{sec:q}--\ref{sec:arm}:
+\subsection{Full semantics for ARM}
+
+\refdef{def:pomsets-arm} combines all of the features of
+\textsection\ref{sec:q}--\ref{sec:arm}.  For completeness, we repeat
+\ref{L4}, which is unchanged from \refdef{def:pomsets-trans}.
+%Only \ref{L5} and \ref{T3} are changed from \refdef{def:pomsets-down}.
+
 \begin{definition}[$\xCO$/$\xRASC$/$\xDGR$/$\xRRD$]
-  \label{def:pomsets-down-rr}
+  \label{def:pomsets-arm}
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
   \item[\ref{S3})]
@@ -258,9 +263,9 @@ the uninterpreted symbol $\RW$.
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$,
+    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$.
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$.
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
@@ -270,10 +275,14 @@ the uninterpreted symbol $\RW$.
     \land (\RW\limplies\bForm)$.
   \end{enumerate}  
 \end{definition}
-Here, we have repeated all of the rules for preconditions and transformers,
-including \ref{L4}, which is unchanged from \refdef{def:pomsets-trans}.
-Only \ref{L5} and \ref{T3} are changed from \refdef{def:pomsets-down}.
-
+\begin{proposition}
+  Every \armeight{} execution is allowed by \refdef{def:pomsets-arm}.
+  \begin{proof}[Proof Sketch]
+    By \EGC{}, an \armeight{} execution linearization of local-order and
+    per-location program order.  Every such linearization is also a valid
+    pomset under \refdef{def:pomsets-arm}.
+  \end{proof}
+\end{proposition}
 
 % \begin{definition}
 %   Let $[\aForm/\RW{}]$ be the substitution that replaces $\RW{}$ by $\aForm$.

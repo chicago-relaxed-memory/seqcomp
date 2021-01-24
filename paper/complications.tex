@@ -4,45 +4,51 @@
 \subsection{Local Invariant Reasoning}
 
 \begin{example}
-  Test case 1
+  \label{ex:tc1-1}
+  JMM causality Test Case 1 \citep{PughWebsite} states the following
+  execution should be allowed ``since interthread compiler analysis could
+  determine that $x$ and $y$ are always non-negative, allowing simplification
+  of $r{\geq}0$ to true, and allowing write $y\GETS1$ to be moved early.''
   \begin{gather*}
-    \begin{gathered}
-      x\GETS 0 \SEMI
-      (r\GETS x\SEMI\IF{r\geq0}\THEN y\GETS1 \FI
+    x\GETS 0 \SEMI
+    \FORK{\!
+      (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
       \PAR
       x\GETS y)
-      \\[-1ex]
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{wx0}{\DW{x}{0}}{}
-          \event{rx1}{\DR{x}{1}}{right=3em of wx0}
-          \event{wy1}{0\geq0\mid\DW{y}{1}}{right=of rx1}
-          \event{ry1}{\DR{y}{1}}{right=3em of wy1}
-          \event{wx1}{\DW{x}{1}}{right=of ry1}
-          \po{ry1}{wx1}
-          \rf[out=-168,in=-12]{wx1}{rx1}
-          \rf{wy1}{ry1}
-          \wk[out=10,in=170]{wx0}{wx1}
-          \wk{wx0}{rx1}
-        \end{tikzinline}}
-      % \hbox{\begin{tikzinline}[node distance=1.5em and 2em]
-      %   \event{wy1}{0\geq0\mid\DW{y}{1}}{}
-      %   \event{rx1}{\DR{x}{1}}{left=of wy1}
-      %   \event{wx0}{\DW{x}{0}}{below left=-.2em and 2em of rx1}
-      %   \event{ry1}{\DR{y}{1}}{below=of rx1}
-      %   \event{wx1}{\DW{x}{1}}{right=of ry1}
-      %   \po{ry1}{wx1}
-      %   \rf[out=140,in=-20]{wx1}{rx1}
-      %   \rf{wy1}{ry1}
-      %   \wk[out=10,in=155]{wx0}{wx1}
-      %   \wk{wx0}{rx1}
-      % \end{tikzinline}}
-    \end{gathered}
+    }
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{rx1}{\DR{x}{1}}{right=3em of wx0}
+        \event{wy1}{1{\geq}1\mid\DW{y}{1}}{right=of rx1}
+        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+        \event{wx1}{\DW{x}{1}}{right=of ry1}
+        \po{ry1}{wx1}
+        \rf[out=-168,in=-12]{wx1}{rx1}
+        \rf{wy1}{ry1}
+        \wk[out=10,in=170]{wx0}{wx1}
+        \wk{wx0}{rx1}
+        \po{rx1}{wy1}
+      \end{tikzinline}}
   \end{gather*}
+  Under the definitions given thus far, the precondition on $\DWP{y}{1}$ can
+  only be satisfied by the read of $x$, disallowing this execution.
+  %This execution is not allowed under \refdef{def:pomsets-down-rr}
 \end{example}
 
-\begin{definition}
+In order to allow such executions, we include memory references in formula.
+\ref{L4} is unchanged in \refdef{def:pomsets-lir}.
+
+\begin{definition}[\xLIR]
+  \label{def:pomsets-lir}
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
+  \item[{\labeltext[S4]{S4)}{S4}}]
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+  \item[{\labeltext[S5]{S5)}{S5}}]
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+  \item[{\labeltext[L4]{L4)}{L4}}]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
     $\aTr{\cEvs}{\bForm}$ implies
     $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
@@ -57,6 +63,69 @@ for load?  In this case, we have no value $\aVal$ to mention, and therefore
 the best we can do is to emulate skip.  In order to eventually arrive at a
 top-level pomset, this means that subsequent code must be independent of
 $\aReg$.
+
+\begin{example}
+  Let us revisit \refex{ex:tc1-1}.
+    \begin{gather*}
+    x\GETS 0 \SEMI
+    \FORK{\!
+      (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+      \PAR
+      x\GETS y)
+    }
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{rx1}{\DR{x}{1}}{right=3em of wx0}
+        \event{wy1}{0{\geq}0\mid\DW{y}{1}}{right=of rx1}
+        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+        \event{wx1}{\DW{x}{1}}{right=of ry1}
+        \po{ry1}{wx1}
+        \rf[out=-168,in=-12]{wx1}{rx1}
+        \rf{wy1}{ry1}
+        \wk[out=10,in=170]{wx0}{wx1}
+        \wk{wx0}{rx1}
+      \end{tikzinline}}
+  \end{gather*}
+  Looking at the first forked thread:
+  \begin{align*}
+    \begin{gathered}
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{1{=}r\limplies\bForm}{}
+          \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{below=of xd}
+          \event{a1}{\DR{x}{1}}{above=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{r{\geq}0}\THEN y\GETS1 \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{(r{\geq}0\limplies\bForm\noSUB{[r/y]}) \land (r{<}0\limplies\bForm)}{}
+          \xform{xi}{(r{\geq}0\limplies\bForm\noSUB{[r/y]}) \land (r{<}0\limplies\bForm)}{below=of xd}
+          \event{a2}{r{\geq}0\mid\DW{y}{1}}{above=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Putting these together without order, and dropping the predicate transformers:
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \IF{r{\geq}0}\THEN y\GETS1 \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{\geq}0\mid\DW{y}{1}}{right=of a1}
+      \end{tikzinline}}
+  \end{gather*}
+  The precondition of $\DWP{y}{1}$ can be simplified to
+  $(x{=}r\limplies r{\geq}0$.
+  $\DWP{x}{0}$ has predicate transformer $(\bForm\noSUB{[0/x]})$, both in the
+  dependent and independent cases.
+\end{example}
 
 \subsection{Register Recycling}
 
@@ -108,9 +177,9 @@ resolve nondeterminism in loads when merging (see
         \wk{a}{b}
       \end{tikzinline}}
   \end{gather*}
-  However, for any $\aForm$, \refdef{def:pomsets-trans} \emph{does} allow:
+  However, for any $\aExp$, \refdef{def:pomsets-trans} \emph{does} allow:
   \begin{gather*}
-    \IF{\aForm}\THEN\aCmd\ELSE\aCmd\FI
+    \IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1em]
         \event{a}{\DW{x}{0}}{}
@@ -137,9 +206,9 @@ single action, as long as the events have disjoint preconditions.
   \item[\ref{S2})] $\labelingAct(\aEv) = \DWREFP{\cVal_\aEv}{\aVal_\aEv}$,
   \item[\ref{S3})] $\labelingForm(\aEv)$ implies $\cForm_\aEv \land \aExp{=}\aVal$,
   \item[\ref{S4})] $(\forall\aEv\in\aEvs\cap\bEvs)$
-    $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies \bForm[\aExp/\aLoc]$,
+    $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies \bForm\noSUB{[\aExp/\aLoc]}$,
   \item[\ref{S5})] 
-    $\aTr{\cEvs}{\bForm}$ implies $(\!\not\exists\aEv\in\aEvs\cap\cEvs \suchthat \cForm_\aEv) \limplies \bForm[\aExp/\aLoc]$,
+    $\aTr{\cEvs}{\bForm}$ implies $(\!\not\exists\aEv\in\aEvs\cap\cEvs \suchthat \cForm_\aEv) \limplies \bForm\noSUB{[\aExp/\aLoc]}$,
   \end{enumerate}
 
   If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
@@ -171,9 +240,9 @@ single action, as long as the events have disjoint preconditions.
       \PW{x}{0}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[0/x]}{}
+          \xform{xd}{\bForm\noSUB{[0/x]}}{}
           \event{a}{\DW{x}{0}}{above=of xd}      
-          \xform{xi}{\bForm[0/x]}{above=of a}
+          \xform{xi}{\bForm\noSUB{[0/x]}}{above=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
@@ -182,14 +251,14 @@ single action, as long as the events have disjoint preconditions.
       \PW{x}{\BANG\BANG r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xdi}{r{=}0\limplies\bForm[\BANG\BANG r/x]}{}
-          \xform{xid}{r{\neq}0\limplies\bForm[\BANG\BANG r/x]}{right=.5em of xdi}
+          \xform{xdi}{r{=}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{}
+          \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{right=.5em of xdi}
           \event{a}{r{=}0\mid\DW{x}{0}}{above=of xdi}      
           \xo{a}{xdi}
           \event{b}{r{\neq}0\mid\DW{x}{1}}{above=of xid}      
           \xo{b}{xid}
-          \xform{xdd}{\bForm[\BANG\BANG r/x]}{above=of a}
-          \xform{xii}{\bForm[\BANG\BANG r/x]}{above=of b}
+          \xform{xdd}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of a}
+          \xform{xii}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of b}
           \xo{a}{xdd}
           \xo{b}{xdd}
         \end{tikzinline}}
@@ -199,9 +268,9 @@ single action, as long as the events have disjoint preconditions.
       \PW{x}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[1/x]}{}
+          \xform{xd}{\bForm\noSUB{[1/x]}}{}
           \event{a}{\DW{x}{1}}{above=of xd}      
-          \xform{xi}{\bForm[1/x]}{above=of a}
+          \xform{xi}{\bForm\noSUB{[1/x]}}{above=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
@@ -213,14 +282,14 @@ single action, as long as the events have disjoint preconditions.
       \PW{x}{\BANG\BANG r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xdi}{r{=}0\limplies\bForm[\BANG\BANG r/x]}{}
-          \xform{xid}{r{\neq}0\limplies\bForm[\BANG\BANG r/x]}{right=.5em of xdi}
+          \xform{xdi}{r{=}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{}
+          \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{right=.5em of xdi}
           \event{a}{\DW{x}{0}}{above=of xdi}      
           \xo{a}{xdi}
           \event{b}{r{\neq}0\mid\DW{x}{1}}{above=of xid}      
           \xo{b}{xid}
-          \xform{xdd}{\bForm[\BANG\BANG r/x]}{above=of a}
-          \xform{xii}{\bForm[\BANG\BANG r/x]}{above=of b}
+          \xform{xdd}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of a}
+          \xform{xii}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of b}
           \xo{a}{xdd}
           \xo{b}{xdd}
         \end{tikzinline}}
@@ -230,9 +299,9 @@ single action, as long as the events have disjoint preconditions.
       \PW{x}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[1/x]}{}
+          \xform{xd}{\bForm\noSUB{[1/x]}}{}
           \event{a}{\DW{x}{1}}{above=of xd}      
-          \xform{xi}{\bForm[1/x]}{above=of a}
+          \xform{xi}{\bForm\noSUB{[1/x]}}{above=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
@@ -245,14 +314,14 @@ single action, as long as the events have disjoint preconditions.
       \PW{x}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xdi}{r{=}0\limplies\bForm[1/x]}{}
-          \xform{xid}{r{\neq}0\limplies\bForm[1/x]}{right=of xdi}
+          \xform{xdi}{r{=}0\limplies\bForm\noSUB{[1/x]}}{}
+          \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[1/x]}}{right=of xdi}
           \event{a}{\DW{x}{0}}{above=of xdi}      
           \xo{a}{xdi}
           \event{b}{\DW{x}{1}}{above=of xid}      
           \xo{b}{xid}
-          \xform{xdd}{\bForm[1/x]}{above=of a}
-          \xform{xii}{\bForm[1/x]}{above=of b}
+          \xform{xdd}{\bForm\noSUB{[1/x]}}{above=of a}
+          \xform{xii}{\bForm\noSUB{[1/x]}}{above=of b}
           \xo{a}{xdd}
           \xo{b}{xdd}
         \end{tikzinline}}
@@ -277,8 +346,8 @@ single action, as long as the events have disjoint preconditions.
   \end{enumerate}
 
   \begin{enumerate}
-  \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm[\aExp/\REF{\dVal}]$,
-  \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm[\aExp/\REF{\dVal}]$,
+  \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
+  \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
   \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \aVal{=}\aReg\limplies\bForm$, 
   % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
   % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.

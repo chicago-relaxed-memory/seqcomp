@@ -103,7 +103,7 @@ We require that:
   % \item formulae include the symbols
   $\Q{\mSC}$, $\Q{\mRA}$, $\Qx{\aLoc}$, 
   $\Qw{\aLoc}$, $\Dx{\aLoc}$, $\RW$, % for all $\aLoc$,
-  (which are not needed in this section, but are used later),
+  (which are used in \textsection\ref{sec:q}--\ref{sec:arm}),
 \item formulae are closed under negation, conjunction, disjunction, and
   substitutions $[\aExp/\aReg]$ and $[\aExp/\aLoc]$, 
 \item there is an entailment relation $\vDash$ between formulae,
@@ -123,6 +123,12 @@ $(\aLoc{=}1)$ and $(\aReg{=}\bReg{+}1)$.
 % I would like to drop this, an be careful about program vs logical syntax
 We use expressions as formulae, coercing $\aExp$ to $\aExp{\neq}0$.
 Formulae are subject to substitutions of the form $[\aExp/\aReg]$ and $[\aExp/\aLoc]$; actions are not.
+
+In formulae, (in)equations have precedence over logical operators; thus
+$\aReg{=}\aVal\limplies\bReg{>}\bVal$ is read
+$(\aReg{=}\aVal)\limplies(\bReg{>}\bVal)$.  Implication associates to the
+right; thus $\aForm\limplies\bForm\limplies\cForm$ is read
+$\aForm\limplies(\bForm\limplies\cForm)$.
 
 % \begin{definition}
 %   \label{def:independent}
@@ -503,7 +509,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{loadpre-kappa2}
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-    $\labelingForm(\aEv)$ implies $(\aReg{=}\aVal){\limplies}\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv{<}\aEv$, or \\
+    $\labelingForm(\aEv)$ implies $\aReg{=}\aVal\limplies\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv<\aEv$, or \\
     $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$.
     % \\ \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
   \end{enumerate}  
@@ -575,11 +581,11 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx1}{\DR{x}{1}}{}
-        \event{wy1}{r{=}1\limplies(r{=}1) \mid \DW{y}{1}}{right=of rx1}
+        \event{wy1}{r{=}1\limplies r{=}1 \mid \DW{y}{1}}{right=of rx1}
         \po{rx1}{wy1}
       \end{tikzinline}}
     \end{gather*}
-  Since $(r{=}1)\limplies(r{=}1)$ is a tautology, this can be part of
+  Since $r{=}1\limplies r{=}1$ is a tautology, this can be part of
   a top-level pomset.
 \end{example}
 
@@ -622,7 +628,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \event{wy1}{1{=}1 \mid \DW{y}{1}}{right=of rx0}
       \end{tikzinline}}
     \end{gather*}
-  Since $(1{=}1)$ is a tautology, this can be part of
+  Since $1{=}1$ is a tautology, this can be part of
   a top-level pomset.
 \end{example}
 
@@ -848,9 +854,9 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   \item[{\labeltext[S3]{S3)}{S3}}]
     $\labelingForm(\aEv)$ implies $\aExp{=}\aVal$,
   \item[{\labeltext[S4]{S4)}{S4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm\noSUB{[\aExp/\aLoc]}$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
   \item[{\labeltext[S5]{S5)}{S5}}]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$, % \land % \lnot\Q{}$.
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm\noSUB{[\aExp/\aLoc]}$, % \land % \lnot\Q{}$.
     \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$.
     % \item %if $\bEvs\neq\emptyset$ then
     %   $\aTr{\bEvs}{\bForm}$ implies $(\aExp{=}\aVal) \land \bForm[\aExp/\aLoc]$, if $\bEvs\neq\emptyset$,
@@ -1246,8 +1252,8 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \xform{xd}{1{=}r\limplies\bForm}{}
-          \xform{xi}{(x{=}r\lor1{=}r)\limplies\bForm}{below=of xd}
-          \event{a1}{\DR{x}{1}}{above=of xd}
+          \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
+          \event{a1}{\DR{x}{1}}{left=of xd}
           \xo{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
@@ -1256,44 +1262,26 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
       \PW{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[r/y]}{}
-          \xform{xi}{\bForm[r/y]}{below=of xd}
-          \event{a2}{r{=}1\mid\DW{y}{1}}{above=of xd}      
+          \xform{xd}{\bForm\noSUB{[r/y]}}{}
+          \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
+          \event{a2}{r{=}1\mid\DW{y}{1}}{left=of xd}      
           \xo{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
   Putting these together without order:
-  % \begin{gather*}
-  %   \PR{x}{r} \SEMI
-  %   \PW{y}{r}
-  %   \\
-  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %     \xform{xdi}{((1{=}r)\limplies\bForm)[r/y]}{}
-  %     \xform{xid}{(((x{=}r\lor1{=}r)\limplies\bForm))[r/y]\land r{=}1}{right=of xdi}
-  %     \event{a1}{\DR{x}{1}}{above=of xdi}
-  %     \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1)\mid\DW{y}{1}}{right=of a1}
-  %     \xform{xdd}{((1{=}r)\limplies\bForm)[r/y]\land r{=}1}{above right=.5em and -1em of a1}
-  %     \xform{xii}{(((x{=}r\lor1{=}r)\limplies\bForm))[r/y]}{below=2.7em of a2}
-  %     \xo{a1}{xdi}
-  %     \xo{a2}{xid}
-  %     \xo{a1}{xdd}
-  %     \xo{a2}{xdd}
-  %   \end{tikzinline}}
-  % \end{gather*}
-  % simplifying:
   \begin{gather*}
     \PR{x}{r} \SEMI
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdd}{1{=}r\limplies\bForm[r/y]}{}
-        \xform{xdi}{1{=}r\limplies\bForm[r/y]}{below=of xdd}
-        \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdd}
-        \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=of xid}
-        \event{a1}{\DR{x}{1}}{above=of xdd}
-        \event{a2}{(x{=}r\lor1{=}r)\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
-        \xo[out=-170,in=170]{a1}{xdi}
+        \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
+        \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
+        \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
+        \event{a1}{\DR{x}{1}}{above=of xdi}
+        \event{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{=}1\mid\DW{y}{1}}{above=of xid}
+        \xo{a1}{xdi}
         \xo{a2}{xid}
         \xo{a1}{xdd}
         \xo{a2}{xdd}
@@ -1306,13 +1294,13 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
   $(1{=}r\limplies r{=}1)$, which is a tautology.
   \begin{gather*}
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdd}{1{=}r\limplies\bForm[r/y]}{}
-        \xform{xdi}{1{=}r\limplies\bForm[r/y]}{below=of xdd}
-        \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdd}
-        \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=of xid}
-        \event{a1}{\DR{x}{1}}{above=of xdd}
+        \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
+        \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
+        \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
+        \event{a1}{\DR{x}{1}}{above=of xdi}
         \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
-        \xo[out=-170,in=170]{a1}{xdi}
+        \xo{a1}{xdi}
         \xo{a2}{xid}
         \xo{a1}{xdd}
         \xo{a2}{xdd}        
@@ -1331,8 +1319,8 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \xform{xd}{1{=}r\limplies\bForm}{}
-          \xform{xi}{(x{=}r\lor1{=}r)\limplies\bForm}{below=of xd}
-          \event{a1}{\DR{x}{1}}{above=of xd}
+          \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
+          \event{a1}{\DR{x}{1}}{left=of xd}
           \xo{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
@@ -1341,123 +1329,38 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
       \PW{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[r/y]}{}
-          \xform{xi}{\bForm[r/y]}{below=of xd}
-          \event{a2}{r{=}2\mid\DW{y}{2}}{above=of xd}      
+          \xform{xd}{\bForm\noSUB{[r/y]}}{}
+          \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
+          \event{a2}{r{=}2\mid\DW{y}{2}}{left=of xd}      
           \xo{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
-  Putting these together without order:
+  Putting these together with order:
   \begin{gather*}
     \PR{x}{r} \SEMI
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdd}{1{=}r\limplies\bForm[r/y]}{}
-        \xform{xdi}{1{=}r\limplies\bForm[r/y]}{below=of xdd}
-        \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdd}
-        \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=of xid}
-        \event{a1}{\DR{x}{1}}{above=of xdd}
-        \event{a2}{(x{=}r\lor1{=}r)\limplies r{=}2\mid\DW{y}{2}}{above=of xid}
-        \xo[out=-170,in=170]{a1}{xdi}
+        \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
+        \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
+        \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
+        \event{a1}{\DR{x}{1}}{above=of xdi}
+        \event{a2}{1{=}r\limplies r{=}2\mid\DW{y}{2}}{above=of xid}
+        \xo{a1}{xdi}
         \xo{a2}{xid}
         \xo{a1}{xdd}
         \xo{a2}{xdd}
+        \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
   The precondition of $\DWP{y}{2}$ is unsatisfiable if no further assumptions
   can be made on $r$; that is the case here, since we assume each register
-  occurs at most once in source programs. If we choose a pomset that orders
-  $\DRP{x}{1}\xpo\DWP{y}{2}$, then the predicate transformers are the same,
-  but the precondition of $\DWP{y}{1}$ is weakened to
-  $(1{=}r\limplies r{=}2)$; this is also unsatisfiable without further
-  assumptions on $r$.
-  % \begin{gather*}
-  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %     \xform{xdd}{1{=}r\limplies\bForm[r/y]}{}
-  %     \xform{xid}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{right=of xdd}
-  %     \event{a1}{\DR{x}{1}}{above=of xdd}
-  %     \event{a2}{1{=}r\limplies r{=}2\mid\DW{y}{2}}{above=of xid}
-  %     \xform{xdi}{1{=}r\limplies\bForm[r/y]}{below=of xdd}
-  %     \xform{xii}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{below=of xid}
-  %     \xo[out=-170,in=170]{a1}{xdi}
-  %     \xo{a2}{xid}
-  %     \xo{a1}{xdd}
-  %     \xo{a2}{xdd}        
-  %       %     \event{a1}{\DR{x}{1}}{}
-  %       %     \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
-  %     \po{a1}{a2}
-  %   \end{tikzinline}}
-  % \end{gather*}
+  occurs at most once in source programs. If we choose a pomset that without
+  the order $\DRP{x}{1}\xpo\DWP{y}{2}$, the precondition of $\DWP{y}{1}$ is
+  strengthened to $(r{=}2)$, which is also unsatisfiable without further
+  assumptions on $r$; the predicate transformers are unchanged.
 \end{example}
 
 
-\begin{example}
-  The JMM causality test cases \citep{PughWebsite} are justified via compiler
-  analysis, possibly in collusion with the scheduler: If every observed value
-  can be shown to satisfy a precondition, then the precondition can be
-  dropped.  
-
-  For example, Test Case 1 determines that the following execution
-  should be allowed:
-  \begin{gather*}
-    x\GETS 0 \SEMI
-    \FORK{\!
-      (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
-      \PAR
-      x\GETS y)
-    }
-    \\[-1ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wx0}{\DW{x}{0}}{}
-        \event{rx1}{\DR{x}{1}}{right=3em of wx0}
-        \event{wy1}{0{\geq}0\mid\DW{y}{1}}{right=of rx1}
-        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
-        \event{wx1}{\DW{x}{1}}{right=of ry1}
-        \po{ry1}{wx1}
-        \rf[out=-168,in=-12]{wx1}{rx1}
-        \rf{wy1}{ry1}
-        \wk[out=10,in=170]{wx0}{wx1}
-        \wk{wx0}{rx1}
-      \end{tikzinline}}
-  \end{gather*}
-  Looking at the first forked thread:
-  \begin{align*}
-    \begin{gathered}
-      \PR{x}{r} 
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{1{=}r\limplies\bForm}{}
-          \xform{xi}{(x{=}r\lor1{=}r)\limplies\bForm}{below=of xd}
-          \event{a1}{\DR{x}{1}}{above=of xd}
-          \xo{a1}{xd}
-        \end{tikzinline}}    
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \IF{r{\geq}0}\THEN y\GETS1 \FI
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{(r{\geq}0\limplies\bForm[r/y]) \land (r{<}0\limplies\bForm)}{}
-          \xform{xi}{(r{\geq}0\limplies\bForm[r/y]) \land (r{<}0\limplies\bForm)}{below=of xd}
-          \event{a2}{r{\geq}0\mid\DW{y}{1}}{above=of xd}      
-          \xo{a2}{xd}
-        \end{tikzinline}}    
-    \end{gathered}
-  \end{align*}
-  Putting these together without order, and dropping the predicate transformers:
-  \begin{gather*}
-    \PR{x}{r} \SEMI
-    \IF{r{\geq}0}\THEN y\GETS1 \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a2}{(x{=}r\lor1{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}
-      \end{tikzinline}}
-  \end{gather*}
-  The precondition of $\DWP{y}{1}$ can be simplified to
-  $(x{=}r\limplies r{\geq}0$.
-  $\DWP{x}{0}$ has predicate transformer $(\bForm[0/x])$, both in the
-  dependent and independent cases.
-\end{example}

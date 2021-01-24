@@ -54,9 +54,9 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{=}\aVal)\land\bForm[\aExp/\aLoc]$,
+    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{=}\aVal)\land\bForm\noSUB{[\aExp/\aLoc]}$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \bForm[\aExp/\aLoc]$.
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \bForm\noSUB{[\aExp/\aLoc]}$.
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
@@ -89,8 +89,8 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
       \PW{x}{1} 
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[1/x]\land (\Qw{x}\limplies 1{=}1)}{}
-          \xform{xi}{\bForm[1/x]\land \lnot\Qw{x}}{below=of xd}
+          \xform{xd}{\bForm\noSUB{[1/x]}\land (\Qw{x}\limplies 1{=}1)}{}
+          \xform{xi}{\bForm\noSUB{[1/x]}\land \lnot\Qw{x}}{below=of xd}
           \event{a1}{1{=}1\land \Qx{x}\mid\DW{x}{1}}{above=of xd}
           \xo{a1}{xd}
         \end{tikzinline}}    
@@ -100,8 +100,8 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
       \PW{x}{2}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[2/x]\land (\Qw{x}\limplies 2{=}2)}{}
-          \xform{xi}{\bForm[2/x]\land \lnot\Qw{x}}{below=of xd}
+          \xform{xd}{\bForm\noSUB{[2/x]}\land (\Qw{x}\limplies 2{=}2)}{}
+          \xform{xi}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{below=of xd}
           \event{a2}{2{=}2\land\Qx{x}\mid\DW{x}{2}}{above=of xd}      
           \xo{a2}{xd}
         \end{tikzinline}}    
@@ -113,8 +113,8 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
       \PW{x}{1} 
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[1/x]}{}
-          \xform{xi}{\bForm[1/x]\land \lnot\Qw{x}}{below=of xd}
+          \xform{xd}{\bForm\noSUB{[1/x]}}{}
+          \xform{xi}{\bForm\noSUB{[1/x]}\land \lnot\Qw{x}}{right=0.5em of xd}
           \event{a1}{\Qx{x}\mid\DW{x}{1}}{left=of xd}
           \xo{a1}{xd}
         \end{tikzinline}}    
@@ -124,8 +124,8 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
       \PW{x}{2}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[2/x]}{}
-          \xform{xi}{\bForm[2/x]\land \lnot\Qw{x}}{below=of xd}
+          \xform{xd}{\bForm\noSUB{[2/x]}}{}
+          \xform{xi}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=0.5em of xd}
           \event{a2}{\Qx{x}\mid\DW{x}{2}}{left=of xd}      
           \xo{a2}{xd}
         \end{tikzinline}}    
@@ -144,12 +144,12 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
     \PW{x}{1}\SEMI \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdi}{\bForm[2/x]\land \lnot\Qw{x}}{}
-        \xform{xdd}{\bForm[2/x]}{right=of xdi}
-        \xform{xid}{\bForm[2/x]\land \lnot\Qw{x}}{right=of xdd}
-        \xform{xii}{\bForm[2/x]\land \lnot\Qw{x}}{below=of xdd}
-        \event{a1}{\Qx{x}\mid\DW{x}{1}}{above left=.5em and -1em of xdd}
-        \event{a2}{\Qx{x}\mid\DW{x}{2}}{above right=.5em and -1em of xdd}
+        \xform{xdi}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{}
+        \xform{xdd}{\bForm\noSUB{[2/x]}}{right=of xdi}
+        \xform{xid}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=of xdd}
+        \xform{xii}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=of xid}
+        \event{a1}{\Qx{x}\mid\DW{x}{1}}{above=of xdi}
+        \event{a2}{\Qx{x}\mid\DW{x}{2}}{above=of xid}
         \xo{a1}{xdi}
         \xo{a2}{xid}
         \xo{a1}{xdd}
@@ -160,12 +160,12 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
   % Adding order does nothing since the preconditions are tautologies.
   % \begin{gather*}
   %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %     \xform{xdi}{\bForm[1/x]\land \lnot\Q{}}{}
-  %     \xform{xdd}{\bForm[1/x]}{right=of xdi}
-  %     \xform{xid}{\bForm[1/x]\land \lnot\Q{}}{right=of xdd}
+  %     \xform{xdi}{\bForm\noSUB{[1/x]}\land \lnot\Q{}}{}
+  %     \xform{xdd}{\bForm\noSUB{[1/x]}}{right=of xdi}
+  %     \xform{xid}{\bForm\noSUB{[1/x]}\land \lnot\Q{}}{right=of xdd}
   %     \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
   %     \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
-  %     \xform{xii}{\bForm[1/x]\land \lnot\Q{}}{below=of xdd}
+  %     \xform{xii}{\bForm\noSUB{[1/x]}\land \lnot\Q{}}{below=of xdd}
   %     \xo{a1}{xdi}
   %     \xo{a2}{xid}
   %     \xo{a1}{xdd}
@@ -176,16 +176,16 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
 \end{example}
 
 \begin{example}
-  \ref{S4} includes $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)$ in order to
-  prevent \emph{left merges}.  Consider the following.  
+  \ref{S4} includes $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)$ to ensure that
+  \emph{left merges} are not quiescent.  Consider the following.
   \begin{align*}
     \begin{gathered}
       \PW{x}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{1{=}1\land\Qx{x}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm[1/x]\land (\Qw{x}\limplies 1{=}1)}{below=of a1}
-          \xform{x1i}{\bForm[1/x]\land \lnot\Qw{x}}{below=of x1d}
+          \xform{x1d}{\bForm\noSUB{[1/x]}\land (\Qw{x}\limplies 1{=}1)}{below=of a1}
+          \xform{x1i}{\bForm\noSUB{[1/x]}\land \lnot\Qw{x}}{below=of x1d}
           \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
@@ -195,8 +195,8 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{2{=}1\land\Qx{x}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm[2/x]\land (\Qw{x}\limplies 2{=}1)}{below=of a1}
-          \xform{x1i}{\bForm[2/x]\land \lnot\Qw{x}}{below=of x1d}
+          \xform{x1d}{\bForm\noSUB{[2/x]}\land (\Qw{x}\limplies 2{=}1)}{below=of a1}
+          \xform{x1i}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{below=of x1d}
           \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
@@ -208,8 +208,8 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\Qx{x}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm[1/x]}{right=of a1}
-          \xform{x1i}{\bForm[1/x]\land \lnot\Q{}}{below=of x1d}
+          \xform{x1d}{\bForm\noSUB{[1/x]}}{right=of a1}
+          \xform{x1i}{\bForm\noSUB{[1/x]}\land \lnot\Qw{x}}{below=of x1d}
           \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
@@ -219,139 +219,106 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\FALSE\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm[2/x]\land \lnot\Q{}}{right=of a1}
-          \xform{x1i}{\bForm[2/x]\land \lnot\Q{}}{below=of x1d}
+          \xform{x1d}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=of a1}
+          \xform{x1i}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{below=of x1d}
           \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
   Merging the actions, we have:
-  % \begin{gather*}
-  %   \PW{x}{1}\SEMI \PW{x}{2}
-  %   \\
-  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %     \event{a1}{1{=}1\lor2{=}1\mid\DW{x}{1}}{}
-  %     \xform{x1d}{(\bForm[1/x]\land (\Q{}\limplies 1{=}1))[2/x]\land (\Q{}\limplies 2{=}1)}{below=of a1}
-  %     \xform{x1i}{(\bForm[1/x]\land \lnot\Q{})[2/x]\land \lnot\Q{}}{below=of x1d}
-  %     \xo{a1}{x1d}
-  %   \end{tikzinline}}
-  % \end{gather*}
-  % which simplifies to
-  % \begin{gather*}
-  %   %   \PW{x}{1}\SEMI \PW{x}{2}
-  %   %   \\
-  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %     \event{a1}{\DW{x}{1}}{}
-  %     \xform{x1d}{\bForm[1/x]\land (\Q{}\limplies 1{=}1 \land 2{=}1)}{right=of a1}
-  %     \xform{x1i}{\bForm[1/x]\land \lnot\Q{}}{right=of x1d}
-  %     \xo{a1}{x1d}
-  %   \end{tikzinline}}
-  % \end{gather*}
-  % which simplifies to
-  % \begin{gather*}
-  %   %   \PW{x}{1}\SEMI \PW{x}{2}
-  %   %   \\
-  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %     \event{a1}{\DW{x}{1}}{}
-  %     \xform{x1d}{(\bForm[1/x])[2/x]\land \lnot\Q{}}{right=of a1}
-  %     \xform{x1i}{(\bForm[1/x]\land \lnot\Q{})[2/x]\land \lnot\Q{}}{below=of x1d}
-  %     \xo{a1}{x1d}
-  %   \end{tikzinline}}
-  % \end{gather*}
-  % which simplifies to
   \begin{gather*}
     % \PW{x}{1}\SEMI \PW{x}{2}
     % \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a1}{\Qx{x}\mid\DW{x}{1}}{}
-        \xform{x1d}{\bForm[2/x]\land \lnot\Q{}}{right=of a1}
-        \xform{x1i}{\bForm[2/x]\land \lnot\Q{}}{right=of x1d}
+        \xform{x1d}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=of a1}
+        \xform{x1i}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=.5em of x1d}
         \xo{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
 \end{example}
 
 
-\begin{comment}
-  Read to write dependency, first separately:
-  \begin{align*}
-    \begin{gathered}
-      \PR{x}{r} 
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{(1{=}r)\limplies\bForm}{}
-          \xform{xi}{((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{}}{below=of xd}
-          \event{a1}{\DR{x}{1}}{above=of xd}
-          \xo{a1}{xd}
-        \end{tikzinline}}    
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \PW{y}{r}
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm[r/y]\land (\Q{}\limplies r{=}1)}{}
-          \xform{xi}{\bForm[r/y]\land \lnot\Q{}}{below=of xd}
-          \event{a2}{r{=}1\mid\DW{y}{1}}{above=of xd}      
-          \xo{a2}{xd}
-        \end{tikzinline}}    
-    \end{gathered}
-  \end{align*}
-  Putting these together without order:
-  \begin{gather*}
-    \PR{x}{r} \SEMI
-    \PW{y}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdi}{((1{=}r)\limplies\bForm)[r/y]\land \lnot\Q{}}{}
-        \xform{xid}{(((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{})[r/y]\land (\Q{}\limplies r{=}1)}{below right=.5em and -10em of xdi}
-        \event{a1}{\DR{x}{1}}{above=of xdi}
-        \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above right=2.7em and -16em of xid}
-        \xform{xdd}{((1{=}r)\limplies\bForm)[r/y]\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
-        \xform{xii}{(((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{})[r/y]\land \lnot\Q{}}{below=of xid}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}
-      \end{tikzinline}}
-  \end{gather*}
-  Note that
-  \begin{math}
-    \lnot\Q{}\land (\Q{}\limplies r{=}1)
-  \end{math}
-  simplifies to 
-  \begin{math}
-    \lnot\Q{}.
-  \end{math}
-  \begin{gather*}
-    \PR{x}{r} \SEMI
-    \PW{y}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdi}{((1{=}r)\limplies\bForm[r/y])\land \lnot\Q{}}{}
-        \xform{xid}{((x{=}r\lor1{=}r)\limplies\bForm[r/y])\land \lnot\Q{}}{below right=.5em and -4em of xdi}
-        \event{a1}{\DR{x}{1}}{above=of xdi}
-        \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above=2.7em of xid}
-        \xform{xdd}{((1{=}r)\limplies\bForm[r/y])\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
-        \xform{xii}{((x{=}r\lor1{=}r)\limplies\bForm[r/y])\land \lnot\Q{}}{below=of xid}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}
-      \end{tikzinline}}
-  \end{gather*}
-  With order:
-  \begin{gather*}
-    % \PR{x}{r} \SEMI
-    % \PW{y}{r}
-    % \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
-        \po{a1}{a2}
-      \end{tikzinline}}
-  \end{gather*}
-\end{comment}
+% \begin{comment}
+%   Read to write dependency, first separately:
+%   \begin{align*}
+%     \begin{gathered}
+%       \PR{x}{r} 
+%       \\
+%       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%           \xform{xd}{(1{=}r)\limplies\bForm}{}
+%           \xform{xi}{((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{}}{below=of xd}
+%           \event{a1}{\DR{x}{1}}{above=of xd}
+%           \xo{a1}{xd}
+%         \end{tikzinline}}    
+%     \end{gathered}
+%     &&
+%     \begin{gathered}
+%       \PW{y}{r}
+%       \\
+%       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%           \xform{xd}{\bForm\noSUB{[r/y]}\land (\Q{}\limplies r{=}1)}{}
+%           \xform{xi}{\bForm\noSUB{[r/y]}\land \lnot\Q{}}{below=of xd}
+%           \event{a2}{r{=}1\mid\DW{y}{1}}{above=of xd}      
+%           \xo{a2}{xd}
+%         \end{tikzinline}}    
+%     \end{gathered}
+%   \end{align*}
+%   Putting these together without order:
+%   \begin{gather*}
+%     \PR{x}{r} \SEMI
+%     \PW{y}{r}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%         \xform{xdi}{((1{=}r)\limplies\bForm)[r/y]\land \lnot\Q{}}{}
+%         \xform{xid}{(((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{})[r/y]\land (\Q{}\limplies r{=}1)}{below right=.5em and -10em of xdi}
+%         \event{a1}{\DR{x}{1}}{above=of xdi}
+%         \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above right=2.7em and -16em of xid}
+%         \xform{xdd}{((1{=}r)\limplies\bForm)[r/y]\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
+%         \xform{xii}{(((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{})[r/y]\land \lnot\Q{}}{below=of xid}
+%         \xo{a1}{xdi}
+%         \xo{a2}{xid}
+%         \xo{a1}{xdd}
+%         \xo{a2}{xdd}
+%       \end{tikzinline}}
+%   \end{gather*}
+%   Note that
+%   \begin{math}
+%     \lnot\Q{}\land (\Q{}\limplies r{=}1)
+%   \end{math}
+%   simplifies to 
+%   \begin{math}
+%     \lnot\Q{}.
+%   \end{math}
+%   \begin{gather*}
+%     \PR{x}{r} \SEMI
+%     \PW{y}{r}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%         \xform{xdi}{((1{=}r)\limplies\bForm\noSUB{[r/y]})\land \lnot\Q{}}{}
+%         \xform{xid}{((x{=}r\lor1{=}r)\limplies\bForm\noSUB{[r/y]})\land \lnot\Q{}}{below right=.5em and -4em of xdi}
+%         \event{a1}{\DR{x}{1}}{above=of xdi}
+%         \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above=2.7em of xid}
+%         \xform{xdd}{((1{=}r)\limplies\bForm\noSUB{[r/y]})\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
+%         \xform{xii}{((x{=}r\lor1{=}r)\limplies\bForm\noSUB{[r/y]})\land \lnot\Q{}}{below=of xid}
+%         \xo{a1}{xdi}
+%         \xo{a2}{xid}
+%         \xo{a1}{xdd}
+%         \xo{a2}{xdd}
+%       \end{tikzinline}}
+%   \end{gather*}
+%   With order:
+%   \begin{gather*}
+%     % \PR{x}{r} \SEMI
+%     % \PW{y}{r}
+%     % \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%         \event{a1}{\DR{x}{1}}{}
+%         \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+%         \po{a1}{a2}
+%       \end{tikzinline}}
+%   \end{gather*}
+% \end{comment}
 
 
 
