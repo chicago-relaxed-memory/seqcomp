@@ -5,14 +5,16 @@
   \\
   % \fwp{x\GETS \aExp}{\bForm} &= (\forall y)\; y{=}\aExp \limplies \bForm[y/x] \text{}{ where $y$ is fresh}
   % \\
-  \fwp{x\GETS \aExp}{\bForm} &= \bForm[\aExp/x] 
+  \fwp{r\GETS \aExp}{\bForm} &= \bForm[\aExp/r] 
   \\
-  \fwp{r\GETS \aLoc}{\bForm} &= \bForm[x/r] 
-  \\
+  %% \fwp{x\GETS \aExp}{\bForm} &= \bForm[\aExp/x] 
+  %% \\
+  %% \fwp{r\GETS \aLoc}{\bForm} &= \bForm[x/r] 
+  %% \\
   \fwp{\aCmd_1;\aCmd_2}{\bForm} &= \fwp{\aCmd_1}{\fwp{\aCmd_2}{\bForm}}
   \\
   \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm} &=
-  (\aExp\limplies \fwp{\aCmd_1}{\bForm}) \land (\lnot\aExp\limplies \fwp{\aCmd_2}{\bForm})
+  ((\aExp \ne 0) \limplies \fwp{\aCmd_1}{\bForm}) \land ((\aExp=0) \limplies \fwp{\aCmd_2}{\bForm})
 \end{align*}
 
 % \begin{align*}

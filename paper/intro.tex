@@ -254,49 +254,146 @@ investigates how existing models of sequential composition interact with relaxed
 %% optimizations, support for logics that prove the absence of thin-air
 %% behaviors, and a local data race freedom theorem.
 
-% \begin{figure*}
-%   \input{fig-sp}
-%   \caption{Weakest Precondition and Strongest Postcondition \cite{}}
-% \end{figure*}
-
+\begin{figure*}
+  \input{fig-sp}
+  \caption{Weakest precondition semantics}
+  \label{fig:sp}
+\end{figure*}
 
 Our approach follows that of weakest precondition semantics of
 \citet{DBLP:journals/cacm/Dijkstra75}, which provides an alternative
 characterization of Hoare logic \citep{Hoare:1969:ABC:363235.363259} by
-mapping postconditions to preconditions.
+mapping postconditions to preconditions. We recall the definition of
+$\fwp{\aCmd}{\bForm}$ in Figure~\ref{fig:sp}. The rule we are most interested
+in is the one for sequential composition, which maps seqential composition of programs
+to function composition of predicate transformers.
 
-% Our transformers $\aTr$ map preconditions to postconditions, in order to
-% apply to preconditions.
-% \begin{align*}
-%   \hoare{\aForm}{\bCmd}{\bForm}
-%   \;\;\Leftrightarrow\;\;
-%   \hoare{\aTr(\aCmd,\aForm)}{\aCmd\SEMI\bCmd}{\bForm}
-% \end{align*}
-% For example
-% \begin{gather*}
-%   \hoare{r{=}1}{\PW{y}{r}}{y{=}1}
-%   \\
-%   \hoare{x{=}1}{\PR{x}{r}\SEMI\PW{y}{r}}{y{=}1}
-% \end{gather*}
+Predicate transformers are a good fit to logical models of dependency calculation,
+since both are concerned with preconditions, and how they are transformed by
+sequential composition. Our first attempt is to associate a predicate transformer
+with each pomset. We visualize this in diagrams by showing how $\bForm$ is transformed,
+for example:
+  \begin{align*}
+    \begin{gathered}
+      r \GETS x
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{rx0}{\DR{x}{0}}{}
+          \xform{rx0d}{(r{=}0) \limplies \bForm}{below=of rx0}
+          \xo{rx0}{rx0d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      s \GETS y
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{ry0}{\DR{y}{0}}{}
+          \xform{ry0d}{(s{=}0) \limplies \bForm}{below=of ry0}
+          \xo{ry0}{ry0d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{s{<}1} \THEN z\GETS r\&s \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
+          \event{wz0}{(s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{}
+          \xform{wz0d}{\bForm}{below=of wz0}
+          \xo{wz0}{wz0d}
+      \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+For the sequentially consistent semantics, sequential composition composition
+is straightforward: we apply each predicate transformer to the preconditions
+of subsequent events, and compose the predicate transformers:
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \event{wz0}{(r{=}0) \limplies (s{=}0) \limplies (s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{below=of ry0}
+        \po{rx0}{ry0}
+        \po{ry0}{wz0}
+        \xo{rx0}{rx0ry0d}
+        \xo{ry0}{rx0ry0d}
+        \xo{wz0}{rx0ry0d}
+      \end{tikzinline}}
+  \end{gather*}
+This model works for the sequentially consistent case, but needs to be
+weakened for the relaxed case. The key observation of this paper is
+that rather than working with one predicate transformer, we should
+work with a \emph{family} of predicate transformers, indexed by sets
+of events.
 
+For example, for single-event pomsets, there are two predicate
+transformers, since there are two subsets of any one-element set.
+We call the predicate transfomer for $\emptyset$ the \emph{independent}
+transformer, and the one indexed by $\{e\}$ the \emph{dependent} transformer.
+We visualize this by including more than one transformed predicate,
+with an edge leading to the dependent one. For example:
+  \begin{align*}
+    \begin{gathered}
+      r \GETS x
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{rx0}{\DR{x}{0}}{}
+          \xform{rx0i}{\bForm}{above=of rx0}
+          \xform{rx0d}{(r{=}0) \limplies \bForm}{below=of rx0}
+          \xo{rx0}{rx0d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      s \GETS y
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{ry0}{\DR{y}{0}}{}
+          \xform{ry0i}{\bForm}{above=of ry0}
+          \xform{ry0d}{(s{=}0) \limplies \bForm}{below=of ry0}
+          \xo{ry0}{ry0d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{s{<}1} \THEN z\GETS r\&s \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
+          \event{wz0}{(s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{}
+          \xform{wz0i}{\bForm}{above=of wz0}
+          \xform{wz0d}{\bForm}{below=of wz0}
+          \xo{wz0}{wz0d}
+      \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+The model of sequential composition then picks which
+predicate transformer to apply to an event's precondition by picking
+the one indexed by all the events before it in causal order.
 
-\endinput
-
-This paper builds on
-\cite{2019-sp} and
-\cite{10.1145/3428262}.
-
-
-Pomsets are a nice model of concurrent computation.
-Predicate transformers are a nice model of sequential computation.
-We show how these interact.
-
-We do this by attaching predicate transformers to \emph{configurations}.
-
-Thus the amount of transformation depends on which read events are seen in
-the configuration.
-
-We develop the theory of pomsets with predicate transformers, then apply the
-theory to model relaxed memory.
-
-Other things we could model include Map/Reduce and Fork/Join.
+For example, we can recover the expected semantics
+for the above example by choosing
+the predicate transformer which is independent of $(\DR x0)$
+but dependent on $(\DR y0)$, which is the transformer
+which maps $\bForm$ to $(s{=}0) \limplies \bForm$.
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r\&s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r\&s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{below=of ry0}
+        \xform{rx0d}{(r{=}0) \limplies \bForm}{above=of rx0}
+        \xform{ry0d}{(s{=}0) \limplies \bForm}{right=of rx0d}
+        \xform{wz0i}{\bForm}{above=of wz0}
+        \po{ry0}{wz0}
+        \xo{rx0}{rx0d}
+        \xo{ry0}{ry0d}
+        \xo{rx0}{rx0ry0d}
+        \xo{ry0}{rx0ry0d}
+      \end{tikzinline}}
+  \end{gather*}
