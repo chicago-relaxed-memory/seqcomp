@@ -477,9 +477,9 @@ as one would hope.
 \subsection{Contributions}
 
 This paper is the first model of relaxed memory with a compositional
-semantics for sequential composition.  It shows how the pomsets with
-preconditions model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined
-with the predicate transformer model of~\cite{DBLP:journals/cacm/Dijkstra75}.
+semantics for sequential composition.  It shows how pomsets with
+preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined
+with predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75}.
 \begin{itemize}
 \item \S\ref{sec:model} presents the basic model, with few features
   required of the logic of preconditions, but a resulting lack of fidelity
@@ -494,3 +494,14 @@ with the predicate transformer model of~\cite{DBLP:journals/cacm/Dijkstra75}.
 \item \S\ref{sec:discussion} is a discussion of the design space.
 \end{itemize}
 % Acknowledgements go here, once we're not double-blinded.
+The definitions in this paper have been formalized in Agda.
+
+Because it is closely related, we expect that the memory-model results of
+\cite{DBLP:journals/pacmpl/JagadeesanJR20} apply to our model, including
+compositional reasoning for temporal safety properties and {local} \drfsc.
+In \textsection\ref{sec:arm}, we provide an alternative proof strategy for
+efficient compilation to \armeight{}, which improves upon that of
+\cite{DBLP:journals/pacmpl/JagadeesanJR20} by using a recent alternative
+characterization of \armeight{}.
+
+
