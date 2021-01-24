@@ -1,9 +1,22 @@
 \section{Model}
 \label{sec:model}
 
-Batty suggest example where dependencies are added and also go away, perhaps
-by store forwarding. Something like:
-\texttt{(r=x; y=1); (s=y; z=s+r)}
+%% Batty suggest example where dependencies are added and also go away, perhaps
+%% by store forwarding. Something like:
+%% \texttt{(r=x; y=1); (s=y; z=s+r)}
+
+In this section, we present the mathematical preliminaries for the
+model (which can be skipped on first reading). We then present the
+model incrementally, starting with a model built using
+\emph{partially ordered multisets}
+(\emph{pomsets})~\cite{GISCHER1988199,Plotkin:1997:TSP:266557.266600},
+and then adding preconditions and finally predicate transformers.
+
+In later sections, we will discuss extensions to the logic, and to the
+semantics of load, store and thread initialization, in order to model
+relaxed memory more faithfully. We stress that these features do
+\emph{not} change any of the structures of the language: conditionals,
+and parallel and sequential composition are as defined in this section.
 
 \subsection{Preliminaries}
 \label{sec:prelim}
@@ -85,11 +98,12 @@ $\dEvs$.
 We require that:
 \begin{itemize}
 \item actions include writes $\DWP{\aLoc}{\aVal}$ and reads $\DRP{\aLoc}{\aVal}$,
-\item formulae include equalities $(\aExp{=}\bExp)$ and $(\aExp{=}\aLoc)$,
+\item formulae include equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
 \item formulae include symbols % for all $\aLoc$,
   % \item formulae include the symbols
   $\Q{\mSC}$, $\Q{\mRA}$, $\Qx{\aLoc}$, 
   $\Qw{\aLoc}$, $\Dx{\aLoc}$, $\RW$, % for all $\aLoc$,
+  (which are not needed in this section, but are used later),
 \item formulae are closed under negation, conjunction, disjunction, and
   substitutions $[\aExp/\aReg]$ and $[\aExp/\aLoc]$, 
 \item there is an entailment relation $\vDash$ between formulae,
@@ -106,6 +120,7 @@ We require that:
 
 Logical formulae include equations over memory references and registers, such
 $(\aLoc{=}1)$ and $(\aReg{=}\bReg{+}1)$.
+% I would like to drop this, an be careful about program vs logical syntax
 We use expressions as formulae, coercing $\aExp$ to $\aExp{\neq}0$.
 Formulae are subject to substitutions of the form $[\aExp/\aReg]$ and $[\aExp/\aLoc]$; actions are not.
 
@@ -150,8 +165,11 @@ instead that
 \subsection{Pomsets}
 
 We first consider a fragment of our language that can be modeled using simple
-pomsets.
+pomsets.  This captures read and write actions which may be reordered,
+but as we shall see does\emph{not} capture control or data dependencies.
+
 \begin{definition}
+  \label{def:pomsets}
   A \emph{pomset} over $\Act$ is a tuple
   $(\Event, {\le}, \labeling)$ where
   \begin{itemize}
@@ -179,7 +197,7 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
   % fulfilled, there is a $\bEv\le\aEv$ which fulfills it, and for any $\cEv$
   % which can block $\aEv$, either $\cEv\le\bEv$ or $\aEv\le\cEv$.
 
-  Event $\aEv$ is \emph{fulfilled} if there is a $\bEv\le\aEv$ which
+  A read event $\aEv$ is \emph{fulfilled} if there is a $\bEv\le\aEv$ which
   matches it and, for any $\cEv$ which can block $\aEv$, either $\cEv\le\bEv$
   or $\aEv\le\cEv$.
 
@@ -191,8 +209,8 @@ provide examples with coherence in this subsection.  In
 \textsection\ref{sec:q} we show that coherence can be encoded in the logic,
 making independency unnecessary.
 \begin{definition}
-  Actions $\aAct$ and $\bAct$ are \emph{independent} (notation
-  ${\aAct\reorder\bAct}$) if either both are reads or they are accesses to
+  Actions $\aAct$ and $\bAct$ are \emph{independent}
+  (${\aAct\reorder\bAct}$) if either both are reads or they are accesses to
   different locations.  Formally
   \begin{math}
     {\reorder} = \{(\DR{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \}
@@ -215,12 +233,11 @@ making independency unnecessary.
 
   Actions that are not independent are in \emph{conflict}.
 \end{definition}
-
-
-% Definition \ref{def:pomsets} describes operators over sets of pomsets
-% sufficient to give the semantics for the following fragment of our language:
+We can now define a model of processes given as sets of pomsets
+sufficient to give the semantics for a fragment of our language
+without control or data dependencies.
 \begin{definition} %$\phantom{\;}$\par
-  \label{def:pomsets}
+  \label{def:pomset-semantics}
 
   \noindent
   If $\aPS\in\sNIL$ then $\aEvs = \emptyset$.
@@ -382,11 +399,12 @@ appear later in the paper):
 \subsection{Pomsets with Preconditions}
 \label{sec:pomsets-pre}
 
-[Problem with previous section is that notion of dependency is impoverished]
-
-The model described here is essentially the model of
-\cite{DBLP:journals/pacmpl/JagadeesanJR20}, restricting attention
-to relaxed access.  We discuss the differences in the appendix.
+The previous section modeled a language fragment without conditionals (and hence no
+control dependencies) or expressions (and hence no data dependencies). We now
+address this, by adopting a \emph{pomsets with preconditions} model
+similar to~\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
+% restricting attention to relaxed access.
+We discuss the differences in \S\ref{sec:discussion}.
 
 \begin{definition}
   A \emph{pomset with preconditions} is
@@ -407,6 +425,11 @@ to relaxed access.  We discuss the differences in the appendix.
 
 % Definition \ref{def:pomsets-pre}, describes operators 
 % sufficient to give the semantics to a larger fragment of our language:
+We can now define a model of processes given as sets of pomsets with preconditions
+sufficient to give the semantics for a fragment of our language
+where every use of sequential composition is either
+$(\aLoc\GETS\aExp\SEMI \aCmd)$ or
+$(\aReg\GETS\aLoc\SEMI \aCmd)$.
 \begin{definition}%$\phantom{\;}$\par
   \label{def:pomsets-pre}
   
@@ -420,7 +443,7 @@ to relaxed access.  We discuss the differences in the appendix.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParDisjointCount}}
   \item[\ref{par-E}--\ref{par-disjoint})]
-    as for $\sPAR$ in \refdef{def:pomsets},
+    as for $\sPAR$ in \refdef{def:pomset-semantics},
   \item \label{par-kappa1}
     if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
   \item \label{par-kappa2}
@@ -436,7 +459,7 @@ to relaxed access.  We discuss the differences in the appendix.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParCount}}
   \item[\ref{par-E}--\ref{par-le2})] 
-    as for $\sPAR$  in \refdef{def:pomsets} (ignoring disjointness),
+    as for $\sPAR$  in \refdef{def:pomset-semantics} (ignoring disjointness),
   \item \label{if-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
   \item \label{if-kappa2}
@@ -457,7 +480,7 @@ to relaxed access.  We discuss the differences in the appendix.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[\ref{pre-E}--\ref{pre-reorder})]
-    as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
+    as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{storepre-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aExp{=}\aVal$,
   \item \label{storepre-kappa2}
@@ -477,11 +500,11 @@ to relaxed access.  We discuss the differences in the appendix.
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[\ref{pre-E}--\ref{pre-reorder})]
-    as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomsets}, % (ignoring \thepomsetPrefixOrderCount),
+    as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{loadpre-kappa2}
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-    $\labelingForm(\aEv)$ implies $\aReg{=}\aVal\limplies\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv<\aEv$, or \\
-    $\labelingForm(\aEv)$ implies $(\aReg{=}\aVal\lor\aReg{=}\aLoc)\limplies\labelingForm_2(\aEv)$.
+    $\labelingForm(\aEv)$ implies $(\aReg{=}\aVal)\limplies\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv<\aEv$, or \\
+    $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$.
     % \\ \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
   \end{enumerate}  
 \end{definition}
@@ -492,33 +515,150 @@ to relaxed access.  We discuss the differences in the appendix.
     \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd_1}\sELSE\sem{\aCmd_2}\sFI
     \\
     \begin{aligned}
-      \sem{\PW[\amode]{\aLoc}{\aExp}\SEMI \aCmd} &=
+      \sem{\PW{\aLoc}{\aExp}\SEMI \aCmd} &=
       \sSTOREPRE{\aLoc}{\aExp}{\sem{\aCmd}}
       &
       \sem{\SKIP} &= \sem{\NIL} = \sNIL 
       \\
-      \sem{\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd} &=
+      \sem{\PR{\aLoc}{\aReg}\SEMI \aCmd} &=
       \sLOADPRE{\aReg}{\aLoc}{\sem{\aCmd}}
       &
       \makebox[3.5em][r]{$\sem{\aGrp_1 \PAR \aGrp_2}$} &= \sem{\aGrp_1}\sPAR\sem{\aGrp_2}
     \end{aligned}
   \end{gather*}
 \end{definition}
-Following our convention for subscripts, in the final clause of
-$\sLOADPRE{}{}{}$, $<$ refers to the order of $\aPS$.  Also note that
-$\sLOADPRE{}{}{}$ does not constrain $\labelingForm(\aEv)$ if
-$\aEv\in\aEvs_1$.
+%% Following our convention for subscripts, in the final clause of
+%% $\sLOADPRE{}{}{}$, $<$ refers to the order of $\aPS$.  Also note that
+%% $\sLOADPRE{}{}{}$ does not constrain $\labelingForm(\aEv)$ if
+%% $\aEv\in\aEvs_1$.
 
 \begin{example}
-  Dependency
+  A simple example of a data dependency
+  is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS r}$,
+  for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
+  such as:
+    \begin{gather*}
+      y\GETS r
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{(r{=}1)\mid\DW{y}{1}}{}
+      \end{tikzinline}}
+    \end{gather*}
+  If $\aVal$ is chosen badly, we have a pomset with a precodition
+  that cannot be part of a top-level pomset such as:
+    \begin{gather*}
+      r\GETS x\SEMI y\GETS r
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{wy1}{(r{=}0)\limplies(r{=}1) \mid \DW{y}{1}}{right=of rx0}
+        \po{rx0}{wy1}
+      \end{tikzinline}}
+    \end{gather*}
+  But if $\aVal$ is $1$ then we have two cases, the independent case, which again cannot
+  be part of a top-level pomset:
+    \begin{gather*}
+      r\GETS x\SEMI y\GETS r
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{wy1}{(r{=}1) \mid \DW{y}{1}}{right=of rx1}
+      \end{tikzinline}}
+    \end{gather*}
+  or the dependent case:
+    \begin{gather*}
+      r\GETS x\SEMI y\GETS r
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{wy1}{(r{=}1)\limplies(r{=}1) \mid \DW{y}{1}}{right=of rx1}
+        \po{rx1}{wy1}
+      \end{tikzinline}}
+    \end{gather*}
+  Since $(r{=}1)\limplies(r{=}1)$ is a tautology, this can be part of
+  a top-level pomset.
 \end{example}
 
 \begin{example}
-  Independency
+  Control dependencies are similar, for example
+  for any $\aPS\in\sem{r\GETS x\SEMI \IF r \THEN y\GETS 1 \FI}$,
+  there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\IF r \THEN y\GETS 1 \FI}$
+  such as:
+    \begin{gather*}
+      \IF r \THEN y\GETS 1 \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{(r{\ne}0)\mid\DW{y}{1}}{}
+      \end{tikzinline}}
+    \end{gather*}
+  The rest of the reasoning is the same as for a data dependency.
 \end{example}
 
 \begin{example}
-  Conditional merging events
+  A simple example of an independency
+  is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS 1}$,
+  for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
+  such as:
+    \begin{gather*}
+      y\GETS 1
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{(1{=}1)\mid\DW{y}{1}}{}
+      \end{tikzinline}}
+    \end{gather*}
+  In this case it doesn't matter what $\aVal$ is, for example:
+    \begin{gather*}
+      r\GETS x\SEMI y\GETS 1
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{wy1}{(1{=}1) \mid \DW{y}{1}}{right=of rx0}
+      \end{tikzinline}}
+    \end{gather*}
+  Since $(1{=}1)$ is a tautology, this can be part of
+  a top-level pomset.
+\end{example}
+
+\begin{example}
+  Consider $\aPS\in\sem{\IF {r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI}$, so
+  there must be $\aPS_1\in\sem{y\GETS r}$,
+  and $\aPS_2\in\sem{y\GETS 1}$, such as:
+  \begin{align*}
+    \begin{gathered}
+      y \GETS r
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{wy1}{(r{=}1) \mid \DW{y}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      y \GETS 1
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{wy1}{(1{=}1) \mid \DW{y}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Since there is no requirement for disjointnessin the semantics of conditionals,
+  we can can consider the case where the pomsets share their event,
+  in which case:
+    \begin{gather*}
+      \IF{r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
+      \end{tikzinline}}
+    \end{gather*}
+  where the precondition on $(\DW{y}{1})$ is a tautlogy, and so is independent of $r$.
 \end{example}
 
 \subsection{Pomsets with Predicate Transformers}
