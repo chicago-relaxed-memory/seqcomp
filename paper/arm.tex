@@ -85,8 +85,8 @@ $\Dx{\aLoc}$.
   \item[\ref{S5})]
     $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm[\aExp/\aLoc]$.
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
-  \item[\ref{L6})]
+  %   $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
+  % \item[\ref{L6})]
     $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land\bForm$.
   \end{enumerate}
 \end{definition}
@@ -209,7 +209,8 @@ the uninterpreted symbol $\RW$.
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$,
+    %$\aTr{\cEvs}{\bForm}$ implies $\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$,
+    $\aTr{\cEvs}{\bForm}$ implies $\RW\limplies\bForm$,
   \end{enumerate}  
 \end{definition}
 
@@ -263,9 +264,10 @@ the uninterpreted symbol $\RW$.
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land(\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
-  \item[\ref{L6})]
-    $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land\bForm$.
+  %   $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land(\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
+  % \item[\ref{L6})]
+    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode}
+    \land (\RW\limplies\bForm)$.
   \end{enumerate}  
 \end{definition}
 Here, we have repeated all of the rules for preconditions and transformers,

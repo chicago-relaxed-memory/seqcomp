@@ -170,6 +170,7 @@ when clear from context, such as
 $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
 
 \begin{definition}
+  \label{def:fulfilled}
   Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
   Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any
   $\aVal$, $\bVal$.
@@ -185,9 +186,13 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
   Pomset $\aPS$ is \emph{fulfilled} if every read in $\aPS$ is fulfilled.
 \end{definition}
 
+We introduce independency \cite{DBLP:books/ws/95/Mazurkiewicz95} in order to
+provide examples with coherence in this subsection.  In
+\textsection\ref{sec:q} we show that coherence can be encoded in the logic,
+making independency unnecessary.
 \begin{definition}
   Actions $\aAct$ and $\bAct$ are \emph{independent} (notation
-  $\aAct\reorder\bAct$) if either both are reads or they are accesses to
+  ${\aAct\reorder\bAct}$) if either both are reads or they are accesses to
   different locations.  Formally
   \begin{math}
     {\reorder} = \{(\DR{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \}
@@ -211,12 +216,6 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
   Actions that are not independent are in \emph{conflict}.
 \end{definition}
 
-This use of independency is inspired by
-\citet{DBLP:books/ws/95/Mazurkiewicz95}.  It is worth noting that if
-${\reorder}$ is taken to be the empty relation, then fulfilled pomsets in the
-following semantics correspond to sequentially consistent executions
-\cite{Lamport:1979:MMC:1311099.1311750} up to mumbling
-\cite{DBLP:journals/iandc/Brookes96}.
 
 % Definition \ref{def:pomsets} describes operators over sets of pomsets
 % sufficient to give the semantics for the following fragment of our language:
@@ -294,6 +293,11 @@ In this semantics, both $\SKIP$ and $\NIL$ map to the empty pomset.  Parallel
 composition is disjoint union, inheriting labeling and order from the two
 side.  Prefixing may add a new action (on the left) to an existing pomset
 (on the right), inheriting labeling and order from the right.  
+
+It is worth noting that if ${\reorder}$ is taken to be the empty relation,
+then fulfilled pomsets of \refdef{def:pomsets} correspond to sequentially
+consistent executions \cite{Lamport:1979:MMC:1311099.1311750} up to mumbling
+\cite{DBLP:journals/iandc/Brookes96}.
 
 \begin{example}
   \label{ex:mumble1}
@@ -386,11 +390,11 @@ to relaxed access.  We discuss the differences in the appendix.
 
 \begin{definition}
   A \emph{pomset with preconditions} is
-  a pomset together with $\labelingForm:\aEvs\fun\Formulae$.
+  a pomset (\refdef{def:pomsets}) together with $\labelingForm:\aEvs\fun\Formulae$.
 \end{definition}
 
 \begin{definition}
-  A pomset with preconditions is \emph{top level} if it is fulfilled and
+  A pomset with preconditions is \emph{top level} if it is fulfilled (\refdef{def:fulfilled}) and
   every precondition is a tautology.
 \end{definition}
 
@@ -517,7 +521,6 @@ $\aEv\in\aEvs_1$.
   Conditional merging events
 \end{example}
 
-
 \subsection{Pomsets with Predicate Transformers}
 
 [The problem with the previous section is that there's no story for
@@ -570,7 +573,7 @@ Note that in a family of predicate transformers for $\aEvs$, transformers for
 smaller subsets of $\aEvs$ are stronger.
 
 \begin{definition}
-  A pomset with predicate tansformers is a pomset with preconditions,
+  A pomset with predicate tansformers is a pomset with preconditions (\refdef{def:pomsets-pre}),
   together with a family of predicate transformers for $\aEvs$.
 \end{definition}
 
@@ -753,15 +756,16 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   \item[{\labeltext[L4]{L4)}{L4}}]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
-    $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, % \land \lnot\Q{}$,
+    %$\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, % \land \lnot\Q{}$,
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm$, % \land \lnot\Q{}$,
     \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$,
   \end{enumerate}
-  or
-  $\aEvs=\emptyset$ and 
-  \begin{enumerate}
-  \item[{\labeltext[L6]{L6)}{L6}}] 
-    $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$. % \land \lnot\Q{}$.
-  \end{enumerate}
+  % or
+  % $\aEvs=\emptyset$ and 
+  % \begin{enumerate}
+  % \item[{\labeltext[L6]{L6)}{L6}}] 
+  %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$. % \land \lnot\Q{}$.
+  % \end{enumerate}
 \end{definition}
 \begin{definition}
   \noindent
@@ -805,12 +809,6 @@ weaker assumption that either $\aReg$ is $\aVal$ or it is value defined by
 preceding code for $\aLoc$.  That is, we do not know whether subsequent code
 sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
 
-We include \ref{L6} in order to ensure prefix closure on sets of pomsets.  If
-we choose a pomset with no events, what should the predicate transformer do
-for load?  In this case, we have no value $\aVal$ to mention, and therefore
-the best we can do is to emulate skip.  In order to eventually arrive at a
-top-level pomset, this means that subsequent code must be independent of
-$\aReg$.
 
 % Recall that $\uRegs{\bEvs}=\{\uReg{\bEv}\mid\bEv\in\bEvs\}$.
 
