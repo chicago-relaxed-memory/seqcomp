@@ -7,15 +7,18 @@ For sequential composition, parallel composition and the conditional, we
 believe that the definition is \emph{natural}, even \emph{canonical}.
 For stores and loads, instead, the definition in Figure~\ref{fig:full} is a
 Frankenstein's monster of features.  This complexity is \emph{essential},
-however, not an accident of our poor choices.  Relaxed memory models must
+however, not just an accident of our poor choices.  Relaxed memory models must
 please many audiences: compiler writers want one thing, hardware designers
 another, and programmers yet another still.  The result is inevitably full of
 compromise.
 
-Given that \emph{complexity} cannot be eliminated from relaxed memory models, the
-best one can do is attempt to understand its causes.  We have broken the
+Given that \emph{complexity} cannot be eliminated from relaxed memory models,
+the best one can do is attempt to understand its causes.  We have broken the
 problem into eight manageable pieces, discussed throughout
-\textsection\ref{sec:co}--\ref{sec:complications}.
+\textsection\ref{sec:q}--\ref{sec:complications}.  \refdef{def:pomsets-arm}
+summarizes all the features necessary for efficient implementation on
+\armeight{}.
+
 
 {Logic} is the thread that sews these features together.
 

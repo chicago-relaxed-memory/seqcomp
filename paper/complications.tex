@@ -67,13 +67,13 @@
   \label{def:pomsets-lir}
   Update \refdef{def:pomsets-trans} to (\ref{L4} unchanged):
   \begin{enumerate}
-  \item[{\labeltext[S4]{S4)}{S4}}]
+  \item[\ref{S4})]
     $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
-  \item[{\labeltext[S5]{S5)}{S5}}]
+  \item[\ref{S5})]
     $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
-  \item[{\labeltext[L4]{L4)}{L4}}]
+  \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
-  \item[{\labeltext[L5]{L5)}{L5}}]
+  \item[\ref{L5})]
     $\aTr{\cEvs}{\bForm}$ implies
     $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
   \item[{\labeltext[L6]{L6)}{L6}}] 
@@ -221,7 +221,7 @@ most once in a program.  We relax this by renaming.
 
 
 \begin{definition}[$\xRecycle$]
-  \label{def:pomsets-if}
+  \label{def:pomsets-recycle}
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
   \item[\ref{L4})] 
@@ -702,7 +702,7 @@ pomset, unlike \jjr{}.
     \begin{gathered}
       \REF{r} \GETS 0
       \\
-      \hbox{\begin{tikzinline}[node distance=.8em]
+      \hbox{\begin{tikzinline}[node distance=.5em]
           \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
           \eventl{d}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{below=of a}
         \end{tikzinline}}
@@ -711,7 +711,7 @@ pomset, unlike \jjr{}.
     \begin{gathered}
       \REF{0}\GETS \BANG r
       \\
-      \hbox{\begin{tikzinline}[node distance=.8em]
+      \hbox{\begin{tikzinline}[node distance=.5em]
           \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{}
           \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{below=of b}
         \end{tikzinline}}
@@ -725,7 +725,7 @@ pomset, unlike \jjr{}.
       \SEMI
       \REF{0}\GETS \BANG r
       \\
-      \hbox{\begin{tikzinline}[node distance=.8em]
+      \hbox{\begin{tikzinline}[node distance=1em]
           \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
           \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
           \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
