@@ -5,9 +5,6 @@ blocks of computing: memory and sequential composition. One would like
 to think that these are well-worn topics, where every issue has been
 settled, but this is sadly not the case.
 
-Let $\aReg$--$\bReg$ range over thread-local registers and $\aLoc$-$\cLoc$
-range over shared memory references.
-
 \subsection{Memory}
 
 For single-threaded programs, memory can be thought of as you might
@@ -34,6 +31,8 @@ for example:
         \po{ry2}{rx1}
       \end{tikzinline}}
   \end{gather*}
+(In examples, $\aReg$--$\bReg$ range over thread-local registers and $\aLoc$-$\cLoc$
+range over shared memory references.)
 
 This model naturally extends to the case of shared-memory concurrency
 in a natural way, leading to a \emph{sequentially consistent}
