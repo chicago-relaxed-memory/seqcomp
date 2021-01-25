@@ -124,7 +124,7 @@ be independent of $\aReg$.
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
-  Composing:
+  % Composing:
   \begin{align*}
     \begin{gathered}[t]
       \PW{x}{0} 
@@ -268,9 +268,9 @@ most once in a program.  We relax this by renaming.
       \SEMI
       \PR{x}{s}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinline}[node distance=.5em and .5em]
           \eventl{e}{a0}{\DR{x}{0}}{}
-          \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm[r/s]}{below=of a0}
+          \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm[r/s]}{right=of a0}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -282,7 +282,7 @@ most once in a program.  We relax this by renaming.
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
-  Composing:
+  %Composing:
   \begin{align*}
     \begin{gathered}[t]
       \PR{x}{r}
@@ -310,6 +310,20 @@ most once in a program.  We relax this by renaming.
 % Requires indexing to resolve nondeterminism.
 
 % IF closure/case analysis: $\psi_e$
+
+\begin{figure*}
+  \begin{center}
+    \begin{minipage}{0.905\textwidth}
+      \input{fig-full}
+      % \input{fig-full-where}
+      % \input{fig-full-noco}
+    \end{minipage}
+  \end{center}
+  \caption{Full Semantics of Loads, Stores and Threads (See \refdef{def:QS}
+    for $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ and \refdef{def:DS} for
+    $\DL{\aLoc}{\amode}$ and $\DS{\aLoc}{\amode}$)}
+  \label{fig:full}
+\end{figure*}    
 
 \begin{example}
   \label{ex:if1}
@@ -501,6 +515,8 @@ most once in a program.  We relax this by renaming.
   \end{align*}
   Coalescing events gives the desired result.
 \end{example}
+These examples show that we must allow inconsistent predicates in a single
+pomset, unlike \jjr{}.
 % \begin{example}
 %   Revisiting \refex{ex:if1}, we can split the middle store:
 %   \begin{align*}
@@ -624,15 +640,7 @@ most once in a program.  We relax this by renaming.
 \end{definition}
 
 \begin{example}
-  punning badly:
-  Consider that
-  \begin{math}
-    \sem{\REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r}
-  \end{math}
-  includes both of the following pomsets
-  % (``$\BANG$'' is logical
-  % negation---``$\BANG \aExp$'' evaluates to $1$ if
-  % $\aExp$ is $0$, and $0$ otherwise):
+  \refdef{def:pomsets-addr} is naive.  Consider
   \begin{align*}
     \begin{gathered}
       \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r

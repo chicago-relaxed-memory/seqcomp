@@ -34,14 +34,14 @@ events that write to $x$, for example:
 These symbols are left alone in the dependent case, but
 in the independent case we substitute $\FALSE$ for $\Qw{\aLoc}$:
   \begin{gather*}
-    \PW{x}{1}\SEMI \PW{x}{2}
-    \\
+    % \PW{x}{1}\SEMI \PW{x}{2}
+    % \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{wx1}{1{=}1\land \Qr{\aLoc}\land\Qw{\aLoc} \mid\DW{x}{1}}{}
         \event{wx2}{2{=}2\land \Qr{\aLoc}\land\FALSE \mid\DW{x}{2}}{right=of wx1}
       \end{tikzinline}}
   \end{gather*}
-This substitution is part of the predicate transformer for store:
+This substitution is part of the predicate transformer:
   \begin{gather*}
       \PW{x}{1} 
       \\
@@ -144,8 +144,8 @@ symbols, for example:
   Simplifying, we have:
   \begin{align*}
     \begin{gathered}
-      \PW{x}{1}
-      \\
+      % \PW{x}{1}
+      % \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm}{below right=of a1}
@@ -155,8 +155,8 @@ symbols, for example:
     \end{gathered}
     &&
     \begin{gathered}
-      \PW{x}{2}
-      \\
+      % \PW{x}{2}
+      % \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a2}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{2}}{}
           \xform{x2d}{\bForm}{below left=of a2}
@@ -187,8 +187,8 @@ symbols, for example:
   In order to get a satisfiable precondition for $\DWP{x}{2}$, we must
   introduce order:
   \begin{gather*}
-    \PW{x}{1}\SEMI \PW{x}{2}
-    \\
+    % \PW{x}{1}\SEMI \PW{x}{2}
+    % \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm}{below right=of a1}
@@ -531,8 +531,8 @@ top-level pomsets.
   In order to get a satisfiable precondition for $\DWP{y}{1}$, we must
   introduce order:
   \begin{gather*}
-    \PW{x}{1}\SEMI \PW[\mRA]{y}{1}
-    \\
+    % \PW{x}{1}\SEMI \PW[\mRA]{y}{1}
+    % \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm}{below right=of a1}
@@ -557,10 +557,10 @@ top-level pomsets.
     \begin{gathered}
       \PR[\mRA]{y}{r}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinline}[node distance=.5em and .5em]
           \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}
           \xform{x1d}{r{=}1\limplies\bForm}{below=of a1}
-          \xform{x1i}{\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{below=of x1d}
+          \xform{x1i}{\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{right=of x1d}
           \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
@@ -568,10 +568,10 @@ top-level pomsets.
     \begin{gathered}
       \PR{x}{s}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinline}[node distance=.5em and .5em]
           \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{}
           \xform{x2d}{s{=}1\limplies\bForm}{below=of a2}
-          \xform{x2i}{\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of x2d}
+          \xform{x2i}{\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{right=of x2d}
           \xo{a2}{x2d}
         \end{tikzinline}}
     \end{gathered}
@@ -585,7 +585,7 @@ top-level pomsets.
           \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}
           \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
           \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
-          \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mRA}][\FALSE/\QL{\aLoc}{\mRLX}]}{below=of xdd}
+          \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mRA}][\FALSE/\QL{\aLoc}{\mRLX}]}{above=of xdd}
           \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{right=of xdd}
           \event{a2}{\FALSE\mid\DR{x}{1}}{above=of x2d}
           \xo{a1}{x1d}
@@ -597,20 +597,20 @@ top-level pomsets.
   In order to get a satisfiable precondition for $\DRP{x}{1}$, we must
   introduce order:
   \begin{gather*}
-    \PR[\mRA]{y}{r}\SEMI \PR{x}{s}
-    \\
+    % \PR[\mRA]{y}{r}\SEMI \PR{x}{s}
+    % \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}
           \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
           \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
-          \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mRA}][\FALSE/\QL{\aLoc}{\mRLX}]}{below=of xdd}
+          \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mRA}][\FALSE/\QL{\aLoc}{\mRLX}]}{above=of xdd}
           \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{right=of xdd}
           \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{above=of x2d}
           \xo{a1}{x1d}
           \xo{a2}{x2d}
           \xo{a1}{xdd}
           \xo{a2}{xdd}
-          \sync{a1}{a2}
+          \sync[out=15,in=165]{a1}{a2}
         \end{tikzinline}}
   \end{gather*}
   

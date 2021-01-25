@@ -74,7 +74,7 @@ We model the following language.
 ($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed mode is the
 default; we regularly elide it from examples.  $\mRA$/$\mSC$ accesses are
 collectively known as \emph{synchronized accesses}.
- 
+
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs.
 % 
@@ -385,8 +385,8 @@ appear later in the paper):
 \begin{itemize}  
 \item relaxed accesses are blue, with a single border,
 \item synchronized accesses are red, with a double border,
-% \item sequentially-consistent accesses are orange, with a bold double
-%   border,
+  % \item sequentially-consistent accesses are orange, with a bold double
+  %   border,
 \item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
 \item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
   \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
@@ -544,18 +544,18 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
   is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS r}$,
   for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
   such as:
-    \begin{gather*}
-      y\GETS r
+  \begin{gather*}
+    y\GETS r
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{wy1}{r{=}1\mid\DW{y}{1}}{}
       \end{tikzinline}}
-    \end{gather*}
+  \end{gather*}
   If $\aVal$ is chosen badly, we have a pomset with a precondition
   that cannot be part of a top-level pomset such as:
-    \begin{gather*}
-      r\GETS x\SEMI y\GETS r
+  \begin{gather*}
+    r\GETS x\SEMI y\GETS r
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -563,29 +563,29 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \event{wy1}{r{=}0\limplies r{=}1 \mid \DW{y}{1}}{right=of rx0}
         \po{rx0}{wy1}
       \end{tikzinline}}
-    \end{gather*}
+  \end{gather*}
   But if $\aVal$ is $1$ then we have two cases, the independent case, which again cannot
   be part of a top-level pomset:
-    \begin{gather*}
-      r\GETS x\SEMI y\GETS r
+  \begin{gather*}
+    r\GETS x\SEMI y\GETS r
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx1}{\DR{x}{1}}{}
         \event{wy1}{r{=}1 \mid \DW{y}{1}}{right=of rx1}
       \end{tikzinline}}
-    \end{gather*}
+  \end{gather*}
   or the dependent case:
-    \begin{gather*}
-      r\GETS x\SEMI y\GETS r
-    \\
-    \nonumber
+  \begin{gather*}
+    % r\GETS x\SEMI y\GETS r
+    % \\
+    % \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx1}{\DR{x}{1}}{}
         \event{wy1}{r{=}1\limplies r{=}1 \mid \DW{y}{1}}{right=of rx1}
         \po{rx1}{wy1}
       \end{tikzinline}}
-    \end{gather*}
+  \end{gather*}
   Since $r{=}1\limplies r{=}1$ is a tautology, this can be part of
   a top-level pomset.
 \end{example}
@@ -595,14 +595,14 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
   for any $\aPS\in\sem{r\GETS x\SEMI \IF r \THEN y\GETS 1 \FI}$,
   there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\IF r \THEN y\GETS 1 \FI}$
   such as:
-    \begin{gather*}
-      \IF r \THEN y\GETS 1 \FI
+  \begin{gather*}
+    \IF r \THEN y\GETS 1 \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{wy1}{r{\ne}0\mid\DW{y}{1}}{}
       \end{tikzinline}}
-    \end{gather*}
+  \end{gather*}
   The rest of the reasoning is the same as for a data dependency.
 \end{example}
 
@@ -611,24 +611,24 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
   is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS 1}$,
   for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
   such as:
-    \begin{gather*}
-      y\GETS 1
+  \begin{gather*}
+    y\GETS 1
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{wy1}{1{=}1\mid\DW{y}{1}}{}
       \end{tikzinline}}
-    \end{gather*}
+  \end{gather*}
   In this case it doesn't matter what $\aVal$ is, for example:
-    \begin{gather*}
-      r\GETS x\SEMI y\GETS 1
+  \begin{gather*}
+    r\GETS x\SEMI y\GETS 1
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx0}{\DR{x}{0}}{}
         \event{wy1}{1{=}1 \mid \DW{y}{1}}{right=of rx0}
       \end{tikzinline}}
-    \end{gather*}
+  \end{gather*}
   % Since $1{=}1$ is a tautology, this can be part of
   % a top-level pomset.
 \end{example}
@@ -657,17 +657,17 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
   Since there is no requirement for disjointness in the semantics of conditionals,
   we can consider the case where the event \emph{coalesces} from the two pomsets,
   in which case:
-    \begin{gather*}
-      \IF{r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI
+  \begin{gather*}
+    \IF{r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
+        \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
       \end{tikzinline}}
-    \end{gather*}
-    Here, the precondition on $(\DW{y}{1})$ is a tautology, and so is
-    independent of $r$.
-    %We refer to event sharing as \emph{coalescing} or \emph{merging}.
+  \end{gather*}
+  Here, the precondition on $(\DW{y}{1})$ is a tautology, and so is
+  independent of $r$.
+  % We refer to event sharing as \emph{coalescing} or \emph{merging}.
 \end{example}
 
 \subsection{Pomsets with Predicate Transformers}
@@ -682,6 +682,7 @@ Note that substitutions ($\aTr{}{\psi}=\psi[\aExp/\aReg]$) and implications on t
 ($\aTr{}{\psi}=\phi\limplies\psi$) are predicate transformers.
 
 \begin{definition}
+  \label{def:trans}
   A \emph{predicate transformer} is a %monotone
   function
   $\aTr{}{}:\Formulae\fun\Formulae$ such that
@@ -700,6 +701,7 @@ indexed by sets of events. We use $\aTr{\bEvs}{}$ as the predicate transformer
 applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
 
 \begin{definition}
+  \label{def:family}
   A \emph{family of predicate transformers} for $\aEvs$ consists of a
   predicate transformer $\aTr{\bEvs}{}$ for each $\bEvs\subseteq\AllEvents$,
   such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}$
@@ -900,7 +902,7 @@ semantics.
   \item[{\labeltext[L4]{L4)}{L4}}]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
-    %$\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, % \land \lnot\Q{}$,
+    % $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, % \land \lnot\Q{}$,
     $\aTr{\cEvs}{\bForm}$ implies $\bForm$, % \land \lnot\Q{}$,
     \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$,
   \end{enumerate}
@@ -1322,7 +1324,7 @@ order.
         \xo{a2}{xid}
         \xo{a1}{xdd}
         \xo{a2}{xdd}
-        \wk{a1}{a2}
+        \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
   This pomset's preconditions do not depend on a bound register, so can contribute
@@ -1371,7 +1373,7 @@ order.
         \xo{a2}{xid}
         \xo{a1}{xdd}
         \xo{a2}{xdd}
-        \wk{a1}{a2}
+        \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
 
@@ -1383,56 +1385,161 @@ order.
   % assumptions on $r$; the predicate transformers are unchanged.
 \end{example}
 
-\subsection{Relaxed memory}
-
-\begin{enumerate}
-\item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg]$, 
-% \item[\ref{L5})]
-%   $\aTr{\emptyset}{\bForm}\;$ implies $\bForm[\aLoc/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$,
-\item[\ref{L5})]
-  $\aTr{\emptyset}{\bForm}\;$ implies $(\forall\aReg)\bForm$.
-\end{enumerate}
-
 \begin{example}
+  The predicate transformer we have chosen for \ref{L4} is different from the
+  one used traditionally, which is written using substitution.  Attempting to
+  write the predicate transformers in this style we arrive at:
+  \begin{enumerate}
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg]$, 
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm}\;$ implies $(\forall\aReg)\bForm$.
+  \end{enumerate}
+  This phrasing of \ref{L5} says that $\bForm$ must be independent of $\aReg$
+  in order to appear in a top-level pomset.  This choice for \ref{L5} is forced
+  by \refdef{def:family}, which states that the predicate transformer for a
+  small subset of $\aEvs$ must imply the transformer for a larger subset.
+  Sadly, this definition fails associativity.
+
+  Consider the following, eliding transformers:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{\BANG r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r{=}0\mid\DW{x}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{\BANG\BANG r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r{\neq}0\mid\DW{x}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{\DW{x}{0}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}  
+  Associating to the right and merging:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{\BANG r} 
+      \SEMI \PW{x}{\BANG\BANG r} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r{=}0 \lor r{\neq}0\mid\DW{x}{1}}{}
+          \event{c}{\DW{x}{0}}{right=of b}
+          \wk{b}{c}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}  
+  The precondition of $\DWP{x}{1}$ is a tautology, thus we have:
   \begin{align*}
     \begin{gathered}[t]
       \PR{y}{r}
       \SEMI \PW{x}{\BANG r} 
-      \SEMI \PW{x}{r {\AND} s} 
+      \SEMI \PW{x}{\BANG\BANG r} 
       \SEMI \PW{x}{0} 
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a}{\DR{y}{1}}{}
           \event{b}{\DW{x}{1}}{right=of a}
           \event{c}{\DW{x}{0}}{right=of b}
+          \wk{b}{c}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  If, instead, we associate to the left:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI \PW{x}{\BANG r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+          \event{b}{1{=}0\mid\DW{x}{1}}{right=of a}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{\BANG\BANG r} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r{\neq}0\mid\DW{x}{1}}{}
+          \event{c}{\DW{x}{0}}{right=of b}
+          \wk{b}{c}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}  
+  Sequencing and merging:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI \PW{x}{\BANG r} 
+      \SEMI \PW{x}{\BANG\BANG r} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+          \event{b}{1{=}0 \lor r{\neq}0\mid\DW{x}{1}}{right=of a}
+          \event{c}{\DW{x}{0}}{right=of b}
+          \wk{b}{c}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  In this case, the precondition of $\DWP{x}{1}$ is not a tautology, forcing
+  a dependency $\DRP{y}{1}\xpo \DWP{x}{1}$.
+
+  Our solution is to Skolemize.  We have proven associativity of
+  \refdef{def:pomsets-trans} in Agda.  The proof requires that predicate
+  transformers distribute through disjunction (\refdef{def:trans}).
+  Since universal quantification does not distribute through disjunction, the
+  attempt to define predicate transformers using substitution fails.
 \end{example}
 
-The final semantic functions for load, store, and thread
-initialization, given in Figure~\ref{fig:full}, are quite complex.  In
-the remainder of the paper, we explain the definition by looking at
-its constituent parts, building on \refdef{def:pomsets-trans}, which
-models sequential composition, parallel composition, and conditionals.
-In \textsection\ref{sec:q}, we add \emph{quiescence}, which encodes
-coherence, release-acquire and SC access, and termination.  In
+\subsection{The Road Ahead}
+
+The final semantic functions for load, store, and thread initialization
+are given in Figure~\ref{fig:full}, at the end of the paper.
+In \textsection\ref{sec:q}--\ref{sec:complications}, we explain this definition by looking at its
+constituent parts, building on \refdef{def:pomsets-trans}.  In
+\textsection\ref{sec:q}, we add \emph{quiescence}, which encodes coherence,
+release-acquire and SC access, and termination.  In
 \textsection\ref{sec:arm}, we add peculiarities that are necessary for
 efficient implementation on \armeight.  In
-\textsection\ref{sec:complications}, we discuss
-other features such as register recycling and address calculation.
-\begin{figure*}
-  \begin{center}
-    \begin{minipage}{0.905\textwidth}
-      \input{fig-full}
-      % \input{fig-full-where}
-      % \input{fig-full-noco}
-    \end{minipage}
-  \end{center}
-  \caption{Full Semantics of Loads, Stores and Threads (See \refdef{def:QS}
-    for $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ and \refdef{def:DS} for
-    $\DL{\aLoc}{\amode}$ and $\DS{\aLoc}{\amode}$)}
-  \label{fig:full}
-\end{figure*}    
+\textsection\ref{sec:complications}, we discuss other features such as
+register recycling and address calculation.
+
+The final definitions of load and store are quite complex, due to the
+inherent complexities of relaxed memory.  The core of
+\refdef{def:pomsets-trans}, modeling sequential composition, parallel
+composition, and conditionals, is stable, remaining unchanged in later
+sections.  The messiness of relaxed memory is quarantined to the rules
+for load and store, rather than permeating the entire semantics.
+
 
