@@ -121,7 +121,9 @@ Logical formulae include equations over registers, such as
 $(\aReg{=}\bReg{+}1)$.
 For use in \textsection\ref{sec:tc1}, we also include equations over memory references, such as $(\aLoc{=}1)$.
 % I would like to drop this, an be careful about program vs logical syntax
-Formulae are subject to substitutions of the form $[\aExp/\aReg]$ and $[\aExp/\aLoc]$; actions are not.
+Formulae are subject to substitutions; % of the form $[\aExp/\aReg]$ and
+% $[\aExp/\aLoc]$;
+actions are not.
 We use expressions as formulae, coercing $\aExp$ to $\aExp{\neq}0$.
 Equations have precedence over logical operators; thus
 $\aReg{=}\aVal\limplies\bReg{>}\bVal$ is read

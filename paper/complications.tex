@@ -40,11 +40,11 @@
   \begin{gather*}
     % x\GETS 0 \SEMI
     % \FORK{\!
-    %   (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
-    %   \PAR
-    %   x\GETS y)
+    % (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+    % \PAR
+    % x\GETS y)
     % }
-    % \\[-1ex]
+    %   \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
         \event{rx1}{\DR{x}{1}}{right=3em of wx0}
@@ -160,7 +160,7 @@ most once in a program.  We relax this by renaming.
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DR{x}{1}}{}
-        %\event{a2}{\DR{x}{1}}{right=of a1}
+        % \event{a2}{\DR{x}{1}}{right=of a1}
         \event{a3}{\DW{y}{1}}{right=of a1}
         \po{a1}{a3}
         % \po[out=-20,in=-160]{a1}{a3}
@@ -168,7 +168,7 @@ most once in a program.  We relax this by renaming.
         \event{b2}{\DW{x}{1}}{right=of b1}
         \rf{a3}{b1}
         \po{b1}{b2}
-        %\rf[out=169,in=11]{b2}{a2}
+        % \rf[out=169,in=11]{b2}{a2}
         \rf[out=169,in=11]{b2}{a1}
       \end{tikzinline}}
   \end{gather*}
@@ -184,15 +184,15 @@ most once in a program.  We relax this by renaming.
   \begin{gather*}
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DR{x}{1}}{}
-        %\event{a2}{\DR{x}{1}}{right=of a1}
+        % \event{a2}{\DR{x}{1}}{right=of a1}
         \event{a3}{\DW{y}{1}}{right=of a1}
-        %\po{a1}{a3}
+        % \po{a1}{a3}
         % \po[out=-20,in=-160]{a1}{a3}
         \event{b1}{\DR{y}{1}}{right=3em of a3}
         \event{b2}{\DW{x}{1}}{right=of b1}
         \rf{a3}{b1}
         \po{b1}{b2}
-        %\rf[out=169,in=11]{b2}{a2}
+        % \rf[out=169,in=11]{b2}{a2}
         \rf[out=169,in=11]{b2}{a1}
       \end{tikzinline}}
   \end{gather*}
@@ -206,8 +206,8 @@ most once in a program.  We relax this by renaming.
   \item[\ref{L4})] 
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\uReg{\aEv}\limplies\bForm[\uReg{\aEv}/\aReg]$, 
   \item[\ref{L5})] 
-  %   $\aTr{\cEvs}{\bForm}$ implies $(\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
-  % \item[\ref{L6})] 
+    % $\aTr{\cEvs}{\bForm}$ implies $(\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
+    % \item[\ref{L6})] 
     $(\forall\bReg)$ $\aTr{\cEvs}{\bForm}$ implies $\bForm[\bReg/\aReg]$. 
   \end{enumerate}
 \end{definition}
@@ -238,8 +238,8 @@ most once in a program.  We relax this by renaming.
     %   \IF{r{\geq}s}\THEN y\GETS1 \FI
     %   \\
     %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-    %       \event{a2}{r{=}s\mid\DW{y}{1}}{}      
-    %     \end{tikzinline}}    
+    %     \event{a2}{r{=}s\mid\DW{y}{1}}{}      
+    %   \end{tikzinline}}    
     % \end{gathered}
   \end{align*}
   Coalescing and composing:
@@ -343,32 +343,68 @@ most once in a program.  We relax this by renaming.
   non-tautological precondition.  Our solution is to allow a pomset to
   contain many events for a single action, as long as the events have
   disjoint preconditions.
+
+  This is not simply a theoretical question; it is observable.
+  \begin{gather*}
+    \begin{gathered}
+      \PR{y}{r}\SEMI
+      \IF{r}\THEN\PW{x}{1}\FI \SEMI
+      \PW{x}{1} \SEMI
+      \IF{\lnot r}\THEN\PW{x}{1}\FI\SEMI
+      \PW{z}{r}
+      \\[-.5ex]{}\PAR{}
+      \IF{x}\THEN
+        \PW{x}{0} \SEMI
+        \IF{x}\THEN \PW{y}{1} \FI
+      \FI
+    \end{gathered}    
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a1}{\DW{x}{1}}{}
+        \event{a2}{\DW{x}{1}}{right=of a1}
+        \wk{a1}{a2}
+        \event{a0}{\DR{y}{1}}{left=of a1}
+        \event{a3}{\DW{z}{1}}{right=of a2}
+        \po[out=20,in=160]{a0}{a3}
+        \event{b0}{\DR{x}{1}}{below right=1em and -1em of a0}
+        \event{b1}{\DW{x}{0}}{right=of b0}
+        \event{b2}{\DR{x}{1}}{right=of b1}
+        \event{b3}{\DW{y}{1}}{right=of b2}
+        \wk{b0}{b1}
+        \wk{b1}{b2}
+        \po{b2}{b3}
+        \rf{b3}{a0}
+        \rf{a1}{b0}
+        \rf{a2}{b2}
+        \wk{b1}{a2}
+      \end{tikzinline}}
+  \end{gather*}  
 \end{example}
 % \begin{example}
 %   \label{ex:if1}
 %   \refdef{def:pomsets-trans} does \emph{not} allow:
 %   \begin{gather*}
 %     \aCmd=\PBR{
-%       \PW{x}{0}\SEMI
-%       \PW{x}{\BANG\BANG r}\SEMI
-%       \PW{x}{1}
-%     }
+%     \PW{x}{0}\SEMI
+%     \PW{x}{\BANG\BANG r}\SEMI
+%     \PW{x}{1}
+%   }
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a}{\DW{x}{0}}{}
-%         \event{b}{\DW{x}{1}}{right=of a}
-%         \wk{a}{b}
-%       \end{tikzinline}}
+%       \event{a}{\DW{x}{0}}{}
+%       \event{b}{\DW{x}{1}}{right=of a}
+%       \wk{a}{b}
+%     \end{tikzinline}}
 %   \end{gather*}
 %   However, for any $\aExp$, \refdef{def:pomsets-trans} \emph{does} allow:
 %   \begin{gather*}
 %     \IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a}{\DW{x}{0}}{}
-%         \event{b}{\DW{x}{1}}{right=of a}
-%         \wk{a}{b}
-%       \end{tikzinline}}
+%       \event{a}{\DW{x}{0}}{}
+%       \event{b}{\DW{x}{1}}{right=of a}
+%       \wk{a}{b}
+%     \end{tikzinline}}
 %   \end{gather*}
 %   If $r=0$, the middle store can merge left; otherwise, it can merge right.
 % \end{example}
@@ -407,9 +443,9 @@ most once in a program.  We relax this by renaming.
     $(\forall\aEv\in\aEvs\cap\bEvs)$
     $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies \aVal_\aEv{=}\uReg{\aEv}\limplies\bForm[\uReg{\aEv}/\aReg]$, 
   \item[\ref{L5})]
-  %   $(\forall\aEv\in\aEvs\setminus\cEvs)$
-  %   $\aTr{\cEvs}{\bForm}$ implies $\cForm_\aEv \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
-  % \item[\ref{L6})]
+    % $(\forall\aEv\in\aEvs\setminus\cEvs)$
+    % $\aTr{\cEvs}{\bForm}$ implies $\cForm_\aEv \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
+    % \item[\ref{L6})]
     $(\forall\bReg)$
     $\aTr{\cEvs}{\bForm}$ implies $(\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv) \limplies \bForm[\bReg/\aReg]$. 
   \end{enumerate}  
@@ -452,39 +488,39 @@ most once in a program.  We relax this by renaming.
 %       \PW{x}{0}
 %       \\
 %       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%           \xform{xd}{\bForm\noSUB{[0/x]}}{}
-%           \event{a}{\DW{x}{0}}{above=of xd}      
-%           \xform{xi}{\bForm\noSUB{[0/x]}}{above=of a}
-%           \xo{a}{xd}
-%         \end{tikzinline}}
+%         \xform{xd}{\bForm\noSUB{[0/x]}}{}
+%         \event{a}{\DW{x}{0}}{above=of xd}      
+%         \xform{xi}{\bForm\noSUB{[0/x]}}{above=of a}
+%         \xo{a}{xd}
+%       \end{tikzinline}}
 %     \end{gathered}
 %     &&
 %     \begin{gathered}
 %       \PW{x}{\BANG\BANG r}
 %       \\
 %       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%           \xform{xdi}{r{=}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{}
-%           \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{right=.5em of xdi}
-%           \event{a}{r{=}0\mid\DW{x}{0}}{above=of xdi}      
-%           \xo{a}{xdi}
-%           \event{b}{r{\neq}0\mid\DW{x}{1}}{above=of xid}      
-%           \xo{b}{xid}
-%           \xform{xdd}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of a}
-%           \xform{xii}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of b}
-%           \xo{a}{xdd}
-%           \xo{b}{xdd}
-%         \end{tikzinline}}
+%         \xform{xdi}{r{=}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{}
+%         \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{right=.5em of xdi}
+%         \event{a}{r{=}0\mid\DW{x}{0}}{above=of xdi}      
+%         \xo{a}{xdi}
+%         \event{b}{r{\neq}0\mid\DW{x}{1}}{above=of xid}      
+%         \xo{b}{xid}
+%         \xform{xdd}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of a}
+%         \xform{xii}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of b}
+%         \xo{a}{xdd}
+%         \xo{b}{xdd}
+%       \end{tikzinline}}
 %     \end{gathered}
 %     &&
 %     \begin{gathered}
 %       \PW{x}{1}
 %       \\
 %       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%           \xform{xd}{\bForm\noSUB{[1/x]}}{}
-%           \event{a}{\DW{x}{1}}{above=of xd}      
-%           \xform{xi}{\bForm\noSUB{[1/x]}}{above=of a}
-%           \xo{a}{xd}
-%         \end{tikzinline}}
+%         \xform{xd}{\bForm\noSUB{[1/x]}}{}
+%         \event{a}{\DW{x}{1}}{above=of xd}      
+%         \xform{xi}{\bForm\noSUB{[1/x]}}{above=of a}
+%         \xo{a}{xd}
+%       \end{tikzinline}}
 %     \end{gathered}
 %   \end{align*}
 %   Associating to the left and merging, we have:
@@ -494,28 +530,28 @@ most once in a program.  We relax this by renaming.
 %       \PW{x}{\BANG\BANG r}
 %       \\
 %       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%           \xform{xdi}{r{=}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{}
-%           \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{right=.5em of xdi}
-%           \event{a}{\DW{x}{0}}{above=of xdi}      
-%           \xo{a}{xdi}
-%           \event{b}{r{\neq}0\mid\DW{x}{1}}{above=of xid}      
-%           \xo{b}{xid}
-%           \xform{xdd}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of a}
-%           \xform{xii}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of b}
-%           \xo{a}{xdd}
-%           \xo{b}{xdd}
-%         \end{tikzinline}}
+%         \xform{xdi}{r{=}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{}
+%         \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[\BANG\BANG r/x]}}{right=.5em of xdi}
+%         \event{a}{\DW{x}{0}}{above=of xdi}      
+%         \xo{a}{xdi}
+%         \event{b}{r{\neq}0\mid\DW{x}{1}}{above=of xid}      
+%         \xo{b}{xid}
+%         \xform{xdd}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of a}
+%         \xform{xii}{\bForm\noSUB{[\BANG\BANG r/x]}}{above=of b}
+%         \xo{a}{xdd}
+%         \xo{b}{xdd}
+%       \end{tikzinline}}
 %     \end{gathered}
 %     &&
 %     \begin{gathered}
 %       \PW{x}{1}
 %       \\
 %       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%           \xform{xd}{\bForm\noSUB{[1/x]}}{}
-%           \event{a}{\DW{x}{1}}{above=of xd}      
-%           \xform{xi}{\bForm\noSUB{[1/x]}}{above=of a}
-%           \xo{a}{xd}
-%         \end{tikzinline}}
+%         \xform{xd}{\bForm\noSUB{[1/x]}}{}
+%         \event{a}{\DW{x}{1}}{above=of xd}      
+%         \xform{xi}{\bForm\noSUB{[1/x]}}{above=of a}
+%         \xo{a}{xd}
+%       \end{tikzinline}}
 %     \end{gathered}
 %   \end{align*}
 %   The merging right, we have, as desired:
@@ -526,17 +562,17 @@ most once in a program.  We relax this by renaming.
 %       \PW{x}{1}
 %       \\
 %       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%           \xform{xdi}{r{=}0\limplies\bForm\noSUB{[1/x]}}{}
-%           \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[1/x]}}{right=of xdi}
-%           \event{a}{\DW{x}{0}}{above=of xdi}      
-%           \xo{a}{xdi}
-%           \event{b}{\DW{x}{1}}{above=of xid}      
-%           \xo{b}{xid}
-%           \xform{xdd}{\bForm\noSUB{[1/x]}}{above=of a}
-%           \xform{xii}{\bForm\noSUB{[1/x]}}{above=of b}
-%           \xo{a}{xdd}
-%           \xo{b}{xdd}
-%         \end{tikzinline}}
+%         \xform{xdi}{r{=}0\limplies\bForm\noSUB{[1/x]}}{}
+%         \xform{xid}{r{\neq}0\limplies\bForm\noSUB{[1/x]}}{right=of xdi}
+%         \event{a}{\DW{x}{0}}{above=of xdi}      
+%         \xo{a}{xdi}
+%         \event{b}{\DW{x}{1}}{above=of xid}      
+%         \xo{b}{xid}
+%         \xform{xdd}{\bForm\noSUB{[1/x]}}{above=of a}
+%         \xform{xii}{\bForm\noSUB{[1/x]}}{above=of b}
+%         \xo{a}{xdd}
+%         \xo{b}{xdd}
+%       \end{tikzinline}}
 %     \end{gathered}
 %   \end{align*}
 % \end{example}
@@ -561,8 +597,8 @@ most once in a program.  We relax this by renaming.
   \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
   \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
   \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \aVal{=}\aReg\limplies\bForm$, 
-  % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
-  % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
+    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
+    % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
   \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
   \end{enumerate}  
 \end{definition}
