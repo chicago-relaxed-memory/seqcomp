@@ -655,7 +655,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \end{gathered}
   \end{align*}
   Since there is no requirement for disjointness in the semantics of conditionals,
-  we can consider the case where the pomsets share their event,
+  we can consider the case where the event \emph{coalesces} from the two pomsets,
   in which case:
     \begin{gather*}
       \IF{r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI
@@ -665,7 +665,9 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
           \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
       \end{tikzinline}}
     \end{gather*}
-  where the precondition on $(\DW{y}{1})$ is a tautology, and so is independent of $r$.
+    Here, the precondition on $(\DW{y}{1})$ is a tautology, and so is
+    independent of $r$.
+    %We refer to event sharing as \emph{coalescing} or \emph{merging}.
 \end{example}
 
 \subsection{Pomsets with Predicate Transformers}
