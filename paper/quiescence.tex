@@ -6,26 +6,29 @@ We introduce \emph{quiescence}, which captures \emph{coherence},
 \textsection\ref{sec:prelim} that formulae include
 symbols $\Q{\mSC}$, $\Qr{\aLoc}$, and $\Qw{\aLoc}$.
 We refer to these collectively as \emph{quiescence symbols}.
+In this section, we will show how these logical symbols can be used
+to capture coherence and synchronization. This illustrates a feature
+of our model, which is that many features of weak memory can be cautured
+in the logic, not in the pomset model itself.
 
 \subsection{Coherence ($\xCO$)}
 \label{sec:co}
 
 In the logic, the quiescence symbols are just uninterpreted formula, but
-the semantics uses them as preconditions, to ensure that
-syntactically preceding actions must also be causally preceding.
-
+the semantics uses them as preconditions, to ensure appropriate causal
+order.
 For example, \emph{write-write coherence} enforces order
-between writes to $x$ in the same thread. We
+between writes to the same location in the same thread. We
 model this by adding the precondition
-$(\Qr{\aLoc}\land\Qw{\aLoc})$ to write
-events, for example:
+$(\Qr{\aLoc}\land\Qw{\aLoc})$ to 
+events that write to $x$, for example:
   \begin{gather*}
     \PW{x}{1}\SEMI \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{wx1}{1{=}1\land \Qr{\aLoc}\land\Qw{\aLoc} \mid\DW{x}{1}}{}
         \event{wx2}{2{=}2\land \Qr{\aLoc}\land\Qw{\aLoc} \mid\DW{x}{2}}{right=of wx1}
-        \po{wx1}{wx2}
+        \wk{wx1}{wx2}
       \end{tikzinline}}
   \end{gather*}
 These symbols are left alone in the dependent case, but
@@ -38,7 +41,7 @@ in the independent case we substitute $\FALSE$ for $\Qw{\aLoc}$:
         \event{wx2}{2{=}2\land \Qr{\aLoc}\land\FALSE \mid\DW{x}{2}}{right=of wx1}
       \end{tikzinline}}
   \end{gather*}
-We perform this substitution in the predicate transformer for store:
+This substitution is part of the predicate transformer for store:
   \begin{gather*}
       \PW{x}{1} 
       \\
@@ -49,200 +52,180 @@ We perform this substitution in the predicate transformer for store:
         \xo{wx1}{xd}
       \end{tikzinline}}    
   \end{gather*}
+We treat read-write and write-read coherence similarly:
+  \begin{gather*}
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{rx1}{\Qw{\aLoc} \mid\DR{x}{1}}{}
+        \xform{xd}{r{=}1 \limplies \bForm}{right=of rx1}
+        \xform{xi}{\bForm[\FALSE/\Qr{\aLoc}]}{right=of xd}
+        \xo{rx1}{xd}
+      \end{tikzinline}}    
+  \end{gather*}
+In this model, there is no read-read coherence, but to restore it
+we would identify $\Qr{\aLoc}$ with $\Qw{\aLoc}$.
+
+When threads are initialized, we substitute every quiesence symbol
+with $\TRUE$, so at top level there are no remaining quiescence
+symbols, for example:
+  \begin{gather*}
+    \THREAD{\PW{x}{1}\SEMI \PW{x}{2}} \PAR
+    \THREAD{\PR{x}{r}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{wx1}{1{=}1\land \TRUE \land \TRUE \mid\DW{x}{1}}{}
+        \event{wx2}{2{=}2\land \TRUE \land \TRUE \mid\DW{x}{2}}{right=4em of wx1}
+        \event{rx1}{\TRUE \mid \DR{x}{1}}{below right=1ex and 0em of wx1}
+        \wk{wx1}{wx2}
+        \rf[out=320,in=180]{wx1}{rx1}
+        \wk[out=0,in=220]{rx1}{wx2}
+      \end{tikzinline}}
+  \end{gather*}
 
 \begin{definition}
-  Let $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ be defined:
+  Let $\QS{\aLoc}{}$ and $\QL{\aLoc}{}$ be defined:
   \begin{align*}
-    \QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
-    &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
-    \\
-    \QS{\aLoc}{\mRA}&=\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
-    &\QL{\aLoc}{\mRA}&=\Qw{\aLoc}
-    \\
-    \QS{\aLoc}{\mSC}&=\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc} \land \Qsc
-    &\QL{\aLoc}{\mSC}&=\Qw{\aLoc}\land\Qsc
+    \QS{\aLoc}{}&=\Qr{\aLoc}\land\Qw{\aLoc}
+    &\QL{\aLoc}{}&=\Qw{\aLoc}
   \end{align*}
 \end{definition}
-
-GOT THIS FAR
-
-The memory
-references associated with quiescence symbols are indices that are not
-subject to substitution, for example $\Qx{\aLoc}[\aExp/\aLoc]$ is $\Qx{\aLoc}$.
-
-
-
-
-% \begin{itemize}
-% \item Coherence respects program order: $\Qx{\aLoc}$
-% \item Drop read-read coherence: $\Qw{\aLoc}$ (Required for CSE without
-%   alias analysis over read only code, not required by hardware)
-% \end{itemize}
-
-% In order to describe coherence, we use the uninterpreted logical symbols
-% $\Qx{\aLoc}$ and $\Qw{\aLoc}$, for each location $\aLoc$, with the
-% interpretation that
-% \begin{math}
-%   \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc
-% \end{math}
-% (and therefore $\lnot\Qw{\aLoc} \textimplies \lnot\Qx{\aLoc}$.)
-
-When $\Qx{\aLoc}$ is discharged in the precondition of event $\aEv$, we
-expect that all reads and writes of $\aLoc$ that precede $\aEv$ in program
-order also precede $\aEv$ in pomset order.
-$\Qw{\aLoc}$ is similar, but applies only to preceding writes.
 
 \begin{definition}
   Let $[\TRUE/\Q{}]$ be the substitution that replaces all quiescence
   symbols by $\TRUE$.
 \end{definition}
 
-We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
 \begin{definition}[$\xCO$]
   \label{def:pomsets-co}
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
   \item[\ref{S3})]
-    $\labelingForm(\aEv)$ implies $\Qx{\aLoc}\land\aExp{=}\aVal$,
+    $\labelingForm(\aEv)$ implies $\QS{\aLoc}{}\land\aExp{=}\aVal$,
   \item[\ref{L3})]
-    $\labelingForm(\aEv)$ implies $\Qw{\aLoc}$,
+    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{}$,
   \item[\ref{T3})]
     $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{=}\aVal)\land\bForm\noSUB{[\aExp/\aLoc]}$,
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \bForm\noSUB{[\aExp/\aLoc]}$.
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Qw{\aLoc}]$,.
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
   %   $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
   % \item[\ref{L6})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land\bForm$.
+    $\aTr{\cEvs}{\bForm}$ implies $[\FALSE/\Qr{\aLoc}]$.
     % \end{enumerate}
     % Update thread as follows
     % \begin{enumerate}
   \end{enumerate}
 \end{definition}
-% or
-% \begin{enumerate}
-% \item[{\labeltext[S6]{S6)}{S6}}] 
-%   $\aTr{\bEvs}{\bForm}$ implies $\Q{}\limplies\aExp{=}\aVal$,
-% \item[{\labeltext[S7]{S7)}{S7}}] 
-%   $\aTr{\emptyset}{\bForm}\;$ implies $\lnot\Q{}$,
-% \item[{\labeltext[L6]{L6)}{L6}}] 
-%   $\aTr{\emptyset}{\bForm}\;$ implies $\lnot\Q{}$,
-% \item[{\labeltext[E2]{E2)}{E2}}] 
-%   $\aTr{\emptyset}{\bForm}\;$ implies $\lnot\Q{}$.
-% \end{enumerate}
-
 
 
 \begin{example}
   \refdef{def:pomsets-co} enforces coherence.  Consider:
   \begin{align*}
     \begin{gathered}
-      \PW{x}{1} 
+      \PW{x}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm\noSUB{[1/x]}\land (\Qw{x}\limplies 1{=}1)}{}
-          \xform{xi}{\bForm\noSUB{[1/x]}\land \lnot\Qw{x}}{below=of xd}
-          \event{a1}{1{=}1\land \Qx{x}\mid\DW{x}{1}}{above=of xd}
-          \xo{a1}{xd}
-        \end{tikzinline}}    
+          \event{a1}{1{=}1\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm[(\Qw{\aLoc}\land1{=}1)/\Qw{\aLoc}]}{below=of a1}
+          \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
     \end{gathered}
     &&
     \begin{gathered}
       \PW{x}{2}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm\noSUB{[2/x]}\land (\Qw{x}\limplies 2{=}2)}{}
-          \xform{xi}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{below=of xd}
-          \event{a2}{2{=}2\land\Qx{x}\mid\DW{x}{2}}{above=of xd}      
-          \xo{a2}{xd}
-        \end{tikzinline}}    
+          \event{a2}{2{=}2\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{2}}{}
+          \xform{x2d}{\bForm[(\Qw{\aLoc}\land2{=}2)/\Qw{\aLoc}]}{below=of a2}
+          \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
+          \xo{a2}{x2d}
+        \end{tikzinline}}
     \end{gathered}
   \end{align*}
   Simplifying, we have:
   \begin{align*}
     \begin{gathered}
-      \PW{x}{1} 
+      \PW{x}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm\noSUB{[1/x]}}{}
-          \xform{xi}{\bForm\noSUB{[1/x]}\land \lnot\Qw{x}}{right=0.5em of xd}
-          \event{a1}{\Qx{x}\mid\DW{x}{1}}{left=of xd}
-          \xo{a1}{xd}
-        \end{tikzinline}}    
+          \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm}{below right=of a1}
+          \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a1}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
     \end{gathered}
     &&
     \begin{gathered}
       \PW{x}{2}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm\noSUB{[2/x]}}{}
-          \xform{xi}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=0.5em of xd}
-          \event{a2}{\Qx{x}\mid\DW{x}{2}}{left=of xd}      
-          \xo{a2}{xd}
-        \end{tikzinline}}    
+          \event{a2}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{2}}{}
+          \xform{x2d}{\bForm}{below left=of a2}
+          \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
+          \xo{a2}{x2d}
+        \end{tikzinline}}
     \end{gathered}
   \end{align*}
   If we attempt to put these together unordered, the precondition of
-  $\DWP{x}{2}$ will be
-  \begin{math}
-    (\Qx{x})[1/x]\land \lnot\Qw{x}, 
-  \end{math}
-  which is unsatisfiable: $\Qx{x}\land \lnot\Qx{x}$.
-  % 
+  $(\DW{x}{2})$ becomes unsatisfiable:
+  \begin{gather*}
+    \PW{x}{1}\SEMI \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+          \event{a2}{\Qr{\aLoc}\land\FALSE\mid\DW{x}{2}}{above right=of x1d}
+          \xform{x1d}{\bForm}{below right=of a1}
+          \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a1}
+          \xform{x2d}{\bForm}{below left=of a2}
+          \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
+          \xform{xii}{\bForm[\FALSE/\Qw{\aLoc}]}{below right=of a2}
+          \xo{a1}{x1d}
+          \xo{a2}{x2d}
+          \xo{a1}{x2i}
+          \xo{a2}{x1i}
+        \end{tikzinline}}
+  \end{gather*}
   In order to get a satisfiable precondition for $\DWP{x}{2}$, we must
   introduce order:
   \begin{gather*}
     \PW{x}{1}\SEMI \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdi}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{}
-        \xform{xdd}{\bForm\noSUB{[2/x]}}{right=of xdi}
-        \xform{xid}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=of xdd}
-        \xform{xii}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=of xid}
-        \event{a1}{\Qx{x}\mid\DW{x}{1}}{above=of xdi}
-        \event{a2}{\Qx{x}\mid\DW{x}{2}}{above=of xid}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}
-        \po{a1}{a2}
-      \end{tikzinline}}
+          \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm}{below right=of a1}
+          \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a1}
+          \xo{a1}{x1d}
+          \event{a2}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{2}}{above right=of x1d}
+          \xform{x2d}{\bForm}{below left=of a2}
+          \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
+          \xform{xii}{\bForm[\FALSE/\Qw{\aLoc}]}{below right=of a2}
+          \xo{a2}{x2d}
+          \xo{a1}{x2i}
+          \xo{a2}{x1i}
+          \wk{a1}{a2}
+        \end{tikzinline}}
   \end{gather*}
-  % Adding order does nothing since the preconditions are tautologies.
-  % \begin{gather*}
-  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %     \xform{xdi}{\bForm\noSUB{[1/x]}\land \lnot\Q{}}{}
-  %     \xform{xdd}{\bForm\noSUB{[1/x]}}{right=of xdi}
-  %     \xform{xid}{\bForm\noSUB{[1/x]}\land \lnot\Q{}}{right=of xdd}
-  %     \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
-  %     \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
-  %     \xform{xii}{\bForm\noSUB{[1/x]}\land \lnot\Q{}}{below=of xdd}
-  %     \xo{a1}{xdi}
-  %     \xo{a2}{xid}
-  %     \xo{a1}{xdd}
-  %     \xo{a2}{xdd}
-  %     \po{a1}{a2}
-  %   \end{tikzinline}}
-  % \end{gather*}
 \end{example}
 
 \begin{example}
-  \ref{S4} includes $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)$ to ensure that
+  \ref{S4} includes the substitution $\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]$ to ensure that
   \emph{left merges} are not quiescent.  Consider the following.
   \begin{align*}
     \begin{gathered}
       \PW{x}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a1}{1{=}1\land\Qx{x}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm\noSUB{[1/x]}\land (\Qw{x}\limplies 1{=}1)}{below=of a1}
-          \xform{x1i}{\bForm\noSUB{[1/x]}\land \lnot\Qw{x}}{below=of x1d}
+          \event{a1}{1{=}1\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm[(\Qw{\aLoc}\land1{=}1)/\Qw{\aLoc}]}{below=of a1}
+          \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
           \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
@@ -251,48 +234,50 @@ We repeat \ref{L4}, although it is unchanged from \refdef{def:pomsets-trans}.
       \PW{x}{2}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a1}{2{=}1\land\Qx{x}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm\noSUB{[2/x]}\land (\Qw{x}\limplies 2{=}1)}{below=of a1}
-          \xform{x1i}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{below=of x1d}
-          \xo{a1}{x1d}
+          \event{a2}{2{=}1\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+          \xform{x2d}{\bForm[(\Qw{\aLoc}\land2{=}1)/\Qw{\aLoc}]}{below=of a2}
+          \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
+          \xo{a2}{x2d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
   Simplifying:
-  \begin{align*}
-    \begin{gathered}
-      \PW{x}{1}
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a1}{\Qx{x}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm\noSUB{[1/x]}}{right=of a1}
-          \xform{x1i}{\bForm\noSUB{[1/x]}\land \lnot\Qw{x}}{below=of x1d}
-          \xo{a1}{x1d}
-        \end{tikzinline}}
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \PW{x}{2}
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a1}{\FALSE\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=of a1}
-          \xform{x1i}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{below=of x1d}
-          \xo{a1}{x1d}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{align*}
-  Merging the actions, we have:
+  %% \begin{align*}
+  %%   \begin{gathered}
+  %%     \PW{x}{1}
+  %%     \\
+  %%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %%         \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+  %%         \xform{x1d}{\bForm}{below=of a1}
+  %%         \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
+  %%         \xo{a1}{x1d}
+  %%       \end{tikzinline}}
+  %%   \end{gathered}
+  %%   &&
+  %%   \begin{gathered}
+  %%     \PW{x}{2}
+  %%     \\
+  %%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %%         \event{a2}{\FALSE\mid\DW{x}{1}}{}
+  %%         \xform{x2d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
+  %%         \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
+  %%         \xo{a2}{x2d}
+  %%       \end{tikzinline}}
+  %%   \end{gathered}
+  %% \end{align*}
+  and merging the actions, we have:
   \begin{gather*}
-    % \PW{x}{1}\SEMI \PW{x}{2}
-    % \\
+    \PW{x}{1}\SEMI \PW{x}{2}
+    \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{\Qx{x}\mid\DW{x}{1}}{}
-        \xform{x1d}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=of a1}
-        \xform{x1i}{\bForm\noSUB{[2/x]}\land \lnot\Qw{x}}{right=.5em of x1d}
+        \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+        \xform{x1d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
+        \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{right=of a2}
         \xo{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
+  which is what we would hope, that the program $\PW{x}{1}\SEMI \PW{x}{2}$ 
+  should only be quiescent if there is a $(\DW{x}{2})$ event.
 \end{example}
 
 
@@ -435,6 +420,20 @@ symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
 \begin{math}
   \Q{\mSC} \textimplies \Q{\mRA} \textimplies \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc.
 \end{math}
+
+\begin{definition}
+  Let $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ be defined:
+  \begin{align*}
+    \QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
+    &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
+    \\
+    \QS{\aLoc}{\mRA}&=\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
+    &\QL{\aLoc}{\mRA}&=\Qw{\aLoc}
+    \\
+    \QS{\aLoc}{\mSC}&=\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc} \land \Qsc
+    &\QL{\aLoc}{\mSC}&=\Qw{\aLoc}\land\Qsc
+  \end{align*}
+\end{definition}
 
 \begin{definition}[$\xCO$/$\xRASC$]
   \label{def:QS}
