@@ -161,23 +161,6 @@ It is worth emphasizing that this reasoning is local, and therefore
 unaffected by the introduction of additional threads, as in Test Case 9
 \citep{PughWebsite}.
 
-\begin{example}
-  \begin{align*}
-    \begin{gathered}[t]
-      \PR{y}{r}
-      \SEMI \PW{x}{\BANG r} 
-      \SEMI \PW{x}{r {\AND} s} 
-      \SEMI \PW{x}{0} 
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a}{\DR{y}{1}}{}
-          \event{b}{\DW{x}{1}}{right=of a}
-          \event{c}{\DW{x}{0}}{right=of b}
-        \end{tikzinline}}    
-    \end{gathered}
-  \end{align*}  
-\end{example}
-
 \subsection{Register Recycling ($\xRecycle$)}
 
 The semantics considered thus far assume that each register is assigned at

@@ -1385,6 +1385,32 @@ order.
 
 \subsection{Relaxed memory}
 
+\begin{enumerate}
+\item[\ref{L4})]
+  $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg]$, 
+% \item[\ref{L5})]
+%   $\aTr{\emptyset}{\bForm}\;$ implies $\bForm[\aLoc/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$,
+\item[\ref{L5})]
+  $\aTr{\emptyset}{\bForm}\;$ implies $(\forall\aReg)\bForm$.
+\end{enumerate}
+
+\begin{example}
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI \PW{x}{\BANG r} 
+      \SEMI \PW{x}{r {\AND} s} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+          \event{b}{\DW{x}{1}}{right=of a}
+          \event{c}{\DW{x}{0}}{right=of b}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}  
+\end{example}
+
 The final semantic functions for load, store, and thread
 initialization, given in Figure~\ref{fig:full}, are quite complex.  In
 the remainder of the paper, we explain the definition by looking at
