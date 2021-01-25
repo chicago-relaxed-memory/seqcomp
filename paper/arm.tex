@@ -83,13 +83,29 @@ $\Dx{\aLoc}$.
   Update \refdef{def:pomsets-ra} to (\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]\DS{\aLoc}{\amode}$,
+    $\aTr{\bEvs}{\bForm}$ implies
+    \begin{math}
+      \bForm
+      \DS{\aLoc}{\amode}
+      [(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}],
+    \end{math}
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{\aLoc}{\amode}]\DS{\aLoc}{\amode}$,
+    $\aTr{\cEvs}{\bForm}$ implies
+    \begin{math}
+      \bForm
+      \DS{\aLoc}{\amode}
+      [\FALSE/\QS{\aLoc}{\amode}],
+    \end{math}
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm}$ implies
+    \begin{math}
+      \aVal{=}\aReg\limplies\bForm,
+    \end{math}
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\DL{\aLoc}{\amode}\land \bForm[\FALSE/\QL{\aLoc}{\amode}]$.
+    $\aTr{\cEvs}{\bForm}$ implies
+    \begin{math}
+      \DL{\aLoc}{\amode}\land \bForm[\FALSE/\QL{\aLoc}{\amode}].
+    \end{math}
   \end{enumerate}
 \end{definition}
 Load actions that require downgrading introduce $\Dx{\aLoc}$.
