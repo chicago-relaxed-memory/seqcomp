@@ -116,7 +116,6 @@ symbols, for example:
   \end{enumerate}
 \end{definition}
 
-
 \begin{example}
   \refdef{def:pomsets-co} enforces coherence.  Consider:
   \begin{align*}
@@ -462,6 +461,137 @@ symbols, for example:
 \end{definition}
 
 
+\begin{example}
+  \refdef{def:pomsets-co} enforces publication.  Consider:
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{1{=}1\land\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm[(\Qw{\aLoc}\land1{=}1)/\Qw{\aLoc}]}{below=of a1}
+          \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of x1d}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW[\mRA]{y}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \raevent{a2}{1{=}1\land\QS{\bLoc}{\mRA}\mid\DW{y}{2}}{}
+          \xform{x2d}{\bForm[(\Qw{\bLoc}\land1{=}1)/\Qw{\bLoc}]}{below=of a2}
+          \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mRA}]}{below=of x2d}
+          \xo{a2}{x2d}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Since $\QS{\bLoc}{\mRA}[\FALSE/\QS{\aLoc}{\mRLX}]$ is $\FALSE$,
+  composing these without order simplifies to:
+  \begin{gather*}
+    \PW{x}{1}\SEMI \PW[\mRA]{y}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm}{below right=of a1}
+          \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mRA}]}{below=of a1}
+          \xo{a1}{x1d}
+          \raevent{a2}{\FALSE\mid\DW{\bLoc}{1}}{above right=of x1d}
+          \xform{x2d}{\bForm}{below left=of a2}
+          \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
+          \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mRA}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
+          \xo{a2}{x2d}
+          \xo{a1}{x2i}
+          \xo{a2}{x1i}
+        \end{tikzinline}}
+  \end{gather*}
+  In order to get a satisfiable precondition for $\DWP{y}{1}$, we must
+  introduce order:
+  \begin{gather*}
+    \PW{x}{1}\SEMI \PW[\mRA]{y}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
+          \xform{x1d}{\bForm}{below right=of a1}
+          \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mRA}]}{below=of a1}
+          \xo{a1}{x1d}
+          \raevent{a2}{\QS{\bLoc}{\mRA}\mid\DW{\bLoc}{1}}{above right=of x1d}
+          \xform{x2d}{\bForm}{below left=of a2}
+          \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
+          \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mRA}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
+          \xo{a2}{x2d}
+          \xo{a1}{x2i}
+          \xo{a2}{x1i}
+          \sync{a1}{a2}
+        \end{tikzinline}}
+  \end{gather*}
+\end{example}
+
+\begin{example}
+  \refdef{def:pomsets-co} enforces subscription.  Consider:
+  \begin{align*}
+    \begin{gathered}
+      \PR[\mRA]{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}
+          \xform{x1d}{r{=}1\limplies\bForm}{below=of a1}
+          \xform{x1i}{\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{below=of x1d}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PR{x}{s}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{}
+          \xform{x2d}{s{=}1\limplies\bForm}{below=of a2}
+          \xform{x2i}{\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of x2d}
+          \xo{a2}{x2d}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Since $\QL{\aLoc}{\mRLX}[\FALSE/\QL{\bLoc}{\mRA}]$ is $\FALSE$,
+  composing these without order simplifies to:
+  \begin{gather*}
+    \PR[\mRA]{y}{r}\SEMI \PR{x}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}
+          \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
+          \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
+          \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mRA}][\FALSE/\QL{\aLoc}{\mRLX}]}{below=of xdd}
+          \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{right=of xdd}
+          \event{a2}{\FALSE\mid\DR{x}{1}}{above=of x2d}
+          \xo{a1}{x1d}
+          \xo{a2}{x2d}
+          \xo{a1}{xdd}
+          \xo{a2}{xdd}
+        \end{tikzinline}}
+  \end{gather*}
+  In order to get a satisfiable precondition for $\DRP{x}{1}$, we must
+  introduce order:
+  \begin{gather*}
+    \PR[\mRA]{y}{r}\SEMI \PR{x}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}
+          \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
+          \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
+          \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mRA}][\FALSE/\QL{\aLoc}{\mRLX}]}{below=of xdd}
+          \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{right=of xdd}
+          \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{above=of x2d}
+          \xo{a1}{x1d}
+          \xo{a2}{x2d}
+          \xo{a1}{xdd}
+          \xo{a2}{xdd}
+          \sync{a1}{a2}
+        \end{tikzinline}}
+  \end{gather*}
+  
+\end{example}
+
 
 % $\QS{\aLoc}{\mRLX}=\Qx{\aLoc}$ and otherwise $\QS{\aLoc}{\amode}=\Q{\amode}$.
 
@@ -536,8 +666,9 @@ symbols, for example:
 \subsection{Completed Pomsets}
 
 \begin{definition}
-  A pomset with predicate transformers $\aPS$ is \emph{completed} if
-  $\aTr{\aEvs}{\Q{\mSC}}$ implies $\Q{\mSC}$.
+  A pomset with predicate transformers $\aPS$ is \emph{completed} if,
+  for every quiescence symbol $\aSym$,
+  $\aTr{\aEvs}{\aSym}$ implies $\aSym$.
 \end{definition}
 
 
