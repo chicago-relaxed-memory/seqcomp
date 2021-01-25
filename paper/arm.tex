@@ -58,49 +58,43 @@ which is very close to our model.
   relaxed write in the same thread.
 \end{example}
 
-
 To model such \emph{downgraded reads}, we use the uninterpreted symbols
-$\Dx{\aLoc}$.  Load actions that requiring downgrading introduce $\Dx{\aLoc}$.
-Relaxed stores on $\aLoc$ substitute true for $\Dx{\aLoc}$, whereas
-synchronizing stores substitute false for $\Dx{\aLoc}$.
+$\Dx{\aLoc}$.  
 
 \begin{definition}
   \label{def:DS}
-  Let $[\FALSE/\D]$ be the substitution that performs $[\FALSE/\Dx{\aLoc}]$
-  for every $\aLoc$.
-  Let $\DS{\aLoc}{\amode}{}$ and $\DL{\aLoc}{\amode}{}$ be defined:
+  % Let $[\FALSE/\D]$ be the substitution that performs $[\FALSE/\Dx{\aLoc}]$
+  % for every $\aLoc$.
+  Let $[\aForm/\Dx{*}]$ substitute $\aForm$ for every $\Dx{\bLoc}$.\\
+  Let formula $\DL{\aLoc}{\amode}$ and substitution $\DS{\aLoc}{\amode}$ be defined:
   \begin{align*}
-    \DS{\aLoc}{\mRLX}{\bForm}&=\bForm[\TRUE/\Dx{\aLoc}] 
-    &\DL{\aLoc}{\mRLX}{\bForm}&=\bForm%\TRUE
+    \DL{\aLoc}{\mRLX}&=\TRUE
+    &\DS{\aLoc}{\mRLX}&=[\TRUE/\Dx{\aLoc}] 
     \\
-    \DS{\aLoc}{\mRA}{\bForm}&=\bForm[\FALSE/\D]
-    &\DL{\aLoc}{\mRA}{\bForm}&=\bForm\land\Dx{\aLoc}
+    \DL{\aLoc}{\mRA}&=\Dx{\aLoc}%\land\D{}
+    &\DS{\aLoc}{\mRA}&=[\FALSE/\D]
     \\
-    \DS{\aLoc}{\mSC}{\bForm}&=\bForm[\FALSE/\D]
-    &\DL{\aLoc}{\mSC}{\bForm}&=\bForm\land\Dx{\aLoc}
+    \DL{\aLoc}{\mSC}&=\Dx{\aLoc}%\land\D{}
+    &\DS{\aLoc}{\mSC}&=[\FALSE/\D]
   \end{align*}
 \end{definition}
-
 \begin{definition}[$\xCO$/$\xRASC$/$\xDGR$]
   \label{def:pomsets-down}
-  Update \refdef{def:pomsets-ra} to:
+  Update \refdef{def:pomsets-ra} to (\ref{L4} unchanged):
   \begin{enumerate}
-  % \item[\ref{S4})]
-  %   $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$,
-  % \item[\ref{S5})]
-  %   $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$.
-  % \item[\ref{L5})]
-  %   % $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode}{} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
-  %   % \item[\ref{L6})]
-  %   $\aTr{\dEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode}{} \land\bForm$.
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\DS{\aLoc}{\amode}{\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]}$,
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]\DS{\aLoc}{\amode}$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\DS{\aLoc}{\amode}{\bForm[\FALSE/\Qw{\aLoc}]}$.
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{\aLoc}{\amode}]\DS{\aLoc}{\amode}$,
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\dEvs}{\bForm}$ implies $\DL{\aLoc}{\amode}{\bForm[\FALSE/\Qr{\aLoc}]}$.
+    $\aTr{\cEvs}{\bForm}$ implies $\DL{\aLoc}{\amode}\land \bForm[\FALSE/\QL{\aLoc}{\amode}]$.
   \end{enumerate}
 \end{definition}
+Load actions that require downgrading introduce $\Dx{\aLoc}$.
+Relaxed stores on $\aLoc$ substitute true for $\Dx{\aLoc}$, whereas
+synchronizing stores substitute false for $\Dx{\aLoc}$.
 
 \begin{example}
   Revisiting \refex{ex:dgr1} and eliding irrelevant transformers:
@@ -359,13 +353,12 @@ the uninterpreted symbol $\RW$.
 \subsection{Full semantics for ARM}
 
 \refdef{def:pomsets-arm} combines all of the features of
-\textsection\ref{sec:q}--\ref{sec:arm}.  For completeness, we repeat
-\ref{L4}, which is unchanged from \refdef{def:pomsets-trans}.
+\textsection\ref{sec:q}--\ref{sec:arm}.  
 % Only \ref{L5} and \ref{T3} are changed from \refdef{def:pomsets-down}.
 
 \begin{definition}[$\xCO$/$\xRASC$/$\xDGR$/$\xRRD$]
   \label{def:pomsets-arm}
-  Update \refdef{def:pomsets-trans} to:
+  Update \refdef{def:pomsets-trans} to (\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
     $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,

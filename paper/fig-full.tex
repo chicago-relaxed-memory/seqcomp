@@ -27,8 +27,11 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     \cForm_\aEv
     \limplies (\cExp{=}\dVal)
     \limplies \PBR{
-      (\QwREF{\dVal} \limplies \aExp{=}\aVal_\aEv)
-      \land \DS{\REF{\dVal}}{\amode}{\bForm[\aExp/\REF{\dVal}]}
+      %(\QwREF{\dVal} \limplies \aExp{=}\aVal_\aEv) \land
+      \bForm
+      [\aExp/\REF{\dVal}]
+      [(\QwREF{\dVal}\land\aExp{=}\aVal)/\QwREF{\dVal}]
+      \DS{\REF{\dVal}}{\amode}
     }
   \end{math},
 \item[\ref{S5})] %if 
@@ -45,8 +48,11 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     (\!\not\exists\aEv\in\aEvs\cap\cEvs \suchthat \cForm_\aEv)
     \limplies (\cExp{=}\dVal)
     \limplies \PBR{
-      \lnot\QwREF{\dVal}
-      \land \DS{\REF{\dVal}}{\amode}{\bForm[\aExp/\REF{\dVal}]}
+      % \lnot\QwREF{\dVal} \land
+      \bForm
+      [\aExp/\REF{\dVal}]
+      [\FALSE/\QS{\REF{\dVal}}{\amode}]
+      \DS{\REF{\dVal}}{\amode}
     }.
   \end{math}
   % \\ where 
@@ -183,12 +189,14 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     \cForm_\aEv
     \limplies (\cExp{=}\dVal)
     \limplies \PBR{        
-      \lnot\QxREF{\dVal}
-      \land\DL{\REF{\dVal}}{\amode}
-      \land
+      %\lnot\QxREF{\dVal}\land
+      \DL{\REF{\dVal}}{\amode} \land
       (\RW
       \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor\REF{\dVal}{=}\uReg{\aEv}) 
-      \limplies \bForm[\uReg{\aEv}/\aReg]%[\uReg{\aEv}/\REF{\dVal}]
+      \limplies
+      \bForm
+      [\uReg{\aEv}/\aReg]%[\uReg{\aEv}/\REF{\dVal}]
+      [\FALSE/\QL{\REF{\dVal}}{\amode}]
       )
     }      
   \end{math},
@@ -207,9 +215,11 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
     \limplies (\cExp{=}\dVal)
     \limplies \PBR{        
-      \lnot\QxREF{\dVal}
-      \land \DL{\REF{\dVal}}{\amode}
-      \land \bForm[\bReg/\aReg]%[\bReg/\REF{\dVal}]
+      %\lnot\QxREF{\dVal} \land
+      \DL{\REF{\dVal}}{\amode} \land
+      \bForm
+      [\bReg/\aReg]%[\bReg/\REF{\dVal}]
+      [\FALSE/\QL{\REF{\dVal}}{\amode}]
     }.
   \end{math}
   % \\ where $\DL{}{\mRLX}=\TRUE$ and otherwise $\DL{}{\amode}=\DxREF{\dVal}$.

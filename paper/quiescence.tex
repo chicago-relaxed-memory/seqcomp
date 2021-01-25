@@ -90,7 +90,7 @@ symbols, for example:
 
 \begin{definition}[$\xCO$]
   \label{def:pomsets-co}
-  Update \refdef{def:pomsets-trans} to:
+  Update \refdef{def:pomsets-trans} to (\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
     $\labelingForm(\aEv)$ implies $\Qr{\aLoc}\land\Qw{\aLoc}\land\aExp{=}\aVal$,
@@ -103,7 +103,7 @@ symbols, for example:
   \item[\ref{S4})]
     $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Qw{\aLoc}]$,.
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Qw{\aLoc}]$,
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
@@ -262,12 +262,12 @@ symbols, for example:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
-        \xform{x1d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
-        \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{right=of a2}
+        \xform{x1d}{\bForm[\FALSE/\Qw{\aLoc}]}{right=of a2}
+        \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{right=of x1d}
         \xo{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
-  which is what we would hope, that the program $\PW{x}{1}\SEMI \PW{x}{2}$ 
+  This is what we would hope: that the program $\PW{x}{1}\SEMI \PW{x}{2}$ 
   should only be quiescent if there is a $(\DW{x}{2})$ event.
 \end{example}
 
@@ -413,37 +413,41 @@ symbols, for example:
 %% \end{math}
  
 \begin{definition}
+  \label{def:QS}
+  Let $\Qr{*}=\textstyle\bigwedge_\bLoc \Qr{\bLoc}$, and similarly for $\Qw{*}$.\\
   Let formulae $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ be defined:
   \begin{align*}
     \QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
     &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
     \\
-    \QS{\aLoc}{\mRA}&=\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
+    \QS{\aLoc}{\mRA}&=
+    \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
     &\QL{\aLoc}{\mRA}&=\Qw{\aLoc}
     \\
-    \QS{\aLoc}{\mSC}&=\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc} \land \Qsc
+    \QS{\aLoc}{\mSC}&=
+    \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
+    \land \Qsc
     &\QL{\aLoc}{\mSC}&=\Qw{\aLoc}\land\Qsc
   \end{align*}
-\end{definition}
-
-\begin{definition}
+% \end{definition}
+% \begin{definition}
+  Let $[\aForm/\Qr{*}]$ substitute $\aForm$ for every $\Qr{\bLoc}$, and similarly for $\Qw{*}$.
   Let substitutions $[\aForm/\QS{\aLoc}{\amode}]$ and  $[\aForm/\QL{\aLoc}{\amode}]$ be defined:
   \begin{align*}
     [\aForm/\QS{\aLoc}{\mRLX}] &= [\aForm/\Qw{\aLoc}]
     &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{\aLoc}]
     \\
     [\aForm/\QS{\aLoc}{\mRA}] &= [\aForm/\Qw{\aLoc}]
-    &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
+    &{} [\aForm/\QL{\aLoc}{\mRA}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
     \\
     [\aForm/\QS{\aLoc}{\mSC}] &= [\aForm/\Qw{\aLoc},\aForm/\Qsc]
-    &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
+    &{} [\aForm/\QL{\aLoc}{\mSC}] &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
   \end{align*}
 \end{definition}
 
 \begin{definition}[$\xCO$/$\xRASC$]
-  \label{def:QS}
   \label{def:pomsets-ra}
-  Update \refdef{def:pomsets-co} to:
+  Update \refdef{def:pomsets-co} to (\ref{S4}/\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
     $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
@@ -453,12 +457,31 @@ symbols, for example:
     $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
   \end{enumerate}
   \begin{enumerate}
+  \item[\ref{S4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{\aLoc}{\amode}]$,.
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{\aLoc}{\amode}]$,
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
     $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QL{\aLoc}{\amode}]$.
   \end{enumerate}
 \end{definition}
+
+The quiescence formulae indicate what must precede an event.
+For example, all preceding accesses must be ordered before a releasing write,
+whereas only writes on $x$ must be ordered before a releasing read on $x$.
+
+The quiescence substitutions update quiescence symbols in subsequent code.
+For complete threads, $\ref{T3}$ substitutes true.
+For subsequent independent code, $\ref{S5}$ and $\ref{L5}$ substitute false.
+%
+For example, we substitute $\FALSE$ for $\QS{\aLoc}{\mRA}$ in the independent
+case for a releasing write; this ensures that subsequent writes to $\aLoc$
+follow the releasing write in top-level pomsets.  Similarly, we substitute
+$\FALSE$ for $\QL{\aLoc}{\mRA}$ in the independent case for an acquiring
+write; this ensures that all subsequent accesses follow the acquiring read in
+top-level pomsets.
 
 
 \begin{example}
