@@ -373,16 +373,31 @@ the uninterpreted symbol $\RW$.
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$,
+    $\aTr{\bEvs}{\bForm}$ implies
+    \begin{math}
+      %(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land
+      \bForm %\noSUB{[\aExp/\aLoc]},
+      [(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]
+      \DS{\aLoc}{\amode}
+    \end{math}
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qw{\aLoc}\land \DS{\aLoc}{\amode}\bForm\noSUB{[\aExp/\aLoc]}$.
+    $\aTr{\cEvs}{\bForm}$ implies
+    \begin{math}
+      %\lnot\Qw{\aLoc}\land 
+      \bForm %\noSUB{[\aExp/\aLoc]}.
+      [\FALSE/\QS{\aLoc}{\amode}]
+      \DS{\aLoc}{\amode}
+    \end{math}
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
     % $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land(\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
     % \item[\ref{L6})]
-    $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode}{}
-    \land (\RW\limplies\bForm)$.
+    $\aTr{\cEvs}{\bForm}$ implies
+    \begin{math}
+      % \lnot\Qx{\aLoc} \land
+      \DL{\aLoc}{\amode}{} \land (\RW\limplies\bForm[\FALSE/\QL{\aLoc}{\amode}]).
+    \end{math}
   \end{enumerate}  
 \end{definition}
 
