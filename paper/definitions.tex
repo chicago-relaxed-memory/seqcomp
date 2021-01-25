@@ -672,33 +672,14 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
 
 \subsection{Pomsets with Predicate Transformers}
 
-[The problem with the previous section is that there's no story for
-sequential composition.]
+Having reviewed the work we are building on, we now turn to
+the contribution of this paper, which is a model of \emph{pomsets with predicate transformers},
+which provide a natural model of sequential composition.
 
-The final semantic functions for load and store, given in
-Figure~\ref{fig:full}, are quite complex.  We explain the definition by
-looking at its constituent parts, starting with
-\refdef{def:pomsets-trans}, below, which captures dependency.  In
-\textsection\ref{sec:q}, we add \emph{quiescence}, which encodes coherence,
-release-acquire and SC access, and termination.  In
-\textsection\ref{sec:arm}, we add peculiarities that are necessary for
-efficient implementation on \armeight.  In
-\textsection\ref{sec:complications}, we discuss the complications required
-to validate if-closure and to allow address calculation.
-\begin{figure*}
-  \begin{center}
-    \begin{minipage}{0.905\textwidth}
-      \input{fig-full}
-      % \input{fig-full-where}
-      % \input{fig-full-noco}
-    \end{minipage}
-  \end{center}
-  \caption{Full Semantics of Loads, Stores and Threads (See \refdef{def:QS}
-    for $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ and \refdef{def:DS} for
-    $\DL{\aLoc}{\amode}$ and $\DS{\aLoc}{\amode}$)}
-  \label{fig:full}
-\end{figure*}    
-
+Our model is based on \emph{predicate transformers},
+which are functions on formulae which preserve logical structure.
+Note that substitutions ($\aTr{}{\psi}=\psi[\aExp/\aReg]$) and implications on the right
+($\aTr{}{\psi}=\phi\limplies\psi$) are predicate transformers.
 
 \begin{definition}
   A \emph{predicate transformer} is a %monotone
@@ -712,6 +693,12 @@ to validate if-closure and to allow address calculation.
   \end{itemize}
 \end{definition}
 
+As discussed in \S\ref{sec:intro}, predicate transformers suffice for sequentially consistent
+models, but not relaxed models in which dependency calculation is crucial.
+For dependency calculation, we use \emph{family} of predicate transformers,
+indexed by sets of events. We use $\aTr{\bEvs}{}$ as the predicate transformer
+applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
+
 \begin{definition}
   A \emph{family of predicate transformers} for $\aEvs$ consists of a
   predicate transformer $\aTr{\bEvs}{}$ for each $\bEvs\subseteq\AllEvents$,
@@ -719,11 +706,11 @@ to validate if-closure and to allow address calculation.
   implies $\aTr{\bEvs}{\bForm}$.
 \end{definition}
 
-Note that in a family of predicate transformers for $\aEvs$, transformers for
-smaller subsets of $\aEvs$ are stronger.
+%% Note that in a family of predicate transformers for $\aEvs$, transformers for
+%% smaller subsets of $\aEvs$ are stronger.
 
 \begin{definition}
-  A pomset with predicate transformers is a pomset with preconditions (\refdef{def:pomsets-pre}),
+  A \emph{pomset with predicate transformers} is a pomset with preconditions (\refdef{def:pomsets-pre}),
   together with a family of predicate transformers for $\aEvs$.
 \end{definition}
 
@@ -732,9 +719,10 @@ smaller subsets of $\aEvs$ are stronger.
 %   $\downclose[0]{\aEv} = \{ \bEv\in\aEvs \mid \bEv < \aEv \}$.
 % \end{definition}
 
-$\sTHREAD{}$ converts a pomset with predicate transformers into a pomset
-with preconditions by dropping the predicate transformer.  For the
-reverse embedding, $\sFORK{}$ adopts the identity transformer.
+We can covert back and forth between pomsets with preconditions
+and with predicate transformers. In one direction, $\sTHREAD{}$
+drops predicate transformers, and in the other, $\sFORK{}$ adopts
+the identity transformer.
 
 \begin{definition}
   \label{def:pomsets-group}
@@ -768,6 +756,10 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
     \setcounter{pomsetXForkCount}{\value{enumi}}
   \end{enumerate}  
 \end{definition}
+
+We model thread groups as sets of pomsets with preconditions,
+as in \S\ref{sec:pomsets-pre}.
+
 \begin{definition}
   \noindent
   Adopting $\sNIL$ and $\sPAR$ from \refdef{def:pomsets-pre},
@@ -783,6 +775,9 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   % $\sTHREAD{}$ is as follows.
 \end{definition}
 
+We model commands as sets of pomsets with predicate transformers,
+by combining \S\ref{sec:pomsets-pre} with a weakest precondition
+semantics.
 
 \begin{definition}
   \label{def:pomsets-trans}
@@ -943,20 +938,28 @@ reverse embedding, $\sFORK{}$ adopts the identity transformer.
   \end{scope}
 \end{definition}
 
-[Chat about abort, skip, let and if.]
+Most of these definitions are straightforward adaptations of
+\S\ref{sec:pomsets-pre}, but the treatment of sequential composition
+is new.  This uses the usual rule for composition of predicate
+transformers (but preserving the indexing set). For the pomset, we
+take the union of their events, preserving actions, but crucially in
+cases~\ref{seq-kappa2} and~\ref{seq-kappa12} we apply a predicate
+transformer $\aTr[1]{\cEvs}{}$ from the LHS to a precondition
+$\labelingForm_2(\aEv)$ from the RHS to build the precondition
+$\labelingForm'_2(\aEv)$.  The indexing set $\cEvs$ for the predicate
+transformer is $\{ \cEv\mid \cEv<\aEv \}$, so can depend on the causal
+order.
 
-[Chat about semicolon.]
-
-In the predicate transformers for store and load, \ref{S4} and \ref{L4}
-denote the \emph{dependent case}, whereas \ref{S5} and \ref{L5}
-denote the \emph{independent case}.  For stores, the dependent and
-independent cases are the same; this will change in the next section, where
-we introduce quiescence.  In the dependent case for load, we can assume that
-$\aReg$ is the value $\aVal$, which has appears in the read action, when
-proving $\bForm$.  In the independent case for load, we can only make the
-weaker assumption that either $\aReg$ is $\aVal$ or it is value defined by
-preceding code for $\aLoc$.  That is, we do not know whether subsequent code
-sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
+%% In the predicate transformers for store and load, \ref{S4} and \ref{L4}
+%% denote the \emph{dependent case}, whereas \ref{S5} and \ref{L5}
+%% denote the \emph{independent case}.  For stores, the dependent and
+%% independent cases are the same; this will change in the next section, where
+%% we introduce quiescence.  In the dependent case for load, we can assume that
+%% $\aReg$ is the value $\aVal$, which has appears in the read action, when
+%% proving $\bForm$.  In the independent case for load, we can only make the
+%% weaker assumption that either $\aReg$ is $\aVal$ or it is value defined by
+%% preceding code for $\aLoc$.  That is, we do not know whether subsequent code
+%% sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
 
 
 % Recall that $\uRegs{\bEvs}=\{\uReg{\bEv}\mid\bEv\in\bEvs\}$.
@@ -1248,7 +1251,7 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
 \end{comment}
 
 \begin{example}
-  Read to write dependency, first separately:
+  For read to write dependency, consider:
   \begin{align*}
     \begin{gathered}
       \PR{x}{r} 
@@ -1256,7 +1259,7 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \xform{xd}{1{=}r\limplies\bForm}{}
           \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
-          \event{a1}{\DR{x}{1}}{left=of xd}
+          \eventl{\bEv}{a1}{\DR{x}{1}}{left=of xd}
           \xo{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
@@ -1267,12 +1270,17 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \xform{xd}{\bForm\noSUB{[r/y]}}{}
           \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
-          \event{a2}{r{=}1\mid\DW{y}{1}}{left=of xd}      
+          \eventl{\aEv}{a2}{r{=}1\mid\DW{y}{1}}{left=of xd}      
           \xo{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
-  Putting these together without order:
+  Putting these together without order,
+  we calculate the precondition $\labelingForm(\aEv)$
+  as $\aTr[1]{\cEvs}{\labelingForm_2(\aEv)}$, where $\cEvs$ is $\{\cEv\mid\cEv<\aEv\}$, which is $\emptyset$.
+  Since $\aTr[1]{\emptyset}{\bForm}$ is $\bForm$, this gives that 
+  $\labelingForm(\aEv)$ is $\labelingForm_2(\aEv)$, which is $\aReg{=}1$.
+  This gives the pomsaet with predicate transformers:
   \begin{gather*}
     \PR{x}{r} \SEMI
     \PW{y}{r}
@@ -1282,36 +1290,43 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
         \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
         \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
-        \event{a1}{\DR{x}{1}}{above=of xdi}
-        \event{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{=}1\mid\DW{y}{1}}{above=of xid}
+        \eventl{\bEv}{a1}{\DR{x}{1}}{above=of xdi}
+        \eventl{\aEv}{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{=}1\mid\DW{y}{1}}{above=of xid}
         \xo{a1}{xdi}
         \xo{a2}{xid}
         \xo{a1}{xdd}
         \xo{a2}{xdd}
       \end{tikzinline}}
   \end{gather*}
-  The precondition of $\DWP{y}{1}$ can be simplified to
-  $(x{=}r\limplies r{=}1)$, which is only a tautology when $x{=}1$.  If we choose a pomset that orders
-  $\DRP{x}{1}\xpo\DWP{y}{1}$, then the predicate transformers are the same,
-  but the precondition of $\DWP{y}{1}$ can be weakened to
-  $(1{=}r\limplies r{=}1)$, which is a tautology.
-  % \begin{gather*}
-  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %       \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
-  %       \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
-  %       \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
-  %       \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
-  %       \event{a1}{\DR{x}{1}}{above=of xdi}
-  %       \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
-  %       \xo{a1}{xdi}
-  %       \xo{a2}{xid}
-  %       \xo{a1}{xdd}
-  %       \xo{a2}{xdd}        
-  %       % \event{a1}{\DR{x}{1}}{}
-  %       % \event{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
-  %       \po{a1}{a2}
-  %     \end{tikzinline}}
-  % \end{gather*}
+  This pomset's preconditions depend on a bound register, so cannot contribute
+  to a top-level pomset.
+  
+  Putting them together with order,
+  we calculate the precondition $\labelingForm(\aEv)$
+  as $\aTr[1]{\cEvs}{\labelingForm_2(\aEv)}$, where $\cEvs$ is $\{\cEv\mid\cEv<\aEv\}$, which is $\{\bEv\}$.
+  Since $\aTr[1]{\{\bEv\}}{\bForm}$ is $(\aReg{=}1 \limplies \bForm)$, this gives that 
+  $\labelingForm(\aEv)$ is $(\aReg{=}1 \limplies \labelingForm_2(\aEv))$, which is $(\aReg{=}1 \limplies \aReg{=}1)$.
+  This gives the pomsaet with predicate transformers:
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
+        \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
+        \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
+        \eventl{\bEv}{a1}{\DR{x}{1}}{above=of xdi}
+        \eventl{\aEv}{a2}{r{=}1\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+        \wk{a1}{a2}
+      \end{tikzinline}}
+  \end{gather*}
+  This pomset's preconditions do not depend on a bound register, so can contribute
+  to a top-level pomset.
 \end{example}
 
 \begin{example}
@@ -1356,7 +1371,7 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
         \xo{a2}{xid}
         \xo{a1}{xdd}
         \xo{a2}{xdd}
-        \po{a1}{a2}
+        \wk{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
 
@@ -1368,4 +1383,30 @@ sees the value $\aVal$, or the value of some preceding write of $\aLoc$.
   % assumptions on $r$; the predicate transformers are unchanged.
 \end{example}
 
+\subsection{Relaxed memory}
+
+The final semantic functions for load, store, and thread
+initialization, given in Figure~\ref{fig:full}, are quite complex.  In
+the remainder of the paper, we explain the definition by looking at
+its constituent parts, building on \refdef{def:pomsets-trans}, which
+models sequential composition, parallel composition, and conditionals.
+In \textsection\ref{sec:q}, we add \emph{quiescence}, which encodes
+coherence, release-acquire and SC access, and termination.  In
+\textsection\ref{sec:arm}, we add peculiarities that are necessary for
+efficient implementation on \armeight.  In
+\textsection\ref{sec:complications}, we discuss
+other features such as register recycling and address calculation.
+\begin{figure*}
+  \begin{center}
+    \begin{minipage}{0.905\textwidth}
+      \input{fig-full}
+      % \input{fig-full-where}
+      % \input{fig-full-noco}
+    \end{minipage}
+  \end{center}
+  \caption{Full Semantics of Loads, Stores and Threads (See \refdef{def:QS}
+    for $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ and \refdef{def:DS} for
+    $\DL{\aLoc}{\amode}$ and $\DS{\aLoc}{\amode}$)}
+  \label{fig:full}
+\end{figure*}    
 
