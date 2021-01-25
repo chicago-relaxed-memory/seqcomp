@@ -1389,7 +1389,7 @@ order.
   The predicate transformer we have chosen for \ref{L4} is different from the
   one used traditionally, which is written using substitution.  Substitution
   is also used in \jjr{}.  Attempting to
-  write the predicate transformers in this style we arrive at:
+  write the predicate transformers in this style we have:
   \begin{enumerate}
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg]$, 
@@ -1400,6 +1400,7 @@ order.
   in order to appear in a top-level pomset.  This choice for \ref{L5} is forced
   by \refdef{def:family}, which states that the predicate transformer for a
   small subset of $\aEvs$ must imply the transformer for a larger subset.
+
   Sadly, this definition fails associativity.
 
   Consider the following, eliding transformers:
@@ -1520,7 +1521,8 @@ order.
   \refdef{def:pomsets-trans} in Agda.  The proof requires that predicate
   transformers distribute through disjunction (\refdef{def:trans}).
   Since universal quantification does not distribute through disjunction, the
-  attempt to define predicate transformers using substitution fails.
+  attempt to define predicate transformers using substitution fails (in
+  particular for \ref{L5}.)
 \end{example}
 
 \subsection{The Road Ahead}
