@@ -84,16 +84,8 @@ symbols, for example:
   \end{gather*}
 
 \begin{definition}
-  Let $\QS{\aLoc}{}$ and $\QL{\aLoc}{}$ be defined:
-  \begin{align*}
-    \QS{\aLoc}{}&=\Qr{\aLoc}\land\Qw{\aLoc}
-    &\QL{\aLoc}{}&=\Qw{\aLoc}
-  \end{align*}
-\end{definition}
-
-\begin{definition}
-  Let $[\TRUE/\Q{}]$ be the substitution that replaces all quiescence
-  symbols by $\TRUE$.
+  Let $[\aForm/\Qr{*}]$ be the substitution that replaces all
+  symbols $\Qr{\aLoc}$ by $\aForm$, and similarly $[\aForm/\Qw{*}]$.
 \end{definition}
 
 \begin{definition}[$\xCO$]
@@ -101,11 +93,11 @@ symbols, for example:
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
   \item[\ref{S3})]
-    $\labelingForm(\aEv)$ implies $\QS{\aLoc}{}\land\aExp{=}\aVal$,
+    $\labelingForm(\aEv)$ implies $\Qr{\aLoc}\land\Qw{\aLoc}\land\aExp{=}\aVal$,
   \item[\ref{L3})]
-    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{}$,
+    $\labelingForm(\aEv)$ implies $\Qw{\aLoc}$,
   \item[\ref{T3})]
-    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{\mSC}]$,
+    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
@@ -117,7 +109,7 @@ symbols, for example:
   \item[\ref{L5})]
   %   $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land((\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
   % \item[\ref{L6})]
-    $\aTr{\cEvs}{\bForm}$ implies $[\FALSE/\Qr{\aLoc}]$.
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Qr{\aLoc}]$.
     % \end{enumerate}
     % Update thread as follows
     % \begin{enumerate}
@@ -415,14 +407,14 @@ symbols, for example:
   \end{gather*}
 \end{example}
 
-In order to describe $\mRA$/$\mSC$ access, we use the uninterpreted logical
-symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
-\begin{math}
-  \Q{\mSC} \textimplies \Q{\mRA} \textimplies \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc.
-\end{math}
-
+%% In order to describe $\mRA$/$\mSC$ access, we use the uninterpreted logical
+%% symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
+%% \begin{math}
+%%   \Q{\mSC} \textimplies \Q{\mRA} \textimplies \Qx{\aLoc} \textimplies \Qw{\bLoc} \textwhen \aLoc=\bLoc.
+%% \end{math}
+ 
 \begin{definition}
-  Let $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ be defined:
+  Let formulae $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ be defined:
   \begin{align*}
     \QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
     &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
@@ -435,6 +427,20 @@ symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
   \end{align*}
 \end{definition}
 
+\begin{definition}
+  Let substitutions $[\aForm/\QS{\aLoc}{\amode}]$ and  $[\aForm/\QL{\aLoc}{\amode}]$ be defined:
+  \begin{align*}
+    [\aForm/\QS{\aLoc}{\mRLX}] &= [\aForm/\Qw{\aLoc}]
+    &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{\aLoc}]
+    \\
+    [\aForm/\QS{\aLoc}{\mRA}] &= [\aForm/\Qw{\aLoc}]
+    &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
+    \\
+    [\aForm/\QS{\aLoc}{\mSC}] &= [\aForm/\Qw{\aLoc},\aForm/\Qsc]
+    &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
+  \end{align*}
+\end{definition}
+
 \begin{definition}[$\xCO$/$\xRASC$]
   \label{def:QS}
   \label{def:pomsets-ra}
@@ -444,6 +450,14 @@ symbols $\Q{\mRA}$ and $\Q{\mSC}$, with the interpretation that
     $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
   \item[\ref{L3})]
     $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$.
+  \item[\ref{T3})]
+    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
+  \end{enumerate}
+  \begin{enumerate}
+  \item[\ref{S5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{\aLoc}{\amode}]$,.
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QL{\aLoc}{\amode}]$.
   \end{enumerate}
 \end{definition}
 
