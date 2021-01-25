@@ -101,16 +101,14 @@ We require that:
 \item formulae include equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
 \item formulae include symbols % for all $\aLoc$,
   % \item formulae include the symbols
-  $\Q{\mSC}$, $\Q{\mRA}$, $\Qx{\aLoc}$, 
-  $\Qw{\aLoc}$, $\Dx{\aLoc}$, $\RW$, % for all $\aLoc$,
+  $\Qsc$, $\Qr{\aLoc}$, $\Qw{\aLoc}$, $\Dx{\aLoc}$, $\RW$, % for all $\aLoc$,
   (which are used in \textsection\ref{sec:q}--\ref{sec:arm}),
 \item formulae are closed under negation, conjunction, disjunction, and
   substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$, and $[\aForm/\aSym]$
   for each symbol $\aSym$,
 \item there is an entailment relation $\vDash$ between formulae,
 \item $\vDash$ has the expected semantics for $=$, $\lnot$, $\land$, $\lor$,
-  $\limplies$ and substitution,
-\item $\Q{\mSC}\vDash\Q{\mRA}\vDash\Qx{\aLoc}\vDash\Qw{\bLoc}$ when $\aLoc=\bLoc$.  
+  $\limplies$ and substitution.
 \end{itemize}
 
 
