@@ -191,7 +191,14 @@ Prepending $\PW{x}{0}$
 
 \subsection{Fork-Join}
 
-It is also possible to put coherence in the independency relation, in which
+\begin{definition}
+  A pomset with predicate transformers $\aPS$ is \emph{completed} if,
+  for every quiescence symbol $\aSym$,
+  $\aTr{\aEvs}{\aSym}$ implies $\aSym$.
+\end{definition}
+
+
+ It is also possible to put coherence in the independency relation, in which
 case, the semantics of $;$ includes the following.
 \begin{enumerate}
   \setcounter{enumi}{\value{pomsetXSemiCount}}

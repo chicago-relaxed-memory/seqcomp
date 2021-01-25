@@ -135,14 +135,48 @@ be independent of $\aReg$.
           \event{a0}{\DW{x}{0}}{}
           \event{a1}{\DR{x}{1}}{right=of a0}
           \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}      
+          \wk{a0}{a1}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
   The precondition of $\DWP{y}{1}$ is a tautology, as required.
+
+  If \ref{L5} required only that $\aLoc{=}\aReg\limplies\bForm$, then the
+  following execution would be allowed:
+  \begin{gather*}
+    x\GETS 0 \SEMI
+    r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{rx1}{\DR{x}{{-}1}}{right=of wx0}
+        \event{wy1}{\DW{y}{1}}{right=of rx1}
+        \wk{wx0}{rx1}
+      \end{tikzinline}}
+  \end{gather*}
+  But this would violate the expected local invariant: that all values seen
+  for $x$ are nonnegative.
 \end{example}
 It is worth emphasizing that this reasoning is local, and therefore
 unaffected by the introduction of additional threads, as in Test Case 9
 \citep{PughWebsite}.
+
+\begin{example}
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI \PW{x}{\BANG r} 
+      \SEMI \PW{x}{r {\AND} s} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+          \event{b}{\DW{x}{1}}{right=of a}
+          \event{c}{\DW{x}{0}}{right=of b}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}  
+\end{example}
 
 \subsection{Register Recycling ($\xRecycle$)}
 
@@ -216,8 +250,7 @@ most once in a program.  We relax this by renaming.
 \end{definition}
 
 \begin{example}
-  Revisiting \refex{ex:tc2}, eliding irrelevant transformers and choosing
-  $\uReg{\aEv}=r$:
+  Revisiting \refex{ex:tc2} and choosing $\uReg{\aEv}=r$:
   \begin{align*}
     \begin{gathered}[t]
       \PR{x}{r} 
@@ -425,7 +458,7 @@ most once in a program.  We relax this by renaming.
   $(\exists\cForm:\aEvs\fun\Formulae)$
   \begin{enumerate}
   \item[\ref{S1})] if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-  \item[\ref{S2})] $\labelingAct(\aEv) = \DWREFP{\cVal_\aEv}{\aVal_\aEv}$,
+  \item[\ref{S2})] $\labelingAct(\aEv) = \DW{\aLoc}{\aVal_\aEv}$,
   \item[\ref{S3})] $\labelingForm(\aEv)$ implies $\cForm_\aEv \land \aExp{=}\aVal$,
   \item[\ref{S4})] $(\forall\aEv\in\aEvs\cap\bEvs)$
     $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies \bForm\noSUB{[\aExp/\aLoc]}$,
@@ -440,7 +473,7 @@ most once in a program.  We relax this by renaming.
   \item[\ref{L1})] 
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
   \item[\ref{L2})] 
-    $\labelingAct(\aEv) = \DRREFP{\cVal_\aEv}{\aVal_\aEv}$,
+    $\labelingAct(\aEv) = \DR{\aLoc}{\aVal_\aEv}$,
   \item[\ref{L3})] 
     $\labelingForm(\aEv)$ implies $\cForm_\aEv$.
   \item[\ref{L4})] 

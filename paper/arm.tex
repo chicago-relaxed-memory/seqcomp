@@ -343,27 +343,28 @@ the uninterpreted symbol $\RW$.
       \SEMI
       \IF{r}\THEN s\GETS x\FI
       \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{b}{\DR{y}{1}}{}
           \event{c}{\RW\limplies r\mid\DW{x}{0}}{right=of b}
           %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
-  Embedding the thread in thread group, we have, as desired:
+  Embedding the thread in thread group, \ref{T3} yields:
   \begin{align*}
     \begin{gathered}[t]
-      \PR{y}{r}
-      \SEMI
-      \IF{r}\THEN s\GETS x\FI
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
+      % \PR{y}{r}
+      % \SEMI
+      % \IF{r}\THEN s\GETS x\FI
+      % \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{b}{\DR{y}{1}}{}
           \event{c}{\FALSE\limplies r\mid\DW{x}{0}}{right=of b}
           %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
+  The precondition of $\DWP{x}{0}$ is a tautology, as required.
 \end{example}
 
 \subsection{Full semantics for ARM}
@@ -417,12 +418,64 @@ the uninterpreted symbol $\RW$.
   \end{enumerate}  
 \end{definition}
 
+\begin{example}
+  $\xRRD$ does not adversely affect subscription (\refex{ex:subscription}).
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR[\mRA]{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
+          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mRA]{y}{1}}{}
+          \xform{x1i}{\Dx{y}\land(\RW\limplies\bForm[\FALSE/\QL{\aLoc}{\mRA}])}{right=of b} %x1d}
+        \end{tikzinline}}  
+    \end{gathered}  
+    &&
+    \begin{gathered}[t]
+      \PR{x}{s}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \event{c}{\QL{y}{\mRA}\mid\DW{x}{0}}{}
+        \end{tikzinline}}  
+    \end{gathered}  
+  \end{align*}
+  Since $\QL{y}{\mRA}[\FALSE/\QL{\aLoc}{\mRA}]$ is false, we have:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR[\mRA]{y}{r}
+      \SEMI
+      \PR{x}{s}
+      \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mRA]{y}{1}}{}
+          \event{c}{\Dx{y}\land(\RW\limplies\FALSE)\mid\DW{x}{0}}{right=of b}
+        \end{tikzinline}}  
+    \end{gathered}  
+  \end{align*}
+  If this is the complete thread, we apply \ref{T3} to yield:
+  \begin{align*}
+    \begin{gathered}[t]
+      % \PR[\mRA]{y}{r}
+      % \SEMI
+      % \PR{x}{s}
+      % \\
+      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mRA]{y}{1}}{}
+          \event{c}{\Dx{y}\land(\FALSE\limplies\FALSE)\mid\DW{x}{0}}{right=of b}
+        \end{tikzinline}}  
+    \end{gathered}  
+  \end{align*}
+  Although $(\FALSE\limplies\FALSE)$ is a tautology, $\Dx{y}$ is not.  This
+  pomset can only contribute to a top-level pomset if the thread is preceded
+  by a relaxed write to $y$, allowing $\DRP[\mRA]{y}{1}$ to be downgraded to
+  a relaxed read.
+\end{example}
+
 Every \armeight{} execution is allowed by \refdef{def:pomsets-arm}.  The
 proof of this fact is simplified by the recent characterization of
-\armeight{} in terms of \EGC{} \cite[\textsection
-B2.3.6]{arm-reference-manual}.  Under \EGC{}, an \armeight{} execution is a
-linearization of per-location program order and a subset of local-order.
-Every such linearization is also a valid pomset under
+\armeight{} in terms of \emph{external global completion} (\EGC{})
+\cite[\textsection B2.3.6]{arm-reference-manual}.  Under \EGC{}, an
+\armeight{} execution is a linearization of per-location program order and a
+subset of local-order.  Every such linearization is also a valid pomset under
 \refdef{def:pomsets-arm}.
 
 % \begin{definition}
