@@ -1,8 +1,8 @@
 \section{Quiescence}
 \label{sec:q}
 
-We introduce \emph{quiescence}, which captures \emph{coherence},
-\emph{synchronized access}, and \emph{completion}.  Recall from
+We introduce \emph{quiescence}, which captures \emph{coherence} and
+\emph{synchronized access}.  Recall from
 \textsection\ref{sec:prelim} that formulae include
 symbols $\Q{\mSC}$, $\Qr{\aLoc}$, and $\Qw{\aLoc}$.
 We refer to these collectively as \emph{quiescence symbols}.
@@ -232,7 +232,7 @@ symbols, for example:
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
-  Simplifying:
+  % Simplifying
   %% \begin{align*}
   %%   \begin{gathered}
   %%     \PW{x}{1}
@@ -256,7 +256,7 @@ symbols, for example:
   %%       \end{tikzinline}}
   %%   \end{gathered}
   %% \end{align*}
-  and merging the actions, we have:
+  Merging the actions, since $2{=}1$ is unsatisfiable, we have:
   \begin{gather*}
     \PW{x}{1}\SEMI \PW{x}{2}
     \\
@@ -450,9 +450,9 @@ symbols, for example:
   Update \refdef{def:pomsets-co} to (\ref{S4}/\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
-    $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
+    $\labelingForm(\aEv)$ implies $\aExp{=}\aVal\land\QS{\aLoc}{\amode}$,
   \item[\ref{L3})]
-    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$.
+    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$,
   \item[\ref{T3})]
     $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
   \end{enumerate}

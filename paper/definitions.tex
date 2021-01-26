@@ -16,7 +16,7 @@ In later sections, we will discuss extensions to the logic, and to the
 semantics of load, store and thread initialization, in order to model
 relaxed memory more faithfully. We stress that these features do
 \emph{not} change any of the structures of the language: conditionals,
-and parallel and sequential composition are as defined in this section.
+parallel composition, and sequential composition are as defined in this section.
 
 \subsection{Preliminaries}
 \label{sec:prelim}
@@ -164,7 +164,7 @@ instead that
 \begin{itemize}
 \item there are registers
   $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$,
-\item registers in $\uRegs{\AllEvents}$ do not appear in programs.
+\item registers $\uRegs{\AllEvents}$ do not appear in programs: $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.
 \end{itemize}
 % In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
 % assumption.
@@ -173,7 +173,7 @@ instead that
 
 We first consider a fragment of our language that can be modeled using simple
 pomsets.  This captures read and write actions which may be reordered,
-but as we shall see does\emph{not} capture control or data dependencies.
+but as we shall see does \emph{not} capture control or data dependencies.
 
 \begin{definition}
   \label{def:pomsets}
@@ -315,12 +315,12 @@ without control or data dependencies.
 
 In this semantics, both $\SKIP$ and $\NIL$ map to the empty pomset.  Parallel
 composition is disjoint union, inheriting labeling and order from the two
-side.  Prefixing may add a new action (on the left) to an existing pomset
+sides.  Prefixing may add a new action (on the left) to an existing pomset
 (on the right), inheriting labeling and order from the right.  
 
 It is worth noting that if ${\reorder}$ is taken to be the empty relation,
 then fulfilled pomsets of \refdef{def:pomsets} correspond to sequentially
-consistent executions \cite{Lamport:1979:MMC:1311099.1311750} up to mumbling
+consistent executions up to mumbling
 \cite{DBLP:journals/iandc/Brookes96}.
 
 \begin{example}
@@ -435,8 +435,8 @@ similar to~\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
 We can now define a model of processes given as sets of pomsets with preconditions
 sufficient to give the semantics for a fragment of our language
 where every use of sequential composition is either
-$(\aLoc\GETS\aExp\SEMI \aCmd)$ or
-$(\aReg\GETS\aLoc\SEMI \aCmd)$.
+$(\PW[\amode]{\aLoc}{\aExp}\SEMI \aCmd)$ or
+$(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
 \begin{definition}%$\phantom{\;}$\par
   \label{def:pomsets-pre}
   
@@ -522,12 +522,12 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
     \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd_1}\sELSE\sem{\aCmd_2}\sFI
     \\
     \begin{aligned}
-      \sem{\PW{\aLoc}{\aExp}\SEMI \aCmd} &=
+      \sem{\PW[\amode]{\aLoc}{\aExp}\SEMI \aCmd} &=
       \sSTOREPRE{\aLoc}{\aExp}{\sem{\aCmd}}
       &
       \sem{\SKIP} &= \sem{\NIL} = \sNIL 
       \\
-      \sem{\PR{\aLoc}{\aReg}\SEMI \aCmd} &=
+      \sem{\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd} &=
       \sLOADPRE{\aReg}{\aLoc}{\sem{\aCmd}}
       &
       \makebox[3.5em][r]{$\sem{\aGrp_1 \PAR \aGrp_2}$} &= \sem{\aGrp_1}\sPAR\sem{\aGrp_2}
@@ -540,10 +540,12 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
 %% $\aEv\in\aEvs_1$.
 
 \begin{example}
+  \label{ex:data}
   A simple example of a data dependency
   is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS r}$,
   for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
-  such as:
+  such as the following, where $\aVal=1$:
+  %\vspace{-.5\baselineskip}
   \begin{gather*}
     y\GETS r
     \\
@@ -552,8 +554,8 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \event{wy1}{r{=}1\mid\DW{y}{1}}{}
       \end{tikzinline}}
   \end{gather*}
-  If $\aVal$ is chosen badly, we have a pomset with a precondition
-  that cannot be part of a top-level pomset such as:
+  The value chosen for the read may be different from that chosen for the write:
+  %\vspace{-.5\baselineskip}
   \begin{gather*}
     r\GETS x\SEMI y\GETS r
     \\
@@ -564,8 +566,12 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \po{rx0}{wy1}
       \end{tikzinline}}
   \end{gather*}
-  But if $\aVal$ is $1$ then we have two cases, the independent case, which again cannot
-  be part of a top-level pomset:
+  In this case, the pomset's preconditions depend on a bound register, so
+  cannot contribute to a top-level pomset.
+
+  If the values chosen for read and write are compatible, then we have two
+  cases: the independent case, which again cannot be part of a top-level
+  pomset,
   \begin{gather*}
     r\GETS x\SEMI y\GETS r
     \\
@@ -575,7 +581,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \event{wy1}{r{=}1 \mid \DW{y}{1}}{right=of rx1}
       \end{tikzinline}}
   \end{gather*}
-  or the dependent case:
+  and the dependent case:
   \begin{gather*}
     % r\GETS x\SEMI y\GETS r
     % \\
@@ -603,14 +609,17 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \event{wy1}{r{\ne}0\mid\DW{y}{1}}{}
       \end{tikzinline}}
   \end{gather*}
-  The rest of the reasoning is the same as for a data dependency.
+  The rest of the reasoning is the same as \refex{ex:data}.
 \end{example}
 
 \begin{example}
   A simple example of an independency
   is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS 1}$,
-  for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
-  such as:
+  for which there must be:
+  % an %$\aVal\in\Val$ and
+  % $\aPS'\in \sem{y\GETS r}$
+  % such as:
+  %\vspace{-1\baselineskip}
   \begin{gather*}
     y\GETS 1
     \\
@@ -619,7 +628,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \event{wy1}{1{=}1\mid\DW{y}{1}}{}
       \end{tikzinline}}
   \end{gather*}
-  In this case it doesn't matter what $\aVal$ is, for example:
+  In this case it doesn't matter what value the read chooses:
   \begin{gather*}
     r\GETS x\SEMI y\GETS 1
     \\
@@ -665,7 +674,7 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
         \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
       \end{tikzinline}}
   \end{gather*}
-  Here, the precondition on $(\DW{y}{1})$ is a tautology, and so is
+  Here, the precondition is a tautology, 
   independent of $r$.
   % We refer to event sharing as \emph{coalescing} or \emph{merging}.
 \end{example}
@@ -673,13 +682,11 @@ $(\aReg\GETS\aLoc\SEMI \aCmd)$.
 \subsection{Pomsets with Predicate Transformers}
 
 Having reviewed the work we are building on, we now turn to
-the contribution of this paper, which is a model of \emph{pomsets with predicate transformers},
-which provide a natural model of sequential composition.
+the contribution of this paper, which is a model of \emph{pomsets with predicate transformers}.
 
-Our model is based on \emph{predicate transformers},
-which are functions on formulae which preserve logical structure.
-Note that substitutions ($\aTr{}{\psi}=\psi[\aExp/\aReg]$) and implications on the right
-($\aTr{}{\psi}=\phi\limplies\psi$) are predicate transformers.
+\emph{predicate transformers} are
+functions on formulae which preserve logical structure, providing a natural model of sequential composition.
+
 
 \begin{definition}
   \label{def:trans}
@@ -693,10 +700,13 @@ Note that substitutions ($\aTr{}{\psi}=\psi[\aExp/\aReg]$) and implications on t
   \item if $\aForm$ implies $\bForm$, then $\aTr{}{\aForm}$ implies $\aTr{}{\bForm}$.
   \end{itemize}
 \end{definition}
+\noindent
+Note that substitutions ($\aTr{}{\psi}=\psi[\aExp/\aReg]$) and implications on the right
+($\aTr{}{\psi}=\phi\limplies\psi$) are predicate transformers.
 
 As discussed in \S\ref{sec:intro}, predicate transformers suffice for sequentially consistent
-models, but not relaxed models in which dependency calculation is crucial.
-For dependency calculation, we use \emph{family} of predicate transformers,
+models, but not relaxed models, where dependency calculation is crucial.
+For dependency calculation, we use a \emph{family} of predicate transformers,
 indexed by sets of events. We use $\aTr{\bEvs}{}$ as the predicate transformer
 applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
 
@@ -777,9 +787,8 @@ as in \S\ref{sec:pomsets-pre}.
   % $\sTHREAD{}$ is as follows.
 \end{definition}
 
-We model commands as sets of pomsets with predicate transformers,
-by combining \S\ref{sec:pomsets-pre} with a weakest precondition
-semantics.
+We model commands by adding predicate transformers to
+\refdef{def:pomsets-pre}, in order to calculate weakest preconditions.
 
 \begin{definition}
   \label{def:pomsets-trans}
@@ -946,8 +955,8 @@ is new.  This uses the usual rule for composition of predicate
 transformers (but preserving the indexing set). For the pomset, we
 take the union of their events, preserving actions, but crucially in
 cases~\ref{seq-kappa2} and~\ref{seq-kappa12} we apply a predicate
-transformer $\aTr[1]{\cEvs}{}$ from the LHS to a precondition
-$\labelingForm_2(\aEv)$ from the RHS to build the precondition
+transformer $\aTr[1]{\cEvs}{}$ from the left-hand side to a precondition
+$\labelingForm_2(\aEv)$ from the right-hand side to build the precondition
 $\labelingForm'_2(\aEv)$.  The indexing set $\cEvs$ for the predicate
 transformer is $\{ \cEv\mid \cEv<\aEv \}$, so can depend on the causal
 order.
@@ -1532,7 +1541,7 @@ are given in Figure~\ref{fig:full}, at the end of the paper.
 In \textsection\ref{sec:q}--\ref{sec:complications}, we explain this definition by looking at its
 constituent parts, building on \refdef{def:pomsets-trans}.  In
 \textsection\ref{sec:q}, we add \emph{quiescence}, which encodes coherence,
-release-acquire and SC access, and termination.  In
+release-acquire access, and SC access.  In
 \textsection\ref{sec:arm}, we add peculiarities that are necessary for
 efficient implementation on \armeight.  In
 \textsection\ref{sec:complications}, we discuss other features such as

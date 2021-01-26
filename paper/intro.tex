@@ -35,9 +35,8 @@ for example:
 (In examples, $\aReg$--$\bReg$ range over thread-local registers and $\aLoc$-$\cLoc$
 range over shared memory references.)
 
-This model naturally extends to the case of shared-memory concurrency
-in a natural way, leading to a \emph{sequentially consistent}
-semantics, in which \emph{program order} inside a thread implies
+This model naturally extends to the case of shared-memory concurrency, leading to a \emph{sequentially consistent}
+semantics \cite{Lamport:1979:MMC:1311099.1311750}, in which \emph{program order} inside a thread implies
 a total \emph{causal order} between read and write events, for example:
   \begin{gather*}
     \THREAD{x\GETS0\SEMI x\GETS1\SEMI y\GETS2}
@@ -60,8 +59,8 @@ a total \emph{causal order} between read and write events, for example:
   \end{gather*}
 
 Unfortunately, this model does not compile efficiently to commodity
-hardware, resulting in a 37--73\% increase in CPU time~\cite{Liu:2019:ASC:3314221.3314611} on ARM, and
-hence power consumption.  Developers of software and compilers have
+hardware, resulting in a 37--73\% increase in CPU time on ARM~\cite{Liu:2019:ASC:3314221.3314611} and,
+hence, in power consumption.  Developers of software and compilers have
 therefore been faced with a difficult trade-off, between an elegant
 model of memory, and its impact on resource usage (such as size of
 data centers, electricity bills and carbon footprint). Unsurprisingly,
@@ -371,8 +370,9 @@ of events.
 
 For example, for single-event pomsets, there are two predicate
 transformers, since there are two subsets of any one-element set.
-We call the predicate transformer for $\emptyset$ the \emph{independent}
-transformer, and the one indexed by $\{e\}$ the \emph{dependent} transformer.
+The \emph{independent}
+transformer is indexed by the empty set, whereas the \emph{dependent}
+transformer is indexed by the singleton.
 We visualize this by including more than one transformed predicate,
 with an edge leading to the dependent one. For example:
   \begin{align*}
@@ -426,8 +426,8 @@ which maps $\bForm$ to $(s{=}0) \limplies \bForm$.
         \event{rx0}{\DR{x}{0}}{}
         \event{ry0}{\DR{y}{0}}{right=of rx0}
         \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
-        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{below=of ry0}
-        \xform{rx0d}{(r{=}0) \limplies \bForm}{above=of rx0}
+        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{above=of ry0}
+        \xform{rx0d}{(r{=}0) \limplies \bForm}{below=of rx0}
         \xform{ry0d}{(s{=}0) \limplies \bForm}{right=of rx0d}
         \xform{wz0i}{\bForm}{above=of wz0}
         \po{ry0}{wz0}
@@ -447,12 +447,13 @@ associate to the left, with intermediate step:
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx0}{\DR{x}{0}}{}
         \event{ry0}{\DR{y}{0}}{right=of rx0}
-        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{below=of ry0}
-        \xform{rx0d}{(r{=}0) \limplies \bForm}{above=of rx0}
+        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{above=of ry0}
+        \xform{rx0d}{(r{=}0) \limplies \bForm}{below=of rx0}
         \xform{ry0d}{(s{=}0) \limplies \bForm}{right=of rx0d}
-        \xform{wz0i}{\bForm}{right=of ry0d}
+        \xform{wz0i}{\bForm}{right=of rx0ry0d}
         \xo{rx0}{rx0d}
-        \xo{ry0}{ry0d}
+        \xo{ry0}{ry0d}the \emph{independent}
+transformer
         \xo{rx0}{rx0ry0d}
         \xo{ry0}{rx0ry0d}
       \end{tikzinline}}

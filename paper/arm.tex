@@ -329,7 +329,7 @@ the uninterpreted symbol $\RW$.
       \IF{r}\THEN s\GETS x\FI
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{c}{r\mid\DW{x}{0}}{}
+          \event{c}{r\mid\DR{x}{0}}{}
           % \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of c}
           % \xform{x1i}{\lnot\Qw{y}\land\bForm[\TRUE/\Dx{y}]}{below=of x1d}
           % \xo{c}{x1d}
@@ -345,7 +345,7 @@ the uninterpreted symbol $\RW$.
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{b}{\DR{y}{1}}{}
-          \event{c}{\RW\limplies r\mid\DW{x}{0}}{right=of b}
+          \event{c}{\RW\limplies r\mid\DR{x}{0}}{right=of b}
           %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  
@@ -359,12 +359,12 @@ the uninterpreted symbol $\RW$.
       % \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{b}{\DR{y}{1}}{}
-          \event{c}{\FALSE\limplies r\mid\DW{x}{0}}{right=of b}
+          \event{c}{\FALSE\limplies r\mid\DR{x}{0}}{right=of b}
           %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
-  The precondition of $\DWP{x}{0}$ is a tautology, as required.
+  The precondition of $\DRP{x}{0}$ is a tautology, as required.
 \end{example}
 
 \subsection{Full semantics for ARM}
@@ -375,7 +375,7 @@ the uninterpreted symbol $\RW$.
 
 \begin{definition}[$\xCO$/$\xRASC$/$\xDGR$/$\xRRD$]
   \label{def:pomsets-arm}
-  Update \refdef{def:pomsets-trans} to (\ref{L4} unchanged):
+  Update \refdef{def:pomsets-trans} to: % (\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
     $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,

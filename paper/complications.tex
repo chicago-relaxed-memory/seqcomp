@@ -82,7 +82,7 @@
 \end{definition}
 
 \ref{L5} introduces memory references.  It states that to be independent of
-the read, we establish both $\bForm[\aVal/\aReg]$ and $\bForm[\aLoc/\aReg]$.
+the read, we must establish both $\bForm[\aVal/\aReg]$ and $\bForm[\aLoc/\aReg]$.
 If a precondition holds in both circumstances, \ref{S5} allows a local write
 to satisfy the precondition without introducing dependence.
 
@@ -90,7 +90,7 @@ One reading of \ref{L5} is that when satisfying a precondition $\aForm$ it is
 safe to ignore a read as long as $\aForm$ is compatible with both the value
 of the read and the value of the preceding local write.  This begs the
 question: what value must $\aForm$ be compatible with in the case that the
-pomset is empty?  In this case, there is no value $\aVal$ to check!
+pomset is empty?  In this case, there is no value $\aVal$ to check.
 Therefore the best we can do is to emulate skip, as in \ref{L6}.  In order to
 eventually arrive at a top-level pomset, this means that subsequent code must
 be independent of $\aReg$.
@@ -240,7 +240,7 @@ most once in a program.  We relax this by renaming.
       \PR{x}{r} 
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \eventl{e}{a0}{\DR{x}{0}}{}
+          \eventl{e}{a0}{\DR{x}{1}}{}
           \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm[r/r]}{below=of a0}
         \end{tikzinline}}    
     \end{gathered}
@@ -270,7 +270,7 @@ most once in a program.  We relax this by renaming.
       \PR{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and .5em]
-          \eventl{e}{a0}{\DR{x}{0}}{}
+          \eventl{e}{a0}{\DR{x}{1}}{}
           \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm[r/s]}{right=of a0}
         \end{tikzinline}}    
     \end{gathered}
@@ -293,7 +293,7 @@ most once in a program.  We relax this by renaming.
       \IF{r{\geq}s}\THEN y\GETS1 \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \eventl{e}{a0}{\DR{x}{0}}{}
+          \eventl{e}{a0}{\DR{x}{1}}{}
           \event{a2}{(1{=}r\lor x{=}r)\limplies r{=}r\mid\DW{y}{1}}{right=of a0}      
         \end{tikzinline}}    
     \end{gathered}
@@ -663,7 +663,7 @@ pomset, unlike \jjr{}.
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
-  Dropping $c$ and merging, we have:
+  Merging, we have:
   %Thus, the disjunction closure also includes both of the following: % By using \!$\PAR$\!, it also includes:
   \begin{align*}
     \begin{gathered}
@@ -674,9 +674,10 @@ pomset, unlike \jjr{}.
       \FI
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
-          \eventl{d}{a}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{}
-          \eventl{e}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of a}
-          \wk{a}{b}
+          \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
+          \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
+          \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
+          \wk{b}{c}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -695,9 +696,10 @@ pomset, unlike \jjr{}.
   %   \end{gathered}
   % \end{align*}
   The precondition of $\DWREF{0}{0}$ is a tautology; however, this is not
-  possible for $(\REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r)$ alone.
-
-  If-closure, as in Figure~\ref{fig:full}, enables this execution:
+  possible for $(\REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r)$ alone, using \refdef{def:pomsets-addr}.
+  %
+  The full semantics, given in Figure~\ref{fig:full}, enables this execution using if-closure.  The
+  individual commands have the pomsets:
   \begin{align*}
     \begin{gathered}
       \REF{r} \GETS 0
@@ -717,8 +719,9 @@ pomset, unlike \jjr{}.
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
-  These pomsets contain inconsistent preconditions.  This is disallowed in
-  \jjr{}, but allowed here.  Sequencing, we have: 
+  % These pomsets contain inconsistent preconditions.  This is disallowed in
+  % \jjr{}, but allowed here.
+  Sequencing and merging, we have: 
   \begin{align*}
     \begin{gathered}
       \REF{r} \GETS 0
