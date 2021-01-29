@@ -310,7 +310,7 @@ the uninterpreted symbol $\RW$.
   \begin{enumerate}
   \item[\ref{L5})]
     % $\aTr{\cEvs}{\bForm}$ implies $\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$,
-    $\aTr{\cEvs}{\bForm}$ implies $\RW\limplies\bForm$,
+    $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
   \end{enumerate}  
 \end{definition}
 
@@ -322,7 +322,7 @@ the uninterpreted symbol $\RW$.
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
           \event{b}{\DR{y}{1}}{}
-          \xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
+          \xform{x1i}{(1{=}r\lor\RW)\limplies\bForm}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  
     &&
@@ -346,7 +346,7 @@ the uninterpreted symbol $\RW$.
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{b}{\DR{y}{1}}{}
-          \event{c}{\RW\limplies r\mid\DR{x}{0}}{right=of b}
+          \event{c}{(1{=}r\lor\RW)\limplies r\mid\DR{x}{0}}{right=of b}
           %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  
@@ -360,7 +360,7 @@ the uninterpreted symbol $\RW$.
       % \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{b}{\DR{y}{1}}{}
-          \event{c}{\FALSE\limplies r\mid\DR{x}{0}}{right=of b}
+          \event{c}{(1{=}r\lor\FALSE)\limplies r\mid\DR{x}{0}}{right=of b}
           %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  

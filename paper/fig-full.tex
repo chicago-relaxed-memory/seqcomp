@@ -174,11 +174,11 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   $\aTr{\bEvs}{\bForm}$ implies
   \begin{math}
     \cForm_\aEv
-    \limplies (\cExp{=}\dVal)
-    \limplies (\aVal_\aEv{=}\uReg{\aEv})
+    \limplies (\cVal{=}\dVal)
+    \limplies (\cExp{=}\dVal\limplies\aVal_\aEv{=}\uReg{\aEv})
     \limplies \bForm[\uReg{\aEv}/\aReg]%[\uReg{\aEv}/\REF{\dVal}]
   \end{math},
-  \makebox[5.75cm]{}
+  \makebox[6.2cm]{}
 \item[\ref{L5})] 
   \begin{math}
     (\forall\dVal)
@@ -191,7 +191,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     \limplies \PBR{        
       %\lnot\QxREF{\dVal}\land
       \DL{\REF{\dVal}}{\amode} \land
-      (\RW
+      ((\aVal_\aEv{=}\uReg{\aEv}\lor\RW)
       \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor\REF{\dVal}{=}\uReg{\aEv}) 
       \limplies
       \bForm

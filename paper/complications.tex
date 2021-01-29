@@ -314,7 +314,7 @@ most once in a program.  We relax this by renaming.
 
 \begin{figure*}
   \begin{center}
-    \begin{minipage}{0.905\textwidth}
+    \begin{minipage}{1\textwidth}
       \input{fig-full}
       % \input{fig-full-where}
       % \input{fig-full-noco}
@@ -634,7 +634,7 @@ pomset, unlike \jjr{}.
   \begin{enumerate}
   \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
   \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
-  \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\cVal{=}\dVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+  \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cVal{=}\dVal \limplies (\cExp{=}\dVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
     % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
     % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
   \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
