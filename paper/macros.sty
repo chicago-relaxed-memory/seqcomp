@@ -2,6 +2,7 @@
 \newcommand{\noOR}[1]{}
 \newcommand{\refdef}[1]{Def~\ref{#1}}
 \newcommand{\refex}[1]{Ex~\ref{#1}}
+\newcommand{\refexs}[2]{Ex~\ref{#1}/\ref{#2}}
 \newcommand{\aState}{\sigma}
 \newcommand{\bState}{\rho}
 \newcommand{\suchthat}{\mid}
@@ -126,10 +127,12 @@
 \NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}_{#3}}
 \NewDocumentCommand\DR{O{} m O{} m}{\mathsf{R}^{\ifshowRA#1\fi}_{#3}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}
 \NewDocumentCommand\DRP{O{} m O{} m}{\PBR{\DR[#1]{#2}[#3]{#4}}}
+\NewDocumentCommand\PRP{O{} m O{} m}{\PBR{\PR[#1]{#2}[#3]{#4}}}
 
 \NewDocumentCommand\PW{O{} m O{} m}{{#2}^{#1}_{#3} \GETS #4}
 \NewDocumentCommand\DW{O{} m O{} m}{\mathsf{W}^{\ifshowRA#1\fi}_{#3}\ifnotempty{#2}{\mkern0mu#2\ifnotempty{#4}{\mkern1mu#4}}}
 \NewDocumentCommand\DWP{O{} m O{} m}{\PBR{\DW[#1]{#2}[#3]{#4}}}
+\NewDocumentCommand\PWP{O{} m O{} m}{\PBR{\PW[#1]{#2}[#3]{#4}}}
 
 \NewDocumentCommand\PRREF{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{\REF{#2}}^{#1}_{#3}}
 \NewDocumentCommand\DRREF{O{} m O{} m}{\mathsf{R}^{#1}_{#3}\ifnotempty{#2}{\mkern1mu\REF{#2}\ifnotempty{#4}{\mkern1mu#4}}}

@@ -680,6 +680,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
 \end{example}
 
 \subsection{Pomsets with Predicate Transformers}
+\label{sec:pomsets-trans}
 
 Having reviewed the work we are building on, we now turn to
 the contribution of this paper, which is a model of \emph{pomsets with predicate transformers}.
@@ -748,8 +749,8 @@ the identity transformer.
     $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
   \item[{\labeltext[T3]{T3)}{T3}}] % \label{thread-kappa}
     $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$.
-    \newcounter{pomsetXThreadCount}
-    \setcounter{pomsetXThreadCount}{\value{enumi}}
+    % \newcounter{pomsetXThreadCount}
+    % \setcounter{pomsetXThreadCount}{\value{enumi}}
   \end{enumerate}  
 
   \noindent
@@ -764,8 +765,8 @@ the identity transformer.
     $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$, 
   \item[{\labeltext[F4]{F4)}{F4}}] % \label{fork-tau} 
     $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
-    \newcounter{pomsetXForkCount}
-    \setcounter{pomsetXForkCount}{\value{enumi}}
+    % \newcounter{pomsetXForkCount}
+    % \setcounter{pomsetXForkCount}{\value{enumi}}
   \end{enumerate}  
 \end{definition}
 
@@ -1395,6 +1396,7 @@ order.
 \end{example}
 
 \begin{example}
+  \label{ex:skolem}
   The predicate transformer we have chosen for \ref{L4} is different from the
   one used traditionally, which is written using substitution.  Substitution
   is also used in \jjr{}.  Attempting to

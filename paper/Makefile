@@ -2,13 +2,17 @@ paper:
 	rm  -f paper.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error paper.tex
 	killall Skim
+appendix:
+	rm  -f appendix.pdf
+	latexmk -xelatex --pvc --pdf --halt-on-error appendix.tex
+	killall Skim
 x:
 	rm  -f x.pdf
-	latexmk --pvc --pdf --halt-on-error x.tex
+	latexmk -xelatex --pvc --pdf --halt-on-error x.tex
 	killall Skim
 talk:
 	rm  -f talk.pdf
-	latexmk --pvc --pdf --halt-on-error talk.tex
+	latexmk -xelatex --pvc --pdf --halt-on-error talk.tex
 	killall Skim
 clean:
 	latexmk -c

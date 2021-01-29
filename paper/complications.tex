@@ -1,7 +1,7 @@
 \section{Other Features} %Local Invariant Reasoning, Register Recycling, If-Closure and Address Calculation}
 \label{sec:complications}
 
-\subsection{Local Invariant Reasoning ($\xLIR$)}
+\subsection{Local Invariant Reasoning (\xLIR)}
 \label{sec:tc1}
 
 \begin{example}
@@ -77,7 +77,7 @@
     $\aTr{\cEvs}{\bForm}$ implies
     $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
   \item[{\labeltext[L6]{L6)}{L6}}] 
-    $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, $\aEvs=\emptyset$.
+    $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
 \end{definition}
 
@@ -161,7 +161,7 @@ It is worth emphasizing that this reasoning is local, and therefore
 unaffected by the introduction of additional threads, as in Test Case 9
 \citep{PughWebsite}.
 
-\subsection{Register Recycling ($\xRecycle$)}
+\subsection{Register Recycling (\xRecycle)}
 \label{sec:recycle}
 
 The semantics considered thus far assume that each register is assigned at
@@ -220,7 +220,7 @@ most once in a program.  We relax this by renaming.
 \end{example}
 
 
-\begin{definition}[$\xRecycle$]
+\begin{definition}[\xRecycle]
   \label{def:pomsets-recycle}
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
@@ -302,7 +302,7 @@ most once in a program.  We relax this by renaming.
 \end{example}
 
 
-\subsection{If-Closure ($\xIF$)}
+\subsection{If-Closure (\xIF)}
 \label{sec:if}
 
 % x+0 = x
@@ -447,7 +447,7 @@ most once in a program.  We relax this by renaming.
 % The difficulty is that any pomset can contain at most one event for the
 % middle store.  
 
-\begin{definition}[$\xRecycle$/$\xIF$]
+\begin{definition}[\xRecycle/\xIF]
   \label{def:pomsets-if}
   Update \refdef{def:pomsets-trans} to:
 
@@ -487,6 +487,7 @@ most once in a program.  We relax this by renaming.
 \end{definition}
 
 \begin{example}
+  \label{ex:if2}
   Revisiting \refex{ex:if1}, we can split the middle command:
   \begin{align*}
     \begin{gathered}
@@ -614,9 +615,9 @@ pomset, unlike \jjr{}.
 %   \end{align*}
 % \end{example}
 
-\subsection{Address Calculation ($\xADDR$)}
+\subsection{Address Calculation (\xADDR)}
 
-\begin{definition}[$\xADDR$]
+\begin{definition}[\xADDR]
   \label{def:pomsets-addr}
   Update \refdef{def:pomsets-trans} to existentially quantify over $\cVal$
   in $\sSTORE{}{}$ and $\sLOAD{}{}$:
@@ -633,7 +634,7 @@ pomset, unlike \jjr{}.
   \begin{enumerate}
   \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
   \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
-  \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \aVal{=}\aReg\limplies\bForm$, 
+  \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\cVal{=}\dVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
     % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
     % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
   \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.

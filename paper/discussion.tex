@@ -1,7 +1,4 @@
-\section{Discussion}
-\label{sec:discussion}
-
-\subsection{Relation to Traditional Predicate Transformers}
+\section{Relation to Traditional Predicate Transformers}
 
 \begin{proposition}
   If $\aPS\in\sem{\aCmd}$ is top-level and quiescent then 
@@ -63,133 +60,8 @@ Let $\aPS_i\in\sem{\aCmd_i}$.
   $\fwp{\aCmd}{\aForm}\aSub$
 \end{proposition}
 
-\subsection{[r/x] v [x/r]}
-
-[I have a note: TC1: Track local state ???]
-
-\begin{gather*}
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a2}{\DR{x}{2}}{}
-      \event{a3}{(x{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{(x{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-    \end{tikzinline}}
-\end{gather*}
-Without substitution:
-\begin{gather*}
-  \PR{x}{r}\SEMI
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{2}}{below=of a1}
-      \event{a3}{1{=}r\limplies  (x{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
-      \event{a4}{1{=}r\limplies  (x{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-      \po{a1}{a3}
-      \po[out=-20,in=177]{a1}{a4}
-    \end{tikzinline}}
-\end{gather*}
-Prepending $\PW{x}{0}$
-\begin{gather*}
-  % \PW{x}{0}\SEMI
-  % \PR{x}{r}\SEMI
-  % \PR{x}{s}\SEMI
-  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  % \IF{r\land s}\THEN \PW{z}{1}\FI
-  % \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a0}{\DW{x}{0}}{}
-      \event{a1}{\DR{x}{1}}{right=of a0}
-      \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      \event{a4}{\DW{z}{1}}{right=of a3}
-      % \wk{a0}{a1}
-      % \wk[out=-20,in=-160]{a0}{a2}
-      \po[out=20,in=160]{a1}{a3}
-      \po[out=20,in=160]{a1}{a4}
-      \po[out=-20,in=-160]{a2}{a4}
-    \end{tikzinline}}
-\end{gather*}
-With the substitution $[r/x]$:
-\begin{gather*}
-  \PR{x}{r}\SEMI
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{2}}{below=of a1}
-      \event{a3}{1{=}r\limplies  (r{=}s\lor2{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
-      \event{a4}{1{=}r\limplies  (r{=}s\lor2{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-      \po{a1}{a3}
-      \po[out=-20,in=177]{a1}{a4}
-    \end{tikzinline}}
-\end{gather*}
-Prepending $\PW{x}{0}$
-\begin{gather*}
-  % \PW{x}{0}\SEMI
-  % \PR{x}{r}\SEMI
-  % \PR{x}{s}\SEMI
-  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  % \IF{r\land s}\THEN \PW{z}{1}\FI
-  % \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a0}{\DW{x}{0}}{}
-      \event{a1}{\DR{x}{1}}{right=of a0}
-      \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      \event{a4}{\DW{z}{1}}{right=of a3}
-      % \wk{a0}{a1}
-      % \wk[out=-20,in=-160]{a0}{a2}
-      \po[out=20,in=160]{a1}{a3}
-      \po[out=20,in=160]{a1}{a4}
-      \po{a2}{a3}
-    \end{tikzinline}}
-\end{gather*}
-
-
-\begin{comment}
-  if in L6 we said [x/r], that says we know read the local version...  ignoring
-  the value read...  Perhaps there is some intervening stuff that stops you
-  from seeing the local state, such as release-acquire
-
-  We could potentially get rid of [x/r] If you do two reads, your not allowed
-  to be independent of the second based on the value that was read in the first
-  read.
-
-  x=0; r=x; if (r=1) { s=x; if (s=?) {y=1}}
-  read 1 then 2.
-
-
-  In order for the write to be independent of second read what does its
-  precondition have to be.
-  [r/x] then s==1
-  no sub then s==0
-
-  (s=? | Wy1)
-
-  if (phi) z=1
-  phi = s is even
-  phi = s < 2
-
-  With substitution you are saying you know that the ``local copy'' of x is the
-  same as r.  Sitting in the local cache.  Read might have gone to main
-  memory, but if it did it has updated the cache line so that the local copy is
-  what I just read.
-
-  If second read is a cache hit, then I know that I am seeing the same value.
-
-  If we take substitution out then 
-\end{comment}
-
-
-\subsection{Fork-Join}
+\section{Completed Pomsets and Fork-Join}
+\label{sec:join}
 
 \begin{definition}
   A pomset with predicate transformers $\aPS$ is \emph{completed} if,
@@ -198,7 +70,7 @@ Prepending $\PW{x}{0}$
 \end{definition}
 
 
- It is also possible to put coherence in the independency relation, in which
+It is also possible to put coherence in the independency relation, in which
 case, the semantics of $;$ includes the following.
 \begin{enumerate}
   \setcounter{enumi}{\value{pomsetXSemiCount}}
@@ -265,9 +137,9 @@ rather than fork.]
   $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetXThreadCount}}
-  \item[\ref{thread-E}--\ref{thread-kappa})]
-    as for $\sTHREAD{}$ in Definition~\ref{def:thread},
-  \item if $\TICK$ then $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
+  \item[1--3)]
+    as for $\sTHREAD{}$ in \refdef{def:pomsets-group},
+  \item[{\labeltext[T4]{T4)}{T4}}] if $\TICK$ then $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
   \end{enumerate}    
 
   \noindent
@@ -275,8 +147,8 @@ rather than fork.]
   $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetXForkCount}}
-  \item[\ref{F1x}--\ref{F4x})]
-    as for $\sFORK{}$ in Definition~\ref{def:fork},
+  \item[1--4)]
+    as for $\sFORK{}$ in \refdef{def:pomsets-group},
   \item[{\labeltext[F5]{F5)}{F5}}]
     $\TICK_1$.
   \end{enumerate}    
@@ -335,9 +207,7 @@ following, assuming that each register occurs at most once.
 %   $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\TRUE$.
 
 \noindent
-If $\aPS \in \sSTORE[\amode]{\aLoc}{\aExp}$ then
 \begin{enumerate}
-\item[\ref{S1}--\ref{S2})] as before,
 \item[\ref{S3})]
   $\labelingForm(\aEv)$ implies
   \begin{math}
@@ -360,9 +230,7 @@ If $\aPS \in \sSTORE[\amode]{\aLoc}{\aExp}$ then
 \end{enumerate}
 
 \noindent
-If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
 \begin{enumerate}
-\item[\ref{L1}--\ref{L2})] as before,
 \item[\ref{L3})] $\labelingForm(\aEv)$ implies
   \begin{math}
     \RO
@@ -387,84 +255,338 @@ If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
   \end{math}
 \end{enumerate}  
 
-\subsection{Must Allow Inconsistent Preconditions}
+\section{Substitutions}
 
-See examples in \textsection\ref{sec:if}.
-
-Removing the requirements for
-\emph{consistency} and \emph{causal strengthening}, and
-
-[The definition does not give a sensible notion of completed execution
-without consistency and causal strengthening.]
-
-%Item \ref{pre-reorder} does not impose coherence.
-
-
-\subsection{Skolemization}
-
-\jjr{} is non-skolemized, using substitution instead, and collapsing $\aLoc$
-and $\aReg$.
-There, item \ref{loadpre-kappa2}  of $\sLOADPRE{}{}{}$ is written 
-\begin{enumerate}
-\item[] %[\ref{loadpre-kappa2})]
-  if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-  $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
-  $\labelingForm(\aEv)$ implies
-  $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
-\end{enumerate}
-
-
-\jjr{} is non-skolemized---with $[x/r]$ rather than no substitution.
+It is also possible to collapse $\aLoc$ and $\aReg$ in the semantics of
+this paper:
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aLoc/\aReg][\aVal/\aLoc]$, 
-% \item[\ref{L5})]
-%   $\aTr{\emptyset}{\bForm}\;$ implies $\bForm[\aLoc/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$,
-\item[\ref{L6})]
-  $\aTr{\emptyset}{\bForm}\;$ implies $(\forall\aReg)\bForm$.
+  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm[\aReg/\aLoc]$, 
+\item[\ref{L5})]
+  $\aTr{\cEvs}{\bForm}$ implies
+  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm[\aReg/\aLoc]$. %, when $\aEvs\neq\emptyset$,
+  % \item[\ref{L6})] 
+  %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
 \end{enumerate}
+This semantics is incomparable to that the version without the substitution
+of $[r/x]$.
 
-[Skolemization ensures disjunction closure, which is necessary
-for associativity. Show example.]
+\begin{example}
+  Consider the following:
+  \begin{gather*}
+    \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+    \IF{r\land s}\THEN \PW{z}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a3}{r\land s\;\mathsf{even}\mid\DW{y}{1}}{}
+        \event{a4}{r\land s\mid\DW{z}{1}}{below=of a3}
+      \end{tikzinline}}
+  \end{gather*}
+  Prepending $\PRP{x}{s}$, we get the same result regardless of whether we
+  substitute $[s/x]$, since $x$ does not occur in either precondition.  Here
+  we show the independent case:
+  \begin{gather*}
+    \PR{x}{s}\SEMI
+    \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+    \IF{r\land s}\THEN \PW{z}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a2}{\DR{x}{2}}{}
+        \event{a3}{(2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{above right=of a2}
+        \event{a4}{(2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+      \end{tikzinline}}
+  \end{gather*}
+  Prepending $\PRP{x}{r}$, we now get different results since the
+  preconditions mention $x$.
+  Without substitution:
+  \begin{gather*}
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+    \IF{r\land s}\THEN \PW{z}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{x}{2}}{below=of a1}
+        \event{a3}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
+        \event{a4}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+        \po{a1}{a3}
+        \po[out=-20,in=177]{a1}{a4}
+      \end{tikzinline}}
+  \end{gather*}
+  Prepending $\PWP{x}{0}$, which substitutes $[0/x]$, the precondition of
+  $\DWP{y}{1}$ becomes
+  $(1{=}r\limplies (2{=}s\lor0{=}s)\limplies (r\land s\;\mathsf{even}))$,
+  which is a tautology, whereas the precondition of $\DW{z}{1}$ becomes
+  $(1{=}r\limplies(2{=}s\lor0{=}s)\limplies (r\land s))$,
+  which is not.   In order to be top-level, $\DW{z}{1}$ must depend on
+  $\DR{x}{2}$; in this case the precondition becomes
+  $(1{=}r\limplies2{=}s\limplies (r\land s))$, which is a tautology.  
+  \begin{gather*}
+    % \PW{x}{0}\SEMI
+    % \PR{x}{r}\SEMI
+    % \PR{x}{s}\SEMI
+    % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+    % \IF{r\land s}\THEN \PW{z}{1}\FI
+    % \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        \event{a1}{\DR{x}{1}}{right=of a0}
+        \event{a2}{\DR{x}{2}}{right=of a1}
+        \event{a3}{\DW{y}{1}}{right=of a2}
+        \event{a4}{\DW{z}{1}}{right=of a3}
+        % \wk{a0}{a1}
+        % \wk[out=-20,in=-160]{a0}{a2}
+        \po[out=20,in=160]{a1}{a3}
+        \po[out=20,in=160]{a1}{a4}
+        \po[out=-20,in=-160]{a2}{a4}
+      \end{tikzinline}}
+  \end{gather*}
+  The situation reverses with the substitution $[r/x]$:
+  \begin{gather*}
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+    \IF{r\land s}\THEN \PW{z}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{x}{2}}{below=of a1}
+        \event{a3}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
+        \event{a4}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+        \po{a1}{a3}
+        \po[out=-20,in=177]{a1}{a4}
+      \end{tikzinline}}
+  \end{gather*}
+  Prepending $\PWP{x}{0}$:
+  \begin{gather*}
+    % \PW{x}{0}\SEMI
+    % \PR{x}{r}\SEMI
+    % \PR{x}{s}\SEMI
+    % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+    % \IF{r\land s}\THEN \PW{z}{1}\FI
+    % \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        \event{a1}{\DR{x}{1}}{right=of a0}
+        \event{a2}{\DR{x}{2}}{right=of a1}
+        \event{a3}{\DW{y}{1}}{right=of a2}
+        \event{a4}{\DW{z}{1}}{right=of a3}
+        % \wk{a0}{a1}
+        % \wk[out=-20,in=-160]{a0}{a2}
+        \po[out=20,in=160]{a1}{a3}
+        \po[out=20,in=160]{a1}{a4}
+        \po{a2}{a3}
+      \end{tikzinline}}
+  \end{gather*}
+  The dependency has changed from $\DRP{x}{2}\xpo\DWP{z}{1}$ to
+  $\DRP{x}{2}\xpo\DWP{y}{1}$.  The resulting sets of pomsets are
+  incomparable.
+\end{example}
 
-\subsection{Reads Update Local State}
-In the rule for read prefixing we have substituted $[r/x]$, rather than
-$[x/r]$.  This means that reads clobber local state.  We assume registers are
-only used once---otherwise, one needs to generate a fresh register for the
-substitution.
-
-With read-read dependencies, this difference can be seen.  For example, the
-following execution is allowed with $[x/r]$, but not $[r/x]$.
-\begin{gather*}
-  \PW{x}{0}\SEMI
-  \PR{x}{r}\SEMI
-  \IF{r}\THEN \PR{x}{s}\FI\SEMI
-  \PW{y}{s{+}1}
-  \PAR
-  \PW{x}{\PR{y}{}}
-  \\[-1ex]
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{0}}{}
-      \event{a2}{\DW{x}{1}}{right=of a1}
-      \event{a3}{\DR{x}{0}}{right=of a2}
-      \event{a4}{\DW{y}{1}}{right=of a3}
-      \event{b1}{\DR{y}{1}}{right=3em of a4}
-      \event{b2}{\DW{x}{1}}{right=of b1}
-      \wk{a1}{a2}
-      \po{a2}{a3}
-      \po{b1}{b2}
-      \rf{a4}{b1}
-      \rf[out=165,in=15]{b2}{a2}
-    \end{tikzinline}}
-\end{gather*}
-[Is there a difference w/o read-read dependencies?]
-
-[Don't need extended expressions anymore, since never substituting with $x$
-for anything.]
+Thinking in terms of hardware, the difference is whether reads update the
+cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
+cache, whereas without the substitution, they do not.  Since most caches work
+this way, the model with $[r/x]$ is likely preferred for modeling hardware.
+In a software model, however, we see no reason to prefer one of these over
+the other.
 
 
+\begin{comment}
+  if in L6 we said [x/r], that says we know read the local version...  ignoring
+  the value read...  Perhaps there is some intervening stuff that stops you
+  from seeing the local state, such as release-acquire
 
-\subsection{Parallel Composition}
+  We could potentially get rid of [x/r] If you do two reads, your not allowed
+  to be independent of the second based on the value that was read in the first
+  read.
+
+  x=0; r=x; if (r=1) { s=x; if (s=?) {y=1}}
+  read 1 then 2.
+
+
+  In order for the write to be independent of second read what does its
+  precondition have to be.
+  [r/x] then s==1
+  no sub then s==0
+
+  (s=? | Wy1)
+
+  if (phi) z=1
+  phi = s is even
+  phi = s < 2
+
+  With substitution you are saying you know that the ``local copy'' of x is the
+  same as r.  Sitting in the local cache.  Read might have gone to main
+  memory, but if it did it has updated the cache line so that the local copy is
+  what I just read.
+
+  If second read is a cache hit, then I know that I am seeing the same value.
+
+  If we take substitution out then 
+\end{comment}
+
+
+\section{Differences with OOPSLA}
+\label{sec:diff}
+
+\subsubsection*{Substitution}
+
+\jjr{} uses substitution rather than Skolemizing.  Indeed our use of
+Skolemization is motivated by disjunction closure for predicate transformers,
+which do not appear in \jjr{}; see \textsection\ref{sec:pomsets-trans}.
+
+In \textsection\ref{sec:tc1}, we give the semantics of load for nonempty
+pomsets as:
+\begin{enumerate}
+\item[\ref{L4})]
+  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+\item[\ref{L5})]
+  $\aTr{\cEvs}{\bForm}$ implies
+  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$. %, when $\aEvs\neq\emptyset$,
+  % \item[\ref{L6})] 
+  %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+\end{enumerate}
+In \jjr{}, the definition is roughly as follows:
+% (adding the case for $\ref{L6}$, which was missing):
+\begin{enumerate}
+\item[\ref{L4})]
+  $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]$, 
+\item[\ref{L5})]
+  $\aTr{\cEvs}{\bForm}\;$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
+  % \item[\ref{L6})]
+  %   $\aTr{\dEvs}{\bForm}\;$ implies $(\forall\aReg)\bForm$, when $\aEvs=\emptyset$.
+\end{enumerate}
+These substitutions collapse $\aLoc$ and $\aReg$, allowing local invariant
+reasoning, as in \textsection\ref{sec:tc1}.  Without Skolemizing it is
+necessary to substitute $[\aLoc/\aReg]$, since the reverse substitution
+$[\aReg/\aLoc]$ is useless when $\aReg$ is bound.
+
+Removing the substitution of $[x/r]$ in the independent case has a small
+technical advantage: we no longer require \emph{extended} expressions (which
+include memory references), since substitutions no longer introduce memory
+references.
+
+\begin{example}
+  The substitution $[x/r]$ does not work with Skolemization, even for the
+  dependent case.  It forces the reads to the same values.
+  \begin{enumerate}
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$, 
+    % \item[\ref{L5})]
+    %   $\aTr{\cEvs}{\bForm}$ implies
+    %   $(\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
+    % \item[\ref{L6})] 
+    %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+  \end{enumerate}
+  For example
+  \begin{gather*}
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r{<}s}\THEN \PW{y}{1}\FI 
+    \\
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{x}{2}}{right=of a1}
+        \event{a3}{1{=}x\limplies 2{=}x\limplies x{<} x\mid\DW{y}{1}}{right=of a2}
+        \po[out=20,in=160]{a1}{a3}
+        \po{a2}{a3}
+      \end{tikzinline}}
+  \end{gather*}
+\end{example}
+
+
+% There, item \ref{loadpre-kappa2}  of $\sLOADPRE{}{}{}$ is written 
+% \begin{enumerate}
+% \item[] %[\ref{loadpre-kappa2})]
+%   if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
+%   $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
+%   $\labelingForm(\aEv)$ implies
+%   $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
+% \end{enumerate}
+
+
+% [Skolemization ensures disjunction closure, which is necessary
+% for associativity. Show example.]
+
+\subsubsection*{Consistency}
+\jjr{} imposes \emph{consistency} and \emph{causal strengthening}.  To see
+that we must allow inconsistent preconditions, see \textsection\ref{sec:if}.
+
+\begin{example}
+  % The lack of causal strengthening does not cause thin-air executions, as it
+  % would in \jjr{}.
+  
+  Consider the following program, from \jjr{\textsection5}, where initially $x=0$, $y=0$, $\REF{0}=0$,
+  $\REF{1}=2$, and $\REF{2}=1$.  It should only be possible to read $0$,
+  disallowing the attempted execution below:
+  \begin{gather*}
+    \begin{gathered}
+      r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      \PAR
+      r\GETS x\SEMI s\GETS \REF{r}\SEMI y\GETS s
+      \\
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{y}{2}}{}
+          \event{a2}{\DR{\REF{2}}{1}}{right=of a1}
+          \event{a3}{\DW{x}{1}}{right=of a2}
+          \po{a2}{a3}
+          \po[out=10,in=170]{a1}{a3}
+          \event{b1}{\DR{x}{1}}{right=3em of a3}
+          \event{b2}{\DR{\REF{1}}{2}}{right=of b1}
+          \event{b3}{\DW{y}{2}}{right=of b2}
+          \po{b2}{b3}
+          \po[out=10,in=170]{b1}{b3}
+          \rf[out=-170,in=-10]{b3}{a1}
+          \rf{a3}{b1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  Using \refdef{def:pomsets-rr} and looking at the left thread:
+  \begin{align*}
+    \begin{gathered}[t]
+      r\GETS y
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{2}}{}
+          \xform{xa}{\RW\limplies\bForm}{below=of a}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      s\GETS \REF{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r\EQ2\mid\DR{\REF{2}}{1}}{}
+          \xform{xb}{1\EQ s \limplies\bForm}{below=of b}
+          \xo{b}{xb}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      x\GETS s
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{s\EQ1\mid\DW{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Composing, we have:
+  \begin{gather*}
+    \begin{gathered}
+      r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      \\
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{y}{2}}{}
+          \event{a2}{\RW\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
+          \event{a3}{\RW\limplies 1\EQ s \limplies s\EQ1\mid\DW{x}{1}}{right=of a2}
+          \po{a2}{a3}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}  
+\end{example}
+
+\subsubsection*{Parallel Composition}
 
 In \jjr{\textsection2.4}, parallel composition is defined allowing coalescing
 of events.  Here we have forbidden coalescing.  This difference appears to be
@@ -472,275 +594,13 @@ arbitrary.  In \jjr{}, however, there is a mistake in the handling of
 termination actions.  The predicates should be joined using $\land$, not
 $\lor$.
 
-\subsection{Redundant Read Elimination}
-\label{sec:redundant}
+\subsubsection*{Internal Acquiring Reads}
 
-Requires indexing to resolve nondeterminism.
-
-\begin{gather*}
-  \taglabel{TC2}
-  \PR{x}{r}\SEMI
-  \PR{x}{s}\SEMI
-  \IF{r{=}s}\THEN \PW{y}{1}\FI
-  \PAR
-  x\GETS y
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{1}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      % \po{a2}{a3}
-      % \po[out=-20,in=-160]{a1}{a3}
-      \event{b1}{\DR{y}{1}}{right=3em of a3}
-      \event{b2}{\DW{x}{1}}{right=of b1}
-      \rf{a3}{b1}
-      \po{b1}{b2}
-      \rf[out=169,in=11]{b2}{a2}
-      \rf[out=169,in=11]{b2}{a1}
-    \end{tikzinline}}
-\end{gather*}
-Precondition of $\DWP{y}{1}$ is $(r{=}s)$ in
-\begin{math}
-  \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
-\end{math}
-Predicate transformers for $\emptyset$ in $\sem{\PR{x}{r}}$ and $\sem{\PR{x}{s}}$ are
-\begin{align*}
-  \PREDP{(r{=}1 \lor r{=}x)\limplies\bForm[r/x]},
-  \\
-  \PREDP{(s{=}1 \lor s{=}x)\limplies\bForm[s/x]}.
-\end{align*}
-Combining the transformers, we have
-\begin{displaymath}
-  \PREDP{(r{=}1 \lor r{=}x)\limplies(s{=}1 \lor s{=}r)\limplies\bForm[s/x]}.
-\end{displaymath}
-Applying this to $(r{=}s)$, we have
-\begin{displaymath}
-  \PREDP{(r{=}1 \lor r{=}x)\limplies (s{=}1 \lor s{=}r)\limplies (r{=}s)},
-\end{displaymath}
-which is not a tautology.
-
-Same problem occurs \jjr{}, where we have:
-\begin{align*}
-  \PREDP{\bForm[v/x,r] \land \bForm[x/r]},
-  \\
-  \PREDP{\bForm[v/x,s] \land \bForm[x/s]}.
-\end{align*}
-Combining the transformers, we have
-\begin{displaymath}
-  \PREDP{\bForm[v/x,r,s] \land \bForm [v/x,r][x/s] \land \bForm[x/r][v/x,s] \land \bForm[x/r,s]}.
-\end{displaymath}
-Applying this to $(r{=}s)$, we have
-\begin{displaymath}
-  \PREDP{v{=}v \land v{=}x \land x{=}v \land x{=}x},
-\end{displaymath}
-which is not a tautology.
-
-The semantics here allows this by coalescing:
-\begin{gather*}
-  r\GETS x\SEMI
-  s\GETS x\SEMI
-  \IF{r{=}s}\THEN y\GETS 1\FI
-  \PAR
-  x\GETS y
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a3}{\DW{y}{1}}{right=of a1}
-      \event{b1}{\DR{y}{1}}{right=3em of a3}
-      \event{b2}{\DW{x}{1}}{right=of b1}
-      \rf{a3}{b1}
-      \po{b1}{b2}
-      \rf[out=169,in=11]{b2}{a1}
-    \end{tikzinline}}
-\end{gather*}
-
-\subsection{Redundant Read Elimination}
-
-In \jjr{\textsection2.6} the semantics of read is defined as follows:
-\begin{align*}
-  \sem{\aReg\GETS\aLoc^\amode\SEMI \aCmd} & \eqdef \textstyle\bigcup_\aVal\;
-  (\DRmode\aLoc\aVal) \prefix \sem{\aCmd} [\aLoc/\aReg]
-\end{align*}
-The definition of prefixing$((\aForm \mid \aAct) \prefix \aPSS)$ has several clauses.
-The most relevant are as follows, where $\bEv$ is the new event labeled with
-$(\aForm \mid \aAct)$ and $\aEv$ is an event from $\aPSS$:
-\begin{description}
-\item[{\labeltextsc[P4c]{(P4c)}{4c}}]
-  If $\bEv$ reads $\aVal$ from $\aLoc$ then either $\aEv=\bEv$ or
-  $\labelingForm'(\aEv)$ implies $\labelingForm(\aEv)[\aVal/\aLoc]$.
-\item[{\labeltextsc[P5a]{(P5a)}{5a}}]\labeltextsc[P5]{}{5}%
-  If $\bEv$ reads and $\aEv$ writes then either $\labelingForm'(\aEv)$
-  implies $\labelingForm(\aEv)$ or $\bEv\le'\aEv$.
-  % \item[{\labeltextsc[P5b]{(P5b)}{5b}}]
-  %   If $\bEv$ and $\aEv$ are in conflict then $\bEv\le'\aEv$.
-\end{description}
-
-We have discovered two issues with this definition.
-
-The first issue concerns the substitution $[\aLoc/\aReg]$.  It should be
-$[\aReg/\aLoc]$.  We noticed this error while developing the alternative
-characterization presented here.  The error causes redundant read elimination
-to fail in \jjr{}.  As a result, common subexpression elimination also fails.
-The problem can be seen in \ref{TC2}.
-\begin{gather*}
-  \taglabel{TC2}
-  r\GETS x\SEMI
-  s\GETS x\SEMI
-  \IF{r{=}s}\THEN y\GETS 1\FI
-  \PAR
-  x\GETS y
-\end{gather*}
-% In \jjr{\textsection3.1},
-We claimed that \ref{TC2} allowed the following
-execution:
-\begin{gather*}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{1}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      % \po{a2}{a3}
-      % \po[out=15,in=165]{a1}{a3}
-      \event{b1}{\DR{y}{1}}{right=3em of a3}
-      \event{b2}{\DW{x}{1}}{right=of b1}
-      \rf{a3}{b1}
-      \po{b1}{b2}
-      \rf[out=169,in=11]{b2}{a2}
-      \rf[out=169,in=11]{b2}{a1}
-    \end{tikzinline}}
-\end{gather*}
-But this execution is not possible using the semantics of \jjr{}:
-$\DWP{y}{1}$ has precondition $r{=}s$ in
-\begin{math}
-  \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
-\end{math}
-Given the lack of order in the execution, the precondition of $\DWP{y}{1}$
-must entail $r{=}1\land r{=}x$ in 
-\begin{math}
-  \sem{s\GETS x\SEMI
-    \IF{r{=}s}\THEN y\GETS 1\FI}.
-\end{math}
-\ref{4c} imposes $r{=}1$, and \ref{5a} imposes $r{=}x$.  Adding the second
-read, the precondition of $\DWP{y}{1}$ must entail both $1{=}1\land 1{=}x$
-and also $x{=}1\land x{=}x$.  This can be simplified to $x{=}1$.  This leaves
-a requirement that must be satisfied by a preceding write.  Since the
-preceding write is the initialization to $0$, the requirement cannot be
-satisfied, and the execution is impossible.\footnote{In \jjr{} we ignore the
-  middle terms, mistakenly simplifying this to $1{=}1\land x{=}x$.
-  Correcting the error, the attempted execution is:
-  \begin{gather*}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a2}{\DR{x}{1}}{right=of a1}
-        \event{a3}{\DW{y}{1}}{right=of a2}
-        \po{a2}{a3}
-        \po[out=-20,in=-160]{a1}{a3}
-        \event{b1}{\DR{y}{1}}{right=3em of a3}
-        \event{b2}{\DW{x}{1}}{right=of b1}
-        \rf{a3}{b1}
-        \po{b1}{b2}
-        \rf[out=169,in=11]{b2}{a2}
-        \rf[out=169,in=11]{b2}{a1}
-      \end{tikzinline}}
-  \end{gather*}}
-
-The substitution $[\aLoc/\aReg]$ leaves the obligation on $\aLoc$ to be
-fulfilled by the preceding write.  Thus, the read does not update the
-\emph{value} of $\aLoc$ in subsequent predicates.  The substitution
-$[\aReg/\aLoc]$, instead, does update the value of $\aLoc$, thus removing any
-obligation on $\aLoc$ for preceding code.
-
-In order to write this, we must update the definition of prefixing reads to
-include the register.  Then \ref{4c} becomes:
-\begin{description}
-\item[\textsc{(p4c)}] If $\bEv$ reads $\aVal$ from $\aLoc$ then either
-  $\aEv=\bEv$ or $\labelingForm'(\aEv)$ implies
-  $\labelingForm(\aEv)[\aVal/\aReg]$.
-\end{description}
-
-We can then reason with \ref{TC2} as follows: $\DWP{y}{1}$ has precondition
-$r{=}s$ in
-\begin{math}
-  \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
-\end{math}
-To avoid introducing order in the execution, the precondition of $\DWP{y}{1}$
-must entail $r{=}1\land r{=}s$ in 
-\begin{math}
-  \sem{s\GETS x\SEMI
-    \IF{r{=}s}\THEN y\GETS 1\FI}.
-\end{math}
-\ref{4c} imposes $r{=}1$, and \ref{5a} imposes $r{=}x$.  Adding the second
-read, the precondition of $\DWP{y}{1}$ must entail both $1{=}1\land 1{=}x$
-and also $x{=}1\land x{=}x$.  This can be simplified to $x{=}1$.  This leaves
-a requirement that must be satisfied by a preceding write.
-
-
-With read elimination, the rule for relaxed reads is as follows:
-\begin{align*}
-  \sem{\PR{\aLoc}{\aReg} \SEMI \aCmd} &\eqdef
-  \sem{\aCmd}[\aLoc/\aReg]
-  \cup
-  \textstyle\bigcup_\aVal\;
-  \DRP{\aLoc}{\aVal} \prefix_{\aReg} %\Rdis{\aLoc}{\aVal}
-  \sem{\aCmd}[\aReg/\aLoc]
-\end{align*}
-It is interesting to note that the substitution is $[\aLoc/\aReg]$ on
-eliminated reads, and $[\aReg/\aLoc]$ on non-eliminated reads.  Intuitively,
-the subsequent value of $\aLoc$ is fixed by an explicit read, but not for an
-eliminated read.  In the latter case, the value is fixed by some preceding
-action.  The preceding action may itself be a read. This gives rise to some
-fear that we might introduce thin-air reads, since we do not enforce
-read-read coherence.  But this is not the case.  Consider the following example:
-\begin{gather*}
-  r\GETS x\SEMI
-  s\GETS x\SEMI
-  y\GETS s
-  \PAR
-  x\GETS y
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{1}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      % \po{a2}{a3}
-      \po[out=-20,in=-160]{a1}{a3}
-      \event{b1}{\DR{y}{1}}{right=3em of a3}
-      \event{b2}{\DW{x}{1}}{right=of b1}
-      \rf{a3}{b1}
-      \po{b1}{b2}
-      \rf[out=169,in=11]{b2}{a2}
-      \rf[out=169,in=11]{b2}{a1}
-    \end{tikzinline}}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \internal{a2}{\DR{x}{1}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      % \po{a2}{a3}
-      \po[out=-20,in=-160]{a1}{a3}
-      \event{b1}{\DR{y}{1}}{right=3em of a3}
-      \event{b2}{\DW{x}{1}}{right=of b1}
-      \rf{a3}{b1}
-      \po{b1}{b2}
-      % \rf[out=169,in=11]{b2}{a2}
-      \rf[out=169,in=11]{b2}{a1}
-    \end{tikzinline}}
-\end{gather*}
-But this is not a problem, since fulfillment requires that $\DWP{x}{1}$
-precede both reads of $x$.
-
-\subsection{Internal Acquiring Reads}
-
-Our solution allows executions that are not allowed under \armeight{} since
-we do not insist that the local relaxed write is actually read from.  This
-may seem counterintuitive, but we don't see a local way to be more precise.
-
-
-The second issue concerns acquiring reads.  Shortly after publication,
-\citet{anton} noticed a shortcoming of the implementation on \armeight{} in
-\jjr{\textsection 7}.  The proof given there assumes that all internal reads
-can be dropped.  However, this is not the case for acquiring reds.  For
-example, \jjr{} disallows the following execution, which is allowed by
-\armeight{} and \tso{}.
+Shortly after publication, \citet{anton} noticed a shortcoming of the
+implementation on \armeight{} in \jjr{\textsection 7}.  The proof given there
+assumes that all internal reads can be dropped.  However, this is not the
+case for acquiring reds.  For example, \jjr{} disallows the following
+execution, which is allowed by \armeight{} and \tso{}.
 \begin{gather*}
   \PW{x}{2}\SEMI 
   \PR[\mRA]{x}{r}\SEMI
@@ -768,12 +628,295 @@ example, \jjr{} disallows the following execution, which is allowed by
 \end{gather*}
 The solution we have adopted is to allow an acquiring read to be downgraded
 to a relaxed read when it is preceded (sequentially) by a relaxed write that
-could fulfill it.  Back-porting this solution to \jjr{} requires that we add
-access predicates to the logic and allow
+could fulfill it.  This solution allows executions that are not allowed under
+\armeight{} since we do not insist that the local relaxed write is actually
+read from.  This may seem counterintuitive, but we don't see a local way to
+be more precise.
 
-\subsection{Triangular Races}
+As a result, we use a different proof strategy for \armeight{}
+implementation, which does not rely on read elimination.  The proof idea uses
+a recent alternative characterization of \armeight{}
+\citep{alglave-git-alternate,arm-reference-manual}. %,armed-cats}.
 
-The notion of data-race is incorrect in \jjr{}.
+\subsubsection*{Redundant Read Elimination}
+
+Contrary to the claim, redundant read elimination fails for \jjr{}.
+We discussed redundant read elimination in \textsection\ref{sec:recycle}.
+Consider JMM Causality Test Case 2, which we discussed there.
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r{=}s}\THEN \PW{y}{1}\FI
+  \PAR
+  x\GETS y
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{1}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{b1}{\DR{y}{1}}{right=3em of a3}
+      \event{b2}{\DW{x}{1}}{right=of b1}
+      \rf{a3}{b1}
+      \po{b1}{b2}
+      \rf[out=169,in=11]{b2}{a2}
+      \rf[out=169,in=11]{b2}{a1}
+    \end{tikzinline}}
+\end{gather*}
+Under the semantics of \jjr{}, we have
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r{=}s}\THEN \PW{y}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{1}}{right=of a1}
+      \event{a3}{1\EQ1\land1\EQ x \land x\EQ1 \land x=x\mid\DW{y}{1}}{right=of a2}
+    \end{tikzinline}}
+\end{gather*}
+The precondition of $\DWP{y}{1}$ is \emph{not} a tautology, and therefore
+redundant read elimination fails.
+(It is a tautology in
+\begin{math}
+  \PR{x}{r}\SEMI
+  \LET{s}{r}\SEMI
+  \IF{r{=}s}\THEN \PW{y}{1}\FI
+\end{math}.)
+In \jjr{\textsection3.1}, we incorrectly stated that the precondition of
+$\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.  
+
+\begin{comment}
+  Precondition of $\DWP{y}{1}$ is $(r{=}s)$ in
+  \begin{math}
+    \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
+  \end{math}
+  Predicate transformers for $\emptyset$ in $\sem{\PR{x}{r}}$ and $\sem{\PR{x}{s}}$ are
+  \begin{align*}
+    \PREDP{(r{=}1 \lor r{=}x)\limplies\bForm[r/x]},
+    \\
+    \PREDP{(s{=}1 \lor s{=}x)\limplies\bForm[s/x]}.
+  \end{align*}
+  Combining the transformers, we have
+  \begin{displaymath}
+    \PREDP{(r{=}1 \lor r{=}x)\limplies(s{=}1 \lor s{=}r)\limplies\bForm[s/x]}.
+  \end{displaymath}
+  Applying this to $(r{=}s)$, we have
+  \begin{displaymath}
+    \PREDP{(r{=}1 \lor r{=}x)\limplies (s{=}1 \lor s{=}r)\limplies (r{=}s)},
+  \end{displaymath}
+  which is not a tautology.
+
+  Same problem occurs \jjr{}, where we have:
+  \begin{align*}
+    \PREDP{\bForm[v/x,r] \land \bForm[x/r]},
+    \\
+    \PREDP{\bForm[v/x,s] \land \bForm[x/s]}.
+  \end{align*}
+  Combining the transformers, we have
+  \begin{displaymath}
+    \PREDP{\bForm[v/x,r,s] \land \bForm [v/x,r][x/s] \land \bForm[x/r][v/x,s] \land \bForm[x/r,s]}.
+  \end{displaymath}
+  Applying this to $(r{=}s)$, we have
+  \begin{displaymath}
+    \PREDP{v{=}v \land v{=}x \land x{=}v \land x{=}x},
+  \end{displaymath}
+  which is not a tautology.
+
+  The semantics here allows this by coalescing:
+  \begin{gather*}
+    r\GETS x\SEMI
+    s\GETS x\SEMI
+    \IF{r{=}s}\THEN y\GETS 1\FI
+    \PAR
+    x\GETS y
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a3}{\DW{y}{1}}{right=of a1}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+  \end{gather*}
+
+  In \jjr{\textsection2.6} the semantics of read is defined as follows:
+  \begin{align*}
+    \sem{\aReg\GETS\aLoc^\amode\SEMI \aCmd} & \eqdef \textstyle\bigcup_\aVal\;
+    (\DRmode\aLoc\aVal) \prefix \sem{\aCmd} [\aLoc/\aReg]
+  \end{align*}
+  The definition of prefixing$((\aForm \mid \aAct) \prefix \aPSS)$ has several clauses.
+  The most relevant are as follows, where $\bEv$ is the new event labeled with
+  $(\aForm \mid \aAct)$ and $\aEv$ is an event from $\aPSS$:
+  \begin{description}
+  \item[{\labeltextsc[P4c]{(P4c)}{4c}}]
+    If $\bEv$ reads $\aVal$ from $\aLoc$ then either $\aEv=\bEv$ or
+    $\labelingForm'(\aEv)$ implies $\labelingForm(\aEv)[\aVal/\aLoc]$.
+  \item[{\labeltextsc[P5a]{(P5a)}{5a}}]\labeltextsc[P5]{}{5}%
+    If $\bEv$ reads and $\aEv$ writes then either $\labelingForm'(\aEv)$
+    implies $\labelingForm(\aEv)$ or $\bEv\le'\aEv$.
+    % \item[{\labeltextsc[P5b]{(P5b)}{5b}}]
+    %   If $\bEv$ and $\aEv$ are in conflict then $\bEv\le'\aEv$.
+  \end{description}
+
+  We have discovered two issues with this definition.
+
+  The first issue concerns the substitution $[\aLoc/\aReg]$.  It should be
+  $[\aReg/\aLoc]$.  We noticed this error while developing the alternative
+  characterization presented here.  The error causes redundant read elimination
+  to fail in \jjr{}.  As a result, common subexpression elimination also fails.
+  The problem can be seen in \ref{TC2}.
+  \begin{gather*}
+    \taglabel{TC2}
+    r\GETS x\SEMI
+    s\GETS x\SEMI
+    \IF{r{=}s}\THEN y\GETS 1\FI
+    \PAR
+    x\GETS y
+  \end{gather*}
+  % In \jjr{\textsection3.1},
+  We claimed that \ref{TC2} allowed the following
+  execution:
+  \begin{gather*}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{x}{1}}{right=of a1}
+        \event{a3}{\DW{y}{1}}{right=of a2}
+        % \po{a2}{a3}
+        % \po[out=15,in=165]{a1}{a3}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        \rf[out=169,in=11]{b2}{a2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+  \end{gather*}
+  But this execution is not possible using the semantics of \jjr{}:
+  $\DWP{y}{1}$ has precondition $r{=}s$ in
+  \begin{math}
+    \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
+  \end{math}
+  Given the lack of order in the execution, the precondition of $\DWP{y}{1}$
+  must entail $r{=}1\land r{=}x$ in 
+  \begin{math}
+    \sem{s\GETS x\SEMI
+      \IF{r{=}s}\THEN y\GETS 1\FI}.
+  \end{math}
+  \ref{4c} imposes $r{=}1$, and \ref{5a} imposes $r{=}x$.  Adding the second
+  read, the precondition of $\DWP{y}{1}$ must entail both $1{=}1\land 1{=}x$
+  and also $x{=}1\land x{=}x$.  This can be simplified to $x{=}1$.  This leaves
+  a requirement that must be satisfied by a preceding write.  Since the
+  preceding write is the initialization to $0$, the requirement cannot be
+  satisfied, and the execution is impossible.\footnote{In \jjr{} we ignore the
+    middle terms, mistakenly simplifying this to $1{=}1\land x{=}x$.
+    Correcting the error, the attempted execution is:
+    \begin{gather*}
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{x}{1}}{}
+          \event{a2}{\DR{x}{1}}{right=of a1}
+          \event{a3}{\DW{y}{1}}{right=of a2}
+          \po{a2}{a3}
+          \po[out=-20,in=-160]{a1}{a3}
+          \event{b1}{\DR{y}{1}}{right=3em of a3}
+          \event{b2}{\DW{x}{1}}{right=of b1}
+          \rf{a3}{b1}
+          \po{b1}{b2}
+          \rf[out=169,in=11]{b2}{a2}
+          \rf[out=169,in=11]{b2}{a1}
+        \end{tikzinline}}
+    \end{gather*}}
+
+  The substitution $[\aLoc/\aReg]$ leaves the obligation on $\aLoc$ to be
+  fulfilled by the preceding write.  Thus, the read does not update the
+  \emph{value} of $\aLoc$ in subsequent predicates.  The substitution
+  $[\aReg/\aLoc]$, instead, does update the value of $\aLoc$, thus removing any
+  obligation on $\aLoc$ for preceding code.
+
+  In order to write this, we must update the definition of prefixing reads to
+  include the register.  Then \ref{4c} becomes:
+  \begin{description}
+  \item[\textsc{(p4c)}] If $\bEv$ reads $\aVal$ from $\aLoc$ then either
+    $\aEv=\bEv$ or $\labelingForm'(\aEv)$ implies
+    $\labelingForm(\aEv)[\aVal/\aReg]$.
+  \end{description}
+
+  We can then reason with \ref{TC2} as follows: $\DWP{y}{1}$ has precondition
+  $r{=}s$ in
+  \begin{math}
+    \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
+  \end{math}
+  To avoid introducing order in the execution, the precondition of $\DWP{y}{1}$
+  must entail $r{=}1\land r{=}s$ in 
+  \begin{math}
+    \sem{s\GETS x\SEMI
+      \IF{r{=}s}\THEN y\GETS 1\FI}.
+  \end{math}
+  \ref{4c} imposes $r{=}1$, and \ref{5a} imposes $r{=}x$.  Adding the second
+  read, the precondition of $\DWP{y}{1}$ must entail both $1{=}1\land 1{=}x$
+  and also $x{=}1\land x{=}x$.  This can be simplified to $x{=}1$.  This leaves
+  a requirement that must be satisfied by a preceding write.
+
+
+  With read elimination, the rule for relaxed reads is as follows:
+  \begin{align*}
+    \sem{\PR{\aLoc}{\aReg} \SEMI \aCmd} &\eqdef
+    \sem{\aCmd}[\aLoc/\aReg]
+    \cup
+    \textstyle\bigcup_\aVal\;
+    \DRP{\aLoc}{\aVal} \prefix_{\aReg} %\Rdis{\aLoc}{\aVal}
+    \sem{\aCmd}[\aReg/\aLoc]
+  \end{align*}
+  It is interesting to note that the substitution is $[\aLoc/\aReg]$ on
+  eliminated reads, and $[\aReg/\aLoc]$ on non-eliminated reads.  Intuitively,
+  the subsequent value of $\aLoc$ is fixed by an explicit read, but not for an
+  eliminated read.  In the latter case, the value is fixed by some preceding
+  action.  The preceding action may itself be a read. This gives rise to some
+  fear that we might introduce thin-air reads, since we do not enforce
+  read-read coherence.  But this is not the case.  Consider the following example:
+  \begin{gather*}
+    r\GETS x\SEMI
+    s\GETS x\SEMI
+    y\GETS s
+    \PAR
+    x\GETS y
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{x}{1}}{right=of a1}
+        \event{a3}{\DW{y}{1}}{right=of a2}
+        % \po{a2}{a3}
+        \po[out=-20,in=-160]{a1}{a3}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        \rf[out=169,in=11]{b2}{a2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \internal{a2}{\DR{x}{1}}{right=of a1}
+        \event{a3}{\DW{y}{1}}{right=of a2}
+        % \po{a2}{a3}
+        \po[out=-20,in=-160]{a1}{a3}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        % \rf[out=169,in=11]{b2}{a2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+  \end{gather*}
+  But this is not a problem, since fulfillment requires that $\DWP{x}{1}$
+  precede both reads of $x$.
+\end{comment}
+
+\subsubsection*{Triangular Races}
+
+The notion of data-race for local data-race freedom is incorrect in \jjr{}.
 \begin{gather*}
   \PW{x}{1}\SEMI
   \PW[\mRA]{y}{1}\SEMI
@@ -792,7 +935,14 @@ The notion of data-race is incorrect in \jjr{}.
       \rf[out=20,in=160]{a2}{b1}
       \sync{b1}{b2}
     \end{tikzinline}}
-  \\
+\end{gather*}
+Consider the prefix with everything but the read of $x$.  When extending this
+prefix as above, the read sees a stale value.  The local DRF theorem requires
+that whenever such a stale read is possible there is an SC execution that can
+be derived simply by changing the read, and further, that this SC execution
+has a data-race. In this example, there is an SC execution, but it does not
+exhibit a data-race by the definition of \jjr{}.
+\begin{gather*}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
       \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
@@ -805,12 +955,12 @@ The notion of data-race is incorrect in \jjr{}.
       \sync{b1}{b2}
     \end{tikzinline}}
 \end{gather*}
-Bug is in \citep[Lemma A.4]{DBLP:conf/ppopp/DongolJR19}.  It assumes that
-$\DRP[\mRA]{x}{1}$ and $\DWP[\mRA]{x}{2}$ are racing in the first execution
-because they are not ordered by happens-before.  But this is false since
-neither is plain.
+This error is inherited from \citep[Lemma A.4]{DBLP:conf/ppopp/DongolJR19},
+which assumes that $\DRP[\mRA]{x}{1}$ and $\DWP[\mRA]{x}{2}$ are racing in
+the first execution because they are not ordered by happens-before.  But this
+is false since neither is plain.
 
-In addition, the \armeight{} implementation result given here does not rely
-on read elimination.  Instead we use a recent alternative characterization of
-\armeight{} \citep{alglave-git-alternate,arm-reference-manual,armed-cats}.
+We believe that the fix to consider a broader notion of data race when
+stating local DRF with mixed-mode access.
+
 

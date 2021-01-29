@@ -6,7 +6,7 @@ We discuss \armeight{} using \emph{external global completion} (\EGC{})
 \cite[\textsection B2.3.6]{arm-reference-manual}
 which is very close to our model.
 
-\subsection{Downgraded Reads ($\xDGR$)}
+\subsection{Downgraded Reads (\xDGR)}
 \label{sec:internal}
 
 
@@ -78,7 +78,7 @@ $\Dx{\aLoc}$.
     &\DS{\aLoc}{\mSC}&=[\FALSE/\D]
   \end{align*}
 \end{definition}
-\begin{definition}[$\xCO$/$\xRASC$/$\xDGR$]
+\begin{definition}[\xCO/\xRASC/\xDGR]
   \label{def:pomsets-down}
   Update \refdef{def:pomsets-ra} to (\ref{L4} unchanged):
   \begin{enumerate}
@@ -246,7 +246,8 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
   by a relaxed write in the same thread.
 \end{example}
 
-\subsection{Removing Read-Read dependencies ($\xRRD$)}
+\subsection{Removing Read-Read dependencies (\xRRD)}
+\label{sec:rrd}
 
 \begin{example}
   \label{ex:rrd1}
@@ -295,7 +296,7 @@ Since we do not distinguish control dependencies from other dependencies, we
 are forced to drop all dependencies between reads.  In order to do so, we use
 the uninterpreted symbol $\RW$.
 
-\begin{definition}[$\xRRD$]
+\begin{definition}[\xRRD]
   \label{def:pomsets-rr}
   Update \refdef{def:pomsets-trans} to:
   \begin{enumerate}
@@ -373,7 +374,7 @@ the uninterpreted symbol $\RW$.
 \textsection\ref{sec:q}--\ref{sec:arm}.  
 % Only \ref{L5} and \ref{T3} are changed from \refdef{def:pomsets-down}.
 
-\begin{definition}[$\xCO$/$\xRASC$/$\xDGR$/$\xRRD$]
+\begin{definition}[\xCO/\xRASC/\xDGR/\xRRD]
   \label{def:pomsets-arm}
   Update \refdef{def:pomsets-trans} to: % (\ref{L4} unchanged):
   \begin{enumerate}
@@ -419,7 +420,7 @@ the uninterpreted symbol $\RW$.
 \end{definition}
 
 \begin{example}
-  $\xRRD$ does not adversely affect subscription (\refex{ex:subscription}).
+  \xRRD{} does not adversely affect subscription (\refex{ex:subscription}).
   \begin{align*}
     \begin{gathered}[t]
       \PR[\mRA]{y}{r}
