@@ -2,8 +2,57 @@
 
 [Todo.]
 
+Dijkstra's predicate transformers do not distinguish thread-local variables
+from shared variables.  Thus, the assignment rule applies to all types of storage:
+\begin{itemize}
+% \item
+%   \begin{math}
+%     \fwp{\SKIP}{\bForm} = \bForm
+%   \end{math}
+% \item 
+%   \begin{math}
+%     \fwp{\ABORT}{\bForm} = \FALSE
+%   \end{math}
+\item
+  \begin{math}
+    \fwp{r\GETS \aExp}{\bForm} = \bForm[\aExp/r]
+  \end{math}
+\item
+  \begin{math}
+    \fwp{r\GETS x\;\;}{\bForm} = \bForm[x/r]
+  \end{math}
+\item
+  \begin{math}
+    \fwp{x\GETS \aExp}{\bForm} = \bForm[\aExp/x]
+  \end{math}
+% \item
+%   \begin{math}
+%     \fwp{\aCmd_1;\aCmd_2}{\bForm} = \fwp{\aCmd_1}{\fwp{\aCmd_2}{\bForm}}
+%   \end{math}
+% \item
+%   \begin{math}
+%     \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm}= {}
+%   \end{math}
+%   \\
+%   \begin{math}
+%     ((\aExp{\ne}0) \limplies \fwp{\aCmd_1}{\bForm}) \land
+%     ((\aExp{=}0) \limplies \fwp{\aCmd_2}{\bForm})
+%   \end{math}
+\end{itemize}
+%Let $\rho:\Reg\fun\Val$ and $\chi:\Loc\fun\Val$ be substitutions.
+Let $\aState$ and $\rho$ range over substitutions in $(\Reg\cup\Loc)\fun\Val$.
+Treating substitutions as states, the big-step operational semantics of
+programs can be defined as a relation $(\aState,\aCmd)\Downarrow\bState$.
+
+Suppose $(\aState,\aCmd)\Downarrow\rho$ and $\aForm=\fwp{\aCmd}{\bForm}$.
+The standard interpretation of the predicate transformers states that if
+$\aForm$ holds in the initial state $\aState$, then $\bForm$ holds in the
+final state $\bState$.  Formally, if $\fwp{\aCmd}{\bForm}\aState$ is a
+tautology and $(\aState,\aCmd)\Downarrow\rho$ then $\bForm\bState$ is a
+tautology.
+
+
 \begin{comment}
-\begin{proposition}
   If $\aPS\in\sem{\aCmd}$ is top-level and quiescent then 
   $\aTr{\aEvs}{\bForm}$ implies $\fwp{\aCmd}{\bForm}$.
 
@@ -11,58 +60,73 @@
   $\aPS\in\sem{\aCmd}$ %that is top-level and quiescent
   such that all preconditions in $\aPS\aSub$ are tautologies then 
   $\fwp{\aCmd}{\bForm}\aSub$
-\end{proposition}
-
-For a language where all programs are
-terminating, we have for any statement $\aCmd$:
-\begin{align*}
-  \hoare{\aForm}{\aCmd}{\bForm} 
-  \;\;\Leftrightarrow\;\;
-  \aForm \textimplies \fwp{\aCmd}{\bForm}
-\end{align*}
-Interpretation is that if $\aState\models\fwp{\aCmd}{\bForm}$ and
-$(\aState,\aCmd)\Downarrow\bState$
-then $\bState\models\bForm$.
-
-Let $\aCmd_0$ be
-\begin{math}
-  \PW{\aLoc_1}{\aVal_1}\SEMI\cdots\SEMI \PW{\aLoc_n}{\aVal_n}, 
-\end{math}
-such that $\fwp{\aCmd_0}{\aForm}$ is a tautology, and $\aLoc_i=\aLoc_j$
-implies $i=j$.
-
-Let $\aSub_\aPS=[{\aVal_1/\aLoc_1},\ldots, {\aVal_n/\aLoc_n}]$ be the final
-state of $\aPS$.
-
-
-For example, let $\aCmd_1=\PR{x}{r}$ and $\aCmd_2=\PW{x}{r{+}1}$ and
-$\aCmd=\aCmd_1\SEMI \aCmd_2$.
-\begin{align*}
-  \fwp{\aCmd_2}{x{>}1}&=(r{+}1{>}1) = (r{>}0)
-  \\
-  \fwp{\aCmd_1}{r{>}0}=\fwp{\aCmd_0}{x{>}1}&=(x{>}0)
-\end{align*}
-Let $\aPS_i\in\sem{\aCmd_i}$.
-\begin{align*}
-  \aTr[2]{\aEvs_2}{x{>}1}&=(r{+}1{>}1) = (r{>}0)
-  \\
-  \aTr[0]{\aEvs_0}{x{>}1}&=(0{=}\aReg \limplies r{>}0)
-  \\
-  \aTr[0]{\aEvs_0}{x{>}1}&=(1{=}\aReg \limplies r{>}0)
-  \\
-  \aTr[0]{\aEvs_0}{x{>}1}&=(2{=}\aReg \limplies r{>}0)
-\end{align*}
-
-\begin{proposition}
-  If $\aPS\in\sem{\aCmd}$ is top-level and quiescent then 
-  $\aTr{\aEvs}{\aForm}$ implies $\fwp{\aCmd}{\aForm}$.
-
-  For any substitution $\aSub=[{\aVal_1/\aReg_1},\ldots, {\aVal_n/\aReg_n}]$ there is some
-  $\aPS\in\sem{\aCmd}$ %that is top-level and quiescent
-  such that all preconditions in $\aPS\aSub$ are tautologies then 
-  $\fwp{\aCmd}{\aForm}\aSub$
-\end{proposition}
 \end{comment}
+
+
+% For a language where all programs are
+% terminating, we have for any statement $\aCmd$:
+% \begin{align*}
+%   \hoare{\aForm}{\aCmd}{\bForm} 
+%   \;\;\Leftrightarrow\;\;
+%   \aForm \textimplies \fwp{\aCmd}{\bForm}
+% \end{align*}
+% Interpretation is that if $\aState\models\fwp{\aCmd}{\bForm}$ and
+% $(\aState,\aCmd)\Downarrow\bState$
+% then $\bState\models\bForm$.
+
+% Let $\aCmd_0$ be
+% \begin{math}
+%   \PW{\aLoc_1}{\aVal_1}\SEMI\cdots\SEMI \PW{\aLoc_n}{\aVal_n}, 
+% \end{math}
+% such that $\fwp{\aCmd_0}{\aForm}$ is a tautology, and $\aLoc_i=\aLoc_j$
+% implies $i=j$.
+
+% Let $\aSub_\aPS=[{\aVal_1/\aLoc_1},\ldots, {\aVal_n/\aLoc_n}]$ be the final
+% state of $\aPS$.
+
+For example:
+\begin{gather}
+  \nonumber
+  (r{>}0) = \fwp{\PW{x}{r{+}1}}{x{>}1}
+  \\
+  \label{wp1}
+  ([5/r], (\PW{x}{r{+}1})) \Downarrow [5/r,6/x]
+  \\
+  \label{wp2}
+  ([0/r], (\PW{x}{r{+}1})) \Downarrow [0/r,1/x]
+\end{gather}
+In \eqref{wp1}, the pre- and post-conditions are satisfied.
+In \eqref{wp2}, they are not.
+
+
+
+% For example, let $\aCmd_1=\PR{x}{r}$ and $\aCmd_2=\PW{x}{r{+}1}$ and
+% $\aCmd=\aCmd_1\SEMI \aCmd_2$.
+% \begin{align*}
+%   \fwp{\aCmd_2}{x{>}1}&=(r{+}1{>}1) = (r{>}0)
+%   \\
+%   \fwp{\aCmd_1}{r{>}0}=\fwp{\aCmd_0}{x{>}1}&=(x{>}0)
+% \end{align*}
+% Let $\aPS_i\in\sem{\aCmd_i}$.
+% \begin{align*}
+%   \aTr[2]{\aEvs_2}{x{>}1}&=(r{+}1{>}1) = (r{>}0)
+%   \\
+%   \aTr[0]{\aEvs_0}{x{>}1}&=(0{=}\aReg \limplies r{>}0)
+%   \\
+%   \aTr[0]{\aEvs_0}{x{>}1}&=(1{=}\aReg \limplies r{>}0)
+%   \\
+%   \aTr[0]{\aEvs_0}{x{>}1}&=(2{=}\aReg \limplies r{>}0)
+% \end{align*}
+
+% \begin{proposition}
+%   If $\aPS\in\sem{\aCmd}$ is top-level and quiescent then 
+%   $\aTr{\aEvs}{\aForm}$ implies $\fwp{\aCmd}{\aForm}$.
+
+%   For any substitution $\aSub=[{\aVal_1/\aReg_1},\ldots, {\aVal_n/\aReg_n}]$ there is some
+%   $\aPS\in\sem{\aCmd}$ %that is top-level and quiescent
+%   such that all preconditions in $\aPS\aSub$ are tautologies then 
+%   $\fwp{\aCmd}{\aForm}\aSub$
+% \end{proposition}
 
 \section{Completed Pomsets and Fork-Join}
 \label{sec:join}
