@@ -308,11 +308,16 @@ the uninterpreted symbol $\RW$.
     $\labelingForm_1(\aEv)[\FALSE/\RW]$ otherwise.
   \end{enumerate}
   \begin{enumerate}
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
     % $\aTr{\cEvs}{\bForm}$ implies $\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$,
     $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
   \end{enumerate}  
 \end{definition}
+\ref{L5} requires $\aTr{\cEvs}{\bForm}$ implies $\bForm$ for writes and
+$\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$ for reads.  For
+reads, the dependent and independent predicate transformers are identical.
 
 \begin{example}
   Revisiting \refex{ex:rrd1} and eliding irrelevant transformers:

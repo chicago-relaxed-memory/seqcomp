@@ -256,7 +256,7 @@ this paper:
 This semantics is incomparable to that the version without the substitution
 of $[r/x]$.
 
-\begin{example}
+\begin{scope}
   Consider the following:
   \begin{gather*}
     \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
@@ -367,7 +367,7 @@ of $[r/x]$.
   The dependency has changed from $\DRP{x}{2}\xpo\DWP{z}{1}$ to
   $\DRP{x}{2}\xpo\DWP{y}{1}$.  The resulting sets of pomsets are
   incomparable.
-\end{example}
+\end{scope}
 
 Thinking in terms of hardware, the difference is whether reads update the
 cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
@@ -452,7 +452,7 @@ technical advantage: we no longer require \emph{extended} expressions (which
 include memory references), since substitutions no longer introduce memory
 references.
 
-\begin{example}
+\begin{scope}
   The substitution $[x/r]$ does not work with Skolemization, even for the
   dependent case.  It forces the reads to the same values.
   \begin{enumerate}
@@ -478,7 +478,7 @@ references.
         \po{a2}{a3}
       \end{tikzinline}}
   \end{gather*}
-\end{example}
+\end{scope}
 
 
 % There, item \ref{loadpre-kappa2}  of $\sLOADPRE{}{}{}$ is written 
@@ -495,12 +495,239 @@ references.
 % for associativity. Show example.]
 
 \subsubsection*{Consistency}
-\jjr{} imposes \emph{consistency} and \emph{causal strengthening}.  To see
-that we must allow inconsistent preconditions, see \textsection\ref{sec:if}.
+\jjr{} imposes \emph{consistency}, which requires that for every pomset
+$\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.  
+\begin{scope}
+  Associativity requires that we allow pomsets with inconsistent
+  preconditions.  Consider a variant of \refex{ex:if1} from
+  \textsection\ref{sec:if}.
+  \begin{scope}
+    \footnotesize
+    \begin{align*}
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{x}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\aExp\mid\DW{x}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\aExp\mid\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\lnot\aExp\mid\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+    \end{align*}
+  \end{scope}
+  Associating left and right, we have:
+  \begin{scope}
+    \footnotesize
+    \begin{align*}
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{x}{1}\FI
+        \SEMI
+        \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\DW{x}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{y}{1}\FI
+        \SEMI
+        \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+    \end{align*}
+  \end{scope}  
+  Associating into the middle, instead, we require:
+  \begin{scope}
+    \footnotesize
+    \begin{align*}
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{x}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\aExp\mid\DW{x}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+        \SEMI
+        \IF{\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
+            \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\lnot\aExp\mid\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+    \end{align*}
+  \end{scope}  
+\end{scope}
 
-\begin{example}
-  The lack of causal strengthening does not cause thin-air executions, as it
-  would in \jjr{}, but the predicate transformers are quite delicate.
+\subsubsection*{Causal Strengthening}
+\jjr{} imposes \emph{causal strengthening}, which requires for every pomset
+$\aPS$, if $\bEv\le\aEv$ then $\labelingForm(\aEv)$ implies
+$\labelingForm(\bEv)$. 
+\begin{scope}
+  Associativity requires that we allow pomsets without causal strengthening.
+  Consider the following.
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\aExp\mid\DR{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{r{=}1\mid\DW{y}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Associating left, with causal strengthening:
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \SEMI
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\aExp\mid\DR{x}{1}}{}
+          \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+          \po{a}{b}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Finally, merging:
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \SEMI
+      \PW{y}{r}
+      \SEMI
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\DR{x}{1}}{}
+          \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+          \po{a}{b}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Instead, associating right:
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\aExp\mid\DR{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{r}
+      \SEMI
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
+          \event{b}{r{=}1\mid\DW{y}{1}}{left=of a}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Merging:
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \SEMI
+      \PW{y}{r}
+      \SEMI
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\DR{x}{1}}{}
+          \event{b}{\DW{y}{1}}{right=of a}
+          \po{a}{b}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  With causal strengthening, the precondition of $\DW{y}{1}$ depends upon how
+  we associate.  This is not an issue in \jjr{}, which always associates to
+  the right.
+\end{scope}
+
+\subsubsection*{Causal Strengthening and Address Dependencies}
+\begin{scope}
+  In order to guarantee that address calculation does not introduce thin-air
+  executions, the predicate transformer for address calculation must be
+  chosen carefully.
+  Combing \refdef{def:pomsets-rr} and \refdef{def:pomsets-addr} we have:
+
+  \newpage
+  
+  \begin{enumerate}
+  % \item[\ref{L4})]
+  %   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  % \item[\ref{L5})]
+  %   $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+    
+  \item[\ref{L4})]
+    $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+  \item[\ref{L5})]
+    $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor\RW) \limplies \bForm$.
+  \end{enumerate}  
   
   Consider the following program, from \jjr{\textsection5}, where initially $x=0$, $y=0$, $\REF{0}=0$,
   $\REF{1}=2$, and $\REF{2}=1$.  It should only be possible to read $0$,
@@ -527,7 +754,7 @@ that we must allow inconsistent preconditions, see \textsection\ref{sec:if}.
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
-  Using \refdef{def:pomsets-rr} with \refdef{def:pomsets-addr} and looking at the left thread:
+  Looking at the left thread:
   \begin{align*}
     \begin{gathered}[t]
       r\GETS y
@@ -570,7 +797,21 @@ that we must allow inconsistent preconditions, see \textsection\ref{sec:if}.
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}  
-\end{example}
+  Substituting for $\RW$:
+  \begin{gather*}
+    \begin{gathered}
+      r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\DR{y}{2}}{}
+          \event{a2}{2{=}r\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
+          \event{a3}{(r\EQ2\limplies 1\EQ s)
+            \limplies s\EQ1\mid\DW{x}{1}}{below right=.5em and -3em of a2}
+          \po{a2}{a3}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}  
+\end{scope}
 
 \subsubsection*{Parallel Composition}
 
@@ -922,7 +1163,7 @@ The notion of data-race for local data-race freedom is incorrect in \jjr{}.
       \sync{b1}{b2}
     \end{tikzinline}}
 \end{gather*}
-Consider the prefix with everything but the read of $x$.  When extending this
+Consider the prefix with everything above but the read of $x$.  When extending this
 prefix as above, the read sees a stale value.  The local DRF theorem requires
 that whenever such a stale read is possible there is an SC execution that can
 be derived simply by changing the read, and further, that this SC execution
