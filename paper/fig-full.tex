@@ -1,3 +1,5 @@
+\renewcommand{\cEvs}{D}
+\renewcommand{\dEvs}{D}
 \noindent
 If $\aPS \in \sSTORE[\amode]{\cExp}{\aExp}$ then
 $(\exists\cVal:\aEvs\fun\Val)$
@@ -24,12 +26,12 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   $\aTr{\bEvs}{\bForm}$ implies 
   \begin{math}
     \cForm_\aEv
-    \limplies (\cExp{=}\cVal_\aEv)
-    \limplies \PBR{
+    %\limplies (\cExp{=}\cVal_\aEv)
+    \limplies {
       \bForm
       [\aExp/\REF{\cVal_\aEv}]
       \DS{\REF{\cVal_\aEv}}{\amode}
-      [(\QwREF{\cVal_\aEv}\land\aExp{=}\aVal_\aEv)/\QwREF{\cVal_\aEv}]
+      [(\QwREF{\cVal_\aEv}\land\aExp{=}\aVal_\aEv\land\cExp{=}\cVal_\aEv)/\QwREF{\cVal_\aEv}]
     }
   \end{math},
 \item[\ref{S5})] 
@@ -39,13 +41,13 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   $\aTr{\cEvs}{\bForm}$ implies
   \begin{math}
     \cForm_\aEv
-    \limplies (\cExp{=}\cVal_\aEv)
-    \limplies \PBR{
+    %\limplies (\cExp{=}\cVal_\aEv)
+    \limplies {
       \bForm
       [\aExp/\REF{\cVal_\aEv}]
       \DS{\REF{\cVal_\aEv}}{\amode}
       [\FALSE/\QS{\REF{\cVal_\aEv}}{\amode}]
-    }.
+    },
   \end{math}
 \item[S6)]%\ref{S6})] 
   \begin{math}
@@ -56,29 +58,29 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
     %(\!\not\exists\aEv\in\aEvs\cap\cEvs \suchthat \cForm_\aEv)
     \limplies (\cExp{=}\dVal)
-    \limplies \PBR{
+    \limplies {
       \bForm
       [\aExp/\REF{\dVal}]
       \DS{\REF{\dVal}}{\amode}
       [\FALSE/\QS{\REF{\dVal}}{\amode}]
     }.
   \end{math}
-\item[S5-6)]%\ref{S6})] 
-  \begin{math}
-    (\forall\dVal)
-  \end{math}
-  $\aTr{\cEvs}{\bForm}$ implies
-  \begin{math}
-    %(\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-    (\!\not\exists\aEv\in\aEvs\cap\cEvs \suchthat \cForm_\aEv)
-    \limplies (\cExp{=}\dVal)
-    \limplies \PBR{
-      \bForm
-      [\aExp/\REF{\dVal}]
-      \DS{\REF{\dVal}}{\amode}
-      [\FALSE/\QS{\REF{\dVal}}{\amode}]
-    }.
-  \end{math}
+% \item[S5-6)]%\ref{S6})] 
+%   \begin{math}
+%     (\forall\dVal)
+%   \end{math}
+%   $\aTr{\cEvs}{\bForm}$ implies
+%   \begin{math}
+%     %(\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+%     (\!\not\exists\aEv\in\aEvs\cap\cEvs \suchthat \cForm_\aEv)
+%     \limplies (\cExp{=}\dVal)
+%     \limplies \PBR{
+%       \bForm
+%       [\aExp/\REF{\dVal}]
+%       \DS{\REF{\dVal}}{\amode}
+%       [\FALSE/\QS{\REF{\dVal}}{\amode}]
+%     }.
+%   \end{math}
   % \\ where 
   % $\DS{}{\mRLX}{}=[\TRUE/\DxREF{\dVal}]$ and otherwise
   % $\DS{}{\amode}{}=[\FALSE/\D]$. % for $\amode\neq\mRLX$.
@@ -200,26 +202,31 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     \limplies (\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv})
     \limplies \bForm[\uReg{\aEv}/\aReg]
   \end{math},
-  \makebox[6.2cm]{}
+  %\makebox[6.2cm]{}
 \item[\ref{L5})] 
   \begin{math}
     (\forall\aEv\in\aEvs\setminus\cEvs)
   \end{math}
   $\aTr{\cEvs}{\bForm}$ implies
   \begin{math}
-    \cForm_\aEv
-    \limplies        
+    \cForm_\aEv 
+    \limplies
+    \DL{\REF{\cVal_\aEv}}{\amode}
+    \land
     \PBRbig{
-      \DL{\REF{\cVal_\aEv}}{\amode} \land
-      \PBRbig{
-        ((\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv})\lor\RW)
-        \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor\REF{\cVal_\aEv}{=}\uReg{\aEv}) 
-        \limplies
-        \bForm
-        [\uReg{\aEv}/\aReg]
-        [\FALSE/\QL{\REF{\cVal_\aEv}}{\amode}]
+      \ABRbig{
+        \PBR{\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}}
+        \lor
+        \PBR{
+          \RW\lor
+          \PBR{\cExp{=}\cVal_\aEv\limplies\REF{\cVal_\aEv}{=}\uReg{\aEv}}
+        }
       }
-    }
+      \limplies
+      \bForm
+      [\uReg{\aEv}/\aReg]
+      [\FALSE/\QL{\REF{\cVal_\aEv}}{\amode}]
+    }    
   \end{math},
 \item[\ref{L6})] 
   \begin{math}

@@ -1,10 +1,11 @@
+\newcommand{\aState}{\sigma}
+\newcommand{\bState}{\rho}
+
 \newcommand{\noSUB}[1]{}
 \newcommand{\noOR}[1]{}
 \newcommand{\refdef}[1]{Def~\ref{#1}}
 \newcommand{\refex}[1]{Ex~\ref{#1}}
 \newcommand{\refexs}[2]{Ex~\ref{#1}/\ref{#2}}
-\newcommand{\aState}{\sigma}
-\newcommand{\bState}{\rho}
 \newcommand{\suchthat}{\mid}
 \newcommand{\TICK}{\checkmark\!}
 % <<<<<<< HEAD
@@ -151,8 +152,11 @@
 \newcommand{\PRED}[2][\aForm]{#2 \mid #1}
 \newcommand{\PREDP}[2][\aForm]{\ABR{\PRED[#1]{#2}}}
 \newcommand{\ABR}[1]{\langle#1\rangle}
+\newcommand{\ABRbig}[1]{\bigl\langle#1\bigr\rangle}
 \newcommand{\PBR}[1]{(#1)}
 \newcommand{\PBRbig}[1]{\bigl(#1\bigr)}
+\newcommand{\SBR}[1]{{[}#1{]}}
+\newcommand{\SBRbig}[1]{\bigl{[}#1\bigr{]}}
 
 % \newcommand{\sem}[2][]{\llbracket#2\rrbracket_{#1}}
 % \NewDocumentCommand\DR{O{} O{} m m}{#2\mathsf{R}^{#1}\ifnotempty{#3}{\mkern1mu#3\ifnotempty{#4}{\mkern1mu#4}}}
