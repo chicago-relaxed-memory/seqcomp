@@ -44,12 +44,14 @@ Let $\aState$ and $\rho$ range over substitutions in $(\Reg\cup\Loc)\fun\Val$.
 Treating substitutions as states, the big-step operational semantics of
 programs can be defined as a relation $(\aState,\aCmd)\Downarrow\bState$.
 
-Suppose $(\aState,\aCmd)\Downarrow\rho$ and $\aForm=\fwp{\aCmd}{\bForm}$.
-The standard interpretation of the predicate transformers states that if
-$\aForm$ holds in the initial state $\aState$, then $\bForm$ holds in the
-final state $\bState$.  Formally, if $\fwp{\aCmd}{\bForm}\aState$ is a
-tautology and $(\aState,\aCmd)\Downarrow\rho$ then $\bForm\bState$ is a
-tautology.
+\begin{itemize}
+\item Precondition: Suppose $(\aState,\aCmd)\Downarrow\rho$ and $\aForm=\fwp{\aCmd}{\bForm}$.
+  If $\aForm\aState$ is a tautology then $\bForm\bState$ is a tautology.
+\item Weakest: If $\aForm'\aState$ is a tautology, then $\aForm$ implies $\aForm'$.
+\end{itemize}
+Weakest preconditions are \emph{sound} in that if $\aForm$ holds in the
+initial state $\aState$, then $\bForm$ holds in the final state $\bState$.
+Formally, 
 
 
 \begin{comment}
