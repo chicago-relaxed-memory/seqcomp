@@ -1,57 +1,201 @@
 \section{Relation to Traditional Predicate Transformers}
 
-[Todo.]
+We compare traditional transformers to the dependent-case transformers of
+\refdef{def:pomsets-lir}.  Because we only consider the dependent case, we
+drop the superscript $\aEvs$ on $\aTr{\aEvs}{}$ throughout this section.  We
+also assume that each register appears at most once in a program, as we did
+throughout \textsection\ref{sec:model}--\ref{sec:arm}.
 
-Dijkstra's predicate transformers do not distinguish thread-local variables
-from shared variables.  Thus, the assignment rule applies to all types of storage:
-\begin{itemize}
+We are not interested in isolating the \emph{weakest} precondition.  Thus we
+think of transformers as Hoare triples.  In addition, all programs in our
+language are strongly normalizing, so we need not distinguish strong and weak
+correctness.  In this setting, the Hoare triple
+$\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when
+$\aForm \limplies \fwp{\aCmd}{\bForm}$.
+
+Hoare triples do not distinguish thread-local variables from shared
+variables.  Thus, the assignment rule applies to all types of storage. The
+rules can be written as follows:
+\begin{align*}
+  % \fwp{x\GETS \aExp}{\bForm} &= (\forall y)\; y{=}\aExp \limplies \bForm[y/x] &&\text{ where $y$ is fresh}
+  % \\
+  \fwp{\PW{\aLoc}{\aExp}}{\bForm} &= \bForm[\aExp/\aLoc]
+  \\
+  \fwp{\LET{\aReg}{\aExp}}{\bForm} &= \bForm[\aExp/\aReg]
+  \\
+  \fwp{\PR{\aLoc}{\aReg}}{\bForm} &= \aLoc{=}\aReg\limplies\bForm
+\end{align*}
+Here we have chosen an alternative formulation for the read rule, which is
+equivalent the more traditional $\bForm[\aLoc/\aReg]$, as long as registers
+occur at most once in a program.  In \refdef{def:pomsets-lir}, the
+transformers for the dependent case are as follows:
+\begin{align*}
+  \trd{\PW{\aLoc}{\aExp}}{\bForm} &= \bForm[\aExp/\aLoc]
+  \\
+  \trd{\LET{\aReg}{\aExp}}{\bForm} &= \bForm[\aExp/\aReg]
+  \\
+  \trd{\PR{\aLoc}{\aReg}}{\bForm} &= \aVal{=}\aReg\limplies\bForm &&
+  \textwhere \labelingAct(\aEv)=\DR{\aLoc}{\aVal}
+\end{align*}
+Only the read rule differs from the traditional one.
+
+
+For programs where every register is bound and every read is fulfilled, our
+dependent transformers are the same as the traditional ones.  
+
+As a running example, let $\aCmd_i$ be defined:
+% as follows.
+\begin{align*}
+  \aCmd_1&=\PR{x}{s}\SEMI\PW{x}{s{+}r}
+  \\  
+  \aCmd_2&=\PW{x}{t}\SEMI\aCmd_1
+  \\  
+  \aCmd_3&=\LET{t}{2}\SEMI\LET{r}{5}\SEMI\aCmd_2
+\end{align*}
+% \begin{itemize}
 % \item
 %   \begin{math}
-%     \fwp{\SKIP}{\bForm} = \bForm
-%   \end{math}
-% \item 
-%   \begin{math}
-%     \fwp{\ABORT}{\bForm} = \FALSE
-%   \end{math}
-\item
-  \begin{math}
-    \fwp{r\GETS \aExp}{\bForm} = \bForm[\aExp/r]
-  \end{math}
-\item
-  \begin{math}
-    \fwp{r\GETS x\;\;}{\bForm} = \bForm[x/r]
-  \end{math}
-\item
-  \begin{math}
-    \fwp{x\GETS \aExp}{\bForm} = \bForm[\aExp/x]
-  \end{math}
-% \item
-%   \begin{math}
-%     \fwp{\aCmd_1;\aCmd_2}{\bForm} = \fwp{\aCmd_1}{\fwp{\aCmd_2}{\bForm}}
+%     \fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]
 %   \end{math}
 % \item
 %   \begin{math}
-%     \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm}= {}
+%     \fwp{\PR{\aLoc}{\aReg}\;\,}{\bForm} = %\bForm[x/r]
+%     %     (\forall\bReg)
+%     %     \aLoc{=}\bReg\limplies\bForm [\bReg/\aLoc]
+%     \aLoc{=}\aReg\limplies\bForm
 %   \end{math}
+% \item
+%   \begin{math}
+%     \fwp{\PW{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]
+%   \end{math}
+% \end{itemize}
+% General relation between Hoare triples and $\fwp{}{}$:
+% \begin{itemize}
+% \item $\hoare{\fwp{\aCmd}{\bForm}}{\aCmd}{\bForm}$,
+% \item If $\hoare{\aForm}{\aCmd}{\bForm}$ and $\aCmd$ terminates when starting
+%   in any state satisfying $\aForm$, then $\aForm \limplies \fwp{\aCmd}{\bForm}$.
+% \end{itemize}
+In our semantics, we limit attention to totally-ordered executions where
+every read could be fulfilled by prepending some writes.  The following
+pomset appears in the semantics of $\aCmd_2$.  A pomset for $\aCmd_3$ can be
+derived by substituting $[2/t,\allowbreak5/r]$.  A pomset for $\aCmd_1$ can
+be derived by eliminating the initial write.
+\begin{gather*}
+  % \begin{gathered}[t]
+  %   \PW{x}{3}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \event{c}{\DW{x}{3}}{}
+  %     \xform{xd}{\bForm}{below=of c}
+  %     \xo{c}{xd}
+  %   \end{tikzinline}}
+  % \end{gathered}
+  % \qquad\quad
+  % \begin{gathered}[t]
+  %   \PR{x}{s}\SEMI\PW{x}{s{+}r}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \event{a}{\DR{x}{2}}{}
+  %     \event{b}{2{=}s\limplies(s{+}r){=}7\mid\DW{x}{7}}{right=of a}%6.5em of a}
+  %     \po{a}{b}
+  %     \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{below right=.5em and -1em of a}
+  %       %     \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{above=of a}
+  %       %     \xform{xdi}{2{=}s \limplies \bForm[s{+}r/x]}{below=of a}
+  %       %     \xform{xii}{(2{=}s\lor x{=}s)\limplies\bForm[s{+}r/x]}{above=of b}
+  %       %     \xform{xid}{(2{=}s\lor x{=}s)\limplies\bForm[s{+}r/x]}{below=of b}
+  %       %     \xo{a}{xdi}
+  %       %     \xo{b}{xid}
+  %     \xo{a}{xdd}
+  %     \xo{b}{xdd}
+  %   \end{tikzinline}}
+  % \end{gathered}
+  % \\[1ex]
+  \begin{gathered}[t]
+    % \LET{t}{2}\SEMI
+    % \LET{r}{5}\SEMI
+    \PW{x}{t}\SEMI
+    \PR{x}{s}\SEMI\PW{x}{s{+}r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a}{\DR{x}{2}}{}
+        \event{b}{2{=}s\limplies(s{+}r){=}7\mid\DW{x}{7}}{right=of a}
+        \event{c}{t{=}2\mid\DW{x}{2}}{left=of a}
+        \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{below=of a}%below right=.5em and -1em of a}
+        \xo{a}{xdd}
+        \xo{b}{xdd}
+        \xo{c}{xdd}
+        \po{a}{b}
+        \rf{c}{a}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+The predicate transformers are:
+% \begin{align*}
+%   \fwp{\aCmd_1}{\bForm} &= x{=}s\limplies\bForm[s{+}r/x] 
 %   \\
-%   \begin{math}
-%     ((\aExp{\ne}0) \limplies \fwp{\aCmd_1}{\bForm}) \land
-%     ((\aExp{=}0) \limplies \fwp{\aCmd_2}{\bForm})
-%   \end{math}
-\end{itemize}
-%Let $\rho:\Reg\fun\Val$ and $\chi:\Loc\fun\Val$ be substitutions.
-Let $\aState$ and $\rho$ range over substitutions in $(\Reg\cup\Loc)\fun\Val$.
-Treating substitutions as states, the big-step operational semantics of
-programs can be defined as a relation $(\aState,\aCmd)\Downarrow\bState$.
+%   \fwp{\aCmd_2}{\bForm} &= t\,{=}s\limplies\bForm[s{+}r/x] 
+%   \\
+%   \fwp{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+%   \\
+%   \trd{\aCmd_1}{\bForm} = \trd{\aCmd_2}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
+%   \\
+%   \trd{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+% \end{align*}
+\begin{scope}
+  \small
+\begin{align*}
+  \fwp{\aCmd_1}{\bForm} &= x{=}s\limplies\bForm[s{+}r/x] 
+  &
+  \trd{\aCmd_1}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
+  \\
+  \fwp{\aCmd_2}{\bForm} &= t\,{=}s\limplies\bForm[s{+}r/x] 
+  &
+  \trd{\aCmd_2}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
+  \\
+  \fwp{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+  &
+  \trd{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+\end{align*}
+\end{scope}
 
-\begin{itemize}
-\item Precondition: Suppose $(\aState,\aCmd)\Downarrow\rho$ and $\aForm=\fwp{\aCmd}{\bForm}$.
-  If $\aForm\aState$ is a tautology then $\bForm\bState$ is a tautology.
-\item Weakest: If $\aForm'\aState$ is a tautology, then $\aForm$ implies $\aForm'$.
-\end{itemize}
-Weakest preconditions are \emph{sound} in that if $\aForm$ holds in the
-initial state $\aState$, then $\bForm$ holds in the final state $\bState$.
-Formally, 
+% % Let $\rho:\Reg\fun\Val$ and $\chi:\Loc\fun\Val$ be substitutions.
+% Let $\aState$ and $\rho$ range over substitutions $(\Reg\cup\Loc)\fun\Val$.
+% Treating substitutions as states, the big-step operational semantics of
+% programs can be defined as a relation $\bigstep{\aState}{\aCmd}{\bState}$.
+% % Ie, $\aForm\aState$ implies $\bForm\bState$.
+% \begin{align}
+%   \label{wp1}
+%   \bigstep{[5/r,2/x]}{\aCmd_1&}{[5/r,2/s,7/x]}
+%   \\
+%   \label{wp2}
+%   \bigstep{[\NEG5/r,2/x]}{\aCmd_1&}{[\NEG5/r,2/s,\NEG3/x]}
+% \end{align}
+
+% Then the semantics of Hoare triples guarantees that if
+% $\aForm\limplies\fwp{\aCmd}{\bForm}$, $\bigstep{\aState}{\aCmd}{\rho}$ and
+% $\aForm\aState$ is a tautology then $\bForm\bState$ is a tautology.
+% \begin{align*}
+%   \fwp{\aCmd_1}{x{>}0} &= (x{+}r{>}0) 
+% \end{align*}
+% In \eqref{wp1}, the pre- and post-conditions are satisfied.
+% In \eqref{wp2}, they are not.
+
+
+% \begin{itemize}  
+% \item Suppose $\bigstep{\aState}{\aCmd}{\rho}$ and $\aForm\limplies\fwp{\aCmd}{\bForm}$.\\
+%   If $\aForm\aState$ is a tautology then $\bForm\bState$ is a tautology.\\
+%   Ie, $\aForm\aState$ implies $\bForm\bState$.
+% \item Suppose $\bigstep{\aState}{\aCmd}{\rho}$ and $\hoare{\aForm}{\aCmd}{\bForm}$.\\
+%   If $\aForm\aState$ is a tautology then $\bForm\bState$ is a tautology.\\
+%   Ie, $\aForm\aState$ implies $\bForm\bState$.
+% \item Suppose $\bigstep{\aState}{\aCmd}{\rho}$ and $\aForm=\fwp{\aCmd}{\bForm}$.\\
+%   $\aForm\aState$ is a tautology if and only if $\bForm\bState$ is a tautology.\\
+%   Ie, $\aForm\aState$ iff $\bForm\bState$.
+% % \item Weakest: If $\aForm'\aState$ is a tautology, then $\aForm$ implies $\aForm'$.
+% \end{itemize}
+% Weakest preconditions are \emph{sound} in that if $\aForm$ holds in the
+% initial state $\aState$, then $\bForm$ holds in the final state $\bState$.
+% Formally, 
 
 
 \begin{comment}
@@ -73,7 +217,7 @@ Formally,
 %   \aForm \textimplies \fwp{\aCmd}{\bForm}
 % \end{align*}
 % Interpretation is that if $\aState\models\fwp{\aCmd}{\bForm}$ and
-% $(\aState,\aCmd)\Downarrow\bState$
+% $\bigstep{\aState}{\aCmd}{\rho}$
 % then $\bState\models\bForm$.
 
 % Let $\aCmd_0$ be
@@ -86,21 +230,84 @@ Formally,
 % Let $\aSub_\aPS=[{\aVal_1/\aLoc_1},\ldots, {\aVal_n/\aLoc_n}]$ be the final
 % state of $\aPS$.
 
-For example:
-\begin{gather}
-  \nonumber
-  (r{>}0) = \fwp{\PW{x}{r{+}1}}{x{>}1}
-  \\
-  \label{wp1}
-  ([5/r], (\PW{x}{r{+}1})) \Downarrow [5/r,6/x]
-  \\
-  \label{wp2}
-  ([0/r], (\PW{x}{r{+}1})) \Downarrow [0/r,1/x]
-\end{gather}
-In \eqref{wp1}, the pre- and post-conditions are satisfied.
-In \eqref{wp2}, they are not.
+% Let $\aState$ and $\rho$ range over substitutions $\Loc\fun\Exp$.
+% If we leave the registers free, we have:
+% \begin{align}
+%   \label{wp1x}
+%   \bigstep{[2/x]}{\aCmd&}{[6/x]}
+% \end{align}
 
+% Using \refdef{def:pomsets-trans}:
+% \begin{align*}
+%   \begin{gathered}[t]
+%     %     \PR{x}{s}\SEMI\PW{x}{s{+}r}
+%     \PR{x}{s}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{\DR{x}{2}}{}
+%       \xform{xi}{\bForm}{above=of a}
+%       \xform{xd}{2{=}s \limplies \bForm}{below=of a}
+%       \xo{a}{xd}
+%     \end{tikzinline}}
+%   \end{gathered}
+%   &&
+%   \begin{gathered}[t]
+%     \PW{x}{s{+}r}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{(s{+}r){=}7\mid\DW{x}{7}}{}
+%       \xform{xi}{\bForm}{above=of a}
+%       \xform{xd}{\bForm}{below=of a}
+%       \xo{a}{xd}
+%     \end{tikzinline}}
+%   \end{gathered}
+% \end{align*}
+% Composing
+% \begin{align*}
+%   \begin{gathered}[t]
+%     \PR{x}{s}\SEMI\PW{x}{s{+}r}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{\DR{x}{2}}{}
+%       \event{b}{(s{+}r){=}7\mid\DW{x}{7}}{right=of a}
+%       \xform{xdd}{2{=}s \limplies \bForm}{above=of a}
+%       \xform{xdi}{2{=}s \limplies \bForm}{below=of a}
+%       \xform{xii}{\bForm}{above=of b}
+%       \xform{xid}{\bForm}{below=of b}
+%       \xo{a}{xdi}
+%       \xo{b}{xid}
+%       \xo{a}{xdd}
+%       \xo{b}{xdd}
+%     \end{tikzinline}}
+%   \end{gathered}
+% \end{align*}
 
+% Using \refdef{def:pomsets-lir}:
+% \begin{align*}
+%   \begin{gathered}[t]
+%     %     \PR{x}{s}\SEMI\PW{x}{s{+}r}
+%     \PR{x}{s}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{\DR{x}{2}}{}
+%       \xform{xi}{(2{=}s\lor x{=}s)\limplies \bForm}{above=of a}
+%       \xform{xd}{2{=}s \limplies \bForm}{below=of a}
+%       \xo{a}{xd}
+%     \end{tikzinline}}
+%   \end{gathered}
+%   &&
+%   \begin{gathered}[t]
+%     \PW{x}{s{+}r}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{(s{+}r){=}7\mid\DW{x}{7}}{}
+%       \xform{xi}{\bForm[s{+}r/x]}{above=of a}
+%       \xform{xd}{\bForm[s{+}r/x]}{below=of a}
+%       \xo{a}{xd}
+%     \end{tikzinline}}
+%   \end{gathered}
+% \end{align*}
+% Composing
 
 % For example, let $\aCmd_1=\PR{x}{r}$ and $\aCmd_2=\PW{x}{r{+}1}$ and
 % $\aCmd=\aCmd_1\SEMI \aCmd_2$.
@@ -133,38 +340,29 @@ In \eqref{wp2}, they are not.
 \section{Completed Pomsets and Fork-Join}
 \label{sec:join}
 
-[Todo.]
-\begin{comment}
-  \begin{definition}
-    A pomset with predicate transformers $\aPS$ is \emph{completed} if, for
-    every quiescence symbol $\aSym$, $\aTr{\aEvs}{\aSym}$ implies $\aSym$.
-  \end{definition}
+The $\FORK{}$ operation of \textsection\ref{sec:pomsets-trans} is
+asynchronous: In $\FORK{\aGrp}\SEMI \aCmd$, the threads in $\aGrp$ run
+concurrently with $\aCmd$.  In this section, we show how to model the
+synchronous $\FORKJOIN{}$ operation: In $\FORKJOIN{\aGrp}\SEMI\aCmd$, the
+threads in $\aGrp$ must complete before $\aCmd$ begins to run.
 
-
-  It is also possible to put coherence in the independency relation, in which
-  case, the semantics of $;$ includes the following.
-  \begin{enumerate}
-    \setcounter{enumi}{\value{pomsetXSemiCount}}
-  \item
-    \label{seq-reorder} if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either
-    $\bEv<\aEv$ or $a\reorder\labeling_2(\aEv)$.
-  \end{enumerate}
-  One must be careful, however, due to \emph{inconsistency}.  Consider that
-  \texttt{x=0;x=1} should not have completed pomset with only $\DWP{x}{0}$.
-
-  \eqref{seq-reorder} does not do the right thing with fork either.  If you
-  want to enforce coherence this way then you need to use fork-join as the
-  sequential combinator, rather than fork.
-
-
-  [We drop $\reorder$ because incompatible with $\sFORK{}$.  If you want to
-  use $\reorder$, then you need to use fork-join as the sequential
-  combinator, rather than fork.]
-
+When modeling $\FORK{}$, we gave the semantics of thread groups as pomsets
+with preconditions.  In order to model $\FORKJOIN{}$, we require a
+termination predicate.
 \begin{definition}
   A \emph{pomset with preconditions and termination} is a pomset with
   preconditions together with a predicate $\TICK$.
 \end{definition}
+
+We embed pomsets with predicate transformers into pomsets with preconditions
+and termination using the following notion of \emph{completion}.
+\begin{definition}
+  A pomset with predicate transformers $\aPS$ is \emph{completed} if, for
+  every quiescence symbol $\aSym$, $\aTr{\aEvs}{\aSym}$ implies $\aSym$.
+\end{definition}
+
+The definition is a small change relative to that of
+\textsection\ref{sec:pomsets-trans}.
 
 % Define $\sTHREAD{}$ to transform a pomset with predicate transformers into
 % a pomset with preconditions and termination by dropping the predicate
@@ -207,8 +405,8 @@ In \eqref{wp2}, they are not.
   If $\aPS \in \sTHREAD{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}
   \item[1--3)] as for $\sTHREAD{}$ in \refdef{def:pomsets-group},
-  \item[{\labeltext[T4]{T4)}{T4}}] if $\TICK$ then $\aTr{\aEvs}{\Q{}}$
-    implies $\Q{}$.
+  \item[{\labeltext[T4]{T4)}{T4}}] if $\TICK$ then $\aPS$ is completed.
+    %$\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
   \end{enumerate}
 
   \noindent
@@ -219,9 +417,39 @@ In \eqref{wp2}, they are not.
   \end{enumerate}
 \end{definition}
 
-\begin{align*}
-  \sem{\FORKJOIN{\aGrp}} &= \sFORKJOIN{}\sem{\aGrp}  
-\end{align*}
+\begin{definition}
+  Update \refdef{def:sem-funs} to include:
+  \begin{align*}
+    \sem{\FORKJOIN{\aGrp}} = \sFORKJOIN{}\sem{\aGrp}  
+  \end{align*}
+\end{definition}
+
+\section{Using Independency for Coherence}
+\label{sec:independency-coherence}
+
+[Under construction.]
+
+Using $\FORKJOIN{}$ parallelism, we can move coherence out of the logic by
+restoring the use of independency (\textsection\ref{sec:pomsets}).
+\begin{definition}
+\begin{enumerate}
+  \setcounter{enumi}{\value{pomsetXSemiCount}}
+\item
+  \label{seq-reorder} if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either
+  $\bEv<\aEv$ or $a\reorder\labeling_2(\aEv)$.
+\end{enumerate}  
+\end{definition}
+One must be careful, however, due to \emph{inconsistency}.  Consider that
+\texttt{x=0;x=1} should not have completed pomset with only $\DWP{x}{0}$.
+
+\eqref{seq-reorder} does not do the right thing with fork either.  If you
+want to enforce coherence this way then you need to use fork-join as the
+sequential combinator, rather than fork.
+
+
+[We drop $\reorder$ because incompatible with $\sFORK{}$.  If you want to
+use $\reorder$, then you need to use fork-join as the sequential
+combinator, rather than fork.]
 
 We can then encode coherence as follows.
 \begin{enumerate}
@@ -304,9 +532,9 @@ following, assuming that each register occurs at most once.
     (\aVal{=}\aReg\lor\aLoc{=}\aReg) \limplies \bForm[\aReg/{\aLoc}] ).
   \end{math}
 \end{enumerate}
-\end{comment}
 
 \section{Substitutions}
+\label{sec:substitutions}
 
 It is also possible to collapse $\aLoc$ and $\aReg$ in the semantics of
 this paper:
@@ -520,17 +748,19 @@ references.
 
 \begin{scope}
   The substitution $[x/r]$ does not work with Skolemization, even for the
-  dependent case.  It forces the reads to the same values.
+  dependent case, since we lose the unique marker for each read.  In effect,
+  this forces the reads to the same values.  To be concrete, the candidate
+  definition would modify \ref{L4} to be:
   \begin{enumerate}
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$, 
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$.
     % \item[\ref{L5})]
     %   $\aTr{\cEvs}{\bForm}$ implies
     %   $(\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
     % \item[\ref{L6})] 
     %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
-  For example
+  Using this definition, consider the following:
   \begin{gather*}
     \PR{x}{r}\SEMI
     \PR{x}{s}\SEMI
@@ -544,6 +774,8 @@ references.
         \po{a2}{a3}
       \end{tikzinline}}
   \end{gather*}
+  Although the execution seems reasonable, the precondition on the write is
+  unsatisfiable.
 \end{scope}
 
 
@@ -781,18 +1013,22 @@ $\labelingForm(\bEv)$.
   chosen carefully.
   Combing \refdef{def:pomsets-rr} and \refdef{def:pomsets-addr} we have:
 
-  \newpage
-  
   \begin{enumerate}
-  % \item[\ref{L4})]
-  %   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
-  % \item[\ref{L5})]
-  %   $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+    % \item[\ref{L4})]
+    %   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    % \item[\ref{L5})]
+    %   $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
     
   \item[\ref{L4})]
-    $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm}$ implies
+    \begin{math}
+      (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm,
+    \end{math}
   \item[\ref{L5})]
-    $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor\RW) \limplies \bForm$.
+    $\aTr{\cEvs}{\bForm}$ implies
+    \begin{math}
+      ((\cExp{=}\cVal\limplies\aVal{=}\aReg)\lor\RW)\limplies\bForm.
+    \end{math}
   \end{enumerate}  
   
   Consider the following program, from \jjr{\textsection5}, where initially $x=0$, $y=0$, $\REF{0}=0$,
@@ -827,7 +1063,9 @@ $\labelingForm(\bEv)$.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a}{\DR{y}{2}}{}
-          \xform{xa}{(2{=}r\lor\RW)\limplies\bForm}{below=of a}
+          \xform{xi}{(2{=}r\lor\RW)\limplies\bForm}{above=of a}
+          \xform{xd}{2{=}r\limplies\bForm}{below=of a}
+          \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -836,8 +1074,9 @@ $\labelingForm(\bEv)$.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{b}{r\EQ2\mid\DR{\REF{2}}{1}}{}
-          \xform{xb}{(r\EQ2\limplies 1\EQ s) \limplies\bForm}{below=of b}
-          \xo{b}{xb}
+          \xform{xd}{(r\EQ2\limplies 1\EQ s) \limplies\bForm}{below=of b}
+          \xform{xi}{((r\EQ2\limplies 1\EQ s)\lor\RW) \limplies\bForm}{above=of b}
+          \xo{b}{xd}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -846,6 +1085,9 @@ $\labelingForm(\bEv)$.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{b}{s\EQ1\mid\DW{x}{1}}{}
+          \xform{xd}{\bForm}{below=of b}
+          \xform{xi}{\bForm}{above=of b}
+          \xo{b}{xd}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -870,13 +1112,30 @@ $\labelingForm(\bEv)$.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\DR{y}{2}}{}
-          \event{a2}{2{=}r\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
-          \event{a3}{(r\EQ2\limplies 1\EQ s)
-            \limplies s\EQ1\mid\DW{x}{1}}{below right=.5em and -3em of a2}
+          \event{a2}{(2{=}r\lor\TRUE)\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
+          \event{a3}{(2{=}r\lor\FALSE)\limplies (r\EQ2\limplies 1\EQ s)
+            \limplies s\EQ1\mid\DW{x}{1}}{below right=.5em and -8em of a2}
           \po{a2}{a3}
         \end{tikzinline}}
     \end{gathered}
-  \end{gather*}  
+  \end{gather*}
+  The precondition of $\DRP{\REF{2}}{1}$ is a tautology, but the precondition
+  of $\DWP{x}{1}$ is not.  This forces a dependency:
+  \begin{gather*}
+    \begin{gathered}
+      r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\DR{y}{2}}{}
+          \event{a2}{(2{=}r\lor\TRUE)\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
+          \event{a3}{2{=}r\limplies (r\EQ2\limplies 1\EQ s)
+            \limplies s\EQ1\mid\DW{x}{1}}{below right=.5em and -5em of a2}
+          \po[out=-20,in=180]{a1}{a3}
+          \po{a2}{a3}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  All the preconditions are now tautologies.
 \end{scope}
 
 \subsubsection*{Parallel Composition}

@@ -315,9 +315,10 @@ the uninterpreted symbol $\RW$.
     $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
   \end{enumerate}  
 \end{definition}
-\ref{L5} requires $\aTr{\cEvs}{\bForm}$ implies $\bForm$ for writes and
-$\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$ for reads.  For
-reads, the dependent and independent predicate transformers are identical.
+For reads, the dependent and independent predicate transformers are identical
+(since $\RW$ is $\FALSE$).  For writes, \ref{L5} requires
+$\aTr{\cEvs}{\bForm}$ implies $\bForm$ for the independent case (since $\RW$
+is $\TRUE$).
 
 \begin{example}
   Revisiting \refex{ex:rrd1} and eliding irrelevant transformers:
