@@ -19,16 +19,16 @@
   filecolor=ACMDarkBlue}
 \usepackage{amsmath}
 \usepackage{amsthm}
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}
-%\newtheorem{conjecture}{Conjecture}
-\newtheorem{proposition}{Prop}
-\newtheorem{lemma}{Lemma}
 \theoremstyle{definition}
 \newtheorem{definition}{Def}
 \newtheorem{example}[definition]{Ex}
 \theoremstyle{remark}
 \newtheorem{remark}{Remark}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+%\newtheorem{conjecture}{Conjecture}
+\newtheorem{proposition}[definition]{Prop}
+\newtheorem{lemma}{Lemma}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 % \author{\IEEEauthorblockN{%
@@ -45,10 +45,15 @@
 \usepackage[sectionbib,numbers,square]{natbib}
 
 
-\usepackage{xr}
+\usepackage{xr,refcount}
+\externaldocument{paper}
+\setcounter{definition}{\getrefnumber{finaldef}}
+\addtocounter{definition}{-1}
+\setcounter{figure}{\getrefnumber{finalfig}}
+\addtocounter{figure}{-1}
 \newcounter{pomsetPreParCount}\setcounter{pomsetPreParCount}{8}
 \newcounter{pomsetXSemiCount}\setcounter{pomsetXSemiCount}{8}
-\externaldocument{paper}
+
 \begin{document} 
 \pagestyle{plain}
 \appendices

@@ -207,6 +207,7 @@ symbols, for example:
 \end{example}
 
 \begin{example}
+  \label{ex:left-merge}
   \ref{S4} includes the substitution $\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]$ to ensure that
   \emph{left merges} are not quiescent.  Consider the following.
   \begin{align*}
@@ -356,6 +357,7 @@ symbols, for example:
 
 
 \subsection{Synchronized Access (\xRASC)}
+\label{sec:sync}
 % Write $\Q{}$ as $\Q{\mSC}$ and introduce $\Q{\mRA}$.
 
 % $\Q{\mSC}$ implies $\Q{\mRA}$.
@@ -431,7 +433,7 @@ symbols, for example:
   \end{align*}
 % \end{definition}
 % \begin{definition}
-  Let $[\aForm/\Qr{*}]$ substitute $\aForm$ for every $\Qr{\bLoc}$, and similarly for $\Qw{*}$.
+  %Let $[\aForm/\Qr{*}]$ substitute $\aForm$ for every $\Qr{\bLoc}$, and similarly for $\Qw{*}$.
   Let substitutions $[\aForm/\QS{\aLoc}{\amode}]$ and  $[\aForm/\QL{\aLoc}{\amode}]$ be defined:
   \begin{align*}
     [\aForm/\QS{\aLoc}{\mRLX}] &= [\aForm/\Qw{\aLoc}]
@@ -447,7 +449,7 @@ symbols, for example:
 
 \begin{definition}[\xCO/\xRASC]
   \label{def:pomsets-ra}
-  Update \refdef{def:pomsets-co} to: % (\ref{S4}/\ref{L4} unchanged):
+  Update \refdef{def:pomsets-trans} to: % (\ref{S4}/\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
     $\labelingForm(\aEv)$ implies $\aExp{=}\aVal\land\QS{\aLoc}{\amode}$,

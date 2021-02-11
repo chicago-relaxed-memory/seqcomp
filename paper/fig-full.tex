@@ -6,9 +6,11 @@ $(\exists\cVal:\aEvs\fun\Val)$
 $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\cForm:\aEvs\fun\Formulae)$
 \begin{enumerate}
-\item[\ref{S1})] if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-\item[\ref{S2})] $\labelingAct(\aEv) = \DWREF{\cVal_\aEv}{\aVal_\aEv}$,
-\item[\ref{S3})] 
+\item[{\labeltext[S1]{S1)}{S1full}}] % [\ref{S1})]
+  if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item[{\labeltext[S2]{S2)}{S2full}}] %[\ref{S2})]
+  $\labelingAct(\aEv) = \DWREF{\cVal_\aEv}{\aVal_\aEv}$,
+\item[{\labeltext[S3]{S3)}{S3full}}] %[\ref{S3})] 
   $\labelingForm(\aEv)$ implies
   \begin{math}
     \cForm_\aEv
@@ -19,7 +21,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   \end{math},
   % where
   % $\QS{}{\mRLX}=\QxREF{\cVal_\aEv}$ and otherwise $\QS{}{\amode}=\Q{\amode}$, % for $\amode\neq\mRLX$,
-\item[\ref{S4})]
+\item[{\labeltext[S4]{S4)}{S4full}}] %[\ref{S4})]
   \begin{math}
     (\forall\aEv\in\aEvs\cap\bEvs)
   \end{math}
@@ -34,7 +36,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
       [(\QwREF{\cVal_\aEv}\land\aExp{=}\aVal_\aEv\land\cExp{=}\cVal_\aEv)/\QwREF{\cVal_\aEv}]
     }
   \end{math},
-\item[\ref{S5})] 
+\item[{\labeltext[S5]{S5)}{S5full}}] %[\ref{S5})] 
   \begin{math}    
     (\forall\aEv\in\aEvs\setminus\cEvs)
   \end{math}
@@ -49,7 +51,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
       [\FALSE/\QS{\REF{\cVal_\aEv}}{\amode}]
     },
   \end{math}
-\item[S6)]%\ref{S6})] 
+\item[{\labeltext[S6]{S6)}{S6full}}] %[S6)]%\ref{S6})] 
   \begin{math}
     (\forall\dVal)
   \end{math}
@@ -181,9 +183,12 @@ $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\cForm:\aEvs\fun\Formulae)$
 % $(\forall\uReg{\aEv}\in\uRegs{\aEvs})$
 \begin{enumerate}
-\item[\ref{L1})] if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-\item[\ref{L2})] $\labelingAct(\aEv) = \DRREF{\cVal_\aEv}{\aVal_\aEv}$,
-\item[\ref{L3})] $\labelingForm(\aEv)$ implies
+\item[{\labeltext[L1]{L1)}{L1full}}] %[\ref{L1})]
+  if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item[{\labeltext[L2]{L2)}{L2full}}] %[\ref{L2})]
+  $\labelingAct(\aEv) = \DRREF{\cVal_\aEv}{\aVal_\aEv}$,
+\item[{\labeltext[L3]{L3)}{L3full}}] %[\ref{L3})]
+  $\labelingForm(\aEv)$ implies
   \begin{math}
     \cForm_\aEv
     \land \QL{\REF{\cVal_\aEv}}{\amode}
@@ -192,7 +197,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   \end{math},
   % where    
   % $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\QwREF{\cVal_\aEv}$, % for $\amode\neq\mRLX$,
-\item[\ref{L4})]
+\item[{\labeltext[L4]{L4)}{L4full}}] %[\ref{L4})]
   \begin{math}
     (\forall\aEv\in\aEvs\cap\bEvs)
   \end{math}
@@ -203,7 +208,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     \limplies \bForm[\uReg{\aEv}/\aReg]
   \end{math},
   %\makebox[6.2cm]{}
-\item[\ref{L5})] 
+\item[{\labeltext[L5]{L5)}{L5full}}] %[\ref{L5})] 
   \begin{math}
     (\forall\aEv\in\aEvs\setminus\cEvs)
   \end{math}
@@ -228,7 +233,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
       [\FALSE/\QL{\REF{\cVal_\aEv}}{\amode}]
     }    
   \end{math},
-\item[\ref{L6})] 
+\item[{\labeltext[L6]{L6)}{L6full}}] %[\ref{L6})] 
   \begin{math}
     (\forall\dVal)
     (\forall\bReg)
@@ -288,11 +293,11 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
 If $\aPS \in \sTHREAD{\aPSS}$ then
 $(\exists\aPS_1\in\aPSS)$
 \begin{enumerate}
-\item[\ref{T1})]
+\item[{\labeltext[T1]{T1)}{T1full}}] %[\ref{T1})]
   $\aEvs=\aEvs_1$,
-\item[\ref{T2})]
+\item[{\labeltext[T2]{T2)}{T2full}}] %[\ref{T2})]
   $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
-\item[\ref{T3})]
+\item[{\labeltext[T3]{T3)}{T3full}}] %[\ref{T3})]
   $\labelingForm(\aEv)$ implies
   $\labelingForm_1(\aEv) [\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
   \\

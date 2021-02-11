@@ -1,10 +1,12 @@
-\section{Relation to Traditional Predicate Transformers}
+\section{Discussion}
+\subsection{Comparison with Weakest Preconditions}
 
 We compare traditional transformers to the dependent-case transformers of
-\refdef{def:pomsets-lir}.  Because we only consider the dependent case, we
-drop the superscript $\aEvs$ on $\aTr{\aEvs}{}$ throughout this section.  We
-also assume that each register appears at most once in a program, as we did
-throughout \textsection\ref{sec:model}--\ref{sec:arm}.
+\refdef{def:pomsets-lir}; thus we consider only totally ordered executions.
+Because we only consider the dependent case, we drop the superscript $\aEvs$
+on $\aTr{\aEvs}{}$ throughout this section.  We also assume that each
+register appears at most once in a program, as we did throughout
+\textsection\ref{sec:model}--\ref{sec:arm}.
 
 We are not interested in isolating the \emph{weakest} precondition.  Thus we
 think of transformers as Hoare triples.  In addition, all programs in our
@@ -41,9 +43,12 @@ Only the read rule differs from the traditional one.
 
 
 For programs where every register is bound and every read is fulfilled, our
-dependent transformers are the same as the traditional ones.  
+dependent transformers are the same as the traditional ones.  In our
+semantics, thus, we only consider totally-ordered executions where every read
+could be fulfilled by prepending some writes.  For example, we ignore pomsets
+of $\PW{x}{2}\SEMI\PR{x}{r}$ that read $1$ for $x$.
 
-As a running example, let $\aCmd_i$ be defined:
+For example, let $\aCmd_i$ be defined:
 % as follows.
 \begin{align*}
   \aCmd_1&=\PR{x}{s}\SEMI\PW{x}{s{+}r}
@@ -75,11 +80,9 @@ As a running example, let $\aCmd_i$ be defined:
 % \item If $\hoare{\aForm}{\aCmd}{\bForm}$ and $\aCmd$ terminates when starting
 %   in any state satisfying $\aForm$, then $\aForm \limplies \fwp{\aCmd}{\bForm}$.
 % \end{itemize}
-In our semantics, we limit attention to totally-ordered executions where
-every read could be fulfilled by prepending some writes.  The following
-pomset appears in the semantics of $\aCmd_2$.  A pomset for $\aCmd_3$ can be
-derived by substituting $[2/t,\allowbreak5/r]$.  A pomset for $\aCmd_1$ can
-be derived by eliminating the initial write.
+The following pomset appears in the semantics of $\aCmd_2$.  A pomset for
+$\aCmd_3$ can be derived by substituting $[2/t,\allowbreak5/r]$.  A pomset
+for $\aCmd_1$ can be derived by eliminating the initial write.
 \begin{gather*}
   % \begin{gathered}[t]
   %   \PW{x}{3}
@@ -143,19 +146,19 @@ The predicate transformers are:
 % \end{align*}
 \begin{scope}
   \small
-\begin{align*}
-  \fwp{\aCmd_1}{\bForm} &= x{=}s\limplies\bForm[s{+}r/x] 
-  &
-  \trd{\aCmd_1}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
-  \\
-  \fwp{\aCmd_2}{\bForm} &= t\,{=}s\limplies\bForm[s{+}r/x] 
-  &
-  \trd{\aCmd_2}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
-  \\
-  \fwp{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
-  &
-  \trd{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
-\end{align*}
+  \begin{align*}
+    \fwp{\aCmd_1}{\bForm} &= x{=}s\limplies\bForm[s{+}r/x] 
+    &
+    \trd{\aCmd_1}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
+    \\
+    \fwp{\aCmd_2}{\bForm} &= t\,{=}s\limplies\bForm[s{+}r/x] 
+    &
+    \trd{\aCmd_2}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
+    \\
+    \fwp{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+    &
+    \trd{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+  \end{align*}
 \end{scope}
 
 % % Let $\rho:\Reg\fun\Val$ and $\chi:\Loc\fun\Val$ be substitutions.
@@ -337,32 +340,185 @@ The predicate transformers are:
 %   $\fwp{\aCmd}{\aForm}\aSub$
 % \end{proposition}
 
-\section{Completed Pomsets and Fork-Join}
-\label{sec:join}
+% \subsection{Fences}
+% \label{sec:fences}
 
-The $\FORK{}$ operation of \textsection\ref{sec:pomsets-trans} is
-asynchronous: In $\FORK{\aGrp}\SEMI \aCmd$, the threads in $\aGrp$ run
-concurrently with $\aCmd$.  In this section, we show how to model the
-synchronous $\FORKJOIN{}$ operation: In $\FORKJOIN{\aGrp}\SEMI\aCmd$, the
-threads in $\aGrp$ must complete before $\aCmd$ begins to run.
+\subsection{Closure properties}
 
-When modeling $\FORK{}$, we gave the semantics of thread groups as pomsets
-with preconditions.  In order to model $\FORKJOIN{}$, we require a
-termination predicate.
 \begin{definition}
-  A \emph{pomset with preconditions and termination} is a pomset with
-  preconditions together with a predicate $\TICK$.
+  \label{def:augment}
+  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
+  \begin{enumerate}
+  \item $\aEvs_2=\aEvs_1$,
+  \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+  \item $\labelingForm_2(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item $\aTr[2]{\bEvs}{\aEv}$ implies $\aTr[1]{\bEvs}{\aEv}$,
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
+  \end{enumerate}
 \end{definition}
 
-We embed pomsets with predicate transformers into pomsets with preconditions
-and termination using the following notion of \emph{completion}.
 \begin{definition}
+  \label{def:downset}
+  $\aPS_2$ is an \emph{downset} of $\aPS_1$ if
+  \begin{enumerate}
+  \item $\aEvs_2\subseteq\aEvs_1$,
+  \item $(\forall \aEv\in\aEvs_2)$ $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+  \item $(\forall \aEv\in\aEvs_2)$ $\labelingForm_2(\aEv)=\labelingForm_1(\aEv)$,
+  \item $(\forall \aEv\in\aEvs_2)$ $\aTr[2]{\bEvs}{\aEv}=\aTr[1]{\bEvs}{\aEv}$,
+  \item $(\forall \bEv\in\aEvs_2)$ $(\forall \aEv\in\aEvs_2)$ $\bEv\le_2\aEv$ if and only if $\bEv\le_1\aEv$,
+  \item $(\forall \bEv\in\aEvs_1)$ $(\forall \aEv\in\aEvs_2)$ if $\bEv\le_1\aEv$ then $\bEv\in\aEvs_2$.
+  \end{enumerate}
+\end{definition}
+
+\begin{proposition}
+  Suppose $\aPS_1\in\sem{\aCmd}$.
+  \begin{enumerate}
+  \item If $\aPS_2$ is an augment of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+  \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+  \end{enumerate}
+\end{proposition}
+
+In examples, we typically consider pomsets that are augment-minimal.
+
+\subsection{Completed Pomsets and Fork}
+\label{sec:fork}
+
+It is sometimes useful to distinguish \emph{terminated} or \emph{completed}
+executions from partial executions.  For example in
+\begin{math}
+  \sem{\PW{x}{1}\SEMI\PW{y}{1}},
+\end{math}
+we expect completed executions to include two write actions.  Note that this
+is different from being downset-maximal.
+\begin{gather}
+  \nonumber
+  \PW{x}{0} \SEMI \PW{x}{1}
+  \PAR
+  \PR{x}{r}\SEMI\PR{x}{s}\SEMI\IF{s}\THEN\PW{y}{1}\FI
+  \\
+  \label{down1}
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a}{\DW{x}{0}}{}
+      \event{b}{\DW{x}{1}}{right=of a}
+      \event{c}{\DR{x}{1}}{right=3em of b}
+      \event{d}{\DR{x}{0}}{right=of c}
+      \wk{a}{b}
+      \rf{b}{c}
+      \rf[out=-20,in=-160]{a}{d}
+    \end{tikzinline}}
+  \\
+  \label{down2}
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a}{\DW{x}{0}}{}
+      \event{b}{\DW{x}{1}}{right=of a}
+      \event{c}{\DR{x}{0}}{right=3em of b}
+      \event{d}{\DR{x}{1}}{right=of c}
+      \event{e}{\DW{y}{1}}{right=of d}
+      \po{d}{e}
+      \wk{a}{b}
+      \rf[out=-20,in=-160]{a}{c}
+      \rf[out=-20,in=-160]{b}{d}
+    \end{tikzinline}}
+\end{gather}
+\eqref{down1} is a downset of \eqref{down2}, but both are completed. 
+
+For pomsets with predicate transformers, we identify \emph{completion} with
+\emph{quiescence.}
+\begin{definition}
+  \label{def:completed}
   A pomset with predicate transformers $\aPS$ is \emph{completed} if, for
   every quiescence symbol $\aSym$, $\aTr{\aEvs}{\aSym}$ implies $\aSym$.
 \end{definition}
+For example, there are no pomsets in $\sem{\ABORT}$ that are completed,
+whereas the augment-minimal pomset of $\sem{\SKIP}$ is completed.
 
-The definition is a small change relative to that of
-\textsection\ref{sec:pomsets-trans}.
+While this definition is sensible for single \emph{threads}, it is less
+satisfying for thread \emph{groups}.  To see why, consider that in
+$\sem{\FORK{\THREAD{\aCmd}}}$:
+\begin{itemize}
+\item by \ref{T3full}, quiescence symbols and the symbol $\RW$ have been
+  substituted out of preconditions $\labelingForm(\aEv)$,
+\item by \ref{F4}, every predicate transformer $\aTr{\bEvs}{}$ is the
+  identity function. %, for any $\bEvs$.
+\end{itemize}
+Every pomset in $\sem{\FORK{\aGrp}}$ is completed, by definition. As a
+result, in general, $\sem{\FORK{\THREAD{\aCmd}}}\neq\sem{\aCmd}$.
+
+The $\FORK{}$ operation is asynchronous: In
+$\sem{\aCmd_1\SEMI\FORK{\aGrp}\SEMI \aCmd_2}$, the threads in $\sem{\aGrp}$
+run concurrently with $\sem{\aCmd_1\SEMI\aCmd_2}$.  % $\FORK{}$ %(\textsection\ref{sec:pomsets-trans})
+% does not introduce barriers:
+\begin{gather*}
+  \PR{x}{r}\SEMI\FORK{\THREAD{\PW{x}{1}}}
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a}{\DR{x}{1}}{}
+      \event{b}{\DW{x}{1}}{right=3em of a}
+      \rf{b}{a}
+    \end{tikzinline}}
+\end{gather*}
+In fact, perhaps surprisingly,
+\begin{math}
+  \sem{\PR{x}{r}\SEMI\FORK{\THREAD{\PW{x}{1}}}} = \sem{\FORK{\THREAD{\PW{x}{1}}}\SEMI\PR{x}{r}}.
+\end{math}
+Order between the threads
+can be enforced using synchronization.  For example, the ``backwards'' read
+above is forbidden in:
+\begin{gather*}
+  \PR{x}{r}\SEMI\PW[\mRA]{z}{1}\SEMI\FORK{\THREAD{\IF{\PR[\mRA]{z}{}}\THEN\PW{x}{1}\FI}}
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a}{\DR{x}{1}}{}
+      \event{b}{\DW{z}{1}}{right=of a}
+      \event{c}{\DR{z}{1}}{right=3em of b}
+      \event{d}{\DW{x}{1}}{right=of c}
+      \rf{b}{c}
+      \sync{a}{b}
+      \sync{c}{d}
+      \rf[out=-160,in=-20]{d}{a}
+    \end{tikzinline}}
+\end{gather*}
+
+\subsection{Fork-Join}
+\label{sec:join}
+
+In this subsection, we model a variant of our language that removes
+asynchronous $\FORK{}$ operation and adds a synchronous $\FORKJOIN{}$.
+\begin{align*}
+  \aCmd
+  \BNFDEF& \ABORT
+  \BNFSEP \SKIP
+  \BNFSEP \LET{\aReg}{\aExp}
+  % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
+  % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
+  \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
+  \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
+  % \BNFSEP \PA{\aLoc}{\aExp} 
+  \\[-.5ex]
+  \BNFSEP& \FORKJOIN{\aGrp}
+  \BNFSEP \aCmd_1 \SEMI \aCmd_2
+  \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
+\end{align*}
+In $\PBR{\aCmd_1\SEMI\FORKJOIN{\aGrp}\SEMI\aCmd_2}$, ${\aCmd_1}$ must
+complete before ${\aGrp}$ begins, and threads in ${\aGrp}$ must complete
+before ${\aCmd_2}$ begins.  Thus $\PBR{\FORKJOIN{\THREAD{\PR{x}{r}}}}$ acts
+like a full fence.
+% 
+As modeled here, however, if $\aGrp$ is empty, no order is imposed between
+${\aCmd_1}$ and ${\aCmd_2}$.  Thus
+$\sem{\FORKJOIN{\THREAD{\SKIP}}}=\sem{\SKIP}$.
+
+To model $\FORKJOIN{}$, we give the semantics of thread groups using pomsets
+with preconditions \emph{and termination}.
+\begin{definition}
+  \label{def:pomsets-term}
+  A \emph{pomset with preconditions and termination} is a pomset with
+  preconditions (\refdef{def:pomsets-pre}) together with a termination
+  predicate (notation $\TICK$).
+\end{definition}
+
+% The definition is a small change relative to that of
+% \textsection\ref{sec:pomsets-trans}.
 
 % Define $\sTHREAD{}$ to transform a pomset with predicate transformers into
 % a pomset with preconditions and termination by dropping the predicate
@@ -387,9 +543,24 @@ The definition is a small change relative to that of
 % \item $\TICK_1$.
 % \end{enumerate}
 
-\begin{definition}$\phantom{\;}$\par
+\begin{definition}%$\phantom{\;}$\par
+  \label{def:pomsets-fj}
   % \noindent
   % If $\aPS\in\sNIL$ then $\aEvs = \emptyset$ and $\TICK$.
+  \noindent
+  If $\aPS \in \sTHREAD{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
+  \begin{enumerate}
+  \item[1--2)] as for $\sTHREAD{}$ in \refdef{def:pomsets-arm},% \reffig{fig:full},    
+  \item[\ref{T3full})]
+    $\labelingForm(\aEv)$ implies
+    $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
+    \\
+    $\labelingForm(\aEv)$ implies
+    $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ otherwise.
+    
+  \item[{\labeltext[T4]{T4)}{T4}}] if $\TICK$ then $\aPS$ is completed (\refdef{def:completed}).
+    % $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
+  \end{enumerate}
 
   \noindent
   If $\aPS \in (\aPSS_1\sPAR\aPSS_2)$ then $(\exists\aPS_1\in\aPSS_1)$
@@ -397,26 +568,22 @@ The definition is a small change relative to that of
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPreParCount}}
   \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR$ in
-    Definition~\ref{def:pomsets-pre},
+    \refdef{def:pomsets-pre},
   \item \label{par-tick} $\TICK$ implies $\TICK_1\land\TICK_2$.
-  \end{enumerate}
-
-  \noindent
-  If $\aPS \in \sTHREAD{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
-  \item[1--3)] as for $\sTHREAD{}$ in \refdef{def:pomsets-group},
-  \item[{\labeltext[T4]{T4)}{T4}}] if $\TICK$ then $\aPS$ is completed.
-    %$\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
   \end{enumerate}
 
   \noindent
   If $\aPS \in \sFORKJOIN{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}
-  \item[1--4)] as for $\sFORK{}$ in \refdef{def:pomsets-group},
-  \item[{\labeltext[F5]{F5)}{F5}}] $\TICK_1$.
+  \item[1--2)] as for $\sFORK{}$ in \refdef{def:pomsets-group},
+  \item[\ref{F3})]
+    $\labelingForm(\aEv)$ implies $\Qr{*}\land\Qw{*} \land \Qsc\land \labelingForm_1(\aEv)$,     
+  \item[\ref{F4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm$, if $\bEvs=\aEvs$ and $\TICK_1$,
+  \item[{\labeltext[F5]{F5)}{F5}}]
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$, otherwise.
   \end{enumerate}
 \end{definition}
-
 \begin{definition}
   Update \refdef{def:sem-funs} to include:
   \begin{align*}
@@ -424,244 +591,458 @@ The definition is a small change relative to that of
   \end{align*}
 \end{definition}
 
-\section{Using Independency for Coherence}
+We embed pomsets with predicate transformers into pomsets with preconditions
+and termination using {completion}.  The rules for thread groups keep track
+of the termination predicate.
+As noted \textsection\ref{sec:fork}, every pomset in $\sem{\FORK{\aGrp}}$ is
+completed.  In contrast, a pomset in $\sem{\FORKJOIN{\aGrp}}$ is completed
+only if every thread in $\aGrp$ is completed.
+
+Top-level thread groups do not need quiescence symbols; thus, $\sTHREAD{}$
+removes all quiescence symbols by substitution.  However, $\sFORKJOIN{\aPSS}$
+adds every possible quiescence symbol as a precondition to the events of
+$\aPSS$.  For example, the preconditions of $\sem{\THREAD{\aCmd}\PAR\NIL}$ do
+not contain quiescence symbols.  Instead, the preconditions of
+$\sem{\FORKJOIN{\THREAD{\aCmd}\PAR\NIL}}$ are saturated with them.  As a
+result, in completed top-level pomsets of
+$\sem{\aCmd_1\SEMI\FORKJOIN{\aGrp}}$, all of the events from
+$\sem{\aCmd_1}$ must precede those of $\sem{\aGrp}$.
+
+A similar thing happens with predicate transformers.  Thread groups in
+$\sem{\THREAD{\aCmd}\PAR\NIL}$ do not contain predicate transformers.
+Instead, all of the independent predicate transformers of
+$\sem{\FORKJOIN{\THREAD{\aCmd}\PAR\NIL}}$ take $\bForm$ to
+$\bForm[\FALSE/\Q{}]$.  As a result, in completed top-level pomsets of
+$\sem{\FORKJOIN{\aGrp}\SEMI\aCmd_2}$, all of the events from $\sem{\aGrp}$
+must precede those of $\sem{\aCmd_2}$.
+
+
+% The $\JOIN$ operation requires a full synchronization, but $\FORK{}$ does
+% not.  The following execution is allowed.
+% \begin{gather*}
+%   \PR{x}{r}\SEMI\FORKJOIN{\THREAD{\PW{x}{1}}}\SEMI\PW{y}{1}
+%   \\
+%   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]      
+%     \event{a}{\DW{x}{1}}{}
+%     \event{b}{\DW{y}{1}}{right=3em of a}
+%     \event{c}{\DR{x}{1}}{left=3em of a}
+%     \rf{a}{c}
+%     \sync{a}{b}
+%     \sync[out=-20,in=-160]{c}{b}
+%   \end{tikzinline}}
+% \end{gather*}
+% Synchronization can be added to 
+% This asymmetry arises naturally when using pomsets with preconditions to
+% model thread groups.
+
+\subsection{Using Independency for Coherence}
 \label{sec:independency-coherence}
 
-[Under construction.]
+\begin{figure*}[t]
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \input{fig-q1}
+    \caption{Quiescence Examples (\textsection\ref{sec:sync})}
+    \label{fig:q1}
+  \end{subfigure}  
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \input{fig-q2}
+    \caption{Quiescence Examples (\textsection\ref{sec:independency-coherence})}
+    \label{fig:q2}
+  \end{subfigure}
+  \caption{Quiescence Examples}
+  \label{fig:q}
+\end{figure*}
+% \begin{figure}[t!]
+%   \centering
+%   \input{fig-q1}
+%   \caption{Quiescence Examples (Old)}
+%   \label{fig:q1}
+% \end{figure}
+% \begin{figure}[t!]
+%   \centering
+%   \input{fig-q2}
+%   \caption{Quiescence Examples (New)}
+%   \label{fig:q2}
+% \end{figure}
 
-Using $\FORKJOIN{}$ parallelism, we can move coherence out of the logic by
-restoring the use of independency (\textsection\ref{sec:pomsets}).
+In \textsection\ref{sec:sync}, we encoded coherence and synchronized access
+using quiescence symbols.  Building on the language with $\FORKJOIN{}$, it
+model coherence using independency (\textsection\ref{sec:pomsets}), rather
+than encoding it in the logic.
 \begin{definition}
-\begin{enumerate}
-  \setcounter{enumi}{\value{pomsetXSemiCount}}
-\item
-  \label{seq-reorder} if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either
-  $\bEv<\aEv$ or $a\reorder\labeling_2(\aEv)$.
-\end{enumerate}  
+  \noindent
+  If $\aPS \in (\aPSS_1\sSEMI\aPSS_2)$ then $(\exists\aPS_1\in\aPSS_1)$
+  $(\exists\aPS_2\in\aPSS_2)$
+  % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+  % let
+  % $\labelingForm'_2(\aEv)=\aTr[1]{{\downclose[0]{\aEv}}}{\labelingForm_2(\aEv)}$
+  % let
+  % $\labelingForm'_2(\aEv)=\aTr[1]{\{ \bEv \mid \bEv < \aEv
+  % \}}{\labelingForm_2(\aEv})$
+  \begin{enumerate}
+    \setcounter{enumi}{\value{pomsetXSemiCount}}
+  \item[1--\ref{seq-kappa12})] as for $\sSEMI$ in \refdef{def:pomsets-trans},
+  \item
+    \label{seq-reorder} if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either
+    $\bEv<\aEv$ or $a\reorder\labeling_2(\aEv)$.
+  \end{enumerate}
 \end{definition}
-One must be careful, however, due to \emph{inconsistency}.  Consider that
-\texttt{x=0;x=1} should not have completed pomset with only $\DWP{x}{0}$.
 
-\eqref{seq-reorder} does not do the right thing with fork either.  If you
-want to enforce coherence this way then you need to use fork-join as the
-sequential combinator, rather than fork.
+In the logic, we remove the symbols $\Qw{\aLoc}$ and $\Qr{\aLoc}$.
+Previously, we had given the semantics of $\mRA$ access using $\Qw{*}$ and
+$\Qr{*}$, which were encoded using $\Qw{\aLoc}$ and $\Qr{\aLoc}$.  With these
+gone, we introduce the quiescence symbol $\Qrlx$ and $\Qra$.  Thus, the only
+quiescence symbols required are $\Qrlx$, $\Qra$ and $\Qsc$.
+\reffig{fig:q} shows the difference with the semantics of \textsection\ref{sec:sync}.
+% \reffig{fig:q1}.  In the new
+% interpretation, see \reffig{fig:q2}.
+
+% To see how the quiescence symbols are used, consider the following examples:
+
+\begin{comment}
+  Let formulae $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ be defined:
+  \begin{align*}
+    \QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
+    &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
+    \\
+    \QS{\aLoc}{\mRA}&=
+    \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
+    &\QL{\aLoc}{\mRA}&=\Qw{\aLoc}
+    \\
+    \QS{\aLoc}{\mSC}&=
+    \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
+    \land \Qsc
+    &\QL{\aLoc}{\mSC}&=\Qw{\aLoc}\land\Qsc
+  \end{align*}
+  Let substitutions $[\aForm/\QS{\aLoc}{\amode}]$ and  $[\aForm/\QL{\aLoc}{\amode}]$ be defined:
+  \begin{align*}
+    [\aForm/\QS{\aLoc}{\mRLX}] &= [\aForm/\Qw{\aLoc}]
+    &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{\aLoc}]
+    \\
+    [\aForm/\QS{\aLoc}{\mRA}] &= [\aForm/\Qw{\aLoc}]
+    &{} [\aForm/\QL{\aLoc}{\mRA}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
+    \\
+    [\aForm/\QS{\aLoc}{\mSC}] &= [\aForm/\Qw{\aLoc},\aForm/\Qsc]
+    &{} [\aForm/\QL{\aLoc}{\mSC}] &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
+  \end{align*}
+  Update \refdef{def:pomsets-trans} from: % (\ref{S4}/\ref{L4} unchanged):
+  \begin{enumerate}
+  \item[\ref{S3})]
+    $\labelingForm(\aEv)$ implies $\aExp{=}\aVal\land\QS{\aLoc}{\amode}$,
+  \item[\ref{L3})]
+    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$,
+  \item[\ref{T3})]
+    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
+  \end{enumerate}
+  \begin{enumerate}
+  \item[\ref{S4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]$,
+  \item[\ref{S5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{\aLoc}{\amode}]$,
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QL{\aLoc}{\amode}]$.
+  \end{enumerate}
+\end{comment}
+
+\begin{definition}
+  Let formulae $\QS{}{\amode}$ and $\QL{}{\amode}$ be defined:
+  \begin{align*}
+    \QS{}{\mRLX}&=\Qra
+    &\QL{}{\mRLX}&=\Qra
+    \\
+    \QS{}{\mRA}&=\Qra\land\Qrlx
+    &\QL{}{\mRA}&=\Qra
+    \\
+    \QS{}{\mSC}&=\Qra\land \Qrlx \land \Qsc
+    &\QL{}{\mSC}&=\Qra\land\Qsc
+  \end{align*}
+  Let substitutions $[\aForm/\QS{}{\amode}]$ and  $[\aForm/\QL{}{\amode}]$ be defined:
+  \begin{align*}
+    [\aForm/\QS{}{\mRLX}] &= [\aForm/\Qrlx]
+    &{} [\aForm/\QL{}{\mRLX}] &= [\aForm/\Qrlx]
+    \\
+    [\aForm/\QS{}{\mRA}] &= [\aForm/\Qrlx]
+    &{} [\aForm/\QL{}{\mRA}] &= [\aForm/\Qrlx,\aForm/\Qra]
+    \\
+    [\aForm/\QS{}{\mSC}] &= [\aForm/\Qrlx,\aForm/\Qsc]
+    &{} [\aForm/\QL{}{\mSC}] &= [\aForm/\Qrlx,\aForm/\Qra,\aForm/\Qsc]
+  \end{align*}
+\end{definition}
+\begin{definition}%[\xCO/\xRASC]
+  Update \refdef{def:pomsets-trans} and \ref{def:pomsets-fj} to: % (\ref{S4}/\ref{L4} unchanged):
+  \begin{enumerate}
+  \item[\ref{S3})]
+    $\labelingForm(\aEv)$ implies $\aExp{=}\aVal\land\QS{}{\amode}$,
+  \item[\ref{L3})]
+    $\labelingForm(\aEv)$ implies $\QL{}{\amode}$,
+  \item[\ref{F3})]
+    $\labelingForm(\aEv)$ implies $\Qrlx\land\Qra\land\Qsc\land\labelingForm_1(\aEv)$, 
+  % \item[\ref{T3})]
+  %   $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$, %[\TRUE/\Qrlx][\TRUE/\Qra][\TRUE/\Qsc]$,
+  \end{enumerate}
+  \begin{enumerate}
+  \item[\ref{S4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Qrlx\land\aExp{=}\aVal)/\Qrlx]$,
+  \item[\ref{S5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{}{\amode}]$,
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QL{}{\amode}]$.
+  \end{enumerate}
+\end{definition}
+
+The most interesting examples in \reffig{fig:q2} concern $\mRA$ access.
+Every independent transformer substitutes $[\FALSE/\Qrlx]$.  $\Qrlx$ is a
+precondition for any releasing write $\aEv$, ensuring that all preceding
+events must are ordered before $\aEv$.  Conversely, $\Qra$ is a precondition
+of every event.  The independent transformer for any acquiring read $\aEv$
+substitutes $[\FALSE/\Qra]$, ensuring that all following events must be
+ordered after $\aEv$.
+
+Sequential composition ensures coherence.  Note that this definition is
+incorrect if one allows $\FORK{}$ parallelism, since \ref{T3full} substitutes
+$\TRUE$ for every quiescence symbol.  Preconditions of augment-minimal
+pomsets in $\sem{\FORK{\THREAD{\aCmd}}}$ contain no quiescence symbols.
+Instead, preconditions of augment-minimal pomsets in
+$\sem{\FORKJOIN{\THREAD{\aCmd}}}$ are saturated with quiescence symbols.
+
+As before, the substitution in \ref{S4} ensures that left merges are not
+quiescent (\refex{ex:left-merge}).
+% One must be careful, however, due to \emph{inconsistency}.  Consider that
+% \texttt{x=0;x=1} should not have completed pomset with only $\DWP{x}{0}$.
+
+% \eqref{seq-reorder} does not do the right thing with fork either.  If you
+% want to enforce coherence this way then you need to use fork-join as the
+% sequential combinator, rather than fork.
 
 
-[We drop $\reorder$ because incompatible with $\sFORK{}$.  If you want to
-use $\reorder$, then you need to use fork-join as the sequential
-combinator, rather than fork.]
+% [We drop $\reorder$ because incompatible with $\sFORK{}$.  If you want to
+% use $\reorder$, then you need to use fork-join as the sequential
+% combinator, rather than fork.]
 
-We can then encode coherence as follows.
-\begin{enumerate}
-  \setcounter{enumi}{\value{pomsetXSemiCount}}
-\item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\aEv$ or
-  $a\reorder\labeling_2(\aEv)$.
-\end{enumerate}
-
-
-Access modes can be encoded in the independency relation, indexing labels by
-$\amode$, but the extra flexibility of the logic is necessary for \armeight{}
-(see \textsection\ref{sec:internal}).  Using independency, one would also
-need another way to define completed pomsets.  Finally, this use of
-independency is incompatible with fork (see \textsection\ref{sec:co}).
+% We can then encode coherence as follows.
+% \begin{enumerate}
+%   \setcounter{enumi}{\value{pomsetXSemiCount}}
+% \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\aEv$ or
+%   $a\reorder\labeling_2(\aEv)$.
+% \end{enumerate}
 
 
-If we move coherence to independency (and use fork-join), we have the
-following, assuming that each register occurs at most once.
-\begin{align*}
-  \QS{}{\mSC}&=\Q{\mSC}
-  &\QS{}{\mRA}&=\Q{\mRA}
-  &\QS{}{\mRLX}&=\Qx{\aLoc}
-  \\
-  \QL{}{\mSC}&=\Q{\mSC}
-  &\QL{}{\mRA}&=\Qw{\aLoc}
-  &\QL{}{\mRLX}&=\Qw{\aLoc}
-  \\
-  \DS{\aLoc}{\mSC}{\bForm}&=\bForm[\FALSE/\D]
-  &\DS{\aLoc}{\mRA}{\bForm}&=\bForm[\FALSE/\D]
-  &\DS{\aLoc}{\mRLX}{\bForm}&=\bForm[\TRUE/\Dx{\aLoc}] 
-  \\
-  \DL{\aLoc}{\mSC}&=\Dx{\aLoc}
-  &\DL{\aLoc}{\mRA}&=\Dx{\aLoc}
-  &\DL{\aLoc}{\mRLX}&=\TRUE
-\end{align*}
+% Access modes can be encoded in the independency relation, indexing labels by
+% $\amode$, but the extra flexibility of the logic is necessary for \armeight{}
+% (see \textsection\ref{sec:internal}).  Using independency, one would also
+% need another way to define completed pomsets.  Finally, this use of
+% independency is incompatible with fork (see \textsection\ref{sec:co}).
 
-% $\QS{}{\mRLX}=\TRUE$ and otherwise $\QS{}{\amode}=\Q{\amode}$.
 
-% $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\TRUE$.
+% If we move coherence to independency (and use fork-join), we have the
+% following, assuming that each register occurs at most once.
+% \begin{align*}
+%   \QS{}{\mSC}&=\Q{\mSC}
+%   &\QS{}{\mRA}&=\Q{\mRA}
+%   &\QS{}{\mRLX}&=\Qx{\aLoc}
+%   \\
+%   \QL{}{\mSC}&=\Q{\mSC}
+%   &\QL{}{\mRA}&=\Qw{\aLoc}
+%   &\QL{}{\mRLX}&=\Qw{\aLoc}
+%   \\
+%   \DS{\aLoc}{\mSC}{\bForm}&=\bForm[\FALSE/\D]
+%   &\DS{\aLoc}{\mRA}{\bForm}&=\bForm[\FALSE/\D]
+%   &\DS{\aLoc}{\mRLX}{\bForm}&=\bForm[\TRUE/\Dx{\aLoc}] 
+%   \\
+%   \DL{\aLoc}{\mSC}&=\Dx{\aLoc}
+%   &\DL{\aLoc}{\mRA}&=\Dx{\aLoc}
+%   &\DL{\aLoc}{\mRLX}&=\TRUE
+% \end{align*}
 
-% $\DS{\aLoc}{\mRLX}{\bForm}=\bForm[\TRUE/\Dx{\aLoc}]$ and otherwise
-% $\DS{\aLoc}{\amode}{\bForm}=\bForm[\FALSE/\D]$.
+% % $\QS{}{\mRLX}=\TRUE$ and otherwise $\QS{}{\amode}=\Q{\amode}$.
 
-% $\DL{\aLoc}{\mRLX}=\TRUE$ and otherwise $\DL{\aLoc}{\amode}=\Dx{\aLoc}$.
+% % $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\TRUE$.
 
-% \begin{definition}$\phantom{\;}$\par
-%   $\QS{}{\mRLX}=\TRUE$ and otherwise $\QS{}{\amode}=\Q{\amode}$.
+% % $\DS{\aLoc}{\mRLX}{\bForm}=\bForm[\TRUE/\Dx{\aLoc}]$ and otherwise
+% % $\DS{\aLoc}{\amode}{\bForm}=\bForm[\FALSE/\D]$.
 
-%   $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\TRUE$.
+% % $\DL{\aLoc}{\mRLX}=\TRUE$ and otherwise $\DL{\aLoc}{\amode}=\Dx{\aLoc}$.
 
-\noindent
-\begin{enumerate}
-\item[\ref{S3})] $\labelingForm(\aEv)$ implies
-  \begin{math}
-    \aExp{=}\aVal \land \RW \land \QS{}{\amode}
-  \end{math},
-\item[\ref{S4})] $\aTr{\bEvs}{\bForm}$ implies
-  \begin{math}
-    \aExp{=}\aVal \land \DS{\aLoc}{\amode}{\bForm[\aExp/{\aLoc}]}
-  \end{math},
-\item[\ref{S5})] $\aTr{\emptyset}{\bForm}$ implies
-  \begin{math}
-    \lnot\Q{\mRA} \land \DS{\aLoc}{\amode}{\bForm[\aExp/{\aLoc}]}
-  \end{math}
-\end{enumerate}
+% % \begin{definition}$\phantom{\;}$\par
+% %   $\QS{}{\mRLX}=\TRUE$ and otherwise $\QS{}{\amode}=\Q{\amode}$.
 
-\noindent
-\begin{enumerate}
-\item[\ref{L3})] $\labelingForm(\aEv)$ implies
-  \begin{math}
-    \RO \land \QL{}{\amode}
-  \end{math},
-\item[\ref{L4})] $\aTr{\bEvs}{\bForm}$ implies
-  \begin{math}
-    (\aVal{=}\aReg) \limplies \bForm[\aReg/{\aLoc}]
-  \end{math}
-\item[\ref{L5})] $\aTr{\emptyset}{\bForm}$ implies
-  \begin{math}
-    \DL{\aLoc}{\amode} \land \lnot\Q{\mRA} \land (\RW \limplies
-    (\aVal{=}\aReg\lor\aLoc{=}\aReg) \limplies \bForm[\aReg/{\aLoc}] ).
-  \end{math}
-\end{enumerate}
+% %   $\QL{}{\mSC}=\Q{\mSC}$ and otherwise $\QL{}{\amode}=\TRUE$.
 
-\section{Substitutions}
+% \noindent
+% \begin{enumerate}
+% \item[\ref{S3})] $\labelingForm(\aEv)$ implies
+%   \begin{math}
+%     \aExp{=}\aVal \land \RW \land \QS{}{\amode}
+%   \end{math},
+% \item[\ref{S4})] $\aTr{\bEvs}{\bForm}$ implies
+%   \begin{math}
+%     \aExp{=}\aVal \land \DS{\aLoc}{\amode}{\bForm[\aExp/{\aLoc}]}
+%   \end{math},
+% \item[\ref{S5})] $\aTr{\emptyset}{\bForm}$ implies
+%   \begin{math}
+%     \lnot\Q{\mRA} \land \DS{\aLoc}{\amode}{\bForm[\aExp/{\aLoc}]}
+%   \end{math}
+% \end{enumerate}
+
+% \noindent
+% \begin{enumerate}
+% \item[\ref{L3})] $\labelingForm(\aEv)$ implies
+%   \begin{math}
+%     \RO \land \QL{}{\amode}
+%   \end{math},
+% \item[\ref{L4})] $\aTr{\bEvs}{\bForm}$ implies
+%   \begin{math}
+%     (\aVal{=}\aReg) \limplies \bForm[\aReg/{\aLoc}]
+%   \end{math}
+% \item[\ref{L5})] $\aTr{\emptyset}{\bForm}$ implies
+%   \begin{math}
+%     \DL{\aLoc}{\amode} \land \lnot\Q{\mRA} \land (\RW \limplies
+%     (\aVal{=}\aReg\lor\aLoc{=}\aReg) \limplies \bForm[\aReg/{\aLoc}] ).
+%   \end{math}
+% \end{enumerate}
+
+\subsection{Substitutions}
 \label{sec:substitutions}
 
-It is also possible to collapse $\aLoc$ and $\aReg$ in the semantics of
-this paper:
+Recall the load rules from \textsection\ref{sec:tc1}: % (\refdef{def:pomsets-lir}):
+\begin{enumerate}
+\item[\ref{L4})]
+  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+\item[\ref{L5})]
+  $\aTr{\cEvs}{\bForm}$ implies
+  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+\item[\ref{L6})] 
+  $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+\end{enumerate}
+It is also possible to collapse $\aLoc$ and $\aReg$ when doing a load:
 \begin{enumerate}
 \item[\ref{L4})]
   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm[\aReg/\aLoc]$, 
 \item[\ref{L5})]
   $\aTr{\cEvs}{\bForm}$ implies
-  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm[\aReg/\aLoc]$. %, when $\aEvs\neq\emptyset$,
-  % \item[\ref{L6})] 
-  %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm[\aReg/\aLoc]$, when $\aEvs\neq\emptyset$.
+\item[\ref{L6})] 
+  $\aTr{\dEvs}{\bForm}\;$ implies $\bForm[\aReg/\aLoc]$, when $\aEvs=\emptyset$.
 \end{enumerate}
-This semantics is incomparable to that the version without the substitution
-of $[r/x]$.
 
-\begin{scope}
-  Consider the following:
-  \begin{gather*}
-    \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-    \IF{r\land s}\THEN \PW{z}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-        \event{a3}{r\land s\;\mathsf{even}\mid\DW{y}{1}}{}
-        \event{a4}{r\land s\mid\DW{z}{1}}{below=of a3}
-      \end{tikzinline}}
-  \end{gather*}
-  Prepending $\PRP{x}{s}$, we get the same result regardless of whether we
-  substitute $[s/x]$, since $x$ does not occur in either precondition.  Here
-  we show the independent case:
-  \begin{gather*}
-    \PR{x}{s}\SEMI
-    \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-    \IF{r\land s}\THEN \PW{z}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-        \event{a2}{\DR{x}{2}}{}
-        \event{a3}{(2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{above right=of a2}
-        \event{a4}{(2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-      \end{tikzinline}}
-  \end{gather*}
-  Prepending $\PRP{x}{r}$, we now get different results since the
-  preconditions mention $x$.
-  Without substitution:
-  \begin{gather*}
-    \PR{x}{r}\SEMI
-    \PR{x}{s}\SEMI
-    \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-    \IF{r\land s}\THEN \PW{z}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a2}{\DR{x}{2}}{below=of a1}
-        \event{a3}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
-        \event{a4}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-        \po{a1}{a3}
-        \po[out=-20,in=177]{a1}{a4}
-      \end{tikzinline}}
-  \end{gather*}
-  Prepending $\PWP{x}{0}$, which substitutes $[0/x]$, the precondition of
-  $\DWP{y}{1}$ becomes
-  $(1{=}r\limplies (2{=}s\lor0{=}s)\limplies (r\land s\;\mathsf{even}))$,
-  which is a tautology, whereas the precondition of $\DW{z}{1}$ becomes
-  $(1{=}r\limplies(2{=}s\lor0{=}s)\limplies (r\land s))$,
-  which is not.   In order to be top-level, $\DW{z}{1}$ must depend on
-  $\DR{x}{2}$; in this case the precondition becomes
-  $(1{=}r\limplies2{=}s\limplies (r\land s))$, which is a tautology.  
-  \begin{gather*}
-    % \PW{x}{0}\SEMI
-    % \PR{x}{r}\SEMI
-    % \PR{x}{s}\SEMI
-    % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-    % \IF{r\land s}\THEN \PW{z}{1}\FI
-    % \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a0}{\DW{x}{0}}{}
-        \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{\DR{x}{2}}{right=of a1}
-        \event{a3}{\DW{y}{1}}{right=of a2}
-        \event{a4}{\DW{z}{1}}{right=of a3}
-        % \wk{a0}{a1}
-        % \wk[out=-20,in=-160]{a0}{a2}
-        \po[out=20,in=160]{a1}{a3}
-        \po[out=20,in=160]{a1}{a4}
-        \po[out=-20,in=-160]{a2}{a4}
-      \end{tikzinline}}
-  \end{gather*}
-  The situation reverses with the substitution $[r/x]$:
-  \begin{gather*}
-    \PR{x}{r}\SEMI
-    \PR{x}{s}\SEMI
-    \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-    \IF{r\land s}\THEN \PW{z}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a2}{\DR{x}{2}}{below=of a1}
-        \event{a3}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
-        \event{a4}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
-        \po{a1}{a3}
-        \po[out=-20,in=177]{a1}{a4}
-      \end{tikzinline}}
-  \end{gather*}
-  Prepending $\PWP{x}{0}$:
-  \begin{gather*}
-    % \PW{x}{0}\SEMI
-    % \PR{x}{r}\SEMI
-    % \PR{x}{s}\SEMI
-    % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-    % \IF{r\land s}\THEN \PW{z}{1}\FI
-    % \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a0}{\DW{x}{0}}{}
-        \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{\DR{x}{2}}{right=of a1}
-        \event{a3}{\DW{y}{1}}{right=of a2}
-        \event{a4}{\DW{z}{1}}{right=of a3}
-        % \wk{a0}{a1}
-        % \wk[out=-20,in=-160]{a0}{a2}
-        \po[out=20,in=160]{a1}{a3}
-        \po[out=20,in=160]{a1}{a4}
-        \po{a2}{a3}
-      \end{tikzinline}}
-  \end{gather*}
-  The dependency has changed from $\DRP{x}{2}\xpo\DWP{z}{1}$ to
-  $\DRP{x}{2}\xpo\DWP{y}{1}$.  The resulting sets of pomsets are
-  incomparable.
-\end{scope}
+Perhaps surprisingly, these two semantics are incomparable.  Consider the
+following:
+\begin{gather*}
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a3}{r\land s\;\mathsf{even}\mid\DW{y}{1}}{}
+      \event{a4}{r\land s\mid\DW{z}{1}}{below=of a3}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PRP{x}{s}$, we get the same result regardless of whether we
+substitute $[s/x]$, since $x$ does not occur in either precondition.  Here
+we show the independent case:
+\begin{gather*}
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a2}{\DR{x}{2}}{}
+      \event{a3}{(2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{above right=of a2}
+      \event{a4}{(2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PRP{x}{r}$, we now get different results since the
+preconditions mention $x$.
+Without substitution:
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{2}}{below=of a1}
+      \event{a3}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
+      \event{a4}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+      \po{a1}{a3}
+      \po[out=-20,in=177]{a1}{a4}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PWP{x}{0}$, which substitutes $[0/x]$, the precondition of
+$\DWP{y}{1}$ becomes
+$(1{=}r\limplies (2{=}s\lor0{=}s)\limplies (r\land s\;\mathsf{even}))$,
+which is a tautology, whereas the precondition of $\DW{z}{1}$ becomes
+$(1{=}r\limplies(2{=}s\lor0{=}s)\limplies (r\land s))$,
+which is not.   In order to be top-level, $\DW{z}{1}$ must depend on
+$\DR{x}{2}$; in this case the precondition becomes
+$(1{=}r\limplies2{=}s\limplies (r\land s))$, which is a tautology.  
+\begin{gather*}
+  % \PW{x}{0}\SEMI
+  % \PR{x}{r}\SEMI
+  % \PR{x}{s}\SEMI
+  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  % \IF{r\land s}\THEN \PW{z}{1}\FI
+  % \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a0}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=of a0}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \wk{a0}{a1}
+      % \wk[out=-20,in=-160]{a0}{a2}
+      \po[out=20,in=160]{a1}{a3}
+      \po[out=20,in=160]{a1}{a4}
+      \po[out=-20,in=-160]{a2}{a4}
+    \end{tikzinline}}
+\end{gather*}
+The situation reverses with the substitution $[r/x]$:
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{2}}{below=of a1}
+      \event{a3}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a1}
+      \event{a4}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s)\mid\DW{z}{1}}{below=of a3}
+      \po{a1}{a3}
+      \po[out=-20,in=177]{a1}{a4}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PWP{x}{0}$:
+\begin{gather*}
+  % \PW{x}{0}\SEMI
+  % \PR{x}{r}\SEMI
+  % \PR{x}{s}\SEMI
+  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  % \IF{r\land s}\THEN \PW{z}{1}\FI
+  % \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a0}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=of a0}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \wk{a0}{a1}
+      % \wk[out=-20,in=-160]{a0}{a2}
+      \po[out=20,in=160]{a1}{a3}
+      \po[out=20,in=160]{a1}{a4}
+      \po{a2}{a3}
+    \end{tikzinline}}
+\end{gather*}
+The dependency has changed from $\DRP{x}{2}\xpo\DWP{z}{1}$ to
+$\DRP{x}{2}\xpo\DWP{y}{1}$.  The resulting sets of pomsets are
+incomparable.
+
 
 Thinking in terms of hardware, the difference is whether reads update the
 cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
@@ -715,14 +1096,15 @@ the other.
 Skolemization is motivated by disjunction closure for predicate transformers,
 which do not appear in \jjr{}; see \textsection\ref{sec:pomsets-trans}.
 
-In \textsection\ref{sec:tc1}, we give the semantics of load for nonempty
-pomsets as:
+In \textsection\ref{sec:tc1}, % (\refdef{def:pomsets-lir}):
+we give the semantics of load for nonempty pomsets as:
 \begin{enumerate}
 \item[\ref{L4})]
   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
 \item[\ref{L5})]
   $\aTr{\cEvs}{\bForm}$ implies
-  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$. %, when $\aEvs\neq\emptyset$,
+  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$.
+  % , when $\aEvs\neq\emptyset$,
   % \item[\ref{L6})] 
   %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
 \end{enumerate}
@@ -732,9 +1114,7 @@ In \jjr{}, the definition is roughly as follows:
 \item[\ref{L4})]
   $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}\;$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
-  % \item[\ref{L6})]
-  %   $\aTr{\dEvs}{\bForm}\;$ implies $(\forall\aReg)\bForm$, when $\aEvs=\emptyset$.
+  $\aTr{\cEvs}{\bForm}\;$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$.
 \end{enumerate}
 These substitutions collapse $\aLoc$ and $\aReg$, allowing local invariant
 reasoning, as in \textsection\ref{sec:tc1}.  Without Skolemizing it is
@@ -775,7 +1155,7 @@ references.
       \end{tikzinline}}
   \end{gather*}
   Although the execution seems reasonable, the precondition on the write is
-  unsatisfiable.
+  not a tautology.
 \end{scope}
 
 
@@ -888,6 +1268,26 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
         \\
         \hbox{\begin{tikzinline}[node distance=1em]
             \event{a}{\lnot\aExp\mid\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+    \end{align*}
+  \end{scope}
+  Joining left and right, we have:
+  \begin{scope}
+    \footnotesize
+    \begin{align*}
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{x}{1}\FI
+        \SEMI
+        \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+        \SEMI
+        \IF{\aExp}\THEN\PW{y}{1}\FI
+        \SEMI
+        \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\DW{x}{1}}{}
+            \event{b}{\DW{y}{1}}{right=of a}
           \end{tikzinline}}
       \end{gathered}
     \end{align*}
@@ -1466,35 +1866,38 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   precede both reads of $x$.
 \end{comment}
 
-\subsubsection*{Triangular Races}
+\subsubsection*{A Note on Mixed Races}
 
-The notion of data-race for local data-race freedom is incorrect in \jjr{}.
-\begin{gather*}
+In preparing this paper, we came across the following example, which appears
+to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
+\begin{gather}
+  \nonumber
   \PW{x}{1}\SEMI
   \PW[\mRA]{y}{1}\SEMI
   \PR[\mRA]{x}{r}
   \PAR
   \IF{\PR[\mRA]{y}{}}\THEN \PW[\mRA]{x}{2}\FI
   \\
+  \label{mix1}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
       \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
       \raevent{a3}{\DR[\mRA]{x}{1}}{right=of a2}
       \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mRA]{y}{1}}{below=of a1}
       \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       \rf[out=20,in=160]{a1}{a3}
       \rf[out=20,in=160]{a2}{b1}
+      \wk[out=-20,in=-160]{a3}{b2}
       \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
     \end{tikzinline}}
-\end{gather*}
-Consider the prefix with everything above but the read of $x$.  When extending this
-prefix as above, the read sees a stale value.  The local DRF theorem requires
-that whenever such a stale read is possible there is an SC execution that can
-be derived simply by changing the read, and further, that this SC execution
-has a data-race. In this example, there is an SC execution, but it does not
-exhibit a data-race by the definition of \jjr{}.
-\begin{gather*}
+  \\
+  \label{mix2}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
       \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
@@ -1506,13 +1909,79 @@ exhibit a data-race by the definition of \jjr{}.
       \rf[out=160,in=20]{b2}{a3}
       \sync{b1}{b2}
     \end{tikzinline}}
+\end{gather}
+The program is data-race free.  The two executions shown are the only
+top-level executions that include $\DWP[\mRA]{x}{2}$.
+
+Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19} is stated by extending
+execution sequences.  In the terminology of
+\cite{DBLP:conf/ppopp/DongolJR19}, a read is \emph{$L$-weak} if it is
+sequentially stale.  Let
+\begin{math}
+  \rho=\DWP{x}{1}
+  \DWP[\mRA]{y}{1}
+  \DRP[\mRA]{y}{1}
+  \DWP[\mRA]{x}{2}
+\end{math}
+be a sequence and
+\begin{math}
+  \alpha=\DRP[\mRA]{x}{1}.
+\end{math}
+$\rho$ is $L$-sequential and $\alpha$ is $L$-weak in $\rho\alpha$.  But there
+is no execution of this program that includes a data race, contradicting the
+theorem.  The error seems to be in Lemma A.4 of
+\cite{DBLP:conf/ppopp/DongolJR19}, which states that if $\alpha$ is $L$-weak
+after an $L$-sequential $\rho$, then $\alpha$ must be in a data race.  That
+is clearly false here, since $\DRP[\mRA]{x}{1}$ is stale, but the program is
+data race free.
+
+In proving the SC-LDRF result in \jjr{\textsection8}, we noted that our proof
+technique is more robust than that of \cite{DBLP:conf/ppopp/DongolJR19},
+because it limits the prefixes that must be considered.  In \eqref{mix1}, the
+induction hypothesis requires that we add $\DRP[\mRA]{x}{1}$ before
+$\DWP[\mRA]{x}{2}$ since $\DRP[\mRA]{x}{1}\xwk\DWP[\mRA]{x}{2}$.  In
+particular,
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
+      % \raevent{a3}{\DR[\mRA]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mRA]{y}{1}}{below=of a1}
+      \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      % \rf[out=20,in=160]{a1}{a3}
+      \rf[out=20,in=160]{a2}{b1}
+      % \wk[out=-20,in=-160]{a3}{b2}
+      \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
+    \end{tikzinline}}
 \end{gather*}
-This error is inherited from \citep[Lemma A.4]{DBLP:conf/ppopp/DongolJR19},
-which assumes that $\DRP[\mRA]{x}{1}$ and $\DWP[\mRA]{x}{2}$ are racing in
-the first execution because they are not ordered by happens-before.  But this
-is false since neither is plain.
-
-We believe that the fix to consider a broader notion of data race when
-stating local DRF with mixed-mode access.
-
+is not a downset of \eqref{mix1}, because
+$\DRP[\mRA]{x}{1}\xwk\DWP[\mRA]{x}{2}$.  As we noted in \jjr{\textsection8},
+this affects the inductive order in which we move across pomsets, but does
+not affect the set of pomsets that are considered.  In particular,
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
+      % \raevent{a3}{\DR[\mRA]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mRA]{y}{1}}{below=of a1}
+      % \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      % \rf[out=20,in=160]{a1}{a3}
+      \rf[out=20,in=160]{a2}{b1}
+      % \wk[out=-20,in=-160]{a3}{b2}
+      % \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
+    \end{tikzinline}}
+\end{gather*}
+is a downset of \eqref{mix1}.
 

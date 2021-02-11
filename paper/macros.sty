@@ -1,3 +1,4 @@
+\newcommand{\fid}{\mathsf{id}}
 \newcommand{\NEG}[1]{\texttt{-}#1}
 \newcommand{\bigstep}[3]{(#1,#2)\Downarrow#3}
 \newcommand{\aState}{\sigma}
@@ -5,6 +6,7 @@
 
 \newcommand{\noSUB}[1]{}
 \newcommand{\noOR}[1]{}
+\newcommand{\reffig}[1]{Fig~\ref{#1}}
 \newcommand{\refdef}[1]{Def~\ref{#1}}
 \newcommand{\refex}[1]{Ex~\ref{#1}}
 \newcommand{\refexs}[2]{Ex~\ref{#1}/\ref{#2}}
@@ -17,8 +19,8 @@
 % \newcommand{\DS}[3]{#3\,\mathsf{ds}_{#2}^{#1}}
 % \newcommand{\DSP}[3]{(#3)\mathsf{ds}_{#2}^{#1}}
 % =======
-\newcommand{\QL}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{R}#1}}}
-\newcommand{\QS}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{W}#1}}}
+\newcommand{\QL}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{L}#1}}}
+\newcommand{\QS}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{S}#1}}}
 \newcommand{\DS}[2]{{[}{#2}/\Dx{#1}{]}}
 \newcommand{\DL}[2]{\mathord{\downarrow^{#1}_{#2}}}
 %\newcommand{\DS}[3]{\mathsf{ds}_{#2}^{#1}#3}
@@ -34,6 +36,8 @@
 \newcommand{\Qr}[1]{\mathsf{Q}_{\mathsf{ro}}^{#1}}
 \newcommand{\Qw}[1]{\mathsf{Q}_{\mathsf{wo}}^{#1}}
 \newcommand{\Qsc}{\mathsf{Q}_{\mathsf{sc}}}
+\newcommand{\Qra}{\mathsf{Q}_{\mathsf{acq}}}
+\newcommand{\Qrlx}{\mathsf{Q}^{*}}%_{\mathsf{rlx}}}
 \newcommand{\DxREF}[1]{\Dx{\REF{#1}}}
 \newcommand{\QxREF}[1]{\Qx{\REF{#1}}}
 \newcommand{\QwREF}[1]{\Qw{\REF{#1}}}
@@ -44,6 +48,7 @@
 % \newcommand{\spacetag}[2][3em]{\makebox[#1]{}\tag{#2}}
 % \newcommand{\notagparens}{\renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{\ignorespaces##1\unskip\@@italiccorr}}}}
 
+\usepackage{subcaption}
 \usepackage{pifont}
 \newcommand{\qmark}{{\color{blue!80!black}\text{?}}}
 \newcommand{\cmark}{{\color{green!80!black}\text{\ding{51}}}}
@@ -644,8 +649,11 @@
 \newcommand{\ABORT}{\mathtt{abort}}
 \newcommand{\NIL}{\mathsf{0}}
 \newcommand{\THREAD}[1]{#1}%\mathtt{thread}\ifnotempty{#1}{\;#1}}
-\newcommand{\FORK}[1]{\mathtt{fork}\ifnotempty{#1}{\;#1}}
-\newcommand{\FORKJOIN}[1]{\mathtt{fork}\ifemptyelse{#1}{\text{-}}{\;#1\SEMI}\mathtt{join}}
+\newcommand{\FORK}[1]{\mathtt{fork}\ifnotempty{#1}{\,\THEN#1\FI}}
+\newcommand{\FORKP}[1]{\FORK{#1}}%{\!\THEN#1\FI}}
+\newcommand{\FORKJOIN}[1]{\mathtt{fork}\ifemptyelse{#1}{\text{-}}{\,\THEN#1\FI\SEMI}\mathtt{join}}
+\newcommand{\FORKJOINP}[1]{\FORKJOIN{#1}}%\!\THEN#1\FI}}
+\newcommand{\JOIN}{\mathtt{join}}
 \newcommand{\STOP}{\mathtt{stop}}
 \newcommand{\AND}{\mathbin{\texttt{\&\!\&}}}%\land}
 \newcommand{\BANG}{\texttt{\!!\!}}%\lnot}%\mathtt{!!}\mkern-1mu}

@@ -321,8 +321,8 @@ most once in a program.  We relax this by renaming.
     \end{minipage}
   \end{center}
   \caption{Full Semantics of Loads, Stores and Threads (See \refdef{def:QS}
-    for $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ and \refdef{def:DS} for
-    $\DL{\aLoc}{\amode}$ and $\DS{\aLoc}{\amode}$)}
+    for $\QS{\aLoc}{\amode}$, $\QL{\aLoc}{\amode}$, $[\aForm/\QS{\aLoc}{\amode}]$, $[\aForm/\QL{\aLoc}{\amode}]$ and \refdef{def:DS} for
+    $\DL{\aLoc}{\amode}$, $\DS{\aLoc}{\amode}$)}
   \label{fig:full}
 \end{figure*}    
 
@@ -702,7 +702,7 @@ pomset, unlike \jjr{}.
   The precondition of $\DWREF{0}{0}$ is a tautology; however, this is not
   possible for $(\REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r)$ alone, using \refdef{def:pomsets-addr}.
   %
-  The full semantics, given in Figure~\ref{fig:full}, enables this execution using if-closure.  The
+  The full semantics, given in \reffig{fig:full}, enables this execution using if-closure.  The
   individual commands have the pomsets:
   \begin{align*}
     \begin{gathered}
