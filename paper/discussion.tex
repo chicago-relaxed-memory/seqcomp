@@ -555,7 +555,7 @@ with preconditions \emph{and termination}.
   \noindent
   If $\aPS \in \sTHREAD{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}
-  \item[1--2)] as for $\sTHREAD{}$ in \refdef{def:pomsets-arm},% \reffig{fig:full},    
+  \item[1--3)] as for $\sTHREAD{}$ in \refdef{def:pomsets-arm}, repeating 3 below,% \reffig{fig:full},    
   \item[\ref{T3full})]
     $\labelingForm(\aEv)$ implies
     $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
@@ -756,27 +756,33 @@ quiescence symbols required are $\Qrlx$, $\Qra$ and $\Qsc$.
 
 \begin{definition}
   Let formulae $\QS{}{\amode}$ and $\QL{}{\amode}$ be defined:
-  \begin{align*}
-    \QS{}{\mRLX}&=\Qra
-    &\QL{}{\mRLX}&=\Qra
-    \\
-    \QS{}{\mRA}&=\Qra\land\Qrlx
-    &\QL{}{\mRA}&=\Qra
-    \\
-    \QS{}{\mSC}&=\Qra\land \Qrlx \land \Qsc
-    &\QL{}{\mSC}&=\Qra\land\Qsc
-  \end{align*}
+  \begin{scope}
+    \small
+    \begin{align*}
+      \QS{}{\mRLX}&=\Qra
+      &\QL{}{\mRLX}&=\Qra
+      \\
+      \QS{}{\mRA}&=\Qra\land\Qrlx
+      &\QL{}{\mRA}&=\Qra
+      \\
+      \QS{}{\mSC}&=\Qra\land \Qrlx \land \Qsc
+      &\QL{}{\mSC}&=\Qra\land\Qsc
+    \end{align*}
+  \end{scope}
   Let substitutions $[\aForm/\QS{}{\amode}]$ and  $[\aForm/\QL{}{\amode}]$ be defined:
-  \begin{align*}
-    [\aForm/\QS{}{\mRLX}] &= [\aForm/\Qrlx]
-    &{} [\aForm/\QL{}{\mRLX}] &= [\aForm/\Qrlx]
-    \\
-    [\aForm/\QS{}{\mRA}] &= [\aForm/\Qrlx]
-    &{} [\aForm/\QL{}{\mRA}] &= [\aForm/\Qrlx,\aForm/\Qra]
-    \\
-    [\aForm/\QS{}{\mSC}] &= [\aForm/\Qrlx,\aForm/\Qsc]
-    &{} [\aForm/\QL{}{\mSC}] &= [\aForm/\Qrlx,\aForm/\Qra,\aForm/\Qsc]
-  \end{align*}
+  \begin{scope}
+    \small
+    \begin{align*}
+      [\aForm/\QS{}{\mRLX}] &= [\aForm/\Qrlx]
+      &{} [\aForm/\QL{}{\mRLX}] &= [\aForm/\Qrlx]
+      \\
+      [\aForm/\QS{}{\mRA}] &= [\aForm/\Qrlx]
+      &{} [\aForm/\QL{}{\mRA}] &= [\aForm/\Qrlx,\aForm/\Qra]
+      \\
+      [\aForm/\QS{}{\mSC}] &= [\aForm/\Qrlx,\aForm/\Qsc]
+      &{} [\aForm/\QL{}{\mSC}] &= [\aForm/\Qrlx,\aForm/\Qra,\aForm/\Qsc]
+    \end{align*}
+  \end{scope}
 \end{definition}
 \begin{definition}%[\xCO/\xRASC]
   Update \refdef{def:pomsets-trans} and \ref{def:pomsets-fj} to: % (\ref{S4}/\ref{L4} unchanged):

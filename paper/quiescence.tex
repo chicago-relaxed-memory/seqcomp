@@ -84,8 +84,8 @@ symbols, for example:
   \end{gather*}
 
 \begin{definition}
-  Let $[\aForm/\Qr{*}]$ be the substitution that replaces all
-  symbols $\Qr{\aLoc}$ by $\aForm$, and similarly $[\aForm/\Qw{*}]$.
+  \label{def:q-sub}
+  Let $[\aForm/\Q{}]$ substitute all quiescence symbols by $\aForm$.
 \end{definition}
 
 \begin{definition}[\xCO]
@@ -97,7 +97,7 @@ symbols, for example:
   \item[\ref{L3})]
     $\labelingForm(\aEv)$ implies $\Qw{\aLoc}$,
   \item[\ref{T3})]
-    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}]$,
+    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
@@ -418,33 +418,39 @@ symbols, for example:
   \label{def:QS}
   Let $\Qr{*}=\textstyle\bigwedge_\bLoc \Qr{\bLoc}$, and similarly for $\Qw{*}$.\\
   Let formulae $\QS{\aLoc}{\amode}$ and $\QL{\aLoc}{\amode}$ be defined:
-  \begin{align*}
-    \QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
-    &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
-    \\
-    \QS{\aLoc}{\mRA}&=
-    \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
-    &\QL{\aLoc}{\mRA}&=\Qw{\aLoc}
-    \\
-    \QS{\aLoc}{\mSC}&=
-    \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
-    \land \Qsc
-    &\QL{\aLoc}{\mSC}&=\Qw{\aLoc}\land\Qsc
-  \end{align*}
-% \end{definition}
+  \begin{scope}
+    \small
+    \begin{align*}
+      \QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
+      &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
+      \\
+      \QS{\aLoc}{\mRA}&=
+      \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
+      &\QL{\aLoc}{\mRA}&=\Qw{\aLoc}
+      \\
+      \QS{\aLoc}{\mSC}&=
+      \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
+      \land \Qsc
+      &\QL{\aLoc}{\mSC}&=\Qw{\aLoc}\land\Qsc
+    \end{align*}
+  \end{scope}
+  % \end{definition}
 % \begin{definition}
-  %Let $[\aForm/\Qr{*}]$ substitute $\aForm$ for every $\Qr{\bLoc}$, and similarly for $\Qw{*}$.
+  Let $[\aForm/\Qr{*}]$ substitute $\aForm$ for every $\Qr{\bLoc}$, and similarly for $\Qw{*}$.
   Let substitutions $[\aForm/\QS{\aLoc}{\amode}]$ and  $[\aForm/\QL{\aLoc}{\amode}]$ be defined:
-  \begin{align*}
-    [\aForm/\QS{\aLoc}{\mRLX}] &= [\aForm/\Qw{\aLoc}]
-    &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{\aLoc}]
-    \\
-    [\aForm/\QS{\aLoc}{\mRA}] &= [\aForm/\Qw{\aLoc}]
-    &{} [\aForm/\QL{\aLoc}{\mRA}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
-    \\
-    [\aForm/\QS{\aLoc}{\mSC}] &= [\aForm/\Qw{\aLoc},\aForm/\Qsc]
-    &{} [\aForm/\QL{\aLoc}{\mSC}] &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
-  \end{align*}
+  \begin{scope}
+    \small
+    \begin{align*}
+      [\aForm/\QS{\aLoc}{\mRLX}] &= [\aForm/\Qw{\aLoc}]
+      &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{\aLoc}]
+      \\
+      [\aForm/\QS{\aLoc}{\mRA}] &= [\aForm/\Qw{\aLoc}]
+      &{} [\aForm/\QL{\aLoc}{\mRA}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
+      \\
+      [\aForm/\QS{\aLoc}{\mSC}] &= [\aForm/\Qw{\aLoc},\aForm/\Qsc]
+      &{} [\aForm/\QL{\aLoc}{\mSC}] &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
+    \end{align*}
+  \end{scope}
 \end{definition}
 
 \begin{definition}[\xCO/\xRASC]
@@ -455,8 +461,8 @@ symbols, for example:
     $\labelingForm(\aEv)$ implies $\aExp{=}\aVal\land\QS{\aLoc}{\amode}$,
   \item[\ref{L3})]
     $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$,
-  \item[\ref{T3})]
-    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
+  % \item[\ref{T3})]
+  %   $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
