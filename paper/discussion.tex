@@ -1,4 +1,46 @@
 \section{Discussion}
+\subsection{Closure properties}
+
+The semantics is closed with respect to \emph{augments} and
+\emph{downsets}.
+Augments include more order and stronger formulae; in examples, we typically
+consider pomsets that are augment-minimal.
+Downsets include a subset of initial events, similar to \emph{prefixes} for
+strings.
+\begin{definition}
+  \label{def:augment}
+  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
+  \begin{enumerate}
+  \item $\aEvs_2=\aEvs_1$,
+  \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+  \item $\labelingForm_2(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item $\aTr[2]{\bEvs}{\aEv}$ implies $\aTr[1]{\bEvs}{\aEv}$,
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  \label{def:downset}
+  $\aPS_2$ is an \emph{downset} of $\aPS_1$ if
+  \begin{enumerate}
+  \item $\aEvs_2\subseteq\aEvs_1$,
+  \item $(\forall \aEv\in\aEvs_2)$ $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+  \item $(\forall \aEv\in\aEvs_2)$ $\labelingForm_2(\aEv)=\labelingForm_1(\aEv)$,
+  \item $(\forall \aEv\in\aEvs_2)$ $\aTr[2]{\bEvs}{\aEv}=\aTr[1]{\bEvs}{\aEv}$,
+  \item $(\forall \bEv\in\aEvs_2)$ $(\forall \aEv\in\aEvs_2)$ $\bEv\le_2\aEv$ if and only if $\bEv\le_1\aEv$,
+  \item $(\forall \bEv\in\aEvs_1)$ $(\forall \aEv\in\aEvs_2)$ if $\bEv\le_1\aEv$ then $\bEv\in\aEvs_2$.
+  \end{enumerate}
+\end{definition}
+
+\begin{proposition}
+  Suppose $\aPS_1\in\sem{\aCmd}$.
+  \begin{enumerate}
+  \item If $\aPS_2$ is an augment of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+  \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+  \end{enumerate}
+\end{proposition}
+
+
 \subsection{Comparison with Weakest Preconditions}
 
 We compare traditional transformers to the dependent-case transformers of
@@ -8,11 +50,11 @@ on $\aTr{\aEvs}{}$ throughout this section.  We also assume that each
 register appears at most once in a program, as we did throughout
 \textsection\ref{sec:model}--\ref{sec:arm}.
 
-We are not interested in isolating the \emph{weakest} precondition.  Thus we
-think of transformers as Hoare triples.  In addition, all programs in our
-language are strongly normalizing, so we need not distinguish strong and weak
-correctness.  In this setting, the Hoare triple
-$\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when
+Because of augment closure, we are not interested in isolating the
+\emph{weakest} precondition.  Thus we think of transformers as Hoare triples.
+In addition, all programs in our language are strongly normalizing, so we
+need not distinguish strong and weak correctness.  In this setting, the Hoare
+triple $\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when
 $\aForm \limplies \fwp{\aCmd}{\bForm}$.
 
 Hoare triples do not distinguish thread-local variables from shared
@@ -343,43 +385,6 @@ The predicate transformers are:
 % \subsection{Fences}
 % \label{sec:fences}
 
-\subsection{Closure properties}
-
-\begin{definition}
-  \label{def:augment}
-  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
-  \begin{enumerate}
-  \item $\aEvs_2=\aEvs_1$,
-  \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-  \item $\labelingForm_2(\aEv)$ implies $\labelingForm_1(\aEv)$,
-  \item $\aTr[2]{\bEvs}{\aEv}$ implies $\aTr[1]{\bEvs}{\aEv}$,
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
-  \end{enumerate}
-\end{definition}
-
-\begin{definition}
-  \label{def:downset}
-  $\aPS_2$ is an \emph{downset} of $\aPS_1$ if
-  \begin{enumerate}
-  \item $\aEvs_2\subseteq\aEvs_1$,
-  \item $(\forall \aEv\in\aEvs_2)$ $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-  \item $(\forall \aEv\in\aEvs_2)$ $\labelingForm_2(\aEv)=\labelingForm_1(\aEv)$,
-  \item $(\forall \aEv\in\aEvs_2)$ $\aTr[2]{\bEvs}{\aEv}=\aTr[1]{\bEvs}{\aEv}$,
-  \item $(\forall \bEv\in\aEvs_2)$ $(\forall \aEv\in\aEvs_2)$ $\bEv\le_2\aEv$ if and only if $\bEv\le_1\aEv$,
-  \item $(\forall \bEv\in\aEvs_1)$ $(\forall \aEv\in\aEvs_2)$ if $\bEv\le_1\aEv$ then $\bEv\in\aEvs_2$.
-  \end{enumerate}
-\end{definition}
-
-\begin{proposition}
-  Suppose $\aPS_1\in\sem{\aCmd}$.
-  \begin{enumerate}
-  \item If $\aPS_2$ is an augment of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
-  \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
-  \end{enumerate}
-\end{proposition}
-
-In examples, we typically consider pomsets that are augment-minimal.
-
 \subsection{Completed Pomsets and Fork}
 \label{sec:fork}
 
@@ -482,7 +487,7 @@ above is forbidden in:
 \subsection{Fork-Join}
 \label{sec:join}
 
-In this subsection, we model a variant of our language that removes
+In this subsection, we model a variant of our language that removes the
 asynchronous $\FORK{}$ operation and adds a synchronous $\FORKJOIN{}$.
 \begin{align*}
   \aCmd
@@ -594,7 +599,7 @@ with preconditions \emph{and termination}.
 We embed pomsets with predicate transformers into pomsets with preconditions
 and termination using {completion}.  The rules for thread groups keep track
 of the termination predicate.
-As noted \textsection\ref{sec:fork}, every pomset in $\sem{\FORK{\aGrp}}$ is
+As noted in \textsection\ref{sec:fork}, every pomset in $\sem{\FORK{\aGrp}}$ is
 completed.  In contrast, a pomset in $\sem{\FORKJOIN{\aGrp}}$ is completed
 only if every thread in $\aGrp$ is completed.
 
@@ -668,10 +673,11 @@ must precede those of $\sem{\aCmd_2}$.
 % \end{figure}
 
 In \textsection\ref{sec:sync}, we encoded coherence and synchronized access
-using quiescence symbols.  Building on the language with $\FORKJOIN{}$, it
-model coherence using independency (\textsection\ref{sec:pomsets}), rather
-than encoding it in the logic.
+using quiescence symbols.  Building on the language with $\FORKJOIN{}$, it is
+possible to model coherence using independency
+(\textsection\ref{sec:pomsets}), rather than encoding it in the logic.
 \begin{definition}
+  \label{def:independency-coherence}
   \noindent
   If $\aPS \in (\aPSS_1\sSEMI\aPSS_2)$ then $(\exists\aPS_1\in\aPSS_1)$
   $(\exists\aPS_2\in\aPSS_2)$
@@ -804,15 +810,31 @@ of every event.  The independent transformer for any acquiring read $\aEv$
 substitutes $[\FALSE/\Qra]$, ensuring that all following events must be
 ordered after $\aEv$.
 
-Sequential composition ensures coherence.  Note that this definition is
-incorrect if one allows $\FORK{}$ parallelism, since \ref{T3full} substitutes
-$\TRUE$ for every quiescence symbol.  Preconditions of augment-minimal
-pomsets in $\sem{\FORK{\THREAD{\aCmd}}}$ contain no quiescence symbols.
-Instead, preconditions of augment-minimal pomsets in
-$\sem{\FORKJOIN{\THREAD{\aCmd}}}$ are saturated with quiescence symbols.
-
 As before, the substitution in \ref{S4} ensures that left merges are not
 quiescent (\refex{ex:left-merge}).
+
+Item \ref{seq-reorder} of \refdef{def:independency-coherence} ensures
+coherence.  This definition is incompatible with asynchronous $\FORK{}$
+parallelism of \refdef{def:pomsets-group}, where we expect executions such
+as:
+\begin{gather*}
+  \FORK{\THREAD{\PR{x}{r}}}\SEMI \PW{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a}{\DR{x}{1}}{}
+      \event{b}{\DW{x}{1}}{right=3em of a}
+      \rf{b}{a}
+    \end{tikzinline}}
+\end{gather*}
+Item \ref{seq-reorder} would require $\DRP{x}{1} \xwk \DWP{x}{1}$, forbidding
+this.
+
+% , since \ref{T3full} substitutes
+% $\TRUE$ for every quiescence symbol.  Preconditions of augment-minimal
+% pomsets in $\sem{\FORK{\THREAD{\aCmd}}}$ contain no quiescence symbols.
+% Instead, preconditions of augment-minimal pomsets in
+% $\sem{\FORKJOIN{\THREAD{\aCmd}}}$ are saturated with quiescence symbols.
+
 % One must be careful, however, due to \emph{inconsistency}.  Consider that
 % \texttt{x=0;x=1} should not have completed pomset with only $\DWP{x}{0}$.
 
