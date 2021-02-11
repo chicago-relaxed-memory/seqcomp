@@ -100,8 +100,6 @@
 \usepackage{macros}
 \usepackage[sectionbib,numbers,square]{natbib}
 
-\AtEndDocument{\refstepcounter{definition}\label{finaldef}}
-\AtEndDocument{\refstepcounter{figure}\label{finalfig}}
 \begin{document} 
 \pagestyle{plain}
 \maketitle
@@ -112,6 +110,8 @@
 \input{arm}
 \input{complications}
 \input{outro}
+\refstepcounter{definition}\label{finaldef}
+\refstepcounter{figure}\label{finalfig}
 
 % %\input{oopsla}
 % \clearpage
