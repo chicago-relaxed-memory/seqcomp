@@ -12,9 +12,10 @@ which is very close to our model.
 
 \begin{example}
   \label{ex:dgr1}
-  The following execution is allowed by \armeight{}, but disallowed by
-  \refdef{def:pomsets-ra}.  The coherence order between the writes can be
-  witnessed by a separate thread, which we have elided.
+  The following example is from \citeauthor{anton} \cite{anton}.  It is
+  allowed by \armeight{}, but disallowed by \refdef{def:pomsets-ra}.  The
+  coherence order between the writes can be witnessed by a separate thread,
+  which we have elided.
   \begin{gather*}
     \PW{x}{2}\SEMI 
     \PR[\mRA]{x}{r}\SEMI
