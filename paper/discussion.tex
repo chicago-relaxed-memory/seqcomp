@@ -960,11 +960,11 @@ of the two actions, capturing synchronization:
   \begin{align*}
     {\reorderra} &= \{(\DR[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode=\mRLX\}
     \\&\cup\{ (\DW[\amode]{}{}, \DR[\bmode]{}{})  \mid 
-    \land \amode\neq\mSC \lor \bmode\neq\mSC\}
+     \amode\neq\mSC \lor \bmode\neq\mSC\}
     \\&\cup\{(\DR[\amode]{}{}, \DW[\bmode]{}{})  \mid 
-    \land \amode=\mRLX \land \bmode=\mRLX\}
+     \amode=\mRLX \land \bmode=\mRLX\}
     \\&\cup\{ (\DW[\amode]{}{}, \DW[\bmode]{}{})  \mid 
-    \land \bmode=\mRLX \}
+     \bmode=\mRLX \}
     \\
     {\reorderco} &= \{(\DR{\aLoc}{}, \DR{\bLoc}{})\}
     \\&\cup\{ (\DW{\aLoc}{}, \DR{\bLoc}{})  \mid \aLoc\neq\bLoc\}
