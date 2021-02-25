@@ -1,6 +1,3 @@
-\section{Additional Features}
-\subsection{Address Calculation (\xADDR)}
-
 \begin{figure*}
   \begin{center}
     \begin{minipage}{.91\textwidth}
@@ -9,13 +6,17 @@
       % \input{fig-full-noco}
     \end{minipage}
   \end{center}
-  \caption{Full Semantics of Loads and Stores (See
+  \caption{Full Semantics with Address Calculation (See
     \refdef{def:q-sub} for $\Q{}$, \refdef{def:QS} for $\QS{\aLoc}{\amode}$,
     $\QL{\aLoc}{\amode}$, and
     % $[\aForm/\QS{\aLoc}{\amode}]$, $[\aForm/\QL{\aLoc}{\amode}]$ and
     \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} %, $\DS{\aLoc}{\amode}$)}
   \label{fig:full}
 \end{figure*}    
+
+\appendices
+\section{Additional Features}
+\subsection{Address Calculation (\xADDR)}
 
 \begin{definition}[\xADDR]
   \label{def:pomsets-addr}
@@ -925,6 +926,17 @@ must precede those of $\sem{\aCmd_2}$.
 % This asymmetry arises naturally when using pomsets with preconditions to
 % model thread groups.
 
+\begin{figure*}[t]
+  \begin{center}
+    \begin{minipage}{.91\textwidth}
+      \input{fig-no-q-or-addr}
+    \end{minipage}
+  \end{center}
+  \caption{Simplified Quiescence Semantics without Address Calculation (See
+    \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} 
+  \label{fig:no-q-or-addr}
+\end{figure*}    
+
 \subsection{Using Independency for Coherence and Synchronization}
 \label{sec:independency-ra}
 \showRAtrue
@@ -975,6 +987,9 @@ of the two actions, capturing synchronization:
   \end{align*}  
 \end{definition}
 
+\reffig{fig:no-q-or-addr} shows the resulting semantics of read and write,
+without address calculation.  \reffig{fig:no-q} shows the resulting semantics
+with address calculation.
 
 \begin{definition}
   \label{def:independency-co}
@@ -1035,19 +1050,6 @@ of the two actions, capturing synchronization:
   \end{align*}
 \end{example}
 
-\reffig{fig:no-q-or-addr} shows the resulting semantics of read and write,
-without address calculation.  \reffig{fig:no-q} shows the resulting semantics
-with address calculation.
-\begin{figure*}
-  \begin{center}
-    \begin{minipage}{.91\textwidth}
-      \input{fig-no-q-or-addr}
-    \end{minipage}
-  \end{center}
-  \caption{Full Semantics of Loads and Stores without Address Calculation (See
-    \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} 
-  \label{fig:no-q-or-addr}
-\end{figure*}    
 
 \begin{figure*}
   \begin{center}
@@ -1055,7 +1057,7 @@ with address calculation.
       \input{fig-no-q}
     \end{minipage}
   \end{center}
-  \caption{Full Semantics of Loads and Stores with Address Calculation (See
+  \caption{Simplified Quiescence Semantics with Address Calculation  (See
     \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} 
   \label{fig:no-q}
 \end{figure*}    
@@ -2021,7 +2023,10 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   precede both reads of $x$.
 \end{comment}
 
-\subsubsection*{A Note on Mixed-Mode Data Races}
+\clearpage
+\section{More Stuff}
+
+\subsection{A Note on Mixed-Mode Data Races}
 
 In preparing this paper, we came across the following example, which appears
 to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
@@ -2141,7 +2146,6 @@ not affect the set of pomsets that are considered.  In particular,
 is a downset of \eqref{mix1}.
 
 
-\section{More Stuff}
 \subsection{Downgraded Reads}
 \label{sec:dgr}
 
