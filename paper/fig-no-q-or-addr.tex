@@ -8,7 +8,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
 \item[{\labeltext[S1]{S1)}{S1no-q-or-addr}}] 
   if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
 \item[{\labeltext[S2]{S2)}{S2no-q-or-addr}}] 
-  $\labelingAct(\aEv) = \DW{\aLoc}{\aVal_\aEv}$,
+  $\labelingAct(\aEv) = \DW[\amode]{\aLoc}{\aVal_\aEv}$,
 \item[{\labeltext[S3]{S3)}{S3no-q-or-addr}}] 
   $\labelingForm(\aEv)$ implies
   \begin{math}
@@ -62,12 +62,13 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
 If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
 $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\cForm:\aEvs\fun\Formulae)$
+$(\exists\bmode\in\{\amode,\mRLX\})$
 
 \begin{enumerate}
 \item[{\labeltext[L1]{L1)}{L1no-q-or-addr}}] 
   if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
 \item[{\labeltext[L2]{L2)}{L2no-q-or-addr}}] 
-  $\labelingAct(\aEv) = \DR{\aLoc}{\aVal_\aEv}$,
+  $\labelingAct(\aEv) = \DR[\bmode]{\aLoc}{\aVal_\aEv}$
 \item[{\labeltext[L3]{L3)}{L3no-q-or-addr}}] 
   $\labelingForm(\aEv)$ implies
   \begin{math}
@@ -93,7 +94,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   \begin{math}
     \cForm_\aEv 
     \limplies
-    \DL{\aLoc}{\amode}
+    \DLX{\aLoc}{\amode}{\bmode}
     \land
     \PBRbig{
       \ABRbig{
@@ -118,7 +119,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   \begin{math}
     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
     \limplies \PBR{        
-      \DL{\aLoc}{\amode} \land
+      \DLX{\aLoc}{\amode}{\bmode} \land
       \bForm
       [\bReg/\aReg]
       [\FALSE/\Q{}]

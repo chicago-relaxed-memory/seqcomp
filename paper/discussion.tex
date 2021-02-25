@@ -927,13 +927,14 @@ must precede those of $\sem{\aCmd_2}$.
 % model thread groups.
 
 \begin{figure*}[t]
+  \showRAtrue
   \begin{center}
     \begin{minipage}{.91\textwidth}
       \input{fig-no-q-or-addr}
     \end{minipage}
   \end{center}
   \caption{Simplified Quiescence Semantics without Address Calculation (See
-    \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} 
+    \refdef{def:dlx} for $\DS{\aLoc}{\amode}$ and $\DLX{\aLoc}{\amode}{\bmode}$)} 
   \label{fig:no-q-or-addr}
 \end{figure*}    
 
@@ -992,6 +993,30 @@ without address calculation.  \reffig{fig:no-q} shows the resulting semantics
 with address calculation.
 
 \begin{definition}
+  \label{def:dlx}
+  Let $[\aForm/\Dx{*}]$ substitute $\aForm$ for every $\Dx{\bLoc}$.
+
+  \noindent
+  Let substitution $\DS{\aLoc}{\amode}$ be defined:
+  \begin{displaymath}
+    \DS{\aLoc}{\amode}=
+    \begin{cases}
+      [\TRUE/\Dx{\aLoc}] & \textif \amode=\mRLX
+      \\
+      [\FALSE/\Dx{*}] & \textotherwise
+    \end{cases}
+  \end{displaymath}
+  Let formula $\DLX{\aLoc}{\amode}{\bmode}$ be defined:
+  \begin{displaymath}
+    \DLX{\aLoc}{\amode}{\bmode}=
+    \begin{cases}
+      \TRUE & \textif \amode=\mRLX \textor \amode=\bmode
+      \\
+      \Dx{\aLoc} & \textotherwise
+    \end{cases}
+  \end{displaymath}
+\end{definition}
+\begin{definition}
   \label{def:independency-co}
   \noindent
   If $\aPS \in (\aPSS_1\sSEMI\aPSS_2)$ then $(\exists\aPS_1\in\aPSS_1)$
@@ -1011,10 +1036,14 @@ with address calculation.
   \end{enumerate}
   Update the read and write rules of \refdef{def:pomsets-trans} to: %and \ref{def:pomsets-fj} to: % (\ref{S4}/\ref{L4} unchanged):
   \begin{enumerate}
+  \item[\ref{S2})]
+    $\labelingAct(\aEv) = \DW[\amode]{\aLoc}{\aVal}$,
   \item[\ref{S4})]
     $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Q{}\land\aExp{=}\aVal)/\Q{}]$,
   \item[\ref{S5})]
     $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$,
+  \item[\ref{L2})]
+    $\labelingAct(\aEv) = \DR[\amode]{\aLoc}{\aVal}$,
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
@@ -1052,6 +1081,7 @@ with address calculation.
 
 
 \begin{figure*}
+  \showRAtrue
   \begin{center}
     \begin{minipage}{.91\textwidth}
       \input{fig-no-q}

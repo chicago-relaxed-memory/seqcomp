@@ -9,7 +9,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
 \item[{\labeltext[S1]{S1)}{S1no-q}}] % [\ref{S1})]
   if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
 \item[{\labeltext[S2]{S2)}{S2no-q}}] %[\ref{S2})]
-  $\labelingAct(\aEv) = \DWREF{\cVal_\aEv}{\aVal_\aEv}$,
+  $\labelingAct(\aEv) = \DWREF[\amode]{\cVal_\aEv}{\aVal_\aEv}$,
 \item[{\labeltext[S3]{S3)}{S3no-q}}] %[\ref{S3})] 
   $\labelingForm(\aEv)$ implies
   \begin{math}
@@ -178,12 +178,13 @@ If $\aPS \in \sLOAD[\amode]{\aReg}{\cExp}$ then
 $(\exists\cVal:\aEvs\fun\Val)$
 $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\cForm:\aEvs\fun\Formulae)$
+$(\exists\bmode\in\{\amode,\mRLX\})$
 % $(\forall\uReg{\aEv}\in\uRegs{\aEvs})$
 \begin{enumerate}
 \item[{\labeltext[L1]{L1)}{L1no-q}}] %[\ref{L1})]
   if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
 \item[{\labeltext[L2]{L2)}{L2no-q}}] %[\ref{L2})]
-  $\labelingAct(\aEv) = \DRREF{\cVal_\aEv}{\aVal_\aEv}$,
+  $\labelingAct(\aEv) = \DRREF[\bmode]{\cVal_\aEv}{\aVal_\aEv}$,
 \item[{\labeltext[L3]{L3)}{L3no-q}}] %[\ref{L3})]
   $\labelingForm(\aEv)$ implies
   \begin{math}
@@ -212,7 +213,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   \begin{math}
     \cForm_\aEv 
     \limplies
-    \DL{\REF{\cVal_\aEv}}{\amode}
+    \DLX{\REF{\cVal_\aEv}}{\amode}{\bmode}
     \land
     \PBRbig{
       \ABRbig{
@@ -239,7 +240,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
     \limplies (\cExp{=}\dVal)
     \limplies \PBR{        
-      \DL{\REF{\dVal}}{\amode} \land
+      \DLX{\REF{\dVal}}{\amode}{\bmode} \land
       \bForm
       [\bReg/\aReg]
       [\FALSE/\Q{}]
