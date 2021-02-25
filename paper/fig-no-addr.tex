@@ -1,0 +1,181 @@
+\renewcommand{\cEvs}{D}
+\renewcommand{\dEvs}{D}
+\noindent
+If $\aPS \in \sSTORE[\amode]{\aLoc}{\aExp}$ then
+$(\exists\aVal:\aEvs\fun\Val)$
+$(\exists\cForm:\aEvs\fun\Formulae)$
+\begin{enumerate}
+\item[{\labeltext[S1]{S1)}{S1no-addr}}] 
+  if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item[{\labeltext[S2]{S2)}{S2no-addr}}] 
+  $\labelingAct(\aEv) = \DW{\aLoc}{\aVal_\aEv}$,
+\item[{\labeltext[S3]{S3)}{S3no-addr}}] 
+  $\labelingForm(\aEv)$ implies
+  \begin{math}
+    \cForm_\aEv
+    \land \QS{\aLoc}{\amode}    
+    \land \aExp{=}\aVal_\aEv
+  \end{math},
+  
+  
+\item[{\labeltext[S4]{S4)}{S4no-addr}}] 
+  \begin{math}
+    (\forall\aEv\in\aEvs\cap\bEvs)
+  \end{math}
+  $\aTr{\bEvs}{\bForm}$ implies 
+  \begin{math}
+    \cForm_\aEv
+    \limplies {
+      \bForm
+      [\aExp/\aLoc]
+      \DS{\aLoc}{\amode}
+      [(\Qw{\aLoc}\land\aExp{=}\aVal_\aEv)/\Qw{\aLoc}]
+    }
+  \end{math},
+\item[{\labeltext[S5]{S5)}{S5no-addr}}] 
+  \begin{math}    
+    (\forall\aEv\in\aEvs\setminus\cEvs)
+  \end{math}
+  $\aTr{\cEvs}{\bForm}$ implies
+  \begin{math}
+    \cForm_\aEv
+    \limplies {
+      \bForm
+      [\aExp/\aLoc]
+      \DS{\aLoc}{\amode}
+      [\FALSE/\QS{\aLoc}{\amode}]
+    },
+  \end{math}
+\item[{\labeltext[S6]{S6)}{S6no-addr}}] 
+  $\aTr{\dEvs}{\bForm}$ implies
+  \begin{math}
+    (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+    \limplies {
+      \bForm
+      [\aExp/\aLoc]
+      \DS{\aLoc}{\amode}
+      [\FALSE/\QS{\aLoc}{\amode}]
+    }.
+  \end{math}
+\end{enumerate}
+
+\noindent
+If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
+$(\exists\aVal:\aEvs\fun\Val)$
+$(\exists\cForm:\aEvs\fun\Formulae)$
+
+\begin{enumerate}
+\item[{\labeltext[L1]{L1)}{L1no-addr}}] 
+  if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item[{\labeltext[L2]{L2)}{L2no-addr}}] 
+  $\labelingAct(\aEv) = \DR{\aLoc}{\aVal_\aEv}$,
+\item[{\labeltext[L3]{L3)}{L3no-addr}}] 
+  $\labelingForm(\aEv)$ implies
+  \begin{math}
+    \cForm_\aEv
+    \land \QL{\aLoc}{\amode}
+  \end{math},
+    
+\item[{\labeltext[L4]{L4)}{L4no-addr}}] 
+  \begin{math}
+    (\forall\aEv\in\aEvs\cap\bEvs)
+  \end{math}
+  $\aTr{\bEvs}{\bForm}$ implies
+  \begin{math}
+    \cForm_\aEv
+    \limplies \aVal_\aEv{=}\uReg{\aEv}
+    \limplies \bForm[\uReg{\aEv}/\aReg]
+  \end{math},
+  
+\item[{\labeltext[L5]{L5)}{L5no-addr}}] 
+  \begin{math}
+    (\forall\aEv\in\aEvs\setminus\cEvs)
+  \end{math}
+  $\aTr{\cEvs}{\bForm}$ implies
+  \begin{math}
+    \cForm_\aEv 
+    \limplies
+    \DL{\aLoc}{\amode}
+    \land
+    \PBRbig{
+      \ABRbig{
+        \aVal_\aEv{=}\uReg{\aEv}
+        \lor
+        \PBR{
+          \RW\land
+          \aLoc{=}\uReg{\aEv}
+        }
+      }
+      \limplies
+      \bForm
+      [\uReg{\aEv}/\aReg]
+      [\FALSE/\QL{\aLoc}{\amode}]
+    }    
+  \end{math},
+\item[{\labeltext[L6]{L6)}{L6no-addr}}] 
+  \begin{math}
+    (\forall\bReg)
+  \end{math}
+  $\aTr{\dEvs}{\bForm}$  implies 
+  \begin{math}
+    (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+    \limplies \PBR{        
+      \DL{\aLoc}{\amode} \land
+      \bForm
+      [\bReg/\aReg]
+      [\FALSE/\QL{\aLoc}{\amode}]
+    }.
+  \end{math}  
+\end{enumerate}  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

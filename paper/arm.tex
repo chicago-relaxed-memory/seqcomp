@@ -7,7 +7,7 @@ We discuss \armeight{} using \emph{external global completion} (\EGC{})
 which is very close to our model.
 
 \subsection{Downgraded Reads (\xDGR)}
-\label{sec:internal}
+\label{sec:downgrade}
 
 
 \begin{example}
@@ -158,7 +158,7 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
           \event{a}{\DW{x}{2}}{}
           \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{right=.7em of a}
           % \xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
-          \xo{a}{x1d}
+          \xos{a}{x1d}
         \end{tikzinline}}  
     \end{gathered}  
     &&
@@ -300,26 +300,42 @@ the uninterpreted symbol $\RW$.
 \begin{definition}[\xRRD]
   \label{def:pomsets-rr}
   Update \refdef{def:pomsets-trans} to:
-  \begin{enumerate}
-  \item[\ref{T3})]
-    $\labelingForm(\aEv)$ implies
-    $\labelingForm_1(\aEv)[\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
-    \\
-    $\labelingForm(\aEv)$ implies
-    $\labelingForm_1(\aEv)[\FALSE/\RW]$ otherwise.
-  \end{enumerate}
+  % \begin{enumerate}
+  % \item[\ref{T3})]
+  %   $\labelingForm(\aEv)$ implies
+  %   $\labelingForm_1(\aEv)[\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
+  %   \\
+  %   $\labelingForm(\aEv)$ implies
+  %   $\labelingForm_1(\aEv)[\FALSE/\RW]$ otherwise.
+  % \end{enumerate}
   \begin{enumerate}
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
     % $\aTr{\cEvs}{\bForm}$ implies $\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$,
-    $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+    $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+  \item[{\labeltext[L6]{L6)}{L6}}] 
+    $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}  
 \end{definition}
-For reads, the dependent and independent predicate transformers are identical
-(since $\RW$ is $\FALSE$).  For writes, \ref{L5} requires
-$\aTr{\cEvs}{\bForm}$ implies $\bForm$ for the independent case (since $\RW$
-is $\TRUE$).
+\ref{L4} is the \emph{dependent} case,
+\ref{L5} the \emph{independent} case, and
+\ref{L6} the \emph{empty} case. 
+ Recall the substitutions performed by $\ref{sTOP}$
+(\refdef{def:pomsets-top}).
+For writes, \ref{L5} is the same as \ref{L6} (since $\RW$
+is $\TRUE$).  For reads, \ref{L5} is the
+same as \ref{L4} (since $\RW$ is $\FALSE$).
+% For reads, the dependent and independent predicate transformers are identical
+% .  For writes, \ref{L5} requires
+% $\aTr{\cEvs}{\bForm}$ implies $\bForm$ for the independent case.
+
+One reading of \ref{L5} is that when satisfying a precondition $\aForm$ it is
+safe to use the value of the read, as long as the action is not a write.  If
+the pomset is empty, however, there is no value $\aVal$ to use.  Therefore
+the best we can do is to emulate skip, as in \ref{L6}.  % In order to
+% eventually arrive at a top-level pomset, this means that subsequent code must
+% be independent of $\aReg$.
 
 \begin{example}
   Revisiting \refex{ex:rrd1} and eliding irrelevant transformers:
@@ -358,7 +374,7 @@ is $\TRUE$).
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
-  Embedding the thread in thread group, \ref{T3} yields:
+  At top-level, $\ref{sTOP}$ yields:
   \begin{align*}
     \begin{gathered}[t]
       % \PR{y}{r}
@@ -390,12 +406,12 @@ is $\TRUE$).
     $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
   \item[\ref{L3})]
     $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$.
-  \item[\ref{T3})]
-    $\labelingForm(\aEv)$ implies
-    $\labelingForm_1(\aEv)[\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
-    \\
-    $\labelingForm(\aEv)$ implies
-    $\labelingForm_1(\aEv)[\TRUE/\Q{}][\FALSE/\RW]$ otherwise.
+  % \item[\ref{T3})]
+  %   $\labelingForm(\aEv)$ implies
+  %   $\labelingForm_1(\aEv)[\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
+  %   \\
+  %   $\labelingForm(\aEv)$ implies
+  %   $\labelingForm_1(\aEv)[\TRUE/\Q{}][\FALSE/\RW]$ otherwise.
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
@@ -422,7 +438,7 @@ is $\TRUE$).
     $\aTr{\cEvs}{\bForm}$ implies
     \begin{math}
       % \lnot\Qx{\aLoc} \land
-      \DL{\aLoc}{\amode}{} \land (\RW\limplies\bForm[\FALSE/\QL{\aLoc}{\amode}]).
+      \DL{\aLoc}{\amode}{} \land ((\aVal{=}\aReg\lor\RW)\limplies\bForm[\FALSE/\QL{\aLoc}{\amode}]).
     \end{math}
   \end{enumerate}  
 \end{definition}
@@ -460,7 +476,7 @@ is $\TRUE$).
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
-  If this is the complete thread, we apply \ref{T3} to yield:
+  Applying $\ref{sTOP}$ yields:
   \begin{align*}
     \begin{gathered}[t]
       % \PR[\mRA]{y}{r}
@@ -468,15 +484,15 @@ is $\TRUE$).
       % \PR{x}{s}
       % \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mRA]{y}{1}}{}
+          \raevent{b}{\TRUE\mid\DR[\mRA]{y}{1}}{}
           \event{c}{\Dx{y}\land(\FALSE\limplies\FALSE)\mid\DW{x}{0}}{right=of b}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
-  Although $(\FALSE\limplies\FALSE)$ is a tautology, $\Dx{y}$ is not.  This
-  pomset can only contribute to a top-level pomset if the thread is preceded
-  by a relaxed write to $y$, allowing $\DRP[\mRA]{y}{1}$ to be downgraded to
-  a relaxed read.
+  Although $(\FALSE\limplies\FALSE)$ is a tautology, $\Dx{y}$ is not.  Thus,
+  the pomset can only contribute to a top-level pomset if the thread is
+  preceded by a relaxed write to $y$, allowing $\DRP[\mRA]{y}{1}$ to be
+  downgraded to a relaxed read.
 \end{example}
 
 Every \armeight{} execution is allowed by \refdef{def:pomsets-arm}.  The

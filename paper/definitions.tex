@@ -99,10 +99,10 @@ We require that:
 \begin{itemize}
 \item actions include writes $\DWP{\aLoc}{\aVal}$ and reads $\DRP{\aLoc}{\aVal}$,
 \item formulae include equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
-\item formulae include symbols % for all $\aLoc$,
-  % \item formulae include the symbols
-  $\Qsc$, $\Qr{\aLoc}$, $\Qw{\aLoc}$, $\Dx{\aLoc}$, $\RW$, % for all $\aLoc$,
-  (which are used in \textsection\ref{sec:q}--\ref{sec:arm}),
+\item formulae include quiescence symbols $\Qsc$, $\Qr{\aLoc}$, $\Qw{\aLoc}$
+  (used in \textsection\ref{sec:q}), the downgrade symbols $\Dx{\aLoc}$
+  (used in \textsection\ref{sec:downgrade}), and the write symbol $\RW$
+  (used in \textsection\ref{sec:rrd}),
 \item formulae are closed under negation, conjunction, disjunction, and
   substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$, and $[\aForm/\aSym]$
   for each symbol $\aSym$,
@@ -188,7 +188,8 @@ but as we shall see does \emph{not} capture control or data dependencies.
     $\labeling: \Event \fun \Act$ is a \emph{labeling}.
   \end{itemize}
 \end{definition}
-Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
+Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.  Let $\Pom$
+be the set of all pomsets.
 
 We lift terminology from actions to events.  For example, we say that $\aEv$
 writes $\aLoc$ if $\labeling(\aEv)$ writes $\aLoc$.  We also drop quantifiers
@@ -275,7 +276,7 @@ without control or data dependencies.
 
   \noindent
   If $\aPS \in (\aAct\sPREFIX\aPSS_2)$ then
-  $(\exists\aPS_2\in\aPSS_2)$
+  $(\exists\aEvs_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there is $\aPS_2\in\aPSS$ such that
   \begin{enumerate}
   \item \label{pre-E}
@@ -288,11 +289,11 @@ without control or data dependencies.
     if $\aEv\in\aEvs_2$ then $\labelingAct(\aEv) = \labelingAct_2(\aEv)$,
   \item \label{pre-le2}
     if $\bEv\le_2\aEv$ then $\bEv\le\aEv$, 
-    % \newcounter{pomsetPrefixCount}
-    % \setcounter{pomsetPrefixCount}{\value{enumi}}
   \item
     \label{pre-reorder}
     if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\leq\aEv$ or $a\reorder\labeling_2(\aEv)$.
+    % \newcounter{pomsetPrefixCount}
+    % \setcounter{pomsetPrefixCount}{\value{enumi}}
     \newcounter{pomsetPrefixOrderCount}
     \setcounter{pomsetPrefixOrderCount}{\value{enumi}}
   \end{enumerate}
@@ -418,10 +419,37 @@ similar to~\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
   A \emph{pomset with preconditions} is
   a pomset (\refdef{def:pomsets}) together with $\labelingForm:\aEvs\fun\Formulae$.
 \end{definition}
-
+Let $\PomPre$ be the set of all pomsets with preconditions.
+% A pomset with preconditions is \emph{top level} if it is fulfilled
+% (\refdef{def:fulfilled}) and every precondition is a tautology.
+The function $\sTOP{}:2^{\PomPre}\fun2^{\Pom}$ embeds sets of pomsets with preconditions into sets of
+pomsets.  It also substitutes formulae for quiescence and write symbols, for
+use in \textsection\ref{sec:q}-\ref{sec:arm}.  In these ``top-level''
+pomsets, every read is fulfilled and every precondition is a tautology.
 \begin{definition}
-  A pomset with preconditions is \emph{top level} if it is fulfilled (\refdef{def:fulfilled}) and
-  every precondition is a tautology.
+  \label{def:q-sub}
+  Let $[\aForm/\Q{}]$ substitute all quiescence symbols by $\aForm$.
+\end{definition}
+\begin{definition}
+  \label{def:pomsets-top}
+  \labeltext[\ensuremath{\sTOP{}}]{}{sTOP}
+  \noindent
+  If $\aPS \in \sTOP{\aPSS}$ then
+  $(\exists\aPS_1\in\aPSS)$
+  \begin{enumerate}
+  \item  \label{top-E} % [{\labeltext[T1]{T1)}{T1}}]
+    $\aEvs=\aEvs_1$,
+  \item  \label{top-lambda} % [{\labeltext[T2]{T2)}{T2}}]
+    $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
+  \item  \label{top-le} % [{\labeltext[T2]{T2)}{T2}}]
+    if $\bEv\le_1\aEv$ then $\bEv\le\aEv$, 
+  \item  \label{top-kappa-write} % [{\labeltext[T3]{T3)}{T3}}]
+    if $\labelingAct_1(\aEv)$ is a write, $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ is a tautology,
+  \item  \label{top-kappa-read} % [{\labeltext[T3]{T3)}{T3}}]
+    if $\labelingAct_1(\aEv)$ is a read,
+    $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ is a tautology and
+    $\aEv$ is fulfilled (\refdef{def:fulfilled}).
+  \end{enumerate}  
 \end{definition}
 
 % \begin{definition}
@@ -685,8 +713,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
 
 Having reviewed the work we are building on, we now turn to
 the contribution of this paper, which is a model of \emph{pomsets with predicate transformers}.
-
-\emph{predicate transformers} are
+\emph{Predicate transformers} are
 functions on formulae which preserve logical structure, providing a natural model of sequential composition.
 
 
@@ -727,16 +754,15 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   A \emph{pomset with predicate transformers} is a pomset with preconditions (\refdef{def:pomsets-pre}),
   together with a family of predicate transformers for $\aEvs$.
 \end{definition}
-
+Let $\PomTrans$ be the set of all pomsets with predicate transformers.
 % \begin{definition}
 %   For pomset $\aPS$ and $\aEv\in\aEvs$, let
 %   $\downclose[0]{\aEv} = \{ \bEv\in\aEvs \mid \bEv < \aEv \}$.
 % \end{definition}
-
-We can covert back and forth between pomsets with preconditions
-and with predicate transformers. In one direction, $\sTHREAD{}$
-drops predicate transformers, and in the other, $\sFORK{}$ adopts
-the identity transformer.
+We can covert between pomsets with preconditions and pomsets with predicate
+transformers. In one direction, $\sTHREAD{}:2^{\PomTrans}\fun2^{\PomPre}$
+drops predicate transformers, and in the other,
+$\sFORK{}:2^{\PomPre}\fun2^{\PomTrans}$ adopts the identity transformer.
 
 \begin{definition}
   \label{def:pomsets-group}
@@ -744,30 +770,34 @@ the identity transformer.
   If $\aPS \in \sTHREAD{\aPSS}$ then
   $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}
-  \item[{\labeltext[T1]{T1)}{T1}}] % \label{thread-E}
+  \item  \label{thread-E} % [{\labeltext[T1]{T1)}{T1}}]
     $\aEvs=\aEvs_1$,
-  \item[{\labeltext[T2]{T2)}{T2}}] % \label{thread-lambda}
+  \item  \label{thread-lambda} % [{\labeltext[T2]{T2)}{T2}}]
     $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
-  \item[{\labeltext[T3]{T3)}{T3}}] % \label{thread-kappa}
+  \item \label{thread-le} % [{\labeltext[T2]{T2)}{T2}}]
+    if $\bEv\le_1\aEv$ then $\bEv\le\aEv$,
+  \item  \label{thread-kappa}\label{T3} % [{\labeltext[T3]{T3)}{T3}}]
     $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$.
-    % \newcounter{pomsetXThreadCount}
-    % \setcounter{pomsetXThreadCount}{\value{enumi}}
+    \newcounter{pomsetXThreadCount}
+    \setcounter{pomsetXThreadCount}{\value{enumi}}
   \end{enumerate}  
 
   \noindent
   If $\aPS \in \sFORK{\aPSS}$ then
   $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}
-  \item[{\labeltext[F1]{F1)}{F1}}] %\label{fork-E}
+  \item \label{fork-E} % [{\labeltext[F1]{F1)}{F1}}]
     $\aEvs=\aEvs_1$,
-  \item[{\labeltext[F2]{F2)}{F2}}] % \label{fork-lambda}
+  \item  \label{fork-lambda} % [{\labeltext[F2]{F2)}{F2}}]
     $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
-  \item[{\labeltext[F3]{F3)}{F3}}] % \label{fork-kappa} 
+  \item \label{fork-le} % [{\labeltext[T2]{T2)}{T2}}]
+    if $\bEv\le_1\aEv$ then $\bEv\le\aEv$,
+    \newcounter{pomsetXForkCount}
+    \setcounter{pomsetXForkCount}{\value{enumi}}
+  \item  \label{fork-kappa}\label{F3}  % [{\labeltext[F3]{F3)}{F3}}]
     $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$, 
-  \item[{\labeltext[F4]{F4)}{F4}}] % \label{fork-tau} 
+  \item  \label{fork-tau}\label{F4}  % [{\labeltext[F4]{F4)}{F4}}]
     $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
-    % \newcounter{pomsetXForkCount}
-    % \setcounter{pomsetXForkCount}{\value{enumi}}
   \end{enumerate}  
 \end{definition}
 
@@ -837,7 +867,7 @@ We model commands by adding predicate transformers to
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParCount}}
   \item[1--\ref{par-le2})]
-    as for $\sPAR$  in \refdef{def:pomsets} (ignoring disjointness),
+    as for $\sPAR$  in \refdef{def:pomset-semantics} (ignoring disjointness),
   \item \label{seq-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
   \item \label{seq-kappa2}
@@ -1010,7 +1040,7 @@ order.
           \event{a1}{1{=}1\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm[1/x]}{right=of a1}
           \xform{x1i}{\bForm[1/x]}{below=of x1d}
-          \xo{a1}{x1d}
+          \xos{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -1021,7 +1051,7 @@ order.
           \event{a1}{2{=}1\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm[2/x]}{right=of a1}
           \xform{x1i}{\bForm[2/x]}{below=of x1d}
-          \xo{a1}{x1d}
+          \xos{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -1034,7 +1064,7 @@ order.
   %       \event{a1}{\DW{x}{1}}{}
   %       \xform{x1d}{\bForm[1/x]}{right=of a1}
   %       \xform{x1i}{\bForm[1/x]}{right=of x1d}
-  %       \xo{a1}{x1d}
+  %       \xos{a1}{x1d}
   %     \end{tikzinline}}
   %   \end{gathered}
   %   &&
@@ -1045,7 +1075,7 @@ order.
   %       \event{a1}{\FALSE\mid\DW{x}{1}}{}
   %       \xform{x1d}{\FALSE}{right=of a1}
   %       \xform{x1i}{\bForm[2/x]}{right=of x1d}
-  %       \xo{a1}{x1d}
+  %       \xos{a1}{x1d}
   %     \end{tikzinline}}
   %   \end{gathered}
   % \end{align*}
@@ -1057,7 +1087,7 @@ order.
   %     \event{a1}{1{=}1\lor2{=}1\mid\DW{x}{1}}{}
   %     \xform{x1d}{(\bForm[1/x])[2/x]}{below=of a1}
   %     \xform{x1i}{(\bForm[1/x])[2/x]}{below=of x1d}
-  %     \xo{a1}{x1d}
+  %     \xos{a1}{x1d}
   %   \end{tikzinline}}
   % \end{gather*}
   % which simplifies to
@@ -1068,7 +1098,7 @@ order.
   %     \event{a1}{\DW{x}{1}}{}
   %     \xform{x1d}{\bForm[1/x] }{right=of a1}
   %     \xform{x1i}{\bForm[1/x]}{right=of x1d}
-  %     \xo{a1}{x1d}
+  %     \xos{a1}{x1d}
   %   \end{tikzinline}}
   % \end{gather*}
   % which simplifies to
@@ -1079,7 +1109,7 @@ order.
         \event{a1}{1{=}1\lor2{=}1\mid\DW{x}{1}}{}
         \xform{x1d}{(\bForm[2/x])[1/x]}{right=of a1}
         \xform{x1i}{(\bForm[2/x])[1/x]}{right=of x1d}
-        \xo{a1}{x1d}
+        \xos{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
   which simplifies to
@@ -1090,7 +1120,7 @@ order.
         \event{a1}{\DW{x}{1}}{}
         \xform{x1d}{\bForm[2/x]}{right=of a1}
         \xform{x1i}{\bForm[2/x]}{right=of x1d}
-        \xo{a1}{x1d}
+        \xos{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
   % \end{example}
@@ -1103,7 +1133,7 @@ order.
   %         \event{a1}{1{=}2\mid\DW{x}{1}}{}
   %         \xform{x1d}{\bForm[1/x]}{right=of a1}
   %         \xform{x1i}{\bForm[1/x]}{below=of x1d}
-  %         \xo{a1}{x1d}
+  %         \xos{a1}{x1d}
   %       \end{tikzinline}}
   %     \end{gathered}
   %     &&
@@ -1114,7 +1144,7 @@ order.
   %         \event{a1}{2{=}2\mid\DW{x}{1}}{}
   %         \xform{x1d}{\bForm[2/x]}{right=of a1}
   %         \xform{x1i}{\bForm[2/x]}{below=of x1d}
-  %         \xo{a1}{x1d}
+  %         \xos{a1}{x1d}
   %       \end{tikzinline}}
   %     \end{gathered}
   %   \end{align*}
@@ -1127,7 +1157,7 @@ order.
   %         \event{a1}{\FALSE\mid\DW{x}{2}}{}
   %         \xform{x1d}{\FALSE}{right=of a1}
   %         \xform{x1i}{\bForm[1/x]}{right=of x1d}
-  %         \xo{a1}{x1d}
+  %         \xos{a1}{x1d}
   %       \end{tikzinline}}
   %     \end{gathered}
   %     &&
@@ -1138,7 +1168,7 @@ order.
   %         \event{a1}{\DW{x}{2}}{}
   %         \xform{x1d}{\bForm[2/x]}{right=of a1}
   %         \xform{x1i}{\bForm[2/x]}{right=of x1d}
-  %         \xo{a1}{x1d}
+  %         \xos{a1}{x1d}
   %       \end{tikzinline}}
   %     \end{gathered}
   %   \end{align*}
@@ -1152,7 +1182,7 @@ order.
           \event{a1}{1{=}2\mid\DW{x}{2}}{}
           \xform{x1d}{\bForm[1/x]}{right=of a1}
           \xform{x1i}{\bForm[1/x]}{below=of x1d}
-          \xo{a1}{x1d}
+          \xos{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -1163,7 +1193,7 @@ order.
           \event{a1}{2{=}2\mid\DW{x}{2}}{}
           \xform{x1d}{\bForm[2/x]}{right=of a1}
           \xform{x1i}{\bForm[2/x]}{below=of x1d}
-          \xo{a1}{x1d}
+          \xos{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -1175,7 +1205,7 @@ order.
         \event{a1}{\DW{x}{2}}{}
         \xform{x1d}{\bForm[2/x]}{right=of a1}
         \xform{x1i}{\bForm[2/x]}{right=of x1d}
-        \xo{a1}{x1d}
+        \xos{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
 \end{comment}
@@ -1190,7 +1220,7 @@ order.
           \xform{xd}{\bForm[1/x]}{}
           \xform{xi}{\bForm[1/x]}{below=of xd}
           \event{a1}{1{=}1\mid\DW{x}{1}}{left=of xd}
-          \xo{a1}{xd}
+          \xos{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -1201,7 +1231,7 @@ order.
           \xform{xd}{\bForm[2/x]}{}
           \xform{xi}{\bForm[2/x]}{below=of xd}
           \event{a2}{2{=}2\mid\DW{x}{2}}{left=of xd}      
-          \xo{a2}{xd}
+          \xos{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -1214,7 +1244,7 @@ order.
           \xform{xd}{\bForm[1/x]}{}
           \xform{xi}{\bForm[1/x]}{right=of xd}
           \event{a1}{\DW{x}{1}}{left=of xd}
-          \xo{a1}{xd}
+          \xos{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -1225,7 +1255,7 @@ order.
           \xform{xd}{\bForm[2/x]}{}
           \xform{xi}{\bForm[2/x]}{right=of xd}
           \event{a2}{\DW{x}{2}}{left=of xd}      
-          \xo{a2}{xd}
+          \xos{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -1240,10 +1270,10 @@ order.
         \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
         \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
         \xform{xii}{\bForm[2/x]}{right=of xid}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}
+        \xos{a1}{xdi}
+        \xos{a2}{xid}
+        \xos{a1}{xdd}
+        \xos{a2}{xdd}
       \end{tikzinline}}
   \end{gather*}
   Adding order does nothing since the preconditions are tautologies.
@@ -1255,10 +1285,10 @@ order.
   %     \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
   %     \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
   %     \xform{xii}{\bForm[1/x]}{right=of xid}
-  %     \xo{a1}{xdi}
-  %     \xo{a2}{xid}
-  %     \xo{a1}{xdd}
-  %     \xo{a2}{xdd}
+  %     \xos{a1}{xdi}
+  %     \xos{a2}{xid}
+  %     \xos{a1}{xdd}
+  %     \xos{a2}{xdd}
   %     \po{a1}{a2}
   %   \end{tikzinline}}
   % \end{gather*}
@@ -1274,7 +1304,7 @@ order.
           \xform{xd}{1{=}r\limplies\bForm}{}
           \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
           \eventl{\bEv}{a1}{\DR{x}{1}}{left=of xd}
-          \xo{a1}{xd}
+          \xos{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -1285,7 +1315,7 @@ order.
           \xform{xd}{\bForm\noSUB{[r/y]}}{}
           \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
           \eventl{\aEv}{a2}{r{=}1\mid\DW{y}{1}}{left=of xd}      
-          \xo{a2}{xd}
+          \xos{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -1306,10 +1336,10 @@ order.
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
         \eventl{\bEv}{a1}{\DR{x}{1}}{above=of xdi}
         \eventl{\aEv}{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{=}1\mid\DW{y}{1}}{above=of xid}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}
+        \xos{a1}{xdi}
+        \xos{a2}{xid}
+        \xos{a1}{xdd}
+        \xos{a2}{xdd}
       \end{tikzinline}}
   \end{gather*}
   This pomset's preconditions depend on a bound register, so cannot contribute
@@ -1332,10 +1362,10 @@ order.
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
         \eventl{\bEv}{a1}{\DR{x}{1}}{above=of xdi}
         \eventl{\aEv}{a2}{r{=}1\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}
+        \xos{a1}{xdi}
+        \xos{a2}{xid}
+        \xos{a1}{xdd}
+        \xos{a2}{xdd}
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
@@ -1353,7 +1383,7 @@ order.
           \xform{xd}{1{=}r\limplies\bForm}{}
           \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
           \event{a1}{\DR{x}{1}}{left=of xd}
-          \xo{a1}{xd}
+          \xos{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -1364,7 +1394,7 @@ order.
           \xform{xd}{\bForm\noSUB{[r/y]}}{}
           \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
           \event{a2}{r{=}2\mid\DW{y}{2}}{left=of xd}      
-          \xo{a2}{xd}
+          \xos{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -1381,10 +1411,10 @@ order.
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
         \event{a1}{\DR{x}{1}}{above=of xdi}
         \event{a2}{1{=}r\limplies r{=}2\mid\DW{y}{2}}{above=of xid}
-        \xo{a1}{xdi}
-        \xo{a2}{xid}
-        \xo{a1}{xdd}
-        \xo{a2}{xdd}
+        \xos{a1}{xdi}
+        \xos{a2}{xid}
+        \xos{a1}{xdd}
+        \xos{a2}{xdd}
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
@@ -1540,16 +1570,18 @@ order.
 
 \subsection{The Road Ahead}
 
-The final semantic functions for load, store, and thread initialization
-are given in \reffig{fig:full}, at the end of the paper.
-In \textsection\ref{sec:q}--\ref{sec:complications}, we explain this definition by looking at its
-constituent parts, building on \refdef{def:pomsets-trans}.  In
-\textsection\ref{sec:q}, we add \emph{quiescence}, which encodes coherence,
-release-acquire access, and SC access.  In
+The final semantic functions for load, store, and thread initialization are
+given in \reffig{fig:no-addr}, at the end of the paper.  In
+\textsection\ref{sec:q}--\ref{sec:complications}, we explain this definition
+by looking at its constituent parts, building on \refdef{def:pomsets-trans}.
+In \textsection\ref{sec:q}, we add \emph{quiescence}, which encodes
+coherence, release-acquire access, and SC access.  In
 \textsection\ref{sec:arm}, we add peculiarities that are necessary for
 efficient implementation on \armeight.  In
 \textsection\ref{sec:complications}, we discuss other features such as
-register recycling and address calculation.
+invariant reasoning, case analysis and register recycling.
+% In the appendix,
+% we discuss address calculation and read-modify-write operations.
 
 The final definitions of load and store are quite complex, due to the
 inherent complexities of relaxed memory.  The core of

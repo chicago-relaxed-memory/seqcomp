@@ -76,7 +76,7 @@
   \item[\ref{L5})]
     $\aTr{\cEvs}{\bForm}$ implies
     $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
-  \item[{\labeltext[L6]{L6)}{L6}}] 
+  \item[\ref{L6})] 
     $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
 \end{definition}
@@ -85,15 +85,17 @@
 the read, we must establish both $\bForm[\aVal/\aReg]$ and $\bForm[\aLoc/\aReg]$.
 If a precondition holds in both circumstances, \ref{S5} allows a local write
 to satisfy the precondition without introducing dependence.
+As in \refdef{def:pomsets-rr}, we include \ref{L6} to provide a predicate
+transformer for the empty pomset.
 
-One reading of \ref{L5} is that when satisfying a precondition $\aForm$ it is
-safe to ignore a read as long as $\aForm$ is compatible with both the value
-of the read and the value of the preceding local write.  This begs the
-question: what value must $\aForm$ be compatible with in the case that the
-pomset is empty?  In this case, there is no value $\aVal$ to check.
-Therefore the best we can do is to emulate skip, as in \ref{L6}.  In order to
-eventually arrive at a top-level pomset, this means that subsequent code must
-be independent of $\aReg$.
+% One reading of \ref{L5} is that when satisfying a precondition $\aForm$ it is
+% safe to ignore a read as long as $\aForm$ is compatible with both the value
+% of the read and the value of the preceding local write.  This begs the
+% question: what value must $\aForm$ be compatible with in the case that the
+% pomset is empty?  In this case, there is no value $\aVal$ to check.
+% Therefore the best we can do is to emulate skip, as in \ref{L6}.  In order to
+% eventually arrive at a top-level pomset, this means that subsequent code must
+% be independent of $\aReg$.
 
 \begin{example}
   Revisiting \refex{ex:tc1} and eliding irrelevant transformers:
@@ -160,6 +162,34 @@ be independent of $\aReg$.
 It is worth emphasizing that this reasoning is local, and therefore
 unaffected by the introduction of additional threads, as in Test Case 9
 \citep{PughWebsite}.
+
+Some care is necessary when combining \xLIR{} \refdef{def:pomsets-lir} and
+\xRRD{} \refdef{def:pomsets-rr}.  The proper form for \ref{L5} is:
+\begin{itemize}
+\item[\ref{L5})]
+  $\aTr{\cEvs}{\bForm}$ implies
+  $(\aVal{=}\aReg\lor(\RW\land\aLoc{=}\aReg))\limplies\bForm$.
+\end{itemize}
+When $\RW$ is true, this is unchanged from \ref{L5} in \refdef{def:pomsets-lir}.
+When $\RW$ is false, it is the same as \ref{L4} in \refdef{def:pomsets-lir}.  
+
+One must also be careful when combing \xLIR{} with \RMW{} operations, such as
+$\CAS$.  For these operations, \xLIR{} is unsound.  Thus reads in \RMW{}s
+should always use \ref{L6} for the independent case.
+
+\begin{figure*}
+  \begin{center}
+    \begin{minipage}{.91\textwidth}
+      \input{fig-no-addr}
+    \end{minipage}
+  \end{center}
+  \caption{Full Semantics of Loads and Stores (See
+    \refdef{def:q-sub} for $\Q{}$, \refdef{def:QS} for $\QS{\aLoc}{\amode}$,
+    $\QL{\aLoc}{\amode}$, and
+    % $[\aForm/\QS{\aLoc}{\amode}]$, $[\aForm/\QL{\aLoc}{\amode}]$ and
+    \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} %, $\DS{\aLoc}{\amode}$)}
+  \label{fig:no-addr}
+\end{figure*}    
 
 \subsection{Register Recycling (\xRecycle)}
 \label{sec:recycle}
@@ -311,22 +341,6 @@ most once in a program.  We relax this by renaming.
 % Requires indexing to resolve nondeterminism.
 
 % IF closure/case analysis: $\psi_e$
-
-\begin{figure*}
-  \begin{center}
-    \begin{minipage}{.92\textwidth}
-      \input{fig-full}
-      % \input{fig-full-where}
-      % \input{fig-full-noco}
-    \end{minipage}
-  \end{center}
-  \caption{Full Semantics of Loads, Stores and Threads (See
-    \refdef{def:q-sub} for $\Q{}$, \refdef{def:QS} for $\QS{\aLoc}{\amode}$,
-    $\QL{\aLoc}{\amode}$, and
-    % $[\aForm/\QS{\aLoc}{\amode}]$, $[\aForm/\QL{\aLoc}{\amode}]$ and
-    \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} %, $\DS{\aLoc}{\amode}$)}
-  \label{fig:full}
-\end{figure*}    
 
 \begin{example}
   \label{ex:if1}
@@ -616,136 +630,6 @@ pomset, unlike \jjr{}.
 %     \end{gathered}
 %   \end{align*}
 % \end{example}
-
-\subsection{Address Calculation (\xADDR)}
-
-\begin{definition}[\xADDR]
-  \label{def:pomsets-addr}
-  Update \refdef{def:pomsets-trans} to existentially quantify over $\cVal$
-  in $\sSTORE{}{}$ and $\sLOAD{}{}$:
-  \begin{enumerate}
-  \item[\ref{S2})] $\labelingAct(\aEv) = \DW{\REF\cVal}{\aVal}$,
-  \item[\ref{L2})] $\labelingAct(\aEv) = \DR{\REF{\cVal}}{\aVal}$.
-  \end{enumerate}
-
-  \begin{enumerate}
-  \item[\ref{S3})] $\labelingForm(\aEv)$ implies $\cExp{=}\cVal \land \aExp{=}\aVal$,
-  \item[\ref{L3})] $\labelingForm(\aEv)$ implies $\cExp{=}\cVal$.
-  \end{enumerate}
-
-  \begin{enumerate}
-  % \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
-  % \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
-  %\item[\ref{L4})] $\phantom{(\forall\dVal)}$ $\aTr{\bEvs}{\bForm}$ implies $(\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-  %\item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cVal{=}\dVal \limplies (\cExp{=}\dVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-  \item[\ref{L4})] $\aTr{\bEvs}{\bForm}$ implies $(\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
-    % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
-  %\item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
-  \item[\ref{L5})] $\aTr{\cEvs}{\bForm}$ implies $\bForm$.
-  \end{enumerate}  
-\end{definition}
-
-\begin{example}
-  \refdef{def:pomsets-addr} is naive with respect to merging events.
-  Consider the following example from \jjr{}:
-  \begin{align*}
-    \begin{gathered}
-      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
-      \\
-      \hbox{\begin{tikzinline}[node distance=.8em]
-          \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-          \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-        \end{tikzinline}}
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
-      \\
-      \hbox{\begin{tikzinline}[node distance=.8em]
-          \eventl{d}{a}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{}
-          \eventl{e}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of a}
-          \wk{a}{b}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{align*}
-  Merging, we have:
-  %Thus, the disjunction closure also includes both of the following: % By using \!$\PAR$\!, it also includes:
-  \begin{align*}
-    \begin{gathered}
-      \IF{\aExp}\THEN
-      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
-      \ELSE
-      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
-      \FI
-      \\
-      \hbox{\begin{tikzinline}[node distance=1em]
-          \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-          \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-          \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
-          \wk{b}{c}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{align*}
-  % \begin{align*}
-  %   \begin{gathered}
-  %     \IF{\aExp}\THEN
-  %     \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
-  %     \ELSE
-  %     \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
-  %     \FI
-  %     \\
-  %   \hbox{\begin{tikzinline}[node distance=1em]
-  %         \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-  %         \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-  %       \end{tikzinline}}
-  %   \end{gathered}
-  % \end{align*}
-  The precondition of $\DWREF{0}{0}$ is a tautology; however, this is not
-  possible for $(\REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r)$ alone, using \refdef{def:pomsets-addr}.
-  %
-  The full semantics, given in \reffig{fig:full}, enables this execution using if-closure.  The
-  individual commands have the pomsets:
-  \begin{align*}
-    \begin{gathered}
-      \REF{r} \GETS 0
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em]
-          \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-          \eventl{d}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{below=of a}
-        \end{tikzinline}}
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \REF{0}\GETS \BANG r
-      \\
-      \hbox{\begin{tikzinline}[node distance=.5em]
-          \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{}
-          \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{below=of b}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{align*}
-  % These pomsets contain inconsistent preconditions.  This is disallowed in
-  % \jjr{}, but allowed here.
-  Sequencing and merging, we have: 
-  \begin{align*}
-    \begin{gathered}
-      \REF{r} \GETS 0
-      \SEMI
-      \REF{0}\GETS \BANG r
-      \\
-      \hbox{\begin{tikzinline}[node distance=1em]
-          \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-          \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-          \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
-          \wk{b}{c}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{align*}
-  The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
-\end{example}
-
-
 
 % \subsection{Agda}
 % \begin{figure*}

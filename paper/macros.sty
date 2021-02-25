@@ -1,3 +1,6 @@
+\newcommand{\Pom}{\mathsf{Pom}}
+\newcommand{\PomPre}{\mathsf{PomPre}}
+\newcommand{\PomTrans}{\mathsf{PomTrans}}
 \newcommand{\fid}{\mathsf{id}}
 \newcommand{\NEG}[1]{\texttt{-}#1}
 \newcommand{\bigstep}[3]{(#1,#2)\Downarrow#3}
@@ -12,18 +15,16 @@
 \newcommand{\refexs}[2]{Ex~\ref{#1}/\ref{#2}}
 \newcommand{\suchthat}{\mid}
 \newcommand{\TICK}{\checkmark\!}
-% <<<<<<< HEAD
 % \newcommand{\QL}[2]{\mathsf{ql}_{#2}^{#1}}
 % \newcommand{\DL}[3]{#3\,\mathsf{dl}_{#2}^{#1}}
 % \newcommand{\QS}[2]{\mathsf{qs}_{#2}^{#1}}
 % \newcommand{\DS}[3]{#3\,\mathsf{ds}_{#2}^{#1}}
+% \newcommand{\DS}[3]{\mathsf{ds}_{#2}^{#1}#3}
 % \newcommand{\DSP}[3]{(#3)\mathsf{ds}_{#2}^{#1}}
-% =======
 \newcommand{\QL}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{L}#1}}}
 \newcommand{\QS}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{S}#1}}}
 \newcommand{\DS}[2]{{[}{#2}/\Dx{#1}{]}}
 \newcommand{\DL}[2]{\mathord{\downarrow^{#1}_{#2}}}
-%\newcommand{\DS}[3]{\mathsf{ds}_{#2}^{#1}#3}
 
 \newcommand{\Qmode}[1]{\mathsf{Q}^{#1}}
 \newcommand{\Dmode}[1]{\Dx{#1}}
@@ -127,6 +128,10 @@
 
 \newif\ifshowRA
 \showRAfalse
+\NewDocumentCommand\PRF{O{} m m O{} m}{\ifnotempty{#5}{{#5} \GETS}{#2.#3}^{#1}_{#4}}
+\NewDocumentCommand\PWF{O{} m m O{} m}{{#2.#3}^{#1}_{#4} \GETS #5}
+
+
 \newcommand{\sem}[2][]{\llbracket#2\rrbracket}
 \NewDocumentCommand\PF{O{} m}{\mathtt{F}^{#2}_{#1}}
 \NewDocumentCommand\DF{O{} m}{\mathsf{F}^{#2}_{#1}}
@@ -266,6 +271,8 @@
 \newcommand{\xRecycle}{{\textsc{alpha}}}
 \newcommand{\xDGR}{{\textsc{dgr}}}
 \newcommand{\xRRD}{{\textsc{rrd}}}
+\newcommand{\xRMW}{{\textsc{rmw}}}
+\newcommand{\xFENCE}{{\textsc{fence}}}
 \newcommand{\xIF}{{\textsc{if}}}
 \newcommand{\xADDR}{{\textsc{addr}}}
 \newcommand{\xCO}{{\textsc{co}}}
@@ -278,6 +285,7 @@
 % \newcommand{\xRASC}{{\text{RASC}}}
 
 \newcommand{\amode}{\mu}
+\newcommand{\bmode}{\nu}
 \newcommand{\fmode}{\nu}
 \newcommand{\mWK}{{\mathsf{wk}}}
 \newcommand{\mRA}{{\mathsf{ra}}}
@@ -709,6 +717,7 @@
 \newcommand{\sFORK}[1]{\textnormal{\textit{FORK}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sFORKJOIN}[1]{\textnormal{\textit{FORKJOIN}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sTHREAD}[1]{\textnormal{\textit{THRD}}\ifnotempty{#1}{\allowbreak(#1)}}
+\newcommand{\sTOP}[1]{\textnormal{\textit{TOP}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sLOAD}[3][]{\textnormal{\textit{LOAD}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1})}}
 \newcommand{\sSTORE}[3][]{\textnormal{\textit{STORE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1})}}
 \newcommand{\sSTOREtight}[3][]{\textnormal{\textit{STORE}}\ifnotempty{#2}{\allowbreak(#2,#3\ifnotempty{#1}{,#1})}}
@@ -731,6 +740,8 @@
 \newcommand{\notified}[1]{\mathsf{notified}\,#1}
 \newcommand{\wait}[1]{\mathsf{wait}\,#1}
 \newcommand{\reorder}{\mathrel\leftrightarrow}
+\newcommand{\reorderco}{\mathrel{\smash{\overset{\mathsf{co}}{\leftrightarrow}}}}
+\newcommand{\reorderra}{\mathrel{\smash{\overset{\mathsf{ra}}{\leftrightarrow}}}}
 \newcommand{\reorderRLX}{\mathrel{\smash{\overset{\mRLX}{\leftrightarrow}}}}
 \newcommand{\reorderSC}{\mathrel{\smash{\overset{\mSC}{\leftrightarrow}}}}
 \newcommand{\quietForm}{\mathsf{Q}}
@@ -838,15 +849,18 @@
 \newcommand{\lrace}[1]{\xarrowtikzmath{race}{\;\text{\textcolor{black}{\emph{#1}}}\;}}
 
 \tikzstyle{graypo} = [-latex,color=gray,]
-\tikzstyle{graywk} = [->,dashed,thick,color=gray]
+\tikzstyle{graywk} = [->,dashed,thick,color=gray,]
 \newcommand{\graypo}[3][]{\draw[graypo,#1](#2)to(#3);}
 \newcommand{\graywk}[3][]{\draw[graywk,#1](#2)to(#3);}
 % \newcommand{\graypo}[3][]{}
 % \newcommand{\graywk}[3][]{}
 
 \tikzstyle{xo} = [->,dotted,thick,color=gray!80!black,]
-\newcommand{\xo}[3][]{\draw[xo,#1](#2)to(#3);}
+\tikzstyle{xright} = [out=-0,in=0,looseness=1.5,]
+\tikzstyle{xleft} = [out=-180,in=180,looseness=1.5,]
+\newcommand{\xo}[3][]{\draw[xo,xright,#1](#2)to(#3);}
 \newcommand{\xxo}{\xarrowtikz{xo}{\;\;}}%
+\newcommand{\xos}[3][]{\draw[xo,#1](#2)to(#3);}
 \tikzstyle{po} = [-latex,color=blue,]
 \newcommand{\po}[3][]{\draw[po,#1](#2)to(#3);}
 \newcommand{\xpo}{\xarrowtikz{po}{\;\;}}%

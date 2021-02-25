@@ -5,7 +5,7 @@ composition as a first-class citizen. The model builds directly on \jjr{}.
 
 For sequential composition, parallel composition and the conditional, we
 believe that the definition is \emph{natural}, even \emph{canonical}.
-For stores and loads, instead, the definition in \reffig{fig:full} is a
+For stores and loads, instead, the definition in \reffig{fig:no-addr} is a
 Frankenstein's monster of features.  This complexity is \emph{essential},
 however, not just an accident of our poor choices.  Relaxed memory models must
 please many audiences: compiler writers want one thing, hardware designers
@@ -14,10 +14,12 @@ compromise.
 
 Given that \emph{complexity} cannot be eliminated from relaxed memory models,
 the best one can do is attempt to understand its causes.  We have broken the
-problem into eight manageable pieces, discussed throughout
+problem into seven manageable pieces, discussed throughout
 \textsection\ref{sec:q}--\ref{sec:complications}.  \refdef{def:pomsets-arm}
 summarizes all the features necessary for efficient implementation on
-\armeight{}.
+\armeight{}.  We discuss address calculation, read-modify-write operations
+and fences in the appendix.
+
 {Logic} is the thread that sews these features together.
 
 %A unique feature of our model is the centrality of logic: 
