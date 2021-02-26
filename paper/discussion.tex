@@ -45,8 +45,6 @@
   \end{enumerate}  
 \end{definition}
 
-\reffig{fig:full} describes the full semantics with address calculation.
-
 \begin{example}
   \refdef{def:pomsets-addr} is naive with respect to merging events.
   Consider the following example from \jjr{}:
@@ -146,6 +144,10 @@
   The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 \end{example}
 
+\reffig{fig:full} describes the full semantics with address calculation.
+\ref{S6full} is necessary because \ref{S5full} mentions $\cVal_\aEv$, and
+there is no such value when the set of events is empty.
+
 \subsection{Read-Modify-Write Operations (\xRMW)}
 
 [Todo]
@@ -242,6 +244,20 @@ strings.
   \end{enumerate}
 \end{definition}
 
+Downset closure fails due to \xRRD{} and \xLIR{}.  The key property is that
+the empty set transformer should behave the same as the independent
+transformer.  For \xRRD{}, \refdef{def:pomsets-rr} states:
+\begin{enumerate}
+\item[\ref{L4})]
+  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+\item[\ref{L5})]
+  $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+\item[\ref{L6})] 
+  $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
+\end{enumerate}
+In both cases, for subsequent writes, \ref{L5} is the same as \ref{L6}.  For
+subsequent reads, \ref{L5} is the same as \ref{L4}.
+
 \begin{example}
   The semantics is not downset closed, due to the lack of read-read
   dependencies.  Consider
@@ -293,22 +309,82 @@ strings.
   to a top-level pomset.
 \end{example}
 
-In \refdef{def:pomsets-rr}, these cases are defined:
+For \xLIR{}, \refdef{def:pomsets-lir} states:
 \begin{enumerate}
 \item[\ref{L4})]
   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+  $\aTr{\cEvs}{\bForm}$ implies
+  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
 \item[\ref{L6})] 
   $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
 \end{enumerate}
-For writes, \ref{L5} is the same as \ref{L6}.  For reads, \ref{L5} is the
-same as \ref{L4}.  When attempting to prove downset closure, the lemma that
-fails states that \ref{L5} should behave like \ref{L6}: if you have two
-events in program order, but unordered in the pomset, then the predicate
-transformer for the empty set case and the independent case of the first
-event do the same thing to precondition of the second event, modulo
-quiescence.
+The independency reasoning of \ref{L5} is only applicable for pomsets where
+the ignored read is present!
+
+\begin{example}
+  Revisiting \refex{ex:tc1-revisit}
+  \begin{align*}
+    \begin{gathered}[t]
+      \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a0}{\DW{x}{0}}{}
+          \xform{xi}{\bForm[0/x]}{below=of a0}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{\DR{x}{1}}{}
+          \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm}{below=of a1}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \IF{r{\geq}0}\THEN y\GETS1 \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a2}{r{\geq}0\mid\DW{y}{1}}{}      
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  % Composing:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PW{x}{0} 
+      \SEMI\PR{x}{r} 
+      \SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a0}{\DW{x}{0}}{}
+          \event{a1}{\DR{x}{1}}{right=of a0}
+          \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}      
+          \wk{a0}{a1}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  The precondition of $\DWP{y}{1}$ is a tautology.
+
+  Taking the empty set for the read, however, we have:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PW{x}{0} 
+      \SEMI\PR{x}{r} 
+      \SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a0}{\DW{x}{0}}{}
+          %\event{a1}{\DR{x}{1}}{right=of a0}
+          \event{a2}{r{\geq}0\mid\DW{y}{1}}{right=3em of a1}      
+          %\wk{a0}{a1}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  The precondition of $\DWP{y}{1}$ is not a tautology.
+\end{example}
 
 \subsection{Comparison with Weakest Preconditions}
 
@@ -925,6 +1001,44 @@ must precede those of $\sem{\aCmd_2}$.
 % Synchronization can be added to 
 % This asymmetry arises naturally when using pomsets with preconditions to
 % model thread groups.
+
+\subsection{Left Par}
+
+Rather than fork-join, we can use left par and take register state from the
+left, but quiescence from both sides.  This removes the syntax level of
+thread groups.
+\begin{align*}
+  \aCmd
+  \BNFDEF& \ABORT
+  \BNFSEP \SKIP
+  \BNFSEP \LET{\aReg}{\aExp}
+  % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
+  % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
+  \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
+  \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
+  % \BNFSEP \PA{\aLoc}{\aExp} 
+  \\[-.5ex]
+  \BNFSEP& \aCmd_1 \LPAR \aCmd_2
+  \BNFSEP \aCmd_1 \SEMI \aCmd_2
+  \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI  
+\end{align*}
+
+\begin{definition}
+  If $\aPS \in (\aPSS_1\sLPAR\aPSS_2)$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+  \begin{enumerate}
+    \setcounter{enumi}{\value{pomsetPreParCount}}
+  \item[\ref{par-E}--\ref{par-kappa2})]
+    as for $\sPAR$ in \refdef{def:pomsets-pre},
+  \item \label{par-tau1}
+    $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\bForm}$,
+  \item \label{par-tau2}
+    $\aTr{\bEvs}{\aSym}$ implies $\aTr[2]{\bEvs}{\aSym}$,
+    for every quiescence symbol $\aSym$.
+  \end{enumerate}
+\end{definition}
+
 
 \begin{figure*}[t]
   \showRAtrue
@@ -2262,29 +2376,6 @@ Do sequencing and if commute?
 \subsection{About ARM}
 Hypothesis: gcb cannot contradict (poloc minus RxR).
 
-
-\subsection{Left Par}
-
-Another possibility is to use left par and take register state from the left,
-but quiescence from both sides.  This removes the syntax level of thread
-groups.
-\begin{align*}
-  \aCmd
-  \BNFDEF& \ABORT
-  \BNFSEP \SKIP
-  \BNFSEP \LET{\aReg}{\aExp}
-  % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
-  % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
-  \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
-  \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
-  % \BNFSEP \PA{\aLoc}{\aExp} 
-  \\[-.5ex]
-  \BNFSEP& \aCmd_1 \LPAR \aCmd_2
-  \BNFSEP \aCmd_1 \SEMI \aCmd_2
-  \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI  
-\end{align*}
-
-[Todo.]
 
 \subsection{Using Independency for Coherence}
 \label{sec:independency-co}
