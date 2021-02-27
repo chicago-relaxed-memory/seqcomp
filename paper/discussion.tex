@@ -6,11 +6,10 @@
       % \input{fig-full-noco}
     \end{minipage}
   \end{center}
-  \caption{Full Semantics with Address Calculation (See
-    \refdef{def:q-sub} for $\Q{}$, \refdef{def:QS} for $\QS{\aLoc}{\amode}$,
-    $\QL{\aLoc}{\amode}$, and
-    % $[\aForm/\QS{\aLoc}{\amode}]$, $[\aForm/\QL{\aLoc}{\amode}]$ and
-    \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} %, $\DS{\aLoc}{\amode}$)}
+  \caption{Full Semantics with Address Calculation
+    (See \refdef{def:QS} for $\QS{\aLoc}{\amode}$, $\QL{\aLoc}{\amode}$
+    and \refdef{def:DS} for $\DL{\aLoc}{\amode}$, $\DS{\aLoc}{\amode}$)
+  }
   \label{fig:full}
 \end{figure*}    
 
@@ -1350,8 +1349,10 @@ must precede those of $\sem{\aCmd_2}$.
       \input{fig-no-q-or-addr}
     \end{minipage}
   \end{center}
-  \caption{Simplified Quiescence Semantics without Address Calculation (See
-    \refdef{def:dlx} for $\DS{\aLoc}{\amode}$ and $\DLX{\aLoc}{\amode}{\bmode}$)} 
+  \caption{Simplified Quiescence Semantics without Address Calculation
+    (See \refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
+    \refdef{def:dlx} for $\DLX{\aLoc}{\amode}{\bmode}$, $\DS{\aLoc}{\amode}$)
+  } 
   \label{fig:no-q-or-addr}
 \end{figure*}    
 
@@ -1407,7 +1408,26 @@ must precede those of $\sem{\aCmd_2}$.
       {\reorder} &= \{(\aAct, \bAct) \mid \aAct\reorderco\bAct \land \aAct\reorderra\bAct\}
     \end{align*}  
   \end{definition}
-
+  \begin{definition}
+    \label{def:QSx}
+    Let formulae $\QS{}{\amode}$ and $\QL{}{\amode}$ be defined:
+    \begin{align*}
+      \QS{}{\amode}&=
+      \begin{cases}
+        \Q{} & \textif \amode\neq\mRLX
+        \\
+        \TRUE & \textotherwise
+      \end{cases}
+      &
+      \QL{}{\amode}&=
+      \begin{cases}
+        \Q{} & \textif \amode=\mSC
+        \\
+        \TRUE & \textotherwise
+      \end{cases}
+    \end{align*}
+  \end{definition}
+  
   \begin{definition}
     \label{def:independency-co}
     \noindent
@@ -1430,12 +1450,16 @@ must precede those of $\sem{\aCmd_2}$.
     \begin{enumerate}
     \item[\ref{S2})]
       $\labelingAct(\aEv) = \DW[\amode]{\aLoc}{\aVal}$,
+    \item[\ref{S3})] 
+      $\labelingForm(\aEv)$ implies $\QS{}{\amode} \land \aExp{=}\aVal$
     \item[\ref{S4})]
       $\aTr{\bEvs}{\bForm}$ implies $\bForm[(\Q{}\land\aExp{=}\aVal)/\Q{}]$,
     \item[\ref{S5})]
       $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$,
     \item[\ref{L2})]
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}{\aVal}$,
+    \item[\ref{L3})] 
+      $\labelingForm(\aEv)$ implies $\QL{}{\amode} \land \aExp{=}\aVal$
     \item[\ref{L4})]
       $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
     \item[\ref{L5})]
@@ -1530,8 +1554,10 @@ must precede those of $\sem{\aCmd_2}$.
       \input{fig-no-q}
     \end{minipage}
   \end{center}
-  \caption{Simplified Quiescence Semantics with Address Calculation  (See
-    \refdef{def:DS} for $\DL{\aLoc}{\amode}$)} 
+  \caption{Simplified Quiescence Semantics with Address Calculation
+    (See \refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
+    \refdef{def:dlx} for $\DLX{\aLoc}{\amode}{\bmode}$, $\DS{\aLoc}{\amode}$)
+  } 
   \label{fig:no-q}
 \end{figure*}    
 
