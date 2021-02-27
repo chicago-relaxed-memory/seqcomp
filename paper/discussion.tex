@@ -150,25 +150,260 @@ there is no such value when the set of events is empty.
 
 \subsection{Read-Modify-Write Operations (\xRMW)}
 
-[Todo]
+\RMW{} operations are formalized by adding a relation
+${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
+\RMW{} to the succeeding write.  The definition of a pomset requires the
+following, where two actions \emph{overlap} if they touch the same location:
+\begin{enumerate}
+\item[{\labeltext[A1]{A1)}{A1}}] If $\cEv$ and $\bEv$ overlap, $\bEv \xrmw \aEv$, and $\cEv\gtN \aEv$ then  $\cEv\gtN \bEv$.
+\item[{\labeltext[A2]{A2)}{A2}}] If $\cEv$ and $\bEv$ overlap, $\bEv \xrmw \aEv$, and $\bEv\gtN \cEv$ then  $\aEv\gtN \cEv$.
+\end{enumerate}
 
-% For \RMW{} operations, the independent case for a read should be the same as
-% the empty case.  To see why, consider the semantics of local invariant
-% reasoning (\xLIR) from \refdef{def:pomsets-lir}:
-% \begin{enumerate}
-% \item[\ref{S4})]
-%  $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
-% \item[\ref{S5})]
-%  $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
-% \item[\ref{L4})]
-%  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
-% \item[\ref{L5})]
-%  $\aTr{\cEvs}{\bForm}$ implies
-%  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
-% \item[\ref{L6})] 
-%  $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
-% \end{enumerate}
+\begin{example}
+  This definition ensures atomicity, disallowing executions such as
+  \cite[Ex.~3.2]{DBLP:journals/pacmpl/PodkopaevLV19}:
+  \begin{gather*}
+    % \taglabel{RMW1}
+    \begin{gathered}
+      \aLoc\GETS0\SEMI\bReg\GETS \FADD^{\mRLX,\mRLX}(\aLoc,1)
+      \PAR
+      x\GETS 2\SEMI s\GETS x
+      \\
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a2}{\DR{x}{0}}{}
+          \event{a1}{\DW{x}{0}}{left=of a2}
+          \rf{a1}{a2}
+          \event{a3}{\DW{x}{2}}{right=of a2}
+          \wk{a2}{a3}
+          \event{b2}{\DW{x}{1}}{right=of a3}
+          \event{b3}{\DR{x}{1}}{right=of b2}
+          \rmw[out=-15,in=-165]{a2}[below]{b2}
+          \wk{a3}{b2}
+          \rf{b2}{b3}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  By \ref{A1}, since $\DWP{x}{2}\xwk\DWP{x}{1}$, it must be that
+  $\DWP{x}{2}\xwk\DRP{x}{0}$, creating a cycle.
+\end{example}
 
+\begin{example}
+  \label{ex:rmw-33}
+  Two successful \RMW{}s cannot see the same write:
+  \begin{gather*}
+    \begin{gathered}
+      x\GETS0\SEMI (\FADD^{\mRLX,\mRLX}(\aLoc,1)\PAR \FADD^{\mRLX,\mRLX}(\aLoc,1))
+      \\
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{i}{\DW{x}{0}}{}
+          \event{a1}{a{:}\DR{x}{0}}{right=3em of i}
+          \event{a2}{b{:}\DW{x}{1}}{right=of a1}
+          \event{b1}{c{:}\DR{x}{0}}{right=3em of a2}
+          \event{b2}{d{:}\DW{x}{1}}{right=of b1}
+          \rmw{a1}{a2}
+          \rmw{b1}{b2}
+          \rf{i}{a1}
+          \rf[out=15,in=165]{i}{b1}
+          \wk[out=-15,in=-165]{a1}{b2}
+          %\wk{a1}{b2}
+          \wk{b1}{a2}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  The order from read-to-write is required by fulfillment.  
+  Apply \ref{A1} to $a\xwk d$, we have that $a\xwk c$.  Subsequently
+  applying \ref{A2}, we have $b \xwk c$, creating a cycle.
+\end{example}
+
+\begin{example}
+  By using two actions rather than one, the definition allows examples such as the
+  following, which is allowed by \armeight{} 
+  \cite[Ex.~3.10]{DBLP:journals/pacmpl/PodkopaevLV19}:
+  \begin{gather*}
+    % \taglabel{RMW2}
+    \begin{gathered}
+      r \GETS y\SEMI
+      z \GETS r
+      \PAR
+      r\GETS z\SEMI
+      x\GETS 0\SEMI
+      s\GETS \FADD^{\mRLX,\mRA}(x,1) \SEMI
+      y\GETS s{+}1
+      \\[-1ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{y}{1}}{}
+          \event{a2}{\DW{z}{1}}{right=of a1}
+          \po{a1}{a2}
+          \event{b1}{\DR{z}{1}}{right=3em of a2}
+          \rf{a2}{b1}
+          \event{b2}{\DW{x}{0}}{right=of b1}
+          \event{b3}{\DR{x}{0}}{right=of b2}
+          \rf{b2}{b3}
+          \event{b4}{\DWRel{x}{1}}{right=2em of b3}
+          \rmw{b3}{b4}
+          \event{b5}{\DW{y}{1}}{right=of b4}
+          \sync[out=-15,in=-165]{b1}{b4}
+          \po[out=-20,in=-160]{b3}{b5}
+          \rf[out=170,in=10]{b5}{a1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+\end{example}
+
+\begin{example}
+\label{ex:rmw-dep}
+For \RMW{} operations, the independent case for a read should be the same as
+the empty case.  To see why, consider the semantics of local invariant
+reasoning (\xLIR) from \refdef{def:pomsets-lir}:
+\begin{enumerate}
+\item[\ref{S4})]
+ $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+\item[\ref{S5})]
+ $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+\item[\ref{L4})]
+ $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+\item[\ref{L5})]
+ $\aTr{\cEvs}{\bForm}$ implies
+ $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+\item[\ref{L6})] 
+ $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
+\end{enumerate}
+  Consider the relaxed variant of the \textsc{cdrf} example from
+  \cite{DBLP:conf/pldi/LeeCPCHLV20}, using a semantics for $\FADD$ that
+  simply composes the rules for load and store above.
+  \begin{gather*}
+    \begin{gathered}
+      x\GETS 0\SEMI
+      \begin{aligned}[t]
+        (&r\GETS \FADD^{\mRLX,\mRLX}(x,1)\SEMI \IF{\BANG r}\THEN \IF{y}\THEN x\GETS 0 \FI \FI \;\;\PAR
+        \\&
+        r\GETS \FADD^{\mRLX,\mRLX}(x,1)\SEMI \IF{\BANG r}\THEN y\GETS 1 \FI)
+      \end{aligned}
+      \\
+      \hbox{\begin{tikzinlinesmall}[node distance=1em]
+          \event{i}{\DW{x}{0}}{}
+          \event{b0}{\DR{x}{0}}{right=2em of i}
+          \event{b0b}{\DW{x}{1}}{right=1.5em of b0}
+          \event{b1}{\DR{y}{1}}{right=of b0b}
+          \event{b2}{\DW{x}{0}}{right=of b1}
+          \event{a1}{\DR{x}{0}}{right=2em of b2}
+          \event{a1b}{\DW{x}{1}}{right=1.5em of a1}
+          \event{a2}{\DW{y}{1}}{right=of a1b}
+          \rmw{a1}{a1b}
+          \rmw{b0}{b0b}
+          \rf{i}{b0}
+          \rf[out=-165,in=-12]{a2}{b1}
+          \wk[out=20,in=160]{b0b}{b2}
+          %\sync{a1}{a2}
+          %\sync{b0}{b1}
+          \po{b1}{b2}
+          \rf{b2}{a1}
+        \end{tikzinlinesmall}}
+    \end{gathered}
+  \end{gather*}
+  Looking at the independent transformers of the second thread and
+  initializer, we have:
+  \begin{align*}
+    \begin{gathered}[t]
+      x\GETS0
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DW{x}{0}}{}      
+          \xform{xi}{\bForm[0/x]}{below=of a}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \smash{\FADD^{\mRLX,\mRLX}(x,1)}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em and .75em]
+          \event{a0}{\DR{x}{0}}{}
+          \node(a)[right=of a0]{};
+          \event{a1}{\DW{x}{1}}{right=of a}
+          \rmw{a0}{a1}
+          \xform{xi}{(0{=}r\lor x{=}r)\limplies\bForm[1/x]}{below=of a}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \IF{\BANG r}\THEN y\GETS1 \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a2}{r{=}0\mid\DW{y}{1}}{}      
+          \xform{xi}{\bForm[1/y]}{below=of a2}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  After sequencing, the precondition of $\DWP{y}{1}$ is a tautology:
+  $(0{=}r\lor 0{=}r)\limplies r{=}0$.
+
+  Here, local invariant reasoning is using the initializing write to $x$ to
+  justify the independence of the write to $y$.  But this write is made
+  unavailable by the first thread's successful \RMW{}.
+\end{example}
+As a result, we disallow the use of \ref{L5} when treating the read event in
+an \RMW{}.
+
+[Todo: write out the rules.]
+
+\begin{comment}
+  Consider the \textsc{cdrf} example from \cite{DBLP:conf/pldi/LeeCPCHLV20}:
+  \begin{gather*}
+    \begin{gathered}
+      \begin{aligned}
+        &r\GETS \FADD^{\mRA,\mRA}(x,1)\SEMI \IF{r{=}0}\THEN y\GETS 1 \FI
+        \\\PAR\;\;&
+        r\GETS \FADD^{\mRA,\mRA}(x,1)\SEMI \IF{r{=}0}\THEN \IF{y}\THEN x\GETS 0 \FI \FI
+      \end{aligned}
+      \\
+      \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
+          \raevent{a1}{\DR[\mRA]{x}{0}}{}
+          \raevent{a1b}{\DW[\mRA]{x}{1}}{right=of a1}
+          \event{a2}{\DW{y}{1}}{right=of a1b}
+          \raevent{b0}{\DR[\mRA]{x}{0}}{right=3em of a2}
+          \raevent{b0b}{\DW[\mRA]{x}{1}}{right=of b0}
+          \event{b1}{\DR{y}{1}}{right=of b0b}
+          \event{b2}{\DW{x}{0}}{right=of b1}
+          \rmw{a1}{a1b}
+          \rmw{b0}{b0b}
+          \rf[out=-13,in=-163]{a2}{b1}
+          \sync[out=20,in=160]{a1}{a2}
+          \sync[out=20,in=160]{b0}{b1}
+          \po{b1}{b2}
+          \rf[out=-165,in=-12]{b2}{a1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+\end{comment}
+\begin{comment}
+  Consider this example from \cite[\textsection C]{DBLP:conf/pldi/LeeCPCHLV20}:
+  \begin{gather*}
+      \begin{gathered}
+      \begin{aligned}
+        &r\GETS \CAS^{\mRLX,\mRLX}(x,0,1)\SEMI \IF{r{\leq}1}\THEN y\GETS 1 \FI
+        \\\PAR\;\;&
+        r\GETS \CAS^{\mRLX,\mRLX}(x,0,2)\SEMI \IF{r{=}0}\THEN \IF{y}\THEN x\GETS 0 \FI \FI
+      \end{aligned}
+      \\
+      \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{x}{0}}{}
+          \event{a1b}{\DW{x}{1}}{right=of a1}
+          \event{a2}{\DW{y}{1}}{right=of a1b}
+          \event{b0}{\DR{x}{0}}{right=3em of a2}
+          \event{b0b}{\DW{x}{2}}{right=of b0}
+          \event{b1}{\DR{y}{1}}{right=of b0b}
+          \event{b2}{\DW{x}{0}}{right=of b1}
+          \rmw{a1}{a1b}
+          \rmw{b0}{b0b}
+          \rf[out=-13,in=-163]{a2}{b1}
+          \sync[out=20,in=160]{a1}{a2}
+          \sync[out=20,in=160]{b0}{b1}
+          \po{b1}{b2}
+          \rf[out=-165,in=-12]{b2}{a1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+\end{comment}
 % \begin{example}
 %   Let $\CAS$ return the value read, which is sufficient to determine whether
 %   the $\CAS$ succeeded.
@@ -199,7 +434,36 @@ there is no such value when the set of events is empty.
 
 \subsection{Fence Operations (\xFENCE)}
 
-[Todo]
+Fence actions are pretty straightforward to handle in the semantics that uses
+independency for synchronization.  You just add dummy actions with the
+corresponding rules.
+
+[Todo: validate the following table and type in the corresponding definition
+for $\reorderra$, following \refdef{def:reorderra}.]
+\begin{center}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{c|ccc|ccc|ccc}
+    &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
+    \hline
+    $1^{\text{st}}$& $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mACQ}$ & $\DF{\mREL}$ & $\DF{\mSC}$\\
+    \hline
+    $\DR[\mRLX]{}{}$ & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
+    $\DR[\mRA]{}{}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
+    $\DR[\mSC]{}{}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
+    \hline
+    $\DW[\mRLX]{}{}$ & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \cmark & \xmark & \xmark \\
+    $\DW[\mRA]{}{}$  & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \cmark & \xmark & \xmark \\
+    $\DW[\mSC]{}{}$  & \cmark & \cmark & \xmark & \cmark & \xmark & \xmark & \cmark & \xmark & \xmark \\
+    \hline
+    $\DF{\mACQ}$ & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \cmark & \xmark & \cmark \\
+    $\DF{\mREL}$ & \cmark & \cmark & \cmark & \xmark & \xmark & \xmark & \cmark & \cmark & \cmark \\
+    $\DF{\mSC}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \cmark & \cmark & \cmark 
+  \end{tabular}
+\end{center}
+
+
+[Not sure it is worth working this out in the logical version of
+synchronization.]
 
 \section{Discussion}
 \subsection{Closure properties}
@@ -1063,6 +1327,7 @@ rather than encoding them in the logic.
 
 To capture completion, we use a single quiescence symbol: $\Q{}$.
 
+
 Update actions to include access modes: $\DWP[\amode]{\aLoc}{\aVal}$ and
 $\DRP[\amode]{\aLoc}{\aVal}$.
 Independency of two sequential actions is determined, in part, by the modes
@@ -1083,6 +1348,7 @@ of the two actions, capturing synchronization:
   \end{tabular}
 \end{center}
 \begin{definition}
+  \label{def:reorderra}
   Including coherence, \emph{independency} is defined:
   \begin{align*}
     {\reorderra} &= \{(\DR[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode=\mRLX\}
@@ -1102,34 +1368,6 @@ of the two actions, capturing synchronization:
   \end{align*}  
 \end{definition}
 
-\reffig{fig:no-q-or-addr} shows the resulting semantics of read and write,
-without address calculation.  \reffig{fig:no-q} shows the resulting semantics
-with address calculation.
-
-\begin{definition}
-  \label{def:dlx}
-  Let $[\aForm/\Dx{*}]$ substitute $\aForm$ for every $\Dx{\bLoc}$.
-
-  \noindent
-  Let substitution $\DS{\aLoc}{\amode}$ be defined:
-  \begin{displaymath}
-    \DS{\aLoc}{\amode}=
-    \begin{cases}
-      [\TRUE/\Dx{\aLoc}] & \textif \amode=\mRLX
-      \\
-      [\FALSE/\Dx{*}] & \textotherwise
-    \end{cases}
-  \end{displaymath}
-  Let formula $\DLX{\aLoc}{\amode}{\bmode}$ be defined:
-  \begin{displaymath}
-    \DLX{\aLoc}{\amode}{\bmode}=
-    \begin{cases}
-      \TRUE & \textif \amode=\mRLX \textor \amode=\bmode
-      \\
-      \Dx{\aLoc} & \textotherwise
-    \end{cases}
-  \end{displaymath}
-\end{definition}
 \begin{definition}
   \label{def:independency-co}
   \noindent
@@ -1193,6 +1431,34 @@ with address calculation.
   \end{align*}
 \end{example}
 
+\reffig{fig:no-q-or-addr} shows the resulting full semantics of read and
+write, without address calculation.  \reffig{fig:no-q} shows the resulting
+full semantics with address calculation.
+
+\begin{definition}
+  \label{def:dlx}
+  Let $[\aForm/\Dx{*}]$ substitute $\aForm$ for every $\Dx{\bLoc}$.
+
+  \noindent
+  Let substitution $\DS{\aLoc}{\amode}$ be defined:
+  \begin{displaymath}
+    \DS{\aLoc}{\amode}=
+    \begin{cases}
+      [\TRUE/\Dx{\aLoc}] & \textif \amode=\mRLX
+      \\
+      [\FALSE/\Dx{*}] & \textotherwise
+    \end{cases}
+  \end{displaymath}
+  Let formula $\DLX{\aLoc}{\amode}{\bmode}$ be defined:
+  \begin{displaymath}
+    \DLX{\aLoc}{\amode}{\bmode}=
+    \begin{cases}
+      \TRUE & \textif \amode=\mRLX \textor \amode=\bmode
+      \\
+      \Dx{\aLoc} & \textotherwise
+    \end{cases}
+  \end{displaymath}
+\end{definition}
 
 \begin{figure*}
   \showRAtrue
@@ -1846,6 +2112,16 @@ of events.  Here we have forbidden coalescing.  This difference appears to be
 arbitrary.  In \jjr{}, however, there is a mistake in the handling of
 termination actions.  The predicates should be joined using $\land$, not
 $\lor$.
+
+\subsubsection*{Read-Modify-Write Actions}
+
+In \jjr{}, the atomicity axioms \ref{A1}/\ref{A2} erroneously applies only to
+overlapping writes, not overlapping reads.  The difficulty can be seen in
+\refex{ex:rmw-33}.
+
+\jjr{} does not specify the calculation of dependency for \RMW{}s, as
+discussed in \refex{ex:rmw-dep}.
+
 
 \subsubsection*{Internal Acquiring Reads}
 
