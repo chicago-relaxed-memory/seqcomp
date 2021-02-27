@@ -1448,10 +1448,10 @@ must precede those of $\sem{\aCmd_2}$.
     \refex{ex:q1}.
     \begin{align*}
       \begin{gathered}[t]
-        \PW[\amode]{x}{\aExp}
+        \PW[\mRLX]{x}{\aExp}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \event{a}{\aExp{=}v\mid\DW[\amode]{x}{v}}{}
+            \event{a}{\aExp{=}v\mid\DW[\mRLX]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
             \xform{xd}{\bForm[(\Q{}\land\aExp{=}\aVal)/\Q{}]}{below=of a}
             \xo{a}{xd}
@@ -1459,10 +1459,32 @@ must precede those of $\sem{\aCmd_2}$.
       \end{gathered}
       &&
       \begin{gathered}[t]
-        \PR[\amode]{x}{r}
+        \PR[\amode\in\{\mRLX, \mRA \}]{x}{r}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
             \event{a}{\DR[\amode]{x}{v}}{}
+            \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
+            \xform{xd}{v{=}r\limplies\bForm}{below=of a}
+            \xo{a}{xd}
+          \end{tikzinline}}
+      \end{gathered}
+      \\
+      \begin{gathered}[t]
+        \PW[\amode\in\{\mRA, \mSC \}]{x}{\aExp}
+        \\
+        \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+            \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
+            \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
+            \xform{xd}{\bForm[(\Q{}\land\aExp{=}\aVal)/\Q{}]}{below=of a}
+            \xo{a}{xd}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}[t]
+        \PR[\mSC]{x}{r}
+        \\
+        \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+            \event{a}{\Q{} \mid \DR[\mSC]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
             \xform{xd}{v{=}r\limplies\bForm}{below=of a}
             \xo{a}{xd}
