@@ -441,6 +441,7 @@ corresponding rules.
 [Todo: validate the following table and type in the corresponding definition
 for $\reorderra$, following \refdef{def:reorderra}.]
 \begin{center}
+  \showRAtrue
   \setlength{\tabcolsep}{4pt}
   \begin{tabular}{c|ccc|ccc|ccc}
     &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
@@ -448,17 +449,18 @@ for $\reorderra$, following \refdef{def:reorderra}.]
     $1^{\text{st}}$& $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mACQ}$ & $\DF{\mREL}$ & $\DF{\mSC}$\\
     \hline
     $\DR[\mRLX]{}{}$ & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
-    $\DR[\mRA]{}{}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
-    $\DR[\mSC]{}{}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
+    $\DR[\mRA]{}{}$  & \xmark & \cmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
+    $\DR[\mSC]{}{}$  & \xmark & \xmark & \cmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
     \hline
     $\DW[\mRLX]{}{}$ & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \cmark & \xmark & \xmark \\
-    $\DW[\mRA]{}{}$  & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \cmark & \xmark & \xmark \\
-    $\DW[\mSC]{}{}$  & \cmark & \cmark & \xmark & \cmark & \xmark & \xmark & \cmark & \xmark & \xmark \\
+    $\DW[\mRA]{}{}$  & \cmark & \cmark & \cmark & \cmark & \cmark & \xmark & \cmark & \xmark & \xmark \\
+    $\DW[\mSC]{}{}$  & \cmark & \cmark & \xmark & \cmark & \xmark & \cmark & \cmark & \xmark & \xmark \\
     \hline
     $\DF{\mACQ}$ & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \cmark & \xmark & \cmark \\
     $\DF{\mREL}$ & \cmark & \cmark & \cmark & \xmark & \xmark & \xmark & \cmark & \cmark & \cmark \\
     $\DF{\mSC}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \cmark & \cmark & \cmark 
   \end{tabular}
+  \showRAfalse
 \end{center}
 
 
