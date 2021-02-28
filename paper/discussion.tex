@@ -1062,8 +1062,8 @@ transformer) is completed.
 % result, in general, $\sem{\FORK{\THREAD{\aCmd}}}\neq\sem{\aCmd}$.
 
 The $\FORK{}$ operation is asynchronous: In
-$\sem{\aCmd_1\SEMI\aCmd_2\FORK{\aGrp}\SEMI \aCmd_3}$, the only order enforced
-between $\sem{\aCmd_1\SEMI\aCmd_2\SEMI \aCmd_3}$ and $\sem{\aGrp}$ comes from
+$\sem{\aCmd_1\SEMI\aCmd_2\SEMI\FORK{\aGrp}\SEMI \aCmd_3}$, the only order enforced
+between $\sem{\aCmd_3}$ and $\sem{\aGrp}$ comes from
 quiescence preconditions in $\sem{\aGrp}$; the transformer of
 $\sem{\FORK{\aGrp}}$ is the identity transformer, thus $\sem{\aGrp}$ runs
 concurrently with $\sem{\aCmd_3}$.  In addition, if $\aCmd_2$ includes no
