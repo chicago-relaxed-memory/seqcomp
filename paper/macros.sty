@@ -1,3 +1,6 @@
+\newcommand{\lubmode}{\sqcup}
+\newcommand{\ltmode}{\sqsubset}
+\newcommand{\compat}[2]{#1\Yleft#2}
 \newcommand{\Pom}{\mathsf{Pom}}
 \newcommand{\PomPre}{\mathsf{PomPre}}
 \newcommand{\PomTrans}{\mathsf{PomTrans}}
@@ -742,9 +745,10 @@
 \newcommand{\notify}[1]{\mathsf{notify}\,#1}
 \newcommand{\notified}[1]{\mathsf{notified}\,#1}
 \newcommand{\wait}[1]{\mathsf{wait}\,#1}
-\newcommand{\reorder}{\mathrel\leftrightarrow}
-\newcommand{\reorderco}{\mathrel{\smash{\overset{\mathsf{co}}{\leftrightarrow}}}}
-\newcommand{\reorderra}{\mathrel{\smash{\overset{\mathsf{ra}}{\leftrightarrow}}}}
+\newcommand{\reorder}{\mathrel{\bowtie}}
+\newcommand{\reorderlt}{\mathrel{\ltimes}}%\xleftrightarrow{}}%\mathrel\leftrightarrow}
+\newcommand{\reorderco}{\mathrel{\ltimes}_{\mathsf{co}}}%\xleftrightarrow{\mathsf{co}}}
+\newcommand{\reorderra}{\mathrel{\ltimes}_{\mathsf{sync}}}%\xleftrightarrow{\mathsf{sync}}}%\mathrel{\smash{\overset{\mathsf{ra}}{\leftrightarrow}}}}
 \newcommand{\reorderRLX}{\mathrel{\smash{\overset{\mRLX}{\leftrightarrow}}}}
 \newcommand{\reorderSC}{\mathrel{\smash{\overset{\mSC}{\leftrightarrow}}}}
 \newcommand{\quietForm}{\mathsf{Q}}

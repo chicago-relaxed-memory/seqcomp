@@ -15,6 +15,7 @@
 
 \appendices
 \section{Additional Features}
+
 \subsection{Address Calculation (\xADDR)}
 
 \begin{definition}[\xADDR]
@@ -433,39 +434,85 @@ an \RMW{}.
 
 \subsection{Fence Operations (\xFENCE)}
 
-Fence actions are pretty straightforward to handle in the semantics that uses
-independency for synchronization.  You just add dummy actions with the
-corresponding rules.
+% Fence actions are pretty straightforward to handle in the semantics that uses
+% independency for synchronization.  You just add dummy actions with the
+% corresponding rules.  See \textsection\ref{sec:independency-ra}.
 
-[Todo: validate the following table and type in the corresponding definition
-for $\reorderra$, following \refdef{def:reorderra}.]
-\begin{center}
+Syntactic fences $\FENCE^{\fmode}$ have corresponding actions:
+$\DFP{\fmode}$.  The \emph{syntactic fence mode}
+$(\fmode \!\!\BNFDEF\!\! \mREL \!\BNFSEP\! \mACQ \!\BNFSEP\! \mSC)$ is either
+\emph{release}, \emph{acquire}, or \emph{sequentially-consistent}.
+
+\begin{gather*}
+  \begin{gathered}[t]
+    \PF{\mREL}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \raevent{a}{\Qr{*}\land\Qw{*}\mid\DF{\mREL}}{}
+        \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
+        \xform{xd}{\bForm}{below=of a}
+        \xo{a}{xd}
+      \end{tikzinline}}
+  \end{gathered}
+  \qquad
+  \begin{gathered}[t]
+    \PF{\mACQ}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \raevent{a}{\Qr{*}\mid\DF{\mREL}}{}
+        \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
+        \xform{xd}{\bForm}{below=of a}
+        \xo{a}{xd}
+      \end{tikzinline}}
+  \end{gathered}
+  \\[1ex]
+  \begin{gathered}[t]
+    \PF{\mSC}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \raevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DF{\mREL}}{}
+        \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
+        \xform{xd}{\bForm}{below=of a}
+        \xo{a}{xd}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+
+\subsection{Access Elimination}
+\begin{scope}
   \showRAtrue
-  \setlength{\tabcolsep}{4pt}
-  \begin{tabular}{c|ccc|ccc|ccc}
-    &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
-    \hline
-    $1^{\text{st}}$& $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mACQ}$ & $\DF{\mREL}$ & $\DF{\mSC}$\\
-    \hline
-    $\DR[\mRLX]{}{}$ & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
-    $\DR[\mRA]{}{}$  & \xmark & \cmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
-    $\DR[\mSC]{}{}$  & \xmark & \xmark & \cmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
-    \hline
-    $\DW[\mRLX]{}{}$ & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark & \cmark & \xmark & \xmark \\
-    $\DW[\mRA]{}{}$  & \cmark & \cmark & \cmark & \cmark & \cmark & \xmark & \cmark & \xmark & \xmark \\
-    $\DW[\mSC]{}{}$  & \cmark & \cmark & \xmark & \cmark & \xmark & \cmark & \cmark & \xmark & \xmark \\
-    \hline
-    $\DF{\mACQ}$ & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \cmark & \xmark & \cmark \\
-    $\DF{\mREL}$ & \cmark & \cmark & \cmark & \xmark & \xmark & \xmark & \cmark & \cmark & \cmark \\
-    $\DF{\mSC}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \cmark & \cmark & \cmark 
-  \end{tabular}
-\end{center}
+  For reads, get rid of $\FALSE/\Q{}$ in \ref{L6full}.
 
-[The logical version of synchronization will use the distinction between
-reads and writes that is already there for coherence.]
+  For writes, change the label rules of sequential composition to:
+  \begin{enumerate}
+  \item %\label{par-lambda1}
+    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labeling(\aEv) = \labeling_1(\aEv)$, 
+  \item %\label{par-lambda2}
+    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labeling(\aEv) = \labeling_2(\aEv)$,
+  \item %\label{par-lambda2}
+    if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labeling(\aEv) \in \compat{\labeling_1(\aEv)}{\labeling_2(\aEv)}$.
+  \end{enumerate}
 
-[Todo: flesh this out?]
+  \begin{definition}
+    Define the three point order:
+    \begin{math}
+      \mRLX \ltmode \mRA \ltmode \mSC.
+    \end{math}
 
+    \noindent    
+    Let $\amode\lubmode\bmode$ denote the least upper bound of $\amode$ and $\bmode$.
+    \begin{align*}
+      \compat{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}} &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
+      \\
+      \compat{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}} &= \{ \DW[\amode\lubmode\bmode]{\aLoc}{\bVal} \}
+      \\
+      \compat{\aAct}{\bAct} &= \emptyset, \textotherwise
+    \end{align*}
+  \end{definition}
+
+  
+\end{scope}
 \section{Discussion}
 \subsection{Closure properties}
 
@@ -1356,56 +1403,109 @@ must precede those of $\sem{\aCmd_2}$.
   \label{fig:no-q-or-addr}
 \end{figure*}    
 
-\subsection{Using Independency for Coherence and Synchronization}
+\subsection{Coherence/Synchronization via Reordering}
 \label{sec:independency-ra}
 \begin{scope}
   \showRAtrue
 
   In \textsection\ref{sec:sync}, we encoded coherence and synchronized access
-  using quiescence symbols.  Building on the language with $\FORKJOIN{}$, it is
-  possible to model these using independency (\textsection\ref{sec:pomsets}),
-  rather than encoding them in the logic.
+  using quiescence symbols.  Building on the language with $\FORKJOIN{}$, it
+  is possible to model these using reorderability
+  (\textsection\ref{sec:pomsets}), rather than encoding them in the logic.
+  With synchronization, the relationship becomes asymmetric.
 
   To capture completion, we use a single quiescence symbol: $\Q{}$.
 
 
   Update actions to include access modes: $\DWP[\amode]{\aLoc}{\aVal}$ and
   $\DRP[\amode]{\aLoc}{\aVal}$.
-  Independency of two sequential actions is determined, in part, by the modes
+  Reorderability of two sequential actions is determined, in part, by the modes
   of the two actions, capturing synchronization:
   \begin{center}
     \begin{tabular}{c|ccc|ccc}
       &  \multicolumn{6}{|c}{$2^{\text{nd}}$} \\
       \hline
-      $1^{\text{st}}$& $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$\\
+      $1^{\text{st}}$
+                       & $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$\\
       \hline
-      $\DR[\mRLX]{}{}$ & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark \\
-      $\DR[\mRA]{}{}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
-      $\DR[\mSC]{}{}$  & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
+      $\DR[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark         \\
+      $\DR[\mRA]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark         \\
+      $\DR[\mSC]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark         \\
       \hline
-      $\DW[\mRLX]{}{}$ & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark \\
-      $\DW[\mRA]{}{}$  & \cmark & \cmark & \cmark & \cmark & \xmark & \xmark \\
-      $\DW[\mSC]{}{}$  & \cmark & \cmark & \xmark & \cmark & \xmark & \xmark 
+      $\DW[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark         \\
+      $\DW[\mRA]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark         \\
+      $\DW[\mSC]{}{}$  & \cmark           & \cmark          & \xmark          & \cmark           & \xmark          & \xmark 
     \end{tabular}
   \end{center}
+[Todo: validate the following table and type in the corresponding definition
+for $\reorderra$, following \refdef{def:reorderra}.]
+
+%Least permissive for fences:
+\begin{comment}
+  \showRAtrue
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{c|cccc|cccc|c}
+    &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
+    \hline
+    $1^{\text{st}}$
+                     & $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DF{\mACQ}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mREL}$&$\DF{\mSC}$\\
+    \hline                                                                                                                                                      
+    $\DR[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \xmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+    $\DR[\mRA]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+    $\DR[\mSC]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+    $\DF{\mACQ}$     & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+    \hline                                                                                                                                                      
+    $\DW[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+    $\DW[\mRA]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+    $\DW[\mSC]{}{}$  & \cmark           & \cmark          & \xmark          & \cmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+    $\DF{\mREL}$     & \cmark           & \cmark          & \cmark          & \cmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+    \hline                                                                                                                                                      
+    $\DF{\mSC}$      & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark 
+  \end{tabular}
+\end{comment}
+It seems that fences generally commute.  %Except $\DRP{x}{}\DFP{\mACQ}\DFP{\mREL}\DWP{y}{}$
+\begin{center}
+  \showRAtrue
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{c|ccc|ccc|ccc}
+    &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
+    \hline
+    $1^{\text{st}}$
+                     & $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mREL}$&$\DF{\mACQ}$ &$\DF{\mSC}$\\
+    \hline                                                                                                                                                     
+    $\DR[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
+    $\DR[\mRA]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
+    $\DR[\mSC]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
+    \hline                                                                                                                                                     
+    $\DW[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
+    $\DW[\mRA]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
+    $\DW[\mSC]{}{}$  & \cmark           & \cmark          & \xmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
+    \hline                                                                                                                                                     
+    $\DF{\mREL}$     & \cmark           & \cmark          & \cmark          & \xmark           & \xmark          & \xmark          & \cmark      &\cmark       & \cmark    \\
+    $\DF{\mACQ}$     & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \cmark      &\cmark       & \cmark    \\
+    $\DF{\mSC}$      & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \cmark      &\cmark       & \cmark 
+  \end{tabular}
+\end{center}
   \begin{definition}
     \label{def:reorderra}
-    Including coherence, \emph{independency} is defined:
+    Including coherence, \emph{reorderability} is defined:
     \begin{align*}
-      {\reorderra} &= \{(\DR[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode=\mRLX\}
-      \\&\cup\{ (\DW[\amode]{}{}, \DR[\bmode]{}{})  \mid 
-      \amode\neq\mSC \lor \bmode\neq\mSC\}
-      \\&\cup\{(\DR[\amode]{}{}, \DW[\bmode]{}{})  \mid 
-      \amode=\mRLX \land \bmode=\mRLX\}
-      \\&\cup\{ (\DW[\amode]{}{}, \DW[\bmode]{}{})  \mid 
-      \bmode=\mRLX \}
+      {\reorderra}
+        &=   \{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \}% \mid \amode=\mRLX\}
+         \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{} ) \}%\mid \bmode=\mRLX \}
+      \\&\cup\{(\DR[\amode]{}{}, \DW[\bmode]{}{}) \mid \amode=\mRLX \land \bmode=\mRLX\}
+      \\&\cup\{(\DW[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode\neq\mSC \lor \bmode\neq\mSC\}
+      \\&\cup\{(\DF{\amode},     \DF{\bmode}    ) \}
+         \cup\{(\DF{\mREL},      \DR[\bmode]{}{}) \}%\mid \amode=\mREL \}
+         \cup\{(\DW[\amode]{}{}, \DF{\mACQ}     ) \}%\mid \bmode=\mACQ \}
       \\
-      {\reorderco} &= \{(\DR{\aLoc}{}, \DR{\bLoc}{})\}
-      \\&\cup\{ (\DW{\aLoc}{}, \DR{\bLoc}{})  \mid \aLoc\neq\bLoc\}
-      \\&\cup\{(\DR{\aLoc}{}, \DW{\bLoc}{})  \mid \aLoc\neq\bLoc\}
-      \\&\cup\{ (\DW{\aLoc}{}, \DW{\bLoc}{})  \mid \aLoc\neq\bLoc\}
+      {\reorderco}
+        &=   \{(\DR{\aLoc}{}, \DR{\bLoc}{}) \}
+         \cup\{(\DW{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
+      \\&\cup\{(\DR{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
+         \cup\{(\DW{\aLoc}{}, \DR{\bLoc}{}) \mid \aLoc\neq\bLoc\}
       \\
-      {\reorder} &= \{(\aAct, \bAct) \mid \aAct\reorderco\bAct \land \aAct\reorderra\bAct\}
+      {\reorderlt} &= {\reorderra}\cap{\reorderco} %\{(\aAct, \bAct) \mid \aAct\reorderco\bAct \land \aAct\reorderra\bAct\}
     \end{align*}  
   \end{definition}
   \begin{definition}
@@ -1444,7 +1544,7 @@ must precede those of $\sem{\aCmd_2}$.
     \item[1--\ref{seq-tau})] as for $\sSEMI$ in \refdef{def:pomsets-trans},
     \item
       \label{seq-reorder} if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either
-      $\bEv\le\aEv$ or $a\reorder\labeling_2(\aEv)$.
+      $\bEv\le\aEv$ or $a\reorderlt\labeling_2(\aEv)$.
     \end{enumerate}
     Update the read and write rules of \refdef{def:pomsets-trans} to: %and \ref{def:pomsets-fj} to: % (\ref{S4}/\ref{L4} unchanged):
     \begin{enumerate}

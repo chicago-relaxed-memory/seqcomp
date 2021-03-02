@@ -213,12 +213,12 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
   Pomset $\aPS$ is \emph{fulfilled} if every read in $\aPS$ is fulfilled.
 \end{definition}
 
-We introduce independency \cite{DBLP:books/ws/95/Mazurkiewicz95} in order to
+We introduce reorderability \cite{DBLP:books/ws/95/Mazurkiewicz95} in order to
 provide examples with coherence in this subsection.  In
 \textsection\ref{sec:q} we show that coherence can be encoded in the logic,
-making independency unnecessary.
+making reorderability unnecessary.
 \begin{definition}
-  Actions $\aAct$ and $\bAct$ are \emph{independent}
+  Actions $\aAct$ and $\bAct$ are \emph{reorderable}
   (${\aAct\reorder\bAct}$) if either both are reads or they are accesses to
   different locations.  Formally
   \begin{math}
@@ -240,7 +240,7 @@ making independency unnecessary.
     % \{(\DR{\aLoc}{\aVal}, \DW{\bLoc}{\bVal}), (\DW{\aLoc}{\aVal}, \DR{\bLoc}{\bVal}) \mid \aLoc\neq\bLoc\}
   \end{comment}
 
-  Actions that are not independent are in \emph{conflict}.
+  Actions that are not reorderable are in \emph{conflict}.
 \end{definition}
 We can now define a model of processes given as sets of pomsets
 sufficient to give the semantics for a fragment of our language
@@ -258,18 +258,20 @@ without control or data dependencies.
   \begin{enumerate}
   \item \label{par-E}
     $\aEvs = (\aEvs_1\cup\aEvs_2)$,
-  \item \label{par-lambda1}
-    if $\aEv\in\aEvs_1$ then $\labeling(\aEv) = \labeling_1(\aEv)$, 
-  \item \label{par-lambda2}
-    if $\aEv\in\aEvs_2$ then $\labeling(\aEv) = \labeling_2(\aEv)$,
   \item \label{par-le1}
     if $\bEv\le_1\aEv$ then $\bEv\le\aEv$, 
   \item \label{par-le2}
     if $\bEv\le_2\aEv$ then $\bEv\le\aEv$, 
+  \item \label{par-lambda1}
+    if $\aEv\in\aEvs_1$ then $\labeling(\aEv) = \labeling_1(\aEv)$, 
+  \item \label{par-lambda2}
+    if $\aEv\in\aEvs_2$ then $\labeling(\aEv) = \labeling_2(\aEv)$,
+    \label{pomsetParCountLast}
     \newcounter{pomsetParCount}
     \setcounter{pomsetParCount}{\value{enumi}}
   \item \label{par-disjoint}
     $\aEvs_1$ and $\aEvs_2$ are disjoint.
+    \label{pomsetParDisjointCountLast}
     \newcounter{pomsetParDisjointCount}
     \setcounter{pomsetParDisjointCount}{\value{enumi}}
   \end{enumerate}
@@ -283,15 +285,16 @@ without control or data dependencies.
     $\aEvs=(\aEvs_1 \cup \aEvs_2)$,
   \item \label{pre-unique}
     if $\bEv,\aEv\in\aEvs_1$ then $\bEv=\aEv$,
+  \item \label{pre-le2}
+    if $\bEv\le_2\aEv$ then $\bEv\le\aEv$, 
   \item \label{pre-lambda1}
     if $\aEv\in\aEvs_1$ then $\labelingAct(\aEv) = \aAct$,
   \item \label{pre-lambda2}
     if $\aEv\in\aEvs_2$ then $\labelingAct(\aEv) = \labelingAct_2(\aEv)$,
-  \item \label{pre-le2}
-    if $\bEv\le_2\aEv$ then $\bEv\le\aEv$, 
   \item
     \label{pre-reorder}
     if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\leq\aEv$ or $a\reorder\labeling_2(\aEv)$.
+    \label{pomsetPrefixOrderCountLast}
     % \newcounter{pomsetPrefixCount}
     % \setcounter{pomsetPrefixCount}{\value{enumi}}
     \newcounter{pomsetPrefixOrderCount}
@@ -478,7 +481,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParDisjointCount}}
-  \item[\ref{par-E}--\ref{par-disjoint})]
+  \item[1--\ref{pomsetParDisjointCountLast})]
     as for $\sPAR$ in \refdef{def:pomset-semantics},
   \item \label{par-kappa1}
     if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
@@ -494,7 +497,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParCount}}
-  \item[\ref{par-E}--\ref{par-le2})] 
+  \item[1--\ref{pomsetParCountLast})] 
     as for $\sPAR$  in \refdef{def:pomset-semantics} (ignoring disjointness),
   \item \label{if-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
@@ -504,6 +507,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
     if $\aEv\in\aEvs_1\cap\aEvs_2$ then\\
     $\labelingForm(\aEv)$ implies $(\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$.
     % $\labelingForm(\aEv)$ implies $(\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$.
+    \label{pomsetPreIfCountLast}
     \newcounter{pomsetPreIfCount}
     \setcounter{pomsetPreIfCount}{\value{enumi}}
   \end{enumerate}
@@ -515,7 +519,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   % there is $\aPS_2\in\aPSS$ such that
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
-  \item[\ref{pre-E}--\ref{pre-reorder})]
+  \item[1--\ref{pomsetPrefixOrderCountLast})]
     as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{storepre-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aExp{=}\aVal$,
@@ -535,7 +539,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   % there is $\aPS_2\in\aPSS$ such that
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
-  \item[\ref{pre-E}--\ref{pre-reorder})]
+  \item[1--\ref{pomsetPrefixOrderCountLast})]
     as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{loadpre-kappa2}
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
@@ -849,7 +853,7 @@ We model commands by adding predicate transformers to
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetPreIfCount}}
-  \item[1--\ref{if-kappa12})] as for $\sIF{}$ in \refdef{def:pomsets-pre},
+  \item[1--\ref{pomsetPreIfCountLast})] as for $\sIF{}$ in \refdef{def:pomsets-pre},
   \item \label{if-tau}
     $\aTr{\bEvs}{\bForm}$ implies
     $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$.
@@ -866,7 +870,7 @@ We model commands by adding predicate transformers to
   % let $\labelingForm'_2(\aEv)=\aTr[1]{\{ \bEv \mid \bEv < \aEv \}}{\labelingForm_2(\aEv})$  
   \begin{enumerate}
     \setcounter{enumi}{\value{pomsetParCount}}
-  \item[1--\ref{par-le2})]
+  \item[1--\ref{pomsetParCountLast})]
     as for $\sPAR$  in \refdef{def:pomset-semantics} (ignoring disjointness),
   \item \label{seq-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
@@ -896,7 +900,7 @@ We model commands by adding predicate transformers to
   \item[{\labeltext[S3]{S3)}{S3}}]
     $\labelingForm(\aEv)$ implies $\aExp{=}\aVal$,
   \item[{\labeltext[S4]{S4)}{S4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm\noSUB{[\aExp/\aLoc]}$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
+    $\aTr{\bEvs}{\bForm}$ implies $\aExp{=}\aVal\land\bForm\noSUB{[\aExp/\aLoc]}$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
   \item[{\labeltext[S5]{S5)}{S5}}]
     $\aTr{\cEvs}{\bForm}$ implies $\bForm\noSUB{[\aExp/\aLoc]}$, % \land % \lnot\Q{}$.
     \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$.
