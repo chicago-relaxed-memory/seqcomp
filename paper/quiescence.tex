@@ -119,7 +119,7 @@ symbols, for example:
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{1{=}1\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm[(\Qw{\aLoc}\land1{=}1)/\Qw{\aLoc}]}{below=of a1}
+          \xform{x1d}{\bForm\land1{=}1}{below=of a1}
           \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
           \xo{a1}{x1d}
         \end{tikzinline}}
@@ -130,7 +130,7 @@ symbols, for example:
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a2}{2{=}2\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{2}}{}
-          \xform{x2d}{\bForm[(\Qw{\aLoc}\land2{=}2)/\Qw{\aLoc}]}{below=of a2}
+          \xform{x2d}{\bForm\land2{=}2}{below=of a2}
           \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
           \xo{a2}{x2d}
         \end{tikzinline}}

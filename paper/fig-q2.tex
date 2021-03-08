@@ -6,7 +6,8 @@
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a}{\aExp{=}v\land\Qra\mid\DW{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qrlx]}{above=of a}
-          \xform{xd}{\bForm[(\Qrlx\land\aExp{=}\aVal)/\Qrlx]}{below=of a}
+          \xform{xd}{\aExp{=}\aVal\land\bForm}{below=of a}
+          %\xform{xd}{\bForm[(\Qrlx\land\aExp{=}\aVal)/\Qrlx]}{below=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
@@ -17,7 +18,8 @@
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \raevent{a}{\aExp{=}v\land\Qra\land\Qrlx\mid\DW[\mRA]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qrlx]}{above=of a}
-          \xform{xd}{\bForm[(\Qrlx\land\aExp{=}\aVal)/\Qrlx]}{below=of a}
+          \xform{xd}{\aExp{=}\aVal\land\bForm}{below=of a}
+          %\xform{xd}{\bForm[(\Qrlx\land\aExp{=}\aVal)/\Qrlx]}{below=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
@@ -28,7 +30,8 @@
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \scevent{a}{\aExp{=}v\land\Qra\land\Qrlx\land\Qsc\mid\DW[\mSC]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qrlx][\FALSE/\Qsc]}{above=of a}
-          \xform{xd}{\bForm[(\Qrlx\land\aExp{=}\aVal)/\Qrlx]}{below=of a}
+          \xform{xd}{\aExp{=}\aVal\land\bForm}{below=of a}
+          %\xform{xd}{\bForm[(\Qrlx\land\aExp{=}\aVal)/\Qrlx]}{below=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}

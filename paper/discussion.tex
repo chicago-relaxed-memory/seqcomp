@@ -629,7 +629,7 @@ $\Qr{*}$ in addition to $\Qw{\aLoc}$, as in $\QL{\aLoc}{\mRA}$.
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
             \raevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\mid\DW[\mRA]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
-            \xform{xd}{\bForm[(\Qw{x}\land\aExp{=}\aVal)/\Qw{x}]}{below=of a}
+            \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
             \xo{a}{xd}
           \end{tikzinline}}
       \end{gathered}
@@ -1917,7 +1917,7 @@ must precede those of $\sem{\aCmd_2}$.
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
             \event{a}{\aExp{=}v\mid\DW[\mRLX]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
-            \xform{xd}{\bForm[(\Q{}\land\aExp{=}\aVal)/\Q{}]}{below=of a}
+            \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
             \xo{a}{xd}
           \end{tikzinline}}
       \end{gathered}
@@ -1939,7 +1939,7 @@ must precede those of $\sem{\aCmd_2}$.
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
             \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
-            \xform{xd}{\bForm[(\Q{}\land\aExp{=}\aVal)/\Q{}]}{below=of a}
+            \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
             \xo{a}{xd}
           \end{tikzinline}}
       \end{gathered}
