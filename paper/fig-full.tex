@@ -29,11 +29,12 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
   \begin{math}
     \cForm_\aEv
     %\limplies (\cExp{=}\cVal_\aEv)
-    \limplies {
+    \limplies \PBR{
       \bForm
       [\aExp/\REF{\cVal_\aEv}]
       \DS{\REF{\cVal_\aEv}}{\amode}
-      [(\QwREF{\cVal_\aEv}\land\aExp{=}\aVal_\aEv\land\cExp{=}\cVal_\aEv)/\QwREF{\cVal_\aEv}]
+      %[(\QwREF{\cVal_\aEv}\land\aExp{=}\aVal_\aEv\land\cExp{=}\cVal_\aEv)/\QwREF{\cVal_\aEv}]
+      \land\cExp{=}\cVal_\aEv\land \aExp{=}\aVal_\aEv
     }
   \end{math},
 \item[{\labeltext[S5]{S5)}{S5full}}] %[\ref{S5})] 

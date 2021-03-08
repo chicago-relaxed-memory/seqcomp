@@ -141,6 +141,8 @@
 \NewDocumentCommand\PF{O{} m}{\mathtt{F}^{#2}_{#1}}
 \NewDocumentCommand\DF{O{} m}{\mathsf{F}^{#2}_{#1}}
 \NewDocumentCommand\DFP{O{} m}{\PBR{\DF[#1]{#2}}}
+\NewDocumentCommand\DG{O{} m m}{\mathsf{F}^{#2}_{#1}\,#3}
+\NewDocumentCommand\DGP{O{} m m}{\PBR{\DG[#1]{#2}{#3}}}
 
 \NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}_{#3}}
 \NewDocumentCommand\DR{O{} m O{} m}{\mathsf{R}^{\ifshowRA#1\fi}_{#3}\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}

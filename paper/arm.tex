@@ -69,15 +69,30 @@ $\Dx{\aLoc}$.
   Let $[\aForm/\Dx{*}]$ substitute $\aForm$ for every $\Dx{\bLoc}$.\\
   Let formula $\DL{\aLoc}{\amode}$ and substitution $\DS{\aLoc}{\amode}$ be defined:
   \begin{align*}
-    \DL{\aLoc}{\mRLX}&=\TRUE
-    &\DS{\aLoc}{\mRLX}&=[\TRUE/\Dx{\aLoc}] 
-    \\
-    \DL{\aLoc}{\mRA}&=\Dx{\aLoc}%\land\D{}
-    &\DS{\aLoc}{\mRA}&=[\FALSE/\D]
-    \\
-    \DL{\aLoc}{\mSC}&=\Dx{\aLoc}%\land\D{}
-    &\DS{\aLoc}{\mSC}&=[\FALSE/\D]
+    \DL{\aLoc}{\amode}&=
+    \begin{cases}
+      \Dx{\aLoc} & \textif \amode\neq\mRLX
+      \\
+      \TRUE& \textotherwise
+    \end{cases}
+    &
+    \DS{\aLoc}{\amode}&=
+    \begin{cases}
+      [\TRUE/\Dx{\aLoc}]  & \textif \amode=\mRLX
+      \\
+      [\FALSE/\D] & \textotherwise
+    \end{cases}
   \end{align*}
+  % \begin{align*}
+  %   \DS{\aLoc}{\mRLX}&=[\TRUE/\Dx{\aLoc}] 
+  %   &\DL{\aLoc}{\mRLX}&=\TRUE
+  %   \\
+  %   \DS{\aLoc}{\mRA}&=[\FALSE/\D]
+  %   &\DL{\aLoc}{\mRA}&=\Dx{\aLoc}%\land\D{}
+  %   \\
+  %   \DS{\aLoc}{\mSC}&=[\FALSE/\D]
+  %   &\DL{\aLoc}{\mSC}&=\Dx{\aLoc}%\land\D{}
+  % \end{align*}
 \end{definition}
 \begin{definition}[\xCO/\xRASC/\xDGR]
   \label{def:pomsets-down}
@@ -87,8 +102,8 @@ $\Dx{\aLoc}$.
     $\aTr{\bEvs}{\bForm}$ implies
     \begin{math}
       \bForm
-      \DS{\aLoc}{\amode}
-      [(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}],
+      \DS{\aLoc}{\amode} \land\aExp{=}\aVal,
+      %[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}],
     \end{math}
   \item[\ref{S5})]
     $\aTr{\cEvs}{\bForm}$ implies
@@ -97,11 +112,11 @@ $\Dx{\aLoc}$.
       \DS{\aLoc}{\amode}
       [\FALSE/\QS{\aLoc}{\amode}],
     \end{math}
-  \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies
-    \begin{math}
-      \aVal{=}\aReg\limplies\bForm,
-    \end{math}
+  % \item[\ref{L4})]
+  %   $\aTr{\bEvs}{\bForm}$ implies
+  %   \begin{math}
+  %     \aVal{=}\aReg\limplies\bForm,
+  %   \end{math}
   \item[\ref{L5})]
     $\aTr{\cEvs}{\bForm}$ implies
     \begin{math}
@@ -114,6 +129,7 @@ Relaxed stores on $\aLoc$ substitute true for $\Dx{\aLoc}$, whereas
 synchronizing stores substitute false for $\Dx{\aLoc}$.
 
 \begin{example}
+  \label{ex:dgr2}
   Revisiting \refex{ex:dgr1} and eliding irrelevant transformers:
   \begin{align*}
     \begin{gathered}[t]
@@ -418,17 +434,17 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
     $\aTr{\bEvs}{\bForm}$ implies
     \begin{math}
       %(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land
-      \bForm %\noSUB{[\aExp/\aLoc]},
-      [(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}]
+      \bForm 
       \DS{\aLoc}{\amode}
+      \land\aExp{=}\aVal %\noSUB{[\aExp/\aLoc]},
     \end{math}
   \item[\ref{S5})]
     $\aTr{\cEvs}{\bForm}$ implies
     \begin{math}
       %\lnot\Qw{\aLoc}\land 
       \bForm %\noSUB{[\aExp/\aLoc]}.
-      [\FALSE/\QS{\aLoc}{\amode}]
       \DS{\aLoc}{\amode}
+      [\FALSE/\QS{\aLoc}{\amode}]
     \end{math}
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
@@ -438,8 +454,17 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
     $\aTr{\cEvs}{\bForm}$ implies
     \begin{math}
       % \lnot\Qx{\aLoc} \land
-      \DL{\aLoc}{\amode}{} \land ((\aVal{=}\aReg\lor\RW)\limplies\bForm[\FALSE/\QL{\aLoc}{\amode}]).
+      \DL{\aLoc}{\amode}{} \land
+      ((\aVal{=}\aReg\lor\RW)\limplies\bForm[\FALSE/\QL{\aLoc}{\amode}]),
+      %\textwhen \aEvs\neq\emptyset
     \end{math}
+  \item[\ref{L6})] 
+    $\aTr{\dEvs}{\bForm}$ implies
+    \begin{math}
+      \DL{\aLoc}{\amode}{} \land
+      \bForm,
+    \end{math}
+    when $\aEvs=\emptyset$.
   \end{enumerate}  
 \end{definition}
 

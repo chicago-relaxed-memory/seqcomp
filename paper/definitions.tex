@@ -452,6 +452,8 @@ pomsets, every read is fulfilled and every precondition is a tautology.
     if $\labelingAct_1(\aEv)$ is a read,
     $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ is a tautology and
     $\aEv$ is fulfilled (\refdef{def:fulfilled}).
+    \newcounter{pomsetPreTopCount}
+    \setcounter{pomsetPreTopCount}{\value{enumi}}
   \end{enumerate}  
 \end{definition}
 
@@ -900,7 +902,7 @@ We model commands by adding predicate transformers to
   \item[{\labeltext[S3]{S3)}{S3}}]
     $\labelingForm(\aEv)$ implies $\aExp{=}\aVal$,
   \item[{\labeltext[S4]{S4)}{S4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\aExp{=}\aVal\land\bForm\noSUB{[\aExp/\aLoc]}$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm\noSUB{[\aExp/\aLoc]}\land\aExp{=}\aVal$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
   \item[{\labeltext[S5]{S5)}{S5}}]
     $\aTr{\cEvs}{\bForm}$ implies $\bForm\noSUB{[\aExp/\aLoc]}$, % \land % \lnot\Q{}$.
     \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$.
@@ -957,6 +959,13 @@ We model commands by adding predicate transformers to
   % \item[{\labeltext[L6]{L6)}{L6}}] 
   %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$. % \land \lnot\Q{}$.
   % \end{enumerate}
+  If $\aPS \in \sTOP{\aPSS}$ then
+  $(\exists\aPS_1\in\aPSS)$
+  \begin{enumerate}
+    \setcounter{enumi}{\value{pomsetPreTopCount}}
+  \item[1--\ref{top-kappa-read})] as in \refdef{def:pomsets-top},    
+  \item $\aTr{\aEvs_1}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
+  \end{enumerate}
 \end{definition}
 \begin{definition}
   \label{def:sem-funs}
@@ -1316,7 +1325,7 @@ order.
       \PW{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \xform{xd}{\bForm\noSUB{[r/y]}}{}
+          \xform{xd}{r{=}1\land\bForm\noSUB{[r/y]}}{}
           \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
           \eventl{\aEv}{a2}{r{=}1\mid\DW{y}{1}}{left=of xd}      
           \xos{a2}{xd}
@@ -1334,12 +1343,12 @@ order.
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
+        \xform{xdd}{1{=}r\limplies(r{=}1\land \bForm\noSUB{[r/y]})}{}
         \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
-        \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xid}{r{=}1\land\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
-        \eventl{\bEv}{a1}{\DR{x}{1}}{above=of xdi}
-        \eventl{\aEv}{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{=}1\mid\DW{y}{1}}{above=of xid}
+        \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
+        \eventl{\aEv}{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{=}1\mid\DW{y}{1}}{above right=.5em and -4em of xdd}
         \xos{a1}{xdi}
         \xos{a2}{xid}
         \xos{a1}{xdd}
@@ -1352,20 +1361,20 @@ order.
   Putting them together with order,
   we calculate the precondition $\labelingForm(\aEv)$
   as $\aTr[1]{\cEvs}{\labelingForm_2(\aEv)}$, where $\cEvs$ is $\{\cEv\mid\cEv<\aEv\}$, which is $\{\bEv\}$.
-  Since $\aTr[1]{\{\bEv\}}{\bForm}$ is $(\aReg{=}1 \limplies \bForm)$, this gives that 
-  $\labelingForm(\aEv)$ is $(\aReg{=}1 \limplies \labelingForm_2(\aEv))$, which is $(\aReg{=}1 \limplies \aReg{=}1)$.
-  This gives the pomsaet with predicate transformers:
+  Since $\aTr[1]{\{\bEv\}}{\bForm}$ is $(1{=}\aReg \limplies \bForm)$, this gives that 
+  $\labelingForm(\aEv)$ is $(1{=}\aReg \limplies \labelingForm_2(\aEv))$, which is $(1{=}\aReg \limplies \aReg{=}1)$.
+  This gives the pomset with predicate transformers:
   \begin{gather*}
     \PR{x}{r} \SEMI
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
+        \xform{xdd}{1{=}r\limplies(r{=}1\land \bForm\noSUB{[r/y]})}{}
         \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
-        \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xid}{r{=}1\land\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
-        \eventl{\bEv}{a1}{\DR{x}{1}}{above=of xdi}
-        \eventl{\aEv}{a2}{r{=}1\limplies r{=}1\mid\DW{y}{1}}{above=of xid}
+        \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
+        \eventl{\aEv}{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{above right=.5em and -4em of xdd}
         \xos{a1}{xdi}
         \xos{a2}{xid}
         \xos{a1}{xdd}
@@ -1396,7 +1405,7 @@ order.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \xform{xd}{\bForm\noSUB{[r/y]}}{}
-          \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
+          \xform{xi}{r{=}2\land\bForm\noSUB{[r/y]}}{right=.5em of xd}
           \event{a2}{r{=}2\mid\DW{y}{2}}{left=of xd}      
           \xos{a2}{xd}
         \end{tikzinline}}    
@@ -1409,12 +1418,12 @@ order.
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xdd}{1{=}r\limplies\bForm\noSUB{[r/y]}}{}
+        \xform{xdd}{1{=}r\limplies(r{=}2\land \bForm\noSUB{[r/y]})}{}
         \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
-        \xform{xid}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xid}{r{=}2\land\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
-        \event{a1}{\DR{x}{1}}{above=of xdi}
-        \event{a2}{1{=}r\limplies r{=}2\mid\DW{y}{2}}{above=of xid}
+        \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
+        \eventl{\aEv}{a2}{1{=}r\limplies r{=}2\mid\DW{y}{2}}{above right=.5em and -4em of xdd}
         \xos{a1}{xdi}
         \xos{a2}{xid}
         \xos{a1}{xdd}
@@ -1429,6 +1438,74 @@ order.
   % the order $\DRP{x}{1}\xpo\DWP{y}{2}$, the precondition of $\DWP{y}{1}$ is
   % strengthened to $(r{=}2)$, which is also unsatisfiable without further
   % assumptions on $r$; the predicate transformers are unchanged.
+\end{example}
+
+\begin{example}
+  \label{ex:left-merge}
+  \ref{S4} includes $\aExp{=}\aVal$ to ensure that
+  spurious merges do not go undetected.  Consider the following.
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{1{=}1\mid\DW{x}{1}}{}
+          \xform{x1d}{1{=}1\land\bForm}{right=of a1}
+          \xform{x1i}{\bForm}{right=.5em of x1d}
+          \xos{a1}{x1d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a2}{2{=}1\mid\DW{x}{1}}{}
+          \xform{x2d}{2{=}1\land\bForm}{right=of a2}
+          \xform{x2i}{\bForm}{right=.5em of x2d}
+          \xos{a2}{x2d}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  % Simplifying
+  %% \begin{align*}
+  %%   \begin{gathered}
+  %%     \PW{x}{1}
+  %%     \\
+  %%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %%         \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+  %%         \xform{x1d}{\bForm}{below=of a1}
+  %%         \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
+  %%         \xo{a1}{x1d}
+  %%       \end{tikzinline}}
+  %%   \end{gathered}
+  %%   &&
+  %%   \begin{gathered}
+  %%     \PW{x}{2}
+  %%     \\
+  %%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %%         \event{a2}{\FALSE\mid\DW{x}{1}}{}
+  %%         \xform{x2d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
+  %%         \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
+  %%         \xo{a2}{x2d}
+  %%       \end{tikzinline}}
+  %%   \end{gathered}
+  %% \end{align*}
+  Merging the actions, since $2{=}1$ is unsatisfiable, we have:
+  \begin{gather*}
+    \PW{x}{1}\SEMI \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \xform{x1d}{\FALSE}{right=of a1}
+        \xform{x1i}{\bForm}{right=.5em of x1d}
+        \xos{a1}{x1d}
+      \end{tikzinline}}
+  \end{gather*}
+  This pomset cannot be part of a top-level pomset, since
+  $\aTr{\aEvs}{\aSym}=\FALSE$ for every quiescence symbol $\aSym$.  This is
+  what we would hope: that the program $\PW{x}{1}\SEMI \PW{x}{2}$ should only
+  be top-level if there is a $(\DW{x}{2})$ event.
 \end{example}
 
 \begin{example}

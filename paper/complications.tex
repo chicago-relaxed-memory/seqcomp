@@ -68,7 +68,7 @@
   Update \refdef{def:pomsets-trans} to: % (\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]\land\aExp{=}\aVal$,
   \item[\ref{S5})]
     $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
   \item[\ref{L4})]
@@ -475,7 +475,7 @@ most once in a program.  We relax this by renaming.
   \item[\ref{S2})] $\labelingAct(\aEv) = \DW{\aLoc}{\aVal_\aEv}$,
   \item[\ref{S3})] $\labelingForm(\aEv)$ implies $\cForm_\aEv \land \aExp{=}\aVal$,
   \item[\ref{S4})] $(\forall\aEv\in\aEvs\cap\bEvs)$
-    $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies \bForm\noSUB{[\aExp/\aLoc]}$,
+    $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies (\bForm \land\aExp{=}\aVal\noSUB{[\aExp/\aLoc]})$,
   \item[\ref{S5})] 
     $\aTr{\cEvs}{\bForm}$ implies $(\!\not\exists\aEv\in\aEvs\cap\cEvs \suchthat \cForm_\aEv) \limplies \bForm\noSUB{[\aExp/\aLoc]}$,
   \end{enumerate}
@@ -492,7 +492,7 @@ most once in a program.  We relax this by renaming.
     $\labelingForm(\aEv)$ implies $\cForm_\aEv$.
   \item[\ref{L4})] 
     $(\forall\aEv\in\aEvs\cap\bEvs)$
-    $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies \aVal_\aEv{=}\uReg{\aEv}\limplies\bForm[\uReg{\aEv}/\aReg]$, 
+    $\aTr{\bEvs}{\bForm}$ implies $\cForm_\aEv \limplies \aVal_\aEv{=}\uReg{\aEv} \limplies\bForm[\uReg{\aEv}/\aReg]$, 
   \item[\ref{L5})]
     % $(\forall\aEv\in\aEvs\setminus\cEvs)$
     % $\aTr{\cEvs}{\bForm}$ implies $\cForm_\aEv \limplies (\aVal_\aEv{=}\uReg{\aEv}\lor \aLoc{=}\uReg{\aEv})\allowbreak\limplies\bForm[\uReg{\aEv}/\aReg]$,
