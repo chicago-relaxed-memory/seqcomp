@@ -685,7 +685,8 @@
 \newcommand{\brELSE}{\texttt{\}}\\\mathtt{else}\,\texttt{\{}}
 \newcommand{\brELIF}[1]{\texttt{\}}\\\mathtt{else}\,\IF{#1}}
 \newcommand{\FI}{\texttt{\}}}
-\newcommand{\RPAR}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\mkern-5mu\raisebox{.7ex}{\texttt{\textbf{-}}}\mkern-3mu}\,}
+\newcommand{\RPAR}{\mathrel{\makebox[0pt][l]{$\PAR$}\mkern-9mu\rightarrow}}
+% \newcommand{\RPAR}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\mkern-5mu\raisebox{.7ex}{\texttt{\textbf{-}}}\mkern-3mu}\,}
 \newcommand{\LPAR}{\,\mathbin{\rrceil}\,}
 \newcommand{\VAR}{\mathtt{var}\,}
 \newcommand{\TOUCHED}{\mathtt{touched}\,}
@@ -707,6 +708,7 @@
 
 %\newcommand{\sSEMI}{\mathbin{\dot{\rule{0em}{1.15ex};}}}
 \newcommand{\sSEMI}{\mathbin{;}}
+\newcommand{\sRPAR}{\mathrel{\makebox[0pt][l]{$\sPAR$}\mkern-9mu\rightarrow}}
 \newcommand{\sLPAR}{\mathbin{\rrceil}}
 \newcommand{\sPAR}{\mathbin{\parallel}}
 \newcommand{\sSEND}[2]{#1!\ifnotempty{#2}{\langle#2\rangle}}

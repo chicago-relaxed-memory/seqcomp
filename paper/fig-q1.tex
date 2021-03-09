@@ -4,9 +4,9 @@
       \PW{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a}{\aExp{=}v\land\Qr{x}\land\Qw{x}\mid\DW{x}{v}}{}
+          \event{a}{\Qr{x}\land\Qw{x}\land\aExp{=}v\mid\DW{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qw{x}]}{above=of a}
-          \xform{xd}{\aExp{=}\aVal\land\bForm}{below=of a}
+          \xform{xd}{\bForm\land \aExp{=}\aVal}{below=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
@@ -15,9 +15,9 @@
       \PW[\mRA]{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \raevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\mid\DW[\mRA]{x}{v}}{}
+          \raevent{a}{\Qr{*}\land\Qw{*}\land\aExp{=}v\mid\DW[\mRA]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qw{x}]}{above=of a}
-          \xform{xd}{\aExp{=}\aVal\land\bForm}{below=of a}
+          \xform{xd}{\bForm\land \aExp{=}\aVal}{below=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
@@ -26,9 +26,9 @@
       \PW[\mSC]{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \scevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\land\Qsc\mid\DW[\mSC]{x}{v}}{}
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc \land\aExp{=}v\mid\DW[\mSC]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qw{x}][\FALSE/\Qsc]}{above=of a}
-          \xform{xd}{\aExp{=}\aVal\land\bForm}{below=of a}
+          \xform{xd}{\bForm\land \aExp{=}\aVal}{below=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}

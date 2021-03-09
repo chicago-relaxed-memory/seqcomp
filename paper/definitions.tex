@@ -60,29 +60,31 @@ We model the following language.
   \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
   % \BNFSEP \PA{\aLoc}{\aExp} 
   \\[-.5ex]
-  \BNFSEP& \FORK{\aGrp}
+  \BNFSEP& \aCmd_1 \RPAR \aCmd_2 %\FORK{\aGrp}
   \BNFSEP \aCmd_1 \SEMI \aCmd_2
   \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
-  \\
-  \aGrp 
-  \BNFDEF& \NIL
-  \BNFSEP\THREAD{\aCmd}
-  \BNFSEP\aGrp_1 \PAR \aGrp_2
+  % \\
+  % \aGrp 
+  % \BNFDEF& \NIL
+  % \BNFSEP\THREAD{\aCmd}
+  % \BNFSEP\aGrp_1 \PAR \aGrp_2
 \end{align*}
 
 \emph{Memory modes}, $\amode$, are {relaxed} ($\mRLX$), {release-acquire}
 ($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed mode is the
 default; we regularly elide it from examples.  $\mRA$/$\mSC$ accesses are
-collectively known as \emph{synchronized accesses}.
+collectively known as \emph{synchronized accesses}.  We use $\RPAR$ to denote
+parallel composition, preserving thread state on the right after a join.  In
+examples and sublanguages without join, we use the symmetric $\PAR$ operator.
 
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs.
 % 
-\emph{Thread groups}, $\aGrp$, include commands and $\NIL$, which denotes
-inaction. %, or deadlock.
-% 
-The $\FORK{}$ command spawns a thread group.  % We often drop the words
-% $\FORK{}$ and $\THREAD{}$.
+% \emph{Thread groups}, $\aGrp$, include commands and $\NIL$, which denotes
+% inaction. %, or deadlock.
+% % 
+% The $\FORK{}$ command spawns a thread group.
+% % We often drop the words $\FORK{}$ and $\THREAD{}$.
 
 The semantics is built from the following.
 \begin{itemize}
@@ -210,7 +212,7 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
   matches it and, for any $\cEv$ which can block $\aEv$, either $\cEv\le\bEv$
   or $\aEv\le\cEv$.
 
-  Pomset $\aPS$ is \emph{fulfilled} if every read in $\aPS$ is fulfilled.
+  % Pomset $\aPS$ is \emph{fulfilled} if every read in $\aPS$ is fulfilled.
 \end{definition}
 
 We introduce reorderability \cite{DBLP:books/ws/95/Mazurkiewicz95} in order to
@@ -275,7 +277,6 @@ without control or data dependencies.
     \newcounter{pomsetParDisjointCount}
     \setcounter{pomsetParDisjointCount}{\value{enumi}}
   \end{enumerate}
-
   \noindent
   If $\aPS \in (\aAct\sPREFIX\aPSS_2)$ then
   $(\exists\aEvs_1)$ $(\exists\aPS_2\in\aPSS_2)$
@@ -293,13 +294,31 @@ without control or data dependencies.
     if $\aEv\in\aEvs_2$ then $\labelingAct(\aEv) = \labelingAct_2(\aEv)$,
   \item
     \label{pre-reorder}
-    if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\leq\aEv$ or $a\reorder\labeling_2(\aEv)$.
+    if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ then either
+    $\bEv\leq\aEv$ or $a\reorder\labeling_2(\aEv)$.
     \label{pomsetPrefixOrderCountLast}
     % \newcounter{pomsetPrefixCount}
     % \setcounter{pomsetPrefixCount}{\value{enumi}}
     \newcounter{pomsetPrefixOrderCount}
-    \setcounter{pomsetPrefixOrderCount}{\value{enumi}}
+    \setcounter{pomsetPrefixOrderCount}{\value{enumi}}    
   \end{enumerate}
+  \noindent
+  If $\aPS \in \sTOP{\aPSS}$ then
+  $(\exists\aPS_1\in\aPSS)$
+  \begin{enumerate}
+  \item  \label{top-E} % [{\labeltext[T1]{T1)}{T1}}]
+    $\aEvs=\aEvs_1$,
+  \item  \label{top-lambda} % [{\labeltext[T2]{T2)}{T2}}]
+    $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
+  \item  \label{top-le} % [{\labeltext[T2]{T2)}{T2}}]
+    if $\bEv\le_1\aEv$ then $\bEv\le\aEv$, 
+  \item  \label{top-fulfilled} % [{\labeltext[T3]{T3)}{T3}}]
+    if $\labelingAct_1(\aEv)$ is a read then
+    $\aEv$ is fulfilled (\refdef{def:fulfilled}).
+    \label{pomsetTopCountLast}
+    \newcounter{pomsetTopCount}
+    \setcounter{pomsetTopCount}{\value{enumi}}
+  \end{enumerate}  
 \end{definition}
 \begin{definition}
   \noindent
@@ -324,7 +343,7 @@ sides.  Prefixing may add a new action (on the left) to an existing pomset
 (on the right), inheriting labeling and order from the right.  
 
 It is worth noting that if ${\reorder}$ is taken to be the empty relation,
-then fulfilled pomsets of \refdef{def:pomsets} correspond to sequentially
+then top-level pomsets of \refdef{def:pomsets} correspond to sequentially
 consistent executions up to mumbling
 \cite{DBLP:journals/iandc/Brookes96}.
 
@@ -416,46 +435,17 @@ control dependencies) or expressions (and hence no data dependencies). We now
 address this, by adopting a \emph{pomsets with preconditions} model
 similar to~\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
 % restricting attention to relaxed access.
-%We discuss the differences in \S\ref{sec:discussion}.
+% We discuss the differences in \S\ref{sec:discussion}.
 
 \begin{definition}
   A \emph{pomset with preconditions} is
   a pomset (\refdef{def:pomsets}) together with $\labelingForm:\aEvs\fun\Formulae$.
 \end{definition}
-Let $\PomPre$ be the set of all pomsets with preconditions.
-% A pomset with preconditions is \emph{top level} if it is fulfilled
-% (\refdef{def:fulfilled}) and every precondition is a tautology.
-The function $\sTOP{}:2^{\PomPre}\fun2^{\Pom}$ embeds sets of pomsets with preconditions into sets of
-pomsets.  It also substitutes formulae for quiescence and write symbols, for
-use in \textsection\ref{sec:q}-\ref{sec:arm}.  In these ``top-level''
-pomsets, every read is fulfilled and every precondition is a tautology.
 \begin{definition}
   \label{def:q-sub}
   Let $[\aForm/\Q{}]$ substitute all quiescence symbols by $\aForm$.
 \end{definition}
-\begin{definition}
-  \label{def:pomsets-top}
-  \labeltext[\ensuremath{\sTOP{}}]{}{sTOP}
-  \noindent
-  If $\aPS \in \sTOP{\aPSS}$ then
-  $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
-  \item  \label{top-E} % [{\labeltext[T1]{T1)}{T1}}]
-    $\aEvs=\aEvs_1$,
-  \item  \label{top-lambda} % [{\labeltext[T2]{T2)}{T2}}]
-    $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
-  \item  \label{top-le} % [{\labeltext[T2]{T2)}{T2}}]
-    if $\bEv\le_1\aEv$ then $\bEv\le\aEv$, 
-  \item  \label{top-kappa-write} % [{\labeltext[T3]{T3)}{T3}}]
-    if $\labelingAct_1(\aEv)$ is a write, $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ is a tautology,
-  \item  \label{top-kappa-read} % [{\labeltext[T3]{T3)}{T3}}]
-    if $\labelingAct_1(\aEv)$ is a read,
-    $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ is a tautology and
-    $\aEv$ is fulfilled (\refdef{def:fulfilled}).
-    \newcounter{pomsetPreTopCount}
-    \setcounter{pomsetPreTopCount}{\value{enumi}}
-  \end{enumerate}  
-\end{definition}
+
 
 % \begin{definition}
 %   Let $\aSub$ be a substitution.  If $\aPS\in(\aPSS\aSub)$ then
@@ -549,7 +539,33 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
     $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$.
     % \\ \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
   \end{enumerate}  
+
+  \label{def:pomsets-top}
+  \labeltext[\ensuremath{\sTOP{}}]{}{sTOP}
+  \noindent
+  If $\aPS \in \sTOP{\aPSS}$ then
+  $(\exists\aPS_1\in\aPSS)$
+  \begin{enumerate}
+    \setcounter{enumi}{\value{pomsetTopCount}}
+  \item[1--\ref{pomsetTopCountLast})] % \label{top-E} % [{\labeltext[T1]{T1)}{T1}}]
+    as for $\sTOP{}$ in \refdef{def:pomset-semantics},
+  \item \label{top-kappa-write} % [{\labeltext[T3]{T3)}{T3}}]
+    if $\labelingAct_1(\aEv)$ is a write,
+    $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ is a tautology,
+  \item \label{top-kappa-read} % [{\labeltext[T3]{T3)}{T3}}]
+    if $\labelingAct_1(\aEv)$ is a read,
+    $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ is a tautology.
+    \newcounter{pomsetPreTopCount}
+    \setcounter{pomsetPreTopCount}{\value{enumi}}
+  \end{enumerate}  
 \end{definition}
+Let $\PomPre$ be the set of all pomsets with preconditions.
+% A pomset with preconditions is \emph{top level} if it is fulfilled
+% (\refdef{def:fulfilled}) and every precondition is a tautology.
+The function $\sTOP{}:2^{\PomPre}\fun2^{\Pom}$ embeds sets of pomsets with preconditions into sets of
+pomsets.  It also substitutes formulae for quiescence and write symbols, for
+use in \textsection\ref{sec:q}-\ref{sec:arm}.  In these ``top-level''
+pomsets, every read is fulfilled and every precondition is a tautology.
 \begin{definition}
   \noindent
   For a language fragment, the semantics is:
@@ -580,7 +596,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS r}$,
   for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
   such as the following, where $\aVal=1$:
-  %\vspace{-.5\baselineskip}
+  % \vspace{-.5\baselineskip}
   \begin{gather*}
     y\GETS r
     \\
@@ -590,7 +606,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
       \end{tikzinline}}
   \end{gather*}
   The value chosen for the read may be different from that chosen for the write:
-  %\vspace{-.5\baselineskip}
+  % \vspace{-.5\baselineskip}
   \begin{gather*}
     r\GETS x\SEMI y\GETS r
     \\
@@ -654,7 +670,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   % an %$\aVal\in\Val$ and
   % $\aPS'\in \sem{y\GETS r}$
   % such as:
-  %\vspace{-1\baselineskip}
+  % \vspace{-1\baselineskip}
   \begin{gather*}
     y\GETS 1
     \\
@@ -760,74 +776,75 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   A \emph{pomset with predicate transformers} is a pomset with preconditions (\refdef{def:pomsets-pre}),
   together with a family of predicate transformers for $\aEvs$.
 \end{definition}
-Let $\PomTrans$ be the set of all pomsets with predicate transformers.
-% \begin{definition}
-%   For pomset $\aPS$ and $\aEv\in\aEvs$, let
-%   $\downclose[0]{\aEv} = \{ \bEv\in\aEvs \mid \bEv < \aEv \}$.
-% \end{definition}
-We can covert between pomsets with preconditions and pomsets with predicate
-transformers. In one direction, $\sTHREAD{}:2^{\PomTrans}\fun2^{\PomPre}$
-drops predicate transformers, and in the other,
-$\sFORK{}:2^{\PomPre}\fun2^{\PomTrans}$ adopts the identity transformer.
+\begin{comment}
+  Let $\PomTrans$ be the set of all pomsets with predicate transformers.
+  % \begin{definition}
+  %   For pomset $\aPS$ and $\aEv\in\aEvs$, let
+  %   $\downclose[0]{\aEv} = \{ \bEv\in\aEvs \mid \bEv < \aEv \}$.
+  % \end{definition}
+  We can covert between pomsets with preconditions and pomsets with predicate
+  transformers. In one direction, $\sTHREAD{}:2^{\PomTrans}\fun2^{\PomPre}$
+  drops predicate transformers, and in the other,
+  $\sFORK{}:2^{\PomPre}\fun2^{\PomTrans}$ adopts the identity transformer.
 
-\begin{definition}
-  \label{def:pomsets-group}
-  \noindent
-  If $\aPS \in \sTHREAD{\aPSS}$ then
-  $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
-  \item  \label{thread-E} % [{\labeltext[T1]{T1)}{T1}}]
-    $\aEvs=\aEvs_1$,
-  \item  \label{thread-lambda} % [{\labeltext[T2]{T2)}{T2}}]
-    $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
-  \item \label{thread-le} % [{\labeltext[T2]{T2)}{T2}}]
-    if $\bEv\le_1\aEv$ then $\bEv\le\aEv$,
-  \item  \label{thread-kappa}\label{T3} % [{\labeltext[T3]{T3)}{T3}}]
-    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$.
-    \newcounter{pomsetXThreadCount}
-    \setcounter{pomsetXThreadCount}{\value{enumi}}
-  \end{enumerate}  
+  \begin{definition}
+    \label{def:pomsets-group}
+    \noindent
+    If $\aPS \in \sTHREAD{\aPSS}$ then
+    $(\exists\aPS_1\in\aPSS)$
+    \begin{enumerate}
+    \item  \label{thread-E} % [{\labeltext[T1]{T1)}{T1}}]
+      $\aEvs=\aEvs_1$,
+    \item  \label{thread-lambda} % [{\labeltext[T2]{T2)}{T2}}]
+      $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
+    \item \label{thread-le} % [{\labeltext[T2]{T2)}{T2}}]
+      if $\bEv\le_1\aEv$ then $\bEv\le\aEv$,
+    \item  \label{thread-kappa}\label{T3} % [{\labeltext[T3]{T3)}{T3}}]
+      $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$.
+      \newcounter{pomsetXThreadCount}
+      \setcounter{pomsetXThreadCount}{\value{enumi}}
+    \end{enumerate}  
 
-  \noindent
-  If $\aPS \in \sFORK{\aPSS}$ then
-  $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
-  \item \label{fork-E} % [{\labeltext[F1]{F1)}{F1}}]
-    $\aEvs=\aEvs_1$,
-  \item  \label{fork-lambda} % [{\labeltext[F2]{F2)}{F2}}]
-    $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
-  \item \label{fork-le} % [{\labeltext[T2]{T2)}{T2}}]
-    if $\bEv\le_1\aEv$ then $\bEv\le\aEv$,
-    \newcounter{pomsetXForkCount}
-    \setcounter{pomsetXForkCount}{\value{enumi}}
-  \item  \label{fork-kappa}\label{F3}  % [{\labeltext[F3]{F3)}{F3}}]
-    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$, 
-  \item  \label{fork-tau}\label{F4}  % [{\labeltext[F4]{F4)}{F4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
-  \end{enumerate}  
-\end{definition}
+    \noindent
+    If $\aPS \in \sFORK{\aPSS}$ then
+    $(\exists\aPS_1\in\aPSS)$
+    \begin{enumerate}
+    \item \label{fork-E} % [{\labeltext[F1]{F1)}{F1}}]
+      $\aEvs=\aEvs_1$,
+    \item  \label{fork-lambda} % [{\labeltext[F2]{F2)}{F2}}]
+      $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
+    \item \label{fork-le} % [{\labeltext[T2]{T2)}{T2}}]
+      if $\bEv\le_1\aEv$ then $\bEv\le\aEv$,
+      \newcounter{pomsetXForkCount}
+      \setcounter{pomsetXForkCount}{\value{enumi}}
+    \item  \label{fork-kappa}\label{F3}  % [{\labeltext[F3]{F3)}{F3}}]
+      $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$, 
+    \item  \label{fork-tau}\label{F4}  % [{\labeltext[F4]{F4)}{F4}}]
+      $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
+    \end{enumerate}  
+  \end{definition}
 
-We model thread groups as sets of pomsets with preconditions,
-as in \S\ref{sec:pomsets-pre}.
+  We model thread groups as sets of pomsets with preconditions,
+  as in \S\ref{sec:pomsets-pre}.
 
-\begin{definition}
-  \noindent
-  Adopting $\sNIL$ and $\sPAR$ from \refdef{def:pomsets-pre},
-  the semantics of thread groups is:
-  \begin{align*}
-    \sem{\THREAD{\aCmd}} &= \sTHREAD{}\sem{\aCmd}
-    &
-    \sem{\aGrp_1 \PAR \aGrp_2} &= \sem{\aGrp_1}\sPAR\sem{\aGrp_2}      
-    &
-    \sem{\NIL} &= \sNIL     
-  \end{align*}
-  % , and
-  % $\sTHREAD{}$ is as follows.
-\end{definition}
+  \begin{definition}
+    \noindent
+    Adopting $\sNIL$ and $\sPAR$ from \refdef{def:pomsets-pre},
+    the semantics of thread groups is:
+    \begin{align*}
+      \sem{\THREAD{\aCmd}} &= \sTHREAD{}\sem{\aCmd}
+      &
+      \sem{\aGrp_1 \PAR \aGrp_2} &= \sem{\aGrp_1}\sPAR\sem{\aGrp_2}      
+      &
+      \sem{\NIL} &= \sNIL     
+    \end{align*}
+    % , and
+    % $\sTHREAD{}$ is as follows.
+  \end{definition}
 
-We model commands by adding predicate transformers to
-\refdef{def:pomsets-pre}, in order to calculate weakest preconditions.
-
+  We model commands by adding predicate transformers to
+  \refdef{def:pomsets-pre}, in order to calculate preconditions.
+\end{comment}
 \begin{definition}
   \label{def:pomsets-trans}
 
@@ -862,6 +879,21 @@ We model commands by adding predicate transformers to
     % $(\aForm\land\aTr[1]{\bEvs%\cap\aEvs_1
     % }{\bForm})\lor(\neg\aForm\land\aTr[2]{\bEvs%\cap\aEvs_2
     % }{\bForm})$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS \in (\aPSS_1\sRPAR\aPSS_2)$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+  \begin{enumerate}
+    \setcounter{enumi}{\value{pomsetPreParCount}}
+  \item[\ref{par-E}--\ref{par-kappa2})]
+    as for $\sPAR$ in \refdef{def:pomsets-pre},
+  \item \label{par-tau1}
+    $\aTr{\bEvs}{\bForm}$ implies $\aTr[2]{\bEvs}{\bForm}$,
+  \item \label{par-tau2}
+    $\aTr{\bEvs}{\aSym}$ implies $\aTr[1]{\bEvs}{\aSym}$,
+    for every quiescence symbol $\aSym$.
   \end{enumerate}
 
   \noindent
@@ -1473,22 +1505,22 @@ order.
   %%     \PW{x}{1}
   %%     \\
   %%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %%         \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
-  %%         \xform{x1d}{\bForm}{below=of a1}
-  %%         \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
-  %%         \xo{a1}{x1d}
-  %%       \end{tikzinline}}
+  %%       \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+  %%       \xform{x1d}{\bForm}{below=of a1}
+  %%       \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
+  %%       \xo{a1}{x1d}
+  %%     \end{tikzinline}}
   %%   \end{gathered}
   %%   &&
   %%   \begin{gathered}
   %%     \PW{x}{2}
   %%     \\
   %%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %%         \event{a2}{\FALSE\mid\DW{x}{1}}{}
-  %%         \xform{x2d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
-  %%         \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
-  %%         \xo{a2}{x2d}
-  %%       \end{tikzinline}}
+  %%       \event{a2}{\FALSE\mid\DW{x}{1}}{}
+  %%       \xform{x2d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
+  %%       \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
+  %%       \xo{a2}{x2d}
+  %%     \end{tikzinline}}
   %%   \end{gathered}
   %% \end{align*}
   Merging the actions, since $2{=}1$ is unsatisfiable, we have:
