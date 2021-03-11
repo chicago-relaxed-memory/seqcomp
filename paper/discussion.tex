@@ -587,18 +587,50 @@ an \RMW{}.
 
 Syntactic fences $\FENCE^{\fmode}$ have corresponding actions:
 $\DFP{\fmode}$.  The \emph{syntactic fence mode}
-$(\fmode \!\!\BNFDEF\!\! \mREL \!\BNFSEP\! \mACQ \!\BNFSEP\! \mSC)$ is either
+$(\fmode \!\!\BNFDEF\!\! \mREL \!\BNFSEP\! \mACQ \!\BNFSEP\! \mFSC)$ is either
 \emph{release}, \emph{acquire}, or \emph{sequentially-consistent}.
 
+
 We can enrich read and write actions to use these modes.
-Reads use the four point order:
-\begin{math}
-  \mRLX \ltmode \mRA \ltmode \mREL \ltmode \mSC.
-\end{math}
-Writes use the four point order:
-\begin{math}
-  \mRLX \ltmode \mRA \ltmode \mACQ \ltmode \mSC.
-\end{math}
+The resulting order is:
+% Reads use the four point order:
+% \begin{math}
+%   \mRLX \ltmode \mRA \ltmode \mREL \ltmode \mSC.
+% \end{math}
+% Writes use the four point order:
+% \begin{math}
+%   \mRLX \ltmode \mRA \ltmode \mACQ \ltmode \mSC.
+% \end{math}
+\begin{displaymath}
+  \begin{tikzpicture}
+    \node (rlx) at (0, 0) {$\mRLX$};
+    \node (ra)  at (1, 0) {$\mRA$};
+    \node (sc)  at (2, 0) {$\mSC$};
+    \node (fsc) at (3, 0) {$\mFSC$};
+    \node (rel) at (2, -0.3) {$\mREL$};
+    \node (acq) at (2,  0.3) {$\mACQ$};
+    \draw[->](rlx)to(ra);
+    \draw[->](ra)to(sc);
+    \draw[->](ra)to(rel);
+    \draw[->](ra)to(acq);
+    \draw[->](sc)to(fsc);
+    \draw[->](rel)to(fsc);
+    \draw[->](acq)to(fsc);
+  \end{tikzpicture}
+\end{displaymath}
+We write $\amode\lemode\bmode$ for this order.
+Let $\amode\lubmode\bmode$ denote the least upper bound of $\amode$ and $\bmode$.
+
+Reads allow all annotations but $\mREL$.  Writes allow all annotations but
+$\mACQ$.  Fences allow only the three annotations $\mREL$, $\mACQ$ and
+$\mFSC$.
+% \begin{displaymath}
+%   \begin{tikzcd}[column sep=.5em, row sep=.5ex]
+%                              &                                                                 & \mREL \arrow[rd,sqsubset] &        \\
+%     \mRLX \arrow[r,sqsubset] & \mRA \arrow[r,sqsubset] \arrow[ru,sqsubset] \arrow[rd,sqsubset] & \mSC  \arrow[r,sqsubset]  & \mFSC  \\
+%                              &                                                                 & \mACQ \arrow[ru,sqsubset] &          
+%   \end{tikzcd}
+% \end{displaymath}
 
 Formalizing this, $\QS{\aLoc}{\mREL}$ substitutes for $\Qw{*}$ in addition to
 $\Qw{\aLoc}$, as in $\QS{\aLoc}{\mRA}$.  $\QL{\aLoc}{\mACQ}$ requires
@@ -613,11 +645,36 @@ $\Qr{*}$ in addition to $\Qw{\aLoc}$, as in $\QL{\aLoc}{\mRA}$.
     \\
     [\aForm/\QS{\aLoc}{\mREL}] &= [\aForm/\Qw{*}]
     &{} [\aForm/\QL{\aLoc}{\mACQ}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
+    % \\
+    % \DS{\aLoc}{\mREL}&=[\FALSE/\D]
+    % &\DL{\aLoc}{\mACQ}&=\Dx{\aLoc}%\land\D{}
+  \end{align*}
+  \begin{align*}
+    \QS{\aLoc}{\mFSC}=
+    \QL{\aLoc}{\mFSC}&=
+    \Qr{*}\land\Qw{*} \land\Qsc
     \\
-    \DS{\aLoc}{\mREL}&=[\FALSE/\D]
-    &\DL{\aLoc}{\mACQ}&=\Dx{\aLoc}%\land\D{}
+    [\aForm/\QS{\aLoc}{\mFSC}] =
+    [\aForm/\QL{\aLoc}{\mACQ}] &=
+    [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
   \end{align*}
 \end{definition}
+
+[Todo: sort this definition out with quiescence.]
+
+If $\aPS \in \sFENCE[\ascope]{\amode}$ then
+\begin{enumerate}
+\item%[{\labeltext[F1]{(F1)}{F1}}]
+  if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+\item%[{\labeltext[F2]{(F2)}{F2}}]
+  $\labelingAct(\aEv) = \DF[\ascope]{\amode}$,
+\item%[{\labeltext[F3]{(F3)}{F3}}]
+  $\labelingForm(\aEv)$ implies $\TRUE$,
+\item%[{\labeltext[F4]{(F4)}{F4}}]
+  $\aTr{\bEvs}{\bForm}$ implies $\bForm$, where $\bEvs\cap\aEvs\neq\emptyset$,
+\item%[{\labeltext[F5]{(F5)}{F5}}]
+  $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/Q{}]$, where $\cEvs\cap\aEvs=\emptyset$.
+\end{enumerate}
 
 \begin{example}
   Extend \refex{ex:q1}.
@@ -651,7 +708,7 @@ $\Qr{*}$ in addition to $\Qw{\aLoc}$, as in $\QL{\aLoc}{\mRA}$.
         \PR[\mACQ]{x}{r}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qw{x}\land\Qr{*}\mid\DR[\mRA]{x}{v}}{}
+            \raevent{a}{\Qw{x}\land\Qr{*}\mid\DR[\mACQ]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{v{=}r\limplies\bForm}{below=of a}
             \xo{a}{xd}
@@ -662,26 +719,53 @@ $\Qr{*}$ in addition to $\Qw{\aLoc}$, as in $\QL{\aLoc}{\mRA}$.
         \PF{\mACQ}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\mid\DF{\mREL}}{}
+            \raevent{a}{\Qr{*}\mid\DF{\mACQ}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xo{a}{xd}
           \end{tikzinline}}
       \end{gathered}
     \end{gathered}
-    \\[1ex]
+    \\
     \begin{gathered}[t]
-      \PF{\mSC}
+      \PF{\mFSC}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DF{\mREL}}{}
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DF{\mSC}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm}{below=of a}
           \xo{a}{xd}
         \end{tikzinline}}
     \end{gathered}
+    \\
+    \begin{gathered}[t]
+      \PW[\mFSC]{x}{\aExp}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\land\aExp{=}\aVal\mid\DW[\mFSC]{x}{v}}{}
+          \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
+          \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
+          \xo{a}{xd}
+        \end{tikzinline}}
+    \end{gathered}
+    \;
+    \begin{gathered}[t]
+      \PR[\mFSC]{x}{\aExp}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DR[\mFSC]{x}{v}}{}
+          \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
+          \xform{xd}{v{=}r\limplies\bForm}{below=of a}
+          \xo{a}{xd}
+        \end{tikzinline}}
+    \end{gathered}
   \end{gather*}
 \end{example}
+
+
+
+\subsection{Fence Actions with Downgrading Reads (\xFENCE/\xDGR)}
+\label{sec:fence}
 
 \begin{example}
   Revisiting \refex{ex:dgr2} using fences:
@@ -765,9 +849,7 @@ $\Qr{*}$ in addition to $\Qw{\aLoc}$, as in $\QL{\aLoc}{\mRA}$.
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
-  [Todo: check to see if ARM allows the following.  If so, try to fix
-  downgrading for acquire fences by dropping order from read to fence when it
-  has preceding relaxed write.]
+  What we want is this:
   \begin{align*}
     \begin{gathered}[t]
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
@@ -782,11 +864,8 @@ $\Qr{*}$ in addition to $\Qw{\aLoc}$, as in $\QL{\aLoc}{\mRA}$.
   \end{align*}
 \end{example}
 
-
-\subsection{Fence Actions with Downgrading Reads (\xFENCE/\xDGR)}
-\label{sec:fence}
-
 Let acquiring fence actions include a set: $\DGP{\fmode}{\aLocs}$.
+The set is nondeterministically chosen by the semantics.
 Idea is to downgrade the reads in $\aLocs$ and fence everything else.
 
 
@@ -804,17 +883,15 @@ For writes, change the label rules of sequential composition to:
 \end{enumerate}
 
 \begin{definition}
-  Fences use the three point order:
-  \begin{math}
-    \mREL \ltmode \mSC
-  \end{math}
-  and 
-  \begin{math}
-    \mACQ \ltmode \mSC.
-  \end{math}
-
+  % Fences use the three point order:
+  % \begin{math}
+  %   \mREL \ltmode \mSC
+  % \end{math}
+  % and 
+  % \begin{math}
+  %   \mACQ \ltmode \mSC.
+  % \end{math}
   \noindent    
-  Let $\amode\lubmode\bmode$ denote the least upper bound of $\amode$ and $\bmode$.
   \begin{align*}
     \compat{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}} &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
     \\
@@ -1382,353 +1459,6 @@ The predicate transformers are:
 % \subsection{Fences}
 % \label{sec:fences}
 
-\subsection{Completed Pomsets and Fork}
-\label{sec:fork}
-
-It is sometimes useful to distinguish \emph{terminated} or \emph{completed}
-executions from partial executions.  For example in
-\begin{math}
-  \sem{\PW{x}{1}\SEMI\PW{y}{1}},
-\end{math}
-we expect completed executions to include two write actions.  Note that this
-is different from being downset-maximal.
-\begin{gather}
-  \nonumber
-  \PW{x}{0} \SEMI \PW{x}{1}
-  \PAR
-  \PR{x}{r}\SEMI\PR{x}{s}\SEMI\IF{s}\THEN\PW{y}{1}\FI
-  \\
-  \label{down1}
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a}{\DW{x}{0}}{}
-      \event{b}{\DW{x}{1}}{right=of a}
-      \event{c}{\DR{x}{1}}{right=3em of b}
-      \event{d}{\DR{x}{0}}{right=of c}
-      \wk{a}{b}
-      \rf{b}{c}
-      \rf[out=-20,in=-160]{a}{d}
-    \end{tikzinline}}
-  \\
-  \label{down2}
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a}{\DW{x}{0}}{}
-      \event{b}{\DW{x}{1}}{right=of a}
-      \event{c}{\DR{x}{0}}{right=3em of b}
-      \event{d}{\DR{x}{1}}{right=of c}
-      \event{e}{\DW{y}{1}}{right=of d}
-      \po{d}{e}
-      \wk{a}{b}
-      \rf[out=-20,in=-160]{a}{c}
-      \rf[out=-20,in=-160]{b}{d}
-    \end{tikzinline}}
-\end{gather}
-\eqref{down1} is a downset of \eqref{down2}, but both are completed. 
-
-For pomsets with predicate transformers, we identify \emph{completion} with
-\emph{quiescence.}
-\begin{definition}
-  \label{def:completed}
-  A pomset with predicate transformers $\aPS$ is \emph{completed} if
-  $\aTr{\aEvs}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
-\end{definition}
-For example, there are no pomsets in $\sem{\ABORT}$ that are completed,
-whereas the augment-minimal pomset of $\sem{\SKIP}$ (which has the identity
-transformer) is completed.
-
-% While this definition is sensible for single \emph{threads}, it is less
-% satisfying for thread \emph{groups}.  To see why, consider that in
-% $\sem{\FORK{\THREAD{\aCmd}}}$:
-% \begin{itemize}
-% \item by \ref{T3full}, quiescence symbols and the symbol $\RW$ have been
-%   substituted out of preconditions $\labelingForm(\aEv)$,
-% \item by \ref{F4}, every predicate transformer $\aTr{\bEvs}{}$ is the
-%   identity function. %, for any $\bEvs$.
-% \end{itemize}
-% Every pomset in $\sem{\FORK{\aGrp}}$ is completed, by definition. As a
-% result, in general, $\sem{\FORK{\THREAD{\aCmd}}}\neq\sem{\aCmd}$.
-
-The $\FORK{}$ operation is asynchronous: In
-$\sem{\aCmd_1\SEMI\aCmd_2\SEMI\FORK{\aGrp}\SEMI \aCmd_3}$, the only order enforced
-between $\sem{\aCmd_3}$ and $\sem{\aGrp}$ comes from
-quiescence preconditions in $\sem{\aGrp}$; the transformer of
-$\sem{\FORK{\aGrp}}$ is the identity transformer, thus $\sem{\aGrp}$ runs
-concurrently with $\sem{\aCmd_3}$.  In addition, if $\aCmd_2$ includes no
-releases and the locations of $\aCmd_2$ are disjoint from those of $\aGrp$,
-then $\sem{\aGrp}$ run concurrently with $\sem{\aCmd_2\SEMI\aCmd_3}$.
-% $\FORK{}$ %(\textsection\ref{sec:pomsets-trans})
-% does not introduce barriers:
-\begin{gather*}
-  \PW{x}{1}\SEMI \PW{y}{1}\SEMI\FORK{\THREAD{\PW{x}{2}}}
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a}{\DW{x}{1}}{}
-      \event{b}{\DW{y}{1}}{right=of a}
-      \event{c}{\DW{x}{2}}{right=3em of b}
-      \wk[out=-20,in=-160]{a}{c}
-    \end{tikzinline}}
-\end{gather*}
-% In fact, perhaps surprisingly,
-% \begin{math}
-%   \sem{\PR{x}{r}\SEMI\FORK{\THREAD{\PW{x}{1}}}} = \sem{\FORK{\THREAD{\PW{x}{1}}}\SEMI\PR{x}{r}}.
-% \end{math}
-% Order between the threads
-% can be enforced using synchronization.  For example, the ``backwards'' read
-% above is forbidden in:
-% \begin{gather*}
-%   \PR{x}{r}\SEMI\PW[\mRA]{z}{1}\SEMI\FORK{\THREAD{\IF{\PR[\mRA]{z}{}}\THEN\PW{x}{1}\FI}}
-%   \\
-%   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-%     \event{a}{\DR{x}{1}}{}
-%     \event{b}{\DW{z}{1}}{right=of a}
-%     \event{c}{\DR{z}{1}}{right=3em of b}
-%     \event{d}{\DW{x}{1}}{right=of c}
-%     \rf{b}{c}
-%     \sync{a}{b}
-%     \sync{c}{d}
-%     \rf[out=-160,in=-20]{d}{a}
-%   \end{tikzinline}}
-% \end{gather*}
-
-% [Proposal: add level of syntax for full programs and do all thread
-% substitutions there... have one level of syntax around for each semantic
-% categories.]
-
-\subsection{Fork-Join Parallelism 1}
-
-In this subsection, we model a variant of our language that removes the
-asynchronous $\FORK{}$ operation and adds a synchronous \emph{fork-join},
-which we define using an asymmetric operator for parallel composition, as in
-\cite{DBLP:conf/icfp/FerreiraHJ96}.
-
-We remove thread groups as a separate category in the syntax and semantics.
-The transformer for the \emph{left composition} $\aCmd_1\LPAR\aCmd_2$ takes
-the register state from the left, but quiescence from both sides.
-\begin{align*}
-  \aCmd
-  \BNFDEF& \ABORT
-  \BNFSEP \SKIP
-  \BNFSEP \LET{\aReg}{\aExp}
-  % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
-  % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
-  \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
-  \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
-  % \BNFSEP \PA{\aLoc}{\aExp} 
-  \\[-.5ex]
-  \BNFSEP& \aCmd_1 \LPAR \aCmd_2
-  \BNFSEP \aCmd_1 \SEMI \aCmd_2
-  \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI  
-\end{align*}
-
-\begin{definition}
-  If $\aPS \in (\aPSS_1\sLPAR\aPSS_2)$ then
-  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
-  % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
-  \begin{enumerate}
-    \setcounter{enumi}{\value{pomsetPreParCount}}
-  \item[\ref{par-E}--\ref{par-kappa2})]
-    as for $\sPAR$ in \refdef{def:pomsets-pre},
-  \item \label{par-tau1}
-    $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\bForm}$,
-  \item \label{par-tau2}
-    $\aTr{\bEvs}{\aSym}$ implies $\aTr[2]{\bEvs}{\aSym}$,
-    for every quiescence symbol $\aSym$.
-  \end{enumerate}
-\end{definition}
-
-We now interpret pomsets with predicate transformers directly as
-\emph{top-level} (rather than passing through the intermediate interpretation
-of thread groups as pomsets with preconditions).  We only consider
-\emph{completed} pomsets with predicate transformers to be top-level.
-\begin{definition}
-  \label{def:pomsets-top2}
-  \labeltext[\ensuremath{\sTOP{}}]{}{sTOP2}
-  \noindent
-  If $\aPS \in \sTOP{\aPSS}$ then
-  $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
-  \item[1-5)] as in \refdef{def:pomsets-top},
-    % \item  \label{top2-E} % [{\labeltext[T1]{T1)}{T1}}]
-    %   $\aEvs=\aEvs_1$,
-    % \item  \label{top2-lambda} % [{\labeltext[T2]{T2)}{T2}}]
-    %   $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
-    % \item  \label{top2-le} % [{\labeltext[T2]{T2)}{T2}}]
-    %   if $\bEv\le_1\aEv$ then $\bEv\le\aEv$, 
-    % \item  \label{top2-kappa-write} % [{\labeltext[T3]{T3)}{T3}}]
-    %   if $\labelingAct_1(\aEv)$ is a write, $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ is a tautology,
-    % \item  \label{top2-kappa-read} % [{\labeltext[T3]{T3)}{T3}}]
-    %   if $\labelingAct_1(\aEv)$ is a read,
-    %   $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ is a tautology and
-    %   $\aEv$ is fulfilled (\refdef{def:fulfilled}),
-  \item[6)]  \label{top2-tau} % [{\labeltext[T3]{T3)}{T3}}]
-    $\aTr[1]{\aEvs_1}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
-  \end{enumerate}  
-\end{definition}
-
-
-\begin{comment}
-  \subsection{Fork-Join Parallelism 2}
-  \label{sec:join2}
-
-  In this subsection, we model a variant of our language that removes the
-  asynchronous $\FORK{}$ operation and adds a synchronous $\FORKJOIN{}$.
-  \begin{align*}
-    \aCmd
-    \BNFDEF& \ABORT
-    \BNFSEP \SKIP
-    \BNFSEP \LET{\aReg}{\aExp}
-    % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
-    % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
-    \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
-    \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
-    % \BNFSEP \PA{\aLoc}{\aExp} 
-    \\[-.5ex]
-    \BNFSEP& \FORKJOIN{\aGrp}
-    \BNFSEP \aCmd_1 \SEMI \aCmd_2
-    \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
-  \end{align*}
-  In $\PBR{\aCmd_1\SEMI\FORKJOIN{\aGrp}\SEMI\aCmd_2}$, ${\aCmd_1}$ must
-  complete before ${\aGrp}$ begins, and threads in ${\aGrp}$ must complete
-  before ${\aCmd_2}$ begins.  Thus $\PBR{\FORKJOIN{\THREAD{\PR{x}{r}}}}$ acts
-  like a full fence.
-  % 
-  As modeled here, however, if $\aGrp$ is empty, no order is imposed between
-  ${\aCmd_1}$ and ${\aCmd_2}$.  Thus
-  $\sem{\FORKJOIN{\THREAD{\SKIP}}}=\sem{\SKIP}$.
-
-  To model $\FORKJOIN{}$, we give the semantics of thread groups using pomsets
-  with preconditions \emph{and termination}.
-  \begin{definition}
-    \label{def:pomsets-term}
-    A \emph{pomset with preconditions and termination} is a pomset with
-    preconditions (\refdef{def:pomsets-pre}) together with a termination
-    predicate (notation $\TICK$).
-  \end{definition}
-
-  % The definition is a small change relative to that of
-  % \textsection\ref{sec:pomsets-trans}.
-
-  % Define $\sTHREAD{}$ to transform a pomset with predicate transformers into
-  % a pomset with preconditions and termination by dropping the predicate
-  % transformer and setting $\TICK$ to indicate whether the pomset was
-  % completed.
-
-  % Extend the definition of $\sNIL$ so that $\TICK$ is true.
-
-  % Extend the definition of $\sPAR$ to handle for $\TICK$ by adding the
-  % following.
-  % \begin{enumerate}
-  %   \setcounter{enumi}{\value{pomsetPreParCount}}
-  % \item \label{par-tick} if $\TICK$ then $\TICK_1$ and $\TICK_2$.
-  % \end{enumerate}
-
-  % Similarly, $\sFORKJOIN{}$ extends $\sFORK{}$ by adding the following.
-  % % \noindent
-  % % If $\aPS \in \sFORKJOIN{\aPSS}$ then
-  % % $(\exists\aPS_1\in\aPSS)$
-  % \begin{enumerate}
-  %   \setcounter{enumi}{\value{pomsetXForkCount}}
-  % \item $\TICK_1$.
-  % \end{enumerate}
-
-  \begin{definition}%$\phantom{\;}$\par
-    \label{def:pomsets-fj}
-    % \noindent
-    % If $\aPS\in\sNIL$ then $\aEvs = \emptyset$ and $\TICK$.
-    \noindent
-    If $\aPS \in \sTHREAD{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
-    \begin{enumerate}
-      \setcounter{enumi}{\value{pomsetXThreadCount}}
-    \item[\ref{thread-E}--\ref{thread-kappa})] as for $\sTHREAD{}$ in \refdef{def:pomsets-group}, %, repeating 3 below,% \reffig{fig:full},    
-      % \item[\ref{T3full})]
-      %   $\labelingForm(\aEv)$ implies
-      %   $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
-      %   \\
-      %   $\labelingForm(\aEv)$ implies
-      %   $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ otherwise.
-      
-    \item %[{\labeltext[T4]{T4)}{T4}}]
-      if $\TICK$ then $\aPS$ is completed (\refdef{def:completed}).
-      % $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
-    \end{enumerate}
-
-    \noindent
-    If $\aPS \in (\aPSS_1\sPAR\aPSS_2)$ then $(\exists\aPS_1\in\aPSS_1)$
-    $(\exists\aPS_2\in\aPSS_2)$
-    \begin{enumerate}
-      \setcounter{enumi}{\value{pomsetPreParCount}}
-    \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR$ in
-      \refdef{def:pomsets-pre},
-    \item \label{par-tick} $\TICK$ implies $\TICK_1\land\TICK_2$.
-    \end{enumerate}
-
-    \noindent
-    If $\aPS \in \sFORKJOIN{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
-    \begin{enumerate}
-      \setcounter{enumi}{\value{pomsetXForkCount}}
-    \item[\ref{fork-E}--\ref{fork-le})] as for $\sFORK{}$ in \refdef{def:pomsets-group},
-    \item
-      $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,    
-    \item 
-      $\labelingForm(\aEv)$ implies $\aSym$, for every quiescence symbol $\aSym$,
-    \item
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm$, if $\bEvs=\aEvs$ and $\TICK_1$,
-    \item %[{\labeltext[F5]{F5)}{F5}}]
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$, otherwise.
-    \end{enumerate}
-  \end{definition}
-  \begin{definition}
-    Update \refdef{def:sem-funs} to include:
-    \begin{align*}
-      \sem{\FORKJOIN{\aGrp}} = \sFORKJOIN{}\sem{\aGrp}  
-    \end{align*}
-  \end{definition}
-
-  We embed pomsets with predicate transformers into pomsets with preconditions
-  and termination using {completion}.  The rules for thread groups keep track
-  of the termination predicate.
-  As noted in \textsection\ref{sec:fork}, every pomset in $\sem{\FORK{\aGrp}}$ is
-  completed.  In contrast, a pomset in $\sem{\FORKJOIN{\aGrp}}$ is completed
-  only if every thread in $\aGrp$ is completed.
-
-  Top-level thread groups do not need quiescence symbols; thus, $\sTHREAD{}$
-  removes all quiescence symbols by substitution.  However, $\sFORKJOIN{\aPSS}$
-  adds every possible quiescence symbol as a precondition to the events of
-  $\aPSS$.  For example, the preconditions of $\sem{\THREAD{\aCmd}\PAR\NIL}$ do
-  not contain quiescence symbols.  Instead, the preconditions of
-  $\sem{\FORKJOIN{\THREAD{\aCmd}\PAR\NIL}}$ are saturated with them.  As a
-  result, in completed top-level pomsets of
-  $\sem{\aCmd_1\SEMI\FORKJOIN{\aGrp}}$, all of the events from
-  $\sem{\aCmd_1}$ must precede those of $\sem{\aGrp}$.
-
-  A similar thing happens with predicate transformers.  Thread groups in
-  $\sem{\THREAD{\aCmd}\PAR\NIL}$ do not contain predicate transformers.
-  Instead, all of the independent predicate transformers of
-  $\sem{\FORKJOIN{\THREAD{\aCmd}\PAR\NIL}}$ take $\bForm$ to
-  $\bForm[\FALSE/\Q{}]$.  As a result, in completed top-level pomsets of
-  $\sem{\FORKJOIN{\aGrp}\SEMI\aCmd_2}$, all of the events from $\sem{\aGrp}$
-  must precede those of $\sem{\aCmd_2}$.
-
-
-  % The $\JOIN$ operation requires a full synchronization, but $\FORK{}$ does
-  % not.  The following execution is allowed.
-  % \begin{gather*}
-  %   \PR{x}{r}\SEMI\FORKJOIN{\THREAD{\PW{x}{1}}}\SEMI\PW{y}{1}
-  %   \\
-  %   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]      
-  %     \event{a}{\DW{x}{1}}{}
-  %     \event{b}{\DW{y}{1}}{right=3em of a}
-  %     \event{c}{\DR{x}{1}}{left=3em of a}
-  %     \rf{a}{c}
-  %     \sync{a}{b}
-  %     \sync[out=-20,in=-160]{c}{b}
-  %   \end{tikzinline}}
-  % \end{gather*}
-  % Synchronization can be added to 
-  % This asymmetry arises naturally when using pomsets with preconditions to
-  % model thread groups.
-\end{comment}
-
-
 \begin{figure*}[t]
   \showRAtrue
   \begin{center}
@@ -1736,7 +1466,7 @@ of thread groups as pomsets with preconditions).  We only consider
       \input{fig-no-q-or-addr}
     \end{minipage}
   \end{center}
-  \caption{Simplified Quiescence Semantics without Address Calculation
+  \caption{Simplified Quiescence Semantics w/o Address Calculation
     (See \refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
     \refdef{def:dlx} for $\DLX{\aLoc}{\amode}{\bmode}$, $\DS{\aLoc}{\amode}$)
   } 
@@ -1777,8 +1507,6 @@ of thread groups as pomsets with preconditions).  We only consider
       $\DW[\mSC]{}{}$  & \cmark           & \cmark          & \xmark          & \cmark           & \xmark          & \xmark 
     \end{tabular}
   \end{center}
-  [Todo: validate the following table and type in the corresponding definition
-  for $\reorderra$, following \refdef{def:reorderra}.]
 
   % Least permissive for fences:
   \begin{comment}
@@ -1803,7 +1531,7 @@ of thread groups as pomsets with preconditions).  We only consider
       $\DF{\mSC}$      & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark 
     \end{tabular}
   \end{comment}
-  It seems that fences generally commute.  %Except $\DRP{x}{}\DFP{\mACQ}\DFP{\mREL}\DWP{y}{}$
+  It seems that fences generally do not commute, except for road-motel.
   \begin{center}
     \showRAtrue
     \setlength{\tabcolsep}{4pt}
@@ -1811,7 +1539,7 @@ of thread groups as pomsets with preconditions).  We only consider
       &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
       \hline
       $1^{\text{st}}$
-      & $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mREL}$&$\DF{\mACQ}$ &$\DF{\mSC}$\\
+      & $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mREL}$&$\DF{\mACQ}$ &$\DF{\mFSC}$\\
       \hline                                                                                                                                                     
       $\DR[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
       $\DR[\mRA]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
@@ -1821,34 +1549,84 @@ of thread groups as pomsets with preconditions).  We only consider
       $\DW[\mRA]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
       $\DW[\mSC]{}{}$  & \cmark           & \cmark          & \xmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
       \hline                                                                                                                                                     
-      $\DF{\mREL}$     & \cmark           & \cmark          & \cmark          & \xmark           & \xmark          & \xmark          & \cmark      &\cmark       & \cmark    \\
-      $\DF{\mACQ}$     & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \cmark      &\cmark       & \cmark    \\
-      $\DF{\mSC}$      & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \cmark      &\cmark       & \cmark 
+      $\DF{\mREL}$     & \cmark           & \cmark          & \cmark          & \xmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
+      $\DF{\mACQ}$     & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
+      $\DF{\mFSC}$     & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark 
     \end{tabular}
   \end{center}
-  [Todo. Get table and definition to line up with \textsection\ref{sec:fence}, where not all fences commute.]
   \begin{definition}
     \label{def:reorderra}
     Including coherence, \emph{reorderability} is defined:
     \begin{align*}
+      {\reorderco}
+      &=
+      \{(\DW{\aLoc}{}, \DR{\bLoc}{}) \mid \aLoc\neq\bLoc\}
+      \cup\{(\DW{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
+      \\&
+      \cup\{(\DR{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
+      \cup\{(\DR{\aLoc}{}, \DR{\bLoc}{}) \}
+      \\
       {\reorderra}
-      &=   \{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \}% \mid \amode=\mRLX\}
-      \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{} ) \}%\mid \bmode=\mRLX \}
-      \\&\cup\{(\DR[\amode]{}{}, \DW[\bmode]{}{}) \mid \amode=\mRLX \land \bmode=\mRLX\}
-      \\&\cup\{(\DW[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode\neq\mSC \lor \bmode\neq\mSC\}
-      \\&\cup\{(\DF{\amode},     \DF{\bmode}    ) \}
+      &=
+      \{(\DW[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode\neq\mSC \lor \bmode\neq\mSC\}
+      \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{} \} %\mid \amode\neq\mREL \}
+      \\&
+      \cup\{(\DR[\amode]{}{}, \DW[\bmode]{}{}) \mid \amode=\mRLX \land \bmode=\mRLX\}
+      \cup\{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \} %\mid \bmode\neq\mACQ\}
+      \\&
+      \cup\{(\DF{\mREL},      \DF{\mACQ}    ) \}
       \cup\{(\DF{\mREL},      \DR[\bmode]{}{}) \}%\mid \amode=\mREL \}
       \cup\{(\DW[\amode]{}{}, \DF{\mACQ}     ) \}%\mid \bmode=\mACQ \}
       \\
-      {\reorderco}
-      &=   \{(\DR{\aLoc}{}, \DR{\bLoc}{}) \}
-      \cup\{(\DW{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
-      \\&\cup\{(\DR{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
-      \cup\{(\DW{\aLoc}{}, \DR{\bLoc}{}) \mid \aLoc\neq\bLoc\}
-      \\
-      {\reorderlt} &= {\reorderra}\cap{\reorderco} %\{(\aAct, \bAct) \mid \aAct\reorderco\bAct \land \aAct\reorderra\bAct\}
+      {\reorderlt}
+      &=
+      {\reorderra}\cap{\reorderco} %\{(\aAct, \bAct) \mid \aAct\reorderco\bAct \land \aAct\reorderra\bAct\}
     \end{align*}  
   \end{definition}
+  Here is the version with generalized modes for read and write:  
+  \begin{scope}
+    \small
+    \begin{align*}
+      {\reorderra}
+      &=
+      \{(\DW[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode\not\gemode\mSC \lor \bmode\not\gemode\mSC\}
+      \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{} \mid \amode\not\gemode\mREL \}
+      \\&
+      \cup\{(\DR[\amode]{}{}, \DW[\bmode]{}{}) \mid \amode=\mRLX \land \bmode=\mRLX\}
+      \cup\{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \mid \bmode\not\gemode\mACQ \}
+      \\&
+      \cup\{(\DF{\mREL},      \DF{\mACQ}    ) \}
+      \cup\{(\DF{\mREL},      \DR[\bmode]{}{}) \}%\mid \amode=\mREL \}
+      \cup\{(\DW[\amode]{}{}, \DF{\mACQ}     ) \}%\mid \bmode=\mACQ \}
+    \end{align*}  
+  \end{scope}
+  \begin{center}
+    \footnotesize
+    \showRAtrue
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{c|ccccc|ccccc}
+      &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
+      \hline
+      $1^{\text{st}}$
+                       & $\DR[\mRLX]{}{}$  & $\DR[\mRA]{}{}$ & $\DR[\mACQ]{}{}$& $\DR[\mSC]{}{}$  & $\DR[\mFSC]{}{}$ & $\DW[\mRLX]{}{}$& $\DW[\mRA]{}{}$ & $\DW[\mREL]{}{}$& $\DW[\mSC]{}{}$& $\DW[\mFSC]{}{}$\\% & $\DF{\mREL}$&$\DF{\mACQ}$ &$\DF{\mFSC}$\\
+      \hline                                                                                                                                                                                                                            
+      $\DR[\mRLX]{}{}$ & \cmark            & \cmark          & \xmark          & \cmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
+      $\DR[\mRA]{}{}$  & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
+      $\DR[\mACQ]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
+      $\DR[\mSC]{}{}$  & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
+      $\DR[\mFSC]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
+      \hline                                                                                                                                                                                                                           
+      $\DW[\mRLX]{}{}$ & \cmark            & \cmark          & \cmark          & \cmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
+      $\DW[\mRA]{}{}$  & \cmark            & \cmark          & \cmark          & \cmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
+      $\DW[\mREL]{}{}$ & \cmark            & \cmark          & \cmark          & \cmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
+      $\DW[\mSC]{}{}$  & \cmark            & \cmark          & \cmark          & \xmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
+      $\DW[\mFSC]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
+      % \hline                                                                                                                                                                                       
+      % $\DF{\mREL}$     & \cmark            & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
+      % $\DF{\mACQ}$     & \xmark            & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
+      % $\DF{\mFSC}$     & \xmark            & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\xmark       & \xmark 
+    \end{tabular}
+  \end{center}
   \begin{definition}
     \label{def:QSx}
     Let formulae $\QS{}{\amode}$ and $\QL{}{\amode}$ be defined:
@@ -1908,34 +1686,65 @@ of thread groups as pomsets with preconditions).  We only consider
     \end{enumerate}
   \end{definition}
 
+  \begin{comment}
+    The logic of quiescence is greatly simplified.  Compare the following to
+    \refex{ex:q1}.
+    \begin{align*}
+      \begin{gathered}
+        \begin{gathered}[t]
+          \PW[\mRLX]{x}{\aExp}
+          \\
+          \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+              \event{a}{\aExp{=}v\mid\DW[\mRLX]{x}{v}}{}
+              \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
+              \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
+              \xo{a}{xd}
+            \end{tikzinline}}
+        \end{gathered}
+        \\
+        \begin{gathered}[t]
+          \PW[\amode\in\{\mRA, \mSC \}]{x}{\aExp}
+          \\
+          \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+              \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
+              \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
+              \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
+              \xo{a}{xd}
+            \end{tikzinline}}
+        \end{gathered}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \begin{gathered}[t]
+          \PR[\amode\in\{\mRLX, \mRA \}]{x}{r}
+          \\
+          \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+              \event{a}{\DR[\amode]{x}{v}}{}
+              \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
+              \xform{xd}{v{=}r\limplies\bForm}{below=of a}
+              \xo{a}{xd}
+            \end{tikzinline}}
+        \end{gathered}
+        \\
+        \begin{gathered}[t]
+          \PR[\mSC]{x}{r}
+          \\
+          \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+              \event{a}{\Q{} \mid \DR[\mSC]{x}{v}}{}
+              \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
+              \xform{xd}{v{=}r\limplies\bForm}{below=of a}
+              \xo{a}{xd}
+            \end{tikzinline}}
+        \end{gathered}
+      \end{gathered}
+    \end{align*}
+  \end{comment}
   \begin{example}
     The logic of quiescence is greatly simplified.  Compare the following to
     \refex{ex:q1}.
     \begin{align*}
       \begin{gathered}[t]
-        \PW[\mRLX]{x}{\aExp}
-        \\
-        \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \event{a}{\aExp{=}v\mid\DW[\mRLX]{x}{v}}{}
-            \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
-            \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
-            \xo{a}{xd}
-          \end{tikzinline}}
-      \end{gathered}
-      &&
-      \begin{gathered}[t]
-        \PR[\amode\in\{\mRLX, \mRA \}]{x}{r}
-        \\
-        \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \event{a}{\DR[\amode]{x}{v}}{}
-            \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
-            \xform{xd}{v{=}r\limplies\bForm}{below=of a}
-            \xo{a}{xd}
-          \end{tikzinline}}
-      \end{gathered}
-      \\
-      \begin{gathered}[t]
-        \PW[\amode\in\{\mRA, \mSC \}]{x}{\aExp}
+        \PW[\amode]{x}{\aExp}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
             \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
@@ -1946,10 +1755,10 @@ of thread groups as pomsets with preconditions).  We only consider
       \end{gathered}
       &&
       \begin{gathered}[t]
-        \PR[\mSC]{x}{r}
+        \PR[\amode]{x}{r}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \event{a}{\Q{} \mid \DR[\mSC]{x}{v}}{}
+            \event{a}{\DR[\amode]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
             \xform{xd}{v{=}r\limplies\bForm}{below=of a}
             \xo{a}{xd}
@@ -3414,3 +3223,347 @@ this.
 %     \end{math}
 %   \end{enumerate}
 
+\begin{comment}
+  \subsection{Completed Pomsets and Fork}
+  \label{sec:fork}
+
+  It is sometimes useful to distinguish \emph{terminated} or \emph{completed}
+  executions from partial executions.  For example in
+  \begin{math}
+    \sem{\PW{x}{1}\SEMI\PW{y}{1}},
+  \end{math}
+  we expect completed executions to include two write actions.  Note that this
+  is different from being downset-maximal.
+  \begin{gather}
+    \nonumber
+    \PW{x}{0} \SEMI \PW{x}{1}
+    \PAR
+    \PR{x}{r}\SEMI\PR{x}{s}\SEMI\IF{s}\THEN\PW{y}{1}\FI
+    \\
+    \label{down1}
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a}{\DW{x}{0}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \event{c}{\DR{x}{1}}{right=3em of b}
+        \event{d}{\DR{x}{0}}{right=of c}
+        \wk{a}{b}
+        \rf{b}{c}
+        \rf[out=-20,in=-160]{a}{d}
+      \end{tikzinline}}
+    \\
+    \label{down2}
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a}{\DW{x}{0}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \event{c}{\DR{x}{0}}{right=3em of b}
+        \event{d}{\DR{x}{1}}{right=of c}
+        \event{e}{\DW{y}{1}}{right=of d}
+        \po{d}{e}
+        \wk{a}{b}
+        \rf[out=-20,in=-160]{a}{c}
+        \rf[out=-20,in=-160]{b}{d}
+      \end{tikzinline}}
+  \end{gather}
+  \eqref{down1} is a downset of \eqref{down2}, but both are completed. 
+
+  For pomsets with predicate transformers, we identify \emph{completion} with
+  \emph{quiescence.}
+  \begin{definition}
+    \label{def:completed}
+    A pomset with predicate transformers $\aPS$ is \emph{completed} if
+    $\aTr{\aEvs}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
+  \end{definition}
+  For example, there are no pomsets in $\sem{\ABORT}$ that are completed,
+  whereas the augment-minimal pomset of $\sem{\SKIP}$ (which has the identity
+  transformer) is completed.
+
+  % While this definition is sensible for single \emph{threads}, it is less
+  % satisfying for thread \emph{groups}.  To see why, consider that in
+  % $\sem{\FORK{\THREAD{\aCmd}}}$:
+  % \begin{itemize}
+  % \item by \ref{T3full}, quiescence symbols and the symbol $\RW$ have been
+  %   substituted out of preconditions $\labelingForm(\aEv)$,
+  % \item by \ref{F4}, every predicate transformer $\aTr{\bEvs}{}$ is the
+  %   identity function. %, for any $\bEvs$.
+  % \end{itemize}
+  % Every pomset in $\sem{\FORK{\aGrp}}$ is completed, by definition. As a
+  % result, in general, $\sem{\FORK{\THREAD{\aCmd}}}\neq\sem{\aCmd}$.
+
+  The $\FORK{}$ operation is asynchronous: In
+  $\sem{\aCmd_1\SEMI\aCmd_2\SEMI\FORK{\aGrp}\SEMI \aCmd_3}$, the only order enforced
+  between $\sem{\aCmd_3}$ and $\sem{\aGrp}$ comes from
+  quiescence preconditions in $\sem{\aGrp}$; the transformer of
+  $\sem{\FORK{\aGrp}}$ is the identity transformer, thus $\sem{\aGrp}$ runs
+  concurrently with $\sem{\aCmd_3}$.  In addition, if $\aCmd_2$ includes no
+  releases and the locations of $\aCmd_2$ are disjoint from those of $\aGrp$,
+  then $\sem{\aGrp}$ run concurrently with $\sem{\aCmd_2\SEMI\aCmd_3}$.
+  % $\FORK{}$ %(\textsection\ref{sec:pomsets-trans})
+  % does not introduce barriers:
+  \begin{gather*}
+    \PW{x}{1}\SEMI \PW{y}{1}\SEMI\FORK{\THREAD{\PW{x}{2}}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a}{\DW{x}{1}}{}
+        \event{b}{\DW{y}{1}}{right=of a}
+        \event{c}{\DW{x}{2}}{right=3em of b}
+        \wk[out=-20,in=-160]{a}{c}
+      \end{tikzinline}}
+  \end{gather*}
+  % In fact, perhaps surprisingly,
+  % \begin{math}
+  %   \sem{\PR{x}{r}\SEMI\FORK{\THREAD{\PW{x}{1}}}} = \sem{\FORK{\THREAD{\PW{x}{1}}}\SEMI\PR{x}{r}}.
+  % \end{math}
+  % Order between the threads
+  % can be enforced using synchronization.  For example, the ``backwards'' read
+  % above is forbidden in:
+  % \begin{gather*}
+  %   \PR{x}{r}\SEMI\PW[\mRA]{z}{1}\SEMI\FORK{\THREAD{\IF{\PR[\mRA]{z}{}}\THEN\PW{x}{1}\FI}}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+  %     \event{a}{\DR{x}{1}}{}
+  %     \event{b}{\DW{z}{1}}{right=of a}
+  %     \event{c}{\DR{z}{1}}{right=3em of b}
+  %     \event{d}{\DW{x}{1}}{right=of c}
+  %     \rf{b}{c}
+  %     \sync{a}{b}
+  %     \sync{c}{d}
+  %     \rf[out=-160,in=-20]{d}{a}
+  %   \end{tikzinline}}
+  % \end{gather*}
+
+  % [Proposal: add level of syntax for full programs and do all thread
+  % substitutions there... have one level of syntax around for each semantic
+  % categories.]
+
+  \subsection{Fork-Join Parallelism}
+
+  In this subsection, we model a variant of our language that removes the
+  asynchronous $\FORK{}$ operation and adds a synchronous \emph{fork-join},
+  which we define using an asymmetric operator for parallel composition, as in
+  \cite{DBLP:conf/icfp/FerreiraHJ96}.
+
+  We remove thread groups as a separate category in the syntax and semantics.
+  The transformer for the \emph{left composition} $\aCmd_1\LPAR\aCmd_2$ takes
+  the register state from the left, but quiescence from both sides.
+  \begin{align*}
+    \aCmd
+    \BNFDEF& \ABORT
+    \BNFSEP \SKIP
+    \BNFSEP \LET{\aReg}{\aExp}
+    % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
+    % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
+    \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
+    \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
+    % \BNFSEP \PA{\aLoc}{\aExp} 
+    \\[-.5ex]
+    \BNFSEP& \aCmd_1 \LPAR \aCmd_2
+    \BNFSEP \aCmd_1 \SEMI \aCmd_2
+    \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI  
+  \end{align*}
+
+  \begin{definition}
+    If $\aPS \in (\aPSS_1\sLPAR\aPSS_2)$ then
+    $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+    % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
+    \begin{enumerate}
+      \setcounter{enumi}{\value{pomsetPreParCount}}
+    \item[\ref{par-E}--\ref{par-kappa2})]
+      as for $\sPAR$ in \refdef{def:pomsets-pre},
+    \item \label{par-tau1}
+      $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\bForm}$,
+    \item \label{par-tau2}
+      $\aTr{\bEvs}{\aSym}$ implies $\aTr[2]{\bEvs}{\aSym}$,
+      for every quiescence symbol $\aSym$.
+    \end{enumerate}
+  \end{definition}
+
+  We now interpret pomsets with predicate transformers directly as
+  \emph{top-level} (rather than passing through the intermediate interpretation
+  of thread groups as pomsets with preconditions).  We only consider
+  \emph{completed} pomsets with predicate transformers to be top-level.
+  \begin{definition}
+    \label{def:pomsets-top2}
+    \labeltext[\ensuremath{\sTOP{}}]{}{sTOP2}
+    \noindent
+    If $\aPS \in \sTOP{\aPSS}$ then
+    $(\exists\aPS_1\in\aPSS)$
+    \begin{enumerate}
+    \item[1-5)] as in \refdef{def:pomsets-top},
+      % \item  \label{top2-E} % [{\labeltext[T1]{T1)}{T1}}]
+      %   $\aEvs=\aEvs_1$,
+      % \item  \label{top2-lambda} % [{\labeltext[T2]{T2)}{T2}}]
+      %   $\labelingAct(\aEv) = \labelingAct_1(\aEv)$,
+      % \item  \label{top2-le} % [{\labeltext[T2]{T2)}{T2}}]
+      %   if $\bEv\le_1\aEv$ then $\bEv\le\aEv$, 
+      % \item  \label{top2-kappa-write} % [{\labeltext[T3]{T3)}{T3}}]
+      %   if $\labelingAct_1(\aEv)$ is a write, $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ is a tautology,
+      % \item  \label{top2-kappa-read} % [{\labeltext[T3]{T3)}{T3}}]
+      %   if $\labelingAct_1(\aEv)$ is a read,
+      %   $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ is a tautology and
+      %   $\aEv$ is fulfilled (\refdef{def:fulfilled}),
+    \item[6)]  \label{top2-tau} % [{\labeltext[T3]{T3)}{T3}}]
+      $\aTr[1]{\aEvs_1}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
+    \end{enumerate}  
+  \end{definition}
+
+  \subsection{Fork-Join Parallelism 2}
+  \label{sec:join2}
+
+  In this subsection, we model a variant of our language that removes the
+  asynchronous $\FORK{}$ operation and adds a synchronous $\FORKJOIN{}$.
+  \begin{align*}
+    \aCmd
+    \BNFDEF& \ABORT
+    \BNFSEP \SKIP
+    \BNFSEP \LET{\aReg}{\aExp}
+    % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
+    % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
+    \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
+    \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
+    % \BNFSEP \PA{\aLoc}{\aExp} 
+    \\[-.5ex]
+    \BNFSEP& \FORKJOIN{\aGrp}
+    \BNFSEP \aCmd_1 \SEMI \aCmd_2
+    \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
+  \end{align*}
+  In $\PBR{\aCmd_1\SEMI\FORKJOIN{\aGrp}\SEMI\aCmd_2}$, ${\aCmd_1}$ must
+  complete before ${\aGrp}$ begins, and threads in ${\aGrp}$ must complete
+  before ${\aCmd_2}$ begins.  Thus $\PBR{\FORKJOIN{\THREAD{\PR{x}{r}}}}$ acts
+  like a full fence.
+  % 
+  As modeled here, however, if $\aGrp$ is empty, no order is imposed between
+  ${\aCmd_1}$ and ${\aCmd_2}$.  Thus
+  $\sem{\FORKJOIN{\THREAD{\SKIP}}}=\sem{\SKIP}$.
+
+  To model $\FORKJOIN{}$, we give the semantics of thread groups using pomsets
+  with preconditions \emph{and termination}.
+  \begin{definition}
+    \label{def:pomsets-term}
+    A \emph{pomset with preconditions and termination} is a pomset with
+    preconditions (\refdef{def:pomsets-pre}) together with a termination
+    predicate (notation $\TICK$).
+  \end{definition}
+
+  % The definition is a small change relative to that of
+  % \textsection\ref{sec:pomsets-trans}.
+
+  % Define $\sTHREAD{}$ to transform a pomset with predicate transformers into
+  % a pomset with preconditions and termination by dropping the predicate
+  % transformer and setting $\TICK$ to indicate whether the pomset was
+  % completed.
+
+  % Extend the definition of $\sNIL$ so that $\TICK$ is true.
+
+  % Extend the definition of $\sPAR$ to handle for $\TICK$ by adding the
+  % following.
+  % \begin{enumerate}
+  %   \setcounter{enumi}{\value{pomsetPreParCount}}
+  % \item \label{par-tick} if $\TICK$ then $\TICK_1$ and $\TICK_2$.
+  % \end{enumerate}
+
+  % Similarly, $\sFORKJOIN{}$ extends $\sFORK{}$ by adding the following.
+  % % \noindent
+  % % If $\aPS \in \sFORKJOIN{\aPSS}$ then
+  % % $(\exists\aPS_1\in\aPSS)$
+  % \begin{enumerate}
+  %   \setcounter{enumi}{\value{pomsetXForkCount}}
+  % \item $\TICK_1$.
+  % \end{enumerate}
+
+  \begin{definition}%$\phantom{\;}$\par
+    \label{def:pomsets-fj}
+    % \noindent
+    % If $\aPS\in\sNIL$ then $\aEvs = \emptyset$ and $\TICK$.
+    \noindent
+    If $\aPS \in \sTHREAD{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
+    \begin{enumerate}
+      \setcounter{enumi}{\value{pomsetXThreadCount}}
+    \item[\ref{thread-E}--\ref{thread-kappa})] as for $\sTHREAD{}$ in \refdef{def:pomsets-group}, %, repeating 3 below,% \reffig{fig:full},    
+      % \item[\ref{T3full})]
+      %   $\labelingForm(\aEv)$ implies
+      %   $\labelingForm_1(\aEv) [\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
+      %   \\
+      %   $\labelingForm(\aEv)$ implies
+      %   $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ otherwise.
+      
+    \item %[{\labeltext[T4]{T4)}{T4}}]
+      if $\TICK$ then $\aPS$ is completed (\refdef{def:completed}).
+      % $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
+    \end{enumerate}
+
+    \noindent
+    If $\aPS \in (\aPSS_1\sPAR\aPSS_2)$ then $(\exists\aPS_1\in\aPSS_1)$
+    $(\exists\aPS_2\in\aPSS_2)$
+    \begin{enumerate}
+      \setcounter{enumi}{\value{pomsetPreParCount}}
+    \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR$ in
+      \refdef{def:pomsets-pre},
+    \item \label{par-tick} $\TICK$ implies $\TICK_1\land\TICK_2$.
+    \end{enumerate}
+
+    \noindent
+    If $\aPS \in \sFORKJOIN{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
+    \begin{enumerate}
+      \setcounter{enumi}{\value{pomsetXForkCount}}
+    \item[\ref{fork-E}--\ref{fork-le})] as for $\sFORK{}$ in \refdef{def:pomsets-group},
+    \item
+      $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,    
+    \item 
+      $\labelingForm(\aEv)$ implies $\aSym$, for every quiescence symbol $\aSym$,
+    \item
+      $\aTr{\bEvs}{\bForm}$ implies $\bForm$, if $\bEvs=\aEvs$ and $\TICK_1$,
+    \item %[{\labeltext[F5]{F5)}{F5}}]
+      $\aTr{\bEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$, otherwise.
+    \end{enumerate}
+  \end{definition}
+  \begin{definition}
+    Update \refdef{def:sem-funs} to include:
+    \begin{align*}
+      \sem{\FORKJOIN{\aGrp}} = \sFORKJOIN{}\sem{\aGrp}  
+    \end{align*}
+  \end{definition}
+
+  We embed pomsets with predicate transformers into pomsets with preconditions
+  and termination using {completion}.  The rules for thread groups keep track
+  of the termination predicate.
+  As noted in \textsection\ref{sec:fork}, every pomset in $\sem{\FORK{\aGrp}}$ is
+  completed.  In contrast, a pomset in $\sem{\FORKJOIN{\aGrp}}$ is completed
+  only if every thread in $\aGrp$ is completed.
+
+  Top-level thread groups do not need quiescence symbols; thus, $\sTHREAD{}$
+  removes all quiescence symbols by substitution.  However, $\sFORKJOIN{\aPSS}$
+  adds every possible quiescence symbol as a precondition to the events of
+  $\aPSS$.  For example, the preconditions of $\sem{\THREAD{\aCmd}\PAR\NIL}$ do
+  not contain quiescence symbols.  Instead, the preconditions of
+  $\sem{\FORKJOIN{\THREAD{\aCmd}\PAR\NIL}}$ are saturated with them.  As a
+  result, in completed top-level pomsets of
+  $\sem{\aCmd_1\SEMI\FORKJOIN{\aGrp}}$, all of the events from
+  $\sem{\aCmd_1}$ must precede those of $\sem{\aGrp}$.
+
+  A similar thing happens with predicate transformers.  Thread groups in
+  $\sem{\THREAD{\aCmd}\PAR\NIL}$ do not contain predicate transformers.
+  Instead, all of the independent predicate transformers of
+  $\sem{\FORKJOIN{\THREAD{\aCmd}\PAR\NIL}}$ take $\bForm$ to
+  $\bForm[\FALSE/\Q{}]$.  As a result, in completed top-level pomsets of
+  $\sem{\FORKJOIN{\aGrp}\SEMI\aCmd_2}$, all of the events from $\sem{\aGrp}$
+  must precede those of $\sem{\aCmd_2}$.
+
+
+  % The $\JOIN$ operation requires a full synchronization, but $\FORK{}$ does
+  % not.  The following execution is allowed.
+  % \begin{gather*}
+  %   \PR{x}{r}\SEMI\FORKJOIN{\THREAD{\PW{x}{1}}}\SEMI\PW{y}{1}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]      
+  %     \event{a}{\DW{x}{1}}{}
+  %     \event{b}{\DW{y}{1}}{right=3em of a}
+  %     \event{c}{\DR{x}{1}}{left=3em of a}
+  %     \rf{a}{c}
+  %     \sync{a}{b}
+  %     \sync[out=-20,in=-160]{c}{b}
+  %   \end{tikzinline}}
+  % \end{gather*}
+  % Synchronization can be added to 
+  % This asymmetry arises naturally when using pomsets with preconditions to
+  % model thread groups.
+\end{comment}

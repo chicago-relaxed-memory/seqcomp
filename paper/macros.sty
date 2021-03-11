@@ -1,5 +1,7 @@
 \newcommand{\lubmode}{\sqcup}
 \newcommand{\ltmode}{\sqsubset}
+\newcommand{\lemode}{\sqsubseteq}
+\newcommand{\gemode}{\sqsupseteq}
 \newcommand{\compat}[2]{#1\Yleft#2}
 \newcommand{\Pom}{\mathsf{Pom}}
 \newcommand{\PomPre}{\mathsf{PomPre}}
@@ -296,10 +298,11 @@
 \newcommand{\fmode}{\nu}
 \newcommand{\mWK}{{\mathsf{wk}}}
 \newcommand{\mRA}{{\mathsf{ra}}}
+\newcommand{\mSC}{{\mathsf{sc}}}
 \newcommand{\mRLX}{{\mathsf{rlx}}}
 \newcommand{\mREL}{{\mathsf{rel}}}
 \newcommand{\mACQ}{{\mathsf{acq}}}
-\newcommand{\mSC}{{\mathsf{sc}}}
+\newcommand{\mFSC}{{\mathsf{fsc}}}
 
 \newcommand{\ascope}{\varsigma}
 \newcommand{\sCTA}{{\mathsf{cta}}}
@@ -358,7 +361,12 @@
 \newcommand{\RMW}{{\sc rmw}}
 \newcommand{\RMWs}{{\sc rmw}s}
 \newcommand{\drf}{{\sc drf}}
-\newcommand{\drfsc}{{\sc sc-drf}}
+\newcommand{\drfsc}{{\sc drf-sc}}
+\newcommand{\drfra}{{\sc drf-ra}}
+\newcommand{\drfpf}{{\sc drf-pf}}
+\newcommand{\ldrfsc}[1]{\ifemptyelse{#1}{{\sc l}}{\ensuremath{\{#1\}}{\sc -}}{\sc drf-sc}}
+\newcommand{\ldrfra}[1]{\ifemptyelse{#1}{{\sc l}}{\ensuremath{\{#1\}}{\sc -}}{\sc drf-ra}}
+\newcommand{\ldrfpf}[1]{\ifemptyelse{#1}{{\sc l}}{\ensuremath{\{#1\}}{\sc -}}{\sc drf-pf}}
 \newcommand{\rfub}{{\sc rfub}}
 \newcommand{\oota}{{\sc oota}}
 \newcommand{\jmm}{{\sc jmm}}
@@ -366,7 +374,11 @@
 \newcommand{\armseven}{{\sc arm7}}
 \newcommand{\EGC}{{\sc egc}}
 \newcommand{\armeight}{{\sc arm8}}
+\newcommand{\IMM}{{\sc imm}}
+\newcommand{\PTX}{{\sc ptx}}
 \newcommand{\ppc}{{\sc power}}
+\newcommand{\rcXI}{{\sc rc11}}
+\newcommand{\cXI}{{\sc c11}}
 \newcommand{\mca}{{\sc mca}}
 \newcommand{\iriw}{{\sc iriw}}
 
@@ -737,6 +749,7 @@
 \newcommand{\sSKIP}{\textnormal{\textit{SKIP}}}
 \newcommand{\sSTOP}{\textnormal{\textit{STOP}}}
 \newcommand{\sABORT}{\textnormal{\textit{ABORT}}}
+\newcommand{\sFENCE}[2][]{\textnormal{\textit{FENCE}}\ifnotempty{#2}{\allowbreak(#2\ifnotempty{#1}{,\,\allowbreak#1})}}
 \newcommand{\sNIL}{\textnormal{\textit{NIL}}}
 
 \newcommand{\init}[1]{\mathsf{init}\,#1}
@@ -765,6 +778,21 @@
 
 %% \wk[out=-30,in=-70,transform canvas={xshift=-1ex}]{wx0}{wx1}
 \usepackage{tikz}
+\usepackage{tikz-cd}
+\tikzset{
+  symbol/.style={
+    draw=none,
+    every to/.append style={
+      edge node={node [sloped, allow upside down, auto=false]{$#1$}}}
+  }
+}
+\tikzset{
+  sqsubset/.style={
+    draw=none,
+    every to/.append style={
+      edge node={node [sloped, allow upside down, auto=false]{$\sqsubset$}}}
+  }
+}
 \usetikzlibrary{shapes}
 \usetikzlibrary{shapes.misc}
 \usetikzlibrary{shapes.geometric}

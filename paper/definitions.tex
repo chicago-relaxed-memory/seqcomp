@@ -73,12 +73,13 @@ We model the following language.
 \emph{Memory modes}, $\amode$, are {relaxed} ($\mRLX$), {release-acquire}
 ($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed mode is the
 default; we regularly elide it from examples.  $\mRA$/$\mSC$ accesses are
-collectively known as \emph{synchronized accesses}.  We use $\RPAR$ to denote
-parallel composition, preserving thread state on the right after a join.  In
-examples and sublanguages without join, we use the symmetric $\PAR$ operator.
+collectively known as \emph{synchronized accesses}.  
 
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
-given mode, as well as the usual structural constructs.
+given mode, as well as the usual structural constructs. Following
+\cite{DBLP:conf/icfp/FerreiraHJ96}, $\RPAR$ denotes parallel composition,
+preserving thread state on the right after a join.  In examples and
+sublanguages without join, we use the symmetric $\PAR$ operator.
 % 
 % \emph{Thread groups}, $\aGrp$, include commands and $\NIL$, which denotes
 % inaction. %, or deadlock.
@@ -154,7 +155,7 @@ $\aForm$ is \emph{unsatisfiable} if $\aForm\vDash\FALSE$.
 Throughout \textsection\ref{sec:model}--\ref{sec:arm} we 
 additionally require that
 \begin{itemize}
-\item each register appears at most once in a program.
+\item each register is assigned at most once in a program.
   % \end{itemize}
   % In \textsection\ref{sec:complications} and following, we
   % require instead that
@@ -330,7 +331,7 @@ without control or data dependencies.
     \\
     \sem{\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd} &= \textstyle\bigcup_{\aVal}\DRP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
     &
-    \sem{\aGrp_1 \PAR \aGrp_2} &= \sem{\aGrp_1}\sPAR\sem{\aGrp_2}
+    \sem{\aCmd_1 \PAR \aCmd_2} &= \sem{\aCmd_1}\sPAR\sem{\aCmd_2}
     % \\
     % \sem{\PA{\aLoc}{\aVal}\SEMI \aCmd} &= \textstyle\DRP{\aLoc}{\aVal}\sPREFIX\sem{\aCmd}
   \end{align*}
@@ -581,7 +582,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
       \sem{\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd} &=
       \sLOADPRE{\aReg}{\aLoc}{\sem{\aCmd}}
       &
-      \makebox[3.5em][r]{$\sem{\aGrp_1 \PAR \aGrp_2}$} &= \sem{\aGrp_1}\sPAR\sem{\aGrp_2}
+      \makebox[3.5em][r]{$\sem{\aCmd_1 \PAR \aCmd_2}$} &= \sem{\aCmd_1}\sPAR\sem{\aCmd_2}
     \end{aligned}
   \end{gather*}
 \end{definition}
@@ -1019,7 +1020,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
         \\
         \sem{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
         &
-        \sem{\FORK{\aGrp}} &= \sFORK{}\sem{\aGrp}      
+        \sem{\aCmd_1 \RPAR \aCmd_2} &= \sem{\aCmd_1}\sRPAR\sem{\aCmd_2}
         \\
         \sem{\aCmd_1 \SEMI \aCmd_2} &= \sem{\aCmd_1}\sSEMI\sem{\aCmd_2}
       \end{aligned}
