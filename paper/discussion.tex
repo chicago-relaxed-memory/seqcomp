@@ -591,46 +591,6 @@ $(\fmode \!\!\BNFDEF\!\! \mREL \!\BNFSEP\! \mACQ \!\BNFSEP\! \mFSC)$ is either
 \emph{release}, \emph{acquire}, or \emph{sequentially-consistent}.
 
 
-We can enrich read and write actions to use these modes.
-The resulting order is:
-% Reads use the four point order:
-% \begin{math}
-%   \mRLX \ltmode \mRA \ltmode \mREL \ltmode \mSC.
-% \end{math}
-% Writes use the four point order:
-% \begin{math}
-%   \mRLX \ltmode \mRA \ltmode \mACQ \ltmode \mSC.
-% \end{math}
-\begin{displaymath}
-  \begin{tikzpicture}
-    \node (rlx) at (0, 0) {$\mRLX$};
-    \node (ra)  at (1, 0) {$\mRA$};
-    \node (sc)  at (2, 0) {$\mSC$};
-    \node (fsc) at (3, 0) {$\mFSC$};
-    \node (rel) at (2, -0.3) {$\mREL$};
-    \node (acq) at (2,  0.3) {$\mACQ$};
-    \draw[->](rlx)to(ra);
-    \draw[->](ra)to(sc);
-    \draw[->](ra)to(rel);
-    \draw[->](ra)to(acq);
-    \draw[->](sc)to(fsc);
-    \draw[->](rel)to(fsc);
-    \draw[->](acq)to(fsc);
-  \end{tikzpicture}
-\end{displaymath}
-We write $\amode\lemode\bmode$ for this order.
-Let $\amode\lubmode\bmode$ denote the least upper bound of $\amode$ and $\bmode$.
-
-Reads allow all annotations but $\mREL$.  Writes allow all annotations but
-$\mACQ$.  Fences allow only the three annotations $\mREL$, $\mACQ$ and
-$\mFSC$.
-% \begin{displaymath}
-%   \begin{tikzcd}[column sep=.5em, row sep=.5ex]
-%                              &                                                                 & \mREL \arrow[rd,sqsubset] &        \\
-%     \mRLX \arrow[r,sqsubset] & \mRA \arrow[r,sqsubset] \arrow[ru,sqsubset] \arrow[rd,sqsubset] & \mSC  \arrow[r,sqsubset]  & \mFSC  \\
-%                              &                                                                 & \mACQ \arrow[ru,sqsubset] &          
-%   \end{tikzcd}
-% \end{displaymath}
 
 Formalizing this, $\QS{\aLoc}{\mREL}$ substitutes for $\Qw{*}$ in addition to
 $\Qw{\aLoc}$, as in $\QS{\aLoc}{\mRA}$.  $\QL{\aLoc}{\mACQ}$ requires
@@ -639,41 +599,52 @@ $\Qr{*}$ in addition to $\Qw{\aLoc}$, as in $\QL{\aLoc}{\mRA}$.
 \begin{definition}
   Extend \refdef{def:QS} and \refdef{def:DS}.
   \begin{align*}
-    \QS{\aLoc}{\mREL}&=
-    \Qr{*}\land\Qw{*} %\textstyle\bigwedge_\bLoc \Qr{\bLoc}\land\Qw{\bLoc}
-    &\QL{\aLoc}{\mACQ}&=\Qw{\aLoc}\land \Qr{*}
+    \QF{\aLoc}{\mREL}
+    %=\QS{\aLoc}{\mREL}
+    &=\Qr{*}\land\Qw{*} 
+    &
+    \QF{\aLoc}{\mACQ}
+    %=\QL{\aLoc}{\mACQ}
+    &=\Qw{\aLoc}\land \Qr{*}
     \\
-    [\aForm/\QS{\aLoc}{\mREL}] &= [\aForm/\Qw{*}]
-    &{} [\aForm/\QL{\aLoc}{\mACQ}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
+    [\aForm/\QF{\aLoc}{\mREL}]
+    %= [\aForm/\QS{\aLoc}{\mREL}]
+    &= [\aForm/\Qw{*}]
+    &{}
+    [\aForm/\QF{\aLoc}{\mACQ}]
+    %= [\aForm/\QL{\aLoc}{\mACQ}]
+    &= [\aForm/\Qr{*},\aForm/\Qw{*}]
     % \\
     % \DS{\aLoc}{\mREL}&=[\FALSE/\D]
     % &\DL{\aLoc}{\mACQ}&=\Dx{\aLoc}%\land\D{}
   \end{align*}
   \begin{align*}
-    \QS{\aLoc}{\mFSC}=
-    \QL{\aLoc}{\mFSC}&=
-    \Qr{*}\land\Qw{*} \land\Qsc
+    \QF{\aLoc}{\mFSC}
+    % = \QS{\aLoc}{\mFSC}
+    % = \QL{\aLoc}{\mFSC}
+    &= \Qr{*}\land\Qw{*} \land\Qsc
     \\
-    [\aForm/\QS{\aLoc}{\mFSC}] =
-    [\aForm/\QL{\aLoc}{\mACQ}] &=
-    [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
+    [\aForm/\QF{\aLoc}{\mFSC}] 
+    % = [\aForm/\QS{\aLoc}{\mFSC}] 
+    % = [\aForm/\QL{\aLoc}{\mACQ}]
+    &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
   \end{align*}
 \end{definition}
 
-[Todo: sort this definition out with quiescence.]
-
 If $\aPS \in \sFENCE[\ascope]{\amode}$ then
-\begin{enumerate}
+$(\exists\aLocs\subseteq\Loc)$
+%$(\exists\bmode\in\{\amode,\mRLX\})$
+\begin{enumerate}[resume]
 \item%[{\labeltext[F1]{(F1)}{F1}}]
   if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
 \item%[{\labeltext[F2]{(F2)}{F2}}]
-  $\labelingAct(\aEv) = \DF[\ascope]{\amode}$,
+  $\labelingAct(\aEv) = \DG[\ascope]{\amode}{\aLocs}$,
 \item%[{\labeltext[F3]{(F3)}{F3}}]
-  $\labelingForm(\aEv)$ implies $\TRUE$,
+  $\labelingForm(\aEv)$ implies $\bigwedge_{\aLoc\in (\Loc\setminus\aLocs)}\QF{\aLoc}{\amode}$,
 \item%[{\labeltext[F4]{(F4)}{F4}}]
   $\aTr{\bEvs}{\bForm}$ implies $\bForm$, where $\bEvs\cap\aEvs\neq\emptyset$,
 \item%[{\labeltext[F5]{(F5)}{F5}}]
-  $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/Q{}]$, where $\cEvs\cap\aEvs=\emptyset$.
+  $\aTr{\cEvs}{\bForm}$ implies $\bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc} \land\bForm[\FALSE/\QF{\aLoc}{}]$, where $\cEvs\cap\aEvs=\emptyset$.
 \end{enumerate}
 
 \begin{example}
@@ -902,6 +873,50 @@ For writes, change the label rules of sequential composition to:
     \compat{\aAct}{\bAct} &= \emptyset, \textotherwise
   \end{align*}
 \end{definition}  
+
+\subsection{Extended Access Modes}
+
+We can enrich read and write actions to use fence modes.
+The resulting order is:
+% Reads use the four point order:
+% \begin{math}
+%   \mRLX \ltmode \mRA \ltmode \mREL \ltmode \mSC.
+% \end{math}
+% Writes use the four point order:
+% \begin{math}
+%   \mRLX \ltmode \mRA \ltmode \mACQ \ltmode \mSC.
+% \end{math}
+\begin{displaymath}
+  \begin{tikzpicture}
+    \node (rlx) at (0, 0) {$\mRLX$};
+    \node (ra)  at (1, 0) {$\mRA$};
+    \node (sc)  at (2, 0) {$\mSC$};
+    \node (fsc) at (3, 0) {$\mFSC$};
+    \node (rel) at (2, -0.3) {$\mREL$};
+    \node (acq) at (2,  0.3) {$\mACQ$};
+    \draw[->](rlx)to(ra);
+    \draw[->](ra)to(sc);
+    \draw[->](ra)to(rel);
+    \draw[->](ra)to(acq);
+    \draw[->](sc)to(fsc);
+    \draw[->](rel)to(fsc);
+    \draw[->](acq)to(fsc);
+  \end{tikzpicture}
+\end{displaymath}
+We write $\amode\lemode\bmode$ for this order.
+Let $\amode\lubmode\bmode$ denote the least upper bound of $\amode$ and $\bmode$.
+
+Reads allow all annotations but $\mREL$.  Writes allow all annotations but
+$\mACQ$.  Fences allow only the three annotations $\mREL$, $\mACQ$ and
+$\mFSC$.
+% \begin{displaymath}
+%   \begin{tikzcd}[column sep=.5em, row sep=.5ex]
+%                              &                                                                 & \mREL \arrow[rd,sqsubset] &        \\
+%     \mRLX \arrow[r,sqsubset] & \mRA \arrow[r,sqsubset] \arrow[ru,sqsubset] \arrow[rd,sqsubset] & \mSC  \arrow[r,sqsubset]  & \mFSC  \\
+%                              &                                                                 & \mACQ \arrow[ru,sqsubset] &          
+%   \end{tikzcd}
+% \end{displaymath}
+
 
 \begin{definition}
   \showRAtrue
@@ -1467,7 +1482,7 @@ The predicate transformers are:
     \end{minipage}
   \end{center}
   \caption{Simplified Quiescence Semantics w/o Address Calculation
-    (See \refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
+    (See %\refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
     \refdef{def:dlx} for $\DLX{\aLoc}{\amode}{\bmode}$, $\DS{\aLoc}{\amode}$)
   } 
   \label{fig:no-q-or-addr}
@@ -1627,7 +1642,7 @@ The predicate transformers are:
       % $\DF{\mFSC}$     & \xmark            & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\xmark       & \xmark 
     \end{tabular}
   \end{center}
-  \begin{definition}
+  \begin{comment}
     \label{def:QSx}
     Let formulae $\QS{}{\amode}$ and $\QL{}{\amode}$ be defined:
     \begin{align*}
@@ -1645,7 +1660,7 @@ The predicate transformers are:
         \TRUE & \textotherwise
       \end{cases}
     \end{align*}
-  \end{definition}
+  \end{comment}
   
   \begin{definition}
     \label{def:independency-co}
@@ -1670,7 +1685,8 @@ The predicate transformers are:
     \item[\ref{S2})]
       $\labelingAct(\aEv) = \DW[\amode]{\aLoc}{\aVal}$,
     \item[\ref{S3})] 
-      $\labelingForm(\aEv)$ implies $\QS{}{\amode} \land \aExp{=}\aVal$
+      $\labelingForm(\aEv)$ implies %$\QS{}{\amode} \land
+      $\aExp{=}\aVal$,
     \item[\ref{S4})]
       $\aTr{\bEvs}{\bForm}$ implies $\bForm \land\aExp{=}\aVal$,
     \item[\ref{S5})]
@@ -1678,7 +1694,8 @@ The predicate transformers are:
     \item[\ref{L2})]
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}{\aVal}$,
     \item[\ref{L3})] 
-      $\labelingForm(\aEv)$ implies $\QL{}{\amode} \land \aExp{=}\aVal$
+      $\labelingForm(\aEv)$ implies %$\QL{}{\amode} \land
+      $\TRUE$.
     \item[\ref{L4})]
       $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
     \item[\ref{L5})]
@@ -1773,7 +1790,7 @@ The predicate transformers are:
 
   \begin{definition}
     \label{def:dlx}
-    Let $[\aForm/\Dx{*}]$ substitute $\aForm$ for every $\Dx{\bLoc}$.
+    % Let $[\aForm/\Dx{*}]$ substitute $\aForm$ for every $\Dx{\bLoc}$.
 
     \noindent
     Let substitution $\DS{\aLoc}{\amode}$ be defined:
@@ -1805,7 +1822,7 @@ The predicate transformers are:
     \end{minipage}
   \end{center}
   \caption{Simplified Quiescence Semantics with Address Calculation
-    (See \refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
+    (See %\refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
     \refdef{def:dlx} for $\DLX{\aLoc}{\amode}{\bmode}$, $\DS{\aLoc}{\amode}$)
   } 
   \label{fig:no-q}
