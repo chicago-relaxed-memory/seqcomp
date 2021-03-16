@@ -1,0 +1,177 @@
+Dear James,
+
+Thank you for your submission to LICS2021. The LICS2021 rebuttal
+period will be between 10 March and 14 March. Please note that all LICS
+deadlines are AoE.
+
+During this time, you will have access to the current state of your
+reviews and have the opportunity to submit a response of up to 600
+words. Please keep in mind the following during this process:
+
+* The response must focus on any factual errors in the reviews and
+any questions posed by the reviewers. It must not provide new
+research results or reformulate the presentation. Try to be as
+concise and to the point as possible.
+
+* The rebuttal period is an opportunity to react to the reviews, but
+not a requirement to do so. Thus, if you feel the reviews are
+accurate and the reviewers have not asked any questions, then you do
+not have to respond.
+
+* The reviews are as submitted by the PC members, without any
+coordination between them. Thus, there may be inconsistencies.
+Furthermore, these are not the final versions of the reviews. The
+reviews can later be updated to take into account the discussions at
+the program committee meeting, and we may find it necessary to
+solicit other outside reviews after the rebuttal period.
+
+* The program committee will read your responses carefully and take
+this information into account during the discussions. On the other
+hand, the program committee will not directly respond to your
+responses, either before the program committee meeting or in the
+final versions of the reviews.
+
+* Your response will be seen by all PC members who have access to the
+discussion of your paper, so please try to be polite and constructive.
+
+* We have received almost all reviews before the rebuttal, 98.5% of them,
+to be precise. Still, a very small number of papers have a review missing.
+If yours is one of those, and the missing review arrives during the rebuttal
+period, I will notify you.
+
+The reviews on your paper are attached to this letter. To submit your
+response you should log on the EasyChair Web page for LICS2021 and
+select your submission on the menu.
+
+----------------------- REVIEW 1 ---------------------
+SUBMISSION: 178
+TITLE: Sequential Composition for Relaxed Memory: Pomsets with Predicate Transformers
+AUTHORS: Alan Jeffrey and James Riely
+
+----------- Overall evaluation -----------
+
+To this reviewer, the pomsets-with-preconditions model is very appealing, and
+the idea to use it with predicate transformers is attractive.
+
+Unfortunately, I believe the main headline claim, that "This paper presents
+the first semantics for relaxed memory with a compositional definition of
+sequential composition", is false. For the paper
+
+Ryan Kavanagh, Stephen Brookes:
+A denotational account of C11-style memory. CoRR abs/1804.04214 (2018)
+
+has a compositonal semantics of sequential composition. Furthermore, I don't
+believe giving a compositional semantics of sequential composition in the
+presence of relaxed memory is in and of itself a difficult problem. For
+instance,
+
+Jonathan Hayman, Glynn Winskel: Independence and Concurrent Separation
+Logic. Log. Methods Comput. Sci. 4(1) (2008)
+
+do so for an independence model which is related to, but not identical to,
+pomsets. While they don't specialize their ideas to a weak memory model, it
+seems like there would be a pretty easy path. There are doubtless other
+papers in this vicinity too (sequential composition for true concurrency
+models).
+
+But independently of how easy it is, I believe that the Kavanagh-Brookes
+paper already achieves what this paper claims is it's main contribution.
+
+As a result, I don't see a way to accept this paper. The contents seem
+interesting to me, but the pitch is problematic. And, as a reviewer, I don't
+think it is correct for me to attempt to rewrite the paper, to discover a
+different way to say why it is interesting or a contribution. In saying this
+I want to emphasize to the authors that my low grade does not mean I think
+this is low quality work or a bad direction -- quite the contrary. Rather,
+there is (as far as I can tell) a simple slip-up in explaining what the work
+achieves, and I hope the authors will, perhaps with additional technical
+work, arrive at a convincing explanation for what looks like an interesting
+model that is worth exploring.
+
+
+----------------------- REVIEW 2 ---------------------
+SUBMISSION: 178
+TITLE: Sequential Composition for Relaxed Memory: Pomsets with Predicate Transformers
+AUTHORS: Alan Jeffrey and James Riely
+
+----------- Overall evaluation -----------
+Summary:
+========
+
+This paper presents a new relaxed memory model. This model is based on the
+model proposed in [10] where each execution of the program is represented as
+a partial order over read and write events. The order between these events
+corresponds to their dependency relation. The events are then extended with
+preconditions (i.e., formula over local registers, memory references, ...)
+that are used to encode control and data dependencies between the events.
+
+The model presented in [10] suffers from the limitation that it does not
+allow the modeling of general sequencing. To remedy this, the authors propose
+to extend the model of [10] in order to support sequential composition. To
+that aim, the authors define a family of predicate transformers (which allow
+the mapping of each postcondition to a precondition). This family of
+predicate transformers is indexed by a subset of events. The authors then use
+this family of predicate transformers to define compositional semantics for
+sequential composition. This model is also extended in order to deal with
+release-acquire access and SC access.  Finally, the authors present an
+efficient compilation of the proposed relaxed model to ARMv8.
+
+Evaluation:
+=========
+
+This paper addresses an interesting problem which is to define a relaxed
+memory model that captures most of the common program transformations and
+enjoys an efficient compilation to ARMv8. This is a difficult and challenging
+problem. This paper presents the first logical relaxed memory model with
+compositional semantics for sequential composition. The paper is well-written
+and easy to follow.
+
+On the negative side, it lacks an appropriate work section on the paper. For
+the related work section, the authors refer the reader to [10]. This makes
+the paper not-self contained. Therefore, I encourage the authors to add a
+related work section with a detailed comparison to [10] and a description of
+the challenges and difficulties encountered.
+
+It is also important that the authors try to prove that the new proposed
+relaxed model satisfies the DRF guarantee (which is a very important
+property).
+
+Finally, it is not clear whether the proposed relaxed model can be extended
+to handle loops and recursive functions. This paper can be seen as a step
+towards that goal.
+
+Other comments:
+==============
+
+- It's great to use this large number of examples to illustrate the new
+  casual model. However, it is important to add an explanation/description of
+  these examples in order to help the reader.
+
+- Page 4: "Each register appears at most once" --> "Each register is assigned
+  at most once"
+
+----------------------- REVIEW 3 ---------------------
+SUBMISSION: 178
+TITLE: Sequential Composition for Relaxed Memory: Pomsets with Predicate Transformers
+AUTHORS: Alan Jeffrey and James Riely
+
+----------- Overall evaluation -----------
+
+The paper is concerned with the semantics for programs in terms of memory
+models, where instructions are interpreted as a collection of read/write
+operations satisfying some consistency criteria. In this case, the memory
+models considered are relaxed memory models, where consistency is required
+only locally (when read/write affect the same location). The paper builds on
+a related work [10] in using pomsets, extended with predicate transformers
+and weakest precondition semantics, to interpret sequential composition.
+
+The paper is well motivated and certainly relevant to LICS. However, it is
+not so clear what (formal) properties this new semantics are supposed to
+have. Some litmus tests are given in Section 5 to illustrate the adequacy of
+the semantics, but there are no formal proofs that establish desired
+properties (as captured by those litmus tests, for example). The formal parts
+of the paper seem to consist of a series of definitions. The author(s) claim
+these have been formalised in Agda, but it's not clear whether the
+formalisation includes (interesting) properties of the semantics.
+
+------------------------------------------------------

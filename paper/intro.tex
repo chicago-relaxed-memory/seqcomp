@@ -478,10 +478,10 @@ as one would hope.
 
 \subsection{Contributions}
 
-This paper is the first model of relaxed memory with a compositional
-semantics for sequential composition.  It shows how pomsets with
-preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined
-with predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75}.
+In this paper, we show how pomsets with
+preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined with
+predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75} to create a
+compositional semantics for sequential composition.
 \begin{itemize}
 \item \S\ref{sec:model} presents the basic model, with few features
   required of the logic of preconditions, but a resulting lack of fidelity
@@ -506,7 +506,32 @@ efficient compilation to \armeight{}, which improves upon that of
 \cite{DBLP:journals/pacmpl/JagadeesanJR20} by using a recent alternative
 characterization of \armeight{}.
 
-As far as we are aware, there are no previous attempts to provide a
-compositional semantics of sequential composition in a relaxed memory model.
-For a discussion of related work for relaxed memory models in general, see
-\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
+\section{Related Work}
+
+\begin{itemize}
+\item Models with strong dependencies that disallow compiler optimizations
+  and efficient implementation on \armeight{}:
+  \cite{Lamport:1979:MMC:1311099.1311750,
+    DBLP:conf/pldi/LahavVKHD17,
+    Dolan:2018:BDR:3192366.3192421,
+    DBLP:conf/pldi/LahavVKHD17,
+    DBLP:conf/lics/JeffreyR16,
+    Boehm:2014:OGA:2618128.2618134,
+    DBLP:journals/corr/abs-1804-04214}.
+\item Models with weak dependencies that allow some forms of thin-air
+  reasoning:
+  \cite{Manson:2005:JMM:1047659.1040336,
+    DBLP:conf/esop/JagadeesanPR10,
+    DBLP:conf/popl/KangHLVD17,
+    DBLP:journals/pacmpl/ChakrabortyV19}
+\item Models that do not calculate dependencies:
+  \cite{Batty:2011:MCC:1926385.1926394,
+    DBLP:journals/pacmpl/WattRP19,
+    DBLP:conf/pldi/WattPPBDFPG20,
+    goMM}.
+\end{itemize}
+Like us, \citet{DBLP:journals/corr/abs-1804-04214} use pomsets to create a
+compositional account of sequential composition.  However, their model
+requires a fence after every read on \armeight{}, and uses syntactic
+dependencies, thus invalidating many compiler optimizations.
+

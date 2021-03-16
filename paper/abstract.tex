@@ -1,15 +1,10 @@
-This paper presents the first semantics for relaxed memory with a
-compositional definition of sequential composition.  Previous
-definitions of relaxed memory have given detailed treatments of
-parallel composition, but have given sequential composition less
-attention, often relegating it to a (sometimes speculative)
-operational semantics of single-threaded programs. In this paper we show how
-sequential composition can be restored to a first-class citizen, by giving
-it a denotational semantics in a model of pomsets with preconditions,
-extended with a family of predicate transformers. Previous work has shown that
-pomsets with preconditions are a model of concurrent composition,
-and that predicate transformers are a model of sequential composition.
-This paper show how they can be combined.
+This paper presents the first compositional definition of sequential
+composition that applies to a relaxed memory model weak enough to allow
+efficient implementation on Arm.  We extend the denotational model of pomsets
+with preconditions with predicate transformers. Previous work has shown that
+pomsets with preconditions are a model of concurrent composition, and that
+predicate transformers are a model of sequential composition.  This paper
+show how they can be combined.
 
 % Program logics and semantics tell us that in order to derive
 % \begin{math}

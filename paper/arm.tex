@@ -6,6 +6,97 @@ We discuss \armeight{} using \emph{external global completion} (\EGC{})
 \cite[\textsection B2.3.6]{arm-reference-manual}
 which is very close to our model.
 
+\begin{example}
+  Bad example:
+  \begin{gather*}
+    \PR{x}{r}\SEMI 
+    \PW{x}{2}\SEMI
+    \PR{x}{s}\SEMI
+    \PW{y}{s{-}1} \PAR
+    \PR{y}{r}\SEMI
+    \PW{x}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{x}{2}}{right=of a}
+        \event{c}{\DR{x}{2}}{right=of b}
+        \event{d}{\DW{y}{1}}{right=of c}
+        \event{e}{\DR{y}{1}}{right=of d}
+        \event{f}{\DW{x}{1}}{right=of e}
+        \wk{a}{b}
+        \rf{b}{c}
+        \po{c}{d}
+        \rf{d}{e}
+        \po{e}{f}
+        \rf[out=-165,in=-15]{f}{a}
+      \end{tikzinline}}
+  \end{gather*}
+\end{example}
+
+\begin{example}
+  Should not wipe out local state only when there is a release-acquire pair,
+  as in the definition of \jjr{}, which allows the following execution.  Even
+  though there is a blocker $\DWP{x}{3}$, here we are using $\DWP{x}{0}$ to
+  justify the lack of dependence $\DRP{x}{4}\xpo\DWP{w}{4}$.
+  \begin{gather*}
+    \PW{x}{0}\SEMI
+    \IF{x}\THEN\PW{y}{2}\FI\SEMI
+    \IF{\PR[\mRA]{z}{}}\THEN
+      \PR{x}{s}\SEMI
+      \IF{s\;\mathsf{even}}\THEN\PW{w}{4}\FI
+    \FI
+    \PAR
+    \PW{x}{2}\SEMI
+    \IF{\PR[\mRA]{y}{}}\THEN
+      \PW{x}{3}\SEMI
+      \PW[\mRA]{z}{1}
+    \FI
+    \SEMI
+    \PW{x}{\PR{w}{}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{2a}{\DW{x}{0}}{}
+        \event{2b}{\DR{x}{2}}{right=of 2a}
+        \event{2c}{\DW{y}{1}}{right=of 2b}
+        \raevent{2d}{\DR[\mRA]{z}{1}}{right=of 2c}
+        \event{2e}{\DR{x}{4}}{right=of 2d}
+        \event{2f}{\DW{w}{4}}{right=of 2e}
+        %
+        \event{3a}{\DW{x}{2}}{below=of 2a}
+        \raevent{3b}{\DR[\mRA]{y}{1}}{right=of 3a}
+        \event{3c}{\DW{x}{3}}{right=of 3b}
+        \raevent{3d}{\DW[\mRA]{z}{1}}{right=of 3c}
+        \event{3e}{\DR{w}{4}}{right=of 3d}
+        \event{3f}{\DW{x}{4}}{right=of 3e}
+        \wk{2a}{2b}
+        \po{2b}{2c}
+        \sync{2d}{2e}
+        \sync[out=20,in=160]{2d}{2f}
+        \sync{3b}{3c}
+        \sync{3c}{3d}
+        \po{3e}{3f}
+        \rf{3a}{2b}
+        \rf{2c}{3b}
+        \rf{3d}{2d}
+        \rf{3f}{2e}
+        \rf{2f}{3e}
+        \wk{2a}{3a}
+        %\wk[out=-20,in=-160]{3c}{3f}
+        %\wk[out=20,in=160]{2b}{2e}
+      \end{tikzinline}}
+  \end{gather*}
+  (The read-clobbering semantics from \textsection\ref{sec:substitutions}
+  does not change this.)
+\end{example}
+
+It does seem to me like a non-local blocker for program-order must include a
+read of $x$ or a release (to get order from the write) and an acquire (to get
+the order to the read).
+
+What if an acquire preceded by a release or non-local read on $x$ wiped the
+local state of $x$?  The problem with this kind of solution (and P6 in ooplsa
+specifically) is that it destroys roach-motel.
+
 \subsection{Downgraded Reads (\xDGR)}
 \label{sec:downgrade}
 
@@ -80,7 +171,7 @@ $\Dx{\aLoc}$.
     \begin{cases}
       [\TRUE/\Dx{\aLoc}]  & \textif \amode=\mRLX
       \\
-      [\FALSE/\D] & \textotherwise
+      [\TRUE/\Dx{\aLoc}][\FALSE/\D] & \textotherwise
     \end{cases}
   \end{align*}
   % \begin{align*}

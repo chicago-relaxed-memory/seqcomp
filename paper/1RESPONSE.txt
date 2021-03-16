@@ -1,0 +1,50 @@
+In [10] we presented a model of relaxed memory that (1) supports
+compositional reasoning for temporal safety properties, (2) supports expected
+sequential compiler optimizations, (3) satisfies the DRF-SC criterion, and
+(4) compiles to x64 and ARM microprocessors without requiring extra fences on
+relaxed accesses.
+
+In this paper, we give an alternative characterization of [10] that supports
+sequential composition.  Our technique is novel, using families of predicate
+transformers to accurately track the dependencies induced by sequential
+composition. 
+
+Referee 2, thank you for reading our paper!  We will add a detailed
+comparison with [10] and include a discussion of related work.
+
+About DRF-SC, in [10] we provide a proof of _local_ DRF-SC, which is a
+stronger property; the argument is not substantively changed here.
+
+We agree that adding loops and recursive functions is a substantial challenge
+for future work.  We will add a comment on this fact.
+
+Referee 3, thank you for reading our paper!  Because the model essentially an
+alternative characterization of [10], we expect the results shown there to
+carry over.  Recent work on alternative characterizations of ARM have
+simplified the proof of efficient implementation on ARM.  We will add a list
+of results in revision.
+
+For this paper, we have mechanized the proof that sequential composition is
+associative.  This is the most important result concerning the main novel
+feature of this paper.
+
+Referee 1 has not written a proper review, dismissing the paper based on the
+first sentence: "This paper presents the first semantics for relaxed memory
+with a compositional definition of sequential composition".  We will revise
+this sentence to include the qualifier "that supports common compiler
+optimizations and efficient implementation on ARM".
+
+The referee cites Kavanagh and Brookes 2018 arXiv paper as a prior solution.
+However, there are two goals of our paper that K+B do not address.  First,
+K+B model RC11, which requires a fence after every relaxed read on ARM.
+Second, K+B model syntactic dependencies, thus invalidating common compiler
+optimizations, such as replacing (x*0) by (0), replacing (if b then C else C)
+by (C) or replacing (x:=1;y:=x) by (x:=1;y:=1).  We agree with the referee
+that such syntactic dependencies are easy to model, but we have not done
+that.  Syntactic dependencies are sufficient in hardware models, but not
+software models.
+
+Other work on semantic models of true concurrency is only loosely related.
+The main contribution of our work is to model dependencies accurately in
+order to allow efficient compilation to ARM, validating standard compiler
+optimizations.
