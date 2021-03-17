@@ -233,7 +233,7 @@ instead that
   If $\aPS \in (\aPSS_1\sRPAR\aPSS_2)$ then  
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   \begin{multicols}{2}
-    \begin{enumerate}
+    \begin{enumerate}[topsep=0pt]
     \item \label{par-E}
       $\aEvs = (\aEvs_1\cup\aEvs_2)$,
     \item
@@ -260,12 +260,12 @@ instead that
       $\aTr{\bEvs}{\bForm}$ implies $\aTr[2]{\bEvs}{\bForm}$.
     \end{enumerate}
   \end{multicols}
-  \smallskip
+  \medskip
 
   % \noindent
   If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{4}
   \item[(\ref{par-E}--\ref{par-lambda2})] as for $\sRPAR$,
   \item
@@ -281,8 +281,8 @@ instead that
     $\aTr{\bEvs}{\bForm}$ implies
     $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$.
   \end{enumerate}
+  \medskip
 
-  % \noindent
   If $\aPS \in (\aPSS_1\sSEMI\aPSS_2)$ then
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % let
@@ -293,7 +293,7 @@ instead that
   %     \aEvs_1 &\textotherwise
   %   \end{cases}}
   % \end{math}
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{4}
   \item[(\ref{par-E}--\ref{par-lambda2})] as for $\sRPAR$,
   \item
@@ -314,6 +314,7 @@ instead that
   \item \label{seq-reorder}
     if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\le\aEv$ or $\labeling_1(\bEv)\reorderlt\labeling_2(\aEv)$.
   \end{enumerate}
+  \medskip
 
   % \noindent
   If $\aPS\in\sLET{\aReg}{\aExp}$ then $\aEvs = \emptyset$ and
@@ -326,7 +327,7 @@ instead that
   If $\aPS \in \sFENCE[\ascope]{\amode}$ then
   % $(\exists\aLocs\subseteq\Loc)$
   % $(\exists\bmode\in\{\amode,\mRLX\})$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item%[{\labeltext[F1]{(F1)}{F1}}]
     $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
   \item%[{\labeltext[F2]{(F2)}{F2}}]
@@ -336,79 +337,112 @@ instead that
   \item%[{\labeltext[F4]{(F4)}{F4}}]
     $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
   \end{enumerate}
+  \medskip
 
   \renewcommand{\cEvs}{D}
   \renewcommand{\dEvs}{D}
 
-  If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}$ then
-  $(\exists\aVal\in\Val)$
-  \begin{enumerate}
-  \item
-    $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-  \item
-    $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal}$,
-  \item
-    $\labelingForm(\aEv)$ implies
-    \begin{math}
-      \aExp{=}\aVal
-    \end{math},    
-  \item
-    \begin{math}
-      (\forall\aEv\in\aEvs\cap\bEvs)
-    \end{math}
-    $\aTr{\bEvs}{\bForm}$ implies 
-    \begin{math}
-      \bForm
-      %[\aExp/\aLoc]
-      \land\aExp{=}\aVal
-    \end{math},
-  \item
-    \begin{math}    
-      (\forall\aEv\in\aEvs\setminus\cEvs)
-    \end{math}
-    $\aTr{\cEvs}{\bForm}$ implies
-    \begin{math}
-      \bForm
-      %[\aExp/\aLoc]
-    \end{math}.
-  \end{enumerate}
 
-  If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}$ then
-  $(\exists\aVal\in\Val)$
-  \begin{enumerate}
-  \item
-    $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-  \item
-    $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}$
-  \item
-    $\labelingForm(\aEv)$ implies
-    \begin{math}
-      \TRUE
-    \end{math},    
-  \item
-    \begin{math}
-      (\forall\aEv\in\aEvs\cap\bEvs)
-    \end{math}
-    $\aTr{\bEvs}{\bForm}$ implies
-    \begin{math}
-      \aVal{=}\aReg
-      \limplies \bForm
-    \end{math},    
-  \item
-    \begin{math}
-      (\forall\aEv\in\aEvs\setminus\cEvs)
-    \end{math}
-    $\aTr{\cEvs}{\bForm}$ implies
-    \begin{math}
-      %\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
-      \bForm
-    \end{math}.
-  \end{enumerate}
+  \begin{multicols}{2}
+    If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}$ then
+    $(\exists\aVal\in\Val)$
+    \begin{enumerate}[topsep=0pt]
+    \item
+      $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    \item
+      $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal}$,
+    \item
+      $\labelingForm(\aEv)$ implies
+      \begin{math}
+        \aExp{=}\aVal
+      \end{math},    
+    \item
+      \begin{math}
+        (\forall\aEv\in\aEvs\cap\bEvs)
+      \end{math}
+      $\aTr{\bEvs}{\bForm}$ implies 
+      \begin{math}
+        \bForm
+        % [\aExp/\aLoc]
+        \land\aExp{=}\aVal
+      \end{math},
+    \item
+      \begin{math}    
+        (\forall\aEv\in\aEvs\setminus\cEvs)
+      \end{math}
+      $\aTr{\cEvs}{\bForm}$ implies
+      \begin{math}
+        \bForm
+        % [\aExp/\aLoc]
+      \end{math}.
+    \end{enumerate}
+    \columnbreak
+    If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}$ then
+    $(\exists\aVal\in\Val)$
+    \begin{enumerate}[topsep=0pt]
+    \item
+      $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    \item
+      $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}$
+    \item
+      $\labelingForm(\aEv)$ implies
+      \begin{math}
+        \TRUE
+      \end{math},    
+    \item
+      \begin{math}
+        (\forall\aEv\in\aEvs\cap\bEvs)
+      \end{math}
+      $\aTr{\bEvs}{\bForm}$ implies
+      \begin{math}
+        \aVal{=}\aReg
+        \limplies \bForm
+      \end{math},    
+    \item
+      \begin{math}
+        (\forall\aEv\in\aEvs\setminus\cEvs)
+      \end{math}
+      $\aTr{\cEvs}{\bForm}$ implies
+      \begin{math}
+        % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+        \bForm
+      \end{math}.
+    \end{enumerate}
+  \end{multicols}
+  %\smallskip
+% Given these definitions, the semantics of commands is:
+  \begin{scope}
+    \allowdisplaybreaks
+    \begin{gather*}
+      \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd_1}\sELSE\sem{\aCmd_2}\sFI
+      \\
+      \begin{aligned}
+        \sem{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}
+        &
+        \sem{\SKIP} &= \sSKIP 
+        \\
+        \sem{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}
+        &
+        \sem{\aCmd_1 \RPAR \aCmd_2} &= \sem{\aCmd_1}\sRPAR\sem{\aCmd_2}
+        \\
+        \sem{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
+        & 
+        \sem{\aCmd_1 \SEMI \aCmd_2} &= \sem{\aCmd_1}\sSEMI\sem{\aCmd_2}
+        \\
+        \sem{\PF[\ascope]{\amode}} &= \sFENCE[\ascope]{\amode}
+        &
+      \end{aligned}
+    \end{gather*}
+  \end{scope}
+%  \caption{Semantics}
+\end{definition}
+
+Full versions:
 
   If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item
     $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is a tautology and
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
@@ -467,7 +501,7 @@ instead that
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
   % $(\exists\bmode\in\{\amode,\mRLX\})$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item
     $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is a tautology and
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
@@ -531,31 +565,7 @@ instead that
   \end{enumerate}  
   % \noindent
 
-  Given these definitions, the semantics of commands is:
-  \begin{scope}
-    \allowdisplaybreaks
-    \begin{gather*}
-      \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd_1}\sELSE\sem{\aCmd_2}\sFI
-      \\
-      \begin{aligned}
-        \sem{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}
-        &
-        \sem{\SKIP} &= \sSKIP 
-        \\
-        \sem{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}
-        &
-        \sem{\aCmd_1 \RPAR \aCmd_2} &= \sem{\aCmd_1}\sRPAR\sem{\aCmd_2}
-        \\
-        \sem{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
-        & 
-        \sem{\aCmd_1 \SEMI \aCmd_2} &= \sem{\aCmd_1}\sSEMI\sem{\aCmd_2}
-        \\
-        \sem{\PF[\ascope]{\amode}} &= \sFENCE[\ascope]{\amode}
-        &
-      \end{aligned}
-    \end{gather*}
-  \end{scope}
-\end{definition}
+
 
 \subsection{Pomsets}
 \label{sec:pomsets}
@@ -643,7 +653,7 @@ without control or data dependencies.
   If $\aPS \in (\aPSS_1\sPAR\aPSS_2)$ then  
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item \label{par-E}
     $\aEvs = (\aEvs_1\cup\aEvs_2)$,
   \item \label{par-le1}
@@ -667,7 +677,7 @@ without control or data dependencies.
   If $\aPS \in (\aAct\sPREFIX\aPSS_2)$ then
   $(\exists\aEvs_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there is $\aPS_2\in\aPSS$ such that
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item \label{pre-E}
     $\aEvs=(\aEvs_1 \cup \aEvs_2)$,
   \item \label{pre-unique}
@@ -691,7 +701,7 @@ without control or data dependencies.
   \noindent
   If $\aPS \in \sTOP{\aPSS}$ then
   $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item  \label{top-E} % [{\labeltext[T1]{T1)}{T1}}]
     $\aEvs=\aEvs_1$,
   \item  \label{top-lambda} % [{\labeltext[T2]{T2)}{T2}}]
@@ -857,7 +867,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   If $\aPS \in (\aPSS_1\sPAR\aPSS_2)$ then
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetParDisjointCount}}
   \item[1--\ref{pomsetParDisjointCountLast})]
     as for $\sPAR$ in \refdef{def:pomset-semantics},
@@ -873,7 +883,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetParCount}}
   \item[1--\ref{pomsetParCountLast})] 
     as for $\sPAR$  in \refdef{def:pomset-semantics} (ignoring disjointness),
@@ -895,7 +905,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   $(\exists\aPS_2\in\aPSS_2)$
   $(\exists\aVal\in\Val)$
   % there is $\aPS_2\in\aPSS$ such that
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[1--\ref{pomsetPrefixOrderCountLast})]
     as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
@@ -915,7 +925,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   $(\exists\aPS_2\in\aPSS_2)$
   $(\exists\aVal\in\Val)$
   % there is $\aPS_2\in\aPSS$ such that
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetPrefixOrderCount}}
   \item[1--\ref{pomsetPrefixOrderCountLast})]
     as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
@@ -931,7 +941,7 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   \noindent
   If $\aPS \in \sTOP{\aPSS}$ then
   $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetTopCount}}
   \item[1--\ref{pomsetTopCountLast})] % \label{top-E} % [{\labeltext[T1]{T1)}{T1}}]
     as for $\sTOP{}$ in \refdef{def:pomset-semantics},
@@ -1178,7 +1188,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
     \noindent
     If $\aPS \in \sTHREAD{\aPSS}$ then
     $(\exists\aPS_1\in\aPSS)$
-    \begin{enumerate}
+    \begin{enumerate}[topsep=0pt]
     \item  \label{thread-E} % [{\labeltext[T1]{T1)}{T1}}]
       $\aEvs=\aEvs_1$,
     \item  \label{thread-lambda} % [{\labeltext[T2]{T2)}{T2}}]
@@ -1194,7 +1204,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
     \noindent
     If $\aPS \in \sFORK{\aPSS}$ then
     $(\exists\aPS_1\in\aPSS)$
-    \begin{enumerate}
+    \begin{enumerate}[topsep=0pt]
     \item \label{fork-E} % [{\labeltext[F1]{F1)}{F1}}]
       $\aEvs=\aEvs_1$,
     \item  \label{fork-lambda} % [{\labeltext[F2]{F2)}{F2}}]
@@ -1256,7 +1266,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetPreIfCount}}
   \item[1--\ref{pomsetPreIfCountLast})] as for $\sIF{}$ in \refdef{def:pomsets-pre},
   \item \label{if-tau}
@@ -1271,7 +1281,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   If $\aPS \in (\aPSS_1\sRPAR\aPSS_2)$ then
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetPreParCount}}
   \item[\ref{par-E}--\ref{par-kappa2})]
     as for $\sPAR$ in \refdef{def:pomsets-pre},
@@ -1288,7 +1298,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
   % let $\labelingForm'_2(\aEv)=\aTr[1]{{\downclose[0]{\aEv}}}{\labelingForm_2(\aEv)}$  
   % let $\labelingForm'_2(\aEv)=\aTr[1]{\{ \bEv \mid \bEv < \aEv \}}{\labelingForm_2(\aEv})$  
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetParCount}}
   \item[1--\ref{pomsetParCountLast})]
     as for $\sPAR$  in \refdef{def:pomset-semantics} (ignoring disjointness),
@@ -1312,7 +1322,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   If $\aPS \in \sSTORE[\amode]{\aLoc}{\aExp}$ then
   $(\exists\aVal\in\Val)$
   % $(\forall\bEvs\neq\emptyset)$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item[{\labeltext[S1]{S1)}{S1}}]
     if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
   \item[{\labeltext[S2]{S2)}{S2}}]
@@ -1334,7 +1344,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   % If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then
   % $(\exists\aVal\in\Val)$
   % $(\forall\bEvs\neq\emptyset)$
-  % \begin{enumerate}
+  % \begin{enumerate}[topsep=0pt]
   % \item[{\labeltext[L1]{L1)}{L1}}] 
   %   if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
   % \item[{\labeltext[L2]{L2)}{L2}}]
@@ -1357,7 +1367,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   If $\aPS \in \sLOAD[\amode]{\aReg}{\aLoc}$ then %either $\aEvs\neq\emptyset$ and
   $(\exists\aVal\in\Val)$
   % $(\forall\bEvs{\neq}\emptyset)$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item[{\labeltext[L1]{L1)}{L1}}] 
     if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
   \item[{\labeltext[L2]{L2)}{L2}}]
@@ -1373,13 +1383,13 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   \end{enumerate}
   % or
   % $\aEvs=\emptyset$ and 
-  % \begin{enumerate}
+  % \begin{enumerate}[topsep=0pt]
   % \item[{\labeltext[L6]{L6)}{L6}}] 
   %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$. % \land \lnot\Q{}$.
   % \end{enumerate}
   If $\aPS \in \sTOP{\aPSS}$ then
   $(\exists\aPS_1\in\aPSS)$
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetPreTopCount}}
   \item[1--\ref{top-kappa-read})] as in \refdef{def:pomsets-top},    
   \item $\aTr{\aEvs_1}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
@@ -1554,7 +1564,7 @@ order.
         \xos{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
-  % \end{example}
+  % \end{figure}
   % \begin{example} Merging right.
   %   \begin{align*}
   %     \begin{gathered}
@@ -1932,7 +1942,7 @@ order.
   one used traditionally, which is written using substitution.  Substitution
   is also used in \jjr{}.  Attempting to
   write the predicate transformers in this style we have:
-  \begin{enumerate}
+  \begin{enumerate}[topsep=0pt]
   \item[\ref{L4})]
     $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg]$, 
   \item[\ref{L5})]
