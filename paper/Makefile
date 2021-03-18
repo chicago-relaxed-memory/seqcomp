@@ -1,10 +1,10 @@
-main:
-	rm  -f main.pdf
-	latexmk -xelatex --pvc --pdf --halt-on-error main.tex
-	killall Skim
 paper:
 	rm  -f paper.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error paper.tex
+	killall Skim
+main:
+	rm  -f main.pdf
+	latexmk -xelatex --pvc --pdf --halt-on-error main.tex
 	killall Skim
 appendix:
 	rm  -f appendix.pdf

@@ -333,7 +333,7 @@ instead that
   % $(\exists\bmode\in\{\amode,\mRLX\})$
   \begin{enumerate}[topsep=0pt]
   \item%[{\labeltext[F1]{(F1)}{F1}}]
-    $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+     $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
   \item%[{\labeltext[F2]{(F2)}{F2}}]
     $\labelingAct(\aEv) = \DF[\ascope]{\amode}$,
     % \item%[{\labeltext[F3]{(F3)}{F3}}]
@@ -343,16 +343,12 @@ instead that
   \end{enumerate}
   \medskip
 
-  \renewcommand{\cEvs}{D}
-  \renewcommand{\dEvs}{D}
-
-
   \begin{multicols}{2}
     If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}$ then
     $(\exists\aVal\in\Val)$
     \begin{enumerate}[topsep=0pt]
     \item
-      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+     $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
     \item
       $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal}$,
     \item
@@ -367,9 +363,7 @@ instead that
         \bForm
         % [\aExp/\aLoc]
         \land\aExp{=}\aVal
-      \end{math},
-    \item
-      $\aEvs\neq\emptyset$.
+      \end{math}.
     \end{enumerate}
     \columnbreak
     If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}$ then
@@ -379,11 +373,11 @@ instead that
       if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
     \item
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}$
-    \item
-      $\labelingForm(\aEv)$ implies
-      \begin{math}
-        \TRUE
-      \end{math},    
+    % \item
+    %   $\labelingForm(\aEv)$ implies
+    %   \begin{math}
+    %     \TRUE
+    %   \end{math},    
     \item
       $\aTr{\bEvs}{\bForm}$ implies
       \begin{math}
@@ -392,7 +386,7 @@ instead that
       \end{math},    
       if $(\aEvs\cap\bEvs)\neq\emptyset$
     \item
-      $\aTr{\cEvs}{\bForm}$ implies
+      $\aTr{\bEvs}{\bForm}$ implies
       \begin{math}
         % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
         \bForm,
@@ -448,9 +442,10 @@ Full versions:
     
     
   \item
-    \begin{math}
-      (\forall\aEv\in\aEvs\cap\bEvs)
-    \end{math}
+    % \begin{math}
+    %   %(\forall\aEv\in\aEvs\cap\bEvs)
+    %   (\forall\aEv\in\aEvs)
+    % \end{math}
     $\aTr{\bEvs}{\bForm}$ implies 
     \begin{math}
       \cForm_\aEv
@@ -461,22 +456,22 @@ Full versions:
         \land\aExp{=}\aVal_\aEv
       }
     \end{math},
-  \item
-    \begin{math}    
-      (\forall\aEv\in\aEvs\setminus\cEvs)
-    \end{math}
-    $\aTr{\cEvs}{\bForm}$ implies
-    \begin{math}
-      \cForm_\aEv
-      \limplies {
-        \bForm
-        [\aExp/\aLoc]
-        % \DS{\aLoc}{\amode}
-        % [\FALSE/\Q{}]
-      }
-    \end{math}
+  % \item
+  %   \begin{math}    
+  %     (\forall\aEv\in\aEvs\setminus\bEvs)
+  %   \end{math}
+  %   $\aTr{\bEvs}{\bForm}$ implies
+  %   \begin{math}
+  %     \cForm_\aEv
+  %     \limplies {
+  %       \bForm
+  %       [\aExp/\aLoc]
+  %       % \DS{\aLoc}{\amode}
+  %       % [\FALSE/\Q{}]
+  %     }
+  %   \end{math}
     % \item
-    %   $\aTr{\dEvs}{\bForm}$ implies
+    %   $\aTr{\bEvs}{\bForm}$ implies
     %   \begin{math}
     %     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
     %     \limplies {
@@ -519,9 +514,9 @@ Full versions:
     
   \item
     \begin{math}
-      (\forall\aEv\in\aEvs\setminus\cEvs)
+      (\forall\aEv\in\aEvs\setminus\bEvs)
     \end{math}
-    $\aTr{\cEvs}{\bForm}$ implies
+    $\aTr{\bEvs}{\bForm}$ implies
     \begin{math}
       \cForm_\aEv 
       \limplies
@@ -546,7 +541,7 @@ Full versions:
   \begin{math}
     (\forall\bReg)
   \end{math}
-  $\aTr{\dEvs}{\bForm}$  implies 
+  $\aTr{\bEvs}{\bForm}$  implies 
   \begin{math}
     \bForm[\bReg/\aReg].
   \end{math}
@@ -554,7 +549,7 @@ Full versions:
     %   \begin{math}
     %     (\forall\bReg)
     %   \end{math}
-    %   $\aTr{\dEvs}{\bForm}$  implies 
+    %   $\aTr{\bEvs}{\bForm}$  implies 
     %   \begin{math}
     %     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
     %     \limplies \PBR{        
