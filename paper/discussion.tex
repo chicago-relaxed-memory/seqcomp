@@ -1731,7 +1731,7 @@ The predicate transformers are:
   \begin{definition}
     \label{def:independency-co}
     \noindent
-    If $\aPS \in (\aPSS_1\sSEMI\aPSS_2)$ then $(\exists\aPS_1\in\aPSS_1)$
+    If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$
     $(\exists\aPS_2\in\aPSS_2)$
     % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
     % let
@@ -1741,7 +1741,7 @@ The predicate transformers are:
     % \}}{\labelingForm_2(\aEv})$
     \begin{enumerate}
       \setcounter{enumi}{\value{pomsetXSemiCount}}
-    \item[1--\ref{seq-tau})] as for $\sSEMI$ in \refdef{def:pomsets-trans},
+    \item[1--\ref{seq-tau})] as for $\sSEMI{}{}$ in \refdef{def:pomsets-trans},
     \item
       \label{seq-reorder} if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either
       $\bEv\le\aEv$ or $a\reorderlt\labeling_2(\aEv)$.
@@ -3451,7 +3451,7 @@ this.
     \begin{enumerate}
       \setcounter{enumi}{\value{pomsetPreParCount}}
     \item[\ref{par-E}--\ref{par-kappa2})]
-      as for $\sPAR$ in \refdef{def:pomsets-pre},
+      as for $\sPAR{}{}$ in \refdef{def:pomsets-pre},
     \item \label{par-tau1}
       $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\bForm}$,
     \item \label{par-tau2}
@@ -3537,7 +3537,7 @@ this.
 
   % Extend the definition of $\sNIL$ so that $\TICK$ is true.
 
-  % Extend the definition of $\sPAR$ to handle for $\TICK$ by adding the
+  % Extend the definition of $\sPAR{}{}$ to handle for $\TICK$ by adding the
   % following.
   % \begin{enumerate}
   %   \setcounter{enumi}{\value{pomsetPreParCount}}
@@ -3575,11 +3575,11 @@ this.
     \end{enumerate}
 
     \noindent
-    If $\aPS \in (\aPSS_1\sPAR\aPSS_2)$ then $(\exists\aPS_1\in\aPSS_1)$
+    If $\aPS \in \sPAR{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$
     $(\exists\aPS_2\in\aPSS_2)$
     \begin{enumerate}
       \setcounter{enumi}{\value{pomsetPreParCount}}
-    \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR$ in
+    \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR{}{}$ in
       \refdef{def:pomsets-pre},
     \item \label{par-tick} $\TICK$ implies $\TICK_1\land\TICK_2$.
     \end{enumerate}
