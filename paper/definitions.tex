@@ -173,7 +173,6 @@ instead that
 % assumption.
 
 \begin{definition}
-  \showRAtrue
   \label{def:reorderra}
   Reorderability relations.
   Coherence-after and synchronization.
@@ -188,7 +187,7 @@ instead that
     \\
     {\reorderra}
     &=
-    \{(\DW[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode\neq\mSC \lor \bmode\neq\mSC\}
+    \{(\DW[\amode\neq\mSC]{}{}, \DR[\bmode\neq\mSC]{}{})\}% \mid \amode\neq\mSC \lor \bmode\neq\mSC\}
     \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{}) \} %\mid \amode\neq\mREL \}
     \cup\{(\DF{\mREL},      \DR[\bmode]{}{}) \}%\mid \amode=\mREL \}
     \\&
@@ -208,12 +207,16 @@ instead that
 Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
 Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
 
+Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
+\emph{release actions}.
+
+
 \subsection{Model}
 
 \begin{definition}
   \label{def:pomset}
   A \emph{pomset with predicate transformers} over $\Act$
-  is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, {\rrfx}, {\le})$ where
+  is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\rrfx}, {\le})$ where
   \begin{enumerate}
   \item $\Event\subset\AllEvents$ is a set of \emph{events},
   \item
@@ -223,14 +226,18 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
   \item
     $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ defines a \emph{predicate transformer} for each set of events,
   \item
+    $\aTerm:\Formulae$ defines a \emph{termination condition},
+  \item 
     ${\le} \subseteq (\Event\times\Event)$, is a partial order capturing \emph{causality},
   \item
     \label{pom-rf}
     ${\rrfx} \subseteq (\Event\times\Event)$ is a relation capturing \emph{reads-from} such that %$\{(\bEv,\aEv)\mid\labeling(\aEv)=\DWP{\aLoc}{\aVal}\textand\labeling(\bEv)=\DRP{\aLoc}{\aVal}\}$,
     \begin{itemize}
     \item[(\ref{pom-rf}a)]
-      if $(\bEv,\aEv)\in{\rrfx}$ then $\labeling(\bEv)$ matches $\labeling(\aEv)$,
+      if $(\bEv,\aEv)\in{\rrfx}$ and $(\cEv,\aEv)\in{\rrfx}$ then $\bEv=\cEv$,
     \item[(\ref{pom-rf}b)]
+      if $(\bEv,\aEv)\in{\rrfx}$ then $\labeling(\bEv)$ matches $\labeling(\aEv)$,
+    \item[(\ref{pom-rf}c)]
       if $(\bEv,\aEv)\in{\rrfx}$ and $\labeling(\cEv)$ blocks
       $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
     \end{itemize}
@@ -255,42 +262,23 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
       % \label{pomsetParLast}
       % \newcounter{pomsetParCount}
       % \setcounter{pomsetParCount}{\value{enumi}}
+    \item \label{par-term}
+      $\aTerm$ implies $\aTerm[1]\land\aTerm[2]$,
+    \item \label{par-disjoint}
+      $\aEvs_1$ and $\aEvs_2$ are disjoint,
+      \columnbreak
     \item \label{par-rf}
       $\PBR{{\rrfx_1}\cup{\rrfx_2}}\subseteq{\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$,
-      \columnbreak
-    \item \label{par-disjoint}
-      $\aEvs_1$ and $\aEvs_2$ are disjoint.
     \item \label{par-kappa1}
       if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
     \item \label{par-kappa2}
       if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$,
-      % \item \label{par-tau1}
-      %   $\aTr{\bEvs}{\Q{}}$ implies $\aTr[1]{\bEvs}{\Q{}}$,
-    \item \label{par-tau2}
+    \item \label{par-tau}
       $\aTr{\bEvs}{\bForm}$ implies $\aTr[2]{\bEvs}{\bForm}$.
     \end{enumerate}
+      % \item \label{par-tau1}
+      %   $\aTr{\bEvs}{\Q{}}$ implies $\aTr[1]{\bEvs}{\Q{}}$,
   \end{multicols}
-  \medskip
-
-  % \noindent
-  If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
-  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
-  \begin{enumerate}[topsep=0pt]
-    \setcounter{enumi}{3}
-  \item[(\ref{par-E}--\ref{par-rf})] as for $\sRPAR{}{}$,
-  \item
-    ${\rrfx}=\PBR{{\rrfx_1}\cup{\rrfx_2}}$, 
-  \item \label{if-kappa1}
-    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
-  \item \label{if-kappa2}
-    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv)$ implies $\neg\aForm\land\labelingForm_2(\aEv)$, 
-  \item \label{if-kappa12}
-    if $\aEv\in\aEvs_1\cap\aEvs_2$ then
-    $\labelingForm(\aEv)$ implies $(\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$,
-  \item \label{if-tau}
-    $\aTr{\bEvs}{\bForm}$ implies
-    $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$.
-  \end{enumerate}
   \medskip
 
   If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then
@@ -304,18 +292,22 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
   %   \end{cases}}
   % \end{math}
   \begin{enumerate}[topsep=0pt]
-    \setcounter{enumi}{3}
-  \item[(\ref{par-E}--\ref{par-rf})] as for $\sRPAR{}{}$,
-  \item
-    ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup(\aEvs_1\times \aEvs_2)}$, 
-  \item
+    \setcounter{enumi}{4}
+  \item[(\ref{par-E}--\ref{par-term})] as for $\sRPAR{}{}$,
+  \item \label{seq-rf1}
+    $\PBR{{\rrfx_1}\cup{\rrfx_2}}\subseteq{\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup(\aEvs_1\times \aEvs_2)}$, 
+  \item \label{seq-rf2}
     if $(\bEv,\aEv)\in{\rrfx}$
-    and $\labeling(\cEv)$ blocks $\labeling(\aEv)$, 
-    where $\cEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, 
-    then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+    and $\labeling(\cEv)$ blocks $\labeling(\aEv)$
+    for some $\cEv\in\aEvs_1$ and $\aEv\in\aEvs_2$
+    then  $\cEv\le\bEv$,
     % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
     % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
     % or $\cEv\le\bEv$,
+  \item \label{seq-reorder}
+    if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\le\aEv$ or $\labeling_1(\bEv)\reorderlt\labeling_2(\aEv)$,
+  \item \label{seq-release}
+    if $\labeling(\aEv)$ is a release for some $\aEv\in\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aTerm[1]$,
   \item \label{seq-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
   \item \label{seq-kappa2}
@@ -328,9 +320,36 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
     where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write,
     and $\Cdown{\aEv}=\aEvs_1$, otherwise,
   \item \label{seq-tau}
-    $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
-  \item \label{seq-reorder}
-    if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\le\aEv$ or $\labeling_1(\bEv)\reorderlt\labeling_2(\aEv)$.
+    $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$.
+  \end{enumerate}
+  \medskip
+
+  % \noindent
+  If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  \begin{enumerate}[topsep=0pt]
+    \setcounter{enumi}{3}
+  \item[(\ref{par-E}--\ref{par-le})] as for $\sRPAR{}{}$,
+  \item
+    \label{if-rf}
+    ${\rrfx}=\PBR{{\rrfx_1}\cup{\rrfx_2}}$
+    and
+    $\PBR{{\rrfx}\cap(\aEvs_1\times\aEvs_1)}={\rrfx_1}$
+    and
+    $\PBR{{\rrfx}\cap(\aEvs_2\times\aEvs_2)}={\rrfx_2}$, 
+  \item \label{if-kappa1}
+    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
+  \item \label{if-kappa2}
+    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv)$ implies $\neg\aForm\land\labelingForm_2(\aEv)$, 
+  \item \label{if-kappa12}
+    if $\aEv\in\aEvs_1\cap\aEvs_2$ then
+    $\labelingForm(\aEv)$ implies $(\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$,
+  \item \label{if-tau}
+    $\aTr{\bEvs}{\bForm}$ implies
+    $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$,
+  \item \label{if-term}
+    $\aTerm$ implies
+    $(\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
   \end{enumerate}
   \medskip
 
@@ -353,7 +372,7 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
     % \item%[{\labeltext[F3]{(F3)}{F3}}]
     %   $\labelingForm(\aEv)$ implies $\bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc}$,
   \item%[{\labeltext[F4]{(F4)}{F4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
+    $\aTr{\bEvs}{\bForm}$ implies $\bForm$,
   \end{enumerate}
   \medskip
 
@@ -362,22 +381,24 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
     $(\exists\aVal\in\Val)$
     \begin{enumerate}[topsep=0pt]
     \item
-     $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+     if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
     \item
       $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal}$,
-    \item
-      $\labelingForm(\aEv)$ implies
-      \begin{math}
-        \aExp{=}\aVal
-      \end{math},    
     \item
       %if $(\aEvs\cap\bEvs)\neq\emptyset$ then
       $\aTr{\bEvs}{\bForm}$ implies 
       \begin{math}
         \bForm
         % [\aExp/\aLoc]
-        \land\aExp{=}\aVal
-      \end{math}.
+        %\land\aExp{=}\aVal
+      \end{math},
+    \item
+      $\labelingForm(\aEv)$ implies
+      \begin{math}
+        \aExp{=}\aVal
+      \end{math},    
+    \item%[{\labeltext[F4]{(F4)}{F4}}]
+      $\aTerm$ implies $\aExp{=}\aVal$.
     \end{enumerate}
     \columnbreak
     If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}$ then
@@ -386,7 +407,7 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
     \item
       if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
     \item
-      $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}$
+      $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}$,
     % \item
     %   $\labelingForm(\aEv)$ implies
     %   \begin{math}
@@ -398,7 +419,7 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
         \aVal{=}\aReg
         \limplies \bForm
       \end{math},    
-      if $(\aEvs\cap\bEvs)\neq\emptyset$
+      if $(\aEvs\cap\bEvs)\neq\emptyset$,
     \item
       $\aTr{\bEvs}{\bForm}$ implies
       \begin{math}
@@ -463,12 +484,8 @@ Full versions:
     $\aTr{\bEvs}{\bForm}$ implies 
     \begin{math}
       \cForm_\aEv
-      \limplies \PBR{
-        \bForm
-        [\aExp/\aLoc]
-        % \DS{\aLoc}{\amode}
-        \land\aExp{=}\aVal_\aEv
-      }
+      \limplies 
+      \bForm[\aExp/\aLoc]
     \end{math},
   % \item
   %   \begin{math}    
@@ -496,7 +513,7 @@ Full versions:
     %   }
     %   \end{math}.
   \item
-    $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is a tautology.
+    $\aTerm$ implies $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
   \end{enumerate}
 
 \medskip
@@ -534,47 +551,29 @@ Full versions:
     \begin{math}
       \cForm_\aEv 
       \limplies
-      % \DLX{\aLoc}{\amode}{\bmode}
-      {
-        \PBR{
-          \aVal_\aEv{=}\uReg{\aEv}
-          \lor
-          {
-            % \RW\land
-            \aLoc{=}\uReg{\aEv}
-          }
-        }
-        \limplies
-        \bForm
-        [\uReg{\aEv}/\aReg]
-        % [\FALSE/\Q{}]
-      }    
+      \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+      \limplies
+      \bForm[\uReg{\aEv}/\aReg]
     \end{math},
-\item 
-  if $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is unsatisfiable then  
-  \begin{math}
-    (\forall\bReg)
-  \end{math}
-  $\aTr{\bEvs}{\bForm}$  implies 
-  \begin{math}
-    \bForm[\bReg/\aReg].
-  \end{math}
-    % \item
-    %   \begin{math}
-    %     (\forall\bReg)
-    %   \end{math}
-    %   $\aTr{\bEvs}{\bForm}$  implies 
-    %   \begin{math}
-    %     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-    %     \limplies \PBR{        
-    %       %     \DLX{\aLoc}{\amode}{\bmode} \land
-    %     \bForm
-    %     [\bReg/\aReg]
-    %       %     [\FALSE/\Q{}]
-    %   }.
-    %   \end{math}  
+    \item
+      \begin{math}
+        (\forall\bReg)
+      \end{math}
+      $\aTr{\bEvs}{\bForm}$  implies 
+      \begin{math}
+        %(\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+        (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        \limplies 
+        \bForm[\bReg/\aReg].
+      \end{math}  
   \end{enumerate}  
 \medskip
+
+In $\sIFTHEN{}{}{}$, \eqref{if-rf} stops coalescing the rf in
+\begin{displaymath}
+  \IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI
+\end{displaymath}
+
 
 In diagrams, we use different colors for arrows.  We distinguish
 $\rrfx$ edges that are included in order from those that are not.
