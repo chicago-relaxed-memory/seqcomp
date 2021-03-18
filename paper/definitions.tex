@@ -205,6 +205,9 @@ instead that
   \end{align*}  
 \end{definition}
 
+Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
+Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
+
 \subsection{Model}
 
 \begin{definition}
@@ -220,10 +223,17 @@ instead that
   \item
     $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ defines a \emph{predicate transformer} for each set of events,
   \item
-    ${\rrfx} \subseteq \{(\bEv,\aEv)\mid\labeling(\aEv)=\DWP{\aLoc}{\aVal}\textand\labeling(\bEv)=\DRP{\aLoc}{\aVal}\}$,
-    is a relation capturing \emph{reads-from},
+    ${\le} \subseteq (\Event\times\Event)$, is a partial order capturing \emph{causality},
   \item
-    ${\le} \subseteq (\Event\times\Event)$, is a partial order capturing \emph{causality}.
+    \label{pom-rf}
+    ${\rrfx} \subseteq (\Event\times\Event)$ is a relation capturing \emph{reads-from} such that %$\{(\bEv,\aEv)\mid\labeling(\aEv)=\DWP{\aLoc}{\aVal}\textand\labeling(\bEv)=\DRP{\aLoc}{\aVal}\}$,
+    \begin{itemize}
+    \item[(\ref{pom-rf}a)]
+      if $(\bEv,\aEv)\in{\rrfx}$ then $\labeling(\bEv)$ matches $\labeling(\aEv)$,
+    \item[(\ref{pom-rf}b)]
+      if $(\bEv,\aEv)\in{\rrfx}$ and $\labeling(\cEv)$ blocks
+      $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+    \end{itemize}
   \end{enumerate}
 \end{definition}
 
@@ -299,9 +309,13 @@ instead that
   \item
     ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup(\aEvs_1\times \aEvs_2)}$, 
   \item
-    if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
-    either $\labeling(\cEv) \reorderca \labeling(\bEv)$
-    or $\cEv\le\bEv$,
+    if $(\bEv,\aEv)\in{\rrfx}$
+    and $\labeling(\cEv)$ blocks $\labeling(\aEv)$, 
+    where $\cEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, 
+    then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+    % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
+    % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
+    % or $\cEv\le\bEv$,
   \item \label{seq-kappa1}
     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
   \item \label{seq-kappa2}
