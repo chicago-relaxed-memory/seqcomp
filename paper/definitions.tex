@@ -352,7 +352,7 @@ instead that
     $(\exists\aVal\in\Val)$
     \begin{enumerate}[topsep=0pt]
     \item
-      $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
     \item
       $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal}$,
     \item
@@ -361,9 +361,7 @@ instead that
         \aExp{=}\aVal
       \end{math},    
     \item
-      \begin{math}
-        (\forall\aEv\in\aEvs\cap\bEvs)
-      \end{math}
+      %if $(\aEvs\cap\bEvs)\neq\emptyset$ then
       $\aTr{\bEvs}{\bForm}$ implies 
       \begin{math}
         \bForm
@@ -371,21 +369,14 @@ instead that
         \land\aExp{=}\aVal
       \end{math},
     \item
-      \begin{math}    
-        (\forall\aEv\in\aEvs\setminus\cEvs)
-      \end{math}
-      $\aTr{\cEvs}{\bForm}$ implies
-      \begin{math}
-        \bForm
-        % [\aExp/\aLoc]
-      \end{math}.
+      $\aEvs\neq\emptyset$.
     \end{enumerate}
     \columnbreak
     If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}$ then
     $(\exists\aVal\in\Val)$
     \begin{enumerate}[topsep=0pt]
     \item
-      $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
     \item
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}$
     \item
@@ -394,23 +385,19 @@ instead that
         \TRUE
       \end{math},    
     \item
-      \begin{math}
-        (\forall\aEv\in\aEvs\cap\bEvs)
-      \end{math}
       $\aTr{\bEvs}{\bForm}$ implies
       \begin{math}
         \aVal{=}\aReg
         \limplies \bForm
       \end{math},    
+      if $(\aEvs\cap\bEvs)\neq\emptyset$
     \item
-      \begin{math}
-        (\forall\aEv\in\aEvs\setminus\cEvs)
-      \end{math}
       $\aTr{\cEvs}{\bForm}$ implies
       \begin{math}
         % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
-        \bForm
-      \end{math}.
+        \bForm,
+      \end{math}
+      if $(\aEvs\cap\bEvs)=\emptyset$.
     \end{enumerate}
   \end{multicols}
   %\smallskip
@@ -443,12 +430,12 @@ instead that
 
 Full versions:
 
+\medskip
   If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
   \begin{enumerate}[topsep=0pt]
   \item
-    $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is a tautology and
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
   \item
     $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}$,
@@ -487,7 +474,7 @@ Full versions:
         % \DS{\aLoc}{\amode}
         % [\FALSE/\Q{}]
       }
-    \end{math}.
+    \end{math}
     % \item
     %   $\aTr{\dEvs}{\bForm}$ implies
     %   \begin{math}
@@ -499,15 +486,17 @@ Full versions:
     %       %     [\FALSE/\Q{}]
     %   }
     %   \end{math}.
+  \item
+    $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is a tautology.
   \end{enumerate}
 
+\medskip
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
   % $(\exists\bmode\in\{\amode,\mRLX\})$
   \begin{enumerate}[topsep=0pt]
   \item
-    $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is a tautology and
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
   \item
     $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}$
@@ -551,7 +540,16 @@ Full versions:
         [\uReg{\aEv}/\aReg]
         % [\FALSE/\Q{}]
       }    
-    \end{math}.
+    \end{math},
+\item 
+  if $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is unsatisfiable then  
+  \begin{math}
+    (\forall\bReg)
+  \end{math}
+  $\aTr{\dEvs}{\bForm}$  implies 
+  \begin{math}
+    \bForm[\bReg/\aReg].
+  \end{math}
     % \item
     %   \begin{math}
     %     (\forall\bReg)
@@ -567,8 +565,27 @@ Full versions:
     %   }.
     %   \end{math}  
   \end{enumerate}  
-  % \noindent
+\medskip
 
+In diagrams, we use different colors for arrows.  We distinguish
+$\rrfx$ edges that are included in order from those that are not.
+\begin{itemize}
+\item \makebox{$\aEv\xrf\bEv$} arises from $\rrfx$, where $\aEv\lestrong\bEv$,
+\item \makebox{$\aEv\xrfint\bEv$} arises from $\rrfx$, where $\lnot(\aEv\lestrong\bEv)$.
+\end{itemize}
+To help the reader understand why order is included, we also different colors
+for arrows induced by order.  We adopt the following conventions:
+\begin{itemize}  
+  % \item relaxed accesses are blue, with a single border,
+  % \item synchronized accesses are red, with a double border,
+% \item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
+% \item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
+%   \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
+%   $\bEv$ and their actions \emph{conflict},
+\item \makebox{$\aEv\xwk\bEv$} arises from \emph{fulfillment},
+\item \makebox{$\aEv\xpo\bEv$} arises from control/data/address \emph{dependency},
+\item \makebox{$\aEv\xsync\bEv$} arises from \emph{synchronized access}.
+\end{itemize}
 
 
 \subsection{Pomsets}

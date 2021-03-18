@@ -297,21 +297,21 @@
 
 We combine access and fence modes into a single order:
 \begin{align*}
-  \begin{tikzpicture}
-    \node (rlx) at (0, 0) {$\mRLX$};
-    \node (ra)  at (1, 0) {$\mRA$};
-    \node (sc)  at (2, 0) {$\mSC$};
+  \begin{tikzcenter}
+    \node (rlx) at (0, 0) {$\mathstrut\mRLX$};
+    \node (ra)  at (1, 0) {$\mathstrut\mRA$};
+    \node (sc)  at (2, 0) {$\mathstrut\mSC$};
     \draw[->](rlx)to(ra);
     \draw[->](ra)to(sc);
-  \end{tikzpicture}
+  \end{tikzcenter}
   &&
-  \begin{tikzpicture}
-    \node (fsc) at (3, 0) {$\mFSC$};
-    \node (rel) at (2, -0.3) {$\mREL$};
-    \node (acq) at (2,  0.3) {$\mACQ$};
+  \begin{tikzcenter}
+    \node (fsc) at (3, 0) {$\mathstrut\mFSC$};
+    \node (rel) at (2, -0.3) {$\mathstrut\mREL$};
+    \node (acq) at (2,  0.3) {$\mathstrut\mACQ$};
     \draw[->](rel)to(fsc);
     \draw[->](acq)to(fsc);
-  \end{tikzpicture}
+  \end{tikzcenter}
 \end{align*}
 
 \begin{definition}
@@ -354,13 +354,13 @@ We combine access and fence modes into a single order:
 \RMW{} operations are formalized by adding a relation
 ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
 \RMW{} to the succeeding write.  The definition of a pomset requires the
-following, where two actions \emph{overlap} if they touch the same location:
+following, where two actions \emph{overlap} if they access the same location:
 \begin{enumerate}
 \item
   ${\rrmw} \subseteq {\le}$ is a relation capturing
   \emph{read-modify-write atomicity}, such that for any $\cEv$, $\bEv$, $\aEv\in\aEvs$,
   where $\labeling(\cEv)$ and
-  $\labeling(\bEv)$ touch the same location:
+  $\labeling(\bEv)$ access the same location:
   \begin{itemize}
   \item if $\bEv \xrmw \aEv$ and $\cEv\le \aEv$ then $\cEv\le \bEv$,
   \item if $\bEv \xrmw \aEv$ and $\bEv\le \cEv$ then $\aEv\le \cEv$.
@@ -954,12 +954,12 @@ The resulting order is:
 % \end{math}
 \begin{displaymath}
   \begin{tikzpicture}
-    \node (rlx) at (0, 0) {$\mRLX$};
-    \node (ra)  at (1, 0) {$\mRA$};
-    \node (sc)  at (2, 0) {$\mSC$};
-    \node (fsc) at (3, 0) {$\mFSC$};
-    \node (rel) at (2, -0.3) {$\mREL$};
-    \node (acq) at (2,  0.3) {$\mACQ$};
+    \node (rlx) at (0, 0) {$\mathstrut\mRLX$};
+    \node (ra)  at (1, 0) {$\mathstrut\mRA$};
+    \node (sc)  at (2, 0) {$\mathstrut\mSC$};
+    \node (fsc) at (3, 0) {$\mathstrut\mFSC$};
+    \node (rel) at (2, -0.3) {$\mathstrut\mREL$};
+    \node (acq) at (2,  0.3) {$\mathstrut\mACQ$};
     \draw[->](rlx)to(ra);
     \draw[->](ra)to(sc);
     \draw[->](ra)to(rel);
