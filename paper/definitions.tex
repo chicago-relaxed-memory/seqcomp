@@ -248,7 +248,7 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
   A pomset is \emph{top-level} if for every $\aEv\in\aEvs$:
   \begin{enumerate}
   \item $\labelingForm(\aEv)$ is a tautology,    
-  \item if $\labeling(\aEv)=\DRP{}{}$ then $\aEv\in\fcodom({\rrfx})$.
+  \item if $\labeling(\aEv)=\DRP{}{}$ then $(\exists\bEv)\;(\bEv,\aEv)\in{\rrfx}$.
   \end{enumerate}
 \end{definition}
 
@@ -270,19 +270,19 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
       % \label{pomsetParLast}
       % \newcounter{pomsetParCount}
       % \setcounter{pomsetParCount}{\value{enumi}}
-    \item \label{par-term}
-      $\aTerm$ implies $\aTerm[1]\land\aTerm[2]$,
+    \item \label{par-rf}
+      $\PBR{{\rrfx_1}\cup{\rrfx_2}}\subseteq{\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$,
     \item \label{par-disjoint}
       $\aEvs_1$ and $\aEvs_2$ are disjoint,
       \columnbreak
-    \item \label{par-rf}
-      $\PBR{{\rrfx_1}\cup{\rrfx_2}}\subseteq{\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$,
     \item \label{par-kappa1}
       if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
     \item \label{par-kappa2}
       if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$,
     \item \label{par-tau}
-      $\aTr{\bEvs}{\bForm}$ implies $\aTr[2]{\bEvs}{\bForm}$.
+      $\aTr{\bEvs}{\bForm}$ implies $\aTr[2]{\bEvs}{\bForm}$,
+    \item \label{par-term}
+      $\aTerm$ implies $\aTerm[1]\land\aTerm[2]$.
     \end{enumerate}
       % \item \label{par-tau1}
       %   $\aTr{\bEvs}{\Q{}}$ implies $\aTr[1]{\bEvs}{\Q{}}$,
@@ -300,8 +300,8 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
   %   \end{cases}}
   % \end{math}
   \begin{enumerate}[topsep=0pt]
-    \setcounter{enumi}{4}
-  \item[(\ref{par-E}--\ref{par-term})] as for $\sRPAR{}{}$,
+    \setcounter{enumi}{3}
+  \item[(\ref{par-E}--\ref{par-le})] as for $\sRPAR{}{}$,
   \item \label{seq-rf1}
     $\PBR{{\rrfx_1}\cup{\rrfx_2}}\subseteq{\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup(\aEvs_1\times \aEvs_2)}$, 
   \item \label{seq-rf2}
@@ -328,7 +328,9 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
     where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write,
     and $\Cdown{\aEv}=\aEvs_1$, otherwise,
   \item \label{seq-tau}
-    $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$.
+    $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
+  \item \label{seq-term}
+    $\aTerm$ implies $\aTr[1]{\aEvs_1}{\aTerm[2]}$.
   \end{enumerate}
   \medskip
 
@@ -381,6 +383,8 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
     %   $\labelingForm(\aEv)$ implies $\bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc}$,
   \item%[{\labeltext[F4]{(F4)}{F4}}]
     $\aTr{\bEvs}{\bForm}$ implies $\bForm$,
+  \item
+    if $\aEvs=\emptyset$ then $\aTerm$ implies $\FALSE$.
   \end{enumerate}
   \medskip
 
@@ -406,7 +410,9 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
         %\land\aExp{=}\aVal
       \end{math},
     \item%[{\labeltext[F4]{(F4)}{F4}}]
-      $\aTerm$ implies $\aExp{=}\aVal$.
+      if $\aEvs=\emptyset$ then $\aTerm$ implies $\FALSE$,
+    \item 
+      if $\aEvs\neq\emptyset$ then $\aTerm$ implies $\aExp{=}\aVal$.
     \end{enumerate}
     \columnbreak
     If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
