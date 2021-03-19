@@ -240,6 +240,8 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
     \item[(\ref{pom-rf}c)]
       if $(\bEv,\aEv)\in{\rrfx}$ and $\labeling(\cEv)$ blocks
       $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+    \item[(\ref{pom-rf}d)]
+      if $(\bEv,\aEv)\in{\rrfx}$ then $\bEv\le\aEv$.
     \end{itemize}
   \end{enumerate}
 \end{definition}
@@ -330,7 +332,7 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
   \item \label{seq-tau}
     $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
   \item \label{seq-term}
-    $\aTerm$ implies $\aTr[1]{\aEvs_1}{\aTerm[2]}$.
+    $\aTerm$ implies $\aTerm[1]\land\aTr[1]{\aEvs_1}{\aTerm[2]}$.
   \end{enumerate}
   \medskip
 
