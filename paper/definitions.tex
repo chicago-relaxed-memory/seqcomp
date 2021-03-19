@@ -51,23 +51,18 @@ We model the following language.
   \BNFSEP \mSC
   \\
   \aCmd
-  \BNFDEF& \ABORT
-  \BNFSEP \SKIP
+  \BNFDEF& \SKIP
   \BNFSEP \LET{\aReg}{\aExp}
-  % \BNFSEP \PR[\amode]{\aLoc}{\aReg}
-  % \BNFSEP \PW[\amode]{\aLoc}{\aExp}
-  \BNFSEP \PRREF[\amode]{\cExp}{\aReg}
-  \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
-  % \BNFSEP \PA{\aLoc}{\aExp} 
-  \\[-.5ex]
-  \BNFSEP& \aCmd_1 \RPAR \aCmd_2 %\FORK{\aGrp}
-  \BNFSEP \aCmd_1 \SEMI \aCmd_2
+  \BNFSEP \PR[\amode]{\REF{\cExp}}[\ascope]{\aReg}
+  \BNFSEP \PW[\amode]{\REF{\cExp}}[\ascope]{\aExp}
+  \BNFSEP \PF[\ascope]{\fmode}
   \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
-  % \\
-  % \aGrp 
-  % \BNFDEF& \NIL
-  % \BNFSEP\THREAD{\aCmd}
-  % \BNFSEP\aGrp_1 \PAR \aGrp_2
+  \BNFSEP \aCmd_1 \SEMI \aCmd_2
+  \BNFSEP \aCmd_1 \RPAR[\bThrd] \aCmd_2
+  \\[-.5ex]
+  \BNFSEP& \PCAS[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
+  \BNFSEP \PFADD[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  \BNFSEP \PEXCHG[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
 \end{align*}
 
 \emph{Memory modes}, $\amode$, are {relaxed} ($\mRLX$), {release-acquire}
@@ -102,13 +97,13 @@ We require that:
 \begin{itemize}
 \item actions include writes $\DWP{\aLoc}{\aVal}$ and reads $\DRP{\aLoc}{\aVal}$,
 \item formulae include equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
-\item formulae include quiescence symbols $\Qsc$, $\Qr{\aLoc}$, $\Qw{\aLoc}$
-  (used in \textsection\ref{sec:q}), the downgrade symbols $\Dx{\aLoc}$
-  (used in \textsection\ref{sec:downgrade}), and the write symbol $\RW$
-  (used in \textsection\ref{sec:rrd}),
+% \item formulae include quiescence symbols $\Qsc$, $\Qr{\aLoc}$, $\Qw{\aLoc}$
+%   (used in \textsection\ref{sec:q}), the downgrade symbols $\Dx{\aLoc}$
+%   (used in \textsection\ref{sec:downgrade}), and the write symbol $\RW$
+%   (used in \textsection\ref{sec:rrd}),
 \item formulae are closed under negation, conjunction, disjunction, and
-  substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$, and $[\aForm/\aSym]$
-  for each symbol $\aSym$,
+  substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$,
+  % and $[\aForm/\aSym]$ for each symbol $\aSym$,
 \item there is an entailment relation $\vDash$ between formulae,
 \item $\vDash$ has the expected semantics for $=$, $\lnot$, $\land$, $\lor$,
   $\limplies$ and substitution.
@@ -1447,22 +1442,23 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   \begin{scope}
     \allowdisplaybreaks
     \begin{gather*}
-      \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIF{\aExp{\neq}0}\sTHEN\sem{\aCmd_1}\sELSE\sem{\aCmd_2}\sFI
+      \sem[\aThrd]{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIFTHEN{\aExp{\neq}0}{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
       \\
       \begin{aligned}
-        \sem{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}{\aExp}
+        \sem[\aThrd]{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]
         &
-        \makebox[0em][r]{$\sem{\ABORT}$} &= \sABORT 
+        \sem[\aThrd]{\SKIP} &= \sSKIP 
         \\
-        \sem{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}{\aLoc}
+        \sem[\aThrd]{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
         &
-        \sem{\SKIP} &= \sSKIP 
+        \sem[\aThrd]{\aCmd_1 \RPAR[\bThrd] \aCmd_2} &= \sRPAR{\sem[\bThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
         \\
-        \sem{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
+        \sem[\aThrd]{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
+        & 
+        \sem[\aThrd]{\aCmd_1 \SEMI \aCmd_2} &= \sSEMI{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
+        \\
+        \sem[\aThrd]{\PF[\ascope]{\amode}} &= \sFENCE[\ascope]{\amode}[\aThrd]
         &
-        \sem{\aCmd_1 \RPAR \aCmd_2} &= \sRPAR{\sem{\aCmd_1}}{\sem{\aCmd_2}}
-        \\
-        \sem{\aCmd_1 \SEMI \aCmd_2} &= \sSEMI{\sem{\aCmd_1}}{\sem{\aCmd_2}}
       \end{aligned}
     \end{gather*}
   \end{scope}
