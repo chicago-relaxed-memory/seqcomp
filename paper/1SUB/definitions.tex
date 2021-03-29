@@ -37,8 +37,11 @@ We require that
 \begin{itemize}
 \item values and registers are disjoint, 
 \item values include at least the constants $0$ and $1$,  
+  % \item for any set $\aEvs$ there are registers $\uRegs{\aEvs}=\{\uReg{\aEv}\mid\aEv\in\aEvs\}$,
 \item expressions include at least registers and values, 
 \item expressions do \emph{not} include references: $\aExp[\bExp/\aLoc]=\aExp$.
+  % or registers in
+  % $\uRegs{\aEvs}$, for any set $\aEvs$.
 \end{itemize}
 
 We model the following language.
@@ -72,6 +75,12 @@ given mode, as well as the usual structural constructs. Following
 \cite{DBLP:conf/icfp/FerreiraHJ96}, $\LPAR$ denotes parallel composition,
 preserving thread state on the right after a join.  In examples and
 sublanguages without join, we use the symmetric $\PAR$ operator.
+% 
+% \emph{Thread groups}, $\aGrp$, include commands and $\NIL$, which denotes
+% inaction. %, or deadlock.
+% % 
+% The $\FORK{}$ command spawns a thread group.
+% % We often drop the words $\FORK{}$ and $\THREAD{}$.
 
 The semantics is built from the following.
 \begin{itemize}
@@ -79,21 +88,32 @@ The semantics is built from the following.
   $\cEv$, $\dEv$, 
 \item a set of \emph{logical formulae} $\Formulae$, ranged over by $\aForm$,
   $\bForm$, $\cForm$,
-\item a set of \emph{actions} $\Act$, ranged over by $\aAct$, 
+\item a set of \emph{actions} $\Act$, ranged over by $\aAct$.
 \end{itemize}
 Subsets of $\AllEvents$ are ranged over by $\aEvs$, $\bEvs$, $\cEvs$,
 $\dEvs$.
 
 We require that:
 \begin{itemize}
+\item actions include writes $\DWP{\aLoc}{\aVal}$ and reads $\DRP{\aLoc}{\aVal}$,
 \item formulae include equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
+\item formulae include quiescence symbols $\Qsc$, $\Qr{\aLoc}$, $\Qw{\aLoc}$
+  (used in \textsection\ref{sec:q}), the downgrade symbols $\Dx{\aLoc}$
+  (used in \textsection\ref{sec:downgrade}), and the write symbol $\RW$
+  (used in \textsection\ref{sec:rrd}),
 \item formulae are closed under negation, conjunction, disjunction, and
   substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$,
-\item there is an entailment relation
-  $\vDash\subseteq(\Formulae\times\Formulae)$ %between formulae
-  with the expected semantics for $=$, $\lnot$, $\land$, $\lor$, $\limplies$
-  and substitution.
+  and $[\aForm/\aSym]$ for each symbol $\aSym$,
+\item there is an entailment relation $\vDash$ between formulae,
+\item $\vDash$ has the expected semantics for $=$, $\lnot$, $\land$, $\lor$,
+  $\limplies$ and substitution.
 \end{itemize}
+
+
+% Action $\DWP{\aLoc}{\aVal}$ models a write of $\aVal$ to $\aLoc$, and
+% $\DRP{\aLoc}{\aVal}$ models a read of $\aVal$ from $\aLoc$.
+% We use $\DAP{\aLoc}{\aVal}$ to indicate a generic access, which could be
+% either a read or a write.
 
 Logical formulae include equations over registers, such as
 $(\aReg{=}\bReg{+}1)$.
@@ -184,408 +204,6 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
 
 Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
 \emph{release actions}.
-
-
-\subsection{Model}
-
-\begin{definition}
-  \label{def:pomset}
-  A \emph{pomset with predicate transformers} over $\Act$
-  is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\le}, {\rrfx})$ where
-  \begin{enumerate}
-  \item $\Event\subseteq\AllEvents$ is a set of \emph{events},
-  \item
-    $\labeling: \Event \fun \Act$ defines a \emph{label} for each event,
-  \item
-    $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
-  \item
-    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ defines a \emph{predicate transformer} for each set of events,
-  \item
-    $\aTerm:\Formulae$ defines a \emph{termination condition},
-  \item 
-    ${\le} \subseteq (\Event\times\Event)$, is a partial order capturing \emph{causality},
-  \item
-    \label{pom-rf}
-    ${\rrfx} \subseteq (\Event\times\Event)$ is a relation capturing \emph{reads-from} such that %$\{(\bEv,\aEv)\mid\labeling(\aEv)=\DWP{\aLoc}{\aVal}\textand\labeling(\bEv)=\DRP{\aLoc}{\aVal}\}$,
-    \begin{itemize}
-    \item[(\ref{pom-rf}a)]
-      if $(\bEv,\aEv)\in{\rrfx}$ and $(\cEv,\aEv)\in{\rrfx}$ then $\bEv=\cEv$,
-    \item[(\ref{pom-rf}b)]
-      if $(\bEv,\aEv)\in{\rrfx}$ then $\labeling(\bEv)$ matches $\labeling(\aEv)$,
-    \item[(\ref{pom-rf}c)]
-      if $(\bEv,\aEv)\in{\rrfx}$ and $\labeling(\cEv)$ blocks
-      $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
-    \item[(\ref{pom-rf}d)]
-      if $(\bEv,\aEv)\in{\rrfx}$ then $\bEv\le\aEv$.
-    \end{itemize}
-  \end{enumerate}
-\end{definition}
-
-\begin{definition}
-  A pomset is \emph{top-level} if for every $\aEv\in\aEvs$:
-  \begin{enumerate}
-  \item $\labelingForm(\aEv)$ is a tautology,    
-  \item if $\labeling(\aEv)=\DRP{}{}$ then $(\exists\bEv)\;(\bEv,\aEv)\in{\rrfx}$.
-  \end{enumerate}
-\end{definition}
-
-\begin{definition}
-  % \noindent
-  If $\aPS \in \sLPAR{\aPSS_1}{\aPSS_2}$ then  
-  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
-  \begin{multicols}{2}
-    \begin{enumerate}[topsep=0pt]
-    \item \label{par-E}
-      $\aEvs = (\aEvs_1\cup\aEvs_2)$,
-    \item \label{par-lambda}
-      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
-      %if $\aEv\in\aEvs_2$ then $\labeling(\aEv) = \labeling_2(\aEv)$,
-    % \item \label{par-lambda1}
-    %   if $\aEv\in\aEvs_1$ then $\labeling(\aEv) = \labeling_1(\aEv)$, 
-    \item \label{par-le}
-      ${\le}\supseteq\PBR{{\le_1}\cup{\le_2}}$, 
-      % \label{pomsetParLast}
-      % \newcounter{pomsetParCount}
-      % \setcounter{pomsetParCount}{\value{enumi}}
-    \item \label{par-rf}
-      ${\rrfx}\supseteq\PBR{{\rrfx_1}\cup{\rrfx_2}}$,\\
-      $\PBR{{\rrfx_1}\cup{\rrfx_2}}\subseteq{\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$,
-    \item \label{par-disjoint}
-      $\aEvs_1$ and $\aEvs_2$ are disjoint,
-      \columnbreak
-    \item \label{par-kappa1}
-      if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
-    \item \label{par-kappa2}
-      if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$,
-    \item \label{par-tau}
-      $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\bForm}$,
-    \item \label{par-term}
-      $\aTerm$ implies $\aTerm[1]\land\aTerm[2]$.
-    \end{enumerate}
-      % \item \label{par-tau1}
-      %   $\aTr{\bEvs}{\Q{}}$ implies $\aTr[1]{\bEvs}{\Q{}}$,
-  \end{multicols}
-  \medskip
-
-  If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then
-  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
-  % let
-  % \begin{math}
-  %   \smash{
-  %   \downarrow\aEv=\begin{cases}
-  %     \{ \cEv \mid \cEv \lt \aEv \} &\textif \labeling(\aEv) \;\text{is a write}\\
-  %     \aEvs_1 &\textotherwise
-  %   \end{cases}}
-  % \end{math}
-  \begin{enumerate}[topsep=0pt]
-    \setcounter{enumi}{3}
-  \item[(\ref{par-E}--\ref{par-le})] as for $\sLPAR{}{}$,
-  \item \label{seq-rf1}
-    $\PBR{{\rrfx_1}\cup{\rrfx_2}}\subseteq{\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup(\aEvs_1\times \aEvs_2)}$, 
-  \item \label{seq-kappa1}
-    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
-  \item \label{seq-kappa2}
-    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm'_2(\aEv)$,
-  \item \label{seq-kappa12}
-    if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
-    % \\ \makebox[5em]{}
-    where
-    $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,\\
-    where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write,
-    and $\Cdown{\aEv}=\aEvs_1$, otherwise,
-  \item \label{seq-reorder}
-    if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\le\aEv$ or $\labeling_1(\bEv)\reorderlt\labeling_2(\aEv)$,
-  \item \label{seq-rf2}
-    if $(\bEv,\aEv)\in{\rrfx}$
-    and $\labeling(\cEv)$ blocks $\labeling(\aEv)$
-    for some $\cEv\in\aEvs_1$ and $\aEv\in\aEvs_2$
-    then  $\cEv\le\bEv$,
-    % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
-    % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
-    % or $\cEv\le\bEv$,
-  \item \label{seq-release}
-    if $\aEv\in\aEvs_2$ and $\labeling(\aEv)$ is a release then $\labelingForm(\aEv)$ implies $\aTerm[1]$,
-  \item \label{seq-tau}
-    $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
-  \item \label{seq-term}
-    $\aTerm$ implies $\aTerm[1]\land\aTr[1]{\aEvs_1}{\aTerm[2]}$.
-  \end{enumerate}
-  \medskip
-
-  % \noindent
-  If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
-  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
-  \begin{enumerate}[topsep=0pt]
-    \setcounter{enumi}{3}
-  \item[(\ref{par-E}--\ref{par-le})] as for $\sLPAR{}{}$,
-  \item
-    \label{if-rf}
-    ${\rrfx}=\PBR{{\rrfx_1}\cup{\rrfx_2}}$
-    and
-    $\PBR{{\rrfx}\cap(\aEvs_1\times\aEvs_1)}={\rrfx_1}$
-    and
-    $\PBR{{\rrfx}\cap(\aEvs_2\times\aEvs_2)}={\rrfx_2}$, 
-  \item \label{if-kappa1}
-    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
-  \item \label{if-kappa2}
-    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv)$ implies $\neg\aForm\land\labelingForm_2(\aEv)$, 
-  \item \label{if-kappa12}
-    if $\aEv\in\aEvs_1\cap\aEvs_2$ then
-    $\labelingForm(\aEv)$ implies $(\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$,
-  \item \label{if-tau}
-    $\aTr{\bEvs}{\bForm}$ implies
-    $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$,
-  \item \label{if-term}
-    $\aTerm$ implies
-    $(\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
-  \end{enumerate}
-  \medskip
-
-  % \noindent
-  If $\aPS\in\sLET{\aReg}{\aExp}$ then $\aEvs = \emptyset$ and
-  $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aReg]$.
-
-  % \noindent
-  If $\aPS\in\sSKIP$ then $\aEvs = \emptyset$ and
-  $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
-
-  If $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
-  % $(\exists\aLocs\subseteq\Loc)$
-  % $(\exists\bmode\in\{\amode,\mRLX\})$
-  \begin{enumerate}[topsep=0pt]
-  \item%[{\labeltext[F1]{(F1)}{F1}}]
-     $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-  \item%[{\labeltext[F2]{(F2)}{F2}}]
-    $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
-    % \item%[{\labeltext[F3]{(F3)}{F3}}]
-    %   $\labelingForm(\aEv)$ implies $\bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc}$,
-  \item%[{\labeltext[F4]{(F4)}{F4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm$,
-  \item
-    if $\aEvs=\emptyset$ then $\aTerm$ implies $\FALSE$.
-  \end{enumerate}
-  \medskip
-
-  \begin{multicols}{2}
-    If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
-    $(\exists\aVal\in\Val)$
-    \begin{enumerate}[topsep=0pt]
-    \item
-     if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-    \item
-      $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
-    \item
-      $\labelingForm(\aEv)$ implies
-      \begin{math}
-        \aExp{=}\aVal
-      \end{math},    
-    \item
-      %if $(\aEvs\cap\bEvs)\neq\emptyset$ then
-      $\aTr{\bEvs}{\bForm}$ implies 
-      \begin{math}
-        \bForm
-        % [\aExp/\aLoc]
-        %\land\aExp{=}\aVal
-      \end{math},
-    \item%[{\labeltext[F4]{(F4)}{F4}}]
-      if $\aEvs=\emptyset$ then $\aTerm$ implies $\FALSE$,
-    \item 
-      if $\aEvs\neq\emptyset$ then $\aTerm$ implies $\aExp{=}\aVal$.
-    \end{enumerate}
-    \columnbreak
-    If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
-    $(\exists\aVal\in\Val)$
-    \begin{enumerate}[topsep=0pt]
-    \item
-      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-    \item
-      $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
-    % \item
-    %   $\labelingForm(\aEv)$ implies
-    %   \begin{math}
-    %     \TRUE
-    %   \end{math},    
-    \item
-      $\aTr{\bEvs}{\bForm}$ implies
-      \begin{math}
-        \aVal{=}\aReg
-        \limplies \bForm
-      \end{math},    
-      if $(\aEvs\cap\bEvs)\neq\emptyset$,
-    \item
-      $\aTr{\bEvs}{\bForm}$ implies
-      \begin{math}
-        % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
-        \bForm,
-      \end{math}
-      if $(\aEvs\cap\bEvs)=\emptyset$.
-    \end{enumerate}
-  \end{multicols}
-  %\smallskip
-% Given these definitions, the semantics of commands is:
-  \begin{scope}
-    \allowdisplaybreaks
-    \begin{gather*}
-      \sem[\aThrd]{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIFTHEN{\aExp{\neq}0}{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
-      \\
-      \begin{aligned}
-        \sem[\aThrd]{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]
-        &
-        \sem[\aThrd]{\SKIP} &= \sSKIP 
-        \\
-        \sem[\aThrd]{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
-        &
-        \sem[\aThrd]{\aCmd_1 \LPAR[\bThrd] \aCmd_2} &= \sLPAR{\sem[\bThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
-        \\
-        \sem[\aThrd]{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
-        & 
-        \sem[\aThrd]{\aCmd_1 \SEMI \aCmd_2} &= \sSEMI{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
-        \\
-        \sem[\aThrd]{\PF[\ascope]{\fmode}} &= \sFENCE[\ascope]{\fmode}[\aThrd]
-        &
-      \end{aligned}
-    \end{gather*}
-  \end{scope}
-%  \caption{Semantics}
-\end{definition}
-
-Full versions:
-
-\medskip
-  If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
-  $(\exists\aVal:\aEvs\fun\Val)$
-  $(\exists\cForm:\aEvs\fun\Formulae)$
-  \begin{enumerate}[topsep=0pt]
-  \item
-    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-  \item
-    $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
-  \item
-    $\labelingForm(\aEv)$ implies
-    \begin{math}
-      \cForm_\aEv
-      \land \aExp{=}\aVal_\aEv
-    \end{math},
-    
-    
-  \item
-    % \begin{math}
-    %   %(\forall\aEv\in\aEvs\cap\bEvs)
-    %   (\forall\aEv\in\aEvs)
-    % \end{math}
-    $\aTr{\bEvs}{\bForm}$ implies 
-    \begin{math}
-      \cForm_\aEv
-      \limplies 
-      \bForm[\aExp/\aLoc]
-    \end{math},
-  % \item
-  %   \begin{math}    
-  %     (\forall\aEv\in\aEvs\setminus\bEvs)
-  %   \end{math}
-  %   $\aTr{\bEvs}{\bForm}$ implies
-  %   \begin{math}
-  %     \cForm_\aEv
-  %     \limplies {
-  %       \bForm
-  %       [\aExp/\aLoc]
-  %       % \DS{\aLoc}{\amode}
-  %       % [\FALSE/\Q{}]
-  %     }
-  %   \end{math}
-    % \item
-    %   $\aTr{\bEvs}{\bForm}$ implies
-    %   \begin{math}
-    %     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-    %     \limplies {
-    %     \bForm
-    %     [\aExp/\aLoc]
-    %       %     \DS{\aLoc}{\amode}
-    %       %     [\FALSE/\Q{}]
-    %   }
-    %   \end{math}.
-  \item
-    $\aTerm$ implies $\bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
-  \end{enumerate}
-
-\medskip
-  If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
-  $(\exists\aVal:\aEvs\fun\Val)$
-  $(\exists\cForm:\aEvs\fun\Formulae)$
-  % $(\exists\bmode\in\{\amode,\mRLX\})$
-  \begin{enumerate}[topsep=0pt]
-  \item
-    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-  \item
-    $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
-  \item
-    $\labelingForm(\aEv)$ implies
-    \begin{math}
-      \cForm_\aEv
-    \end{math},
-    
-  \item
-    \begin{math}
-      (\forall\aEv\in\aEvs\cap\bEvs)
-    \end{math}
-    $\aTr{\bEvs}{\bForm}$ implies
-    \begin{math}
-      \cForm_\aEv
-      \limplies \aVal_\aEv{=}\uReg{\aEv}
-      \limplies \bForm[\uReg{\aEv}/\aReg]
-    \end{math},
-    
-  \item
-    \begin{math}
-      (\forall\aEv\in\aEvs\setminus\bEvs)
-    \end{math}
-    $\aTr{\bEvs}{\bForm}$ implies
-    \begin{math}
-      \cForm_\aEv 
-      \limplies
-      \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
-      \limplies
-      \bForm[\uReg{\aEv}/\aReg]
-    \end{math},
-    \item
-      \begin{math}
-        (\forall\bReg)
-      \end{math}
-      $\aTr{\bEvs}{\bForm}$  implies 
-      \begin{math}
-        %(\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-        (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
-        \limplies 
-        \bForm[\bReg/\aReg].
-      \end{math}  
-  \end{enumerate}  
-\medskip
-
-In $\sIFTHEN{}{}{}$, \eqref{if-rf} stops coalescing the rf in
-\begin{displaymath}
-  \IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI
-\end{displaymath}
-
-
-In diagrams, we use different colors for arrows.  We distinguish
-$\rrfx$ edges that are included in order from those that are not.
-\begin{itemize}
-\item \makebox{$\aEv\xrf\bEv$} arises from $\rrfx$, where $\aEv\le\bEv$,
-\item \makebox{$\aEv\xrfint\bEv$} arises from $\rrfx$, where $\lnot(\aEv\le\bEv)$.
-\end{itemize}
-To help the reader understand why order is included, we also different colors
-for arrows induced by order.  We adopt the following conventions:
-\begin{itemize}  
-  % \item relaxed accesses are blue, with a single border,
-  % \item synchronized accesses are red, with a double border,
-% \item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
-% \item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
-%   \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
-%   $\bEv$ and their actions \emph{conflict},
-\item \makebox{$\aEv\xwk\bEv$} arises from \emph{fulfillment},
-\item \makebox{$\aEv\xpo\bEv$} arises from control/data/address \emph{dependency},
-\item \makebox{$\aEv\xsync\bEv$} arises from \emph{synchronized access}.
-\end{itemize}
 
 
 \subsection{Pomsets}

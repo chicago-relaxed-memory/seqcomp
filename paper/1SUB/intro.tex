@@ -1,0 +1,537 @@
+\section{Introduction}
+\label{sec:intro}
+
+This paper is about the interaction of two of the fundamental building
+blocks of computing: memory and sequential composition. One would like
+to think that these are well-worn topics, where every issue has been
+settled, but this is sadly not the case.
+
+\subsection{Memory}
+
+For single-threaded programs, memory can be thought of as you might
+expect: programs write to, and read from, memory references.
+This can be thought of as a total order of reads and writes,
+where each read has a matching \emph{fulfilling} write,
+for example:
+  \begin{gather*}
+    \THREAD{x\GETS0\SEMI x\GETS1\SEMI y\GETS2\SEMI
+    r\GETS y\SEMI s\GETS x}
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \event{wy2}{\DW{y}{2}}{right=of wx1}
+        \event{ry2}{\DR{y}{2}}{right=of wy2}
+        \event{rx1}{\DR{x}{1}}{right=of ry2}
+        \rf[out=20,in=160]{wy2}{ry2}
+        \rf[out=20,in=160]{wx1}{rx1}
+        \po{wx0}{wx1}
+        \po{wx1}{wy2}
+        \po{wy2}{ry2}
+        \po{ry2}{rx1}
+      \end{tikzinline}}
+  \end{gather*}
+(In examples, $\aReg$--$\bReg$ range over thread-local registers and $\aLoc$-$\cLoc$
+range over shared memory references.)
+
+This model naturally extends to the case of shared-memory concurrency, leading to a \emph{sequentially consistent}
+semantics \cite{Lamport:1979:MMC:1311099.1311750}, in which \emph{program order} inside a thread implies
+a total \emph{causal order} between read and write events, for example:
+  \begin{gather*}
+    \THREAD{x\GETS0\SEMI x\GETS1\SEMI y\GETS2}
+    \PAR
+    \THREAD{r\GETS y\SEMI s\GETS x}
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \event{wy2}{\DW{y}{2}}{right=of wx1}
+        \event{ry2}{\DR{y}{2}}{right=of wy2}
+        \event{rx1}{\DR{x}{1}}{right=of ry2}
+        \rf[out=20,in=160]{wy2}{ry2}
+        \rf[out=20,in=160]{wx1}{rx1}
+        \po{wx0}{wx1}
+        \po{wx1}{wy2}
+        \po{ry2}{rx1}
+      \end{tikzinline}}
+  \end{gather*}
+
+Unfortunately, this model does not compile efficiently to commodity
+hardware, resulting in a 37--73\% increase in CPU time on ARM~\cite{Liu:2019:ASC:3314221.3314611} and,
+hence, in power consumption.  Developers of software and compilers have
+therefore been faced with a difficult trade-off, between an elegant
+model of memory, and its impact on resource usage (such as size of
+data centers, electricity bills and carbon footprint). Unsurprisingly,
+many have chosen to prioritize efficiency over elegance.
+
+This has led to \emph{relaxed memory models}, in which the requirement of
+sequential consistency is weakened to only apply \emph{per-location} and not globally
+over the whole program. This allows executions which
+are inconsistent with program order, such as:
+  \begin{gather*}
+    \THREAD{x\GETS0\SEMI x\GETS1\SEMI y\GETS2}
+    \PAR
+    \THREAD{r\GETS y\SEMI s\GETS x}
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \event{wy2}{\DW{y}{2}}{right=of wx1}
+        \event{ry2}{\DR{y}{2}}{right=of wy2}
+        \event{rx0}{\DR{x}{0}}{right=of ry2}
+        \rf[out=20,in=160]{wy2}{ry2}
+        \rf[out=15,in=165]{wx0}{rx0}
+        \po{wx0}{wx1}
+        \po[out=200,in=340]{rx0}{wx1}
+      \end{tikzinline}}
+  \end{gather*}
+
+In such models, the causal order between events is important,
+and includes control and data dependencies, to avoid
+paradoxical ``out of thin air'' examples such as:
+  \begin{gather*}
+    \THREAD{r\GETS x\SEMI \IF r \THEN y\GETS1 \FI}
+    \PAR
+    \THREAD{s\GETS y\SEMI x\GETS s}
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{wy1}{\DW{y}{1}}{right=of rx1}
+        \event{ry1}{\DR{y}{1}}{right=of wy1}
+        \event{wx1}{\DW{x}{1}}{right=of ry1}
+        \rf[out=20,in=160]{wy1}{ry1}
+        \rf[out=160,in=20]{wx1}{rx1}
+        \po{rx1}{wy1}
+        \po{ry1}{wx1}
+      \end{tikzinline}}
+  \end{gather*}
+This candidate execution forms a cycle in causal order, so is disallowed,
+but this depends crucially on the control dependency
+from $(\DR{x}{1})$ to $(\DW{y}{1})$, and the data dependency
+from $(\DR{y}{1})$ to $(\DW{x}{1})$. If either is missing, then this execution
+is acyclic and hence allowed. For example dropping the control dependency
+results in:
+  \begin{gather*}
+    \THREAD{r\GETS x\SEMI y\GETS1}
+    \PAR
+    \THREAD{s\GETS y\SEMI x\GETS s}
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{wy1}{\DW{y}{1}}{right=of rx1}
+        \event{ry1}{\DR{y}{1}}{right=of wy1}
+        \event{wx1}{\DW{x}{1}}{right=of ry1}
+        \rf[out=20,in=160]{wy1}{ry1}
+        \rf[out=160,in=20]{wx1}{rx1}
+        \po{ry1}{wx1}
+      \end{tikzinline}}
+  \end{gather*}
+
+Unfortunately, while a simple syntactic approach to dependency calculation
+suffices for hardware models, it is not preserved by common compiler
+optimizations. For example, if we calculate control dependencies syntactically,
+then there is a dependency from $(\DR{x}{1})$ to $(\DW{y}{1})$, and therefore a cycle in, the candidate execution:
+  \begin{gather*}
+    \THREAD{r\GETS x\SEMI \IF r \THEN y\GETS1 \ELSE y\GETS1 \FI}
+    \PAR
+    \THREAD{s\GETS y\SEMI x\GETS s}
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{wy1}{\DW{y}{1}}{right=of rx1}
+        \event{ry1}{\DR{y}{1}}{right=of wy1}
+        \event{wx1}{\DW{x}{1}}{right=of ry1}
+        \rf[out=20,in=160]{wy1}{ry1}
+        \rf[out=160,in=20]{wx1}{rx1}
+        \po{rx1}{wy1}
+        \po{ry1}{wx1}
+      \end{tikzinline}}
+  \end{gather*}
+An optimizing compiler might lift the assignment $y\GETS1$ out of the conditional,
+thus removing the control dependency.
+
+Prominent solutions to the problem of dependency calculation include:
+\begin{itemize}
+
+\item \emph{syntactic} methods used in hardware models
+  such as ARM or x86-TSO \cite{alglave},
+\item \emph{speculative execution} methods (which give a semantics based on multiple executions
+  of the same program) such as the Java Memory Model~\cite{Manson:2005:JMM:1047659.1040336} 
+  and related models \cite{Jagadeesan:2010:GOS:2175486.2175503, DBLP:conf/popl/KangHLVD17, DBLP:journals/pacmpl/ChakrabortyV19},
+  % the speculative operational semantics of~\cite{Jagadeesan:2010:GOS:2175486.2175503},
+  % the promising semantics of~\cite{DBLP:conf/popl/KangHLVD17},
+  % or the event structures semantics of~\cite{DBLP:journals/pacmpl/ChakrabortyV19},
+\item \emph{rewriting} methods, which give an operational model
+  up to syntactic rewrites, such as~\cite{Pichon-Pharabod:2016:CSR:2837614.2837616}, and
+\item \emph{logical} methods, such as the pomsets with preconditions
+  model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
+  
+\end{itemize}
+
+In this paper, we will focus on logical models, as those are compositional,
+and align well with existing models of sequential composition.
+The heart of the model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20} is to add logical preconditions
+to events, which are introduced by store actions (modeling data dependencies)
+and conditionals (modeling control dependencies):
+  \begin{gather*}
+    \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
+      \end{tikzinline}}
+  \end{gather*}
+Preconditions are discharged by being ordered after a read:
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \po{ry0}{wz0}
+      \end{tikzinline}}
+  \end{gather*}
+Note that there is dependency order from $(\DR{y}{0})$ to $(\DW{z}{0})$
+so the precondition for $(\DW{z}{0})$ only has to be satisfied assuming the hypothesis
+$(s{=}0)$. There is no matching order from $(\DR{x}{0})$ to $(\DW{z}{0})$
+which is why we do not assume the hypothesis $(r{=}0)$. Nonetheless, the precondition on
+$(\DW{z}{0})$ is a tautology, and so can be elided in the diagram:
+  \begin{gather*}
+    % r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    % \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \event{wz0}{\DW{z}{0}}{right=of ry0}
+        \po{ry0}{wz0}
+      \end{tikzinline}}
+  \end{gather*}
+
+While existing models of relaxed memory have detailed treatments of parallel composition,
+they often give sequential composition little attention, either ignoring it altogether,
+or treating it operationally with its usual small-step semantics. This paper
+investigates how existing models of sequential composition interact with relaxed memory.
+  
+\subsection{Sequential composition}
+
+%% Program logics and semantics tell us that when executing ((S1; S2), state0),
+%% we execute (S1, state0) to arrive at state1, then execute (S2, state1) to
+%% arrive at the final state2.
+
+%% This is a delightfully simple story that can be explained to children.  It is
+%% also a lie.
+
+%% Processors execute instructions out of order, due to pipelines and caches.
+%% Compilers reorder programs even more dramatically.  All of this reordering is
+%% meant to be unobservable in single-threaded code.  In multi-threaded code,
+%% however, all bets are off.  A formal attempt to understand the resulting mess
+%% is known as a ``relaxed memory model.''
+
+%% Most of the relaxed memory models that have been proposed are designed to
+%% help us understand whole program execution: they have no compositionality
+%% properties whatsoever.  Recently, denotation models have appeared that treat
+%% \emph{concurrent} execution compositionally.  One such model is ``Pomsets with
+%% Preconditions''.  It remains an open question, however, whether it is
+%% possible to treat \emph{sequential} execution compositionally in such a model,
+%% without overly restricting processors and compilers.
+
+%% We propose adding families of predicate transformers to Pomsets with
+%% Preconditions.  The resulting model is denotational, supporting both parallel
+%% and sequential composition.  When composing (S1;S2), the predicate
+%% transformer used to validate the precondition of an event in S2 is chosen
+%% based on the dependency order from S1 into this event.  As usual in work on
+%% relaxed memory, we have not handled loops or recursion.
+
+%% Happily, most of the results expected of a relaxed memory model can be
+%% established by appeal to prior work.  So here we are able to concentrate on
+%% the model itself.  The model is formalized in Agda, where we have established
+%% associativity for sequential composition.
+
+%% For the memory-model specialist, we retain the good properties of the prior
+%% work on Pomsets with Preconditions, fixing some errors along the way.  These
+%% properties include efficient implementation on ARMv8, support for compiler
+%% optimizations, support for logics that prove the absence of thin-air
+%% behaviors, and a local data race freedom theorem.
+
+% \begin{figure*}
+%   \input{fig-sp}
+%   \caption{Weakest precondition semantics}
+%   \label{fig:sp}
+% \end{figure*}
+
+Our approach follows that of weakest precondition semantics of
+\citet{DBLP:journals/cacm/Dijkstra75}, which provides an alternative
+characterization of Hoare logic \citep{Hoare:1969:ABC:363235.363259} by
+mapping postconditions to preconditions. We recall the definition of
+$\fwp{\aCmd}{\bForm}$ for loop-free code below. % in Figure~\ref{fig:sp}
+\begin{itemize}
+\item
+  \begin{math}
+    \fwp{\SKIP}{\bForm} = \bForm
+  \end{math}
+\item 
+  \begin{math}
+    \fwp{\ABORT}{\bForm} = \FALSE
+  \end{math}
+\item
+  \begin{math}
+    \fwp{r\GETS \aExp}{\bForm} = \bForm[\aExp/r]
+  \end{math}
+\item
+  \begin{math}
+    \fwp{\aCmd_1;\aCmd_2}{\bForm} = \fwp{\aCmd_1}{\fwp{\aCmd_2}{\bForm}}
+  \end{math}
+\item
+  \begin{math}
+    \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm}= {}
+  \end{math}
+  \\
+  \begin{math}
+    ((\aExp{\ne}0) \limplies \fwp{\aCmd_1}{\bForm}) \land
+    ((\aExp{=}0) \limplies \fwp{\aCmd_2}{\bForm})
+  \end{math}
+\end{itemize}
+The rule we are most interested
+in is the one for sequential composition, which maps sequential composition of programs
+to function composition of predicate transformers.
+
+Predicate transformers are a good fit to logical models of dependency calculation,
+since both are concerned with preconditions, and how they are transformed by
+sequential composition. Our first attempt is to associate a predicate transformer
+with each pomset. We visualize this in diagrams by showing how $\bForm$ is transformed,
+for example:
+  \begin{align*}
+    \begin{gathered}
+      r \GETS x
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{rx0}{\DR{x}{0}}{}
+          \xform{rx0d}{(r{=}0) \limplies \bForm}{below=of rx0}
+          \xo{rx0}{rx0d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      s \GETS y
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{ry0}{\DR{y}{0}}{}
+          \xform{ry0d}{(s{=}0) \limplies \bForm}{below=of ry0}
+          \xo{ry0}{ry0d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{s{<}1} \THEN z\GETS r{*}s \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
+          \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
+          \xform{wz0d}{\bForm}{below=of wz0}
+          \xo[out=-30]{wz0}{wz0d}
+      \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+In the rightmost program above, the write to $z$ affects the shared store, not the
+local state of the thread, therefore we assign it the identity transformer.
+
+For the sequentially consistent semantics, sequential composition 
+is straightforward: we apply each predicate transformer to the preconditions
+of subsequent events, and compose the predicate transformers:
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \event{wz0}{(r{=}0) \limplies (s{=}0) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{below=of ry0}
+        \po{rx0}{ry0}
+        \po{ry0}{wz0}
+        \xos{rx0}{rx0ry0d}
+        \xos{ry0}{rx0ry0d}
+        \xos{wz0}{rx0ry0d}
+      \end{tikzinline}}
+  \end{gather*}
+This model works for the sequentially consistent case, but needs to be
+weakened for the relaxed case. The key observation of this paper is
+that rather than working with one predicate transformer, we should
+work with a \emph{family} of predicate transformers, indexed by sets
+of events.
+
+For example, for single-event pomsets, there are two predicate
+transformers, since there are two subsets of any one-element set.
+The \emph{independent}
+transformer is indexed by the empty set, whereas the \emph{dependent}
+transformer is indexed by the singleton.
+We visualize this by including more than one transformed predicate,
+with an edge leading to the dependent one. For example:
+  \begin{align*}
+    \begin{gathered}
+      r \GETS x
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{rx0}{\DR{x}{0}}{}
+          \xform{rx0i}{\bForm}{above=of rx0}
+          \xform{rx0d}{(r{=}0) \limplies \bForm}{below=of rx0}
+          \xo{rx0}{rx0d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      s \GETS y
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{ry0}{\DR{y}{0}}{}
+          \xform{ry0i}{\bForm}{above=of ry0}
+          \xform{ry0d}{(s{=}0) \limplies \bForm}{below=of ry0}
+          \xo{ry0}{ry0d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{s{<}1} \THEN z\GETS r{*}s \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
+          \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
+          \xform{wz0i}{\bForm}{above=of wz0}
+          \xform{wz0d}{\bForm}{below=of wz0}
+          \xo[out=-30]{wz0}{wz0d}
+      \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+The model of sequential composition then picks which
+predicate transformer to apply to an event's precondition by picking
+the one indexed by all the events before it in causal order.
+
+For example, we can recover the expected semantics
+for the above example by choosing
+the predicate transformer which is independent of $(\DR x0)$
+but dependent on $(\DR y0)$, which is the transformer
+which maps $\bForm$ to $(s{=}0) \limplies \bForm$.
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=of rx0}
+        \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{above=of ry0}
+        \xform{rx0d}{(r{=}0) \limplies \bForm}{below=of rx0}
+        \xform{ry0d}{(s{=}0) \limplies \bForm}{right=of rx0d}
+        \xform{wz0i}{\bForm}{above=of wz0}
+        \po{ry0}{wz0}
+        \xos{rx0}{rx0d}
+        \xos{ry0}{ry0d}
+        \xos{rx0}{rx0ry0d}
+        \xos{ry0}{rx0ry0d}
+      \end{tikzinline}}
+  \end{gather*}
+As a sanity check, we can see that sequential composition is
+associative in this case, since it does not matter whether we
+associate to the left, with intermediate step:
+  \begin{gather*}
+    r\GETS x\SEMI s\GETS y
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{ry0}{\DR{y}{0}}{right=5em of rx0}
+        \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{above
+          right=1ex and -2.5em of rx0}
+        \xform{rx0d}{(r{=}0) \limplies \bForm}{left=of rx0}
+        \xform{ry0d}{(s{=}0) \limplies \bForm}{right=of ry0}
+        \xform{wz0i}{\bForm}{right=of rx0ry0d}
+        \xos{rx0}{rx0d}
+        \xos{ry0}{ry0d}the \emph{independent}
+transformer
+        \xos{rx0}{rx0ry0d}
+        \xos{ry0}{rx0ry0d}
+      \end{tikzinline}}
+  \end{gather*}
+or to the right, with intermediate step:
+    \begin{gather*}
+    s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{ry0}{\DR{y}{0}}{}
+        \event{wz0}{(s{=}0) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+        \xform{ry0d}{(s{=}0) \limplies \bForm}{above=of ry0}
+        \xform{wz0i}{\bForm}{above=of wz0}
+        \po{ry0}{wz0}
+        \xo[xleft]{ry0}{ry0d}
+      \end{tikzinline}}
+  \end{gather*}
+This is an instance of a general result that sequential composition forms a monoid,
+as one would hope.
+
+\subsection{Contributions}
+
+In this paper, we show how pomsets with
+preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined with
+predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75} to create a
+compositional semantics for sequential composition.
+\begin{itemize}
+\item \S\ref{sec:model} presents the basic model, with few features
+  required of the logic of preconditions, but a resulting lack of fidelity
+  to exiting models,
+\item \S\ref{sec:q} adds a model of \emph{quiescence} to the logic,
+  required to model coherence (accessing $x$ has a precondition that $x$ is quiescent)
+  and synchronization (a releasing write requires all locations to be quiescent),
+\item \S\ref{sec:arm} adds the features required for efficient compilation
+  to modern architectures: downgrading some synchronized accesses to relaxed,
+  and removing read-read dependencies, and
+\item \S\ref{sec:complications} show how to address common litmus tests.
+\end{itemize}
+% Acknowledgements go here, once we're not double-blinded.
+The definitions in this paper have been formalized in Agda.
+
+Because it is closely related, we expect that the memory-model results of
+\cite{DBLP:journals/pacmpl/JagadeesanJR20} apply to our model, including
+compositional reasoning for temporal safety properties and {local} \drfsc{}
+as in \cite{Dolan:2018:BDR:3192366.3192421,DBLP:conf/ppopp/DongolJR19}.
+In \textsection\ref{sec:arm}, we provide an alternative proof strategy for
+efficient compilation to \armeight{}, which improves upon that of
+\cite{DBLP:journals/pacmpl/JagadeesanJR20} by using a recent alternative
+characterization of \armeight{}.
+
+\section{Related Work}
+
+\begin{itemize}
+\item Models with strong dependencies that disallow compiler optimizations
+  and efficient implementation on \armeight{}:
+  \cite{Lamport:1979:MMC:1311099.1311750,
+    DBLP:conf/pldi/LahavVKHD17,
+    Dolan:2018:BDR:3192366.3192421,
+    DBLP:conf/pldi/LahavVKHD17,
+    DBLP:conf/lics/JeffreyR16,
+    Boehm:2014:OGA:2618128.2618134,
+    DBLP:journals/corr/abs-1804-04214}.
+\item Models with weak dependencies that allow some forms of thin-air
+  reasoning:
+  \cite{Manson:2005:JMM:1047659.1040336,
+    DBLP:conf/esop/JagadeesanPR10,
+    DBLP:conf/popl/KangHLVD17,
+    DBLP:journals/pacmpl/ChakrabortyV19}
+\item Models that do not calculate dependencies:
+  \cite{Batty:2011:MCC:1926385.1926394,
+    DBLP:journals/pacmpl/WattRP19,
+    DBLP:conf/pldi/WattPPBDFPG20,
+    goMM}.
+\end{itemize}
+Like us, \citet{DBLP:journals/corr/abs-1804-04214} use pomsets to create a
+compositional account of sequential composition.  However, their model
+requires a fence after every read on \armeight{}, and uses syntactic
+dependencies, thus invalidating many compiler optimizations.
+

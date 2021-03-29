@@ -1,0 +1,134 @@
+% LICS:
+% Titles and Short Abstracts Due  20 January 2021
+% Full Papers Due	          25 January 2021
+% Author Response Period          10-14 March 2021
+% Author Notification	          31 March 2021
+% Conference	                  29 June–02 July 2021
+% 
+% Formatting instructions: Every full paper must be submitted in the IEEE
+% Proceedings 2-column 10pt format and may be at most 12 pages, excluding
+% references. LaTeX style files are available at
+% http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/. Please use
+% IEEEtran.cls version V1.8b, released on 26/08/2015.
+%
+% Program Committee 
+% Leonid Libkin (Univ. of Edinburgh/ENS-Paris)
+% Christoph Berkholz (Humboldt-University Berlin)
+% Meghyn Bienvenu (CNRS, University of Bordeaux)
+% Filippo Bonchi (University of Pisa)
+% Véronique Bruyère (University of Mons)
+% Yu-Fang Chen (Academia Sinica)
+% Dmitry Chistikov (University of Warwick)
+% Silvia Crafa (University of Padova)
+% Amina Doumane (CNRS-ENS de Lyon)
+% Stéphanie Delaune (University Rennes, CNRS, IRISA)
+% Ekaterina Fokina (TU Wien)
+% Marco Gaboardi (Boston University)
+% Adria Gascon (Google UK)
+% Lauri Hella (Tampere University)
+% Ekaterina Komendantskaya (Heriott-Watt University)
+% Shankara Narayanan Krishna (IIT, Bombay)
+% Benoit Larose (UQAM, Montréal)
+% Jérôme Leroux (CNRS, University of Bordeaux)
+% Wim Martens (University of Bayreuth)
+% Peter O’Hearn (UCL/Facebook)
+% Daniela Petrisan (Université de Paris, CNRS, IRIF)
+% Miguel Romero (Universidad Adolfo Ibáñez)
+% Philippe Schnoebelen (CNRS & ENS Paris-Saclay)
+% Olivier Serre (Université de Paris, CNRS, IRIF)
+% Sebastian Siebertz (University of Bremen)
+% Kristina Sojakova (INRIA)
+% Alwen Tiu (Australian National University)
+% Patrick Totzke (University of Liverpool)
+% Szymon Torunczyk (University of Warsaw)
+% Takeshi Tsukada (University of Tokyo)
+% Jamie Vicary (University of Cambridge)
+% Michael Zakharyaschev (Birkbeck)
+% Anna Zamansky (Haifa University)
+% Georg Zetzsche (Max Planck Institute for Software Systems)
+% Thomas Zeume (Ruhr-Universität Bochum)
+
+% PLDI Nov 20
+% ICALP will be in glasgow if it happens.  Deadline  Fri 12 Feb 2021. Committee unknown
+% ECOOP deadline Jan 11 (but this is where radha wants to submit his opsem). Committee not perfect but has john wickerson...
+% LICS deadline is 20 Jan
+% ICFP deadline March 2.  Committee unknown.
+% POPL deadline June (adding UB)
+\documentclass[conference,compsoc]{IEEEtran}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Missing includes
+\usepackage{graphicx}
+\usepackage[prologue]{xcolor}
+\definecolor[named]{ACMBlue}{cmyk}{1,0.1,0,0.1}
+\definecolor[named]{ACMYellow}{cmyk}{0,0.16,1,0}
+\definecolor[named]{ACMOrange}{cmyk}{0,0.42,1,0.01}
+\definecolor[named]{ACMRed}{cmyk}{0,0.90,0.86,0}
+\definecolor[named]{ACMLightBlue}{cmyk}{0.49,0.01,0,0}
+\definecolor[named]{ACMGreen}{cmyk}{0.20,0,1,0.19}
+\definecolor[named]{ACMPurple}{cmyk}{0.55,1,0,0.15}
+\definecolor[named]{ACMDarkBlue}{cmyk}{1,0.58,0,0.21}
+\usepackage[bookmarksnumbered,unicode]{hyperref}
+\hypersetup{colorlinks,
+  linkcolor=ACMPurple,
+  citecolor=ACMPurple,
+  urlcolor=ACMDarkBlue,
+  filecolor=ACMDarkBlue}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Def}
+\newtheorem{example}[definition]{Ex}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+%\newtheorem{conjecture}{Conjecture}
+\newtheorem{proposition}[definition]{Prop}
+\newtheorem{lemma}{Lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\renewcommand{\D}{\Dx{\mathtt{*}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\author{\IEEEauthorblockN{%
+    Alan Jeffrey\IEEEauthorrefmark{1} and
+    James Riely\IEEEauthorrefmark{2}
+}
+\IEEEauthorblockA{\IEEEauthorrefmark{1}Roblox}
+\IEEEauthorblockA{\IEEEauthorrefmark{2}DePaul University}}
+%\author{Anonymous\\Anonymous Institution}
+
+\title{Sequential Composition for Relaxed Memory: Pomsets with Predicate Transformers}
+
+\usepackage{macros}
+\showRAfalse
+\usepackage[sectionbib,numbers,square]{natbib}
+
+\begin{document} 
+\pagestyle{plain}
+\maketitle
+\begin{abstract}\input{abstract}\end{abstract}
+\input{intro}
+\input{definitions}
+\input{quiescence}
+\input{arm}
+\input{complications}
+\input{outro}
+\refstepcounter{definition}\label{finaldef}
+\refstepcounter{figure}\label{finalfig}
+
+% %\input{oopsla}
+\clearpage
+%\bibliographystyle{IEEEtranSA}
+\bibliographystyle{abbrvnat}
+\bibliography{bib}
+%\newpage
+\appendices
+\input{discussion}
+
+%\input{scraps}
+\end{document}
+
+% Local Variables:
+% mode: latex
+% TeX-master: t
+% End:

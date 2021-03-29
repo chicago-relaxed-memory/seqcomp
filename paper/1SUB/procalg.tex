@@ -1,0 +1,396 @@
+\section{Process Algebra}
+
+We begin with a warm-up exercise, presenting the key ideas of the
+model in the simplified setting of a process algebra.
+
+Process algebras were developed as a simple model of message-passing
+concurrency~\cite{DBLP:books/daglib/0067019,DBLP:books/ph/Hoare85,DBLP:books/daglib/0069083}
+and have been given many different semantics, notably traces~\cite{???},
+labelled transition systems~\cite{???}, equational~\cite{???}, and event
+structures~\cite{???}.  In this section, we recap the \emph{pomset}
+semantics, and show how it can be used to model a simple process language
+based on the asynchronous $\pi$-calculus~\cite{???} and value-passing
+CCS~\cite{???}.
+
+The key idea of this paper is a relaxed treatment of sequential
+composition, where causality is not given by program order, but
+instead is given by control and data dependencies.
+
+% Note to self: Process algebras typically focus on channel-based
+% communication.  Here we adopt communication via shared memory.
+% Characteristics of this mode of communication:
+% \begin{itemize}
+% \item It is asynchronous.
+% \item Reads are nondestructive.
+% \end{itemize}
+% So it is similar to an asynchronous process calculus with broadcast
+% communication where reads don't kill.
+
+\subsection{Pomsets}
+
+\begin{definition}
+  A \emph{poimet} with alphabet $\Alphabet$ is a tuple
+  $(\Event, {\le}, \labeling)$ where
+  \begin{enumerate}
+  \item $\Event$ is a set of \emph{events}
+  \item
+    ${\le} \subseteq (\Event\times\Event)$ is the \emph{causality} partial order, and
+  \item
+    $\labeling: \Event \fun \Alphabet$ is a \emph{labeling}.
+  \end{enumerate}
+\end{definition}
+
+
+\begin{definition}
+  If $\aPS_0\in\sSTOP$ then:
+  \begin{enumerate}
+    \item $\aEvs_0 = \emptyset$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then  
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$:
+  %there are $\aPS_1\in\aPSS_1$ and $\\\\\0PS_2\in\aPSS_2$ such that:
+  \begin{enumerate}
+  \item $\aEvs_0 = (\aEvs_1\cup\aEvs_2)$,
+  \item if $\aEv\in\aEvs_1$ then $\labeling_0(\aEv) = \labeling_1(\aEv)$, 
+  \item if $\aEv\in\aEvs_2$ then $\labeling_0(\aEv) = \labeling_2(\aEv)$,
+  \item if $\bEv\le_1\aEv$ then $\bEv\le_0\aEv$, 
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
+    \newcounter{pomsetParXount}
+    \setcounter{pomsetParXount}{\value{enumi}}
+  \item $\aEvs_1$ and $\aEvs_2$ are disjoint.
+    \newcounter{pomsetParDisjointXount}
+    \setcounter{pomsetParDisjointXount}{\value{enumi}}
+  \end{enumerate}
+
+  % \noindent
+  % If $\aPS_0 \in (\aAct\sPREFIX\aPSS)$ then
+  % $(\exists\aPS_2\in\aPSS)$:
+  % \begin{enumerate}
+  % \item $\aEvs_0=(\aEvs_1 \cup \aEvs_2)$,
+  % \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \aAct$,
+  % \item if $\aEv\in\aEvs_2$ then $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
+  % \item if $\bEv,\aEv\in\aEvs_1$ then $\bEv=\aEv$,
+  % \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
+  %   \newcounter{pomsetPrefixXount}
+  %   \setcounter{pomsetPrefixXount}{\value{enumi}}
+  % \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\bEv<_0\aEv$.
+  %   \newcounter{pomsetPrefixOrderXount}
+  %   \setcounter{pomsetPrefixOrderXount}{\value{enumi}}
+  % \end{enumerate}
+
+  \noindent
+  If $\aPS_0 \in (\aAct\wPREFIX\aPSS)$ then
+  $(\exists\aPS_2\in\aPSS)$:
+  %there is $\aPS_2\in\aPSS$ such that:
+  \begin{enumerate}
+  \item $\aEvs_0=(\aEvs_1 \cup \aEvs_2)$,
+  \item if $\aEv\in\aEvs_1$ then $\labelingAct_0(\aEv) = \aAct$,
+  \item if $\aEv\in\aEvs_2$ then $\labelingAct_0(\aEv) = \labelingAct_2(\aEv)$,
+  \item if $\bEv,\aEv\in\aEvs_1$ then $\bEv=\aEv$,
+  \item if $\bEv\le_2\aEv$ then $\bEv\le_0\aEv$, and
+    \newcounter{pomsetPrefixXount}
+    \setcounter{pomsetPrefixXount}{\value{enumi}}
+  %   \setcounter{enumi}{\value{pomsetPrefixXount}}
+  % \item[1--\thepomsetPrefixXount)] as for $(\aAct\sPREFIX\aPSS)$ in
+  %   Definition~\ref{tab:pomsets},
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, either $\bEv<_0\aEv$ or $a\reorder\labeling_2(\aEv)$.
+    \newcounter{pomsetPrefixOrderXount}
+    \setcounter{pomsetPrefixOrderXount}{\value{enumi}}
+  \end{enumerate}
+%\caption{Process algebra as sets of pomsets}
+\label{tab:pomsets}
+\end{definition}
+
+[No communication between threads, but this can be added as a condition on pomsets,
+  for instance a simple model where every receive event has a matching send.]
+
+[Introduce ``blocker'', and ``fulfillment'' on $\Alphabet$, and lift up to events.]
+
+For example, for latches:
+\begin{itemize}
+\item $\set{\aChan}{}$ fulfills $\get{\aChan}{}$, and
+\item there are no blockers.
+\end{itemize}
+for condition variables:
+\begin{itemize}
+\item $\notify{\aChan}{}$ fulfills $\notified{\aChan}{}$, and
+\item $\wait{\aChan}{}$ blocks $\notified{\aChan}{}$.
+\end{itemize}
+for mutexes:
+\begin{itemize}
+\item $\init{\aChan}$ and $\release{\aChan}$ fulfil $\acquire{\aChan}{}$,
+\item $\acquire{\aChan}$ fulfills $\release{\aChan}$, and
+\item $\acquire{\aChan}$ and $\release{\aChan}$ block each other and themselves. 
+\end{itemize}
+  
+\begin{definition}
+  A pomset $\aPS$ is closed if
+  for every $\aEv$ which can be fulfilled,
+  there is a $\bEv\le\aEv$ which fulfills it,
+  and for any $\cEv$ which can block $\aEv$, either $\cEv\le\bEv$ or $\aEv\le\cEv$. 
+\end{definition}
+
+[Do some process algebra examples.]
+
+[Use refinement (that is subset order) as notion of compiler optimization.]
+
+For some examples, we want to allow reorderings:
+\[
+  (\aAct \wPREFIX \bAct \wPREFIX \aPS)
+\subseteq
+  (\bAct \wPREFIX \aAct \wPREFIX \aPS)
+\]
+or mumbling:
+\[
+  (\aAct \wPREFIX \aAct \wPREFIX \aPS)
+\subseteq
+  (\aAct \wPREFIX \aPS)
+\]
+[Talk about Mazurkiewicz traces.]
+
+[Introduce $\aAct\reorder\bAct$ for when reordering is valid,
+  and  $\aAct\reorder\aAct$ for when mumbling is valid.]
+
+[Give examples: latches support mumbling, mutexes support roach motel reorderings.]
+
+\subsection{Pomsets with preconditions}
+
+This is essentially the model of \cite{10.1145/3428262}.
+
+\begin{definition}
+  A \emph{pomset with preconditions} is
+  a pomset together with $\labelingForm:\aEvs\fun\Formulae$.
+\end{definition}
+
+\begin{definition}
+  If $\aPS_0\in\sSTOP$ then:
+  \begin{enumerate}
+  \item $\aEvs_0 = \emptyset$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS_0 \in (\aPSS_1\sPAR\aPSS_2)$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$:
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
+  \begin{enumerate}
+     \setcounter{enumi}{\value{pomsetParDisjointXount}}
+  \item[1--\thepomsetParDisjointXount)] as for $(\aPSS_1\sPAR\aPSS_2)$ in Definition~\ref{tab:pomsets},
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_2(\aEv)$,
+    \newcounter{pomsetPreParXount}
+    \setcounter{pomsetPreParXount}{\value{enumi}}
+  \end{enumerate}
+
+  \noindent
+  If $\aPS_0 \in \sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$:
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
+  \begin{enumerate}
+  \setcounter{enumi}{\value{pomsetParXount}}
+  \item[1--\thepomsetParXount)] as for $(\aPSS_1\sPAR\aPSS_2)$  in
+    Definition~\ref{tab:pomsets} (ignoring \thepomsetParDisjointXount),
+  \item if $\aEv\in\aEvs_1$ and $\aEv\not\in\aEvs_1$ then\\ $\labelingForm_0(\aEv)$ implies $\bForm\land\labelingForm_1(\aEv)$,
+  \item if $\aEv\not\in\aEvs_1$ and $\aEv\in\aEvs_2$ then\\ $\labelingForm_0(\aEv)$ implies $\neg\bForm\land\labelingForm_2(\aEv)$, and
+  \item if $\aEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then\\ $\labelingForm_0(\aEv)$ implies $(\bForm\land\labelingForm_1(\aEv))\lor(\neg\bForm\land\labelingForm_2(\aEv))$.
+    \newcounter{pomsetPreIfXount}
+    \setcounter{pomsetPreIfXount}{\value{enumi}}
+  \end{enumerate}
+
+  \noindent
+  If $\aPS_0 \in (\aAct[\aVal/\aLoc]\wPREFIX\aPSS)$ then
+  $(\exists\aPS_2\in\aPSS_2)$:
+  %there is $\aPS_2\in\aPSS$ such that:
+  \begin{enumerate}
+     \setcounter{enumi}{\value{pomsetPrefixXount}}
+  \item[1--\thepomsetPrefixXount)] as for $(\aAct\wPREFIX\aPSS)$ in Definition~\ref{tab:pomsets} (ignoring \thepomsetPrefixOrderXount),
+  \item if $\aEv\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\preForm_\aAct$,
+  \item\label{skolem} if $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $(\aLoc=\aVal) \limplies \labelingForm_2(\aEv)$,
+  \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv<_0\aEv$ or\\ 
+    $\labelingForm_0(\aEv)$ implies $\reorderIndForm_\aAct\land\labelingForm_2(\aEv)$.
+  \end{enumerate}
+% \caption{Process algebra as sets of pomsets with preconditions}
+\label{tab:pomsets-pre}
+\end{definition}
+
+\begin{remark}
+Note that in \ref{skolem} for prefixing, we use
+$(\aLoc=\aVal) \limplies \labelingForm_2(\aEv)$ rather than
+$\labelingForm_2(\aEv) [\aVal/\aLoc]$.
+This use of skolemization  ensures disjunction closure for nonlinear uses of
+the argument.
+
+% \begin{center}
+%   \includegraphics[width=90mm]{boards/skolem1.jpg}
+
+%   Xounterexample:
+%   \includegraphics[width=90mm]{boards/skolem2.jpg}
+
+%   Skolem:
+%   \includegraphics[width=90mm]{boards/skolem3.jpg}
+%   This will be easier if we just require registers to be unique. Then we can use r for s.
+% \end{center}
+\end{remark}
+
+[Introduce data models, with formulae.]
+
+Example of value-passing on unordered channels which allow
+message duplication:
+\begin{eqnarray*}
+  \aForm\sGUARD\aPSS & = &
+  \sIF{\aForm}\sTHEN\aPSS\sELSE\sSTOP\sFI
+\\
+  \sSEND\aChan\aExp\wPREFIX\aPSS & = &
+  \textstyle\bigcup_\aVal (\aExp=\aVal) \sGUARD \send\aChan{\aVal} \wPREFIX \aPSS
+\\
+  \sRECV\aChan\aLoc\wPREFIX\aPSS & = &
+  \textstyle\bigcup_\aVal \recv\aChan{\aVal}[\aVal/\aLoc] \wPREFIX \aPSS
+\end{eqnarray*}
+
+Unfortunately we can't play the same trick with reordering based on
+label, since the label doesn't track control or data dependencies. But
+we can code up reorderings in the logic. Assume formulae
+$\preForm_\aAct$ (the precondition for $\aAct$) and
+$\reorderIndForm_\aAct$ (the precondition for events which can be reordered with $\aAct$).
+
+For example, we introduce a new uninterpreted formula $\quietForm$
+and have for relaxed $\aAct$:
+\[
+  \preForm_{\aAct} = \neg\quietForm
+\qquad
+  \reorderIndForm_{\aAct} = \neg\quietForm
+\]
+for release $\aAct$:
+\[
+  \preForm_{\aAct} = \quietForm
+\qquad
+  \reorderIndForm_{\aAct} = \neg\quietForm
+\]
+and for acquire $\aAct$:
+\[
+  \preForm_{\aAct} = \neg\quietForm
+\qquad
+  \reorderIndForm_{\aAct} = \FALSE
+\]
+
+[Stuff about conditionals and merging events.]
+
+\begin{definition}
+  A pomset with precondition is \emph{top level} if for any $\aEv\in\aEvs$,
+  $\preForm_{\labelingAct(\aEv)}$ implies $\labelingForm(\aEv)$.
+\end{definition}
+
+
+\subsection{A pomset with preconditions and predicate transformers}
+
+[The problem with the previous section is that there's no story for sequential composition.]
+
+\begin{definition}
+  A \emph{predicate transformer} is a monotone function
+  $\aTr:\Formulae\fun\Formulae$ such that
+  $\aTr(\FALSE)$ is $\FALSE$,
+  $\aTr(\aForm\land\bForm)$ is $\aTr(\aForm)\land\aTr(\bForm)$, and
+  $\aTr(\aForm\lor\bForm)$ is $\aTr(\aForm)\lor\aTr(\bForm)$.
+\end{definition}
+
+\begin{definition}
+  A \emph{family of predicate transformers}
+  indexed by subsets of $\aEvs$
+  consists of predicate transformers
+  $\aTr{\bEvs}{}$ for each set of events $\bEvs$,
+  such that if $(\cEvs\cap\aEvs) \subseteq \bEvs$
+  then $\aTr{\cEvs}{\aForm}$ implies $\aTr{\bEvs}{\aForm}$.
+\end{definition}
+
+\begin{definition}
+  A pomset with predicate tansformers is a
+  pomset with preconditions, together with a family of predicate transformers $\aTr$
+  indexed by subsets of $\aEvs$.
+\end{definition}
+
+% \begin{definition}
+%   For pomset $\aPS_0$ and $\aEv\in\aEvs_0$, let
+%   $\downclose[0]{\aEv} = \{ \bEv\in\aEvs_0 \mid \bEv <_0 \aEv \}$.
+% \end{definition}
+
+Process algebra as sets of pomsets with preconditions and predicate
+transformers
+\begin{definition}
+  If $\aPS_0\in\sSTOP$ then:
+  \begin{enumerate}
+    \item $\aEvs_0 = \emptyset$, and
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $\FALSE$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS_0\in\sSKIP$ then:
+  \begin{enumerate}
+  \item $\aEvs_0 = \emptyset$, and
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $\aForm$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS_0 \in \sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$:
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
+  \begin{enumerate}
+  \setcounter{enumi}{\value{pomsetPreIfXount}}
+  \item[1--\thepomsetPreIfXount)] as for $(\sIF{\bForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI)$ in Definition~\ref{tab:pomsets-pre},
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $(\bForm\land\aTr[1]{\bEvs}{\aEv})\lor(\neg\bForm\land\aTr[2]{\bEvs}{\aForm})$.
+  \end{enumerate}
+
+  \noindent
+  If $\aPS_0 \in (\aPSS_1\wSEMI\aPSS_2)$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$,\\
+  %there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that:
+  %let $\labelingForm'_2(\aEv)=\aTr[1]{\downclose[0]{\aEv}}{\labelingForm_2(\aEv)}$:  
+  %let $\labelingForm'_2(\aEv)=\aTr[1]{\{ \bEv \mid \bEv <_0 \aEv \}}{\labelingForm_2(\aEv})$:  
+  let $\labelingForm'_2(\aEv)=\aTr[1]{\cEvs}{\labelingForm_2(\aEv})$, where $\cEvs=\{ \cEv \mid \cEv <_0 \aEv \}$:
+  \begin{enumerate}  
+  \setcounter{enumi}{\value{pomsetParXount}}
+  \item[1--\thepomsetParXount)] as for $(\aPSS_1\sPAR\aPSS_2)$  in
+    Definition~\ref{tab:pomsets} (ignoring \thepomsetParDisjointXount),
+  \item if $\aEv\in\aEvs_1$ and $\aEv\not\in\aEvs_1$ then $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$,
+  \item if $\aEv\not\in\aEvs_1$ and $\aEv\in\aEvs_2$ then $\labelingForm_0(\aEv)$ implies $\labelingForm'_2(\aEv)$,
+  \item if $\aEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then\\ $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$, and
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $\aTr[2]{\bEvs}{\aTr[1]{\bEvs}{\aForm}}$.
+  \end{enumerate}
+  % where we define $\labelingForm'_2(\aEv)$ to be $\aTr[1]{\{ \bEv \mid \bEv <_0 \aEv \}}{\labelingForm_2(\aEv})$.
+
+  \noindent
+  If $\aPS_0 \in (\aAct[\aVal/\aLoc])$ then:
+  \begin{enumerate}
+  \item if $\bEv,\aEv\in\aEvs_0$ then $\bEv=\aEv$,
+  \item $\labelingAct_0(\aEv) = \aAct$,
+  \item $\labelingForm_0(\aEv)$ implies $\preForm_\aAct$,
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $(\aLoc=\aVal)\limplies\aForm$, and
+  \item $\aTr[0]{\emptyset}{\aForm}$ implies $\reorderIndForm_\aAct\land\aForm$.
+  \end{enumerate}
+% \caption{Process algebra as sets of pomsets with preconditions and predicate transformers}
+\end{definition}
+
+Embedding pomsets with preconditions semantics in pomsets with preconditions and predicate transformers semantics  
+\begin{definition}
+  If $\aPS_0 \in \wFORK\aPSS$ then
+  $(\exists\aPS_1\in\aPSS)$:
+  %there is $\aPS_1\in\aPSS$ such that:
+  \begin{enumerate}
+  \item $\aEvs_0=\aEvs_1$,
+  \item $\labelingAct_0(\aEv) = \labelingAct_1(\aEv)$,
+  \item $\labelingForm_0(\aEv)$ implies $\labelingForm_1(\aEv)$, and
+  \item $\aTr[0]{\bEvs}{\aForm}$ implies $\aForm$.
+  \end{enumerate}
+% \caption{Embedding pomsets with precodnitions semantics in pomsets with preconditions and predicate transformers semantics}
+\end{definition}
+
+[Examples.]
+
+\begin{eqnarray*}
+  \sSEND\aChan\aExp & = &
+  \textstyle\bigcup_\aVal (\aExp=\aVal) \sGUARD \send\aChan{\aVal}
+\\
+  \sRECV\aChan\aLoc & = &
+  \textstyle\bigcup_\aVal \recv\aChan{\aVal}[\aVal/\aLoc]
+\end{eqnarray*}
+

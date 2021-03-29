@@ -1,0 +1,58 @@
+This paper presents the first compositional definition of sequential
+composition that applies to a relaxed memory model weak enough to allow
+efficient implementation on Arm.  We extend the denotational model of pomsets
+with preconditions with predicate transformers. Previous work has shown that
+pomsets with preconditions are a model of concurrent composition, and that
+predicate transformers are a model of sequential composition.  This paper
+show how they can be combined.
+
+% Program logics and semantics tell us that in order to derive
+% \begin{math}
+%   ((S_1\SEMI S_2), \sigma_0) \Downarrow \sigma_2,
+% \end{math}
+% we derive 
+% \begin{math}
+%   (S_1, \sigma_0) \Downarrow \sigma_1
+% \end{math}
+% and then
+% \begin{math}
+%   (S_2, \sigma_1) \Downarrow \sigma_2.
+% \end{math}
+%% Program logics and semantics tell us that when executing ((S1; S2), state0),
+%% we execute (S1, state0) to arrive at state1, then execute (S2, state1) to
+%% arrive at the final state2.
+
+%% This is a delightfully simple story that can be explained to children.  It is
+%% also a lie.
+
+%% Processors execute instructions out of order, due to pipelines and caches.
+%% Compilers reorder programs even more dramatically.  All of this reordering is
+%% meant to be unobservable in single-threaded code.  In multi-threaded code,
+%% however, all bets are off.  A formal attempt to understand the resulting mess
+%% is known as a ``relaxed memory model.''
+
+%% Most of the relaxed memory models that have been proposed are designed to
+%% help us understand whole program execution: they have no compositionality
+%% properties whatsoever.  Recently, denotation models have appeared that treat
+%% \emph{concurrent} execution compositionally.  One such model is ``Pomsets with
+%% Preconditions''.  It remains an open question, however, whether it is
+%% possible to treat \emph{sequential} execution compositionally in such a model,
+%% without overly restricting processors and compilers.
+
+%% We propose adding families of predicate transformers to Pomsets with
+%% Preconditions.  The resulting model is denotational, supporting both parallel
+%% and sequential composition.  When composing (S1;S2), the predicate
+%% transformer used to validate the precondition of an event in S2 is chosen
+%% based on the dependency order from S1 into this event.  As usual in work on
+%% relaxed memory, we have not handled loops or recursion.
+
+%% Happily, most of the results expected of a relaxed memory model can be
+%% established by appeal to prior work.  So here we are able to concentrate on
+%% the model itself.  The model is formalized in Agda, where we have established
+%% associativity for sequential composition.
+
+%% For the memory-model specialist, we retain the good properties of the prior
+%% work on Pomsets with Preconditions, fixing some errors along the way.  These
+%% properties include efficient implementation on ARMv8, support for compiler
+%% optimizations, support for logics that prove the absence of thin-air
+%% behaviors, and a local data race freedom theorem.
