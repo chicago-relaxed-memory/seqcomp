@@ -165,8 +165,8 @@ quantified.  In examples, we drop elements of actions, using defaults.  We
 write $\DXP[\amode]{}[\ascope]{}[\aThrd]$ to stand for
 $\DWP[\amode]{}[\ascope]{}[\aThrd]$ or $\DRP[\amode]{}[\ascope]{}[\aThrd]$.
 % or $\DFP[\ascope]{\amode}[\aThrd]$.
-% We write $\DWP[\gemode\mRA]{}{}$ to stand for either
-% $\DWP[\mRA]{}{}$ or $\DWP[\mSC]{}{}$, and similarly for other actions and
+% We write $\DWP[\gemode\mREL]{}{}$ to stand for either
+% $\DWP[\mREL]{}{}$ or $\DWP[\mSC]{}{}$, and similarly for other actions and
 % modes.
 
 Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
@@ -188,19 +188,19 @@ Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$,
   Let \begin{math}
   {\reorderra}
     =
-    \{(\aAct,             \DW[\gemode\mRA]{}{}     )\C
-    (\aAct,               \DF{\gemode\mREL}        )\C
-    (\DR{}{},             \DF{\gemode\mACQ}        )\C
-    (\DR{\aLoc}{},        \DR[\gemode\mRA]{\aLoc}{})\C
-    (\DR[\gemode\mRA]{}{},\aAct                    )\C
-    (\DF{\gemode\mACQ},   \aAct                    )\C
-    (\DF{\gemode\mREL},   \DW{}{}                  )\C
-    (\DW[\gemode\mRA]{\aLoc}{},\DW{\aLoc}{})\}
+    \{(\aAct,             \DW[\gemode\mREL]{}{}     )\C
+    (\aAct,               \DF{\gemode\fREL}        )\C
+    (\DR{}{},             \DF{\gemode\fACQ}        )\C
+    (\DR{\aLoc}{},        \DR[\gemode\mACQ]{\aLoc}{})\C
+    (\DR[\gemode\mACQ]{}{},\aAct                    )\C
+    (\DF{\gemode\fACQ},   \aAct                    )\C
+    (\DF{\gemode\fREL},   \DW{}{}                  )\C
+    (\DW[\gemode\mREL]{\aLoc}{},\DW{\aLoc}{})\}
   \end{math}.
 
   Action $\aAct$ \emph{delays} $\bAct$ if $\aAct\eqreordersc\bAct$ or $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$.
 
-Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
+Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\fACQ}$ are
 \emph{release actions}.
 
 
@@ -821,15 +821,15 @@ consistent executions up to mumbling
   makes no distinction between synchronizing and relaxed access, thus
   allowing:
   \begin{gather*}
-    x\GETS0\SEMI %y\GETS0\SEMI
-    x\GETS 1\SEMI y^\mRA\GETS1 \PAR r\GETS y^\mRA\SEMI s\GETS x
+    \PW{x}{0}\SEMI 
+    \PW{x}{1}\SEMI \PW[\mREL]{y}{1} \PAR \PR[\mACQ]{y}{r} \SEMI \PR{x}{s} 
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
         \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
-        \raevent{ry1}{\DR[\mRA]{y}{1}}{right=2.5em of wy1}
+        \raevent{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
+        \raevent{ry1}{\DR[\mACQ]{y}{1}}{right=2.5em of wy1}
         \event{rx0}{\DR{x}{0}}{right=of ry1}
         % \sync{wx1}{wy1}
         % \sync{ry1}{rx0}
@@ -839,7 +839,7 @@ consistent executions up to mumbling
         \rf[out=15,in=165]{wx0}{rx0}
       \end{tikzinline}}
   \end{gather*}  
-  We show how to enforce the intended semantics, where $\DWP[\mRA]{y}{1}$
+  We show how to enforce the intended semantics, where $\DWP[\mREL]{y}{1}$
   \emph{publishes} $\DWP{x}{1}$ in \refex{ex:pub2}.
 \end{example}
 In diagrams, we use different shapes and colors for arrows and events.  These
@@ -1033,12 +1033,12 @@ pomsets, every read is fulfilled and every precondition is a tautology.
 \begin{example}
   \label{ex:data}
   A simple example of a data dependency
-  is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS r}$,
-  for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
+  is a pomset $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$,
+  for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\PW{y}{r}}$
   such as the following, where $\aVal=1$:
   % \vspace{-.5\baselineskip}
   \begin{gather*}
-    y\GETS r
+    \PW{y}{r}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -1048,7 +1048,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   The value chosen for the read may be different from that chosen for the write:
   % \vspace{-.5\baselineskip}
   \begin{gather*}
-    r\GETS x\SEMI y\GETS r
+    \PR{x}{r}\SEMI \PW{y}{r}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -1064,7 +1064,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   cases: the independent case, which again cannot be part of a top-level
   pomset,
   \begin{gather*}
-    r\GETS x\SEMI y\GETS r
+    \PR{x}{r}\SEMI \PW{y}{r}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -1074,7 +1074,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   \end{gather*}
   and the dependent case:
   \begin{gather*}
-    % r\GETS x\SEMI y\GETS r
+    % \PR{x}{r}\SEMI \PW{y}{r}
     % \\
     % \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -1089,11 +1089,11 @@ pomsets, every read is fulfilled and every precondition is a tautology.
 
 \begin{example}
   Control dependencies are similar, for example
-  for any $\aPS\in\sem{r\GETS x\SEMI \IF r \THEN y\GETS 1 \FI}$,
-  there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\IF r \THEN y\GETS 1 \FI}$
+  for any $\aPS\in\sem{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}$,
+  there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\IF r \THEN \PW{y}{1} \FI}$
   such as:
   \begin{gather*}
-    \IF r \THEN y\GETS 1 \FI
+    \IF r \THEN \PW{y}{1} \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -1105,14 +1105,14 @@ pomsets, every read is fulfilled and every precondition is a tautology.
 
 \begin{example}
   A simple example of an independency
-  is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS 1}$,
+  is a pomset $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{1}}$,
   for which there must be:
   % an %$\aVal\in\Val$ and
-  % $\aPS'\in \sem{y\GETS r}$
+  % $\aPS'\in \sem{\PW{y}{r}}$
   % such as:
   % \vspace{-1\baselineskip}
   \begin{gather*}
-    y\GETS 1
+    \PW{y}{1}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -1121,7 +1121,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   \end{gather*}
   In this case it doesn't matter what value the read chooses:
   \begin{gather*}
-    r\GETS x\SEMI y\GETS 1
+    \PR{x}{r}\SEMI \PW{y}{1}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -1134,12 +1134,12 @@ pomsets, every read is fulfilled and every precondition is a tautology.
 \end{example}
 
 \begin{example}
-  Consider $\aPS\in\sem{\IF {r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI}$, so
-  there must be $\aPS_1\in\sem{y\GETS r}$,
-  and $\aPS_2\in\sem{y\GETS 1}$, such as:
+  Consider $\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, so
+  there must be $\aPS_1\in\sem{\PW{y}{r}}$,
+  and $\aPS_2\in\sem{\PW{y}{1}}$, such as:
   \begin{align*}
     \begin{gathered}
-      y \GETS r
+      \PW{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
           \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
@@ -1147,7 +1147,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
     \end{gathered}
     &&
     \begin{gathered}
-      y \GETS 1
+      \PW{y}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
           \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
@@ -1158,7 +1158,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   we can consider the case where the event \emph{coalesces} from the two pomsets,
   in which case:
   \begin{gather*}
-    \IF{r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI
+    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]

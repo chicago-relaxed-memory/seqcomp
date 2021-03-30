@@ -12,10 +12,10 @@
     \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
-      \PW[\mRA]{x}{\aExp}
+      \PW[\mREL]{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \raevent{a}{\Qr{*}\land\Qw{*}\land\aExp{=}v\mid\DW[\mRA]{x}{v}}{}
+          \raevent{a}{\Qr{*}\land\Qw{*}\land\aExp{=}v\mid\DW[\mREL]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qw{x}]}{above=of a}
           \xform{xd}{\bForm\land \aExp{=}\aVal}{below=of a}
           \xo{a}{xd}
@@ -47,10 +47,10 @@
     \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
-      \PR[\mRA]{x}{r}
+      \PR[\mACQ]{x}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \raevent{a}{\Qw{x}\mid\DR[\mRA]{x}{v}}{}
+          \raevent{a}{\Qw{x}\mid\DR[\mACQ]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xo{a}{xd}

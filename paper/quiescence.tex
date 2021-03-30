@@ -363,15 +363,15 @@ symbols, for example:
   allowed by \refdef{def:pomsets-co}.
   \begin{gather*}
     \begin{gathered}
-      x\GETS0\SEMI %y\GETS0\SEMI
-      x\GETS 1\SEMI y^\mRA\GETS1 \PAR r\GETS y^\mRA\SEMI s\GETS x
+      \PW{x}{0}\SEMI %\PW{y}{0}\SEMI
+      \PW{x}{1}\SEMI \PW[\mREL]{y}{1} \PAR \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
       \\[-.4ex]
       \nonumber
       \hbox{\begin{tikzinline}[node distance=1.5em]
           \event{wx0}{\DW{x}{0}}{}
           \event{wx1}{\DW{x}{1}}{right=of wx0}
-          \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
-          \raevent{ry1}{\DR[\mRA]{y}{1}}{right=2.5em of wy1}
+          \raevent{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
+          \raevent{ry1}{\DR[\mACQ]{y}{1}}{right=2.5em of wy1}
           \event{rx0}{\DR{x}{0}}{right=of ry1}
           % \sync{wx1}{wy1}
           % \sync{ry1}{rx0}
@@ -383,15 +383,15 @@ symbols, for example:
     \end{gathered}
   \end{gather*}
   We disallow this by introducing order
-  $\DWP{x}{1}\xsync \DWP[\mRA]{y}{1}$
+  $\DWP{x}{1}\xsync \DWP[\mREL]{y}{1}$
   and
-  $\DRP[\mRA]{y}{1}\xsync \DRP{x}{0}$.
+  $\DRP[\mACQ]{y}{1}\xsync \DRP{x}{0}$.
   \begin{gather*}
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
         \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
-        \raevent{ry1}{\DR[\mRA]{y}{1}}{right=2.5em of wy1}
+        \raevent{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
+        \raevent{ry1}{\DR[\mACQ]{y}{1}}{right=2.5em of wy1}
         \event{rx0}{\DR{x}{0}}{right=of ry1}
         \sync{wx1}{wy1}
         \sync{ry1}{rx0}
@@ -509,7 +509,7 @@ top-level pomsets.
     \end{gathered}
     &&
     \begin{gathered}
-      \PW[\mRA]{y}{1}
+      \PW[\mREL]{y}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \raevent{a2}{1{=}1\land\QS{\bLoc}{\mRA}\mid\DW{y}{2}}{}
@@ -522,7 +522,7 @@ top-level pomsets.
   Since $\QS{\bLoc}{\mRA}[\FALSE/\QS{\aLoc}{\mRLX}]$ is $\FALSE$,
   composing these without order simplifies to:
   \begin{gather*}
-    \PW{x}{1}\SEMI \PW[\mRA]{y}{1}
+    \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
@@ -541,7 +541,7 @@ top-level pomsets.
   In order to get a satisfiable precondition for $\DWP{y}{1}$, we must
   introduce order:
   \begin{gather*}
-    % \PW{x}{1}\SEMI \PW[\mRA]{y}{1}
+    % \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
     % \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
@@ -565,7 +565,7 @@ top-level pomsets.
   \refdef{def:pomsets-co} enforces subscription.  Consider:
   \begin{align*}
     \begin{gathered}
-      \PR[\mRA]{y}{r}
+      \PR[\mACQ]{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and .5em]
           \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}
@@ -589,7 +589,7 @@ top-level pomsets.
   Since $\QL{\aLoc}{\mRLX}[\FALSE/\QL{\bLoc}{\mRA}]$ is $\FALSE$,
   composing these without order simplifies to:
   \begin{gather*}
-    \PR[\mRA]{y}{r}\SEMI \PR{x}{s}
+    \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}
@@ -607,7 +607,7 @@ top-level pomsets.
   In order to get a satisfiable precondition for $\DRP{x}{1}$, we must
   introduce order:
   \begin{gather*}
-    % \PR[\mRA]{y}{r}\SEMI \PR{x}{s}
+    % \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
     % \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \raevent{a1}{\QL{\bLoc}{\mRA}\mid\DR{y}{1}}{}

@@ -13,10 +13,10 @@
     \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
-      \PW[\mRA]{x}{\aExp}
+      \PW[\mREL]{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \raevent{a}{\Qra\land\Qrlx \land\aExp{=}v\mid\DW[\mRA]{x}{v}}{}
+          \raevent{a}{\Qra\land\Qrlx \land\aExp{=}v\mid\DW[\mREL]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qrlx]}{above=of a}
           \xform{xd}{\bForm\land \aExp{=}\aVal}{below=of a}
           %\xform{xd}{\bForm[(\Qrlx\land\aExp{=}\aVal)/\Qrlx]}{below=of a}
@@ -50,10 +50,10 @@
     \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
-      \PR[\mRA]{x}{r}
+      \PR[\mACQ]{x}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \raevent{a}{\Qra\mid\DR[\mRA]{x}{v}}{}
+          \raevent{a}{\Qra\mid\DR[\mACQ]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qrlx][\FALSE/\Qra]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xo{a}{xd}

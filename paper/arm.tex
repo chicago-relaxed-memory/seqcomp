@@ -41,15 +41,15 @@ which is very close to our model.
   \begin{gather*}
     \PW{x}{0}\SEMI
     \IF{x}\THEN\PW{y}{2}\FI\SEMI
-    \IF{\PR[\mRA]{z}{}}\THEN
+    \IF{\PR[\mACQ]{z}{}}\THEN
       \PR{x}{s}\SEMI
       \IF{s\;\mathsf{even}}\THEN\PW{w}{4}\FI
     \FI
     \PAR
     \PW{x}{2}\SEMI
-    \IF{\PR[\mRA]{y}{}}\THEN
+    \IF{\PR[\mACQ]{y}{}}\THEN
       \PW{x}{3}\SEMI
-      \PW[\mRA]{z}{1}
+      \PW[\mREL]{z}{1}
     \FI
     \SEMI
     \PW{x}{\PR{w}{}}
@@ -58,14 +58,14 @@ which is very close to our model.
         \event{2a}{\DW{x}{0}}{}
         \event{2b}{\DR{x}{2}}{right=of 2a}
         \event{2c}{\DW{y}{1}}{right=of 2b}
-        \raevent{2d}{\DR[\mRA]{z}{1}}{right=of 2c}
+        \raevent{2d}{\DR[\mACQ]{z}{1}}{right=of 2c}
         \event{2e}{\DR{x}{4}}{right=of 2d}
         \event{2f}{\DW{w}{4}}{right=of 2e}
         %
         \event{3a}{\DW{x}{2}}{below=of 2a}
-        \raevent{3b}{\DR[\mRA]{y}{1}}{right=of 3a}
+        \raevent{3b}{\DR[\mACQ]{y}{1}}{right=of 3a}
         \event{3c}{\DW{x}{3}}{right=of 3b}
-        \raevent{3d}{\DW[\mRA]{z}{1}}{right=of 3c}
+        \raevent{3d}{\DW[\mREL]{z}{1}}{right=of 3c}
         \event{3e}{\DR{w}{4}}{right=of 3d}
         \event{3f}{\DW{x}{4}}{right=of 3e}
         \wk{2a}{2b}
@@ -109,17 +109,17 @@ specifically) is that it destroys roach-motel.
   which we have elided.
   \begin{gather*}
     \PW{x}{2}\SEMI 
-    \PR[\mRA]{x}{r}\SEMI
+    \PR[\mACQ]{x}{r}\SEMI
     \PW{y}{1} \PAR
     \PW{y}{2}\SEMI
-    \PW[\mRA]{x}{1}
+    \PW[\mREL]{x}{1}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a}{\DW{x}{2}}{}
-        \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+        \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
         \event{c}{\DW{y}{1}}{right=of b}
         \event{d}{\DW{y}{2}}{right=2.5em of c}
-        \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+        \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
         \rf{a}{b}
         \sync{b}{c}
         \wk{c}{d}
@@ -128,15 +128,15 @@ specifically) is that it destroys roach-motel.
       \end{tikzinline}}
   \end{gather*}
   Under \EGC{}, this is explained by dropping the order
-  $\DRP[\mRA]{x}{2}\xsync\DWP{y}{1}$, because $\DRP[\mRA]{x}{2}$ is fulfilled
+  $\DRP[\mACQ]{x}{2}\xsync\DWP{y}{1}$, because $\DRP[\mACQ]{x}{2}$ is fulfilled
   by a relaxed write in the same thread.
   \begin{gather*}
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a}{\DW{x}{2}}{}
-        \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+        \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
         \event{c}{\DW{y}{1}}{right=of b}
         \event{d}{\DW{y}{2}}{right=2.5em of c}
-        \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+        \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
         \rf{a}{b}
         % \sync{b}{c}
         \wk{c}{d}
@@ -235,10 +235,10 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
     \end{gathered}  
     &&
     \begin{gathered}[t]
-      \PR[\mRA]{x}{r}
+      \PR[\mACQ]{x}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\DR[\mRA]{x}{2}}{}
+          \raevent{b}{\DR[\mACQ]{x}{2}}{}
           % \xform{x1d}{2{=}r\limplies\bForm}{below=of b}
           \xform{x1i}{\Dx{x} \land\bForm[\FALSE/\Qr{x}]}{below=of b} %x1d}
           % \xo{b}{x1d}
@@ -270,12 +270,12 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
     \end{gathered}  
     &&
     \begin{gathered}[t]
-      \PR[\mRA]{x}{r}
+      \PR[\mACQ]{x}{r}
       \SEMI
       \PW{y}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\DR[\mRA]{x}{2}}{}
+          \raevent{b}{\DR[\mACQ]{x}{2}}{}
           \event{c}{\Dx{x}\mid\DW{y}{1}}{right=.7em of b}
         \end{tikzinline}}  
     \end{gathered}  
@@ -285,13 +285,13 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
     \begin{gathered}[t]
       \PW{x}{2}
       \SEMI
-      \PR[\mRA]{x}{r}
+      \PR[\mACQ]{x}{r}
       \SEMI
       \PW{y}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{a}{\DW{x}{2}}{}
-          \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+          \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
           \event{c}{\DW{y}{1}}{right=of b}
           \rf{a}{b}
         \end{tikzinline}}  
@@ -303,17 +303,17 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
 % disallowed by \refdef{def:pomsets-ra}.
 % \begin{gather*}
 %   \PW{x}{2}\SEMI 
-%   \PR[\mRA]{x}{r}\SEMI
+%   \PR[\mACQ]{x}{r}\SEMI
 %   \PR{y}{s} \PAR
 %   \PW{y}{2}\SEMI
-%   \PW[\mRA]{x}{1}
+%   \PW[\mREL]{x}{1}
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=1.5em]
 %     \event{a}{\DW{x}{2}}{}
-%     \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+%     \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
 %     \event{c}{\DR{y}{0}}{right=of b}
 %     \event{d}{\DW{y}{2}}{right=2.5em of c}
-%     \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+%     \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
 %     \rf{a}{b}
 %     \sync{b}{c}
 %     \wk{c}{d}
@@ -363,14 +363,14 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
   \refdef{def:pomsets-ra}.  
   \begin{gather*}
     \begin{gathered}
-      x\GETS0\SEMI x\GETS 1\SEMI y^\mRA\GETS1
+      \PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
       \PAR
-      r\GETS y\SEMI \IF{r}\THEN s\GETS x\FI
+      \PR{y}{r}\SEMI \IF{r}\THEN \PR{x}{s}\FI
       \\[-.4ex]
       \hbox{\begin{tikzinline}[node distance=1.5em]
           \event{wx0}{\DW{x}{0}}{}
           \event{wx1}{\DW{x}{1}}{right=of wx0}
-          \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
+          \raevent{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
           \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
           \event{rx0}{\DR{x}{0}}{right=of ry1}
           \sync{wx1}{wy1}
@@ -457,7 +457,7 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
     \end{gathered}  
     &&
     \begin{gathered}[t]
-      \IF{r}\THEN s\GETS x\FI
+      \IF{r}\THEN \PR{x}{s}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{c}{r\mid\DR{x}{0}}{}
@@ -472,7 +472,7 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
     \begin{gathered}[t]
       \PR{y}{r}
       \SEMI
-      \IF{r}\THEN s\GETS x\FI
+      \IF{r}\THEN \PR{x}{s}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{b}{\DR{y}{1}}{}
@@ -486,7 +486,7 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
     \begin{gathered}[t]
       % \PR{y}{r}
       % \SEMI
-      % \IF{r}\THEN s\GETS x\FI
+      % \IF{r}\THEN \PR{x}{s}\FI
       % \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{b}{\DR{y}{1}}{}
@@ -563,10 +563,10 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
   \xRRD{} does not adversely affect subscription (\refex{ex:subscription}).
   \begin{align*}
     \begin{gathered}[t]
-      \PR[\mRA]{y}{r}
+      \PR[\mACQ]{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
-          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mRA]{y}{1}}{}
+          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mACQ]{y}{1}}{}
           \xform{x1i}{\Dx{y}\land(\RW\limplies\bForm[\FALSE/\QL{\aLoc}{\mRA}])}{right=of b} %x1d}
         \end{tikzinline}}  
     \end{gathered}  
@@ -582,12 +582,12 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
   Since $\QL{y}{\mRA}[\FALSE/\QL{\aLoc}{\mRA}]$ is false, we have:
   \begin{align*}
     \begin{gathered}[t]
-      \PR[\mRA]{y}{r}
+      \PR[\mACQ]{y}{r}
       \SEMI
       \PR{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mRA]{y}{1}}{}
+          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mACQ]{y}{1}}{}
           \event{c}{\Dx{y}\land(\RW\limplies\FALSE)\mid\DW{x}{0}}{right=of b}
         \end{tikzinline}}  
     \end{gathered}  
@@ -595,19 +595,19 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
   Applying $\ref{sTOP}$ yields:
   \begin{align*}
     \begin{gathered}[t]
-      % \PR[\mRA]{y}{r}
+      % \PR[\mACQ]{y}{r}
       % \SEMI
       % \PR{x}{s}
       % \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\TRUE\mid\DR[\mRA]{y}{1}}{}
+          \raevent{b}{\TRUE\mid\DR[\mACQ]{y}{1}}{}
           \event{c}{\Dx{y}\land(\FALSE\limplies\FALSE)\mid\DW{x}{0}}{right=of b}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
   Although $(\FALSE\limplies\FALSE)$ is a tautology, $\Dx{y}$ is not.  Thus,
   the pomset can only contribute to a top-level pomset if the thread is
-  preceded by a relaxed write to $y$, allowing $\DRP[\mRA]{y}{1}$ to be
+  preceded by a relaxed write to $y$, allowing $\DRP[\mACQ]{y}{1}$ to be
   downgraded to a relaxed read.
 \end{example}
 
