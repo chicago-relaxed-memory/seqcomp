@@ -89,10 +89,13 @@ We require that:
 \item formulae include equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
 \item formulae are closed under negation, conjunction, disjunction, and
   substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$,
-\item there is an entailment relation
-  $\vDash\subseteq(\Formulae\times\Formulae)$ %between formulae
-  with the expected semantics for $=$, $\lnot$, $\land$, $\lor$, $\limplies$
-  and substitution.
+\item there is a relation \emph{implies} between
+  formulae, capturing entailment, %\subseteq(\Formulae\times\Formulae)$ %
+\item \emph{implies} has the expected semantics for $=$, $\lnot$, $\land$, $\lor$,
+  $\limplies$ and substitution,
+\item there are relations \emph{matches}, \emph{blocks}, and \emph{waits for}
+  between actions,  
+\item there is a subset of actions, known as \emph{release} actions.
 \end{itemize}
 
 Logical formulae include equations over registers, such as
@@ -116,14 +119,14 @@ $\aForm\limplies(\bForm\limplies\cForm)$.
 %   \emph{dependent} otherwise.
 %   We say $\aForm$ is \emph{location independent} if it is independent of
 %   every location.
-We say
-$\aForm$ \emph{implies} $\bForm$ if $\aForm\vDash\bForm$.
+% We say
+% $\aForm$ \emph{implies} $\bForm$ if $\aForm\vDash\bForm$.
 % We say that
 We say
-$\aForm$ is a \emph{tautology} if $\TRUE\vDash\aForm$.
+$\aForm$ is a \emph{tautology} if $\TRUE$ implies $\aForm$.
 % We say that
 We say
-$\aForm$ is \emph{unsatisfiable} if $\aForm\vDash\FALSE$.
+$\aForm$ is \emph{unsatisfiable} if $\aForm$ implies $\FALSE$.
 % \end{definition}
 
 
@@ -147,40 +150,55 @@ instead that
 % In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
 % assumption.
 
-\begin{definition}
-  \label{def:reorderra}
-  Reorderability relations.
-  Coherence-after and synchronization.
-  \begin{align*}
-    {\reorderca}
-    &=
-    \{(\DW{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
-    \cup\{(\DR{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
-    \cup\{(\DW{\aLoc}{}, \DR{\bLoc}{})\}
-    %\\&
-    \;\cup\;\{(\DR{\aLoc}{}, \DR{\bLoc}{}) \}
-    \\
-    {\reorderra}
-    &=
-    \{(\DW[\amode\neq\mSC]{}{}, \DR[\bmode\neq\mSC]{}{})\}% \mid \amode\neq\mSC \lor \bmode\neq\mSC\}
-    \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{}) \} %\mid \amode\neq\mREL \}
-    \cup\{(\DF{\mREL},      \DR[\bmode]{}{}) \}%\mid \amode=\mREL \}
-    \\&
-    \cup\{(\DR[\mRLX]{}{}, \DW[\mRLX]{}{}) \}
-    \cup\{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \} %\mid \bmode\neq\mACQ\}
-    \cup\{(\DW[\amode]{}{}, \DF{\mACQ}     ) \}%\mid \bmode=\mACQ \}
-    \cup\{(\DF{\mREL},      \DF{\mACQ}    ) \}
-    % \\&
-    % \cup\{(\DR[\mRLX]{\aLoc}{}, \DG{\mACQ}{\aLocs})\mid \aLoc \in\aLocs \}
-    \\
-    {\reorderlt}
-    &=
-    {\reorderra}\cap{\reorderca} %\{(\aAct, \bAct) \mid \aAct\reorderco\bAct \land \aAct\reorderra\bAct\}
-  \end{align*}  
-\end{definition}
+
+In this paper, we let actions be reads, writes and fences:
+\begin{displaymath}
+  \aAct,\bAct \BNFDEF \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
+  \BNFSEP \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
+  \BNFSEP \DF[\ascope]{\fmode}[\aThrd]
+\end{displaymath}
+% % writes $\DWP[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
+% reads $\DRP[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
+% and fences $\DFP[\ascope]{\fmode}[\aThrd]$.
+In definitions, we drop elements of actions that are existentially
+quantified.  In examples, we drop elements of actions, using defaults.  We
+write $\DXP[\amode]{}[\ascope]{}[\aThrd]$ to stand for
+$\DWP[\amode]{}[\ascope]{}[\aThrd]$ or $\DRP[\amode]{}[\ascope]{}[\aThrd]$.
+% or $\DFP[\ascope]{\amode}[\aThrd]$.
+% We write $\DWP[\gemode\mRA]{}{}$ to stand for either
+% $\DWP[\mRA]{}{}$ or $\DWP[\mSC]{}{}$, and similarly for other actions and
+% modes.
 
 Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
+
 Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
+
+  Let 
+  \begin{math}
+    {\eqreordersc}
+    =
+    \{(\DX[\mSC]{}{},\DX[\mSC]{}{})\}
+  \end{math}.
+  Let 
+  \begin{math}
+    {\eqreorderco}
+    =
+    \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{}),\;(\DW{\aLoc}{}, \DR{\aLoc}{})\}
+  \end{math}.
+  Let \begin{math}
+  {\reorderra}
+    =
+    \{(\aAct,             \DW[\gemode\mRA]{}{}     )\C
+    (\aAct,               \DF{\gemode\mREL}        )\C
+    (\DR{}{},             \DF{\gemode\mACQ}        )\C
+    (\DR{\aLoc}{},        \DR[\gemode\mRA]{\aLoc}{})\C
+    (\DR[\gemode\mRA]{}{},\aAct                    )\C
+    (\DF{\gemode\mACQ},   \aAct                    )\C
+    (\DF{\gemode\mREL},   \DW{}{}                  )\C
+    (\DW[\gemode\mRA]{\aLoc}{},\DW{\aLoc}{})\}
+  \end{math}.
+
+  Action $\aAct$ \emph{delays} $\bAct$ if $\aAct\eqreordersc\bAct$ or $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$.
 
 Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
 \emph{release actions}.
@@ -192,40 +210,42 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
   \label{def:pomset}
   A \emph{pomset with predicate transformers} over $\Act$
   is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\le}, {\rrfx})$ where
-  \begin{enumerate}
-  \item $\Event\subseteq\AllEvents$ is a set of \emph{events},
-  \item
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \item \label{pom-E}
+    $\Event\subseteq\AllEvents$ is a set of \emph{events},
+  \item \label{pom-lambda}
     $\labeling: \Event \fun \Act$ defines a \emph{label} for each event,
-  \item
+  \item \label{pom-kappa}
     $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
-  \item
+  \item \label{pom-tau}
     $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ defines a \emph{predicate transformer} for each set of events,
-  \item
+  \item \label{pom-term}
     $\aTerm:\Formulae$ defines a \emph{termination condition},
-  \item 
+  \item \label{pom-le}
     ${\le} \subseteq (\Event\times\Event)$, is a partial order capturing \emph{causality},
-  \item
-    \label{pom-rf}
-    ${\rrfx} \subseteq (\Event\times\Event)$ is a relation capturing \emph{reads-from} such that %$\{(\bEv,\aEv)\mid\labeling(\aEv)=\DWP{\aLoc}{\aVal}\textand\labeling(\bEv)=\DRP{\aLoc}{\aVal}\}$,
-    \begin{itemize}
-    \item[(\ref{pom-rf}a)]
-      if $(\bEv,\aEv)\in{\rrfx}$ and $(\cEv,\aEv)\in{\rrfx}$ then $\bEv=\cEv$,
-    \item[(\ref{pom-rf}b)]
+  \item \label{pom-rf}
+    ${\rrfx} : \Event\fun\Event$ is a partial function capturing \emph{reads-from} such that 
+    \begin{enumerate}
+    % \item
+    %   if $(\bEv,\aEv)\in{\rrfx}$ and $(\cEv,\aEv)\in{\rrfx}$ then $\bEv=\cEv$,
+    \item \label{pom-rf-le}
+      if $(\bEv,\aEv)\in{\rrfx}$ then $\bEv\le\aEv$.
+    \item \label{pom-rf-match}
       if $(\bEv,\aEv)\in{\rrfx}$ then $\labeling(\bEv)$ matches $\labeling(\aEv)$,
-    \item[(\ref{pom-rf}c)]
+    \item \label{pom-rf-block}
       if $(\bEv,\aEv)\in{\rrfx}$ and $\labeling(\cEv)$ blocks
       $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
-    \item[(\ref{pom-rf}d)]
-      if $(\bEv,\aEv)\in{\rrfx}$ then $\bEv\le\aEv$.
-    \end{itemize}
+    \end{enumerate}
   \end{enumerate}
 \end{definition}
 
 \begin{definition}
   A pomset is \emph{top-level} if for every $\aEv\in\aEvs$:
-  \begin{enumerate}
-  \item $\labelingForm(\aEv)$ is a tautology,    
-  \item if $\labeling(\aEv)=\DRP{}{}$ then $(\exists\bEv)\;(\bEv,\aEv)\in{\rrfx}$.
+  \begin{enumerate}[,label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
+  \item \label{pom-top-true}
+    $\labelingForm(\aEv)$ is a tautology,    
+  \item \label{pom-top-rf}
+    if $\labeling(\aEv)$ is a read then there is some $\bEv\xrfx\aEv$.
   \end{enumerate}
 \end{definition}
 
@@ -237,6 +257,8 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
     \begin{enumerate}[topsep=0pt]
     \item \label{par-E}
       $\aEvs = (\aEvs_1\cup\aEvs_2)$,
+      ${\le}\supseteq\PBR{{\le_1}\cup{\le_2}}$, 
+      ${\rrfx}\supseteq\PBR{{\rrfx_1}\cup{\rrfx_2}}$,
     \item \label{par-lambda}
       ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
       %if $\aEv\in\aEvs_2$ then $\labeling(\aEv) = \labeling_2(\aEv)$,
@@ -294,7 +316,8 @@ Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
     where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write,
     and $\Cdown{\aEv}=\aEvs_1$, otherwise,
   \item \label{seq-reorder}
-    if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\le\aEv$ or $\labeling_1(\bEv)\reorderlt\labeling_2(\aEv)$,
+    if %$\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ then either $\bEv\le\aEv$ or
+    $\labeling_1(\bEv)$ and $\labeling_2(\aEv)$,
   \item \label{seq-rf2}
     if $(\bEv,\aEv)\in{\rrfx}$
     and $\labeling(\cEv)$ blocks $\labeling(\aEv)$
