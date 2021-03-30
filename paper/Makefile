@@ -2,6 +2,8 @@ paper:
 	rm  -f paper.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error paper.tex
 	killall Skim
+diff:
+	git latexdiff --main paper.tex HEAD --
 main:
 	rm  -f main.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error main.tex
