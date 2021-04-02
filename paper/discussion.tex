@@ -2076,14 +2076,14 @@ the other.
 \section{Differences with OOPSLA}
 \label{sec:diff}
 
-\subsubsection*{Substitution}
+\myparagraph{Substitution}
 
 \jjr{} uses substitution rather than Skolemizing.  Indeed our use of
 Skolemization is motivated by disjunction closure for predicate transformers,
-which do not appear in \jjr{}; see \textsection\ref{sec:pomsets-trans}.
-
-In \textsection\ref{sec:tc1}, % (\refdef{def:pomsets-lir}):
-we give the semantics of load for nonempty pomsets as:
+which do not appear in \jjr{}.
+In \textsection\ref{sec:tc1} on local invariant
+reasoning (\xLIR), % (\refdef{def:pomsets-lir}):
+we gave the semantics of load for nonempty pomsets as:
 \begin{enumerate}
 \item[\ref{L4})]
   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
@@ -2102,15 +2102,48 @@ In \jjr{}, the definition is roughly as follows:
 \item[\ref{L5})]
   $\aTr{\cEvs}{\bForm}\;$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$.
 \end{enumerate}
-These substitutions collapse $\aLoc$ and $\aReg$, allowing local invariant
+The use of conjunction in \ref{L5} causes disjunction closure to fail
+because the predicate transformer
+% $\aTr{}{\bForm}=\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$ does not distribute through
+% disjunction:
+% \begin{math}
+%   \aTr{}{\bForm_1\lor \bForm_2}=
+%   (\bForm_1\lor \bForm_2)[\aVal/\aReg][\aVal/\aLoc]\land(\bForm_1\lor \bForm_2)[\aLoc/\aReg]
+%   \neq
+%   (\bForm_1[\aVal/\aReg][\aVal/\aLoc]\land\bForm_1[\aLoc/\aReg]) \lor
+%   (\bForm_2[\aVal/\aReg][\aVal/\aLoc]\land\bForm_2[\aLoc/\aReg])
+%   = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+% \end{math}
+$\aTr{}{\bForm}=\bForm'\land\bForm''$ does not distribute through
+disjunction, even assuming that the prime operations do:\footnote{%
+  \begin{math}
+    (\bForm_1\lor \bForm_2)'=(\bForm_1'\lor \bForm_2')
+  \end{math}
+  and
+  \begin{math}
+    (\bForm_1\lor \bForm_2)''=(\bForm_1''\lor \bForm_2'')
+  \end{math}.
+}
+\begin{math}
+  \aTr{}{\bForm_1\lor \bForm_2}=
+  \href{https://www.wolframalpha.com/input/?i=\%28a+or+b\%29+and+\%28c+or+d\%29}{(\bForm_1'\lor \bForm_2')\land(\bForm_1''\lor \bForm_2'')}
+  \neq
+  \href{https://www.wolframalpha.com/input/?i=\%28a+and+c\%29+or+\%28b+and+d\%29}{(\bForm_1'\land\bForm_1'') \lor (\bForm_2'\land\bForm_2'')}
+  = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+\end{math}.
+% \begin{math}
+%   (\bForm_{1}^{1}\lor \bForm_{1}^{2}) \land (\bForm_{2}^{1}\lor \bForm_{2}^{2})
+%   \neq
+%   (\bForm_{1}^{1}\land\bForm_{2}^{1}) \lor (\bForm_{1}^{2}\land\bForm_{1}^{2}).
+% \end{math}
+See also \refex{ex:skolem}.
+
+The substitutions collapse $\aLoc$ and $\aReg$, allowing local invariant
 reasoning, as in \textsection\ref{sec:tc1}.  Without Skolemizing it is
 necessary to substitute $[\aLoc/\aReg]$, since the reverse substitution
 $[\aReg/\aLoc]$ is useless when $\aReg$ is bound---compare with
-\textsection\ref{sec:substitutions}.
-
-Including this substitution affects the interaction of local invariant
-reasoning and downset closure---see the following discussion of \emph{downset
-  closure}.
+\textsection\ref{sec:substitutions}.  As discussed below (\ref{p:downset}),
+including this substitution affects the interaction of \xLIR{} and downset closure.
 
 Removing the substitution of $[x/r]$ in the independent case has a technical
 advantage: we no longer require \emph{extended} expressions (which include
@@ -2163,8 +2196,7 @@ references.
 % [Skolemization ensures disjunction closure, which is necessary
 % for associativity. Show example.]
 
-\subsubsection*{Downset closure}
-% \label{sec:downset-compare}
+\myparagraph[p:downset]{Downset closure}
 
 \jjr{} enforces downset closure in the prefixing rule.  Even without this,
 downset closure would be different for the two semantics, due to the use of
@@ -2200,7 +2232,7 @@ is $[0/r][0/x]$, resulting in:
 \end{align*}
 
 
-\subsubsection*{Consistency}
+\myparagraph{Consistency}
 \jjr{} imposes \emph{consistency}, which requires that for every pomset
 $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.  
 \begin{scope}
@@ -2322,7 +2354,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
   \end{scope}  
 \end{scope}
 
-\subsubsection*{Causal Strengthening}
+\myparagraph{Causal Strengthening}
 \labeltext[]{Causal Strengthening}{xCausal}
 \jjr{} imposes \emph{causal strengthening}, which requires for every pomset
 $\aPS$, if $\bEv\le\aEv$ then $\labelingForm(\aEv)$ implies
@@ -2435,7 +2467,7 @@ $\labelingForm(\bEv)$.
   the right.
 \end{scope}
 
-% \subsubsection*{Causal Strengthening and Address Dependencies}
+% \myparagraph{Causal Strengthening and Address Dependencies}
 % \labeltext[]{Causal Strengthening and Address Dependencies}{xADDRxRRD}
 
 \begin{scope}  
@@ -2482,7 +2514,7 @@ $\labelingForm(\bEv)$.
   rather than conjunction, is more precise.
 \end{scope}
 
-\subsubsection*{Parallel Composition}
+\myparagraph{Parallel Composition}
 
 In \jjr{\textsection2.4}, parallel composition is defined allowing coalescing
 of events.  Here we have forbidden coalescing.  This difference appears to be
@@ -2490,7 +2522,7 @@ arbitrary.  In \jjr{}, however, there is a mistake in the handling of
 termination actions.  The predicates should be joined using $\land$, not
 $\lor$.
 
-\subsubsection*{Read-Modify-Write Actions}
+\myparagraph{Read-Modify-Write Actions}
 
 In \jjr{}, the atomicity axioms \ref{A1}/\ref{A2} erroneously applies only to
 overlapping writes, not overlapping reads.  The difficulty can be seen in
@@ -2500,7 +2532,7 @@ overlapping writes, not overlapping reads.  The difficulty can be seen in
 discussed in \refex{ex:rmw-dep}.
 
 
-\subsubsection*{Downgrading Internal Acquiring Reads}
+\myparagraph{Downgrading Internal Acquiring Reads}
 
 Shortly after publication, \citet{anton} noticed a shortcoming of the
 implementation on \armeight{} in \jjr{\textsection 7}.  The proof given there
@@ -2544,7 +2576,7 @@ implementation, which does not rely on read elimination.  The proof idea uses
 a recent alternative characterization of \armeight{}
 \citep{alglave-git-alternate,arm-reference-manual}. %,armed-cats}.
 
-\subsubsection*{Redundant Read Elimination}
+\myparagraph{Redundant Read Elimination}
 
 Contrary to the claim, redundant read elimination fails for \jjr{}.
 We discussed redundant read elimination in \textsection\ref{sec:recycle}.

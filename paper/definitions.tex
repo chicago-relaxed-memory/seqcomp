@@ -2130,10 +2130,18 @@ order.
 
   Our solution is to Skolemize.  We have proven associativity of
   \refdef{def:pomsets-trans} in Agda.  The proof requires that predicate
-  transformers distribute through disjunction (\refdef{def:trans}).
-  Since universal quantification does not distribute through disjunction, the
-  attempt to define predicate transformers using substitution fails (in
-  particular for \ref{L5}.)
+  transformers distribute through disjunction (\refdef{def:trans}).  The
+  attempt to define predicate transformers using substitution fails for
+  \ref{L5} because the predicate transformer
+  $\aTr{}{\bForm}=(\forall\aReg)\bForm$ does not distribute through
+  disjunction:
+  \begin{math}
+    \aTr{}{\bForm_1\lor \bForm_2}=
+    (\forall r)(\bForm_1\lor \bForm_2)
+    \neq
+    ((\forall r)(\bForm_1)) \lor ((\forall r)(\bForm_2))
+    = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+  \end{math}.
 \end{example}
 
 \subsection{The Road Ahead}
