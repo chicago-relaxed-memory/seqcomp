@@ -94,8 +94,8 @@ We require that:
 \item $\rimpliesdef$ has the expected semantics for $=$, $\lnot$, $\land$, $\lor$,
   $\limplies$ and substitution,
 \item there are binary relations $\rmatchesdef$, $\rblocksdef$, and
-  $\rdelaysdef$ between actions,
-\item there is a subset of actions, known as $\sreleasedef$ actions.
+  $\rdelaysdef$, each in $\Act\times\Act$,
+\item there are subsets of actions, distinguishing $\sreaddef$ and $\sreleasedef$ actions.
 \end{itemize}
 
 Logical formulae include equations over registers, such as
@@ -230,12 +230,12 @@ $\sreleasedef$ actions.
     \begin{enumerate}
       % \item
       %   if $(\bEv,\aEv)\in{\rrfx}$ and $(\cEv,\aEv)\in{\rrfx}$ then $\bEv=\cEv$,
-    \item \label{pom-rf-match}
-      if $\bEv\xrfx\aEv$ then$\labeling(\bEv) \rmatches \labeling(\aEv)$,
-    \item \label{pom-rf-block}
+    \item \label{rf-match}
+      if $\bEv\xrfx\aEv$ then $\labeling(\bEv) \rmatches \labeling(\aEv)$,
+    \item \label{rf-block}
       if $\bEv\xrfx\aEv$ and $\labeling(\cEv)$ blocks $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$,
-    \item \label{pom-rf-le}
-      if $\bEv\xrfx\aEv$ then$\bEv\le\aEv$.
+    \item \label{rf-le}
+      if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
     \end{enumerate}
   \end{enumerate}
 \end{definition}
@@ -243,10 +243,10 @@ $\sreleasedef$ actions.
 \begin{definition}
   A pomset is \emph{top-level} if for every $\aEv\in\aEvs$:
   \begin{enumerate}[,label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
-  \item \label{pom-top-true}
+  \item \label{top-true}
     $\labelingForm(\aEv)$ is a tautology,    
-  \item \label{pom-top-rf}
-    if $\labeling(\aEv)$ is a read then there is some $\bEv\xrfx\aEv$.
+  \item \label{top-rf}
+    if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
   \end{enumerate}
 \end{definition}
 
@@ -483,31 +483,27 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
     \end{enumerate}
   \end{multicols}
 
-  \begin{scope}
-    \allowdisplaybreaks
-    \begin{align*}
-      \begin{aligned}
-        \sem[\aThrd]{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
-        \\
-        \sem[\aThrd]{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
-        \\
-        \sem[\aThrd]{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]
-        \\
-        \sem[\aThrd]{\PF[\ascope]{\fmode}} &= \sFENCE[\ascope]{\fmode}[\aThrd]
-      \end{aligned}
-      &&
-      \begin{aligned}
-        \sem[\aThrd]{\SKIP} &= \sSKIP 
-        \\
-        \sem[\aThrd]{\aCmd_1 \LPAR[\bThrd] \aCmd_2} &= \sLPAR{\sem[\bThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
-        \\
-        \sem[\aThrd]{\aCmd_1 \SEMI \aCmd_2} &= \sSEMI{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
-        \\
-        \sem[\aThrd]{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &= \sIFTHEN{\aExp{\neq}0}{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
-      \end{aligned}
-    \end{align*}
-  \end{scope}
-  % \caption{Semantics}
+  \begin{align*}
+    \begin{aligned}
+      \sem[\aThrd]{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
+      \\
+      \sem[\aThrd]{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
+      \\
+      \sem[\aThrd]{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]
+      \\
+      \sem[\aThrd]{\PF[\ascope]{\fmode}} &= \sFENCE[\ascope]{\fmode}[\aThrd]
+    \end{aligned}
+    &&
+    \begin{aligned}
+      \sem[\aThrd]{\SKIP} &= \sSKIP 
+      \\
+      \sem[\aThrd]{\aCmd_1 \LPAR[\bThrd] \aCmd_2} &= \sLPAR{\sem[\bThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
+      \\
+      \sem[\aThrd]{\aCmd_1 \SEMI \aCmd_2} &= \sSEMI{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
+      \\
+      \sem[\aThrd]{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &= \sIFTHEN{\aExp{\neq}0}{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
+    \end{aligned}
+  \end{align*}
 \end{definition}
 
 Full versions:
