@@ -151,6 +151,8 @@ instead that
 % assumption.
 
 
+\subsection{Actions in This Paper}
+
 In this paper, we let actions be reads, writes and fences:
 \begin{displaymath}
   \aAct,\bAct \BNFDEF \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
@@ -202,7 +204,7 @@ Action $\aAct \rdelaysdef \bAct$ if $\aAct\eqreordersc\bAct$ or $\aAct\eqreorder
 
 Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\fACQ}$ are
 $\sreleasedef$ actions.
-
+Actions $\DRP{}{}$ are $\sread$ actions.
 
 \subsection{Model}
 
@@ -386,6 +388,7 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
   \end{multicols}
   \medskip
 
+  \pagebreak
   \noindent
   If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$
   $(\exists\aPS_2\in\aPSS_2)$
