@@ -276,7 +276,8 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
     \item \label{read-lambda}
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
       \stepcounter{enumi}
-    \item[] \stepcounter{enumi}\label{read-tau}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{r}4]{}{read-tau}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-tau-nonempty}
         \begin{math}
@@ -319,7 +320,8 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
         % [\aExp/\aLoc]
         % \land\aExp{=}\aVal
       \end{math},
-    \item[] \stepcounter{enumi}\label{write-term}
+      \stepcounter{enumi}      
+    \item[] \labeltext[\textsc{w}5]{}{write-term}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{write-term-empty}
         if $\aEvs=\emptyset$ then $\aTerm \rimplies \FALSE$,
@@ -364,7 +366,8 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
       $\aEvs = (\aEvs_1\uplus\aEvs_2)$,
     \item \label{par-lambda}
       ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
-    \item[] \stepcounter{enumi}\label{par-kappa}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{p}3]{}{par-kappa}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{par-kappa1}
         if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
@@ -377,29 +380,17 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
       $\aTerm \rimplies \aTerm[1]\land\aTerm[2]$,
     \item \label{par-le-extends}
       ${\le}\rextends{\le_1}{\le_2}$, 
-      % \item \label{par-rf}
-    \item[] \stepcounter{enumi}\label{par-rf}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{par-rf-extends}
-        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
-      \item \label{par-rf-le}
-        ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$.
-      \end{enumerate}
-      % \item \label{par-disjoint}
-      %   $\aEvs_1$ and $\aEvs_2$ are disjoint.
+    \item \label{par-rf}
+      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
     \end{enumerate}
-    % \item \label{par-tau1}
-    %   $\aTr{\bEvs}{\Q{}} \rimplies \aTr[1]{\bEvs}{\Q{}}$,
   \end{multicols}
   \medskip
 
   \noindent
   If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$
   $(\exists\aPS_2\in\aPSS_2)$
-  \\
   let $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,
-  where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is
-  a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
+  where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$, %if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
   % let
   % \begin{math}
   %   \smash{
@@ -414,7 +405,8 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
       $\aEvs = (\aEvs_1\cup\aEvs_2)$,
     \item \label{seq-lambda}
       ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
-    \item[] \stepcounter{enumi}\label{par-kappa}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{s}3]{}{seq-kappa}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-kappa1}
         if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
@@ -434,17 +426,15 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
       $\aTr{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
     \item \label{seq-term}
       $\aTerm \rimplies \aTerm[1]\land\aTr[1]{}{\aTerm[2]}$.
-    \item[] \stepcounter{enumi}\label{par-le}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{s}6]{}{seq-le}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-le-extends}
         ${\le}\rextends{\le_1}{\le_2}$, 
       \item \label{seq-le-delays}
         if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$,
-      \item \label{seq-le-blocks}
-        if $\labeling_1(\cEv)$ blocks $\labeling_2(\aEv)$\\
-        then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
       \end{enumerate}
-    \item \label{seq-rf-extends}
+    \item \label{seq-rf}
       ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
       % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
       % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
@@ -463,7 +453,8 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
     \item \label{if-lambda}
       ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
       % \item[(\ref{par-E}--\ref{par-le})] as for $\sLPAR{}{}$,
-    \item[] \stepcounter{enumi}\label{par-kappa}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{i}3]{}{if-kappa}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{if-kappa1}
         if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \aForm\land\labelingForm_1(\aEv)$,
@@ -508,19 +499,53 @@ Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
   \end{align*}
 \end{definition}
 
-Full versions:
+In $\sIFTHEN{}{}{}$, the definition of $\rextends{}{}$ stops coalescing the rf in
+\begin{displaymath}
+  \IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI
+\end{displaymath}
 
-\medskip
+\subsection{Arm Compilation}
+In parallel composition, add \eqref{par-rf-le} by splitting
+\eqref{par-rf}:
+\begin{enumerate}[label=(\textsc{p}\arabic*),ref=\textsc{p}\arabic*]
+  \setcounter{enumi}{7}  
+\item[] \labeltext[\textsc{p}7]{}{par-rf-arm}
+  \begin{enumerate}[leftmargin=0pt]
+  \item \label{par-rf-extends}
+    ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+  \item \label{par-rf-le}
+    ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$.
+  \end{enumerate}
+\end{enumerate}
+In sequential composition, change the definition of $\Cdown{\aEv}$:
+%$\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
+\begin{displaymath}
+  \Cdown{\aEv}=
+  \begin{cases}
+    \{ \cEv \mid \cEv \lt \aEv \} & textif \labeling(\aEv) \;\text{is a write}
+    \\
+    \aEvs_1 & \textotherwise
+  \end{cases}
+\end{displaymath}
+Add this to \ref{seq-le}:
+\begin{enumerate}
+\item[(\textsc{s}6c)] \labeltext[\textsc{s}6c]{}{seq-le-blocks}
+  if $\labeling_1(\cEv)$ blocks $\labeling_2(\aEv)$
+  then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
+\end{enumerate}
+  
+\subsection{Full Versions}
+
 If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
 $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\cForm:\aEvs\fun\Formulae)$
 \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
-  \item \label{write-x-E}
+  \item \label{write-E-x}
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-  \item \label{write-x-lambda}
+  \item \label{write-lambda-x}
     $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
-  \item \label{write-x-kappa}
+  \item \label{write-kappa-x}
     \begin{math}
       \labelingForm(\aEv) \rimplies
       \cForm_\aEv
@@ -528,7 +553,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     \end{math},
     
     
-  \item \label{write-x-tau}
+  \item \label{write-tau-x}
     % \begin{math}
     %   %   (\forall\aEv\in\aEvs\cap\bEvs)
     %   (\forall\aEv\in\aEvs)
@@ -564,7 +589,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
     %       %     [\FALSE/\Q{}]
     %   }
     %   \end{math}.
-  \item \label{write-x-term}
+  \item \label{write-term-x}
     $\aTerm \rimplies \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
   \end{enumerate}
 \end{multicols}
@@ -575,19 +600,20 @@ $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\cForm:\aEvs\fun\Formulae)$
 % \begin{multicols}{2}
 \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-\item \label{read-x-E}
+\item \label{read-E-x}
   if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-\item \label{read-x-lambda}
+\item \label{read-lambda-x}
   $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
-\item \label{read-x-kappa}
+\item \label{read-kappa-x}
   \begin{math}
     \labelingForm(\aEv) \rimplies
     \cForm_\aEv
   \end{math},
   
-\item[] \stepcounter{enumi}\label{read-tau}
+  \stepcounter{enumi}
+\item[] \labeltext[\textsc{r}4]{}{read-tau-x}
   \begin{enumerate}[leftmargin=0pt]
-  \item \label{read-x-tau-dependent}
+  \item \label{read-tau-dependent-x}
     \begin{math}
       (\forall\aEv\in\aEvs\cap\bEvs)
     \end{math}
@@ -598,7 +624,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
       \limplies \bForm[\uReg{\aEv}/\aReg]
     \end{math},
     
-  \item \label{read-x-tau-independent}
+  \item \label{read-tau-independent-x}
     \begin{math}
       (\forall\aEv\in\aEvs\setminus\bEvs)
     \end{math}
@@ -611,7 +637,7 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
       \bForm[\uReg{\aEv}/\aReg]
     \end{math},
     
-  \item \label{read-x-tau-empty}
+  \item \label{read-tau-empty-x}
     \begin{math}
       (\forall\bReg)
     \end{math}
@@ -627,31 +653,27 @@ $(\exists\cForm:\aEvs\fun\Formulae)$
 %\end{multicols}
 \medskip
 
-In $\sIFTHEN{}{}{}$, the definition of $\rextends{}{}$ stops coalescing the rf in
-\begin{displaymath}
-  \IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI
-\end{displaymath}
 
 
-In diagrams, we use different colors for arrows.  We distinguish
-$\rrfx$ edges that are included in order from those that are not.
-\begin{itemize}
-\item \makebox{$\aEv\xrf\bEv$} arises from $\rrfx$, where $\aEv\le\bEv$,
-\item \makebox{$\aEv\xrfint\bEv$} arises from $\rrfx$, where $\lnot(\aEv\le\bEv)$.
-\end{itemize}
-To help the reader understand why order is included, we also different colors
-for arrows induced by order.  We adopt the following conventions:
-\begin{itemize}  
-  % \item relaxed accesses are blue, with a single border,
-  % \item synchronized accesses are red, with a double border,
-  % \item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
-  % \item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
-  %   \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
-  %   $\bEv$ and their actions \emph{conflict},
-\item \makebox{$\aEv\xwk\bEv$} arises from \emph{fulfillment},
-\item \makebox{$\aEv\xpo\bEv$} arises from control/data/address \emph{dependency},
-\item \makebox{$\aEv\xsync\bEv$} arises from \emph{synchronized access}.
-\end{itemize}
+% In diagrams, we use different colors for arrows.  We distinguish
+% $\rrfx$ edges that are included in order from those that are not.
+% \begin{itemize}
+% \item \makebox{$\aEv\xrf\bEv$} arises from $\rrfx$, where $\aEv\le\bEv$,
+% \item \makebox{$\aEv\xrfint\bEv$} arises from $\rrfx$, where $\lnot(\aEv\le\bEv)$.
+% \end{itemize}
+% To help the reader understand why order is included, we also different colors
+% for arrows induced by order.  We adopt the following conventions:
+% \begin{itemize}  
+%   % \item relaxed accesses are blue, with a single border,
+%   % \item synchronized accesses are red, with a double border,
+%   % \item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
+%   % \item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
+%   %   \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
+%   %   $\bEv$ and their actions \emph{conflict},
+% \item \makebox{$\aEv\xwk\bEv$} arises from \emph{fulfillment},
+% \item \makebox{$\aEv\xpo\bEv$} arises from control/data/address \emph{dependency},
+% \item \makebox{$\aEv\xsync\bEv$} arises from \emph{synchronized access}.
+% \end{itemize}
 
 
 \subsection{Pomsets}
@@ -958,9 +980,9 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
     \setcounter{enumi}{\value{pomsetParDisjointCount}}
   \item[1--\ref{pomsetParDisjointCountLast})]
     as for $\sPAR{}{}$ in \refdef{def:pomset-semantics},
-  \item \label{par-kappa1}
+  \item %\label{par-kappa1}
     if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
-  \item \label{par-kappa2}
+  \item %\label{par-kappa2}
     if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)$.
     \newcounter{pomsetPreParCount}
     \setcounter{pomsetPreParCount}{\value{enumi}}
