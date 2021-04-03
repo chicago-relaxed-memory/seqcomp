@@ -1,9 +1,9 @@
 \begin{figure*}
   \begin{center}
     \begin{minipage}{.91\textwidth}
-      \input{fig-full}
-      % \input{fig-full-where}
-      % \input{fig-full-noco}
+      \input{fig-full.tex}
+      % \input{fig-full-where.tex}
+      % \input{fig-full-noco.tex}
     \end{minipage}
   \end{center}
   \caption{Full Semantics with Address Calculation
@@ -29,20 +29,20 @@
   \end{enumerate}
 
   \begin{enumerate}
-  \item[\ref{S3})] $\labelingForm(\aEv)$ implies $\cExp{=}\cVal \land \aExp{=}\aVal$,
-  \item[\ref{L3})] $\labelingForm(\aEv)$ implies $\cExp{=}\cVal$.
+  \item[\ref{S3})] $\labelingForm(\aEv) \rimplies \cExp{=}\cVal \land \aExp{=}\aVal$,
+  \item[\ref{L3})] $\labelingForm(\aEv) \rimplies \cExp{=}\cVal$.
   \end{enumerate}
 
   \begin{enumerate}
-    % \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
-    % \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
-    % \item[\ref{L4})] $\phantom{(\forall\dVal)}$ $\aTr{\bEvs}{\bForm}$ implies $(\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-    % \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cVal{=}\dVal \limplies (\cExp{=}\dVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-  \item[\ref{L4})] $\aTr{\bEvs}{\bForm}$ implies $(\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
-    % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
-    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
-  \item[\ref{L5})] $\aTr{\cEvs}{\bForm}$ implies $\bForm$.
+    % \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
+    % \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
+    % \item[\ref{L4})] $\phantom{(\forall\dVal)}$ $\aTr{\bEvs}{\bForm} \rimplies (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+    % \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm} \rimplies \cVal{=}\dVal \limplies (\cExp{=}\dVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+  \item[\ref{L4})] $\aTr{\bEvs}{\bForm} \rimplies (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
+    % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies \bForm$.
+    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies \bForm$.
+  \item[\ref{L5})] $\aTr{\cEvs}{\bForm} \rimplies \bForm$.
   \end{enumerate}  
 \end{definition}
 
@@ -51,7 +51,7 @@
   Consider the following example from \jjr{}:
   \begin{align*}
     \begin{gathered}
-      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
+      \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
       \\
       \hbox{\begin{tikzinline}[node distance=.8em]
           \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
@@ -60,7 +60,7 @@
     \end{gathered}
     &&
     \begin{gathered}
-      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
+      \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
       \\
       \hbox{\begin{tikzinline}[node distance=.8em]
           \eventl{d}{a}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{}
@@ -74,9 +74,9 @@
   \begin{align*}
     \begin{gathered}
       \IF{\aExp}\THEN
-      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
+      \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
       \ELSE
-      \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
+      \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
       \FI
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
@@ -90,9 +90,9 @@
   % \begin{align*}
   %   \begin{gathered}
   %     \IF{\aExp}\THEN
-  %     \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
+  %     \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
   %     \ELSE
-  %     \REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r
+  %     \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
   %     \FI
   %     \\
   %     \hbox{\begin{tikzinline}[node distance=1em]
@@ -102,13 +102,13 @@
   %   \end{gathered}
   % \end{align*}
   The precondition of $\DWREF{0}{0}$ is a tautology; however, this is not
-  possible for $(\REF{r} \GETS 0\SEMI \REF{0}\GETS \BANG r)$ alone, using \refdef{def:pomsets-addr}.
+  possible for $(\PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r})$ alone, using \refdef{def:pomsets-addr}.
   % 
   The full semantics, given in \reffig{fig:full}, enables this execution using if-closure.  The
   individual commands have the pomsets:
   \begin{align*}
     \begin{gathered}
-      \REF{r} \GETS 0
+      \PW{\REF{r}}{0}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em]
           \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
@@ -117,7 +117,7 @@
     \end{gathered}
     &&
     \begin{gathered}
-      \REF{0}\GETS \BANG r
+      \PW{\REF{0}}{\BANG r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em]
           \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{}
@@ -130,9 +130,9 @@
   Sequencing and merging, we have: 
   \begin{align*}
     \begin{gathered}
-      \REF{r} \GETS 0
+      \PW{\REF{r}}{0}
       \SEMI
-      \REF{0}\GETS \BANG r
+      \PW{\REF{0}}{\BANG r}
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
           \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
@@ -152,18 +152,18 @@
   \refdef{def:pomsets-addr} we have:
   \begin{enumerate}
     % \item[\ref{L4})]
-    %   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    %   $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
     % \item[\ref{L5})]
-    %   $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+    %   $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\RW)\limplies\bForm$,
     
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies
     \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies
       (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm,
     \end{math}
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies
     \begin{math}
+      \aTr{\cEvs}{\bForm} \rimplies
       ((\cExp{=}\cVal\limplies\aVal{=}\aReg)\lor\RW)\limplies\bForm.
     \end{math}
   \end{enumerate}
@@ -177,9 +177,9 @@
   disallowing the attempted execution below:
   \begin{gather*}
     \begin{gathered}
-      r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      \PR{y}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{x}{s}
       \PAR
-      r\GETS x\SEMI s\GETS \REF{r}\SEMI y\GETS s
+      \PR{x}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{y}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=1.5em]
           \event{a1}{\DR{y}{2}}{}
@@ -200,7 +200,7 @@
   Looking at the left thread:
   \begin{align*}
     \begin{gathered}[t]
-      r\GETS y
+      \PR{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a}{\DR{y}{2}}{}
@@ -211,7 +211,7 @@
     \end{gathered}
     &&
     \begin{gathered}[t]
-      s\GETS \REF{r}
+      \PR{\REF{r}}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{b}{r\EQ2\mid\DR{\REF{2}}{1}}{}
@@ -222,7 +222,7 @@
     \end{gathered}
     &&
     \begin{gathered}[t]
-      x\GETS s
+      \PW{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{b}{s\EQ1\mid\DW{x}{1}}{}
@@ -235,7 +235,7 @@
   Composing, we have:
   \begin{gather*}
     \begin{gathered}
-      r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      \PR{y}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\DR{y}{2}}{}
@@ -249,7 +249,7 @@
   Substituting for $\RW$:
   \begin{gather*}
     \begin{gathered}
-      % r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      % \PR{y}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{x}{s}
       % \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\DR{y}{2}}{}
@@ -263,7 +263,7 @@
   Which is:
   \begin{gather*}
     \begin{gathered}
-      % r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      % \PR{y}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{x}{s}
       % \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\DR{y}{2}}{}
@@ -278,7 +278,7 @@
   of $\DWP{x}{1}$ is not.  This forces a dependency:
   \begin{gather*}
     \begin{gathered}
-      r\GETS y\SEMI s\GETS \REF{r}\SEMI x\GETS s
+      \PR{y}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a1}{\DR{y}{2}}{}
@@ -293,7 +293,7 @@
   All the preconditions are now tautologies.
 \end{example}
 
-\subsection{Merging different labels}
+\subsection{Merging Different labels}
 
 We combine access and fence modes into a single order:
 \begin{align*}
@@ -306,9 +306,9 @@ We combine access and fence modes into a single order:
   \end{tikzcenter}
   &&
   \begin{tikzcenter}
-    \node (fsc) at (3, 0) {$\mathstrut\mFSC$};
-    \node (rel) at (2, -0.3) {$\mathstrut\mREL$};
-    \node (acq) at (2,  0.3) {$\mathstrut\mACQ$};
+    \node (fsc) at (3, 0) {$\mathstrut\fSC$};
+    \node (rel) at (2, -0.3) {$\mathstrut\fREL$};
+    \node (acq) at (2,  0.3) {$\mathstrut\fACQ$};
     \draw[->](rel)to(fsc);
     \draw[->](acq)to(fsc);
   \end{tikzcenter}
@@ -316,26 +316,26 @@ We combine access and fence modes into a single order:
 
 \begin{definition}
   \label{def:compat}
-  Define $\compat{}{}:\Act\times\Act\fun2^{\Act}$ as follows.  If
-  $\aAct_0\in\compat{\aAct_1}{\aAct_2}$, then $\aAct_1$ and $\aAct_2$ can
+  Define $\fmerge{}{}:\Act\times\Act\fun2^{\Act}$ as follows.  If
+  $\aAct_0\in\fmerge{\aAct_1}{\aAct_2}$, then $\aAct_1$ and $\aAct_2$ can
   coalesce, resulting in $\aAct_0$.  This is useful for replacing
-  $(x\GETS1\SEMI x\GETS2)$ by $(x\GETS2)$.
+  $(\PW{x}{1}\SEMI \PW{x}{2})$ by $(\PW{x}{2})$.
   \begin{align*}
-    \compat{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}}
+    \fmerge{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}}
     &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
     \\
-    \compat{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}}
+    \fmerge{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}}
     &= \{ \DW[\amode\lubmode\bmode]{\aLoc}{\bVal} \}
     \\
-    \compat{\DR[\mRLX]{\aLoc}{\aVal}}{\DW[\amode]{\aLoc}{\aVal}}
+    \fmerge{\DR[\mRLX]{\aLoc}{\aVal}}{\DW[\amode]{\aLoc}{\aVal}}
     &= \{ \DW[\amode]{\aLoc}{\aVal} \}
     \\
-    \compat{\DR[\amode\neq\mRLX]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\aVal}}
+    \fmerge{\DR[\amode\neq\mRLX]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\aVal}}
     &= \{ \DW[\mSC]{\aLoc}{\aVal} \}
     \\
-    \compat{\DF{\amode}}{\DF{\bmode}} &= \{ \DF{\amode\lubmode\bmode} \}
+    \fmerge{\DF{\amode}}{\DF{\bmode}} &= \{ \DF{\amode\lubmode\bmode} \}
     \\
-    \compat{\aAct}{\bAct} &= \emptyset, \textotherwise
+    \fmerge{\aAct}{\bAct} &= \emptyset, \textotherwise
   \end{align*}
 \end{definition}  
 
@@ -346,31 +346,56 @@ We combine access and fence modes into a single order:
   if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labeling(\aEv)=\labeling_2(\aEv)$,
 \item \label{seq-lambda12}
   if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labeling(\aEv)\in
-  \compat{\labeling_1(\aEv)}{\labeling_2(\aEv)}$, the first has no rf,
+  \fmerge{\labeling_1(\aEv)}{\labeling_2(\aEv)}$, the first has no rf,
 \end{enumerate}
   
 \subsection{Read-Modify-Write Operations (\xRMW)}
 
 \RMW{} operations are formalized by adding a relation
 ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
-\RMW{} to the succeeding write.  The definition of a pomset requires the
-following, where two actions \emph{overlap} if they access the same location:
-\begin{enumerate}
-\item
-  ${\rrmw} \subseteq {\le}$ is a relation capturing
-  \emph{read-modify-write atomicity}, such that for any $\cEv$, $\bEv$, $\aEv\in\aEvs$,
-  where $\labeling(\cEv)$ and
-  $\labeling(\bEv)$ access the same location:
-  \begin{itemize}
-  \item if $\bEv \xrmw \aEv$ and $\cEv\le \aEv$ then $\cEv\le \bEv$,
-  \item if $\bEv \xrmw \aEv$ and $\bEv\le \cEv$ then $\aEv\le \cEv$.
-  \end{itemize}
-\end{enumerate}
-Extend the definition of par, if, seq to include:
-\begin{itemize}
-\item ${\rrmw}\supseteq\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
-\end{itemize}
+\RMW{} to the succeeding write.
+We say $\aAct \roverlapsdef \bAct$ if they access the same location.
+Extend the definition of a pomset as follows. % where two actions \emph{overlap} if they access the same location:
+% \begin{enumerate}
+% \item
+%   ${\rrmw} \subseteq {\le}$ is a relation capturing
+%   \emph{read-modify-write atomicity}, such that for any $\cEv$, $\bEv$, $\aEv\in\aEvs$,
+%   where $\labeling(\cEv)$ and
+%   $\labeling(\bEv)$ access the same location:
+%   \begin{itemize}
+%   \item if $\bEv \xrmw \aEv$ and $\cEv\le \aEv$ then $\cEv\le \bEv$,
+%   \item if $\bEv \xrmw \aEv$ and $\bEv\le \cEv$ then $\aEv\le \cEv$.
+%   \end{itemize}
+% \end{enumerate}
 
+\begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \setcounter{enumi}{-1}
+\item \label{pom-rmw}
+  ${\rrmw} : \Event\fun\Event$ is a partial function capturing
+  read-modify-write \emph{atomicity}, such that
+  \begin{enumerate}
+    \item \label{pom-rmw-block}
+      if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$,
+  \item \label{pom-rmw-le}
+    if $\bEv\xrmw\aEv$ then $\bEv \le \aEv$,    
+  \item \label{pom-rmw-atomic}
+    if $\labeling(\cEv) \roverlaps \labeling(\bEv)$ then
+    \begin{enumerate}        
+    \item \label{pom-rmw-atomic1}
+      if $\bEv \xrmw \aEv$ then
+      $\cEv\ledep \aEv$ implies $\cEv\le \bEv$,
+    \item \label{pom-rmw-atomic2}
+      if $\bEv \xrmw \aEv$ then
+      $\bEv\ledep \cEv$ implies $\aEv\le \cEv$.
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+Extend the definition of par, if, seq to include:
+\begin{enumerate}
+  \setcounter{enumi}{-1}
+\item ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
+\end{enumerate}
 
 \begin{example}
   This definition ensures atomicity, disallowing executions such as
@@ -378,9 +403,9 @@ Extend the definition of par, if, seq to include:
   \begin{gather*}
     % \taglabel{RMW1}
     \begin{gathered}
-      \aLoc\GETS0\SEMI\bReg\GETS \FADD^{\mRLX,\mRLX}(\aLoc,1)
+      \PW{x}{0}\SEMI \PFADD[\mRLX][\mRLX]{x}{s}{1}
       \PAR
-      x\GETS 2\SEMI s\GETS x
+      \PW{x}{2}\SEMI \PR{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=1.5em]
           \event{a2}{\DR{x}{0}}{}
@@ -396,7 +421,7 @@ Extend the definition of par, if, seq to include:
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
-  By \ref{A1}, since $\DWP{x}{2}\xwk\DWP{x}{1}$, it must be that
+  By \ref{pom-rmw-atomic1}, since $\DWP{x}{2}\xwk\DWP{x}{1}$, it must be that
   $\DWP{x}{2}\xwk\DRP{x}{0}$, creating a cycle.
 \end{example}
 
@@ -405,7 +430,7 @@ Extend the definition of par, if, seq to include:
   Two successful \RMW{}s cannot see the same write:
   \begin{gather*}
     \begin{gathered}
-      x\GETS0\SEMI (\FADD^{\mRLX,\mRLX}(\aLoc,1)\PAR \FADD^{\mRLX,\mRLX}(\aLoc,1))
+      \PW{x}{0}\SEMI (\FADD^{\mRLX,\mRLX}(\aLoc,1)\PAR \FADD^{\mRLX,\mRLX}(\aLoc,1))
       \\
       \hbox{\begin{tikzinline}[node distance=1.5em]
           \event{i}{\DW{x}{0}}{}
@@ -435,13 +460,13 @@ Extend the definition of par, if, seq to include:
   \begin{gather*}
     % \taglabel{RMW2}
     \begin{gathered}
-      r \GETS y\SEMI
-      z \GETS r
+      \PR{y}{r}\SEMI
+      \PW{z}{r}
       \PAR
-      r\GETS z\SEMI
-      x\GETS 0\SEMI
-      s\GETS \FADD^{\mRLX,\mRA}(x,1) \SEMI
-      y\GETS s{+}1
+      \PR{z}{r}\SEMI
+      \PW{x}{0}\SEMI
+      \PFADD[\mRLX][\mREL]{x}{s}{1} \SEMI
+      \PW{y}{s}{+}1
       \\[-1ex]
       \hbox{\begin{tikzinline}[node distance=1.5em]
           \event{a1}{\DR{y}{1}}{}
@@ -470,27 +495,26 @@ Extend the definition of par, if, seq to include:
   reasoning (\xLIR) from \refdef{def:pomsets-lir}:
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]\land\aExp{=}\aVal$,
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aExp/\aLoc]\land\aExp{=}\aVal$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\aExp/\aLoc]$,
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies
-    $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+    $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
   \item[\ref{L6})] 
-    $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
+    $\aTr{\dEvs}{\bForm} \rimplies \bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
   Consider the relaxed variant of the \textsc{cdrf} example from
   \cite{DBLP:conf/pldi/LeeCPCHLV20}, using a semantics for $\FADD$ that
   simply composes the rules for load and store above.
   \begin{gather*}
     \begin{gathered}
-      x\GETS 0\SEMI
+      \PW{x}{0}\SEMI
       \begin{aligned}[t]
-        (&r\GETS \FADD^{\mRLX,\mRLX}(x,1)\SEMI \IF{\BANG r}\THEN \IF{y}\THEN x\GETS 0 \FI \FI \;\;\PAR
+        (&\PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI \;\;\PAR
         \\&
-        r\GETS \FADD^{\mRLX,\mRLX}(x,1)\SEMI \IF{\BANG r}\THEN y\GETS 1 \FI)
+        \PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \PW{y}{1} \FI)
       \end{aligned}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=1em]
@@ -518,7 +542,7 @@ Extend the definition of par, if, seq to include:
   initializer, we have:
   \begin{align*}
     \begin{gathered}[t]
-      x\GETS0
+      \PW{x}{0}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a}{\DW{x}{0}}{}      
@@ -539,7 +563,7 @@ Extend the definition of par, if, seq to include:
     \end{gathered}
     &&
     \begin{gathered}[t]
-      \IF{\BANG r}\THEN y\GETS1 \FI
+      \IF{\BANG r}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a2}{r{=}0\mid\DW{y}{1}}{}      
@@ -559,22 +583,22 @@ an \RMW{}.
 
 [Todo: write out the rules.]
 
-\begin{comment}
+\begin{example}
   Consider the \textsc{cdrf} example from \cite{DBLP:conf/pldi/LeeCPCHLV20}:
   \begin{gather*}
     \begin{gathered}
       \begin{aligned}
-        &r\GETS \FADD^{\mRA,\mRA}(x,1)\SEMI \IF{r{=}0}\THEN y\GETS 1 \FI
+        &\PFADD[\mACQ][\mREL]{x}{r}{1}\SEMI \IF{r{=}0}\THEN \PW{y}{1} \FI
         \\\PAR\;\;&
-        r\GETS \FADD^{\mRA,\mRA}(x,1)\SEMI \IF{r{=}0}\THEN \IF{y}\THEN x\GETS 0 \FI \FI
+        \PFADD[\mACQ][\mREL]{x}{r}{1}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
       \end{aligned}
       \\
       \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
-          \raevent{a1}{\DR[\mRA]{x}{0}}{}
-          \raevent{a1b}{\DW[\mRA]{x}{1}}{right=of a1}
+          \raevent{a1}{\DR[\mACQ]{x}{0}}{}
+          \raevent{a1b}{\DW[\mREL]{x}{1}}{right=of a1}
           \event{a2}{\DW{y}{1}}{right=of a1b}
-          \raevent{b0}{\DR[\mRA]{x}{0}}{right=3em of a2}
-          \raevent{b0b}{\DW[\mRA]{x}{1}}{right=of b0}
+          \raevent{b0}{\DR[\mACQ]{x}{0}}{right=3em of a2}
+          \raevent{b0b}{\DW[\mREL]{x}{1}}{right=of b0}
           \event{b1}{\DR{y}{1}}{right=of b0b}
           \event{b2}{\DW{x}{0}}{right=of b1}
           \rmw{a1}{a1b}
@@ -587,15 +611,15 @@ an \RMW{}.
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
-\end{comment}
-\begin{comment}
+\end{example}
+\begin{example}
   Consider this example from \cite[\textsection C]{DBLP:conf/pldi/LeeCPCHLV20}:
   \begin{gather*}
     \begin{gathered}
       \begin{aligned}
-        &r\GETS \CAS^{\mRLX,\mRLX}(x,0,1)\SEMI \IF{r{\leq}1}\THEN y\GETS 1 \FI
+        &\PCAS[\mRLX][\mRLX]{x}{r}{0}{1}\SEMI \IF{r{\leq}1}\THEN \PW{y}{1} \FI
         \\\PAR\;\;&
-        r\GETS \CAS^{\mRLX,\mRLX}(x,0,2)\SEMI \IF{r{=}0}\THEN \IF{y}\THEN x\GETS 0 \FI \FI
+        \PCAS[\mRLX][\mRLX]{x}{r}{0}{2}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
       \end{aligned}
       \\
       \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
@@ -616,7 +640,7 @@ an \RMW{}.
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
-\end{comment}
+\end{example}
 % \begin{example}
 %   Let $\CAS$ return the value read, which is sufficient to determine whether
 %   the $\CAS$ succeeded.
@@ -653,46 +677,46 @@ an \RMW{}.
 
 Syntactic fences $\FENCE^{\fmode}$ have corresponding actions:
 $\DFP{\fmode}$.  The \emph{syntactic fence mode}
-$(\fmode \!\!\BNFDEF\!\! \mREL \!\BNFSEP\! \mACQ \!\BNFSEP\! \mFSC)$ is either
+$(\fmode \!\!\BNFDEF\!\! \fREL \!\BNFSEP\! \fACQ \!\BNFSEP\! \fSC)$ is either
 \emph{release}, \emph{acquire}, or \emph{sequentially-consistent}.
 
 
 
-Formalizing this, $\QS{\aLoc}{\mREL}$ substitutes for $\Qw{*}$ in addition to
-$\Qw{\aLoc}$, as in $\QS{\aLoc}{\mRA}$.  $\QL{\aLoc}{\mACQ}$ requires
+Formalizing this, $\QS{\aLoc}{\fREL}$ substitutes for $\Qw{*}$ in addition to
+$\Qw{\aLoc}$, as in $\QS{\aLoc}{\mRA}$.  $\QL{\aLoc}{\fACQ}$ requires
 $\Qr{*}$ in addition to $\Qw{\aLoc}$, as in $\QL{\aLoc}{\mRA}$.
 
 \begin{definition}
   Extend \refdef{def:QS} and \refdef{def:DS}.
   \begin{align*}
-    \QF{\aLoc}{\mREL}
-    %=\QS{\aLoc}{\mREL}
+    \QF{\aLoc}{\fREL}
+    %=\QS{\aLoc}{\fREL}
     &=\Qr{*}\land\Qw{*} 
     &
-    \QF{\aLoc}{\mACQ}
-    %=\QL{\aLoc}{\mACQ}
+    \QF{\aLoc}{\fACQ}
+    %=\QL{\aLoc}{\fACQ}
     &=\Qw{\aLoc}\land \Qr{*}
     \\
-    [\aForm/\QF{\aLoc}{\mREL}]
-    %= [\aForm/\QS{\aLoc}{\mREL}]
+    [\aForm/\QF{\aLoc}{\fREL}]
+    %= [\aForm/\QS{\aLoc}{\fREL}]
     &= [\aForm/\Qw{*}]
     &{}
-    [\aForm/\QF{\aLoc}{\mACQ}]
-    %= [\aForm/\QL{\aLoc}{\mACQ}]
+    [\aForm/\QF{\aLoc}{\fACQ}]
+    %= [\aForm/\QL{\aLoc}{\fACQ}]
     &= [\aForm/\Qr{*},\aForm/\Qw{*}]
     % \\
-    % \DS{\aLoc}{\mREL}&=[\FALSE/\D]
-    % &\DL{\aLoc}{\mACQ}&=\Dx{\aLoc}%\land\D{}
+    % \DS{\aLoc}{\fREL}&=[\FALSE/\D]
+    % &\DL{\aLoc}{\fACQ}&=\Dx{\aLoc}%\land\D{}
   \end{align*}
   \begin{align*}
-    \QF{\aLoc}{\mFSC}
-    % = \QS{\aLoc}{\mFSC}
-    % = \QL{\aLoc}{\mFSC}
+    \QF{\aLoc}{\fSC}
+    % = \QS{\aLoc}{\fSC}
+    % = \QL{\aLoc}{\fSC}
     &= \Qr{*}\land\Qw{*} \land\Qsc
     \\
-    [\aForm/\QF{\aLoc}{\mFSC}] 
-    % = [\aForm/\QS{\aLoc}{\mFSC}] 
-    % = [\aForm/\QL{\aLoc}{\mACQ}]
+    [\aForm/\QF{\aLoc}{\fSC}] 
+    % = [\aForm/\QS{\aLoc}{\fSC}] 
+    % = [\aForm/\QL{\aLoc}{\fACQ}]
     &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
   \end{align*}
 \end{definition}
@@ -706,11 +730,11 @@ $(\exists\aLocs\subseteq\Loc)$
 \item%[{\labeltext[F2]{(F2)}{F2}}]
   $\labelingAct(\aEv) = \DG[\ascope]{\amode}{\aLocs}$,
 \item%[{\labeltext[F3]{(F3)}{F3}}]
-  $\labelingForm(\aEv)$ implies $\bigwedge_{\aLoc\in (\Loc\setminus\aLocs)}\QF{\aLoc}{\amode}$,
+  $\labelingForm(\aEv) \rimplies \bigwedge_{\aLoc\in (\Loc\setminus\aLocs)}\QF{\aLoc}{\amode}$,
 \item%[{\labeltext[F4]{(F4)}{F4}}]
-  $\aTr{\bEvs}{\bForm}$ implies $\bForm$, where $\bEvs\cap\aEvs\neq\emptyset$,
+  $\aTr{\bEvs}{\bForm} \rimplies \bForm$, where $\bEvs\cap\aEvs\neq\emptyset$,
 \item%[{\labeltext[F5]{(F5)}{F5}}]
-  $\aTr{\cEvs}{\bForm}$ implies $\bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc} \land\bForm[\FALSE/\QF{\aLoc}{}]$, where $\cEvs\cap\aEvs=\emptyset$.
+  $\aTr{\cEvs}{\bForm} \rimplies \bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc} \land\bForm[\FALSE/\QF{\aLoc}{}]$, where $\cEvs\cap\aEvs=\emptyset$.
 \end{enumerate}
 
 \begin{example}
@@ -718,10 +742,10 @@ $(\exists\aLocs\subseteq\Loc)$
   \begin{gather*}
     \begin{gathered}
       \begin{gathered}[t]
-        \PW[\mREL]{x}{\aExp}
+        \PW[\fREL]{x}{\aExp}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\land\Qw{*}\land\aExp{=}v\mid\DW[\mRA]{x}{v}}{}
+            \raevent{a}{\Qr{*}\land\Qw{*}\land\aExp{=}v\mid\DW[\mREL]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
             \xo{a}{xd}
@@ -729,10 +753,10 @@ $(\exists\aLocs\subseteq\Loc)$
       \end{gathered}
       \\
       \begin{gathered}[t]
-        \PF{\mREL}
+        \PF{\fREL}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\land\Qw{*}\mid\DF{\mREL}}{}
+            \raevent{a}{\Qr{*}\land\Qw{*}\mid\DF{\fREL}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xo{a}{xd}
@@ -742,10 +766,10 @@ $(\exists\aLocs\subseteq\Loc)$
     \qquad
     \begin{gathered}
       \begin{gathered}[t]
-        \PR[\mACQ]{x}{r}
+        \PR[\fACQ]{x}{r}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qw{x}\land\Qr{*}\mid\DR[\mACQ]{x}{v}}{}
+            \raevent{a}{\Qw{x}\land\Qr{*}\mid\DR[\fACQ]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{v{=}r\limplies\bForm}{below=of a}
             \xo{a}{xd}
@@ -753,10 +777,10 @@ $(\exists\aLocs\subseteq\Loc)$
       \end{gathered}
       \\
       \begin{gathered}[t]
-        \PF{\mACQ}
+        \PF{\fACQ}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\mid\DF{\mACQ}}{}
+            \raevent{a}{\Qr{*}\mid\DF{\fACQ}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xo{a}{xd}
@@ -765,7 +789,7 @@ $(\exists\aLocs\subseteq\Loc)$
     \end{gathered}
     \\
     \begin{gathered}[t]
-      \PF{\mFSC}
+      \PF{\fSC}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DF{\mSC}}{}
@@ -776,10 +800,10 @@ $(\exists\aLocs\subseteq\Loc)$
     \end{gathered}
     \\
     \begin{gathered}[t]
-      \PW[\mFSC]{x}{\aExp}
+      \PW[\fSC]{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\land\aExp{=}\aVal\mid\DW[\mFSC]{x}{v}}{}
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\land\aExp{=}\aVal\mid\DW[\fSC]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
           \xo{a}{xd}
@@ -787,10 +811,10 @@ $(\exists\aLocs\subseteq\Loc)$
     \end{gathered}
     \;
     \begin{gathered}[t]
-      \PR[\mFSC]{x}{\aExp}
+      \PR[\fSC]{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DR[\mFSC]{x}{v}}{}
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DR[\fSC]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xo{a}{xd}
@@ -819,10 +843,10 @@ $(\exists\aLocs\subseteq\Loc)$
   %   \end{gathered}  
   %   &&
   %   \begin{gathered}[t]
-  %     \PR[\mRA]{x}{r}
+  %     \PR[\mACQ]{x}{r}
   %     \\
   %     \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-  %       \raevent{b}{\DR[\mRA]{x}{2}}{}
+  %       \raevent{b}{\DR[\mACQ]{x}{2}}{}
   %         %       \xform{x1d}{2{=}r\limplies\bForm}{below=of b}
   %       \xform{x1i}{\Dx{x} \land\bForm[\FALSE/\Qr{x}]}{below=of b} %x1d}
   %         %       \xo{b}{x1d}
@@ -854,12 +878,12 @@ $(\exists\aLocs\subseteq\Loc)$
   %   \end{gathered}  
   %   &&
   %   \begin{gathered}[t]
-  %     \PR[\mRA]{x}{r}
+  %     \PR[\mACQ]{x}{r}
   %     \SEMI
   %     \PW{y}{1}
   %     \\
   %     \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-  %       \raevent{b}{\DR[\mRA]{x}{2}}{}
+  %       \raevent{b}{\DR[\mACQ]{x}{2}}{}
   %       \event{c}{\Dx{x}\mid\DW{y}{1}}{right=.7em of b}
   %     \end{tikzinline}}  
   %   \end{gathered}  
@@ -871,14 +895,14 @@ $(\exists\aLocs\subseteq\Loc)$
       \SEMI
       \PR{x}{r}
       \SEMI
-      \PF{\mACQ}
+      \PF{\fACQ}
       \SEMI
       \PW{y}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{a}{\DW{x}{2}}{}
           \event{b}{\DR{x}{2}}{right=of a}
-          \raevent{c}{\DF{\mACQ}}{right=of b}
+          \raevent{c}{\DF{\fACQ}}{right=of b}
           \event{d}{\DW{y}{1}}{right=of c}
           \rf{a}{b}
           \sync{b}{c}
@@ -892,7 +916,7 @@ $(\exists\aLocs\subseteq\Loc)$
       \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
           \event{a}{\DW{x}{2}}{}
           \event{b}{\DR{x}{2}}{right=of a}
-          \raevent{c}{\DF{\mACQ}}{right=of b}
+          \raevent{c}{\DF{\fACQ}}{right=of b}
           \event{d}{\DW{y}{1}}{right=of c}
           \rf{a}{b}
           \sync{c}{d}
@@ -916,27 +940,27 @@ For writes, change the label rules of sequential composition to:
 \item %\label{par-lambda2}
   if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labeling(\aEv) = \labeling_2(\aEv)$,
 \item %\label{par-lambda2}
-  if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labeling(\aEv) \in \compat{\labeling_1(\aEv)}{\labeling_2(\aEv)}$.
+  if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labeling(\aEv) \in \fmerge{\labeling_1(\aEv)}{\labeling_2(\aEv)}$.
 \end{enumerate}
 
 \begin{definition}
   % Fences use the three point order:
   % \begin{math}
-  %   \mREL \ltmode \mSC
+  %   \fREL \ltmode \mSC
   % \end{math}
   % and 
   % \begin{math}
-  %   \mACQ \ltmode \mSC.
+  %   \fACQ \ltmode \mSC.
   % \end{math}
   \noindent    
   \begin{align*}
-    \compat{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}} &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
+    \fmerge{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}} &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
     \\
-    \compat{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}} &= \{ \DW[\amode\lubmode\bmode]{\aLoc}{\bVal} \}
+    \fmerge{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}} &= \{ \DW[\amode\lubmode\bmode]{\aLoc}{\bVal} \}
     \\
-    \compat{\DF{\amode}}{\DF{\bmode}} &= \{ \DF{\amode\lubmode\bmode} \}
+    \fmerge{\DF{\amode}}{\DF{\bmode}} &= \{ \DF{\amode\lubmode\bmode} \}
     \\
-    \compat{\aAct}{\bAct} &= \emptyset, \textotherwise
+    \fmerge{\aAct}{\bAct} &= \emptyset, \textotherwise
   \end{align*}
 \end{definition}  
 
@@ -946,20 +970,20 @@ We can enrich read and write actions to use fence modes.
 The resulting order is:
 % Reads use the four point order:
 % \begin{math}
-%   \mRLX \ltmode \mRA \ltmode \mREL \ltmode \mSC.
+%   \mRLX \ltmode \mRA \ltmode \fREL \ltmode \mSC.
 % \end{math}
 % Writes use the four point order:
 % \begin{math}
-%   \mRLX \ltmode \mRA \ltmode \mACQ \ltmode \mSC.
+%   \mRLX \ltmode \mRA \ltmode \fACQ \ltmode \mSC.
 % \end{math}
 \begin{displaymath}
   \begin{tikzpicture}
     \node (rlx) at (0, 0) {$\mathstrut\mRLX$};
     \node (ra)  at (1, 0) {$\mathstrut\mRA$};
     \node (sc)  at (2, 0) {$\mathstrut\mSC$};
-    \node (fsc) at (3, 0) {$\mathstrut\mFSC$};
-    \node (rel) at (2, -0.3) {$\mathstrut\mREL$};
-    \node (acq) at (2,  0.3) {$\mathstrut\mACQ$};
+    \node (fsc) at (3, 0) {$\mathstrut\fSC$};
+    \node (rel) at (2, -0.3) {$\mathstrut\fREL$};
+    \node (acq) at (2,  0.3) {$\mathstrut\fACQ$};
     \draw[->](rlx)to(ra);
     \draw[->](ra)to(sc);
     \draw[->](ra)to(rel);
@@ -972,14 +996,14 @@ The resulting order is:
 We write $\amode\lemode\bmode$ for this order.
 Let $\amode\lubmode\bmode$ denote the least upper bound of $\amode$ and $\bmode$.
 
-Reads allow all annotations but $\mREL$.  Writes allow all annotations but
-$\mACQ$.  Fences allow only the three annotations $\mREL$, $\mACQ$ and
-$\mFSC$.
+Reads allow all annotations but $\fREL$.  Writes allow all annotations but
+$\fACQ$.  Fences allow only the three annotations $\fREL$, $\fACQ$ and
+$\fSC$.
 % \begin{displaymath}
 %   \begin{tikzcd}[column sep=.5em, row sep=.5ex]
-%                              &                                                                 & \mREL \arrow[rd,sqsubset] &        \\
-%     \mRLX \arrow[r,sqsubset] & \mRA \arrow[r,sqsubset] \arrow[ru,sqsubset] \arrow[rd,sqsubset] & \mSC  \arrow[r,sqsubset]  & \mFSC  \\
-%                              &                                                                 & \mACQ \arrow[ru,sqsubset] &          
+%                              &                                                                 & \fREL \arrow[rd,sqsubset] &        \\
+%     \mRLX \arrow[r,sqsubset] & \mRA \arrow[r,sqsubset] \arrow[ru,sqsubset] \arrow[rd,sqsubset] & \mSC  \arrow[r,sqsubset]  & \fSC  \\
+%                              &                                                                 & \fACQ \arrow[ru,sqsubset] &          
 %   \end{tikzcd}
 % \end{displaymath}
 
@@ -987,31 +1011,31 @@ $\mFSC$.
 \begin{definition}
   \showRAtrue
   \begin{align*}
-    \compat{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}}
-    % = \compat{\DF{\amode}}{\DR[\bmode]{\aLoc}{\aVal}}
-    % = \compat{\DR[\amode]{\aLoc}{\aVal}}{\DF{\bmode}}
+    \fmerge{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}}
+    % = \fmerge{\DF{\amode}}{\DR[\bmode]{\aLoc}{\aVal}}
+    % = \fmerge{\DR[\amode]{\aLoc}{\aVal}}{\DF{\bmode}}
     &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
     \\
-    \compat{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}}
-    % = \compat{\DF{\amode}}{\DW[\bmode]{\aLoc}{\bVal}}
-    % = \compat{\DW[\amode]{\aLoc}{\bVal}}{\DF{\bmode}}
+    \fmerge{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}}
+    % = \fmerge{\DF{\amode}}{\DW[\bmode]{\aLoc}{\bVal}}
+    % = \fmerge{\DW[\amode]{\aLoc}{\bVal}}{\DF{\bmode}}
     &= \{ \DW[\amode\lubmode\bmode]{\aLoc}{\bVal} \}
     \\
-    \compat{\DF{\amode}}{\DF{\bmode}} &= \{ \DF{\amode\lubmode\bmode} \}
+    \fmerge{\DF{\amode}}{\DF{\bmode}} &= \{ \DF{\amode\lubmode\bmode} \}
     \\
-    \compat{\DF{\amode}}{\DR[\bmode]{\aLoc}{\aVal}}
-    = \compat{\DR[\amode]{\aLoc}{\aVal}}{\DF{\bmode}}
+    \fmerge{\DF{\amode}}{\DR[\bmode]{\aLoc}{\aVal}}
+    = \fmerge{\DR[\amode]{\aLoc}{\aVal}}{\DF{\bmode}}
     &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
     \\
-    \compat{\DF{\amode}}{\DW[\bmode]{\aLoc}{\bVal}}
-    = \compat{\DW[\amode]{\aLoc}{\bVal}}{\DF{\bmode}}
+    \fmerge{\DF{\amode}}{\DW[\bmode]{\aLoc}{\bVal}}
+    = \fmerge{\DW[\amode]{\aLoc}{\bVal}}{\DF{\bmode}}
     &= \{ \DW[\amode\lubmode\bmode]{\aLoc}{\bVal} \}
     \\
-    \compat{\aAct}{\bAct} &= \emptyset, \textotherwise
+    \fmerge{\aAct}{\bAct} &= \emptyset, \textotherwise
   \end{align*}
 \end{definition}  
 \section{Discussion}
-\subsection{Closure properties}
+\subsection{Closure Properties}
 
 We would like the semantics to be closed with respect to \emph{augments} and
 \emph{downsets}.
@@ -1025,8 +1049,8 @@ closure is that adding order can only cause preconditions to weaken.
   \begin{enumerate}
   \item $\aEvs_2=\aEvs_1$,
   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-  \item $\labelingForm_2(\aEv)$ implies $\labelingForm_1(\aEv)$,
-  \item $\aTr[2]{\bEvs}{\aEv}$ implies $\aTr[1]{\bEvs}{\aEv}$,
+  \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
+  \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
   \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
   \end{enumerate}
 \end{definition}
@@ -1061,11 +1085,11 @@ transformer.
   For \xRRD{}, \refdef{def:pomsets-rr} states:
   \begin{enumerate}
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+    $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\RW)\limplies\bForm$,
   \item[\ref{L6})] 
-    $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
+    $\aTr{\dEvs}{\bForm} \rimplies \bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
   This semantics is not downset closed due to the lack of read-read dependencies.
   In both cases, for subsequent writes, \ref{L5} is the same as \ref{L6}.  For
@@ -1124,12 +1148,11 @@ transformer.
   For \xLIR{}, \refdef{def:pomsets-lir} states:
   \begin{enumerate}
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies
-    $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+    $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
   \item[\ref{L6})] 
-    $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
+    $\aTr{\dEvs}{\bForm} \rimplies \bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
   This semantics is not downset closed: The independency reasoning of
   \ref{L5} is only applicable for pomsets where the ignored read is present!
@@ -1154,7 +1177,7 @@ transformer.
     \end{gathered}
     &&
     \begin{gathered}[t]
-      \IF{r{\geq}0}\THEN y\GETS1 \FI
+      \IF{r{\geq}0}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a2}{r{\geq}0\mid\DW{y}{1}}{}      
@@ -1166,7 +1189,7 @@ transformer.
     \begin{gathered}[t]
       \PW{x}{0} 
       \SEMI\PR{x}{r} 
-      \SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+      \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a0}{\DW{x}{0}}{}
@@ -1183,7 +1206,7 @@ transformer.
     \begin{gathered}[t]
       \PW{x}{0} 
       \SEMI\PR{x}{r} 
-      \SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+      \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a0}{\DW{x}{0}}{}
@@ -1216,8 +1239,6 @@ Hoare triples do not distinguish thread-local variables from shared
 variables.  Thus, the assignment rule applies to all types of storage. The
 rules can be written as follows:
 \begin{align*}
-  % \fwp{x\GETS \aExp}{\bForm} &= (\forall y)\; y{=}\aExp \limplies \bForm[y/x] &&\text{ where $y$ is fresh}
-  % \\
   \fwp{\PW{\aLoc}{\aExp}}{\bForm} &= \bForm[\aExp/\aLoc]
   \\
   \fwp{\LET{\aReg}{\aExp}}{\bForm} &= \bForm[\aExp/\aReg]
@@ -1544,7 +1565,7 @@ The predicate transformers are:
   \showRAtrue
   \begin{center}
     \begin{minipage}{.91\textwidth}
-      \input{fig-no-q-or-addr}
+      \input{fig-no-q-or-addr.tex}
     \end{minipage}
   \end{center}
   \caption{Simplified Quiescence Semantics w/o Address Calculation
@@ -1577,14 +1598,14 @@ The predicate transformers are:
       &  \multicolumn{6}{|c}{$2^{\text{nd}}$} \\
       \hline
       $1^{\text{st}}$
-      & $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$\\
+      & $\DR[\mRLX]{}{}$ & $\DR[\mACQ]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mREL]{}{}$ & $\DW[\mSC]{}{}$\\
       \hline
       $\DR[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark         \\
-      $\DR[\mRA]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark         \\
+      $\DR[\mACQ]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark         \\
       $\DR[\mSC]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark         \\
       \hline
       $\DW[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark         \\
-      $\DW[\mRA]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark         \\
+      $\DW[\mREL]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark         \\
       $\DW[\mSC]{}{}$  & \cmark           & \cmark          & \xmark          & \cmark           & \xmark          & \xmark 
     \end{tabular}
   \end{center}
@@ -1597,17 +1618,17 @@ The predicate transformers are:
       &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
       \hline
       $1^{\text{st}}$
-      & $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DF{\mACQ}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mREL}$&$\DF{\mSC}$\\
+      & $\DR[\mRLX]{}{}$ & $\DR[\mACQ]{}{}$ & $\DR[\mSC]{}{}$ & $\DF{\fACQ}$ & $\DW[\mRLX]{}{}$ & $\DW[\mREL]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\fREL}$&$\DF{\mSC}$\\
       \hline                                                                                                                                                      
       $\DR[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \xmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
-      $\DR[\mRA]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+      $\DR[\mACQ]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
       $\DR[\mSC]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
-      $\DF{\mACQ}$     & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+      $\DF{\fACQ}$     & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
       \hline                                                                                                                                                      
       $\DW[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
-      $\DW[\mRA]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+      $\DW[\mREL]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
       $\DW[\mSC]{}{}$  & \cmark           & \cmark          & \xmark          & \cmark       & \cmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
-      $\DF{\mREL}$     & \cmark           & \cmark          & \cmark          & \cmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
+      $\DF{\fREL}$     & \cmark           & \cmark          & \cmark          & \cmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark    \\
       \hline                                                                                                                                                      
       $\DF{\mSC}$      & \xmark           & \xmark          & \xmark          & \xmark       & \xmark           & \xmark          & \xmark          & \xmark      & \xmark 
     \end{tabular}
@@ -1620,19 +1641,19 @@ The predicate transformers are:
       &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
       \hline
       $1^{\text{st}}$
-      & $\DR[\mRLX]{}{}$ & $\DR[\mRA]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mRA]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\mREL}$&$\DF{\mACQ}$ &$\DF{\mFSC}$\\
+      & $\DR[\mRLX]{}{}$ & $\DR[\mACQ]{}{}$ & $\DR[\mSC]{}{}$ & $\DW[\mRLX]{}{}$ & $\DW[\mREL]{}{}$ & $\DW[\mSC]{}{}$ & $\DF{\fREL}$&$\DF{\fACQ}$ &$\DF{\fSC}$\\
       \hline                                                                                                                                                     
       $\DR[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
-      $\DR[\mRA]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
+      $\DR[\mACQ]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
       $\DR[\mSC]{}{}$  & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
       \hline                                                                                                                                                     
       $\DW[\mRLX]{}{}$ & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
-      $\DW[\mRA]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
+      $\DW[\mREL]{}{}$  & \cmark           & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
       $\DW[\mSC]{}{}$  & \cmark           & \cmark          & \xmark          & \cmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
       \hline                                                                                                                                                     
-      $\DF{\mREL}$     & \cmark           & \cmark          & \cmark          & \xmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
-      $\DF{\mACQ}$     & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
-      $\DF{\mFSC}$     & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark 
+      $\DF{\fREL}$     & \cmark           & \cmark          & \cmark          & \xmark           & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
+      $\DF{\fACQ}$     & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
+      $\DF{\fSC}$     & \xmark           & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark      &\xmark       & \xmark 
     \end{tabular}
   \end{center}
   \begin{definition}
@@ -1650,14 +1671,14 @@ The predicate transformers are:
       {\reorderra}
       &=
       \{(\DW[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode\neq\mSC \lor \bmode\neq\mSC\}
-      \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{} \} %\mid \amode\neq\mREL \}
+      \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{} \} %\mid \amode\neq\fREL \}
       \\&
       \cup\{(\DR[\amode]{}{}, \DW[\bmode]{}{}) \mid \amode=\mRLX \land \bmode=\mRLX\}
-      \cup\{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \} %\mid \bmode\neq\mACQ\}
+      \cup\{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \} %\mid \bmode\neq\fACQ\}
       \\&
-      \cup\{(\DF{\mREL},      \DF{\mACQ}    ) \}
-      \cup\{(\DF{\mREL},      \DR[\bmode]{}{}) \}%\mid \amode=\mREL \}
-      \cup\{(\DW[\amode]{}{}, \DF{\mACQ}     ) \}%\mid \bmode=\mACQ \}
+      \cup\{(\DF{\fREL},      \DF{\fACQ}    ) \}
+      \cup\{(\DF{\fREL},      \DR[\bmode]{}{}) \}%\mid \amode=\fREL \}
+      \cup\{(\DW[\amode]{}{}, \DF{\fACQ}     ) \}%\mid \bmode=\fACQ \}
       \\
       {\reorderlt}
       &=
@@ -1671,14 +1692,14 @@ The predicate transformers are:
       {\reorderra}
       &=
       \{(\DW[\amode]{}{}, \DR[\bmode]{}{}) \mid \amode\not\gemode\mSC \lor \bmode\not\gemode\mSC\}
-      \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{} \mid \amode\not\gemode\mREL \}
+      \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{} \mid \amode\not\gemode\fREL \}
       \\&
       \cup\{(\DR[\amode]{}{}, \DW[\bmode]{}{}) \mid \amode=\mRLX \land \bmode=\mRLX\}
-      \cup\{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \mid \bmode\not\gemode\mACQ \}
+      \cup\{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \mid \bmode\not\gemode\fACQ \}
       \\&
-      \cup\{(\DF{\mREL},      \DF{\mACQ}    ) \}
-      \cup\{(\DF{\mREL},      \DR[\bmode]{}{}) \}%\mid \amode=\mREL \}
-      \cup\{(\DW[\amode]{}{}, \DF{\mACQ}     ) \}%\mid \bmode=\mACQ \}
+      \cup\{(\DF{\fREL},      \DF{\fACQ}    ) \}
+      \cup\{(\DF{\fREL},      \DR[\bmode]{}{}) \}%\mid \amode=\fREL \}
+      \cup\{(\DW[\amode]{}{}, \DF{\fACQ}     ) \}%\mid \bmode=\fACQ \}
     \end{align*}  
   \end{scope}
   \begin{center}
@@ -1689,23 +1710,23 @@ The predicate transformers are:
       &  \multicolumn{9}{|c}{$2^{\text{nd}}$} \\
       \hline
       $1^{\text{st}}$
-                       & $\DR[\mRLX]{}{}$  & $\DR[\mRA]{}{}$ & $\DR[\mACQ]{}{}$& $\DR[\mSC]{}{}$  & $\DR[\mFSC]{}{}$ & $\DW[\mRLX]{}{}$& $\DW[\mRA]{}{}$ & $\DW[\mREL]{}{}$& $\DW[\mSC]{}{}$& $\DW[\mFSC]{}{}$\\% & $\DF{\mREL}$&$\DF{\mACQ}$ &$\DF{\mFSC}$\\
+                       & $\DR[\mRLX]{}{}$  & $\DR[\mACQ]{}{}$ & $\DR[\fACQ]{}{}$& $\DR[\mSC]{}{}$  & $\DR[\fSC]{}{}$ & $\DW[\mRLX]{}{}$& $\DW[\mREL]{}{}$ & $\DW[\fREL]{}{}$& $\DW[\mSC]{}{}$& $\DW[\fSC]{}{}$\\% & $\DF{\fREL}$&$\DF{\fACQ}$ &$\DF{\fSC}$\\
       \hline                                                                                                                                                                                                                            
       $\DR[\mRLX]{}{}$ & \cmark            & \cmark          & \xmark          & \cmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
-      $\DR[\mRA]{}{}$  & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
-      $\DR[\mACQ]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
+      $\DR[\mACQ]{}{}$  & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
+      $\DR[\fACQ]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
       $\DR[\mSC]{}{}$  & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
-      $\DR[\mFSC]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
+      $\DR[\fSC]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\xmark       & \xmark    \\
       \hline                                                                                                                                                                                                                           
       $\DW[\mRLX]{}{}$ & \cmark            & \cmark          & \cmark          & \cmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
-      $\DW[\mRA]{}{}$  & \cmark            & \cmark          & \cmark          & \cmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
-      $\DW[\mREL]{}{}$ & \cmark            & \cmark          & \cmark          & \cmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
+      $\DW[\mREL]{}{}$  & \cmark            & \cmark          & \cmark          & \cmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
+      $\DW[\fREL]{}{}$ & \cmark            & \cmark          & \cmark          & \cmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
       $\DW[\mSC]{}{}$  & \cmark            & \cmark          & \cmark          & \xmark           & \xmark           & \cmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
-      $\DW[\mFSC]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
+      $\DW[\fSC]{}{}$ & \xmark            & \xmark          & \xmark          & \xmark           & \xmark           & \xmark          & \xmark          & \xmark          & \xmark         & \xmark         \\%  & \xmark      &\cmark       & \xmark    \\
       % \hline                                                                                                                                                                                       
-      % $\DF{\mREL}$     & \cmark            & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
-      % $\DF{\mACQ}$     & \xmark            & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
-      % $\DF{\mFSC}$     & \xmark            & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\xmark       & \xmark 
+      % $\DF{\fREL}$     & \cmark            & \cmark          & \cmark          & \cmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\cmark       & \xmark    \\
+      % $\DF{\fACQ}$     & \xmark            & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\xmark       & \xmark    \\
+      % $\DF{\fSC}$     & \xmark            & \xmark          & \xmark          & \xmark           & \xmark          & \xmark          & \xmark          & \xmark          & \xmark      &\xmark       & \xmark 
     \end{tabular}
   \end{center}
   \begin{comment}
@@ -1751,21 +1772,19 @@ The predicate transformers are:
     \item[\ref{S2})]
       $\labelingAct(\aEv) = \DW[\amode]{\aLoc}{\aVal}$,
     \item[\ref{S3})] 
-      $\labelingForm(\aEv)$ implies %$\QS{}{\amode} \land
-      $\aExp{=}\aVal$,
+      $\labelingForm(\aEv) \rimplies \aExp{=}\aVal$,
     \item[\ref{S4})]
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm \land\aExp{=}\aVal$,
+      $\aTr{\bEvs}{\bForm} \rimplies \bForm \land\aExp{=}\aVal$,
     \item[\ref{S5})]
-      $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$,
+      $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\Q{}]$,
     \item[\ref{L2})]
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}{\aVal}$,
     \item[\ref{L3})] 
-      $\labelingForm(\aEv)$ implies %$\QL{}{\amode} \land
-      $\TRUE$.
+      $\labelingForm(\aEv) \rimplies \TRUE$.
     \item[\ref{L4})]
-      $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+      $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
     \item[\ref{L5})]
-      $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$.
+      $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\Q{}]$.
     \end{enumerate}
   \end{definition}
 
@@ -1786,7 +1805,7 @@ The predicate transformers are:
         \end{gathered}
         \\
         \begin{gathered}[t]
-          \PW[\amode\in\{\mRA, \mSC \}]{x}{\aExp}
+          \PW[\amode\in\{\mREL, \mSC \}]{x}{\aExp}
           \\
           \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
               \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
@@ -1799,7 +1818,7 @@ The predicate transformers are:
       &&
       \begin{gathered}
         \begin{gathered}[t]
-          \PR[\amode\in\{\mRLX, \mRA \}]{x}{r}
+          \PR[\amode\in\{\mRLX, \mACQ \}]{x}{r}
           \\
           \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
               \event{a}{\DR[\amode]{x}{v}}{}
@@ -1884,7 +1903,7 @@ The predicate transformers are:
   \showRAtrue
   \begin{center}
     \begin{minipage}{.91\textwidth}
-      \input{fig-no-q}
+      \input{fig-no-q.tex}
     \end{minipage}
   \end{center}
   \caption{Simplified Quiescence Semantics with Address Calculation
@@ -1901,22 +1920,20 @@ The predicate transformers are:
 Recall the load rules from \textsection\ref{sec:tc1}: % (\refdef{def:pomsets-lir}):
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}$ implies
-  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+  $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
 \item[\ref{L6})] 
-  $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+  $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$, when $\aEvs=\emptyset$.
 \end{enumerate}
 It is also possible to collapse $\aLoc$ and $\aReg$ when doing a load:
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm[\aReg/\aLoc]$, 
+  $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm[\aReg/\aLoc]$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}$ implies
-  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm[\aReg/\aLoc]$, when $\aEvs\neq\emptyset$.
+  $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm[\aReg/\aLoc]$, when $\aEvs\neq\emptyset$.
 \item[\ref{L6})] 
-  $\aTr{\dEvs}{\bForm}\;$ implies $\bForm[\aReg/\aLoc]$, when $\aEvs=\emptyset$.
+  $\aTr{\dEvs}{\bForm}\; \rimplies \bForm[\aReg/\aLoc]$, when $\aEvs=\emptyset$.
 \end{enumerate}
 
 Perhaps surprisingly, these two semantics are incomparable.  Consider the
@@ -2078,41 +2095,73 @@ the other.
 \section{Differences with OOPSLA}
 \label{sec:diff}
 
-\subsubsection*{Substitution}
+\myparagraph{Substitution}
 
 \jjr{} uses substitution rather than Skolemizing.  Indeed our use of
 Skolemization is motivated by disjunction closure for predicate transformers,
-which do not appear in \jjr{}; see \textsection\ref{sec:pomsets-trans}.
-
-In \textsection\ref{sec:tc1}, % (\refdef{def:pomsets-lir}):
-we give the semantics of load for nonempty pomsets as:
+which do not appear in \jjr{}.
+In \textsection\ref{sec:tc1} on local invariant
+reasoning (\xLIR), % (\refdef{def:pomsets-lir}):
+we gave the semantics of load for nonempty pomsets as:
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}$ implies
-  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$.
+  $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$.
   % , when $\aEvs\neq\emptyset$,
   % \item[\ref{L6})] 
-  %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+  %   $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$, when $\aEvs=\emptyset$.
 \end{enumerate}
 In \jjr{}, the definition is roughly as follows:
 % (adding the case for $\ref{L6}$, which was missing):
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]$, 
+  $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aVal/\aReg][\aVal/\aLoc]$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}\;$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$.
+  $\aTr{\cEvs}{\bForm}\; \rimplies \bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$.
 \end{enumerate}
-These substitutions collapse $\aLoc$ and $\aReg$, allowing local invariant
+The use of conjunction in \ref{L5} causes disjunction closure to fail
+because the predicate transformer
+% $\aTr{}{\bForm}=\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$ does not distribute through
+% disjunction:
+% \begin{math}
+%   \aTr{}{\bForm_1\lor \bForm_2}=
+%   (\bForm_1\lor \bForm_2)[\aVal/\aReg][\aVal/\aLoc]\land(\bForm_1\lor \bForm_2)[\aLoc/\aReg]
+%   \neq
+%   (\bForm_1[\aVal/\aReg][\aVal/\aLoc]\land\bForm_1[\aLoc/\aReg]) \lor
+%   (\bForm_2[\aVal/\aReg][\aVal/\aLoc]\land\bForm_2[\aLoc/\aReg])
+%   = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+% \end{math}
+$\aTr{}{\bForm}=\bForm'\land\bForm''$ does not distribute through
+disjunction, even assuming that the prime operations do:\footnote{%
+  \begin{math}
+    (\bForm_1\lor \bForm_2)'=(\bForm_1'\lor \bForm_2')
+  \end{math}
+  and
+  \begin{math}
+    (\bForm_1\lor \bForm_2)''=(\bForm_1''\lor \bForm_2'')
+  \end{math}.
+}
+\begin{math}
+  \aTr{}{\bForm_1\lor \bForm_2}=
+  \href{https://www.wolframalpha.com/input/?i=\%28a+or+b\%29+and+\%28c+or+d\%29}{(\bForm_1'\lor \bForm_2')\land(\bForm_1''\lor \bForm_2'')}
+  \neq
+  \href{https://www.wolframalpha.com/input/?i=\%28a+and+c\%29+or+\%28b+and+d\%29}{(\bForm_1'\land\bForm_1'') \lor (\bForm_2'\land\bForm_2'')}
+  = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+\end{math}.
+% \begin{math}
+%   (\bForm_{1}^{1}\lor \bForm_{1}^{2}) \land (\bForm_{2}^{1}\lor \bForm_{2}^{2})
+%   \neq
+%   (\bForm_{1}^{1}\land\bForm_{2}^{1}) \lor (\bForm_{1}^{2}\land\bForm_{1}^{2}).
+% \end{math}
+See also \refex{ex:skolem}.
+
+The substitutions collapse $\aLoc$ and $\aReg$, allowing local invariant
 reasoning, as in \textsection\ref{sec:tc1}.  Without Skolemizing it is
 necessary to substitute $[\aLoc/\aReg]$, since the reverse substitution
 $[\aReg/\aLoc]$ is useless when $\aReg$ is bound---compare with
-\textsection\ref{sec:substitutions}.
-
-Including this substitution affects the interaction of local invariant
-reasoning and downset closure---see the following discussion of \emph{downset
-  closure}.
+\textsection\ref{sec:substitutions}.  As discussed below (\ref{p:downset}),
+including this substitution affects the interaction of \xLIR{} and downset closure.
 
 Removing the substitution of $[x/r]$ in the independent case has a technical
 advantage: we no longer require \emph{extended} expressions (which include
@@ -2126,12 +2175,11 @@ references.
   definition would modify \ref{L4} to be:
   \begin{enumerate}
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$.
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$.
     % \item[\ref{L5})]
-    %   $\aTr{\cEvs}{\bForm}$ implies
-    %   $(\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
+    %   $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
     % \item[\ref{L6})] 
-    %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+    %   $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
   Using this definition, consider the following:
   \begin{gather*}
@@ -2156,17 +2204,15 @@ references.
 % \begin{enumerate}
 % \item[] %[\ref{loadpre-kappa2})]
 %   if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-%   $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
-%   $\labelingForm(\aEv)$ implies
-%   $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
+%   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
+%   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
 % \end{enumerate}
 
 
 % [Skolemization ensures disjunction closure, which is necessary
 % for associativity. Show example.]
 
-\subsubsection*{Downset closure}
-% \label{sec:downset-compare}
+\myparagraph[p:downset]{Downset closure}
 
 \jjr{} enforces downset closure in the prefixing rule.  Even without this,
 downset closure would be different for the two semantics, due to the use of
@@ -2176,7 +2222,7 @@ under the semantics of this paper, which elides the middle read event:
   \begin{gathered}[t]
     \PW{x}{0} 
     \SEMI\PR{x}{r} 
-    \SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a0}{\DW{x}{0}}{}
@@ -2202,7 +2248,7 @@ is $[0/r][0/x]$, resulting in:
 \end{align*}
 
 
-\subsubsection*{Consistency}
+\myparagraph{Consistency}
 \jjr{} imposes \emph{consistency}, which requires that for every pomset
 $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.  
 \begin{scope}
@@ -2324,11 +2370,10 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
   \end{scope}  
 \end{scope}
 
-\subsubsection*{Causal Strengthening}
+\myparagraph{Causal Strengthening}
 \labeltext[]{Causal Strengthening}{xCausal}
 \jjr{} imposes \emph{causal strengthening}, which requires for every pomset
-$\aPS$, if $\bEv\le\aEv$ then $\labelingForm(\aEv)$ implies
-$\labelingForm(\bEv)$. 
+$\aPS$, if $\bEv\le\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)$. 
 \begin{scope}
   Associativity requires that we allow pomsets without causal strengthening.
   Consider the following.
@@ -2437,7 +2482,7 @@ $\labelingForm(\bEv)$.
   the right.
 \end{scope}
 
-% \subsubsection*{Causal Strengthening and Address Dependencies}
+% \myparagraph{Causal Strengthening and Address Dependencies}
 % \labeltext[]{Causal Strengthening and Address Dependencies}{xADDRxRRD}
 
 \begin{scope}  
@@ -2446,9 +2491,9 @@ $\labelingForm(\bEv)$.
   Associating to the right, the intermediate state of \refex{ex:xADDRxRRD} is:
   \begin{align*}
     \begin{gathered}[t]
-      s\GETS \REF{r}
+      \PR{\REF{r}}{s}
       \SEMI
-      x\GETS s
+      \PW{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a2}{r\EQ2\mid\DR{\REF{2}}{1}}{}
@@ -2460,7 +2505,7 @@ $\labelingForm(\bEv)$.
   In \jjr{}, we have, instead:
   \begin{gather*}
     % \begin{gathered}[t]
-    %   x\GETS s
+    %   \PW{x}{s}
     %   \\
     %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
     %     \event{b}{s\EQ1\mid\DW{x}{1}}{}
@@ -2468,8 +2513,8 @@ $\labelingForm(\bEv)$.
     % \end{gathered}
     % \\
     \begin{gathered}
-      % r\GETS y\SEMI
-      s\GETS \REF{r}\SEMI x\GETS s
+      % \PR{y}{r}\SEMI
+      \PR{\REF{r}}{s}\SEMI \PW{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           % \event{a1}{\DR{y}{2}}{}
@@ -2484,7 +2529,7 @@ $\labelingForm(\bEv)$.
   rather than conjunction, is more precise.
 \end{scope}
 
-\subsubsection*{Parallel Composition}
+\myparagraph{Parallel Composition}
 
 In \jjr{\textsection2.4}, parallel composition is defined allowing coalescing
 of events.  Here we have forbidden coalescing.  This difference appears to be
@@ -2492,9 +2537,9 @@ arbitrary.  In \jjr{}, however, there is a mistake in the handling of
 termination actions.  The predicates should be joined using $\land$, not
 $\lor$.
 
-\subsubsection*{Read-Modify-Write Actions}
+\myparagraph{Read-Modify-Write Actions}
 
-In \jjr{}, the atomicity axioms \ref{A1}/\ref{A2} erroneously applies only to
+In \jjr{}, the atomicity axioms \ref{pom-rmw-atomic} erroneously applies only to
 overlapping writes, not overlapping reads.  The difficulty can be seen in
 \refex{ex:rmw-33}.
 
@@ -2502,7 +2547,7 @@ overlapping writes, not overlapping reads.  The difficulty can be seen in
 discussed in \refex{ex:rmw-dep}.
 
 
-\subsubsection*{Downgrading Internal Acquiring Reads}
+\myparagraph{Downgrading Internal Acquiring Reads}
 
 Shortly after publication, \citet{anton} noticed a shortcoming of the
 implementation on \armeight{} in \jjr{\textsection 7}.  The proof given there
@@ -2511,17 +2556,17 @@ case for acquiring reds.  For example, \jjr{} disallows the following
 execution, which is allowed by \armeight{} and \tso{}.
 \begin{gather*}
   \PW{x}{2}\SEMI 
-  \PR[\mRA]{x}{r}\SEMI
+  \PR[\mACQ]{x}{r}\SEMI
   \PR{y}{s} \PAR
   \PW{y}{2}\SEMI
-  \PW[\mRA]{x}{1}
+  \PW[\mREL]{x}{1}
   \\
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a}{\DW{x}{2}}{}
-      \raevent{b}{\DR[\mRA]{x}{2}}{right=of a}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
       \event{c}{\DR{y}{0}}{right=of b}
       \event{d}{\DW{y}{2}}{right=2.5em of c}
-      \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
       \rf{a}{b}
       \sync{b}{c}
       \wk{c}{d}
@@ -2546,7 +2591,7 @@ implementation, which does not rely on read elimination.  The proof idea uses
 a recent alternative characterization of \armeight{}
 \citep{alglave-git-alternate,arm-reference-manual}. %,armed-cats}.
 
-\subsubsection*{Redundant Read Elimination}
+\myparagraph{Redundant Read Elimination}
 
 Contrary to the claim, redundant read elimination fails for \jjr{}.
 We discussed redundant read elimination in \textsection\ref{sec:recycle}.
@@ -2556,7 +2601,7 @@ Consider JMM Causality Test Case 2, which we discussed there.
   \PR{x}{s}\SEMI
   \IF{r{=}s}\THEN \PW{y}{1}\FI
   \PAR
-  x\GETS y
+  \PW{x}{y}
   \\
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DR{x}{1}}{}
@@ -2596,7 +2641,7 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
 \begin{comment}
   Precondition of $\DWP{y}{1}$ is $(r{=}s)$ in
   \begin{math}
-    \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
+    \sem{\IF{r{=}s}\THEN \PW{y}{1}\FI}.
   \end{math}
   Predicate transformers for $\emptyset$ in $\sem{\PR{x}{r}}$ and $\sem{\PR{x}{s}}$ are
   \begin{align*}
@@ -2632,11 +2677,11 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
 
   The semantics here allows this by coalescing:
   \begin{gather*}
-    r\GETS x\SEMI
-    s\GETS x\SEMI
-    \IF{r{=}s}\THEN y\GETS 1\FI
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r{=}s}\THEN \PW{y}{1}\FI
     \PAR
-    x\GETS y
+    \PW{x}{y}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DR{x}{1}}{}
@@ -2651,7 +2696,7 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
 
   In \jjr{\textsection2.6} the semantics of read is defined as follows:
   \begin{align*}
-    \sem{\aReg\GETS\aLoc^\amode\SEMI \aCmd} & \eqdef \textstyle\bigcup_\aVal\;
+    \sem{\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd} & \eqdef \textstyle\bigcup_\aVal\;
     (\DRmode\aLoc\aVal) \prefix \sem{\aCmd} [\aLoc/\aReg]
   \end{align*}
   The definition of prefixing$((\aForm \mid \aAct) \prefix \aPSS)$ has several clauses.
@@ -2660,10 +2705,9 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   \begin{description}
   \item[{\labeltextsc[P4c]{(P4c)}{4c}}]
     If $\bEv$ reads $\aVal$ from $\aLoc$ then either $\aEv=\bEv$ or
-    $\labelingForm'(\aEv)$ implies $\labelingForm(\aEv)[\aVal/\aLoc]$.
+    $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)[\aVal/\aLoc]$.
   \item[{\labeltextsc[P5a]{(P5a)}{5a}}]\labeltextsc[P5]{}{5}%
-    If $\bEv$ reads and $\aEv$ writes then either $\labelingForm'(\aEv)$
-    implies $\labelingForm(\aEv)$ or $\bEv\le'\aEv$.
+    If $\bEv$ reads and $\aEv$ writes then either $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)$ or $\bEv\le'\aEv$.
     % \item[{\labeltextsc[P5b]{(P5b)}{5b}}]
     %   If $\bEv$ and $\aEv$ are in conflict then $\bEv\le'\aEv$.
   \end{description}
@@ -2677,11 +2721,11 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   The problem can be seen in \ref{TC2}.
   \begin{gather*}
     \taglabel{TC2}
-    r\GETS x\SEMI
-    s\GETS x\SEMI
-    \IF{r{=}s}\THEN y\GETS 1\FI
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r{=}s}\THEN \PW{y}{1}\FI
     \PAR
-    x\GETS y
+    \PW{x}{y}
   \end{gather*}
   % In \jjr{\textsection3.1},
   We claimed that \ref{TC2} allowed the following
@@ -2704,13 +2748,13 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   But this execution is not possible using the semantics of \jjr{}:
   $\DWP{y}{1}$ has precondition $r{=}s$ in
   \begin{math}
-    \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
+    \sem{\IF{r{=}s}\THEN \PW{y}{1}\FI}.
   \end{math}
   Given the lack of order in the execution, the precondition of $\DWP{y}{1}$
   must entail $r{=}1\land r{=}x$ in 
   \begin{math}
-    \sem{s\GETS x\SEMI
-      \IF{r{=}s}\THEN y\GETS 1\FI}.
+    \sem{\PR{x}{s}\SEMI
+      \IF{r{=}s}\THEN \PW{y}{1}\FI}.
   \end{math}
   \ref{4c} imposes $r{=}1$, and \ref{5a} imposes $r{=}x$.  Adding the second
   read, the precondition of $\DWP{y}{1}$ must entail both $1{=}1\land 1{=}x$
@@ -2746,20 +2790,19 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   include the register.  Then \ref{4c} becomes:
   \begin{description}
   \item[\textsc{(p4c)}] If $\bEv$ reads $\aVal$ from $\aLoc$ then either
-    $\aEv=\bEv$ or $\labelingForm'(\aEv)$ implies
-    $\labelingForm(\aEv)[\aVal/\aReg]$.
+    $\aEv=\bEv$ or $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)[\aVal/\aReg]$.
   \end{description}
 
   We can then reason with \ref{TC2} as follows: $\DWP{y}{1}$ has precondition
   $r{=}s$ in
   \begin{math}
-    \sem{\IF{r{=}s}\THEN y\GETS 1\FI}.
+    \sem{\IF{r{=}s}\THEN \PW{y}{1}\FI}.
   \end{math}
   To avoid introducing order in the execution, the precondition of $\DWP{y}{1}$
   must entail $r{=}1\land r{=}s$ in 
   \begin{math}
-    \sem{s\GETS x\SEMI
-      \IF{r{=}s}\THEN y\GETS 1\FI}.
+    \sem{\PR{x}{s}\SEMI
+      \IF{r{=}s}\THEN \PW{y}{1}\FI}.
   \end{math}
   \ref{4c} imposes $r{=}1$, and \ref{5a} imposes $r{=}x$.  Adding the second
   read, the precondition of $\DWP{y}{1}$ must entail both $1{=}1\land 1{=}x$
@@ -2784,11 +2827,11 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   fear that we might introduce thin-air reads, since we do not enforce
   read-read coherence.  But this is not the case.  Consider the following example:
   \begin{gather*}
-    r\GETS x\SEMI
-    s\GETS x\SEMI
-    y\GETS s
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \PW{y}{s}
     \PAR
-    x\GETS y
+    \PW{x}{y}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DR{x}{1}}{}
@@ -2832,19 +2875,19 @@ to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
 \begin{gather}
   \nonumber
   \PW{x}{1}\SEMI
-  \PW[\mRA]{y}{1}\SEMI
-  \PR[\mRA]{x}{r}
+  \PW[\mREL]{y}{1}\SEMI
+  \PR[\mACQ]{x}{r}
   \PAR
-  \IF{\PR[\mRA]{y}{}}\THEN \PW[\mRA]{x}{2}\FI
+  \IF{\PR[\mACQ]{y}{}}\THEN \PW[\mREL]{x}{2}\FI
   \\
   \label{mix1}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
-      \raevent{a3}{\DR[\mRA]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mRA]{y}{1}}{below=of a1}
-      \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       \rf[out=20,in=160]{a1}{a3}
       \rf[out=20,in=160]{a2}{b1}
@@ -2859,10 +2902,10 @@ to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
   \label{mix2}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
-      \raevent{a3}{\DR[\mRA]{x}{2}}{right=of a2}
-      \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
-      \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{2}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       \rf[out=20,in=160]{a2}{b1}
       \rf[out=160,in=20]{b2}{a3}
@@ -2870,7 +2913,7 @@ to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
     \end{tikzinline}}
 \end{gather}
 The program is data-race free.  The two executions shown are the only
-top-level executions that include $\DWP[\mRA]{x}{2}$.
+top-level executions that include $\DWP[\mREL]{x}{2}$.
 
 Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19} is stated by extending
 execution sequences.  In the terminology of
@@ -2878,36 +2921,36 @@ execution sequences.  In the terminology of
 sequentially stale.  Let
 \begin{math}
   \rho=\DWP{x}{1}
-  \DWP[\mRA]{y}{1}
-  \DRP[\mRA]{y}{1}
-  \DWP[\mRA]{x}{2}
+  \DWP[\mREL]{y}{1}
+  \DRP[\mACQ]{y}{1}
+  \DWP[\mREL]{x}{2}
 \end{math}
 be a sequence and
 \begin{math}
-  \alpha=\DRP[\mRA]{x}{1}.
+  \alpha=\DRP[\mACQ]{x}{1}.
 \end{math}
 $\rho$ is $L$-sequential and $\alpha$ is $L$-weak in $\rho\alpha$.  But there
 is no execution of this program that includes a data race, contradicting the
 theorem.  The error seems to be in Lemma A.4 of
 \cite{DBLP:conf/ppopp/DongolJR19}, which states that if $\alpha$ is $L$-weak
 after an $L$-sequential $\rho$, then $\alpha$ must be in a data race.  That
-is clearly false here, since $\DRP[\mRA]{x}{1}$ is stale, but the program is
+is clearly false here, since $\DRP[\mACQ]{x}{1}$ is stale, but the program is
 data race free.
 
 In proving the SC-LDRF result in \jjr{\textsection8}, we noted that our proof
 technique is more robust than that of \cite{DBLP:conf/ppopp/DongolJR19},
 because it limits the prefixes that must be considered.  In \eqref{mix1}, the
-induction hypothesis requires that we add $\DRP[\mRA]{x}{1}$ before
-$\DWP[\mRA]{x}{2}$ since $\DRP[\mRA]{x}{1}\xwk\DWP[\mRA]{x}{2}$.  In
+induction hypothesis requires that we add $\DRP[\mACQ]{x}{1}$ before
+$\DWP[\mREL]{x}{2}$ since $\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  In
 particular,
 \begin{gather*}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
-      % \raevent{a3}{\DR[\mRA]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mRA]{y}{1}}{below=of a1}
-      \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       % \rf[out=20,in=160]{a1}{a3}
       \rf[out=20,in=160]{a2}{b1}
@@ -2920,17 +2963,17 @@ particular,
     \end{tikzinline}}
 \end{gather*}
 is not a downset of \eqref{mix1}, because
-$\DRP[\mRA]{x}{1}\xwk\DWP[\mRA]{x}{2}$.  As we noted in \jjr{\textsection8},
+$\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  As we noted in \jjr{\textsection8},
 this affects the inductive order in which we move across pomsets, but does
 not affect the set of pomsets that are considered.  In particular,
 \begin{gather*}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mRA]{y}{1}}{right=of a1}
-      % \raevent{a3}{\DR[\mRA]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mRA]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mRA]{y}{1}}{below=of a1}
-      % \raevent{b2}{\DW[\mRA]{x}{2}}{right=of b1}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      % \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       % \rf[out=20,in=160]{a1}{a3}
       \rf[out=20,in=160]{a2}{b1}
@@ -2951,18 +2994,18 @@ is a downset of \eqref{mix1}.
 We allow downgrades in executions that are not be allowed by \armeight{}.
 \begin{gather*}
   \PW{x}{2}\SEMI 
-  \PR[\mRA]{x}{r}\SEMI
+  \PR[\mACQ]{x}{r}\SEMI
   \PW{y}{1} \PAR
   \PW{y}{2}\SEMI
-  \PW[\mRA]{x}{1} \PAR
+  \PW[\mREL]{x}{1} \PAR
   \PW{x}{3}
   \\
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a}{\DW{x}{2}}{}
-      \raevent{b}{\DR[\mRA]{x}{3}}{right=of a}
+      \raevent{b}{\DR[\mACQ]{x}{3}}{right=of a}
       \event{c}{\DW{y}{1}}{right=of b}
       \event{d}{\DW{y}{2}}{right=2.5em of c}
-      \raevent{e}{\DW[\mRA]{x}{1}}{right=of d}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
       \event{f}{\DW{x}{3}}{right=2.5em of e}
       \wk[out=15,in=165]{a}{f}
       \rf[out=-165,in=-15]{f}{b}
@@ -2977,7 +3020,7 @@ external write.
 \begin{gather*}
   % \taglabel{data-rfi-rfe-rfe}
   \PW{x}{\PR{z}{}} \SEMI
-  \PR[\mRA]{x}{r}\SEMI
+  \PR[\mACQ]{x}{r}\SEMI
   \PW{y}{1} \PAR
   \PW{z}{\PR{y}{}}
   \\
@@ -2985,7 +3028,7 @@ external write.
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a}{\DR{z}{1}}{}
       \event{b}{\DW{x}{1}}{right=of a}
-      \raevent{c}{\DR[\mRA]{x}{1}}{right=of b}
+      \raevent{c}{\DR[\mACQ]{x}{1}}{right=of b}
       \event{d}{\DW{y}{1}}{right=of c}
       \event{e}{\DW{y}{1}}{right=2.5em of d}
       \event{f}{\DW{z}{1}}{right=of e}
@@ -3015,20 +3058,20 @@ vs
 \end{displaymath}
 
 \begin{displaymath}
-  r \GETS \mathtt{new}\SEMI
-  \REF{r} \GETS 42\SEMI
-  s \GETS \REF{r}\SEMI
-  x \GETS r
+  \LET{r}{\mathtt{new}}\SEMI
+  \PW{\REF{r}}{42}\SEMI
+  \PR{\REF{r}}{s}\SEMI
+  \PW{x}{r}
   \PAR
-  r \GETS x\SEMI
-  \REF{r} \GETS 7
+  \PR{x}{r}\SEMI
+  \PW{\REF{r}}{7}
 \end{displaymath}
 
 If closure is at odds with Java Final field semantics.
 
 Do sequencing and if commute?
 
-\subsection{About ARM}
+\subsection{About Arm}
 Hypothesis: gcb cannot contradict (poloc minus RxR).
 
 
@@ -3041,13 +3084,13 @@ results are less interesting.
 \begin{figure*}[t]
   \begin{subfigure}{.5\textwidth}
     \centering
-    \input{fig-q1}
+    \input{fig-q1.tex}
     \caption{Quiescence Examples (\textsection\ref{sec:sync})}
     \label{fig:q1}
   \end{subfigure}  
   \begin{subfigure}{.5\textwidth}
     \centering
-    \input{fig-q2}
+    \input{fig-q2.tex}
     \caption{Quiescence Examples (\textsection\ref{sec:independency-co})}
     \label{fig:q2}
   \end{subfigure}
@@ -3056,13 +3099,13 @@ results are less interesting.
 \end{figure*}
 % \begin{figure}[t!]
 %   \centering
-%   \input{fig-q1}
+%   \input{fig-q1.tex}
 %   \caption{Quiescence Examples (Old)}
 %   \label{fig:q1}
 % \end{figure}
 % \begin{figure}[t!]
 %   \centering
-%   \input{fig-q2}
+%   \input{fig-q2.tex}
 %   \caption{Quiescence Examples (New)}
 %   \label{fig:q2}
 % \end{figure}
@@ -3107,21 +3150,21 @@ quiescence symbols required are $\Qrlx$, $\Qra$ and $\Qsc$.
   Update \refdef{def:pomsets-trans} from: % (\ref{S4}/\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
-    $\labelingForm(\aEv)$ implies $\aExp{=}\aVal\land\QS{\aLoc}{\amode}$,
+    $\labelingForm(\aEv) \rimplies \aExp{=}\aVal\land\QS{\aLoc}{\amode}$,
   \item[\ref{L3})]
-    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$,
+    $\labelingForm(\aEv) \rimplies \QL{\aLoc}{\amode}$,
   \item[\ref{T3})]
-    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
+    $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm \land\aExp{=}\aVal$,
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm \land\aExp{=}\aVal$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{\aLoc}{\amode}]$,
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\QS{\aLoc}{\amode}]$,
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QL{\aLoc}{\amode}]$.
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\QL{\aLoc}{\amode}]$.
   \end{enumerate}
 \end{comment}
 
@@ -3159,23 +3202,23 @@ quiescence symbols required are $\Qrlx$, $\Qra$ and $\Qsc$.
   Update \refdef{def:pomsets-trans} to: %and \ref{def:pomsets-fj} to: % (\ref{S4}/\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
-    $\labelingForm(\aEv)$ implies $\QS{}{\amode}\land\aExp{=}\aVal$,
+    $\labelingForm(\aEv) \rimplies \QS{}{\amode}\land\aExp{=}\aVal$,
   \item[\ref{L3})]
-    $\labelingForm(\aEv)$ implies $\QL{}{\amode}$,
+    $\labelingForm(\aEv) \rimplies \QL{}{\amode}$,
     % \item[\ref{F3})]
-    %   $\labelingForm(\aEv)$ implies $\Qrlx\land\Qra\land\Qsc\land\labelingForm_1(\aEv)$, 
+    %   $\labelingForm(\aEv) \rimplies \Qrlx\land\Qra\land\Qsc\land\labelingForm_1(\aEv)$, 
     % \item[\ref{T3})]
-    %   $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$, %[\TRUE/\Qrlx][\TRUE/\Qra][\TRUE/\Qsc]$,
+    %   $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)[\TRUE/\Q{}]$, %[\TRUE/\Qrlx][\TRUE/\Qra][\TRUE/\Qsc]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm \land\aExp{=}\aVal$,
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm \land\aExp{=}\aVal$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{}{\amode}]$,
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\QS{}{\amode}]$,
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QL{}{\amode}]$.
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\QL{}{\amode}]$.
   \end{enumerate}
 \end{definition}
 
@@ -3354,7 +3397,7 @@ this.
   \begin{definition}
     \label{def:completed}
     A pomset with predicate transformers $\aPS$ is \emph{completed} if
-    $\aTr{\aEvs}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
+    $\aTr{\aEvs}{\aSym} \rimplies \aSym$, for every quiescence symbol $\aSym$.
   \end{definition}
   For example, there are no pomsets in $\sem{\ABORT}$ that are completed,
   whereas the augment-minimal pomset of $\sem{\SKIP}$ (which has the identity
@@ -3400,7 +3443,7 @@ this.
   % can be enforced using synchronization.  For example, the ``backwards'' read
   % above is forbidden in:
   % \begin{gather*}
-  %   \PR{x}{r}\SEMI\PW[\mRA]{z}{1}\SEMI\FORK{\THREAD{\IF{\PR[\mRA]{z}{}}\THEN\PW{x}{1}\FI}}
+  %   \PR{x}{r}\SEMI\PW[\mREL]{z}{1}\SEMI\FORK{\THREAD{\IF{\PR[\mACQ]{z}{}}\THEN\PW{x}{1}\FI}}
   %   \\
   %   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
   %     \event{a}{\DR{x}{1}}{}
@@ -3453,9 +3496,9 @@ this.
     \item[\ref{par-E}--\ref{par-kappa2})]
       as for $\sPAR{}{}$ in \refdef{def:pomsets-pre},
     \item \label{par-tau1}
-      $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\bForm}$,
+      $\aTr{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\bForm}$,
     \item \label{par-tau2}
-      $\aTr{\bEvs}{\aSym}$ implies $\aTr[2]{\bEvs}{\aSym}$,
+      $\aTr{\bEvs}{\aSym} \rimplies \aTr[2]{\bEvs}{\aSym}$,
       for every quiescence symbol $\aSym$.
     \end{enumerate}
   \end{definition}
@@ -3485,7 +3528,7 @@ this.
       %   $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ is a tautology and
       %   $\aEv$ is fulfilled (\refdef{def:fulfilled}),
     \item[6)]  \label{top2-tau} % [{\labeltext[T3]{T3)}{T3}}]
-      $\aTr[1]{\aEvs_1}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
+      $\aTr[1]{\aEvs_1}{\aSym} \rimplies \aSym$, for every quiescence symbol $\aSym$.
     \end{enumerate}  
   \end{definition}
 
@@ -3571,7 +3614,7 @@ this.
       
     \item %[{\labeltext[T4]{T4)}{T4}}]
       if $\TICK$ then $\aPS$ is completed (\refdef{def:completed}).
-      % $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
+      % $\aTr{\aEvs}{\Q{}} \rimplies \Q{}$.
     \end{enumerate}
 
     \noindent
@@ -3581,7 +3624,7 @@ this.
       \setcounter{enumi}{\value{pomsetPreParCount}}
     \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR{}{}$ in
       \refdef{def:pomsets-pre},
-    \item \label{par-tick} $\TICK$ implies $\TICK_1\land\TICK_2$.
+    \item \label{par-tick} $\TICK \rimplies \TICK_1\land\TICK_2$.
     \end{enumerate}
 
     \noindent
@@ -3590,13 +3633,13 @@ this.
       \setcounter{enumi}{\value{pomsetXForkCount}}
     \item[\ref{fork-E}--\ref{fork-le})] as for $\sFORK{}$ in \refdef{def:pomsets-group},
     \item
-      $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,    
+      $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,    
     \item 
-      $\labelingForm(\aEv)$ implies $\aSym$, for every quiescence symbol $\aSym$,
+      $\labelingForm(\aEv) \rimplies \aSym$, for every quiescence symbol $\aSym$,
     \item
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm$, if $\bEvs=\aEvs$ and $\TICK_1$,
+      $\aTr{\bEvs}{\bForm} \rimplies \bForm$, if $\bEvs=\aEvs$ and $\TICK_1$,
     \item %[{\labeltext[F5]{F5)}{F5}}]
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$, otherwise.
+      $\aTr{\bEvs}{\bForm} \rimplies \bForm[\FALSE/\Q{}]$, otherwise.
     \end{enumerate}
   \end{definition}
   \begin{definition}

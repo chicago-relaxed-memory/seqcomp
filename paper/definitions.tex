@@ -241,13 +241,15 @@ $\sreleasedef$ actions.
 \end{definition}
 
 \begin{definition}
-  A pomset is \emph{top-level} if for every $\aEv\in\aEvs$:
-  \begin{enumerate}[,label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
-  \item \label{top-true}
-    $\labelingForm(\aEv)$ is a tautology,    
-  \item \label{top-rf}
-    if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
-  \end{enumerate}
+  A pomset is \emph{top-level} if for every $\aEv\in\aEvs$,
+  $\labelingForm(\aEv)$ is a tautology and
+  if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  % \begin{enumerate}[,label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
+  % \item \label{top-true}
+  %   $\labelingForm(\aEv)$ is a tautology,    
+  % \item \label{top-rf}
+  %   if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  % \end{enumerate}
 \end{definition}
 
 \begin{definition}

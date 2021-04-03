@@ -37,11 +37,8 @@ We require that
 \begin{itemize}
 \item values and registers are disjoint, 
 \item values include at least the constants $0$ and $1$,  
-  % \item for any set $\aEvs$ there are registers $\uRegs{\aEvs}=\{\uReg{\aEv}\mid\aEv\in\aEvs\}$,
 \item expressions include at least registers and values, 
 \item expressions do \emph{not} include references: $\aExp[\bExp/\aLoc]=\aExp$.
-  % or registers in
-  % $\uRegs{\aEvs}$, for any set $\aEvs$.
 \end{itemize}
 
 We model the following language.
@@ -75,12 +72,6 @@ given mode, as well as the usual structural constructs. Following
 \cite{DBLP:conf/icfp/FerreiraHJ96}, $\LPAR$ denotes parallel composition,
 preserving thread state on the right after a join.  In examples and
 sublanguages without join, we use the symmetric $\PAR$ operator.
-% 
-% \emph{Thread groups}, $\aGrp$, include commands and $\NIL$, which denotes
-% inaction. %, or deadlock.
-% % 
-% The $\FORK{}$ command spawns a thread group.
-% % We often drop the words $\FORK{}$ and $\THREAD{}$.
 
 The semantics is built from the following.
 \begin{itemize}
@@ -88,32 +79,24 @@ The semantics is built from the following.
   $\cEv$, $\dEv$, 
 \item a set of \emph{logical formulae} $\Formulae$, ranged over by $\aForm$,
   $\bForm$, $\cForm$,
-\item a set of \emph{actions} $\Act$, ranged over by $\aAct$.
+\item a set of \emph{actions} $\Act$, ranged over by $\aAct$, 
 \end{itemize}
 Subsets of $\AllEvents$ are ranged over by $\aEvs$, $\bEvs$, $\cEvs$,
 $\dEvs$.
 
 We require that:
 \begin{itemize}
-\item actions include writes $\DWP{\aLoc}{\aVal}$ and reads $\DRP{\aLoc}{\aVal}$,
 \item formulae include equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
-\item formulae include quiescence symbols $\Qsc$, $\Qr{\aLoc}$, $\Qw{\aLoc}$
-  (used in \textsection\ref{sec:q}), the downgrade symbols $\Dx{\aLoc}$
-  (used in \textsection\ref{sec:downgrade}), and the write symbol $\RW$
-  (used in \textsection\ref{sec:rrd}),
 \item formulae are closed under negation, conjunction, disjunction, and
   substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$,
-  and $[\aForm/\aSym]$ for each symbol $\aSym$,
-\item there is an entailment relation $\vDash$ between formulae,
-\item $\vDash$ has the expected semantics for $=$, $\lnot$, $\land$, $\lor$,
-  $\limplies$ and substitution.
+\item there is a relation $\rimpliesdef$ between
+  formulae, capturing entailment, %\subseteq(\Formulae\times\Formulae)$ %
+\item $\rimpliesdef$ has the expected semantics for $=$, $\lnot$, $\land$, $\lor$,
+  $\limplies$ and substitution,
+\item there are binary relations $\rmatchesdef$, $\rblocksdef$, and
+  $\rdelaysdef$, each in $\Act\times\Act$,
+\item there are subsets of actions, distinguishing $\sreaddef$ and $\sreleasedef$ actions.
 \end{itemize}
-
-
-% Action $\DWP{\aLoc}{\aVal}$ models a write of $\aVal$ to $\aLoc$, and
-% $\DRP{\aLoc}{\aVal}$ models a read of $\aVal$ from $\aLoc$.
-% We use $\DAP{\aLoc}{\aVal}$ to indicate a generic access, which could be
-% either a read or a write.
 
 Logical formulae include equations over registers, such as
 $(\aReg{=}\bReg{+}1)$.
@@ -136,14 +119,14 @@ $\aForm\limplies(\bForm\limplies\cForm)$.
 %   \emph{dependent} otherwise.
 %   We say $\aForm$ is \emph{location independent} if it is independent of
 %   every location.
+%   We say
+%   $\aForm$ \emph{implies} $\bForm$ if $\aForm\vDash\bForm$.
+%   We say that
 We say
-$\aForm$ \emph{implies} $\bForm$ if $\aForm\vDash\bForm$.
+$\aForm$ is a \emph{tautology} if $\TRUE \rimplies \aForm$.
 % We say that
 We say
-$\aForm$ is a \emph{tautology} if $\TRUE\vDash\aForm$.
-% We say that
-We say
-$\aForm$ is \emph{unsatisfiable} if $\aForm\vDash\FALSE$.
+$\aForm$ is \emph{unsatisfiable} if $\aForm \rimplies \FALSE$.
 % \end{definition}
 
 
@@ -167,43 +150,506 @@ instead that
 % In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
 % assumption.
 
+
+In this paper, we let actions be reads, writes and fences:
+\begin{displaymath}
+  \aAct,\bAct \BNFDEF \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
+  \BNFSEP \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
+  \BNFSEP \DF[\ascope]{\fmode}[\aThrd]
+\end{displaymath}
+% % writes $\DWP[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
+% reads $\DRP[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
+% and fences $\DFP[\ascope]{\fmode}[\aThrd]$.
+In definitions, we drop elements of actions that are existentially
+quantified.  In examples, we drop elements of actions, using defaults.  We
+write $\DXP[\amode]{}[\ascope]{}[\aThrd]$ to stand for
+$\DWP[\amode]{}[\ascope]{}[\aThrd]$ or $\DRP[\amode]{}[\ascope]{}[\aThrd]$.
+% or $\DFP[\ascope]{\amode}[\aThrd]$.
+% We write $\DWP[\gemode\mREL]{}{}$ to stand for either
+% $\DWP[\mREL]{}{}$ or $\DWP[\mSC]{}{}$, and similarly for other actions and
+% modes.
+
+Action $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
+
+Action $\DWP{\aLoc}{\aVal} \rblocksdef \DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
+
+Let 
+\begin{math}
+  {\eqreordersc}
+  =
+  \{(\DX[\mSC]{}{},\DX[\mSC]{}{})\}
+\end{math}.
+Let 
+\begin{math}
+  {\eqreorderco}
+  =
+  \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{}),\;(\DW{\aLoc}{}, \DR{\aLoc}{})\}
+\end{math}.
+Let \begin{math}
+  {\reorderra}
+  =
+  \{(\aAct,             \DW[\gemode\mREL]{}{}     )\C
+  (\aAct,               \DF{\gemode\fREL}        )\C
+  (\DR{}{},             \DF{\gemode\fACQ}        )\C
+  (\DR{\aLoc}{},        \DR[\gemode\mACQ]{\aLoc}{})\C
+  (\DR[\gemode\mACQ]{}{},\aAct                    )\C
+  (\DF{\gemode\fACQ},   \aAct                    )\C
+  (\DF{\gemode\fREL},   \DW{}{}                  )\C
+  (\DW[\gemode\mREL]{\aLoc}{},\DW{\aLoc}{})\}
+\end{math}.
+
+Action $\aAct \rdelaysdef \bAct$ if $\aAct\eqreordersc\bAct$ or $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$.
+
+Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\fACQ}$ are
+$\sreleasedef$ actions.
+
+
+\subsection{Model}
+
 \begin{definition}
-  \label{def:reorderra}
-  Reorderability relations.
-  Coherence-after and synchronization.
-  \begin{align*}
-    {\reorderca}
-    &=
-    \{(\DW{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
-    \cup\{(\DR{\aLoc}{}, \DW{\bLoc}{}) \mid \aLoc\neq\bLoc\}
-    \cup\{(\DW{\aLoc}{}, \DR{\bLoc}{})\}
-    %\\&
-    \;\cup\;\{(\DR{\aLoc}{}, \DR{\bLoc}{}) \}
-    \\
-    {\reorderra}
-    &=
-    \{(\DW[\amode\neq\mSC]{}{}, \DR[\bmode\neq\mSC]{}{})\}% \mid \amode\neq\mSC \lor \bmode\neq\mSC\}
-    \cup\{(\DW[\amode]{}{}, \DW[\mRLX]{}{}) \} %\mid \amode\neq\mREL \}
-    \cup\{(\DF{\mREL},      \DR[\bmode]{}{}) \}%\mid \amode=\mREL \}
-    \\&
-    \cup\{(\DR[\mRLX]{}{}, \DW[\mRLX]{}{}) \}
-    \cup\{(\DR[\mRLX]{}{},  \DR[\bmode]{}{}) \} %\mid \bmode\neq\mACQ\}
-    \cup\{(\DW[\amode]{}{}, \DF{\mACQ}     ) \}%\mid \bmode=\mACQ \}
-    \cup\{(\DF{\mREL},      \DF{\mACQ}    ) \}
-    % \\&
-    % \cup\{(\DR[\mRLX]{\aLoc}{}, \DG{\mACQ}{\aLocs})\mid \aLoc \in\aLocs \}
-    \\
-    {\reorderlt}
-    &=
-    {\reorderra}\cap{\reorderca} %\{(\aAct, \bAct) \mid \aAct\reorderco\bAct \land \aAct\reorderra\bAct\}
-  \end{align*}  
+  \label{def:pomset}
+  A \emph{pomset with predicate transformers} over $\Act$
+  is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\le}, {\rrfx})$ where
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \item \label{pom-E}
+    $\Event\subseteq\AllEvents$ is a set of \emph{events},
+  \item \label{pom-lambda}
+    $\labeling: \Event \fun \Act$ defines a \emph{label} for each event,
+  \item \label{pom-kappa}
+    $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
+  \item \label{pom-tau}
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of
+      predicate transformers} over $\aEvs$, %defines a \emph{predicate transformer} for each set of events,
+  \item \label{pom-term}
+    $\aTerm:\Formulae$ defines a \emph{termination condition},
+  \item \label{pom-le}
+    ${\le} : \Event\times\Event$, is a partial order capturing \emph{causality},
+  \item \label{pom-rf}
+    ${\rrfx} : \Event\fun\Event$ is a partial function capturing
+    \emph{reads-from} such that 
+    \begin{enumerate}
+      % \item
+      %   if $(\bEv,\aEv)\in{\rrfx}$ and $(\cEv,\aEv)\in{\rrfx}$ then $\bEv=\cEv$,
+    \item \label{rf-match}
+      if $\bEv\xrfx\aEv$ then $\labeling(\bEv) \rmatches \labeling(\aEv)$,
+    \item \label{rf-block}
+      if $\bEv\xrfx\aEv$ and $\labeling(\cEv)$ blocks $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$,
+    \item \label{rf-le}
+      if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
+    \end{enumerate}
+  \end{enumerate}
 \end{definition}
 
-Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
-Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
+\begin{definition}
+  A pomset is \emph{top-level} if for every $\aEv\in\aEvs$:
+  \begin{enumerate}[,label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
+  \item \label{top-true}
+    $\labelingForm(\aEv)$ is a tautology,    
+  \item \label{top-rf}
+    if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  \end{enumerate}
+\end{definition}
 
-Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\mACQ}$ are
-\emph{release actions}.
+\begin{definition}
+  Suppose $\aRel_1:\aEvs_1\times\aEvs_1$ and $\aRel_2:\aEvs_2\times\aEvs_2$.
+  We say $\aRel \rextendsdef{\aRel_1}{\aRel_2}$ if
+  $\aRel\supseteq (\aRel_1\cup \aRel_2)$ and
+  $\aRel\cap(\aEvs_1\times \aEvs_1) = \aRel_1$ and
+  $\aRel\cap(\aEvs_2\times \aEvs_2) = \aRel_2$.
+\end{definition}
+Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
+
+\begin{definition}
+  \noindent
+  If $\aPS\in\sLET{\aReg}{\aExp}$ then $\aEvs = \emptyset$ and
+  $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aExp/\aReg]$.
+
+  \noindent
+  If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
+  $(\exists\aVal\in\Val)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+    \item \label{read-E}
+      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    \item \label{read-lambda}
+      $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
+      \stepcounter{enumi}
+    \item[] \stepcounter{enumi}\label{read-tau}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-tau-nonempty}
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \rimplies
+          \aVal{=}\aReg
+          \limplies \bForm
+        \end{math},    
+        if $(\aEvs\cap\bEvs)\neq\emptyset$,
+      \item \label{read-tau-empty}
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \rimplies
+          % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+          \bForm,
+        \end{math}
+        if $(\aEvs\cap\bEvs)=\emptyset$.
+      \end{enumerate}
+    \end{enumerate}
+  \end{multicols}
+  \medskip
+
+  \noindent
+  If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
+  $(\exists\aVal\in\Val)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
+    \item \label{write-E}
+      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    \item \label{write-lambda}
+      $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
+    \item \label{write-kappa}
+      \begin{math}
+        \labelingForm(\aEv) \rimplies
+        \aExp{=}\aVal
+      \end{math},    
+    \item \label{write-tau}
+      % if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+      \begin{math}
+        \aTr{\bEvs}{\bForm} \rimplies 
+        \bForm
+        % [\aExp/\aLoc]
+        % \land\aExp{=}\aVal
+      \end{math},
+    \item[] \stepcounter{enumi}\label{write-term}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{write-term-empty}
+        if $\aEvs=\emptyset$ then $\aTerm \rimplies \FALSE$,
+      \item \label{write-term-nonempty}
+        if $\aEvs\neq\emptyset$ then $\aTerm \rimplies \aExp{=}\aVal$.
+      \end{enumerate}
+    \end{enumerate}
+  \end{multicols}
+  \medskip
+
+  \noindent
+  If $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
+  % $(\exists\aLocs\subseteq\Loc)$
+  % $(\exists\bmode\in\{\amode,\mRLX\})$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
+    \item \label{fork-E}
+      $\aEvs\neq\emptyset$ and if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    \item \label{fork-lambda}
+      $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
+      % \item%[{\labeltext[F3]{(F3)}{F3}}]
+      %   $\labelingForm(\aEv) \rimplies \bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc}$,
+      \stepcounter{enumi}
+    \item \label{fork-tau}
+      $\aTr{\bEvs}{\bForm} \rimplies \bForm$,
+    \item \label{fork-term}
+      if $\aEvs=\emptyset$ then $\aTerm \rimplies \FALSE$.
+    \end{enumerate}
+  \end{multicols}
+  \medskip
+
+  \noindent
+  If $\aPS\in\sSKIP$ then $\aEvs = \emptyset$ and
+  $\aTr{\bEvs}{\bForm} \rimplies \bForm$.
+
+  \noindent
+  If $\aPS \in \sLPAR{\aPSS_1}{\aPSS_2}$ then  
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{p}\arabic*),ref=\textsc{p}\arabic*]
+    \item \label{par-E}
+      $\aEvs = (\aEvs_1\uplus\aEvs_2)$,
+    \item \label{par-lambda}
+      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+    \item[] \stepcounter{enumi}\label{par-kappa}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{par-kappa1}
+        if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
+      \item \label{par-kappa2}
+        if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)$,
+      \end{enumerate}
+    \item \label{par-tau}
+      $\aTr{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\bForm}$,
+    \item \label{par-term}
+      $\aTerm \rimplies \aTerm[1]\land\aTerm[2]$,
+    \item \label{par-le-extends}
+      ${\le}\rextends{\le_1}{\le_2}$, 
+      % \item \label{par-rf}
+    \item[] \stepcounter{enumi}\label{par-rf}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{par-rf-extends}
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+      \item \label{par-rf-le}
+        ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$.
+      \end{enumerate}
+      % \item \label{par-disjoint}
+      %   $\aEvs_1$ and $\aEvs_2$ are disjoint.
+    \end{enumerate}
+    % \item \label{par-tau1}
+    %   $\aTr{\bEvs}{\Q{}} \rimplies \aTr[1]{\bEvs}{\Q{}}$,
+  \end{multicols}
+  \medskip
+
+  \noindent
+  If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$
+  $(\exists\aPS_2\in\aPSS_2)$
+  \\
+  let $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,
+  where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is
+  a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
+  % let
+  % \begin{math}
+  %   \smash{
+  %   \downarrow\aEv=\begin{cases}
+  %     \{ \cEv \mid \cEv \lt \aEv \} &\textif \labeling(\aEv) \;\text{is a write}\\
+  %     \aEvs_1 &\textotherwise
+  %   \end{cases}}
+  % \end{math}
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{s}\arabic*),ref=\textsc{s}\arabic*]
+    \item \label{seq-E}
+      $\aEvs = (\aEvs_1\cup\aEvs_2)$,
+    \item \label{seq-lambda}
+      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+    \item[] \stepcounter{enumi}\label{par-kappa}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{seq-kappa1}
+        if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
+      \item \label{seq-kappa2}
+        if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \rimplies \labelingForm'_2(\aEv)$,
+      \item \label{seq-kappa12}
+        % if $\aEv{\in}\aEvs_1{\cap}\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv){\lor}\labelingForm'_2(\aEv)$,\\
+        if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
+        % where
+        % $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,
+        % where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$
+        % is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise,
+      \item \label{seq-kappa-release}
+        if $\labeling_2(\aEv)$ is a release then $\labelingForm(\aEv) \rimplies \aTerm[1]$,
+      \end{enumerate}
+    \item \label{seq-tau}
+      $\aTr{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
+    \item \label{seq-term}
+      $\aTerm \rimplies \aTerm[1]\land\aTr[1]{}{\aTerm[2]}$.
+    \item[] \stepcounter{enumi}\label{par-le}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{seq-le-extends}
+        ${\le}\rextends{\le_1}{\le_2}$, 
+      \item \label{seq-le-delays}
+        if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$,
+      \item \label{seq-le-blocks}
+        if $\labeling_1(\cEv)$ blocks $\labeling_2(\aEv)$\\
+        then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
+      \end{enumerate}
+    \item \label{seq-rf-extends}
+      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
+      % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
+      % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
+      % or $\cEv\le\bEv$,
+    \end{enumerate}
+  \end{multicols}
+  \medskip
+
+  \noindent
+  If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
+    \item \label{if-E}
+      $\aEvs = (\aEvs_1\cup\aEvs_2)$,
+    \item \label{if-lambda}
+      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+      % \item[(\ref{par-E}--\ref{par-le})] as for $\sLPAR{}{}$,
+    \item[] \stepcounter{enumi}\label{par-kappa}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{if-kappa1}
+        if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \aForm\land\labelingForm_1(\aEv)$,
+      \item \label{if-kappa2}
+        if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \rimplies \neg\aForm\land\labelingForm_2(\aEv)$, 
+      \item \label{if-kappa12}
+        if $\aEv\in\aEvs_1\cap\aEvs_2$\\ then
+        $\labelingForm(\aEv) \rimplies (\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$,
+      \end{enumerate}
+    \item \label{if-tau}
+      $\aTr{\bEvs}{\bForm} \rimplies
+      (\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$,
+    \item \label{if-term}
+      $\aTerm \rimplies (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
+    \item \label{if-le-extends}
+      ${\le}\rextends{\le_1}{\le_2}$, 
+    \item \label{if-rf-extends}
+      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
+    \end{enumerate}
+  \end{multicols}
+
+  \begin{align*}
+    \begin{aligned}
+      \sem[\aThrd]{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
+      \\
+      \sem[\aThrd]{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
+      \\
+      \sem[\aThrd]{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]
+      \\
+      \sem[\aThrd]{\PF[\ascope]{\fmode}} &= \sFENCE[\ascope]{\fmode}[\aThrd]
+    \end{aligned}
+    &&
+    \begin{aligned}
+      \sem[\aThrd]{\SKIP} &= \sSKIP 
+      \\
+      \sem[\aThrd]{\aCmd_1 \LPAR[\bThrd] \aCmd_2} &= \sLPAR{\sem[\bThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
+      \\
+      \sem[\aThrd]{\aCmd_1 \SEMI \aCmd_2} &= \sSEMI{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
+      \\
+      \sem[\aThrd]{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &= \sIFTHEN{\aExp{\neq}0}{\sem[\aThrd]{\aCmd_1}}{\sem[\aThrd]{\aCmd_2}}
+    \end{aligned}
+  \end{align*}
+\end{definition}
+
+Full versions:
+
+\medskip
+If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
+$(\exists\aVal:\aEvs\fun\Val)$
+$(\exists\cForm:\aEvs\fun\Formulae)$
+\begin{multicols}{2}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
+  \item \label{write-x-E}
+    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+  \item \label{write-x-lambda}
+    $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
+  \item \label{write-x-kappa}
+    \begin{math}
+      \labelingForm(\aEv) \rimplies
+      \cForm_\aEv
+      \land \aExp{=}\aVal_\aEv
+    \end{math},
+    
+    
+  \item \label{write-x-tau}
+    % \begin{math}
+    %   %   (\forall\aEv\in\aEvs\cap\bEvs)
+    %   (\forall\aEv\in\aEvs)
+    % \end{math}
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies 
+      \cForm_\aEv
+      \limplies 
+      \bForm[\aExp/\aLoc]
+    \end{math},
+    % \item
+    %   \begin{math}    
+    %     (\forall\aEv\in\aEvs\setminus\bEvs)
+    %   \end{math}
+    %   $\aTr{\bEvs}{\bForm}$ implies
+    %   \begin{math}
+    %     \cForm_\aEv
+    %     \limplies {
+    %     \bForm
+    %     [\aExp/\aLoc]
+    %       %     \DS{\aLoc}{\amode}
+    %       %     [\FALSE/\Q{}]
+    %   }
+    %   \end{math}
+    % \item
+    %   $\aTr{\bEvs}{\bForm}$ implies
+    %   \begin{math}
+    %     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+    %     \limplies {
+    %     \bForm
+    %     [\aExp/\aLoc]
+    %       %     \DS{\aLoc}{\amode}
+    %       %     [\FALSE/\Q{}]
+    %   }
+    %   \end{math}.
+  \item \label{write-x-term}
+    $\aTerm \rimplies \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
+  \end{enumerate}
+\end{multicols}
+
+\medskip
+If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
+$(\exists\aVal:\aEvs\fun\Val)$
+$(\exists\cForm:\aEvs\fun\Formulae)$
+% \begin{multicols}{2}
+\begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+\item \label{read-x-E}
+  if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item \label{read-x-lambda}
+  $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
+\item \label{read-x-kappa}
+  \begin{math}
+    \labelingForm(\aEv) \rimplies
+    \cForm_\aEv
+  \end{math},
+  
+\item[] \stepcounter{enumi}\label{read-tau}
+  \begin{enumerate}[leftmargin=0pt]
+  \item \label{read-x-tau-dependent}
+    \begin{math}
+      (\forall\aEv\in\aEvs\cap\bEvs)
+    \end{math}
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies
+      \cForm_\aEv
+      \limplies \aVal_\aEv{=}\uReg{\aEv}
+      \limplies \bForm[\uReg{\aEv}/\aReg]
+    \end{math},
+    
+  \item \label{read-x-tau-independent}
+    \begin{math}
+      (\forall\aEv\in\aEvs\setminus\bEvs)
+    \end{math}
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies
+      \cForm_\aEv 
+      \limplies
+      \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+      \limplies
+      \bForm[\uReg{\aEv}/\aReg]
+    \end{math},
+    
+  \item \label{read-x-tau-empty}
+    \begin{math}
+      (\forall\bReg)
+    \end{math}
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies 
+      % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+      (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+      \limplies 
+      \bForm[\bReg/\aReg].
+    \end{math}  
+  \end{enumerate}  
+\end{enumerate}
+%\end{multicols}
+\medskip
+
+In $\sIFTHEN{}{}{}$, the definition of $\rextends{}{}$ stops coalescing the rf in
+\begin{displaymath}
+  \IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI
+\end{displaymath}
+
+
+In diagrams, we use different colors for arrows.  We distinguish
+$\rrfx$ edges that are included in order from those that are not.
+\begin{itemize}
+\item \makebox{$\aEv\xrf\bEv$} arises from $\rrfx$, where $\aEv\le\bEv$,
+\item \makebox{$\aEv\xrfint\bEv$} arises from $\rrfx$, where $\lnot(\aEv\le\bEv)$.
+\end{itemize}
+To help the reader understand why order is included, we also different colors
+for arrows induced by order.  We adopt the following conventions:
+\begin{itemize}  
+  % \item relaxed accesses are blue, with a single border,
+  % \item synchronized accesses are red, with a double border,
+  % \item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
+  % \item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
+  %   \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
+  %   $\bEv$ and their actions \emph{conflict},
+\item \makebox{$\aEv\xwk\bEv$} arises from \emph{fulfillment},
+\item \makebox{$\aEv\xpo\bEv$} arises from control/data/address \emph{dependency},
+\item \makebox{$\aEv\xsync\bEv$} arises from \emph{synchronized access}.
+\end{itemize}
 
 
 \subsection{Pomsets}
@@ -235,8 +681,8 @@ $(\forall\aEv\in\Event)(\forall\aLoc\in\Loc)$.
 
 \begin{definition}
   \label{def:fulfilled}
-  Action $\DWP{\aLoc}{\aVal}$ \emph{matches} $\DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
-  Action $\DWP{\aLoc}{\aVal}$ \emph{blocks} $\DRP{\aLoc}{\bVal}$, for any
+  Action $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
+  Action $\DWP{\aLoc}{\aVal} \rblocksdef \DRP{\aLoc}{\bVal}$, for any
   $\aVal$, $\bVal$.
   
   % A pomset $\aPS$ is \emph{closed} if for every $\aEv$ which can be
@@ -416,15 +862,15 @@ consistent executions up to mumbling
   makes no distinction between synchronizing and relaxed access, thus
   allowing:
   \begin{gather*}
-    x\GETS0\SEMI %y\GETS0\SEMI
-    x\GETS 1\SEMI y^\mRA\GETS1 \PAR r\GETS y^\mRA\SEMI s\GETS x
+    \PW{x}{0}\SEMI 
+    \PW{x}{1}\SEMI \PW[\mREL]{y}{1} \PAR \PR[\mACQ]{y}{r} \SEMI \PR{x}{s} 
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
         \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \raevent{wy1}{\DW[\mRA]{y}{1}}{right=of wx1}
-        \raevent{ry1}{\DR[\mRA]{y}{1}}{right=2.5em of wy1}
+        \raevent{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
+        \raevent{ry1}{\DR[\mACQ]{y}{1}}{right=2.5em of wy1}
         \event{rx0}{\DR{x}{0}}{right=of ry1}
         % \sync{wx1}{wy1}
         % \sync{ry1}{rx0}
@@ -434,7 +880,7 @@ consistent executions up to mumbling
         \rf[out=15,in=165]{wx0}{rx0}
       \end{tikzinline}}
   \end{gather*}  
-  We show how to enforce the intended semantics, where $\DWP[\mRA]{y}{1}$
+  We show how to enforce the intended semantics, where $\DWP[\mREL]{y}{1}$
   \emph{publishes} $\DWP{x}{1}$ in \refex{ex:pub2}.
 \end{example}
 In diagrams, we use different shapes and colors for arrows and events.  These
@@ -511,9 +957,9 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   \item[1--\ref{pomsetParDisjointCountLast})]
     as for $\sPAR{}{}$ in \refdef{def:pomset-semantics},
   \item \label{par-kappa1}
-    if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
+    if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
   \item \label{par-kappa2}
-    if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$.
+    if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)$.
     \newcounter{pomsetPreParCount}
     \setcounter{pomsetPreParCount}{\value{enumi}}
   \end{enumerate}
@@ -527,13 +973,13 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   \item[1--\ref{pomsetParCountLast})] 
     as for $\sPAR{}{}$  in \refdef{def:pomset-semantics} (ignoring disjointness),
   \item \label{if-kappa1}
-    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aForm\land\labelingForm_1(\aEv)$,
+    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \aForm\land\labelingForm_1(\aEv)$,
   \item \label{if-kappa2}
-    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv)$ implies $\neg\aForm\land\labelingForm_2(\aEv)$, 
+    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \rimplies \neg\aForm\land\labelingForm_2(\aEv)$, 
   \item \label{if-kappa12}
     if $\aEv\in\aEvs_1\cap\aEvs_2$ then\\
-    $\labelingForm(\aEv)$ implies $(\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$.
-    % $\labelingForm(\aEv)$ implies $(\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$.
+    $\labelingForm(\aEv) \rimplies (\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$.
+    % $\labelingForm(\aEv) \rimplies (\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$.
     \label{pomsetPreIfCountLast}
     \newcounter{pomsetPreIfCount}
     \setcounter{pomsetPreIfCount}{\value{enumi}}
@@ -549,14 +995,14 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
   \item[1--\ref{pomsetPrefixOrderCountLast})]
     as for $\DWP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{storepre-kappa1}
-    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aExp{=}\aVal$,
+    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \aExp{=}\aVal$,
   \item \label{storepre-kappa2}
-    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$,
+    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)$,
   \item \label{storepre-kappa12}
-    if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv)$ implies $\aExp{=}\aVal \lor \labelingForm_2(\aEv)$.
+    if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv) \rimplies \aExp{=}\aVal \lor \labelingForm_2(\aEv)$.
     % \item if $\aEv\in\aEvs_2$ then either
-    %   $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$ or\\
-    %   $\aEv\in\aEvs_1$ and $\labelingForm(\aEv)$ implies $(\aExp{=}\aVal)\lor \labelingForm_2(\aEv)$.
+    %   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)$ or\\
+    %   $\aEv\in\aEvs_1$ and $\labelingForm(\aEv) \rimplies (\aExp{=}\aVal)\lor \labelingForm_2(\aEv)$.
   \end{enumerate}
 
   \noindent
@@ -570,8 +1016,8 @@ $(\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd)$.
     as for $\DRP{\aLoc}{\aVal}\sPREFIX\aPSS_2$ in \refdef{def:pomset-semantics}, % (ignoring \thepomsetPrefixOrderCount),
   \item \label{loadpre-kappa2}
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-    $\labelingForm(\aEv)$ implies $\aReg{=}\aVal\limplies\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv<\aEv$, or \\
-    $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)$.
+    $\labelingForm(\aEv) \rimplies \aReg{=}\aVal\limplies\labelingForm_2(\aEv)$ and $(\exists\bEv\in\aEvs_1)\;\bEv<\aEv$, or \\
+    $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)$.
     % \\ \mbox{$\quad$} for some $\bEv\in\aEvs_1$.
   \end{enumerate}  
 
@@ -628,12 +1074,12 @@ pomsets, every read is fulfilled and every precondition is a tautology.
 \begin{example}
   \label{ex:data}
   A simple example of a data dependency
-  is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS r}$,
-  for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{y\GETS r}$
+  is a pomset $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$,
+  for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\PW{y}{r}}$
   such as the following, where $\aVal=1$:
   % \vspace{-.5\baselineskip}
   \begin{gather*}
-    y\GETS r
+    \PW{y}{r}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -643,7 +1089,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   The value chosen for the read may be different from that chosen for the write:
   % \vspace{-.5\baselineskip}
   \begin{gather*}
-    r\GETS x\SEMI y\GETS r
+    \PR{x}{r}\SEMI \PW{y}{r}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -659,7 +1105,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   cases: the independent case, which again cannot be part of a top-level
   pomset,
   \begin{gather*}
-    r\GETS x\SEMI y\GETS r
+    \PR{x}{r}\SEMI \PW{y}{r}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -669,7 +1115,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   \end{gather*}
   and the dependent case:
   \begin{gather*}
-    % r\GETS x\SEMI y\GETS r
+    % \PR{x}{r}\SEMI \PW{y}{r}
     % \\
     % \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -684,11 +1130,11 @@ pomsets, every read is fulfilled and every precondition is a tautology.
 
 \begin{example}
   Control dependencies are similar, for example
-  for any $\aPS\in\sem{r\GETS x\SEMI \IF r \THEN y\GETS 1 \FI}$,
-  there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\IF r \THEN y\GETS 1 \FI}$
+  for any $\aPS\in\sem{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}$,
+  there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\IF r \THEN \PW{y}{1} \FI}$
   such as:
   \begin{gather*}
-    \IF r \THEN y\GETS 1 \FI
+    \IF r \THEN \PW{y}{1} \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -700,14 +1146,14 @@ pomsets, every read is fulfilled and every precondition is a tautology.
 
 \begin{example}
   A simple example of an independency
-  is a pomset $\aPS\in\sem{r\GETS x\SEMI y\GETS 1}$,
+  is a pomset $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{1}}$,
   for which there must be:
   % an %$\aVal\in\Val$ and
-  % $\aPS'\in \sem{y\GETS r}$
+  % $\aPS'\in \sem{\PW{y}{r}}$
   % such as:
   % \vspace{-1\baselineskip}
   \begin{gather*}
-    y\GETS 1
+    \PW{y}{1}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -716,7 +1162,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   \end{gather*}
   In this case it doesn't matter what value the read chooses:
   \begin{gather*}
-    r\GETS x\SEMI y\GETS 1
+    \PR{x}{r}\SEMI \PW{y}{1}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -729,12 +1175,12 @@ pomsets, every read is fulfilled and every precondition is a tautology.
 \end{example}
 
 \begin{example}
-  Consider $\aPS\in\sem{\IF {r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI}$, so
-  there must be $\aPS_1\in\sem{y\GETS r}$,
-  and $\aPS_2\in\sem{y\GETS 1}$, such as:
+  Consider $\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, so
+  there must be $\aPS_1\in\sem{\PW{y}{r}}$,
+  and $\aPS_2\in\sem{\PW{y}{1}}$, such as:
   \begin{align*}
     \begin{gathered}
-      y \GETS r
+      \PW{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
           \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
@@ -742,7 +1188,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
     \end{gathered}
     &&
     \begin{gathered}
-      y \GETS 1
+      \PW{y}{1}
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
           \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
@@ -753,7 +1199,7 @@ pomsets, every read is fulfilled and every precondition is a tautology.
   we can consider the case where the event \emph{coalesces} from the two pomsets,
   in which case:
   \begin{gather*}
-    \IF{r{=}1} \THEN y\GETS r \ELSE y\GETS 1\FI
+    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -783,7 +1229,7 @@ functions on formulae which preserve logical structure, providing a natural mode
   \item $\aTr{}{\FALSE}$ is $\FALSE$,    
   \item $\aTr{}{\bForm_1\land\bForm_2}$ is $\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
   \item $\aTr{}{\bForm_1\lor\bForm_2}$ is $\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$, 
-  \item if $\aForm$ implies $\bForm$, then $\aTr{}{\aForm}$ implies $\aTr{}{\bForm}$.
+  \item if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies \aTr{}{\bForm}$.
   \end{itemize}
 \end{definition}
 \noindent
@@ -800,8 +1246,10 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   \label{def:family}
   A \emph{family of predicate transformers} for $\aEvs$ consists of a
   predicate transformer $\aTr{\bEvs}{}$ for each $\bEvs\subseteq\AllEvents$,
-  such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}$
-  implies $\aTr{\bEvs}{\bForm}$.
+  such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}
+  \rimplies \aTr{\bEvs}{\bForm}$.
+
+  We write $\aTr{}{}$ as an abbreviation of $\aTr{\aEvs}{}$.
 \end{definition}
 
 %% Note that in a family of predicate transformers for $\aEvs$, transformers for
@@ -835,7 +1283,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
     \item \label{thread-le} % [{\labeltext[T2]{T2)}{T2}}]
       if $\bEv\le_1\aEv$ then $\bEv\le\aEv$,
     \item  \label{thread-kappa}\label{T3} % [{\labeltext[T3]{T3)}{T3}}]
-      $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$.
+      $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$.
       \newcounter{pomsetXThreadCount}
       \setcounter{pomsetXThreadCount}{\value{enumi}}
     \end{enumerate}  
@@ -853,9 +1301,9 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
       \newcounter{pomsetXForkCount}
       \setcounter{pomsetXForkCount}{\value{enumi}}
     \item  \label{fork-kappa}\label{F3}  % [{\labeltext[F3]{F3)}{F3}}]
-      $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$, 
+      $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$, 
     \item  \label{fork-tau}\label{F4}  % [{\labeltext[F4]{F4)}{F4}}]
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
+      $\aTr{\bEvs}{\bForm} \rimplies \bForm$.
     \end{enumerate}  
   \end{definition}
 
@@ -886,19 +1334,19 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   \noindent
   If $\aPS\in\sABORT$ then $\aEvs = \emptyset$ and
   \begin{itemize}
-  \item $\aTr{\bEvs}{\bForm}$ implies $\FALSE$.
+  \item $\aTr{\bEvs}{\bForm} \rimplies \FALSE$.
   \end{itemize}
 
   \noindent
   If $\aPS\in\sSKIP$ then $\aEvs = \emptyset$ and
   \begin{itemize}
-  \item $\aTr{\bEvs}{\bForm}$ implies $\bForm$.
+  \item $\aTr{\bEvs}{\bForm} \rimplies \bForm$.
   \end{itemize}
 
   \noindent
   If $\aPS\in\sLET{\aReg}{\aExp}$ then $\aEvs = \emptyset$ and
   \begin{itemize}
-  \item $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aReg]$.
+  \item $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aExp/\aReg]$.
   \end{itemize}
 
   \noindent
@@ -909,8 +1357,7 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
     \setcounter{enumi}{\value{pomsetPreIfCount}}
   \item[1--\ref{pomsetPreIfCountLast})] as for $\sIF{}$ in \refdef{def:pomsets-pre},
   \item \label{if-tau}
-    $\aTr{\bEvs}{\bForm}$ implies
-    $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$.
+    $\aTr{\bEvs}{\bForm} \rimplies (\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$.
     % $(\aForm\land\aTr[1]{\bEvs%\cap\aEvs_1
     % }{\bForm})\lor(\neg\aForm\land\aTr[2]{\bEvs%\cap\aEvs_2
     % }{\bForm})$.
@@ -925,9 +1372,9 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   \item[\ref{par-E}--\ref{par-kappa2})]
     as for $\sPAR{}{}$ in \refdef{def:pomsets-pre},
   \item \label{par-tau1}
-    $\aTr{\bEvs}{\bForm}$ implies $\aTr[2]{\bEvs}{\bForm}$,
+    $\aTr{\bEvs}{\bForm} \rimplies \aTr[2]{\bEvs}{\bForm}$,
   \item \label{par-tau2}
-    $\aTr{\bEvs}{\aSym}$ implies $\aTr[1]{\bEvs}{\aSym}$,
+    $\aTr{\bEvs}{\aSym} \rimplies \aTr[1]{\bEvs}{\aSym}$,
     for every quiescence symbol $\aSym$.
   \end{enumerate}
 
@@ -942,15 +1389,15 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   \item[1--\ref{pomsetParCountLast})]
     as for $\sPAR{}{}$  in \refdef{def:pomset-semantics} (ignoring disjointness),
   \item \label{seq-kappa1}
-    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,
+    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
   \item \label{seq-kappa2}
-    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv)$ implies $\labelingForm'_2(\aEv)$,
+    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \rimplies \labelingForm'_2(\aEv)$,
   \item \label{seq-kappa12}
-    if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
+    if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
     \\ where $\labelingForm'_2(\aEv)=\aTr[1]{\cEvs%\cap\aEvs_1
     }{\labelingForm_2(\aEv})$, where $\cEvs=\{ \cEv \mid \cEv < \aEv \}$,
   \item \label{seq-tau}
-    $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$.
+    $\aTr{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$.
     \newcounter{pomsetXSemiCount}
     \setcounter{pomsetXSemiCount}{\value{enumi}}
     % \item if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either $\bEv<\aEv$ or $a\reorder\labeling_2(\aEv)$.
@@ -967,14 +1414,14 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   \item[{\labeltext[S2]{S2)}{S2}}]
     $\labelingAct(\aEv) = \DW{\aLoc}{\aVal}$,
   \item[{\labeltext[S3]{S3)}{S3}}]
-    $\labelingForm(\aEv)$ implies $\aExp{=}\aVal$,
+    $\labelingForm(\aEv) \rimplies \aExp{=}\aVal$,
   \item[{\labeltext[S4]{S4)}{S4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm\noSUB{[\aExp/\aLoc]}\land\aExp{=}\aVal$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm\noSUB{[\aExp/\aLoc]}\land\aExp{=}\aVal$, % \land (\Q{}\limplies\aExp{=}\aVal)$,
   \item[{\labeltext[S5]{S5)}{S5}}]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm\noSUB{[\aExp/\aLoc]}$, % \land % \lnot\Q{}$.
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm\noSUB{[\aExp/\aLoc]}$, % \land % \lnot\Q{}$.
     \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$.
     % \item %if $\bEvs\neq\emptyset$ then
-    %   $\aTr{\bEvs}{\bForm}$ implies $(\aExp{=}\aVal) \land \bForm[\aExp/\aLoc]$, if $\bEvs\neq\emptyset$,
+    %   $\aTr{\bEvs}{\bForm} \rimplies (\aExp{=}\aVal) \land \bForm[\aExp/\aLoc]$, if $\bEvs\neq\emptyset$,
     %   \newcounter{pomsetXStoreCount}
     %   \setcounter{pomsetXStoreCount}{\value{enumi}}
   \end{enumerate}
@@ -989,17 +1436,17 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   % \item[{\labeltext[L2]{L2)}{L2}}]
   %   $\labelingAct(\aEv) = \DRP{\aLoc}{\aVal}$,
   % \item[{\labeltext[L3]{L3)}{L3}}]
-  %   $\labelingForm(\aEv)$ implies $\TRUE$,
+  %   $\labelingForm(\aEv) \rimplies \TRUE$,
   % \item[{\labeltext[L4]{L4)}{L4}}]
   %   %   if $\bEvs\neq\emptyset$ then
-  %   $\aTr{\bEvs}{\bForm}$ implies %$\phantom{(\aLoc{=}\aReg\lor{}}
-  %   $\aVal{=}\aReg\limplies\bForm$, 
+  %   $\aTr{\bEvs}{\bForm} \rimplies %$\phantom{(\aLoc{=}\aReg\lor{}}
+  %   \aVal{=}\aReg\limplies\bForm$, 
   % \item[{\labeltext[L5]{L5)}{L5}}]
   %   %   if $\bEvs=\emptyset$ then
-  %   $\aTr{\emptyset}{\bForm}\;$ implies $((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\bForm) \land \lnot\Q{}$.
+  %   $\aTr{\emptyset}{\bForm}\; \rimplies ((\aLoc{=}\aReg\lor\aVal{=}\aReg)\limplies\bForm) \land \lnot\Q{}$.
   % \item[{\labeltext[L6]{L6)}{L6}}]
   %   if $\aEvs=\emptyset$ then
-  %   $\aTr{\emptyset}{\bForm}\;$ implies $\bForm \land \lnot\Q{}$.
+  %   $\aTr{\emptyset}{\bForm}\; \rimplies \bForm \land \lnot\Q{}$.
   % \end{enumerate}
 
   \noindent
@@ -1012,26 +1459,26 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   \item[{\labeltext[L2]{L2)}{L2}}]
     $\labelingAct(\aEv) = \DR{\aLoc}{\aVal}$,
   \item[{\labeltext[L3]{L3)}{L3}}]
-    $\labelingForm(\aEv)$ implies $\TRUE$,
+    $\labelingForm(\aEv) \rimplies \TRUE$,
   \item[{\labeltext[L4]{L4)}{L4}}]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[{\labeltext[L5]{L5)}{L5}}]
-    % $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, % \land \lnot\Q{}$,
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm$, % \land \lnot\Q{}$,
+    % $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, % \land \lnot\Q{}$,
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm$, % \land \lnot\Q{}$,
     \\ where $\bEvs\cap\aEvs\neq\emptyset$ and $\cEvs\cap\aEvs=\emptyset$,
   \end{enumerate}
   % or
   % $\aEvs=\emptyset$ and 
   % \begin{enumerate}[topsep=0pt]
   % \item[{\labeltext[L6]{L6)}{L6}}] 
-  %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$. % \land \lnot\Q{}$.
+  %   $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$. % \land \lnot\Q{}$.
   % \end{enumerate}
   If $\aPS \in \sTOP{\aPSS}$ then
   $(\exists\aPS_1\in\aPSS)$
   \begin{enumerate}[topsep=0pt]
     \setcounter{enumi}{\value{pomsetPreTopCount}}
   \item[1--\ref{top-kappa-read})] as in \refdef{def:pomsets-top},    
-  \item $\aTr{\aEvs_1}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
+  \item $\aTr{\aEvs_1}{\aSym} \rimplies \aSym$, for every quiescence symbol $\aSym$.
   \end{enumerate}
 \end{definition}
 \begin{definition}
@@ -1584,9 +2031,9 @@ order.
   write the predicate transformers in this style we have:
   \begin{enumerate}[topsep=0pt]
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg]$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aVal/\aReg]$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $(\forall\aReg)\bForm$.
+    $\aTr{\cEvs}{\bForm} \rimplies (\forall\aReg)\bForm$.
   \end{enumerate}
   This phrasing of \ref{L5} says that $\bForm$ must be independent of $\aReg$
   in order to appear in a top-level pomset.  This choice for \ref{L5} is forced
@@ -1711,10 +2158,18 @@ order.
 
   Our solution is to Skolemize.  We have proven associativity of
   \refdef{def:pomsets-trans} in Agda.  The proof requires that predicate
-  transformers distribute through disjunction (\refdef{def:trans}).
-  Since universal quantification does not distribute through disjunction, the
-  attempt to define predicate transformers using substitution fails (in
-  particular for \ref{L5}.)
+  transformers distribute through disjunction (\refdef{def:trans}).  The
+  attempt to define predicate transformers using substitution fails for
+  \ref{L5} because the predicate transformer
+  $\aTr{}{\bForm}=(\forall\aReg)\bForm$ does not distribute through
+  disjunction:
+  \begin{math}
+    \aTr{}{\bForm_1\lor \bForm_2}=
+    (\forall r)(\bForm_1\lor \bForm_2)
+    \neq
+    ((\forall r)(\bForm_1)) \lor ((\forall r)(\bForm_2))
+    = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+  \end{math}.
 \end{example}
 
 \subsection{The Road Ahead}

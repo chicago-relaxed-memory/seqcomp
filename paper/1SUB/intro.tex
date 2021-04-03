@@ -14,8 +14,8 @@ This can be thought of as a total order of reads and writes,
 where each read has a matching \emph{fulfilling} write,
 for example:
   \begin{gather*}
-    \THREAD{x\GETS0\SEMI x\GETS1\SEMI y\GETS2\SEMI
-    r\GETS y\SEMI s\GETS x}
+    \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}\SEMI
+    \PR{y}{r}\SEMI \PR{x}{s}}
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -39,9 +39,9 @@ This model naturally extends to the case of shared-memory concurrency, leading t
 semantics \cite{Lamport:1979:MMC:1311099.1311750}, in which \emph{program order} inside a thread implies
 a total \emph{causal order} between read and write events, for example:
   \begin{gather*}
-    \THREAD{x\GETS0\SEMI x\GETS1\SEMI y\GETS2}
+    \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
     \PAR
-    \THREAD{r\GETS y\SEMI s\GETS x}
+    \THREAD{\PR{y}{r}\SEMI \PR{x}{s}}
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -71,9 +71,9 @@ sequential consistency is weakened to only apply \emph{per-location} and not glo
 over the whole program. This allows executions which
 are inconsistent with program order, such as:
   \begin{gather*}
-    \THREAD{x\GETS0\SEMI x\GETS1\SEMI y\GETS2}
+    \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
     \PAR
-    \THREAD{r\GETS y\SEMI s\GETS x}
+    \THREAD{\PR{y}{r}\SEMI \PR{x}{s}}
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -93,9 +93,9 @@ In such models, the causal order between events is important,
 and includes control and data dependencies, to avoid
 paradoxical ``out of thin air'' examples such as:
   \begin{gather*}
-    \THREAD{r\GETS x\SEMI \IF r \THEN y\GETS1 \FI}
+    \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}
     \PAR
-    \THREAD{s\GETS y\SEMI x\GETS s}
+    \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -116,9 +116,9 @@ from $(\DR{y}{1})$ to $(\DW{x}{1})$. If either is missing, then this execution
 is acyclic and hence allowed. For example dropping the control dependency
 results in:
   \begin{gather*}
-    \THREAD{r\GETS x\SEMI y\GETS1}
+    \THREAD{\PR{x}{r}\SEMI \PW{y}{1}}
     \PAR
-    \THREAD{s\GETS y\SEMI x\GETS s}
+    \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -137,9 +137,9 @@ suffices for hardware models, it is not preserved by common compiler
 optimizations. For example, if we calculate control dependencies syntactically,
 then there is a dependency from $(\DR{x}{1})$ to $(\DW{y}{1})$, and therefore a cycle in, the candidate execution:
   \begin{gather*}
-    \THREAD{r\GETS x\SEMI \IF r \THEN y\GETS1 \ELSE y\GETS1 \FI}
+    \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \ELSE \PW{y}{1} \FI}
     \PAR
-    \THREAD{s\GETS y\SEMI x\GETS s}
+    \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -153,7 +153,7 @@ then there is a dependency from $(\DR{x}{1})$ to $(\DW{y}{1})$, and therefore a 
         \po{ry1}{wx1}
       \end{tikzinline}}
   \end{gather*}
-An optimizing compiler might lift the assignment $y\GETS1$ out of the conditional,
+An optimizing compiler might lift the assignment $\PW{y}{1}$ out of the conditional,
 thus removing the control dependency.
 
 Prominent solutions to the problem of dependency calculation include:
@@ -180,7 +180,7 @@ The heart of the model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20} is to add l
 to events, which are introduced by store actions (modeling data dependencies)
 and conditionals (modeling control dependencies):
   \begin{gather*}
-    \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -189,7 +189,7 @@ and conditionals (modeling control dependencies):
   \end{gather*}
 Preconditions are discharged by being ordered after a read:
   \begin{gather*}
-    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -205,7 +205,7 @@ $(s{=}0)$. There is no matching order from $(\DR{x}{0})$ to $(\DW{z}{0})$
 which is why we do not assume the hypothesis $(r{=}0)$. Nonetheless, the precondition on
 $(\DW{z}{0})$ is a tautology, and so can be elided in the diagram:
   \begin{gather*}
-    % r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    % \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
     % \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -263,7 +263,7 @@ investigates how existing models of sequential composition interact with relaxed
 %% behaviors, and a local data race freedom theorem.
 
 % \begin{figure*}
-%   \input{fig-sp}
+%   \input{fig-sp.tex}
 %   \caption{Weakest precondition semantics}
 %   \label{fig:sp}
 % \end{figure*}
@@ -284,7 +284,7 @@ $\fwp{\aCmd}{\bForm}$ for loop-free code below. % in Figure~\ref{fig:sp}
   \end{math}
 \item
   \begin{math}
-    \fwp{r\GETS \aExp}{\bForm} = \bForm[\aExp/r]
+    \fwp{\LET{r}{\aExp}}{\bForm} = \bForm[\aExp/r]
   \end{math}
 \item
   \begin{math}
@@ -311,7 +311,7 @@ with each pomset. We visualize this in diagrams by showing how $\bForm$ is trans
 for example:
   \begin{align*}
     \begin{gathered}
-      r \GETS x
+      \PR{x}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
           \event{rx0}{\DR{x}{0}}{}
@@ -321,7 +321,7 @@ for example:
     \end{gathered}
     &&
     \begin{gathered}
-      s \GETS y
+      \PR{y}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
           \event{ry0}{\DR{y}{0}}{}
@@ -331,7 +331,7 @@ for example:
     \end{gathered}
     &&
     \begin{gathered}
-      \IF{s{<}1} \THEN z\GETS r{*}s \FI
+      \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
           \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
@@ -347,7 +347,7 @@ For the sequentially consistent semantics, sequential composition
 is straightforward: we apply each predicate transformer to the preconditions
 of subsequent events, and compose the predicate transformers:
   \begin{gather*}
-    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -377,7 +377,7 @@ We visualize this by including more than one transformed predicate,
 with an edge leading to the dependent one. For example:
   \begin{align*}
     \begin{gathered}
-      r \GETS x
+      \PR{x}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
           \event{rx0}{\DR{x}{0}}{}
@@ -388,7 +388,7 @@ with an edge leading to the dependent one. For example:
     \end{gathered}
     &&
     \begin{gathered}
-      s \GETS y
+      \PR{y}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
           \event{ry0}{\DR{y}{0}}{}
@@ -399,7 +399,7 @@ with an edge leading to the dependent one. For example:
     \end{gathered}
     &&
     \begin{gathered}
-      \IF{s{<}1} \THEN z\GETS r{*}s \FI
+      \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
           \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
@@ -419,7 +419,7 @@ the predicate transformer which is independent of $(\DR x0)$
 but dependent on $(\DR y0)$, which is the transformer
 which maps $\bForm$ to $(s{=}0) \limplies \bForm$.
   \begin{gather*}
-    r\GETS x\SEMI s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -441,7 +441,7 @@ As a sanity check, we can see that sequential composition is
 associative in this case, since it does not matter whether we
 associate to the left, with intermediate step:
   \begin{gather*}
-    r\GETS x\SEMI s\GETS y
+    \PR{x}{r}\SEMI \PR{y}{s}
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -461,7 +461,7 @@ transformer
   \end{gather*}
 or to the right, with intermediate step:
     \begin{gather*}
-    s\GETS y\SEMI \IF{s{<}1} \THEN z\GETS r{*}s \FI
+    \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]

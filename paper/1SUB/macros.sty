@@ -1,3 +1,31 @@
+\newcommand{\aRel}{R}
+\newcommand{\roverlapsdef}{\mathrel{\textnormal{\emph{overlaps}}}}
+\newcommand{\rmatchesdef}{\mathrel{\textnormal{\emph{matches}}}}
+\newcommand{\rblocksdef}{\mathrel{\textnormal{\emph{blocks}}}}
+\newcommand{\rsmatchesdef}{\mathrel{\textnormal{\emph{strongly-matches}}}}
+\newcommand{\rsblocksdef}{\mathrel{\textnormal{\emph{strongly-blocks}}}}
+\newcommand{\rsmatchesblocksdef}{\mathrel{\textnormal{\emph{strongly-matches/blocks}}}}
+\newcommand{\rdelaysdef}{\mathrel{\textnormal{\emph{delays}}}}
+\newcommand{\rcodelaysdef}{\mathrel{\textnormal{\emph{coherence-delays}}}}
+\newcommand{\rsyncdelaysdef}{\mathrel{\textnormal{\emph{synchronization-delays}}}}
+\newcommand{\sreaddef}{\mathrel{\textnormal{\emph{read}}}}
+\newcommand{\sreleasedef}{\mathrel{\textnormal{\emph{release}}}}
+\newcommand{\rimpliesdef}{\mathrel{\vDash}}%{\mathrel{\textnormal{\emph{implies}}}}
+\newcommand{\rextendsdef}[2]{\mathrel{\textnormal{\emph{extends}}}\ifnotempty{#1#2}{{#1}\textand{#2}}}
+
+\newcommand{\roverlaps}{\mathrel{\textnormal{{overlaps}}}}
+\newcommand{\rmatches}{\mathrel{\textnormal{{matches}}}}
+\newcommand{\rblocks}{\mathrel{\textnormal{{blocks}}}}
+\newcommand{\rsmatches}{\mathrel{\textnormal{{strongly-matches}}}}
+\newcommand{\rsblocks}{\mathrel{\textnormal{{strongly-blocks}}}}
+\newcommand{\rdelays}{\mathrel{\textnormal{{delays}}}}
+\newcommand{\rcodelays}{\mathrel{\textnormal{{coherence-delays}}}}
+\newcommand{\rsyncdelays}{\mathrel{\textnormal{{synchronization-delays}}}}
+\newcommand{\sread}{\mathrel{\textnormal{{read}}}}
+\newcommand{\srelease}{\mathrel{\textnormal{{release}}}}
+\newcommand{\rimplies}{\mathrel{\vDash}}%{\mathrel{\textnormal{{implies}}}}
+\newcommand{\rextends}[2]{\mathrel{\textnormal{{extends}}}\ifnotempty{#1#2}{{#1}\textand{#2}}}
+
 \newcommand{\C}{,\;\allowbreak}
 \newcommand{\fcard}[1]{{|}#1{|}}
 \newcommand{\Cdown}[1]{\smash{\downarrow}#1}
@@ -5,7 +33,7 @@
 \newcommand{\ltmode}{\sqsubset}
 \newcommand{\lemode}{\sqsubseteq}
 \newcommand{\gemode}{\sqsupseteq}
-\newcommand{\compat}[2]{#1\Yleft#2}
+\newcommand{\fmerge}[2]{\mathsf{merge}\ifnotempty{#1#2}{\allowbreak(#1,\;\allowbreak#2)}}
 \newcommand{\Pom}{\mathsf{Pom}}
 \newcommand{\PomPre}{\mathsf{PomPre}}
 \newcommand{\PomTrans}{\mathsf{PomTrans}}
@@ -114,6 +142,7 @@
 \usepackage{mathtools}
 \usepackage{enumitem}
 \setlist[enumerate,2]{label=(\theenumi\alph*),ref=\theenumi\alph*}
+\setlist[enumerate,3]{label=(\roman*),ref=\theenumii(\roman*)}
 % \setlist[enumerate,1]{leftmargin = 1.6\parindent, topsep = 0.2\baselineskip}
 % \setlist[itemize,1]{leftmargin = 1.6\parindent, topsep = 0.2\baselineskip}
 \usepackage{amsmath}
@@ -131,7 +160,8 @@
 %   \columnbreak
 % \end{multicols}
 \usepackage{multicol}
-\setlength{\multicolsep}{0.0pt plus 2.0pt minus 2.0pt}
+\setlength{\multicolsep}{0.0pt plus 2.0pt minus 2.0pt} % vertical spacing above and below
+\setlength{\columnsep}{.3pc} %spacing between columns
 
 % \usepackage{makecell}
 % \usepackage[defblank]{paralist}
@@ -148,7 +178,8 @@
 \newcommand{\classD}{\texttt{D}}
 
 \newcounter{mypara}
-\newcommand{\myparagraph}[1]{\paragraph{#1}\stepcounter{mypara}\belowpdfbookmark{#1}{mypara\arabic{mypara}}}
+%\newcommand{\myparagraph}[2][]{\subsubsection*{#2}\stepcounter{mypara}\belowpdfbookmark{#2}{mypara\arabic{mypara}}\ifnotempty{#1}{\labeltext[#2]{}{#1}}}
+\newcommand{\myparagraph}[2][]{\subsection{#2}\ifnotempty{#1}{\label{sec:#1}\labeltext[\textsection\ref{sec:#1}]{}{#1}}}
 \newcommand{\noparagraph}[1]{\stepcounter{mypara}\belowpdfbookmark{#1}{mypara\arabic{mypara}}}
 
 
@@ -178,9 +209,9 @@
 \NewDocumentCommand\DG{O{} m m O{}}{\ifshowSCOPE#4\fi\mathsf{F}^{#2}\ifshowSCOPE_{#1}\fi\,#3}
 \NewDocumentCommand\DGP{O{} m m O{}}{\PBR{\DG[#1]{#2}{#3}[#4]}}
 
-\NewDocumentCommand\PCAS{O{} O{} m O{} m m m}{\ifnotempty{#5}{{#5} \GETS}\CAS \texttt{(}#3^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi,#6,#7\texttt{)}}
-\NewDocumentCommand\PFADD{O{} O{} m O{} m m}{\ifnotempty{#5}{{#5} \GETS}\FADD \texttt{(}#3^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi,#6\texttt{)}}
-\NewDocumentCommand\PEXCHG{O{} O{} m O{} m m}{\ifnotempty{#5}{{#5} \GETS}\EXCHG \texttt{(}#3^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi,#6\texttt{)}}
+\NewDocumentCommand\PCAS{O{} O{} m O{} m m m}{\ifnotempty{#5}{{#5} \GETS}\CAS^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \texttt{(}#3,#6,#7\texttt{)}}
+\NewDocumentCommand\PFADD{O{} O{} m O{} m m}{\ifnotempty{#5}{{#5} \GETS}\FADD^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \texttt{(}#3,#6\texttt{)}}
+\NewDocumentCommand\PEXCHG{O{} O{} m O{} m m}{\ifnotempty{#5}{{#5} \GETS}\EXCHG^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \texttt{(}#3,#6\texttt{)}}
 
 \NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}\ifshowSCOPE_{#3}\fi}
 \NewDocumentCommand\PRP{O{} m O{} m}{\PBR{\PR[#1]{#2}[#3]{#4}}}
@@ -209,9 +240,10 @@
 
 % \NewDocumentCommand\PAR{O{} O{}}{\mathrel{\ifnotempty{#1}{{}_{#1}}\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\ifnotempty{#2}{_{#2}}}}
 %\newcommand{\LPAR}{\,\mathbin{\rrceil}\,}
-\NewDocumentCommand\LPAR{O{}}{\mathrel{\mkern3mu\makebox[0pt][l]{$\PAR$}\mkern-10mu\leftarrow\ifnotempty{#1}{\mkern-8mu{}_{#1}}}}
-\NewDocumentCommand\RPAR{O{}}{\mathrel{\ifnotempty{#1}{{}_{#1}}\makebox[0pt][l]{$\PAR$}\mkern-9mu\rightarrow}}
-\NewDocumentCommand\PAR{O{} O{}}{\mathrel{\ifnotempty{#1}{{}_{#1}}\parallel\ifnotempty{#2}{_{#2}}}}
+\NewDocumentCommand\LPAR{O{}}{\mathrel{\rrceil\ifnotempty{#1}{\ifshowSCOPE_{#1}\fi}}}
+%\NewDocumentCommand\LPAR{O{}}{\mathrel{\mkern3mu\makebox[0pt][l]{$\PAR$}\mkern-10mu\leftarrow\ifnotempty{#1}{\mkern-8mu{}_{#1}}}}
+\NewDocumentCommand\RPAR{O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\fi}\makebox[0pt][l]{$\PAR$}\mkern-9mu\rightarrow}}
+\NewDocumentCommand\PAR{O{} O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\fi}\parallel\ifnotempty{#2}{_{#2}}}}
 %\NewDocumentCommand\sRPAR{O{} O{}}{\mathrel{\ifnotempty{#1}{{}_{#1}}\makebox[0pt][l]{$\sPAR$}\mkern-9mu\rightarrow\ifnotempty{#2}{_{#2}}}}
 % \newcommand{\RPAR}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\mkern-5mu\raisebox{.7ex}{\texttt{\textbf{-}}}\mkern-3mu}\,}
 
@@ -348,12 +380,14 @@
 \newcommand{\bmode}{\nu}
 \newcommand{\fmode}{\nu}
 \newcommand{\mWK}{{\mathsf{wk}}}
+\newcommand{\mACQ}{{\mathsf{ra}}}
+\newcommand{\mREL}{{\mathsf{ra}}}
 \newcommand{\mRA}{{\mathsf{ra}}}
 \newcommand{\mSC}{{\mathsf{sc}}}
 \newcommand{\mRLX}{{\mathsf{rlx}}}
-\newcommand{\mREL}{{\mathsf{rel}}}
-\newcommand{\mACQ}{{\mathsf{acq}}}
-\newcommand{\mFSC}{{\mathsf{ar}}}
+\newcommand{\fREL}{{\mathsf{rel}}}
+\newcommand{\fACQ}{{\mathsf{acq}}}
+\newcommand{\fSC}{{\mathsf{ar}}}
 
 \newcommand{\ascope}{\sigma}
 \newcommand{\bscope}{\rho}
@@ -384,12 +418,12 @@
 \newcommand{\hole}[1]{\ifnotemptyelse{#1}{[{#1}]}{[\textnormal{--}]}}
 \newcommand{\fsat}{\mathsf{sat}}
 \newcommand{\freadsat}{\mathsf{readsat}}
-\newcommand{\ID}[1]{[#1]}
-\newcommand{\IDLoc}{[\Loc]}
-\newcommand{\IDAcq}{\ID{\Acq}}
-\newcommand{\IDRel}{\ID{\Rel}}
-\newcommand{\IDR}{\ID{\mathsf{R}}}
-\newcommand{\IDW}{\ID{\mathsf{W}}}
+% \newcommand{\ID}[1]{[#1]}
+% \newcommand{\IDLoc}{[\Loc]}
+% \newcommand{\IDAcq}{\ID{\Acq}}
+% \newcommand{\IDRel}{\ID{\Rel}}
+% \newcommand{\IDR}{\ID{\mathsf{R}}}
+% \newcommand{\IDW}{\ID{\mathsf{W}}}
 
 
 \newcommand{\eqdef}{\mathrel{\smash{\overset{\scriptscriptstyle\vartriangle}{=}}}}
@@ -426,6 +460,7 @@
 \newcommand{\freshaval}{\aVal_{{\tt fr}}}
 
 \newcommand{\jjr}[1]{\cite[#1]{DBLP:journals/pacmpl/JagadeesanJR20}}%[JJR\ifnotempty{#1}{, #1}]}
+\newcommand{\ID}{{\sc id}}
 \newcommand{\RMW}{{\sc rmw}}
 \newcommand{\RMWs}{{\sc rmw}s}
 \newcommand{\drf}{{\sc drf}}
@@ -439,9 +474,10 @@
 \newcommand{\oota}{{\sc oota}}
 \newcommand{\jmm}{{\sc jmm}}
 \newcommand{\tso}{{\sc tso}}
-\newcommand{\armseven}{{\sc arm7}}
+\newcommand{\armseven}{Arm7}%{\sc arm7}}
+\newcommand{\EC}{{\sc ec}}
 \newcommand{\EGC}{{\sc egc}}
-\newcommand{\armeight}{{\sc arm8}}
+\newcommand{\armeight}{Arm8}%{\sc arm8}}
 \newcommand{\IMM}{{\sc imm}}
 \newcommand{\PTX}{{\sc ptx}}
 \newcommand{\ppc}{{\sc power}}
@@ -843,7 +879,11 @@
 \newcommand{\reorderlt}{\mathrel{\ltimes}}%\xleftrightarrow{}}%\mathrel\leftrightarrow}
 \newcommand{\reorderca}{\mathrel{\ltimes}_{\mathsf{ca}}}%\xleftrightarrow{\mathsf{co}}}
 \newcommand{\reordersc}{\mathrel{\ltimes}_{\mathsf{sc}}}%\xleftrightarrow{\mathsf{co}}}
-\newcommand{\reorderco}{\mathrel{\ltimes}_{\mathsf{loc}}}%\xleftrightarrow{\mathsf{co}}}
+\newcommand{\eqreordersc}{\mathrel{\bowtie}_{\mathsf{sc}}}%\xleftrightarrow{\mathsf{co}}}
+\newcommand{\eqreorderloc}{\mathrel{\bowtie}_{\mathsf{loc}}}%\xleftrightarrow{\mathsf{co}}}
+\newcommand{\eqreorderco}{\mathrel{\bowtie}_{\mathsf{co}}}%\xleftrightarrow{\mathsf{co}}}
+\newcommand{\reorderco}{\mathrel{\ltimes}_{\mathsf{co}}}%\xleftrightarrow{\mathsf{co}}}
+\newcommand{\reorderloc}{\mathrel{\ltimes}_{\mathsf{loc}}}%\xleftrightarrow{\mathsf{co}}}
 \newcommand{\reorderra}{\mathrel{\ltimes}_{\mathsf{sync}}}%\xleftrightarrow{\mathsf{sync}}}%\mathrel{\smash{\overset{\mathsf{ra}}{\leftrightarrow}}}}
 \newcommand{\reorderRLX}{\mathrel{\smash{\overset{\mRLX}{\leftrightarrow}}}}
 \newcommand{\reorderSC}{\mathrel{\smash{\overset{\mSC}{\leftrightarrow}}}}

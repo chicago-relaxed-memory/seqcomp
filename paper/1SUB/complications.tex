@@ -9,13 +9,13 @@
   JMM causality Test Case 1 \citep{PughWebsite} states the following
   execution should be allowed ``since interthread compiler analysis could
   determine that $x$ and $y$ are always non-negative, allowing simplification
-  of $r{\geq}0$ to true, and allowing write $y\GETS1$ to be moved early.''
+  of $r{\geq}0$ to true, and allowing write $\PW{y}{1}$ to be moved early.''
   \begin{gather*}
-    x\GETS 0 \SEMI
+    \PW{x}{0} \SEMI
     \FORK{\!
-      (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+      (\PR{x}{r}\SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
       \PAR
-      x\GETS y)
+      \PW{x}{y})
     }
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -38,11 +38,11 @@
   In order to allow such executions, we include memory references in formula,
   resulting in:
   \begin{gather*}
-    % x\GETS 0 \SEMI
+    % \PW{x}{0} \SEMI
     % \FORK{\!
-    % (r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+    % (\PR{x}{r}\SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
     % \PAR
-    % x\GETS y)
+    % \PW{x}{y})
     % }
     %   \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -120,7 +120,7 @@ transformer for the empty pomset.
     \end{gathered}
     &&
     \begin{gathered}[t]
-      \IF{r{\geq}0}\THEN y\GETS1 \FI
+      \IF{r{\geq}0}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a2}{r{\geq}0\mid\DW{y}{1}}{}      
@@ -132,7 +132,7 @@ transformer for the empty pomset.
     \begin{gathered}[t]
       \PW{x}{0} 
       \SEMI\PR{x}{r} 
-      \SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+      \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a0}{\DW{x}{0}}{}
@@ -147,8 +147,8 @@ transformer for the empty pomset.
   If \ref{L5} required only that $\aLoc{=}\aReg\limplies\bForm$, then the
   following execution would be allowed:
   \begin{gather*}
-    x\GETS 0 \SEMI
-    r\GETS x\SEMI\IF{r{\geq}0}\THEN y\GETS1 \FI
+    \PW{x}{0} \SEMI
+    \PR{x}{r}\SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
@@ -181,7 +181,7 @@ should always use \ref{L6} for the independent case.
 \begin{figure*}
   \begin{center}
     \begin{minipage}{.91\textwidth}
-      \input{fig-no-addr}
+      \input{fig-no-addr.tex}
     \end{minipage}
   \end{center}
   \caption{Full Semantics of Loads and Stores
@@ -200,14 +200,14 @@ most once in a program.  We relax this by renaming.
   \label{ex:tc2}
   JMM causality Test Case 2 \citep{PughWebsite} states the following
   execution should be allowed ``since redundant read elimination could result
-  in simplification of $\aReg{=}\bReg$ to true, allowing $y\GETS1$ to be
+  in simplification of $\aReg{=}\bReg$ to true, allowing $\PW{y}{1}$ to be
   moved early.''
   \begin{gather*}
     \PR{x}{r}\SEMI
     \PR{x}{s}\SEMI
     \IF{r{=}s}\THEN \PW{y}{1}\FI
     \PAR
-    x\GETS y
+    \PW{x}{y}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DR{x}{1}}{}
@@ -285,7 +285,7 @@ most once in a program.  We relax this by renaming.
     \end{gathered}
     % &&
     % \begin{gathered}[t]
-    %   \IF{r{\geq}s}\THEN y\GETS1 \FI
+    %   \IF{r{\geq}s}\THEN \PW{y}{1} \FI
     %   \\
     %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
     %     \event{a2}{r{=}s\mid\DW{y}{1}}{}      
@@ -306,7 +306,7 @@ most once in a program.  We relax this by renaming.
     \end{gathered}
     &&
     \begin{gathered}[t]
-      \IF{r{\geq}s}\THEN y\GETS1 \FI
+      \IF{r{\geq}s}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \event{a2}{r{=}s\mid\DW{y}{1}}{}      
@@ -320,7 +320,7 @@ most once in a program.  We relax this by renaming.
       \SEMI
       \PR{x}{s}
       \SEMI
-      \IF{r{\geq}s}\THEN y\GETS1 \FI
+      \IF{r{\geq}s}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           \eventl{e}{a0}{\DR{x}{1}}{}
