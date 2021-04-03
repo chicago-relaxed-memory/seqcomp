@@ -29,20 +29,20 @@
   \end{enumerate}
 
   \begin{enumerate}
-  \item[\ref{S3})] $\labelingForm(\aEv)$ implies $\cExp{=}\cVal \land \aExp{=}\aVal$,
-  \item[\ref{L3})] $\labelingForm(\aEv)$ implies $\cExp{=}\cVal$.
+  \item[\ref{S3})] $\labelingForm(\aEv) \rimplies \cExp{=}\cVal \land \aExp{=}\aVal$,
+  \item[\ref{L3})] $\labelingForm(\aEv) \rimplies \cExp{=}\cVal$.
   \end{enumerate}
 
   \begin{enumerate}
-    % \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
-    % \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
-    % \item[\ref{L4})] $\phantom{(\forall\dVal)}$ $\aTr{\bEvs}{\bForm}$ implies $(\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-    % \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm}$ implies $\cVal{=}\dVal \limplies (\cExp{=}\dVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-  \item[\ref{L4})] $\aTr{\bEvs}{\bForm}$ implies $(\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
-    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
-    % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
-    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm}$ implies $\cExp{=}\dVal \limplies \bForm$.
-  \item[\ref{L5})] $\aTr{\cEvs}{\bForm}$ implies $\bForm$.
+    % \item[\ref{S4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
+    % \item[\ref{S5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies \bForm\noSUB{[\aExp/\REF{\dVal}]}$,
+    % \item[\ref{L4})] $\phantom{(\forall\dVal)}$ $\aTr{\bEvs}{\bForm} \rimplies (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+    % \item[\ref{L4})] $(\forall\dVal)$ $\aTr{\bEvs}{\bForm} \rimplies \cVal{=}\dVal \limplies (\cExp{=}\dVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+  \item[\ref{L4})] $\aTr{\bEvs}{\bForm} \rimplies (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm$, 
+    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies (\aVal{=}\aReg\lor \REF{\dVal}{=}\aReg)\limplies\bForm$,
+    % \item[\ref{L6})] $(\forall\dVal)$ $\aTr{\dEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies \bForm$.
+    % \item[\ref{L5})] $(\forall\dVal)$ $\aTr{\cEvs}{\bForm} \rimplies \cExp{=}\dVal \limplies \bForm$.
+  \item[\ref{L5})] $\aTr{\cEvs}{\bForm} \rimplies \bForm$.
   \end{enumerate}  
 \end{definition}
 
@@ -152,18 +152,18 @@
   \refdef{def:pomsets-addr} we have:
   \begin{enumerate}
     % \item[\ref{L4})]
-    %   $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    %   $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
     % \item[\ref{L5})]
-    %   $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+    %   $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\RW)\limplies\bForm$,
     
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies
     \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies
       (\cExp{=}\cVal\limplies\aVal{=}\aReg)\limplies\bForm,
     \end{math}
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies
     \begin{math}
+      \aTr{\cEvs}{\bForm} \rimplies
       ((\cExp{=}\cVal\limplies\aVal{=}\aReg)\lor\RW)\limplies\bForm.
     \end{math}
   \end{enumerate}
@@ -353,24 +353,49 @@ We combine access and fence modes into a single order:
 
 \RMW{} operations are formalized by adding a relation
 ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
-\RMW{} to the succeeding write.  The definition of a pomset requires the
-following, where two actions \emph{overlap} if they access the same location:
-\begin{enumerate}
-\item
-  ${\rrmw} \subseteq {\le}$ is a relation capturing
-  \emph{read-modify-write atomicity}, such that for any $\cEv$, $\bEv$, $\aEv\in\aEvs$,
-  where $\labeling(\cEv)$ and
-  $\labeling(\bEv)$ access the same location:
-  \begin{itemize}
-  \item if $\bEv \xrmw \aEv$ and $\cEv\le \aEv$ then $\cEv\le \bEv$,
-  \item if $\bEv \xrmw \aEv$ and $\bEv\le \cEv$ then $\aEv\le \cEv$.
-  \end{itemize}
-\end{enumerate}
-Extend the definition of par, if, seq to include:
-\begin{itemize}
-\item ${\rrmw}\supseteq\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
-\end{itemize}
+\RMW{} to the succeeding write.
+We say $\aAct \roverlapsdef \bAct$ if they access the same location.
+Extend the definition of a pomset as follows. % where two actions \emph{overlap} if they access the same location:
+% \begin{enumerate}
+% \item
+%   ${\rrmw} \subseteq {\le}$ is a relation capturing
+%   \emph{read-modify-write atomicity}, such that for any $\cEv$, $\bEv$, $\aEv\in\aEvs$,
+%   where $\labeling(\cEv)$ and
+%   $\labeling(\bEv)$ access the same location:
+%   \begin{itemize}
+%   \item if $\bEv \xrmw \aEv$ and $\cEv\le \aEv$ then $\cEv\le \bEv$,
+%   \item if $\bEv \xrmw \aEv$ and $\bEv\le \cEv$ then $\aEv\le \cEv$.
+%   \end{itemize}
+% \end{enumerate}
 
+\begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \setcounter{enumi}{-1}
+\item \label{pom-rmw}
+  ${\rrmw} : \Event\fun\Event$ is a partial function capturing
+  read-modify-write \emph{atomicity}, such that
+  \begin{enumerate}
+    \item \label{pom-rmw-block}
+      if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$,
+  \item \label{pom-rmw-le}
+    if $\bEv\xrmw\aEv$ then $\bEv \le \aEv$,    
+  \item \label{pom-rmw-atomic}
+    if $\labeling(\cEv) \roverlaps \labeling(\bEv)$ then
+    \begin{enumerate}        
+    \item \label{pom-rmw-atomic1}
+      if $\bEv \xrmw \aEv$ then
+      $\cEv\ledep \aEv$ implies $\cEv\le \bEv$,
+    \item \label{pom-rmw-atomic2}
+      if $\bEv \xrmw \aEv$ then
+      $\bEv\ledep \cEv$ implies $\aEv\le \cEv$.
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+Extend the definition of par, if, seq to include:
+\begin{enumerate}
+  \setcounter{enumi}{-1}
+\item ${\rrmw}\supseteq\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
+\end{enumerate}
 
 \begin{example}
   This definition ensures atomicity, disallowing executions such as
@@ -396,7 +421,7 @@ Extend the definition of par, if, seq to include:
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
-  By \ref{A1}, since $\DWP{x}{2}\xwk\DWP{x}{1}$, it must be that
+  By \ref{pom-rmw-atomic1}, since $\DWP{x}{2}\xwk\DWP{x}{1}$, it must be that
   $\DWP{x}{2}\xwk\DRP{x}{0}$, creating a cycle.
 \end{example}
 
@@ -470,16 +495,15 @@ Extend the definition of par, if, seq to include:
   reasoning (\xLIR) from \refdef{def:pomsets-lir}:
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]\land\aExp{=}\aVal$,
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aExp/\aLoc]\land\aExp{=}\aVal$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\aExp/\aLoc]$,
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\aExp/\aLoc]$,
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies
-    $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+    $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
   \item[\ref{L6})] 
-    $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
+    $\aTr{\dEvs}{\bForm} \rimplies \bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
   Consider the relaxed variant of the \textsc{cdrf} example from
   \cite{DBLP:conf/pldi/LeeCPCHLV20}, using a semantics for $\FADD$ that
@@ -706,11 +730,11 @@ $(\exists\aLocs\subseteq\Loc)$
 \item%[{\labeltext[F2]{(F2)}{F2}}]
   $\labelingAct(\aEv) = \DG[\ascope]{\amode}{\aLocs}$,
 \item%[{\labeltext[F3]{(F3)}{F3}}]
-  $\labelingForm(\aEv)$ implies $\bigwedge_{\aLoc\in (\Loc\setminus\aLocs)}\QF{\aLoc}{\amode}$,
+  $\labelingForm(\aEv) \rimplies \bigwedge_{\aLoc\in (\Loc\setminus\aLocs)}\QF{\aLoc}{\amode}$,
 \item%[{\labeltext[F4]{(F4)}{F4}}]
-  $\aTr{\bEvs}{\bForm}$ implies $\bForm$, where $\bEvs\cap\aEvs\neq\emptyset$,
+  $\aTr{\bEvs}{\bForm} \rimplies \bForm$, where $\bEvs\cap\aEvs\neq\emptyset$,
 \item%[{\labeltext[F5]{(F5)}{F5}}]
-  $\aTr{\cEvs}{\bForm}$ implies $\bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc} \land\bForm[\FALSE/\QF{\aLoc}{}]$, where $\cEvs\cap\aEvs=\emptyset$.
+  $\aTr{\cEvs}{\bForm} \rimplies \bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc} \land\bForm[\FALSE/\QF{\aLoc}{}]$, where $\cEvs\cap\aEvs=\emptyset$.
 \end{enumerate}
 
 \begin{example}
@@ -1025,8 +1049,8 @@ closure is that adding order can only cause preconditions to weaken.
   \begin{enumerate}
   \item $\aEvs_2=\aEvs_1$,
   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-  \item $\labelingForm_2(\aEv)$ implies $\labelingForm_1(\aEv)$,
-  \item $\aTr[2]{\bEvs}{\aEv}$ implies $\aTr[1]{\bEvs}{\aEv}$,
+  \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
+  \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
   \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
   \end{enumerate}
 \end{definition}
@@ -1061,11 +1085,11 @@ transformer.
   For \xRRD{}, \refdef{def:pomsets-rr} states:
   \begin{enumerate}
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+    $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\RW)\limplies\bForm$,
   \item[\ref{L6})] 
-    $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
+    $\aTr{\dEvs}{\bForm} \rimplies \bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
   This semantics is not downset closed due to the lack of read-read dependencies.
   In both cases, for subsequent writes, \ref{L5} is the same as \ref{L6}.  For
@@ -1124,12 +1148,11 @@ transformer.
   For \xLIR{}, \refdef{def:pomsets-lir} states:
   \begin{enumerate}
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies
-    $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+    $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
   \item[\ref{L6})] 
-    $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
+    $\aTr{\dEvs}{\bForm} \rimplies \bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
   This semantics is not downset closed: The independency reasoning of
   \ref{L5} is only applicable for pomsets where the ignored read is present!
@@ -1749,21 +1772,19 @@ The predicate transformers are:
     \item[\ref{S2})]
       $\labelingAct(\aEv) = \DW[\amode]{\aLoc}{\aVal}$,
     \item[\ref{S3})] 
-      $\labelingForm(\aEv)$ implies %$\QS{}{\amode} \land
-      $\aExp{=}\aVal$,
+      $\labelingForm(\aEv) \rimplies \aExp{=}\aVal$,
     \item[\ref{S4})]
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm \land\aExp{=}\aVal$,
+      $\aTr{\bEvs}{\bForm} \rimplies \bForm \land\aExp{=}\aVal$,
     \item[\ref{S5})]
-      $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$,
+      $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\Q{}]$,
     \item[\ref{L2})]
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}{\aVal}$,
     \item[\ref{L3})] 
-      $\labelingForm(\aEv)$ implies %$\QL{}{\amode} \land
-      $\TRUE$.
+      $\labelingForm(\aEv) \rimplies \TRUE$.
     \item[\ref{L4})]
-      $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+      $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
     \item[\ref{L5})]
-      $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$.
+      $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\Q{}]$.
     \end{enumerate}
   \end{definition}
 
@@ -1899,22 +1920,20 @@ The predicate transformers are:
 Recall the load rules from \textsection\ref{sec:tc1}: % (\refdef{def:pomsets-lir}):
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}$ implies
-  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
+  $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$, when $\aEvs\neq\emptyset$,
 \item[\ref{L6})] 
-  $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+  $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$, when $\aEvs=\emptyset$.
 \end{enumerate}
 It is also possible to collapse $\aLoc$ and $\aReg$ when doing a load:
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm[\aReg/\aLoc]$, 
+  $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm[\aReg/\aLoc]$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}$ implies
-  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm[\aReg/\aLoc]$, when $\aEvs\neq\emptyset$.
+  $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm[\aReg/\aLoc]$, when $\aEvs\neq\emptyset$.
 \item[\ref{L6})] 
-  $\aTr{\dEvs}{\bForm}\;$ implies $\bForm[\aReg/\aLoc]$, when $\aEvs=\emptyset$.
+  $\aTr{\dEvs}{\bForm}\; \rimplies \bForm[\aReg/\aLoc]$, when $\aEvs=\emptyset$.
 \end{enumerate}
 
 Perhaps surprisingly, these two semantics are incomparable.  Consider the
@@ -2086,21 +2105,20 @@ reasoning (\xLIR), % (\refdef{def:pomsets-lir}):
 we gave the semantics of load for nonempty pomsets as:
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+  $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}$ implies
-  $(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$.
+  $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$.
   % , when $\aEvs\neq\emptyset$,
   % \item[\ref{L6})] 
-  %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+  %   $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$, when $\aEvs=\emptyset$.
 \end{enumerate}
 In \jjr{}, the definition is roughly as follows:
 % (adding the case for $\ref{L6}$, which was missing):
 \begin{enumerate}
 \item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm}$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]$, 
+  $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aVal/\aReg][\aVal/\aLoc]$, 
 \item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm}\;$ implies $\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$.
+  $\aTr{\cEvs}{\bForm}\; \rimplies \bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$.
 \end{enumerate}
 The use of conjunction in \ref{L5} causes disjunction closure to fail
 because the predicate transformer
@@ -2157,12 +2175,11 @@ references.
   definition would modify \ref{L4} to be:
   \begin{enumerate}
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$.
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$.
     % \item[\ref{L5})]
-    %   $\aTr{\cEvs}{\bForm}$ implies
-    %   $(\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
+    %   $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
     % \item[\ref{L6})] 
-    %   $\aTr{\dEvs}{\bForm}\;$ implies $\bForm$, when $\aEvs=\emptyset$.
+    %   $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$, when $\aEvs=\emptyset$.
   \end{enumerate}
   Using this definition, consider the following:
   \begin{gather*}
@@ -2187,9 +2204,8 @@ references.
 % \begin{enumerate}
 % \item[] %[\ref{loadpre-kappa2})]
 %   if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-%   $\labelingForm(\aEv)$ implies $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
-%   $\labelingForm(\aEv)$ implies
-%   $\labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
+%   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
+%   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
 % \end{enumerate}
 
 
@@ -2357,8 +2373,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
 \myparagraph{Causal Strengthening}
 \labeltext[]{Causal Strengthening}{xCausal}
 \jjr{} imposes \emph{causal strengthening}, which requires for every pomset
-$\aPS$, if $\bEv\le\aEv$ then $\labelingForm(\aEv)$ implies
-$\labelingForm(\bEv)$. 
+$\aPS$, if $\bEv\le\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)$. 
 \begin{scope}
   Associativity requires that we allow pomsets without causal strengthening.
   Consider the following.
@@ -2524,7 +2539,7 @@ $\lor$.
 
 \myparagraph{Read-Modify-Write Actions}
 
-In \jjr{}, the atomicity axioms \ref{A1}/\ref{A2} erroneously applies only to
+In \jjr{}, the atomicity axioms \ref{pom-rmw-atomic} erroneously applies only to
 overlapping writes, not overlapping reads.  The difficulty can be seen in
 \refex{ex:rmw-33}.
 
@@ -2690,10 +2705,9 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   \begin{description}
   \item[{\labeltextsc[P4c]{(P4c)}{4c}}]
     If $\bEv$ reads $\aVal$ from $\aLoc$ then either $\aEv=\bEv$ or
-    $\labelingForm'(\aEv)$ implies $\labelingForm(\aEv)[\aVal/\aLoc]$.
+    $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)[\aVal/\aLoc]$.
   \item[{\labeltextsc[P5a]{(P5a)}{5a}}]\labeltextsc[P5]{}{5}%
-    If $\bEv$ reads and $\aEv$ writes then either $\labelingForm'(\aEv)$
-    implies $\labelingForm(\aEv)$ or $\bEv\le'\aEv$.
+    If $\bEv$ reads and $\aEv$ writes then either $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)$ or $\bEv\le'\aEv$.
     % \item[{\labeltextsc[P5b]{(P5b)}{5b}}]
     %   If $\bEv$ and $\aEv$ are in conflict then $\bEv\le'\aEv$.
   \end{description}
@@ -2776,8 +2790,7 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   include the register.  Then \ref{4c} becomes:
   \begin{description}
   \item[\textsc{(p4c)}] If $\bEv$ reads $\aVal$ from $\aLoc$ then either
-    $\aEv=\bEv$ or $\labelingForm'(\aEv)$ implies
-    $\labelingForm(\aEv)[\aVal/\aReg]$.
+    $\aEv=\bEv$ or $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)[\aVal/\aReg]$.
   \end{description}
 
   We can then reason with \ref{TC2} as follows: $\DWP{y}{1}$ has precondition
@@ -3137,21 +3150,21 @@ quiescence symbols required are $\Qrlx$, $\Qra$ and $\Qsc$.
   Update \refdef{def:pomsets-trans} from: % (\ref{S4}/\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
-    $\labelingForm(\aEv)$ implies $\aExp{=}\aVal\land\QS{\aLoc}{\amode}$,
+    $\labelingForm(\aEv) \rimplies \aExp{=}\aVal\land\QS{\aLoc}{\amode}$,
   \item[\ref{L3})]
-    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$,
+    $\labelingForm(\aEv) \rimplies \QL{\aLoc}{\amode}$,
   \item[\ref{T3})]
-    $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
+    $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)[\TRUE/\Qr{*}][\TRUE/\Qw{*}][\TRUE/\Qsc]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm \land\aExp{=}\aVal$,
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm \land\aExp{=}\aVal$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{\aLoc}{\amode}]$,
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\QS{\aLoc}{\amode}]$,
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QL{\aLoc}{\amode}]$.
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\QL{\aLoc}{\amode}]$.
   \end{enumerate}
 \end{comment}
 
@@ -3189,23 +3202,23 @@ quiescence symbols required are $\Qrlx$, $\Qra$ and $\Qsc$.
   Update \refdef{def:pomsets-trans} to: %and \ref{def:pomsets-fj} to: % (\ref{S4}/\ref{L4} unchanged):
   \begin{enumerate}
   \item[\ref{S3})]
-    $\labelingForm(\aEv)$ implies $\QS{}{\amode}\land\aExp{=}\aVal$,
+    $\labelingForm(\aEv) \rimplies \QS{}{\amode}\land\aExp{=}\aVal$,
   \item[\ref{L3})]
-    $\labelingForm(\aEv)$ implies $\QL{}{\amode}$,
+    $\labelingForm(\aEv) \rimplies \QL{}{\amode}$,
     % \item[\ref{F3})]
-    %   $\labelingForm(\aEv)$ implies $\Qrlx\land\Qra\land\Qsc\land\labelingForm_1(\aEv)$, 
+    %   $\labelingForm(\aEv) \rimplies \Qrlx\land\Qra\land\Qsc\land\labelingForm_1(\aEv)$, 
     % \item[\ref{T3})]
-    %   $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)[\TRUE/\Q{}]$, %[\TRUE/\Qrlx][\TRUE/\Qra][\TRUE/\Qsc]$,
+    %   $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)[\TRUE/\Q{}]$, %[\TRUE/\Qrlx][\TRUE/\Qra][\TRUE/\Qsc]$,
   \end{enumerate}
   \begin{enumerate}
   \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\bForm \land\aExp{=}\aVal$,
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm \land\aExp{=}\aVal$,
   \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QS{}{\amode}]$,
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\QS{}{\amode}]$,
   \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
+    $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
   \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies $\bForm[\FALSE/\QL{}{\amode}]$.
+    $\aTr{\cEvs}{\bForm} \rimplies \bForm[\FALSE/\QL{}{\amode}]$.
   \end{enumerate}
 \end{definition}
 
@@ -3384,7 +3397,7 @@ this.
   \begin{definition}
     \label{def:completed}
     A pomset with predicate transformers $\aPS$ is \emph{completed} if
-    $\aTr{\aEvs}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
+    $\aTr{\aEvs}{\aSym} \rimplies \aSym$, for every quiescence symbol $\aSym$.
   \end{definition}
   For example, there are no pomsets in $\sem{\ABORT}$ that are completed,
   whereas the augment-minimal pomset of $\sem{\SKIP}$ (which has the identity
@@ -3483,9 +3496,9 @@ this.
     \item[\ref{par-E}--\ref{par-kappa2})]
       as for $\sPAR{}{}$ in \refdef{def:pomsets-pre},
     \item \label{par-tau1}
-      $\aTr{\bEvs}{\bForm}$ implies $\aTr[1]{\bEvs}{\bForm}$,
+      $\aTr{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\bForm}$,
     \item \label{par-tau2}
-      $\aTr{\bEvs}{\aSym}$ implies $\aTr[2]{\bEvs}{\aSym}$,
+      $\aTr{\bEvs}{\aSym} \rimplies \aTr[2]{\bEvs}{\aSym}$,
       for every quiescence symbol $\aSym$.
     \end{enumerate}
   \end{definition}
@@ -3515,7 +3528,7 @@ this.
       %   $\labelingForm_1(\aEv) [\TRUE/\Q{}][\FALSE/\RW]$ is a tautology and
       %   $\aEv$ is fulfilled (\refdef{def:fulfilled}),
     \item[6)]  \label{top2-tau} % [{\labeltext[T3]{T3)}{T3}}]
-      $\aTr[1]{\aEvs_1}{\aSym}$ implies $\aSym$, for every quiescence symbol $\aSym$.
+      $\aTr[1]{\aEvs_1}{\aSym} \rimplies \aSym$, for every quiescence symbol $\aSym$.
     \end{enumerate}  
   \end{definition}
 
@@ -3601,7 +3614,7 @@ this.
       
     \item %[{\labeltext[T4]{T4)}{T4}}]
       if $\TICK$ then $\aPS$ is completed (\refdef{def:completed}).
-      % $\aTr{\aEvs}{\Q{}}$ implies $\Q{}$.
+      % $\aTr{\aEvs}{\Q{}} \rimplies \Q{}$.
     \end{enumerate}
 
     \noindent
@@ -3611,7 +3624,7 @@ this.
       \setcounter{enumi}{\value{pomsetPreParCount}}
     \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR{}{}$ in
       \refdef{def:pomsets-pre},
-    \item \label{par-tick} $\TICK$ implies $\TICK_1\land\TICK_2$.
+    \item \label{par-tick} $\TICK \rimplies \TICK_1\land\TICK_2$.
     \end{enumerate}
 
     \noindent
@@ -3620,13 +3633,13 @@ this.
       \setcounter{enumi}{\value{pomsetXForkCount}}
     \item[\ref{fork-E}--\ref{fork-le})] as for $\sFORK{}$ in \refdef{def:pomsets-group},
     \item
-      $\labelingForm(\aEv)$ implies $\labelingForm_1(\aEv)$,    
+      $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,    
     \item 
-      $\labelingForm(\aEv)$ implies $\aSym$, for every quiescence symbol $\aSym$,
+      $\labelingForm(\aEv) \rimplies \aSym$, for every quiescence symbol $\aSym$,
     \item
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm$, if $\bEvs=\aEvs$ and $\TICK_1$,
+      $\aTr{\bEvs}{\bForm} \rimplies \bForm$, if $\bEvs=\aEvs$ and $\TICK_1$,
     \item %[{\labeltext[F5]{F5)}{F5}}]
-      $\aTr{\bEvs}{\bForm}$ implies $\bForm[\FALSE/\Q{}]$, otherwise.
+      $\aTr{\bEvs}{\bForm} \rimplies \bForm[\FALSE/\Q{}]$, otherwise.
     \end{enumerate}
   \end{definition}
   \begin{definition}
