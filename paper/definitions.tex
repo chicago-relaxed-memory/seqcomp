@@ -47,6 +47,10 @@ We model the following language.
   \BNFSEP \mRA 
   \BNFSEP \mSC
   \\
+  \fmode \BNFDEF& \fACQ 
+  \BNFSEP \fREL
+  \BNFSEP \fSC
+  \\
   \aCmd
   \BNFDEF& \SKIP
   \BNFSEP \LET{\aReg}{\aExp}
@@ -56,16 +60,19 @@ We model the following language.
   \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
   \BNFSEP \aCmd_1 \SEMI \aCmd_2
   \BNFSEP \aCmd_1 \LPAR[\bThrd] \aCmd_2
-  \\[-.5ex]
-  \BNFSEP& \PCAS[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
-  \BNFSEP \PFADD[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
-  \BNFSEP \PEXCHG[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  % \\[-.5ex]
+  % \BNFSEP& \PCAS[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
+  % \BNFSEP \PFADD[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  % \BNFSEP \PEXCHG[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
 \end{align*}
 
 \emph{Memory modes}, $\amode$, are {relaxed} ($\mRLX$), {release-acquire}
 ($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed mode is the
 default; we regularly elide it from examples.  $\mRA$/$\mSC$ accesses are
 collectively known as \emph{synchronized accesses}.  
+
+\emph{Fence modes}, $\bmode$, are {acquire} ($\fACQ$), {release} ($\fREL$), 
+and {acquire-release} ($\fSC$).  
 
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs. Following
@@ -153,7 +160,7 @@ instead that
 
 \subsection{Actions in This Paper}
 
-In this paper, we let actions be reads, writes and fences:
+In this paper, we let actions be reads and writes and fences:
 \begin{displaymath}
   \aAct,\bAct \BNFDEF \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
   \BNFSEP \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]

@@ -351,6 +351,16 @@ We combine access and fence modes into a single order:
   
 \subsection{Read-Modify-Write Operations (\xRMW)}
 
+Extend the syntax
+\begin{align*}
+  \aCmd
+  \BNFDEF& \cdots 
+  \BNFSEP \PCAS[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
+  \BNFSEP \PFADD[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  \BNFSEP \PEXCHG[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+\end{align*}
+
+
 \RMW{} operations are formalized by adding a relation
 ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
 \RMW{} to the succeeding write.
