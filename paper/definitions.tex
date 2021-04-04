@@ -52,13 +52,13 @@ We model the following language.
   \BNFSEP \fSC
   \\
   \aCmd
-  \BNFDEF& \SKIP
-  \BNFSEP \LET{\aReg}{\aExp}
+  \BNFDEF& \LET{\aReg}{\aExp}
   \BNFSEP \PR[\amode]{\REF{\cExp}}[\ascope]{\aReg}
   \BNFSEP \PW[\amode]{\REF{\cExp}}[\ascope]{\aExp}
   \BNFSEP \PF[\ascope]{\fmode}
-  \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
+  \BNFSEP \SKIP
   \BNFSEP \aCmd_1 \SEMI \aCmd_2
+  \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
   \BNFSEP \aCmd_1 \LPAR[\bThrd] \aCmd_2
   % \\[-.5ex]
   % \BNFSEP& \PCAS[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
@@ -77,7 +77,7 @@ and {acquire-release} ($\fSC$).
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs. Following
 \cite{DBLP:conf/icfp/FerreiraHJ96}, $\LPAR$ denotes parallel composition,
-preserving thread state on the right after a join.  In examples and
+preserving thread state on the left after a join.  In examples and
 sublanguages without join, we use the symmetric $\PAR$ operator.
 
 The semantics is built from the following.
