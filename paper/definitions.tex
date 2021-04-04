@@ -178,10 +178,18 @@ $\DWP[\amode]{}[\ascope]{}[\aThrd]$ or $\DRP[\amode]{}[\ascope]{}[\aThrd]$.
 % $\DWP[\mREL]{}{}$ or $\DWP[\mSC]{}{}$, and similarly for other actions and
 % modes.
 
-Action $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
+We say $\aAct \rmatchesdef \bAct$ if $\aAct=\DWP{\aLoc}{\aVal}$ and $\bAct=\DRP{\aLoc}{\aVal}$.
+% We say $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
+% Action $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
 
-Action $\DWP{\aLoc}{\aVal} \rblocksdef \DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
+We say $\aAct \rblocksdef \bAct$ if $\aAct=\DWP{\aLoc}{}$ and $\bAct=\DRP{\aLoc}{}$, regardless of value.
+% We say $\DWP{\aLoc}{\aVal} \rblocksdef \DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
+% Action $\DWP{\aLoc}{\aVal} \rblocksdef \DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
 
+% Let two actions \emph{overlap} if they access the same location.
+We say $\aAct \roverlapsdef \bAct$ if they access the same location.
+
+We say $\aAct \rdelaysdef \bAct$ if $\aAct\eqreordersc\bAct$ or $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$.
 Let 
 \begin{math}
   {\eqreordersc}
@@ -207,11 +215,9 @@ Let \begin{math}
   (\DW[\gemode\mREL]{\aLoc}{},\DW{\aLoc}{})\}
 \end{math}.
 
-Action $\aAct \rdelaysdef \bAct$ if $\aAct\eqreordersc\bAct$ or $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$.
-
 Actions $\DWP[\amode\neq\mRLX]{}{}$ and $\DFP{\fmode\neq\fACQ}$ are
 $\sreleasedef$ actions.
-Actions $\DRP{}{}$ are $\sread$ actions.
+Actions $\DRP{}{}$ are $\sreaddef$ actions.
 
 \subsection{Model}
 
