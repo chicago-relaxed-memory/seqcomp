@@ -333,6 +333,7 @@ In $\sIFTHEN{}{}{}$, the definition of $\rextendsdef{}{}$ stops coalescing the $
   \IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI
 \end{displaymath}
 
+See \reffig{fig:sem}.
 \input{fig-sem.tex}
 
 We have given the semantics of $\sIF{}{}{}$ using 
@@ -342,127 +343,197 @@ conjunctive normal form.  Note that
 is logically equivalent to
 \href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}.
 
-We include empty sets as prep for adding while loops.
+%We include empty sets as prep for adding while loops.
 
-\subsection{Arm Compilation}
+\subsection{Full Versions}
 
-% Arm does not enforce read-read control dependencies.
-% So we need to weaken the definition of
-% \item
-%   Change the definition of $\Cdown{\aEv}$:
-%   % $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
-%   \begin{displaymath}
-%     \Cdown{\aEv}=
-%     \begin{cases}
-%       \{ \cEv \mid \cEv \lt \aEv \} & \textif \labeling(\aEv) \;\text{is a write}
-%       \\
-%       \aEvs_1 & \textotherwise
-%     \end{cases}
-%   \end{displaymath}
+If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
+$(\exists\aVal:\aEvs\fun\Val)$
+$(\exists\cForm:\aEvs\fun\Formulae)$
+\begin{multicols}{2}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
+  \item \label{write-E-x}
+    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+  \item \label{write-lambda-x}
+    $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
+  \item \label{write-kappa-x}
+    \begin{math}
+      \labelingForm(\aEv) \rimplies
+      \cForm_\aEv
+      \land \aExp{=}\aVal_\aEv
+    \end{math},
+    
+    
+  \item \label{write-tau-x}
+    % \begin{math}
+    %   %   (\forall\aEv\in\aEvs\cap\bEvs)
+    %   (\forall\aEv\in\aEvs)
+    % \end{math}
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies 
+      \cForm_\aEv
+      \limplies 
+      \bForm[\aExp/\aLoc]
+    \end{math},
+    % \item
+    %   \begin{math}    
+    %     (\forall\aEv\in\aEvs\setminus\bEvs)
+    %   \end{math}
+    %   $\aTr{\bEvs}{\bForm}$ implies
+    %   \begin{math}
+    %     \cForm_\aEv
+    %     \limplies {
+    %     \bForm
+    %     [\aExp/\aLoc]
+    %       %     \DS{\aLoc}{\amode}
+    %       %     [\FALSE/\Q{}]
+    %   }
+    %   \end{math}
+    % \item
+    %   $\aTr{\bEvs}{\bForm}$ implies
+    %   \begin{math}
+    %     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+    %     \limplies {
+    %     \bForm
+    %     [\aExp/\aLoc]
+    %       %     \DS{\aLoc}{\amode}
+    %       %     [\FALSE/\Q{}]
+    %   }
+    %   \end{math}.
+    \stepcounter{enumi}
+  \item[] \labeltext[\textsc{w}5]{}{write-term-x}
+    \begin{enumerate}[leftmargin=0pt]
+    \item \label{write-term-nonempty-x}
+      $\aTerm \rimplies \cForm_\aEv \limplies \aExp{=}\aVal_\aEv$,
+    \item \label{write-term-empty-x}
+      $\aTerm \rimplies \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
+    \end{enumerate}
+  \end{enumerate}
+\end{multicols}
 
-The model compiles correctly to arm using the lowering:
-\begin{align*}
-  \low{\PW[\gemode\mREL]{\REF{\aReg}}{\bReg}} &= \texttt{stlr}\;\bReg,\REF{\aReg}
-  &
-  \low{\PR[\mRLX]{\REF{\aReg}}{\bReg}} &= \texttt{ldr}\;\bReg,\REF{\aReg}
-  \\
-  \low{\PW[\mRLX]{\REF{\aReg}}{\bReg}} &= \texttt{str}\;\bReg,\REF{\aReg}
-  &
-  \low{\PR[\gemode\mACQ]{\REF{\aReg}}{\bReg}} &= \texttt{dmb st}\SEMI\texttt{ldar}\;\bReg,\REF{\aReg}
-\end{align*}
-
-Two changes in the definition of sequential composition:
-\begin{itemize}
-\item%[(\textsc{s}6c)] \labeltext[\textsc{s}6c]{}{seq-le-rf}
-  Replace \eqref{seq-le-rf} with:
-  if $\labeling_1(\cEv)$ blocks $\labeling_2(\aEv)$
-  then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
-\item
-  Replace $\eqreorderco$ by $\reorderlws$ in \refdef{def:actions} of
-  $\rdelaysdef$, where
+\medskip
+\noindent
+If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
+$(\exists\aVal:\aEvs\fun\Val)$
+$(\exists\cForm:\aEvs\fun\Formulae)$ 
+% \begin{multicols}{2}
+\begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+\item \label{read-E-x}
+  if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+\item \label{read-lambda-x}
+  $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
+\item \label{read-kappa-x}
   \begin{math}
-    {\reorderlws}
-    =
-    \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}
-  \end{math}, 
-\end{itemize}  
+    \labelingForm(\aEv) \rimplies
+    \cForm_\aEv
+  \end{math},
+  \stepcounter{enumi}
+\item[] \labeltext[\textsc{r}4]{}{read-tau-x}
+  \begin{enumerate}[leftmargin=0pt]
+  \item \label{read-tau-dependent-x}
+    \begin{math}
+      (\forall\aEv\in\aEvs\cap\bEvs)
+    \end{math}
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies
+      \cForm_\aEv
+      \limplies \aVal_\aEv{=}\uReg{\aEv}
+      \limplies \bForm[\uReg{\aEv}/\aReg]
+    \end{math},
+    
+  \item \label{read-tau-independent-x}
+    \begin{math}
+      (\forall\aEv\in\aEvs\setminus\bEvs)
+    \end{math}
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies
+      \cForm_\aEv 
+      \limplies
+      \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+      \limplies
+      \bForm[\uReg{\aEv}/\aReg]
+    \end{math},
+    
+  \item \label{read-tau-empty-x}
+    \begin{math}
+      (\forall\bReg)
+    \end{math}
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies 
+      % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+      (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+      \limplies 
+      \bForm[\bReg/\aReg].
+    \end{math}  
+  \end{enumerate}  
+\end{enumerate}
+% \begin{multicols}{2}
+%   \noindent
+%   And either
+%   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+%     \setcounter{enumi}{1}
+%   \item \label{read-lambda-x}
+%     $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
+%   \item \label{read-kappa-x}
+%     \begin{math}
+%       \labelingForm(\aEv) \rimplies
+%       \cForm_\aEv
+%     \end{math},
+%   \end{enumerate}
+%   or $\amode\neq\mRLX$ and
+%   \begin{enumerate}[topsep=0pt,label=(\textsc{d}\arabic*),ref=\textsc{d}\arabic*]
+%     \setcounter{enumi}{1}
+%   \item \label{read-lambda-x}
+%     $\labelingAct(\aEv) = \DR[\mRLX]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
+%   \item \label{read-kappa-x}
+%     \begin{math}
+%       \labelingForm(\aEv) \rimplies
+%       \cForm_\aEv\land \aLoc{=}\aVal_\aEv
+%     \end{math},
+%   \end{enumerate}
+% \end{multicols}
+% \medskip
+% Could make \textsc{d}4b:
+% \begin{math}
+%   (\forall\aEv\in\aEvs\setminus\bEvs)
+% \end{math}
+% \begin{math}
+%   \aTr{\bEvs}{\bForm} \rimplies
+%   \cForm_\aEv 
+%   \limplies
+%   \PBR{\aVal_\aEv{=}\uReg{\aEv} \land \aLoc{=}\uReg{\aEv}}
+%   \limplies
+%   \bForm[\uReg{\aEv}/\aReg][\uReg{\aEv}/\aLoc]
+% \end{math},
 
-If one wants a post-hoc verification technique for $\rrfx$, it is possible to
-include program order ($\rpox$) in the pomset.  For any $\bEv\xrfx\aEv$ require either
-\begin{itemize}
-\item external fulfillment: $\bEv\le\aEv$ and if $\labeling(\cEv)$ blocks
-  $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$,
-\item internal fulfillment: $\bEv\xpox\aEv$ and $(\not\exists\cEv)$
-  $\labeling(\cEv)$ blocks $\labeling(\aEv)$ and
-  $\bEv\xpox\cEv\xpox\aEv$.
-\end{itemize}
-% \begin{enumerate}
-% \item[(\textsc{m}7d)]
-%   if $\labeling(\cEv)$ blocks $\labeling(\aEv)$
-%   then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
-%   %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv)$ blocks $\labeling(\aEv)$ then not $\bEv\le\cEv\xpox\aEv$.
-% \end{enumerate}
 
 
-Downgrading messes up publication:
-\begin{gather*}
-  \PW{x}{\PR{x}{}+1}\SEMI
-  \PW[\mREL]{y}{1}
-  \PAR
-  \PW{x}{1}\SEMI
-  \IF{\PR[\mACQ]{y}{}\AND\PR[\mACQ]{x}{}}\THEN
-  \PR{z}{s}
-  \FI
-  \PAR
-  \PW{z}{1}\SEMI
-  \PW[\mREL]{x}{1}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{b1}{\DR{x}{1}}{}
-      \event{b2}{\DW{x}{2}}{right=of b1}
-      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
-      \po{b1}{b2}
-      \sync{b2}{b3}
-      \event{a1}{\DW{x}{1}}{right=3em of b3}
-      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
-      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \event{a4}{\DR{z}{0}}{right=of a3}
-      \sync{a2}{a3}
-      \sync{a3}{a4}
-      \event{c1}{\DW{z}{1}}{right=3em of a4}
-      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
-      \sync{c1}{c2}
-      \rf[out=-165,in=-15]{a1}{b1}
-      \rf[out=15,in=165]{b3}{a2}
-      \rf[out=-165,in=-15]{c2}{a3}
-      \wk{a4}{c1}
-    \end{tikzinline}}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{b1}{\DR{x}{1}}{}
-      \event{b2}{\DW{x}{2}}{right=of b1}
-      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
-      \po{b1}{b2}
-      \sync{b2}{b3}
-      \event{a1}{\DW{x}{1}}{right=3em of b3}
-      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
-      \event{a3}{\DR{x}{1}}{right=of a2}
-      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \event{a4}{\DR{z}{0}}{right=of a3}
-      \sync{a2}{a3}
-      \sync[out=15,in=165]{a2}{a4}
-      \event{c1}{\DW{z}{1}}{right=3em of a4}
-      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
-      \sync{c1}{c2}
-      \rf[out=-165,in=-15]{a1}{b1}
-      \rf[out=15,in=165]{b3}{a2}
-      \rf[out=-165,in=-15]{c2}{a3}
-      \wk{a4}{c1}
-    \end{tikzinline}}
-\end{gather*}
+% In diagrams, we use different colors for arrows.  We distinguish
+% $\rrfx$ edges that are included in order from those that are not.
+% \begin{itemize}
+% \item \makebox{$\aEv\xrf\bEv$} arises from $\rrfx$, where $\aEv\le\bEv$,
+% \item \makebox{$\aEv\xrfint\bEv$} arises from $\rrfx$, where $\lnot(\aEv\le\bEv)$.
+% \end{itemize}
+% To help the reader understand why order is included, we also different colors
+% for arrows induced by order.  We adopt the following conventions:
+% \begin{itemize}  
+%   % \item relaxed accesses are blue, with a single border,
+%   % \item synchronized accesses are red, with a double border,
+%   % \item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
+%   % \item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
+%   %   \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
+%   %   $\bEv$ and their actions \emph{conflict},
+% \item \makebox{$\aEv\xwk\bEv$} arises from \emph{fulfillment},
+% \item \makebox{$\aEv\xpo\bEv$} arises from control/data/address \emph{dependency},
+% \item \makebox{$\aEv\xsync\bEv$} arises from \emph{synchronized access}.
+% \end{itemize}
 
+
+
+\section{Arm}
 Restrict to top level parallel composition.
 
+\subsection{Arm executions}
 We give an abstract view of \armeight{} executions, leaving out many
 details.  For example, the definition of \ref{arm-lob-poloc}
 \begin{definition}
@@ -535,6 +606,142 @@ details.  For example, the definition of \ref{arm-lob-poloc}
     \end{enumerate}
   \end{enumerate}
 \end{definition}
+
+\subsection{Arm Compilation 1}
+
+Arm does not enforce read-read control dependencies.  So we need to modify
+the definition of of $\Cdown{\aEv}$:
+% $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
+\begin{displaymath}
+  \Cdown{\aEv}=
+  \begin{cases}
+    \{ \cEv \mid \cEv \lt \aEv \} & \textif \labeling(\aEv) \;\text{is a write}
+    \\
+    \aEvs_1 & \textotherwise
+  \end{cases}
+\end{displaymath}
+
+\citet{DBLP:journals/pacmpl/PodkopaevLV19} lowers to \armeight{} as
+follows: Relaxed access is implemented using \texttt{ldr}/\texttt{str},
+non-relaxed access using \texttt{ldar}/\texttt{stlr}, acquire and other
+fences using \texttt{dmb}.\texttt{ld}/\texttt{dmb}.\texttt{sy}.
+
+\begin{theorem}
+  Our model lowers to arm correctly if non-relaxed reads are lowered to
+  \texttt{dmb st}\SEMI\texttt{ldar}.
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    Use \EGC{}.
+  \end{proof}  
+\end{theorem}
+% This model compiles correctly to arm using the lowering: Relaxed access is
+% implemented using \texttt{ldr}/\texttt{str}, non-relaxed reads using
+% \texttt{dmb st}\SEMI\texttt{ldar}, non-relaxed writes using \texttt{stlr},
+% acquire fences using \texttt{dmb}.\texttt{ld} and other fences using 
+% \texttt{dmb}.\texttt{sy}.
+% \begin{align*}
+%   \low{\PW[\gemode\mREL]{\REF{\aReg}}{\bReg}} &= \texttt{stlr}\;\bReg,\REF{\aReg}
+%   &
+%   \low{\PR[\mRLX]{\REF{\aReg}}{\bReg}} &= \texttt{ldr}\;\bReg,\REF{\aReg}
+%   \\
+%   \low{\PW[\mRLX]{\REF{\aReg}}{\bReg}} &= \texttt{str}\;\bReg,\REF{\aReg}
+%   &
+%   \low{\PR[\gemode\mACQ]{\REF{\aReg}}{\bReg}} &= \texttt{dmb st}\SEMI\texttt{ldar}\;\bReg,\REF{\aReg}
+% \end{align*}
+
+Downgrading messes up publication:
+\begin{gather*}
+  \PW{x}{\PR{x}{}+1}\SEMI
+  \PW[\mREL]{y}{1}
+  \PAR
+  \PW{x}{1}\SEMI
+  \IF{\PR[\mACQ]{y}{}\AND\PR[\mACQ]{x}{}}\THEN
+  \PR{z}{s}
+  \FI
+  \PAR
+  \PW{z}{1}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{b1}{\DR{x}{1}}{}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
+      \po{b1}{b2}
+      \sync{b2}{b3}
+      \event{a1}{\DW{x}{1}}{right=3em of b3}
+      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \event{a4}{\DR{z}{0}}{right=of a3}
+      \sync{a2}{a3}
+      \sync{a3}{a4}
+      \event{c1}{\DW{z}{1}}{right=3em of a4}
+      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
+      \sync{c1}{c2}
+      \rf[out=-165,in=-15]{a1}{b1}
+      \rf[out=15,in=165]{b3}{a2}
+      \rf[out=-165,in=-15]{c2}{a3}
+      \wk{a4}{c1}
+    \end{tikzinline}}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{b1}{\DR{x}{1}}{}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
+      \po{b1}{b2}
+      \sync{b2}{b3}
+      \event{a1}{\DW{x}{1}}{right=3em of b3}
+      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
+      \event{a3}{\DR{x}{1}}{right=of a2}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \event{a4}{\DR{z}{0}}{right=of a3}
+      \sync{a2}{a3}
+      \sync[out=15,in=165]{a2}{a4}
+      \event{c1}{\DW{z}{1}}{right=3em of a4}
+      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
+      \sync{c1}{c2}
+      \rf[out=-165,in=-15]{a1}{b1}
+      \rf[out=15,in=165]{b3}{a2}
+      \rf[out=-165,in=-15]{c2}{a3}
+      \wk{a4}{c1}
+    \end{tikzinline}}
+\end{gather*}
+
+\subsection{Arm Compilation 2}
+
+Two changes in the definition of sequential composition:
+\begin{itemize}
+\item%[(\textsc{s}6c)] \labeltext[\textsc{s}6c]{}{seq-le-rf}
+  Replace \eqref{seq-le-rf} with:
+  if $\labeling_1(\cEv)$ blocks $\labeling_2(\aEv)$
+  then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
+\item
+  Replace $\eqreorderco$ by $\reorderlws$ in \refdef{def:actions} of
+  $\rdelaysdef$, where
+  \begin{math}
+    {\reorderlws}
+    =
+    \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}
+  \end{math}, 
+\end{itemize}  
+
+If one wants a post-hoc verification technique for $\rrfx$, it is possible to
+include program order ($\rpox$) in the pomset.  For any $\bEv\xrfx\aEv$ require either
+\begin{itemize}
+\item external fulfillment: $\bEv\le\aEv$ and if $\labeling(\cEv)$ blocks
+  $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$,
+\item internal fulfillment: $\bEv\xpox\aEv$ and $(\not\exists\cEv)$
+  $\labeling(\cEv)$ blocks $\labeling(\aEv)$ and
+  $\bEv\xpox\cEv\xpox\aEv$.
+\end{itemize}
+% \begin{enumerate}
+% \item[(\textsc{m}7d)]
+%   if $\labeling(\cEv)$ blocks $\labeling(\aEv)$
+%   then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
+%   %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv)$ blocks $\labeling(\aEv)$ then not $\bEv\le\cEv\xpox\aEv$.
+% \end{enumerate}
+
+
+
 
 \begin{lemma}
   \label{lemma:fr}
@@ -744,191 +951,8 @@ Anton example 1 \texttt{[rfi-coe-coe]}
     \end{tikzinline}}
 \end{gather*}
 
-
-\subsection{Full Versions}
-
-If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
-$(\exists\aVal:\aEvs\fun\Val)$
-$(\exists\cForm:\aEvs\fun\Formulae)$
-\begin{multicols}{2}
-  \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
-  \item \label{write-E-x}
-    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-  \item \label{write-lambda-x}
-    $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
-  \item \label{write-kappa-x}
-    \begin{math}
-      \labelingForm(\aEv) \rimplies
-      \cForm_\aEv
-      \land \aExp{=}\aVal_\aEv
-    \end{math},
-    
-    
-  \item \label{write-tau-x}
-    % \begin{math}
-    %   %   (\forall\aEv\in\aEvs\cap\bEvs)
-    %   (\forall\aEv\in\aEvs)
-    % \end{math}
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \rimplies 
-      \cForm_\aEv
-      \limplies 
-      \bForm[\aExp/\aLoc]
-    \end{math},
-    % \item
-    %   \begin{math}    
-    %     (\forall\aEv\in\aEvs\setminus\bEvs)
-    %   \end{math}
-    %   $\aTr{\bEvs}{\bForm}$ implies
-    %   \begin{math}
-    %     \cForm_\aEv
-    %     \limplies {
-    %     \bForm
-    %     [\aExp/\aLoc]
-    %       %     \DS{\aLoc}{\amode}
-    %       %     [\FALSE/\Q{}]
-    %   }
-    %   \end{math}
-    % \item
-    %   $\aTr{\bEvs}{\bForm}$ implies
-    %   \begin{math}
-    %     (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-    %     \limplies {
-    %     \bForm
-    %     [\aExp/\aLoc]
-    %       %     \DS{\aLoc}{\amode}
-    %       %     [\FALSE/\Q{}]
-    %   }
-    %   \end{math}.
-    \stepcounter{enumi}
-  \item[] \labeltext[\textsc{w}5]{}{write-term-x}
-    \begin{enumerate}[leftmargin=0pt]
-    \item \label{write-term-nonempty-x}
-      $\aTerm \rimplies \cForm_\aEv \limplies \aExp{=}\aVal_\aEv$,
-    \item \label{write-term-empty-x}
-      $\aTerm \rimplies \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
-    \end{enumerate}
-  \end{enumerate}
-\end{multicols}
-
-\medskip
-\noindent
-If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
-$(\exists\aVal:\aEvs\fun\Val)$
-$(\exists\cForm:\aEvs\fun\Formulae)$ 
-% \begin{multicols}{2}
-\begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-\item \label{read-E-x}
-  if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-\item \label{read-lambda-x}
-  $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
-\item \label{read-kappa-x}
-  \begin{math}
-    \labelingForm(\aEv) \rimplies
-    \cForm_\aEv
-  \end{math},
-  \stepcounter{enumi}
-\item[] \labeltext[\textsc{r}4]{}{read-tau-x}
-  \begin{enumerate}[leftmargin=0pt]
-  \item \label{read-tau-dependent-x}
-    \begin{math}
-      (\forall\aEv\in\aEvs\cap\bEvs)
-    \end{math}
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \rimplies
-      \cForm_\aEv
-      \limplies \aVal_\aEv{=}\uReg{\aEv}
-      \limplies \bForm[\uReg{\aEv}/\aReg]
-    \end{math},
-    
-  \item \label{read-tau-independent-x}
-    \begin{math}
-      (\forall\aEv\in\aEvs\setminus\bEvs)
-    \end{math}
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \rimplies
-      \cForm_\aEv 
-      \limplies
-      \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
-      \limplies
-      \bForm[\uReg{\aEv}/\aReg]
-    \end{math},
-    
-  \item \label{read-tau-empty-x}
-    \begin{math}
-      (\forall\bReg)
-    \end{math}
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \rimplies 
-      % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-      (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
-      \limplies 
-      \bForm[\bReg/\aReg].
-    \end{math}  
-  \end{enumerate}  
-\end{enumerate}
-% \begin{multicols}{2}
-%   \noindent
-%   And either
-%   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-%     \setcounter{enumi}{1}
-%   \item \label{read-lambda-x}
-%     $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
-%   \item \label{read-kappa-x}
-%     \begin{math}
-%       \labelingForm(\aEv) \rimplies
-%       \cForm_\aEv
-%     \end{math},
-%   \end{enumerate}
-%   or $\amode\neq\mRLX$ and
-%   \begin{enumerate}[topsep=0pt,label=(\textsc{d}\arabic*),ref=\textsc{d}\arabic*]
-%     \setcounter{enumi}{1}
-%   \item \label{read-lambda-x}
-%     $\labelingAct(\aEv) = \DR[\mRLX]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
-%   \item \label{read-kappa-x}
-%     \begin{math}
-%       \labelingForm(\aEv) \rimplies
-%       \cForm_\aEv\land \aLoc{=}\aVal_\aEv
-%     \end{math},
-%   \end{enumerate}
-% \end{multicols}
-% \medskip
-% Could make \textsc{d}4b:
-% \begin{math}
-%   (\forall\aEv\in\aEvs\setminus\bEvs)
-% \end{math}
-% \begin{math}
-%   \aTr{\bEvs}{\bForm} \rimplies
-%   \cForm_\aEv 
-%   \limplies
-%   \PBR{\aVal_\aEv{=}\uReg{\aEv} \land \aLoc{=}\uReg{\aEv}}
-%   \limplies
-%   \bForm[\uReg{\aEv}/\aReg][\uReg{\aEv}/\aLoc]
-% \end{math},
-
-
-
-% In diagrams, we use different colors for arrows.  We distinguish
-% $\rrfx$ edges that are included in order from those that are not.
-% \begin{itemize}
-% \item \makebox{$\aEv\xrf\bEv$} arises from $\rrfx$, where $\aEv\le\bEv$,
-% \item \makebox{$\aEv\xrfint\bEv$} arises from $\rrfx$, where $\lnot(\aEv\le\bEv)$.
-% \end{itemize}
-% To help the reader understand why order is included, we also different colors
-% for arrows induced by order.  We adopt the following conventions:
-% \begin{itemize}  
-%   % \item relaxed accesses are blue, with a single border,
-%   % \item synchronized accesses are red, with a double border,
-%   % \item \makebox{$\aEv\xrf\bEv$} arises from fulfillment, where $\aEv$ \emph{matches} $\bEv$,
-%   % \item \makebox{$\aEv\xwk\bEv$} arises either from fulfillment, where $\aEv$
-%   %   \emph{blocks} $\bEv$, or from prefixing, where $\aEv$ was prefixed before
-%   %   $\bEv$ and their actions \emph{conflict},
-% \item \makebox{$\aEv\xwk\bEv$} arises from \emph{fulfillment},
-% \item \makebox{$\aEv\xpo\bEv$} arises from control/data/address \emph{dependency},
-% \item \makebox{$\aEv\xsync\bEv$} arises from \emph{synchronized access}.
-% \end{itemize}
-
-
+\endinput
+\section{OLD}
 \subsection{Pomsets}
 \label{sec:pomsets}
 
