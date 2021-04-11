@@ -6,6 +6,7 @@
 % Fri 13 Aug 2021 Paper Submission -- 2nd
 % Mon 30 Aug 2021 Notifications - final
 % Mon 13 Sep 2021 Camera-ready submissions
+% Oct 17-22 conference.
 
 % Submitted papers may be at most 23 pages in 10 point font, excluding
 % bibliographic references and appendices.
@@ -70,9 +71,8 @@
 
 
 \RequirePackage{amssymb}  %% bizarre error previous def of Bbbk if after documentclass
-\documentclass[acmsmall,screen]{acmart}\settopmatter{printfolios=true}
+\documentclass[acmsmall,screen,anonymous,review]{acmart}\settopmatter{printfolios=true}
 \hypersetup{bookmarksnumbered,bookmarksopen=true,bookmarksdepth=3}
-%\makeatletter\if@ACM@anonymous\acmSubmissionID{{}}\fi\makeatother %Including this in anonymous so page breaks are right for version with institutions
 \settopmatter{printfolios=true}
 \AtEndPreamble{%
   % \theoremstyle{acmdefinition}
@@ -89,21 +89,17 @@
 \bibliographystyle{ACM-Reference-Format}
 \citestyle{acmauthoryear}   %% For author/year citations
 
-%%% The following is specific to OOPSLA '20 and the paper
-%%% 'Pomsets with Preconditions: A Simple Model of Relaxed Memory'
-%%% by Radha Jagadeesan, Alan Jeffrey, and James Riely.
-%%%
 \setcopyright{rightsretained}
 \acmPrice{}
-\acmDOI{10.1145/3428262}
-\acmYear{2020}
-\copyrightyear{2020}
-\acmSubmissionID{oopsla20main-p286-p}
+\acmDOI{}
+\acmYear{2021}
+\copyrightyear{2021}
+\acmSubmissionID{}
 \acmJournal{PACMPL}
-\acmVolume{4}
+\acmVolume{0}
 \acmNumber{OOPSLA}
-\acmArticle{194}
-\acmMonth{11}
+\acmArticle{0}
+\acmMonth{10}
 \startPage{1}
 
 % \begin{makeatletter}
@@ -151,14 +147,6 @@
 %\email{jriely@cs.depaul.edu}
 
 
-\titlenote{
-%  This paper has been greatly improved by the comments of the anonymous reviewers.
-  Riely was supported by the National Science Foundation under
-  grant No.~CCR-1617175.}
-  % It is based upon work supported by the National Science Foundation under
-  % Grant No. CCR-1617175. Any opinions, findings, and conclusions or
-  % recommendations expressed in this material are those of the author and do
-  % not necessarily reflect the views of the NSF.}
 \begin{abstract}
 \input{abstract.tex}
 \end{abstract}
@@ -196,8 +184,8 @@
 % \input{complications.tex}
 % \input{outro.tex}
  \bibliography{bib}
-% \appendix
-% \input{discussion.tex}
+ % \appendix
+ % \input{discussion.tex}
 \end{document}
 
 % Local Variables:
