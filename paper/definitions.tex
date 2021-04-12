@@ -916,16 +916,15 @@ Downgrading messes up publication:
 
 \begin{definition}
   Let $\semrf{}$ be as defined for $\semrr{}$ in \refdef{def:semrr} and
-  \reffig{fig:sem}, with two changes in the definition of sequential
-  composition:
+  \reffig{fig:sem}, changing \ref{seq-le-rf} and \ref{seq-le-delays}:
   \begin{itemize}
-  \item remove \eqref{seq-le-rf},
-  \item add \labeltext[\textsc{s}7d]{(\textsc{s}7d)}{seq-le-rf2} if
-    $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ then $\bEv\xrfx\aEv$
+  \item[{\labeltext[\textsc{s}7b$'$]{(\textsc{s}7b$'$)}{seq-le-rf-rf}}]
+    if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ then $\bEv\xrfx\aEv$
     implies $\cEv\le\bEv$,
-  \item
-    replace $\eqreorderco$ by $\reorderlws$ in \refdef{def:actions} of
-    $\rdelaysdef$, where
+  \item[{\labeltext[\textsc{s}7c$'$]{(\textsc{s}7c$'$)}{seq-le-delays-rf}}]
+    if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ then $\bEv\le\aEv$,\\
+    where $\rdelayspdef$ replaces $\eqreorderco$ in \refdef{def:actions} of
+    $\rdelaysdef$ by
     \begin{math}
       {\reorderlws}
       =
