@@ -1058,33 +1058,34 @@ $\fSC$.
   \end{align*}
 \end{definition}  
 \section{Discussion}
-\subsection{Closure Properties}
+\subsection{Downset Closure}
 
-We would like the semantics to be closed with respect to \emph{augments} and
-\emph{downsets}.
+% We would like the semantics to be closed with respect to \emph{augments} and
+% \emph{downsets}.
 
-Augments include more order and stronger formulae; in examples, we typically
-consider pomsets that are augment-minimal.  One intuitive reading of augment
-closure is that adding order can only cause preconditions to weaken.
-\begin{definition}
-  \label{def:augment}
-  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
-  \begin{enumerate}
-  \item $\aEvs_2=\aEvs_1$,
-  \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-  \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
-  \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
-  \end{enumerate}
-\end{definition}
+% Augments include more order and stronger formulae; in examples, we typically
+% consider pomsets that are augment-minimal.  One intuitive reading of augment
+% closure is that adding order can only cause preconditions to weaken.
+% \begin{definition}
+%   \label{def:augment}
+%   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
+%   \begin{enumerate}
+%   \item $\aEvs_2=\aEvs_1$,
+%   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+%   \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
+%   \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
+%   \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
+%   \end{enumerate}
+% \end{definition}
 
-\begin{proposition}
-  % Suppose $\aPS_1\in\sem{\aCmd}$.
-  If $\aPS_1\in\sem{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
-  % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
-  % \end{enumerate}
-\end{proposition}
+% \begin{proposition}
+%   % Suppose $\aPS_1\in\sem{\aCmd}$.
+%   If $\aPS_1\in\sem{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+%   % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+%   % \end{enumerate}
+% \end{proposition}
 
+We would like the semantics to be closed with respect to \emph{downsets}.
 Downsets include a subset of initial events, similar to \emph{prefixes} for
 strings.
 \begin{definition}
