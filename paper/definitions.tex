@@ -264,6 +264,47 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 \subsection{Model}
 
 \begin{definition}
+  \label{def:trans}
+  A \emph{predicate transformer} is a %monotone
+  function
+  $\aTr{}{}:\Formulae\fun\Formulae$ such that
+  \begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
+    \item \label{tr-false}
+      $\aTr{}{\FALSE}$ is $\FALSE$,    
+    \item \label{tr-and}
+      $\aTr{}{\bForm_1\land\bForm_2}$ is $\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
+    \item \label{tr-or}
+      $\aTr{}{\bForm_1\lor\bForm_2}$ is $\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$, 
+    \item \label{tr-implies}
+      if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies
+      \aTr{}{\bForm}$.
+    \end{enumerate}
+  \end{multicols}
+\end{definition}
+\noindent
+The definition follows \citet{DBLP:journals/cacm/Dijkstra75}.  Note that
+substitutions ($\aTr{}{\psi}=\psi[\aExp/\aReg]$ and
+$\aTr{}{\psi}=\psi[\aExp/\aLoc]$) and implications on the right
+($\aTr{}{\psi}=\phi\limplies\psi$) are predicate transformers.
+
+As discussed in \S\ref{sec:intro}, predicate transformers suffice for sequentially consistent
+models, but not relaxed models, where dependency calculation is crucial.
+For dependency calculation, we use a \emph{family} of predicate transformers,
+indexed by sets of events. We use $\aTr{\bEvs}{}$ as the predicate transformer
+applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
+
+\begin{definition}
+  \label{def:family}
+  A \emph{family of predicate transformers} for $\aEvs$ consists of a
+  predicate transformer $\aTr{\bEvs}{}$ for each $\bEvs\subseteq\AllEvents$,
+  such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}
+  \rimplies \aTr{\bEvs}{\bForm}$.
+
+  We write $\aTr{}{}$ as an abbreviation of $\aTr{\aEvs}{}$.
+\end{definition}
+
+\begin{definition}
   \label{def:pomset}
   A \emph{pomset with predicate transformers} over $\Act$
   is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\rrfx}, {\le})$ where
@@ -317,6 +358,7 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 
 We give the semantics of programs in \reffig{fig:sem}.
 \input{fig-sem.tex}
+
 \begin{lemma}
   \label{lem:rf:implies:le}
   For any $\aPS$ in the range of $\sem{}$, $\bEv\xrfx\aEv$ implies
@@ -359,6 +401,23 @@ closure is that adding order can only cause preconditions to weaken.
     Induction on the definition of $\sem{}$.
   \end{proof}
 \end{lemma}
+
+\begin{lemma}
+  $(\aPSS_1\SEMI\aPSS_2)\SEMI\aPSS_3=\aPSS_1\SEMI(\aPSS_2\SEMI\aPSS_3)$
+  and    
+  $\aPSS\SEMI\SKIP=\aPSS=\SKIP\SEMI\aPSS$.
+
+  $(\aPSS_1\LPAR\aPSS_2)\LPAR\aPSS_3=\aPSS_1\LPAR(\aPSS_2\LPAR\aPSS_3)$
+  and    
+  $\aPSS\LPAR\SKIP=\aPSS$.  
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    Straightforward calculation.  Associativity of $\SEMI\!$ requires
+    disjunction closure \eqref{tr-or}.
+  \end{proof}
+\end{lemma}
+
 
 
 
@@ -1685,37 +1744,6 @@ the contribution of this paper, which is a model of \emph{pomsets with predicate
 functions on formulae which preserve logical structure, providing a natural model of sequential composition.
 
 
-\begin{definition}
-  \label{def:trans}
-  A \emph{predicate transformer} is a %monotone
-  function
-  $\aTr{}{}:\Formulae\fun\Formulae$ such that
-  \begin{itemize}
-  \item $\aTr{}{\FALSE}$ is $\FALSE$,    
-  \item $\aTr{}{\bForm_1\land\bForm_2}$ is $\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
-  \item $\aTr{}{\bForm_1\lor\bForm_2}$ is $\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$, 
-  \item if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies \aTr{}{\bForm}$.
-  \end{itemize}
-\end{definition}
-\noindent
-Note that substitutions ($\aTr{}{\psi}=\psi[\aExp/\aReg]$) and implications on the right
-($\aTr{}{\psi}=\phi\limplies\psi$) are predicate transformers.
-
-As discussed in \S\ref{sec:intro}, predicate transformers suffice for sequentially consistent
-models, but not relaxed models, where dependency calculation is crucial.
-For dependency calculation, we use a \emph{family} of predicate transformers,
-indexed by sets of events. We use $\aTr{\bEvs}{}$ as the predicate transformer
-applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
-
-\begin{definition}
-  \label{def:family}
-  A \emph{family of predicate transformers} for $\aEvs$ consists of a
-  predicate transformer $\aTr{\bEvs}{}$ for each $\bEvs\subseteq\AllEvents$,
-  such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}
-  \rimplies \aTr{\bEvs}{\bForm}$.
-
-  We write $\aTr{}{}$ as an abbreviation of $\aTr{\aEvs}{}$.
-\end{definition}
 
 %% Note that in a family of predicate transformers for $\aEvs$, transformers for
 %% smaller subsets of $\aEvs$ are stronger.
