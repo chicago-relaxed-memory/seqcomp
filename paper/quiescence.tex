@@ -49,7 +49,7 @@ This substitution is part of the predicate transformer:
         \event{wx1}{1{=}1\land \Qr{\aLoc}\land\Qw{\aLoc} \mid\DW{x}{1}}{}
         \xform{xd}{\bForm}{right=of wx1}
         \xform{xi}{\bForm[\FALSE/\Qw{\aLoc}]}{right=of xd}
-        \xos{wx1}{xd}
+        \xo{wx1}{xd}
       \end{tikzinline}}    
   \end{gather*}
 We treat read-write and write-read coherence similarly:
@@ -60,7 +60,7 @@ We treat read-write and write-read coherence similarly:
         \event{rx1}{\Qw{\aLoc} \mid\DR{x}{1}}{}
         \xform{xd}{r{=}1 \limplies \bForm}{right=of rx1}
         \xform{xi}{\bForm[\FALSE/\Qr{\aLoc}]}{right=of xd}
-        \xos{rx1}{xd}
+        \xo{rx1}{xd}
       \end{tikzinline}}    
   \end{gather*}
 In this model, there is no read-read coherence, but to restore it
@@ -121,7 +121,7 @@ symbols, for example:
           \event{a1}{1{=}1\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm\land1{=}1}{below=of a1}
           \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
-          \xo{a1}{x1d}
+          \xo[xright]{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -132,7 +132,7 @@ symbols, for example:
           \event{a2}{2{=}2\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{2}}{}
           \xform{x2d}{\bForm\land2{=}2}{below=of a2}
           \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
-          \xo{a2}{x2d}
+          \xo[xright]{a2}{x2d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -145,7 +145,7 @@ symbols, for example:
           \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm}{below right=of a1}
           \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a1}
-          \xos{a1}{x1d}
+          \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -156,7 +156,7 @@ symbols, for example:
           \event{a2}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{2}}{}
           \xform{x2d}{\bForm}{below left=of a2}
           \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
-          \xos{a2}{x2d}
+          \xo{a2}{x2d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -173,10 +173,10 @@ symbols, for example:
           %\xform{x2d}{\bForm}{below left=of a2}
           \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
           \xform{xii}{\bForm[\FALSE/\Qw{\aLoc}]}{below right=of a2}
-          \xos{a1}{x1d}
-          \xos{a2}{x1d}
+          \xo{a1}{x1d}
+          \xo{a2}{x1d}
           \xo[xleft]{a1}{x2i}
-          \xo{a2}{x1i}
+          \xo[xright]{a2}{x1i}
         \end{tikzinline}}
   \end{gather*}
   In order to get a satisfiable precondition for $\DWP{x}{2}$, we must
@@ -192,10 +192,10 @@ symbols, for example:
           %\xform{x2d}{\bForm}{below left=of a2}
           \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
           \xform{xii}{\bForm[\FALSE/\Qw{\aLoc}]}{below right=of a2}
-          \xos{a1}{x1d}
-          \xos{a2}{x1d}
+          \xo{a1}{x1d}
+          \xo{a2}{x1d}
           \xo[xleft]{a1}{x2i}
-          \xo{a2}{x1i}
+          \xo[xright]{a2}{x1i}
           \wk{a1}{a2}
         \end{tikzinline}}
   \end{gather*}
@@ -213,7 +213,7 @@ symbols, for example:
 %           \event{a1}{1{=}1\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
 %           \xform{x1d}{\bForm[(\Qw{\aLoc}\land1{=}1)/\Qw{\aLoc}]}{below=of a1}
 %           \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
-%           \xo{a1}{x1d}
+%           \xo[xright]{a1}{x1d}
 %         \end{tikzinline}}
 %     \end{gathered}
 %     &&
@@ -224,7 +224,7 @@ symbols, for example:
 %           \event{a2}{2{=}1\land\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
 %           \xform{x2d}{\bForm[(\Qw{\aLoc}\land2{=}1)/\Qw{\aLoc}]}{below=of a2}
 %           \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
-%           \xo{a2}{x2d}
+%           \xo[xright]{a2}{x2d}
 %         \end{tikzinline}}
 %     \end{gathered}
 %   \end{align*}
@@ -237,7 +237,7 @@ symbols, for example:
 %   %%         \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
 %   %%         \xform{x1d}{\bForm}{below=of a1}
 %   %%         \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
-%   %%         \xo{a1}{x1d}
+%   %%         \xo[xright]{a1}{x1d}
 %   %%       \end{tikzinline}}
 %   %%   \end{gathered}
 %   %%   &&
@@ -248,7 +248,7 @@ symbols, for example:
 %   %%         \event{a2}{\FALSE\mid\DW{x}{1}}{}
 %   %%         \xform{x2d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
 %   %%         \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
-%   %%         \xo{a2}{x2d}
+%   %%         \xo[xright]{a2}{x2d}
 %   %%       \end{tikzinline}}
 %   %%   \end{gathered}
 %   %% \end{align*}
@@ -260,7 +260,7 @@ symbols, for example:
 %         \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
 %         \xform{x1d}{\bForm[\FALSE/\Qw{\aLoc}]}{right=of a2}
 %         \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{right=of x1d}
-%         \xos{a1}{x1d}
+%         \xo{a1}{x1d}
 %       \end{tikzinline}}
 %   \end{gather*}
 %   This is what we would hope: that the program $\PW{x}{1}\SEMI \PW{x}{2}$ 
@@ -278,7 +278,7 @@ symbols, for example:
 %           \xform{xd}{(1{=}r)\limplies\bForm}{}
 %           \xform{xi}{((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{}}{below=of xd}
 %           \event{a1}{\DR{x}{1}}{above=of xd}
-%           \xo{a1}{xd}
+%           \xo[xright]{a1}{xd}
 %         \end{tikzinline}}    
 %     \end{gathered}
 %     &&
@@ -289,7 +289,7 @@ symbols, for example:
 %           \xform{xd}{\bForm\noSUB{[r/y]}\land (\Q{}\limplies r{=}1)}{}
 %           \xform{xi}{\bForm\noSUB{[r/y]}\land \lnot\Q{}}{below=of xd}
 %           \event{a2}{r{=}1\mid\DW{y}{1}}{above=of xd}      
-%           \xo{a2}{xd}
+%           \xo[xright]{a2}{xd}
 %         \end{tikzinline}}    
 %     \end{gathered}
 %   \end{align*}
@@ -305,10 +305,10 @@ symbols, for example:
 %         \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above right=2.7em and -16em of xid}
 %         \xform{xdd}{((1{=}r)\limplies\bForm)[r/y]\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
 %         \xform{xii}{(((x{=}r\lor1{=}r)\limplies\bForm)\land \lnot\Q{})[r/y]\land \lnot\Q{}}{below=of xid}
-%         \xo{a1}{xdi}
-%         \xo{a2}{xid}
-%         \xo{a1}{xdd}
-%         \xo{a2}{xdd}
+%         \xo[xright]{a1}{xdi}
+%         \xo[xright]{a2}{xid}
+%         \xo[xright]{a1}{xdd}
+%         \xo[xright]{a2}{xdd}
 %       \end{tikzinline}}
 %   \end{gather*}
 %   Note that
@@ -330,10 +330,10 @@ symbols, for example:
 %         \event{a2}{((x{=}r\lor1{=}r)\limplies r{=}1) \land\lnot\Q{}\mid\DW{y}{1}}{above=2.7em of xid}
 %         \xform{xdd}{((1{=}r)\limplies\bForm\noSUB{[r/y]})\land (\Q{}\limplies r{=}1)}{above right=.5em and -1em of a1}
 %         \xform{xii}{((x{=}r\lor1{=}r)\limplies\bForm\noSUB{[r/y]})\land \lnot\Q{}}{below=of xid}
-%         \xo{a1}{xdi}
-%         \xo{a2}{xid}
-%         \xo{a1}{xdd}
-%         \xo{a2}{xdd}
+%         \xo[xright]{a1}{xdi}
+%         \xo[xright]{a2}{xid}
+%         \xo[xright]{a1}{xdd}
+%         \xo[xright]{a2}{xdd}
 %       \end{tikzinline}}
 %   \end{gather*}
 %   With order:
@@ -504,7 +504,7 @@ top-level pomsets.
           \event{a1}{1{=}1\land\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
           \xform{x1d}{1{=}1\land\bForm}{below=of a1}
           \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of x1d}
-          \xo{a1}{x1d}
+          \xo[xright]{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -515,7 +515,7 @@ top-level pomsets.
           \raevent{a2}{1{=}1\land\QS{\bLoc}{\mRA}\mid\DW{y}{2}}{}
           \xform{x2d}{1{=}1\land\bForm}{below=of a2}
           \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mRA}]}{below=of x2d}
-          \xo{a2}{x2d}
+          \xo[xright]{a2}{x2d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -528,14 +528,14 @@ top-level pomsets.
           \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm}{below right=of a1}
           \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mRA}]}{below=of a1}
-          \xos{a1}{x1d}
+          \xo{a1}{x1d}
           \raevent{a2}{\FALSE\mid\DW{\bLoc}{1}}{above right=of x1d}
           %\xform{x2d}{\bForm}{below left=of a2}
           \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
           \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mRA}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
-          \xos{a2}{x1d}
+          \xo{a2}{x1d}
           \xo[xleft]{a1}{x2i}
-          \xo{a2}{x1i}
+          \xo[xright]{a2}{x1i}
         \end{tikzinline}}
   \end{gather*}
   In order to get a satisfiable precondition for $\DWP{y}{1}$, we must
@@ -547,14 +547,14 @@ top-level pomsets.
           \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm}{below right=of a1}
           \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mRA}]}{below=of a1}
-          \xos{a1}{x1d}
+          \xo{a1}{x1d}
           \raevent{a2}{\QS{\bLoc}{\mRA}\mid\DW{\bLoc}{1}}{above right=of x1d}
           %\xform{x2d}{\bForm}{below left=of a2}
           \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
           \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mRA}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
-          \xos{a2}{x1d}
+          \xo{a2}{x1d}
           \xo[xleft]{a1}{x2i}
-          \xo{a2}{x1i}
+          \xo[xright]{a2}{x1i}
           \sync{a1}{a2}
         \end{tikzinline}}
   \end{gather*}
@@ -599,9 +599,9 @@ top-level pomsets.
           \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{right=of xdd}
           \event{a2}{\FALSE\mid\DR{x}{1}}{above=of x2d}
           \xo[xleft]{a1}{x1d}
-          \xo{a2}{x2d}
-          \xos{a1}{xdd}
-          \xos{a2}{xdd}
+          \xo[xright]{a2}{x2d}
+          \xo{a1}{xdd}
+          \xo{a2}{xdd}
         \end{tikzinline}}
   \end{gather*}
   In order to get a satisfiable precondition for $\DRP{x}{1}$, we must
@@ -617,9 +617,9 @@ top-level pomsets.
           \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mRA}]}{right=of xdd}
           \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{above=of x2d}
           \xo[xleft]{a1}{x1d}
-          \xo{a2}{x2d}
-          \xos{a1}{xdd}
-          \xos{a2}{xdd}
+          \xo[xright]{a2}{x2d}
+          \xo{a1}{xdd}
+          \xo{a2}{xdd}
           \sync[out=15,in=165]{a1}{a2}
         \end{tikzinline}}
   \end{gather*}

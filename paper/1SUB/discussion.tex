@@ -293,7 +293,50 @@
   All the preconditions are now tautologies.
 \end{example}
 
+\subsection{Access Elimination}
+For reads, get rid of $\FALSE/\Q{}$ in \ref{L6full}.
+
+For writes, change the label rules of sequential composition to:
+\begin{enumerate}
+\item %\label{par-lambda1}
+  if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labeling(\aEv) = \labeling_1(\aEv)$, 
+\item %\label{par-lambda2}
+  if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labeling(\aEv) = \labeling_2(\aEv)$,
+\item %\label{par-lambda2}
+  if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labeling(\aEv) \in \fmerge{\labeling_1(\aEv)}{\labeling_2(\aEv)}$.
+\end{enumerate}
+
+\begin{definition}
+  % Fences use the three point order:
+  % \begin{math}
+  %   \fREL \ltmode \mSC
+  % \end{math}
+  % and 
+  % \begin{math}
+  %   \fACQ \ltmode \mSC.
+  % \end{math}
+  \noindent    
+  \begin{align*}
+    \fmerge{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}} &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
+    \\
+    \fmerge{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}} &= \{ \DW[\amode\lubmode\bmode]{\aLoc}{\bVal} \}
+    \\
+    \fmerge{\DF{\amode}}{\DF{\bmode}} &= \{ \DF{\amode\lubmode\bmode} \}
+    \\
+    \fmerge{\aAct}{\bAct} &= \emptyset, \textotherwise
+  \end{align*}
+\end{definition}  
+
 \subsection{Merging Different labels}
+
+Reordering and Merging:
+\cite[\textsection7.1]{Kang19}
+\cite[\textsection E]{DBLP:conf/cgo/ChakrabortyV17}
+
+Examples of Unsafe Reorderings
+\cite[\textsection D]{DBLP:conf/cgo/ChakrabortyV17}
+See the slides for this paper...
+
 
 We combine access and fence modes into a single order:
 \begin{align*}
@@ -314,6 +357,7 @@ We combine access and fence modes into a single order:
   \end{tikzcenter}
 \end{align*}
 
+Note that for associativity, you have to take the join of modes.
 \begin{definition}
   \label{def:compat}
   Define $\fmerge{}{}:\Act\times\Act\fun2^{\Act}$ as follows.  If
@@ -351,10 +395,23 @@ We combine access and fence modes into a single order:
   
 \subsection{Read-Modify-Write Operations (\xRMW)}
 
+Extend the syntax
+\begin{align*}
+  \aCmd
+  \BNFDEF& \cdots 
+  \BNFSEP \PCAS[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
+  \BNFSEP \PFADD[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  \BNFSEP \PEXCHG[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+\end{align*}
+From the data model, we require an additional binary relation over
+$\Act\times\Act$: $\roverlapsdef$.  For the actions in this paper, we say
+$\aAct \roverlapsdef \bAct$ if they access the same location.
+
+
 \RMW{} operations are formalized by adding a relation
 ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
 \RMW{} to the succeeding write.
-We say $\aAct \roverlapsdef \bAct$ if they access the same location.
+% Let two actions \emph{overlap} if they access the same location.
 Extend the definition of a pomset as follows. % where two actions \emph{overlap} if they access the same location:
 % \begin{enumerate}
 % \item
@@ -930,40 +987,6 @@ The set is nondeterministically chosen by the semantics.
 Idea is to downgrade the reads in $\aLocs$ and fence everything else.
 
 
-\subsection{Access Elimination}
-For reads, get rid of $\FALSE/\Q{}$ in \ref{L6full}.
-
-For writes, change the label rules of sequential composition to:
-\begin{enumerate}
-\item %\label{par-lambda1}
-  if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labeling(\aEv) = \labeling_1(\aEv)$, 
-\item %\label{par-lambda2}
-  if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labeling(\aEv) = \labeling_2(\aEv)$,
-\item %\label{par-lambda2}
-  if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labeling(\aEv) \in \fmerge{\labeling_1(\aEv)}{\labeling_2(\aEv)}$.
-\end{enumerate}
-
-\begin{definition}
-  % Fences use the three point order:
-  % \begin{math}
-  %   \fREL \ltmode \mSC
-  % \end{math}
-  % and 
-  % \begin{math}
-  %   \fACQ \ltmode \mSC.
-  % \end{math}
-  \noindent    
-  \begin{align*}
-    \fmerge{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}} &= \{ \DR[\amode\lubmode\bmode]{\aLoc}{\aVal} \}
-    \\
-    \fmerge{\DW[\amode]{\aLoc}{\aVal}}{\DW[\bmode]{\aLoc}{\bVal}} &= \{ \DW[\amode\lubmode\bmode]{\aLoc}{\bVal} \}
-    \\
-    \fmerge{\DF{\amode}}{\DF{\bmode}} &= \{ \DF{\amode\lubmode\bmode} \}
-    \\
-    \fmerge{\aAct}{\bAct} &= \emptyset, \textotherwise
-  \end{align*}
-\end{definition}  
-
 \subsection{Extended Access Modes}
 
 We can enrich read and write actions to use fence modes.
@@ -1035,33 +1058,34 @@ $\fSC$.
   \end{align*}
 \end{definition}  
 \section{Discussion}
-\subsection{Closure Properties}
+\subsection{Downset Closure}
 
-We would like the semantics to be closed with respect to \emph{augments} and
-\emph{downsets}.
+% We would like the semantics to be closed with respect to \emph{augments} and
+% \emph{downsets}.
 
-Augments include more order and stronger formulae; in examples, we typically
-consider pomsets that are augment-minimal.  One intuitive reading of augment
-closure is that adding order can only cause preconditions to weaken.
-\begin{definition}
-  \label{def:augment}
-  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
-  \begin{enumerate}
-  \item $\aEvs_2=\aEvs_1$,
-  \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-  \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
-  \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
-  \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
-  \end{enumerate}
-\end{definition}
+% Augments include more order and stronger formulae; in examples, we typically
+% consider pomsets that are augment-minimal.  One intuitive reading of augment
+% closure is that adding order can only cause preconditions to weaken.
+% \begin{definition}
+%   \label{def:augment}
+%   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
+%   \begin{enumerate}
+%   \item $\aEvs_2=\aEvs_1$,
+%   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+%   \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
+%   \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
+%   \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
+%   \end{enumerate}
+% \end{definition}
 
-\begin{proposition}
-  % Suppose $\aPS_1\in\sem{\aCmd}$.
-  If $\aPS_1\in\sem{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
-  % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
-  % \end{enumerate}
-\end{proposition}
+% \begin{proposition}
+%   % Suppose $\aPS_1\in\sem{\aCmd}$.
+%   If $\aPS_1\in\sem{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+%   % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+%   % \end{enumerate}
+% \end{proposition}
 
+We would like the semantics to be closed with respect to \emph{downsets}.
 Downsets include a subset of initial events, similar to \emph{prefixes} for
 strings.
 \begin{definition}
@@ -2053,8 +2077,10 @@ Thinking in terms of hardware, the difference is whether reads update the
 cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
 cache, whereas without the substitution, they do not.  Since most caches work
 this way, the model with $[r/x]$ is likely preferred for modeling hardware.
-In a software model, however, we see no reason to prefer one of these over
-the other.
+However, this substitution only makes sense in a model with read-read
+coherence and dependency.  By leaving out the substitution, we also ensure
+that downgraded reads are fulfilled by preceding writes, not reads.
+
 
 
 \begin{comment}
@@ -2864,6 +2890,10 @@ $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.
   But this is not a problem, since fulfillment requires that $\DWP{x}{1}$
   precede both reads of $x$.
 \end{comment}
+
+\myparagraph{Stupid Bug in LDRF}
+Definition of race is wrong.
+Should say that at least one is relaxed.
 
 \clearpage
 \section{More Stuff}

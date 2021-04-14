@@ -1,1118 +1,552 @@
-\section{Efficient Implementation on ARMv8}
-\label{sec:arm}
+\section{Arm}
+For simplicity, we restrict to top level parallel composition and ignore
+fences\footnote{Fences are not actions in \armeight{}, which complicates the
+  theorem statements.}.
 
-We discuss \armeight{} using \emph{external completion} (\EC{})
-\cite{alglave-git-alternate} %,armed-cats},
-\cite[\textsection B2.3.6]{arm-reference-manual}
-which is very close to our model.
+\subsection{Arm executions}
+\begin{definition}
+  An \emph{\armeight{} execution graph}, $\aEG$, is tuple
+  $(\aEvs, \labeling, {\rpoloc}, {\rlob})$ such that
+  \begin{enumerate}[,label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
+  \item $\Event\subseteq\AllEvents$ is a set of {events},
+  \item $\labeling: \Event \fun \Act$ defines a {label} for each event,
+  \item ${\rpoloc} : \Event\times\Event$, is a per-thread, per-location total
+    order, capturing \emph{per-location program order},
+  \item ${\rlob} : \Event\times\Event$, is a per-thread partial order capturing
+    \emph{locally-ordered-before}, such that
+    \begin{enumerate}
+    \item \label{arm-lob-poloc}
+      ${\rpoloc} \cup {\rlob}$ is acyclic.
+    \end{enumerate}
+  \end{enumerate}
+\end{definition}
 
-\begin{example}
-  Bad example:
-  \begin{gather*}
-    \PR{x}{r}\SEMI 
-    \PW{x}{2}\SEMI
-    \PR{x}{s}\SEMI
-    \PW{y}{s{-}1} \PAR
-    \PR{y}{r}\SEMI
-    \PW{x}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a}{\DR{x}{1}}{}
-        \event{b}{\DW{x}{2}}{right=of a}
-        \event{c}{\DR{x}{2}}{right=of b}
-        \event{d}{\DW{y}{1}}{right=of c}
-        \event{e}{\DR{y}{1}}{right=of d}
-        \event{f}{\DW{x}{1}}{right=of e}
-        \wk{a}{b}
-        \rf{b}{c}
-        \po{c}{d}
-        \rf{d}{e}
-        \po{e}{f}
-        \rf[out=-165,in=-15]{f}{a}
-      \end{tikzinline}}
-  \end{gather*}
-\end{example}
-
-\begin{example}
-  Should not wipe out local state only when there is a release-acquire pair,
-  as in the definition of \jjr{}, which allows the following execution.  Even
-  though there is a blocker $\DWP{x}{3}$, here we are using $\DWP{x}{0}$ to
-  justify the lack of dependence $\DRP{x}{4}\xpo\DWP{w}{4}$.
-  \begin{gather*}
-    \PW{x}{0}\SEMI
-    \IF{x}\THEN\PW{y}{2}\FI\SEMI
-    \IF{\PR[\mACQ]{z}{}}\THEN
-      \PR{x}{s}\SEMI
-      \IF{s\;\mathsf{even}}\THEN\PW{w}{4}\FI
-    \FI
-    \PAR
-    \PW{x}{2}\SEMI
-    \IF{\PR[\mACQ]{y}{}}\THEN
-      \PW{x}{3}\SEMI
-      \PW[\mREL]{z}{1}
-    \FI
-    \SEMI
-    \PW{x}{\PR{w}{}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{2a}{\DW{x}{0}}{}
-        \event{2b}{\DR{x}{2}}{right=of 2a}
-        \event{2c}{\DW{y}{1}}{right=of 2b}
-        \raevent{2d}{\DR[\mACQ]{z}{1}}{right=of 2c}
-        \event{2e}{\DR{x}{4}}{right=of 2d}
-        \event{2f}{\DW{w}{4}}{right=of 2e}
-        %
-        \event{3a}{\DW{x}{2}}{below=of 2a}
-        \raevent{3b}{\DR[\mACQ]{y}{1}}{right=of 3a}
-        \event{3c}{\DW{x}{3}}{right=of 3b}
-        \raevent{3d}{\DW[\mREL]{z}{1}}{right=of 3c}
-        \event{3e}{\DR{w}{4}}{right=of 3d}
-        \event{3f}{\DW{x}{4}}{right=of 3e}
-        \wk{2a}{2b}
-        \po{2b}{2c}
-        \sync{2d}{2e}
-        \sync[out=20,in=160]{2d}{2f}
-        \sync{3b}{3c}
-        \sync{3c}{3d}
-        \po{3e}{3f}
-        \rf{3a}{2b}
-        \rf{2c}{3b}
-        \rf{3d}{2d}
-        \rf{3f}{2e}
-        \rf{2f}{3e}
-        \wk{2a}{3a}
-        %\wk[out=-20,in=-160]{3c}{3f}
-        %\wk[out=20,in=160]{2b}{2e}
-      \end{tikzinline}}
-  \end{gather*}
-  (The read-clobbering semantics from \textsection\ref{sec:substitutions}
-  does not change this.)
-\end{example}
-
-It does seem to me like a non-local blocker for program-order must include a
-read of $x$ or a release (to get order from the write) and an acquire (to get
-the order to the read).
-
-What if an acquire preceded by a release or non-local read on $x$ wiped the
-local state of $x$?  The problem with this kind of solution (and P6 in ooplsa
-specifically) is that it destroys roach-motel.
-
-\subsection{Downgraded Reads (\xDGR)}
-\label{sec:downgrade}
-
-
-\begin{example}
-  \label{ex:dgr1}
-  The following example is from \citeauthor{anton} \cite{anton}.  It is
-  allowed by \armeight{}, but disallowed by \refdef{def:pomsets-ra}.  The
-  coherence order between the writes can be witnessed by a separate thread,
-  which we have elided.
-  \begin{gather*}
-    \PW{x}{2}\SEMI 
-    \PR[\mACQ]{x}{r}\SEMI
-    \PW{y}{1} \PAR
-    \PW{y}{2}\SEMI
-    \PW[\mREL]{x}{1}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a}{\DW{x}{2}}{}
-        \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
-        \event{c}{\DW{y}{1}}{right=of b}
-        \event{d}{\DW{y}{2}}{right=2.5em of c}
-        \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
-        \rf{a}{b}
-        \sync{b}{c}
-        \wk{c}{d}
-        \sync{d}{e}
-        \wk[out=-165,in=-15]{e}{a}
-      \end{tikzinline}}
-  \end{gather*}
-  Under \EGC{}, this is explained by dropping the order
-  $\DRP[\mACQ]{x}{2}\xsync\DWP{y}{1}$, because $\DRP[\mACQ]{x}{2}$ is fulfilled
-  by a relaxed write in the same thread.
-  \begin{gather*}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a}{\DW{x}{2}}{}
-        \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
-        \event{c}{\DW{y}{1}}{right=of b}
-        \event{d}{\DW{y}{2}}{right=2.5em of c}
-        \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
-        \rf{a}{b}
-        % \sync{b}{c}
-        \wk{c}{d}
-        \sync{d}{e}
-        \wk[out=-165,in=-15]{e}{a}
-      \end{tikzinline}}  
-  \end{gather*}
-
-  More generally, this can be understood as a compiler optimization that
-  downgrades a read from $\mRA$ to $\mRLX$ when it can be fulfilled by a
-  relaxed write in the same thread.
-\end{example}
-
-To model such \emph{downgraded reads}, we use the uninterpreted symbols
-$\Dx{\aLoc}$.  
+The definition of $\rlob$ is complex.  Comparing with our definition of
+sequential composition, it is sufficient to note that $\rlob$ includes
+\begin{enumerate}[label=(\textsc{l}\arabic*),ref=\textsc{l}\arabic*]
+\item read-write dependencies, required by \ref{seq-kappa},
+\item synchronization delay of ${\reorderra}$, required by \ref{seq-le-delays},
+\item $\mSC$ access delay of ${\eqreordersc}$, required by \ref{seq-le-delays},
+\item write-write and read-to-write coherence delay of ${\reorderco}$, required by \ref{seq-le-delays},
+\end{enumerate}
+and that $\rlob$ does \emph{not} include
+\begin{enumerate}[resume,label=(\textsc{l}\arabic*),ref=\textsc{l}\arabic*]
+\item \label{lob-rr} \labeltext[above]{}{lob-le}
+  read-read control dependencies, required by \ref{seq-kappa},
+\item \label{lob-rf}
+  write-to-read order of $\rrfx$, required by \ref{seq-le-rf},
+\item \label{lob-wr}
+  write-to-read coherence delay of ${\reorderco}$, required by \ref{seq-le-delays}.
+\end{enumerate}
 
 \begin{definition}
-  \label{def:DS}
-  % Let $[\FALSE/\D]$ be the substitution that performs $[\FALSE/\Dx{\aLoc}]$
-  % for every $\aLoc$.
-  Let $[\aForm/\Dx{*}]$ substitute $\aForm$ for every $\Dx{\bLoc}$.\\
-  Let formula $\DL{\aLoc}{\amode}$ and substitution $\DS{\aLoc}{\amode}$ be defined:
-  \begin{align*}
-    \DL{\aLoc}{\amode}&=
-    \begin{cases}
-      \Dx{\aLoc} & \textif \amode\neq\mRLX
-      \\
-      \TRUE& \textotherwise
-    \end{cases}
-    &
-    \DS{\aLoc}{\amode}&=
-    \begin{cases}
-      [\TRUE/\Dx{\aLoc}]  & \textif \amode=\mRLX
-      \\
-      [\TRUE/\Dx{\aLoc}][\FALSE/\D] & \textotherwise
-    \end{cases}
-  \end{align*}
-  % \begin{align*}
-  %   \DS{\aLoc}{\mRLX}&=[\TRUE/\Dx{\aLoc}] 
-  %   &\DL{\aLoc}{\mRLX}&=\TRUE
-  %   \\
-  %   \DS{\aLoc}{\mRA}&=[\FALSE/\D]
-  %   &\DL{\aLoc}{\mRA}&=\Dx{\aLoc}%\land\D{}
-  %   \\
-  %   \DS{\aLoc}{\mSC}&=[\FALSE/\D]
-  %   &\DL{\aLoc}{\mSC}&=\Dx{\aLoc}%\land\D{}
-  % \end{align*}
-\end{definition}
-\begin{definition}[\xCO/\xRASC/\xDGR]
-  \label{def:pomsets-down}
-  Update \refdef{def:pomsets-ra} to: % (\ref{L4} unchanged):
-  \begin{enumerate}
-  \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies
-    \begin{math}
-      \bForm
-      \DS{\aLoc}{\amode} \land\aExp{=}\aVal,
-      %[(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}],
-    \end{math}
-  \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies
-    \begin{math}
-      \bForm
-      \DS{\aLoc}{\amode}
-      [\FALSE/\QS{\aLoc}{\amode}],
-    \end{math}
-  % \item[\ref{L4})]
-  %   $\aTr{\bEvs}{\bForm}$ implies
-  %   \begin{math}
-  %     \aVal{=}\aReg\limplies\bForm,
-  %   \end{math}
-  \item[\ref{L5})]
-    $\aTr{\cEvs}{\bForm}$ implies
-    \begin{math}
-      \DL{\aLoc}{\amode}\land \bForm[\FALSE/\QL{\aLoc}{\amode}].
-    \end{math}
+  Execution $\aEG$ is
+  \emph{$({\rco}, {\rrfx}, {\rgcb})$-valid}, under \emph{External Global
+    Consistency} (\EGC{}) if
+  \begin{enumerate}[label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
+    \setcounter{enumi}{4}
+  %\item[\eqref{arm-co}] and \eqref{arm-rf}, as for \EC,
+  \item \label{arm-co}
+    ${\rco} : \Event\times\Event$, is a per-location total order on
+    writes, capturing \emph{coherence}, 
+  \item \label{arm-rf}
+    ${\rrfx} : \Event\times\Event$, is a surjective and injective
+    relation on reads, capturing \emph{reads-from}, such that
+    \begin{enumerate}
+    \item \label{arm-match}
+      if $\bEv\xrfx\aEv$ then $\labeling(\bEv) \rmatches \labeling(\aEv)$,      
+    \item \label{arm-local}
+      ${\rpoloc} \cup {\rco} \cup {\rrfx} \cup {\rfr}$ is acyclic,
+      where $\aEv\xfr\cEv$ if %$(\exists\bEv)$
+      $\aEv\xrfxinv\bEv\xco\cEv$, for some $\bEv$,
+      % \stepcounter{enumi}
+      % \item[] \labeltext[\textsc{a}2]{}{arm-cb}
+    \end{enumerate}
+    % \item ${\rpoloc} \cup {\rco} \cup {\rrfx} \cup {\rfr}$ is acyclic, where
+    %   $\bEv\xfr\aEv$ if $(\exists\cEv)$ $\bEv\xrfxinv\cEv\xco\aEv$,
+  \item \label{arm-gcb}
+    ${\rgcb}\supseteq\PBR{{\rco}\cup{\rrfx}}$ is a linear order %, capturing \emph{globally completes before}, %$\rcb : % \Event\times\Event$
+    such that 
+    \begin{enumerate}%[leftmargin=0pt]
+      % \item if $\bEv\xco\aEv$ then $\bEv\xgcb\aEv$,
+      % \item if $\bEv\xrfx\aEv$ then $\bEv\xgcb\aEv$,
+    \item \label{arm-gcb-blocks}
+      if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\xgcb\bEv$ or $\aEv\xgcb\cEv$, 
+    \item \label{arm-gcb-lob}
+      if $\aEv\xlob\cEv$ then either $\aEv\xgcb\cEv$ or $(\exists\bEv)$
+      $\bEv\xrfx\aEv$ and $\bEv\xpoloc\aEv$ but not $\bEv\xlob\cEv$.
+    \end{enumerate}
+  \end{enumerate}
+  
+  Execution $\aEG$ is
+  \emph{$({\rco}, {\rrfx}, {\rcb})$-valid} under \emph{External Consistency} (\EC{}) if
+  \begin{enumerate}[resume,label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
+  \item[\eqref{arm-co}] and \eqref{arm-rf}, as for \EGC,
+  \item \label{arm-cb}
+    ${\rcb}\supseteq\PBR{{\rco}\cup{\rlob}}$ is a linear order %, capturing \emph{completes before}, %$\rcb : % \Event\times\Event$
+    such that if $\bEv\xrfx\aEv$ then either
+    \begin{enumerate}%[leftmargin=0pt]
+    \item \label{arm-rfe}
+      % $\bEv\xcb\aEv$ and $\cEv\rblocks\aEv$ then either $\cEv\xcb\bEv$ or $\aEv\xcb\cEv$, or 
+      $\bEv\xcb\aEv$ and if $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\xcb\bEv$ or $\aEv\xcb\cEv$, or
+      % $\bEv\xcb\aEv$ and $(\not\exists\cEv)$ such that $\bEv\xcb\cEv\xcb\aEv$ and $\cEv\rblocks\aEv$, or 
+    \item \label{arm-rfi}
+      $\bEv\xcbinv\aEv$ and $\bEv\xpoloc\aEv$ and $(\not\exists\cEv)$ $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv\xpoloc\cEv\xpoloc\aEv$.
+      % $\bEv\xpoloc\aEv$ and $(\not\exists\cEv)$ such that $\bEv\xpoloc\cEv\xpoloc\aEv$ and $\cEv\rblocks\aEv$.
+      % \item if $\bEv\xco\aEv$ then $\bEv\xgcb\aEv$,
+      % \item if $\bEv\xrfx\aEv$ then $\bEv\xgcb\aEv$,
+      % \item if $\bEv\xrfx\aEv$ and $\cEv\rblocks\aEv$ then either $\cEv\xgcb\bEv$ or $\aEv\xgcb\cEv$,
+      % \item if $\bEv\xlob\aEv$ then either $\bEv\xgcb\aEv$ or $(\exists\cEv)$
+      %   $\cEv\xrfx\bEv$ and $\cEv\xpoloc\bEv$ but not $\cEv\xlob\aEv$.
+    \end{enumerate}
   \end{enumerate}
 \end{definition}
-Load actions that require downgrading introduce $\Dx{\aLoc}$.
-Relaxed stores on $\aLoc$ substitute true for $\Dx{\aLoc}$, whereas
-synchronizing stores substitute false for $\Dx{\aLoc}$.
+\cite{armed} explain \EGC{} and \EC{} using the following example.\footnote{We have
+changed an address dependency in the first thread to a data dependency.}
+\begin{gather*}
+  \PW{x}{1}\SEMI 
+  \PR{x}{r}\SEMI
+  \PW{y}{r} \PAR
+  \PR[\mACQ]{y}{1}\SEMI
+  \PR{x}{s}
+  \\
+  \tag{\cmark\armeight}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \event{b}{\DR{x}{1}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \raevent{d}{\DR[\mACQ]{y}{1}}{right=2.5em of c}
+      \event{e}{\DR{x}{0}}{right=of d}
+      \rfx{a}{b}
+      \lob{b}{c}
+      \rfx{c}{d}
+      \lob{d}{e}
+      \co[out=-165,in=-15]{e}[above right]{a}
+    \end{tikzinline}}
+\end{gather*}
+\EGC{} drops $\rlob$-order in the first thread using \ref{arm-gcb-lob}, since
+$\DWP{x}{1}$ is not $\rlob$-ordered before $\DWP{y}{1}$.
+\begin{gather*}
+  \tag{$\rgcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \event{b}{\DR{x}{1}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \raevent{d}{\DR[\mACQ]{y}{1}}{right=2.5em of c}
+      \event{e}{\DR{x}{0}}{right=of d}
+      \gcbz{a}{b}
+      \gcbz{c}{d}
+      \gcbz{d}{e}
+      \gcbz[out=-165,in=-15]{e}{a}
+      % \rfx{a}{b}
+      % %\lob{b}{c}
+      % \rfx{c}{d}
+      % \lob{d}{e}
+      % \co[out=-165,in=-15]{e}[above right]{a}
+    \end{tikzinline}}
+\end{gather*}
+\EC{} drops $\rrfx$-order in the first thread using \ref{arm-rfi}.
+\begin{gather*}
+  \tag{$\rcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \event{b}{\DR{x}{1}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \raevent{d}{\DR[\mACQ]{y}{1}}{right=2.5em of c}
+      \event{e}{\DR{x}{0}}{right=of d}
+      \cbz{b}{c}
+      \cbz{c}{d}
+      \cbz{d}{e}
+      \cbz[out=-165,in=-15]{e}{a}
+      % %\rfx{a}{b}
+      % \lob{b}{c}
+      % \rfx{c}{d}
+      % \lob{d}{e}
+      % \co[out=-165,in=-15]{e}[above right]{a}
+    \end{tikzinline}}
+\end{gather*}
 
-\begin{example}
-  \label{ex:dgr2}
-  Revisiting \refex{ex:dgr1} and eliding irrelevant transformers:
-  \begin{align*}
-    \begin{gathered}[t]
-      \PW{x}{2}
+\subsection{Arm Compilation 1}
+
+\citet{DBLP:journals/pacmpl/PodkopaevLV19} lowers to \armeight{} as follows:
+Relaxed access is implemented using \LDR/\STR, non-relaxed access using
+\LDAR/\STLR.  %, acquire and other fences using \DMBLD/\DMBSY.
+In this section, we consider a suboptimal strategy, which lowers non-relaxed
+reads to $(\DMBSY\SEMI\LDAR)$.
+
+We do not distinguish control dependencies from address dependencies, and
+therefore \ref{lob-rr} forces us to drop all dependencies between reads.  To
+achieve this, we modify the definition of $\labelingForm'_2$ in
+\reffig{fig:sem}.
+\begin{definition}
+  \label{def:semrr}
+  Let $\semrr{}$ be defined as in \reffig{fig:sem}, replacing the definition
+  of $\labelingForm'_2$ with:
+  \begin{displaymath}
+    \labelingForm'_2(\aEv)=
+    \begin{cases}
+      \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a read}
       \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{a}{\DW{x}{2}}{}
-          \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of a}
-          % \xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
-          \xo{a}{x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-    &&
-    \begin{gathered}[t]
-      \PR[\mACQ]{x}{r}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\DR[\mACQ]{x}{2}}{}
-          % \xform{x1d}{2{=}r\limplies\bForm}{below=of b}
-          \xform{x1i}{\Dx{x} \land\bForm[\FALSE/\Qr{x}]}{below=of b} %x1d}
-          % \xo{b}{x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-    &&
-    \begin{gathered}[t]
-      \PW{y}{1}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{c}{\DW{y}{1}}{}
-          % \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of c}
-          % \xform{x1i}{\lnot\Qw{y}\land\bForm[\TRUE/\Dx{y}]}{below=of x1d}
-          % \xo{c}{x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-  Associating right:
-  \begin{align*}
-    \begin{gathered}[t]
-      \PW{x}{2}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{a}{\DW{x}{2}}{}
-          \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{right=.7em of a}
-          % \xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
-          \xos{a}{x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-    &&
-    \begin{gathered}[t]
-      \PR[\mACQ]{x}{r}
-      \SEMI
-      \PW{y}{1}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\DR[\mACQ]{x}{2}}{}
-          \event{c}{\Dx{x}\mid\DW{y}{1}}{right=.7em of b}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-  Composing, we have, as desired:
-  \begin{align*}
-    \begin{gathered}[t]
-      \PW{x}{2}
-      \SEMI
-      \PR[\mACQ]{x}{r}
-      \SEMI
-      \PW{y}{1}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{a}{\DW{x}{2}}{}
-          \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
-          \event{c}{\DW{y}{1}}{right=of b}
-          \rf{a}{b}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-\end{example}
-
-% The following execution is allowed both by \armeight{} and \tso{}, but
-% disallowed by \refdef{def:pomsets-ra}.
-% \begin{gather*}
-%   \PW{x}{2}\SEMI 
-%   \PR[\mACQ]{x}{r}\SEMI
-%   \PR{y}{s} \PAR
-%   \PW{y}{2}\SEMI
-%   \PW[\mREL]{x}{1}
-%   \\
-%   \hbox{\begin{tikzinline}[node distance=1.5em]
-%     \event{a}{\DW{x}{2}}{}
-%     \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
-%     \event{c}{\DR{y}{0}}{right=of b}
-%     \event{d}{\DW{y}{2}}{right=2.5em of c}
-%     \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
-%     \rf{a}{b}
-%     \sync{b}{c}
-%     \wk{c}{d}
-%     \sync{d}{e}
-%     \wk[out=-165,in=-15]{e}{a}
-%   \end{tikzinline}}
-% \end{gather*}
-
-\begin{example}
-  One might worry that our model is too permissive for $\mSC$ access, but
-  \armeight{} itself allows some very counterintuitive results for $\mSC$
-  access.  In the following execution we elide the initializing write
-  $\DWP{y}{0}$.
-  \begin{gather*}
-    \IF{\PR{x}{}}\THEN \PW{x}{2} \FI\SEMI
-    \PR[\mSC]{x}{r}\SEMI
-    \PR[\mSC]{y}{s} \PAR
-    \PW[\mSC]{y}{2}\SEMI
-    \PW[\mSC]{x}{1}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a}{\DR{x}{1}}{}
-        \event{b}{\DW{x}{2}}{right=of a}
-        \scevent{c}{\DR[\mSC]{x}{2}}{right=of b}
-        \scevent{d}{\DR[\mSC]{y}{0}}{right=of c}
-        \scevent{e}{\DW[\mSC]{y}{2}}{right=2.5em of d}
-        \scevent{f}{\DW[\mSC]{x}{1}}{right=of e}
-        \po{a}{b}
-        \rf{b}{c}
-        % \sync{c}{d}
-        \sync{e}{f}
-        \wk{d}{e}
-        \rf[out=-165,in=-15]{f}{a}
-      \end{tikzinline}}
-  \end{gather*}
-  Under \EGC{}, this is explained by dropping the order
-  $\DRP[\mSC]{x}{2}\xsync\DRP{y}{0}$, because $\DRP[\mSC]{x}{2}$ is fulfilled
-  by a relaxed write in the same thread.
-\end{example}
-
-\subsection{Removing Read-Read dependencies (\xRRD)}
-\label{sec:rrd}
-
-\begin{example}
-  \label{ex:rrd1}
-  The following execution is allowed by \armeight{}, but disallowed by
-  \refdef{def:pomsets-ra}.  
-  \begin{gather*}
-    \begin{gathered}
-      \PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
-      \PAR
-      \PR{y}{r}\SEMI \IF{r}\THEN \PR{x}{s}\FI
-      \\[-.4ex]
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{wx0}{\DW{x}{0}}{}
-          \event{wx1}{\DW{x}{1}}{right=of wx0}
-          \raevent{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
-          \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
-          \event{rx0}{\DR{x}{0}}{right=of ry1}
-          \sync{wx1}{wy1}
-          \po{ry1}{rx0}
-          \rf{wy1}{ry1}
-          \wk[in=-15,out=-165]{rx0}{wx1}
-          \wk{wx0}{wx1}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-  Under \EGC{}, this is explained by dropping the order
-  $\DRP{y}{1}\xpo\DRP{x}{0}$, because \armeight{} does not include control
-  dependencies between reads in the locally-ordered-before relation.
-  \begin{gather*}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wx0}{\DW{x}{0}}{}
-        \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \raevent{wy1}{\DWRel{y}{1}}{right=of wx1}
-        \event{ry1}{\DR{y}{1}}{right=2.5em of wy1}
-        \event{rx0}{\DR{x}{0}}{right=of ry1}
-        \sync{wx1}{wy1}
-        % \po{ry1}{rx0}
-        \rf{wy1}{ry1}
-        \wk[in=-15,out=-165]{rx0}{wx1}
-        \wk{wx0}{wx1}
-      \end{tikzinline}}  
-  \end{gather*}
-\end{example}
-
-Since we do not distinguish control dependencies from other dependencies, we
-are forced to drop all dependencies between reads.  In order to do so, we use
-the uninterpreted symbol $\RW$.
-
-\begin{definition}[\xRRD]
-  \label{def:pomsets-rr}
-  Update \refdef{def:pomsets-trans} to:
-  % \begin{enumerate}
-  % \item[\ref{T3})]
-  %   $\labelingForm(\aEv)$ implies
-  %   $\labelingForm_1(\aEv)[\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
-  %   \\
-  %   $\labelingForm(\aEv)$ implies
-  %   $\labelingForm_1(\aEv)[\FALSE/\RW]$ otherwise.
-  % \end{enumerate}
-  \begin{enumerate}
-  \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
-  \item[\ref{L5})]
-    % $\aTr{\cEvs}{\bForm}$ implies $\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm$,
-    $\aTr{\cEvs}{\bForm}$ implies $(\aVal{=}\aReg\lor\RW)\limplies\bForm$, when $\aEvs\neq\emptyset$,
-  \item[{\labeltext[L6]{L6)}{L6}}] 
-    $\aTr{\dEvs}{\bForm}$ implies $\bForm$, when $\aEvs=\emptyset$.
-  \end{enumerate}  
-\end{definition}
-\ref{L4} is the \emph{dependent} case,
-\ref{L5} the \emph{independent} case, and
-\ref{L6} the \emph{empty} case. 
- Recall the substitutions performed by $\ref{sTOP}$
-(\refdef{def:pomsets-top}).
-For writes, \ref{L5} is the same as \ref{L6} (since $\RW$
-is $\TRUE$).  For reads, \ref{L5} is the
-same as \ref{L4} (since $\RW$ is $\FALSE$).
-% For reads, the dependent and independent predicate transformers are identical
-% .  For writes, \ref{L5} requires
-% $\aTr{\cEvs}{\bForm}$ implies $\bForm$ for the independent case.
-
-One reading of \ref{L5} is that when satisfying a precondition $\aForm$ it is
-safe to use the value of the read, as long as the action is not a write.  If
-the pomset is empty, however, there is no value $\aVal$ to use.  Therefore
-the best we can do is to emulate skip, as in \ref{L6}.  % In order to
-% eventually arrive at a top-level pomset, this means that subsequent code must
-% be independent of $\aReg$.
-
-\begin{example}
-  Revisiting \refex{ex:rrd1} and eliding irrelevant transformers:
-  \begin{align*}
-    \begin{gathered}[t]
-      \PR{y}{r}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
-          \event{b}{\DR{y}{1}}{}
-          \xform{x1i}{(1{=}r\lor\RW)\limplies\bForm}{right=of b} %x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-    &&
-    \begin{gathered}[t]
-      \IF{r}\THEN \PR{x}{s}\FI
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{c}{r\mid\DR{x}{0}}{}
-          % \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of c}
-          % \xform{x1i}{\lnot\Qw{y}\land\bForm[\TRUE/\Dx{y}]}{below=of x1d}
-          % \xo{c}{x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-  Composing sequentially:
-  \begin{align*}
-    \begin{gathered}[t]
-      \PR{y}{r}
-      \SEMI
-      \IF{r}\THEN \PR{x}{s}\FI
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{b}{\DR{y}{1}}{}
-          \event{c}{(1{=}r\lor\RW)\limplies r\mid\DR{x}{0}}{right=of b}
-          %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-  At top-level, $\ref{sTOP}$ yields:
-  \begin{align*}
-    \begin{gathered}[t]
-      % \PR{y}{r}
-      % \SEMI
-      % \IF{r}\THEN \PR{x}{s}\FI
-      % \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{b}{\DR{y}{1}}{}
-          \event{c}{(1{=}r\lor\FALSE)\limplies r\mid\DR{x}{0}}{right=of b}
-          %\xform{x1i}{\RW\limplies\bForm}{right=of b} %x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-  The precondition of $\DRP{x}{0}$ is a tautology, as required.
-\end{example}
-
-\subsection{Full Semantics For Arm}
-
-\refdef{def:pomsets-arm} combines all of the features of
-\textsection\ref{sec:q}--\ref{sec:arm}.  
-% Only \ref{L5} and \ref{T3} are changed from \refdef{def:pomsets-down}.
-
-\begin{definition}[\xCO/\xRASC/\xDGR/\xRRD]
-  \label{def:pomsets-arm}
-  Let $[\aForm/\Q{}]$ be the substitution $[\aForm/\Qr{*}][\aForm/\Qw{*}][\aForm/\Qsc]$.  
-  Update \refdef{def:pomsets-trans} to: % (\ref{L4} unchanged):
-  \begin{enumerate}
-  \item[\ref{S3})]
-    $\labelingForm(\aEv)$ implies $\QS{\aLoc}{\amode}\land\aExp{=}\aVal$,
-  \item[\ref{L3})]
-    $\labelingForm(\aEv)$ implies $\QL{\aLoc}{\amode}$.
-  % \item[\ref{T3})]
-  %   $\labelingForm(\aEv)$ implies
-  %   $\labelingForm_1(\aEv)[\TRUE/\Q{}][\TRUE/\RW]$ if $\labelingAct_1(\aEv)$ is a write,
-  %   \\
-  %   $\labelingForm(\aEv)$ implies
-  %   $\labelingForm_1(\aEv)[\TRUE/\Q{}][\FALSE/\RW]$ otherwise.
-  \end{enumerate}
-  \begin{enumerate}
-  \item[\ref{S4})]
-    $\aTr{\bEvs}{\bForm}$ implies
-    \begin{math}
-      %(\Qw{\aLoc}\limplies\aExp{\neq}\aVal)\land
-      \bForm 
-      \DS{\aLoc}{\amode}
-      \land\aExp{=}\aVal %\noSUB{[\aExp/\aLoc]},
-    \end{math}
-  \item[\ref{S5})]
-    $\aTr{\cEvs}{\bForm}$ implies
-    \begin{math}
-      %\lnot\Qw{\aLoc}\land 
-      \bForm %\noSUB{[\aExp/\aLoc]}.
-      \DS{\aLoc}{\amode}
-      [\FALSE/\QS{\aLoc}{\amode}]
-    \end{math}
-  \item[\ref{L4})]
-    $\aTr{\bEvs}{\bForm}$ implies $\aVal{=}\aReg\limplies\bForm$, 
-  \item[\ref{L5})]
-    % $\aTr{\cEvs}{\bForm}$ implies $\lnot\Qx{\aLoc} \land \DL{\aLoc}{\amode} \land(\RW\limplies(\aVal{=}\aReg\lor\aLoc{=}\aReg)\limplies\bForm)$,
-    % \item[\ref{L6})]
-    $\aTr{\cEvs}{\bForm}$ implies
-    \begin{math}
-      % \lnot\Qx{\aLoc} \land
-      \DL{\aLoc}{\amode}{} \land
-      ((\aVal{=}\aReg\lor\RW)\limplies\bForm[\FALSE/\QL{\aLoc}{\amode}]),
-      %\textwhen \aEvs\neq\emptyset
-    \end{math}
-  \item[\ref{L6})] 
-    $\aTr{\dEvs}{\bForm}$ implies
-    \begin{math}
-      \DL{\aLoc}{\amode}{} \land
-      \bForm,
-    \end{math}
-    when $\aEvs=\emptyset$.
-  \end{enumerate}  
+      \aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv)} & \text{otherwise, where}\; \Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}
+    \end{cases}
+    % $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
+    % \Cdown{\aEv}=
+    % \begin{cases}
+    %   \{ \cEv \mid \cEv \lt \aEv \} & \textif \labeling(\aEv) \;\text{is a write}
+    %   \\
+    %   \aEvs_1 & \textotherwise
+    % \end{cases}
+  \end{displaymath}
 \end{definition}
 
-\begin{example}
-  \xRRD{} does not adversely affect subscription (\refex{ex:subscription}).
-  \begin{align*}
-    \begin{gathered}[t]
-      \PR[\mACQ]{y}{r}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and .5em]
-          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mACQ]{y}{1}}{}
-          \xform{x1i}{\Dx{y}\land(\RW\limplies\bForm[\FALSE/\QL{\aLoc}{\mRA}])}{right=of b} %x1d}
-        \end{tikzinline}}  
-    \end{gathered}  
-    &&
-    \begin{gathered}[t]
-      \PR{x}{s}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \event{c}{\QL{y}{\mRA}\mid\DW{x}{0}}{}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-  Since $\QL{y}{\mRA}[\FALSE/\QL{\aLoc}{\mRA}]$ is false, we have:
-  \begin{align*}
-    \begin{gathered}[t]
-      \PR[\mACQ]{y}{r}
-      \SEMI
-      \PR{x}{s}
-      \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\QL{y}{\mRA}\mid\DR[\mACQ]{y}{1}}{}
-          \event{c}{\Dx{y}\land(\RW\limplies\FALSE)\mid\DW{x}{0}}{right=of b}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-  Applying $\ref{sTOP}$ yields:
-  \begin{align*}
-    \begin{gathered}[t]
-      % \PR[\mACQ]{y}{r}
-      % \SEMI
-      % \PR{x}{s}
-      % \\
-      \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-          \raevent{b}{\TRUE\mid\DR[\mACQ]{y}{1}}{}
-          \event{c}{\Dx{y}\land(\FALSE\limplies\FALSE)\mid\DW{x}{0}}{right=of b}
-        \end{tikzinline}}  
-    \end{gathered}  
-  \end{align*}
-  Although $(\FALSE\limplies\FALSE)$ is a tautology, $\Dx{y}$ is not.  Thus,
-  the pomset can only contribute to a top-level pomset if the thread is
-  preceded by a relaxed write to $y$, allowing $\DRP[\mACQ]{y}{1}$ to be
-  downgraded to a relaxed read.
-\end{example}
-
-Every \armeight{} execution is allowed by \refdef{def:pomsets-arm}.  The
-proof of this fact is simplified by the recent characterization of
-\armeight{} in terms of \emph{external global completion} (\EGC{})
-\cite[\textsection B2.3.6]{arm-reference-manual}.  Under \EGC{}, an
-\armeight{} execution is a linearization of per-location program order and a
-subset of local-order.  Every such linearization is also a valid pomset under
-\refdef{def:pomsets-arm}.
-
-% \begin{definition}
-%   Let $[\aForm/\RW{}]$ be the substitution that replaces $\RW{}$ by $\aForm$.
-% \end{definition}
-
-
-% \subsection{Proof Strategy}
-
-
-\begin{comment}
-  Internal visibility:
-  If $\bEv\xpoloc\aEv$ then either
-  \begin{itemize}
-  \item %$\bEv\xca\aEv$:
-    $\bEv:\DWP{x}{1}\xco\aEv:\DWP{x}{2}$ 
-  \item %$\bEv\xrfx\aEv$:
-    $\bEv:\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
-  \item %$\bEv\mathrel{\xco\xrfx}\aEv$:
-    $\bEv:\DWP{x}{1}\xco\DWP{x}{2}\xrfx\aEv:\DRP{x}{2}$
-  \item
-    $\bEv:\DRP{x}{0}\xfr\aEv:\DWP{x}{1}$\\
-    $\bEv:\DRP{x}{0}\xrfxinv\DWP{x}{0}\xco\aEv:\DWP{x}{1}$
-  \item %$\bEv\mathrel{\xfr\xrfx}\aEv$:
-    $\bEv:\DRP{x}{0}\xfr\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$\\
-    $\bEv:\DRP{x}{0}\xrfxinv\DWP{x}{0}\xco\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
-  \item %$\bEv\mathrel{\xrfxinv\xrfx}\aEv$:
-    $\bEv:\DRP{x}{1}\xrfxinv\DWP{x}{1}\xrfx\aEv:\DRP{x}{1}$
-    % \begin{tikzinline}
-    %   \node(a){$\DWP{x}{1}$};
-    %   \node(b)[right=1.5em of a]{$\DRP{x}{1}$};
-    %   \node(c)[right=1.5em of b]{$\DRP{x}{1}$};
-    %   \rfx{a}{b}
-    %   \rfx[out=15,in=165]{a}{c}
-    % \end{tikzinline}
-  \end{itemize}
-  If $\bEv\xpoloc\aEv$ then the following are impossible:
-  \begin{itemize}
-  \item $\bEv:\DWP{x}{2}\xcoinv\aEv:\DWP{x}{1}$ 
-  \item $\bEv:\DWP{x}{1}\xfrinv\aEv:\DRP{x}{0}$ 
-  \item $\bEv:\DRP{x}{1}\xrfxinv\aEv:\DWP{x}{1}$ 
-  \item $\bEv:\DRP{x}{2}\xrfxinv\DWP{x}{2}\xcoinv\aEv:\DWP{x}{1}$
-  \item $\bEv:\DRP{x}{1}\xrfxinv\DWP{x}{1}\xfrinv\aEv:\DRP{x}{0}$
-  \end{itemize}
-\end{comment}
-
-
-
-
-
-
-
-
-
-
-
-
-\endinput
-
-
-\begin{figure*}
-\begin{verbatim}
-let IM0 = loc & ((IW * (M\IW)) | ((W\FW) * FW))
-
-(* Local read successor *)
-let lrs = [W]; po-loc \ intervening-write(po-loc); [R]
-
-(* Local write successor *)
-let lws = po-loc; [W]
-
-(* Dependency-ordered-before *)
-let dob =  addr | data               
-        | (addr | data); lrs
-        | addr; po; [W]         |  addr; po; [ISB]; po; [R]
-        | ctrl;     [W]         |  ctrl;     [ISB]; po; [R]
-our dob = addr; [W]
-        | data; [W]
-        | ctrl; [W]
-
-(* Barrier-ordered-before *)
-let bob = [A | Q]; po            | po; [dmb.full]; po          | po; ([A];amo;[L]); po
-        | po; [L]                | [R]; po; [dmb.ld]; po
-        | [L]; po; [A]           | [W]; po; [dmb.st]; po; [W]
-
-(* Locally-ordered-before *)                let aob = rmw 
-let rec lob = lws | dob | bob | lob; lob            | [W & range(rmw)]; lrs; [A | Q] 
-
-(* Internal visibility requirement *)
-acyclic po-loc | fr | co | rf as internal
-
-(* External global completion requirement *)
-let gc-req = (W * _) | (R * _) & ((range(rfe) * _) | (rfi^-1; lob))
-let preorder-gcb = IM0 | lob & gc-req
-
-with gcb from linearisations(M, preorder-gcb)
-~empty gcb
-
-let gcbl = gcb & loc
-let rf-gcb = (W * R) & gcbl \ intervening-write(gcbl)
-let co-gcb = (W * W) & gcbl
-
-call equal(rf, rf-gcb)
-call equal(co, co-gcb)
-
-James:
-let po-conflict = po-loc \ (R * R)
-Claim we can add po-conflict to preorder-gcb without changing things
-let preorder-gcb = IM0 | lob & gc-req | po-conflict
-\end{verbatim}
-  \caption{ARM}
-  \label{fig:arm}
-\end{figure*}
-
-\textcolor{red}{[This is out of date, from an old submission]}
-
-
-In this section, we consider the fragment of our language without
-restriction.  For simplicity, we allow release and acquire synchronization
-but ban fences.  We assume that all memory locations are initialized to $0$
-and parallel-composition occurs only at top level.  We take the set of memory
-locations to be finite.  In other words, we assume that programs have the
-form
-\begin{displaymath}
-  {\aLoc_1}\GETS{0}\SEMI
-  \cdots\SEMI
-  {\aLoc_m}\GETS{0}\SEMI
-  (\aCmd^1 \PAR \cdots \PAR \aCmd^n)
-\end{displaymath}
-where $\aCmd^1$, \ldots, $\aCmd^n$ do not include composition, restriction or
-fence operations.
-
-Our language can be translated to ARM using \texttt{ldr} for relaxed read,
-\texttt{ldar} for acquiring read, \texttt{str} for relaxed write, and
-\texttt{stlr} for releasing write.  Relative to the ARM specification, we
-have removed loops and read-modify-write (RMW) operations, in addition to
-fences\footnote{We leave out fences for simplicity.  Following
-  \citet{DBLP:journals/pacmpl/PodkopaevLV19}, our $\FENCE$ instruction can be
-  translated to \texttt{dmb.sy}, since it has release-acquire semantics.
-  Acquire fences map to \texttt{dmb.ld}, and release fences to
-  \texttt{dmb.sy} --- \texttt{dmb.st} does not provide order to prior
-  reads.}.
-
-We show that any ARM-consistent execution graph for this sublanguage can be
-considered an execution of our semantics.  
-% 
-% Syntactically, we drop the superscript \textsf{rlx} on relaxed reads and
-% writes; in addition, we use structured conditionals rather than the more
-% general \textsf{goto}.  We refer to this sublanguage as $\muIMM$.
-% (Because the source language lacks RMW operations, the ``is
-% exclusive'' flag on every read will be \textsf{not-ex} and the RMW mode on
-% every write will be \textsf{normal}.)
-% 
-Due to space limitations, we do not include a full description ARM
-consistency in the main text .
-Here we provide a birds eye view of the details, drawing on the intuitions gleaned from~\citep{DBLP:journals/pacmpl/PulteFDFSS18}.  
-Interested readers should see \textsection\ref{sec:arm:proof}
-for further details.
-
-An ARM execution graph $G$ defines many relations, including program order
-($\rpox$), reads-from ($\rrfx$), coherence ($\rco$) and several dependency
-orders.  From these are derived:
-\begin{itemize}
-\item ${\rpoloc}$, which is the subrelation of $\rpox$ that only relates
-  actions on the same location,
-\item ${\rob}$, which is required to be acyclic (\ref{external}), and
-\item $\reco$, with the requirement that ${\rpoloc}\cup{\reco}$ be acyclic (\ref{sc-per-loc}).
-\end{itemize}
-% Let $G$ be an execution graph satisfying the ARM consistency 
-% requirements.
-Given an execution graph $G$, we say that $\aEv$ is an \emph{internal read} if $\aEv\in\fcodom({\rpox}\cap {\rrfx})$.
-
-The ${\rob}$ order is an acyclic global order on events, agreed upon by all threads, reflecting the progress of time in an \armeight\ execution.  The cross thread component of the ordering is induced by the ordering on conflicting actions on the same location from different threads.    The intra thread component of the ordering is induced by barrier ordering and data ordering.  Notably, these dependencies  are determined syntactically.  In particular, $\rob$
-may not necessarily include the intra thread component of $\rpoloc$ ordering.  
-
-This motivates the translation of an \armeight\ execution into our setting.  In our setting, the progress of time is given by $\lt$.   We accommodate intra-thread reordering by internal read actions, thus excusing us from the obligation of placing them on the global $\lt$-timeline.  
-
-Formally, from $G$ we construct a candidate pomset $\aPS$ as follows:
-\begin{itemize}
-\item $\Event= \textsf{E}$,
-\item $\labelingAct(\aEv)=\tau \mathsf{lab}(e)$, if $\aEv$ is a relaxed
-  internal read, 
-\item $\labelingAct(\aEv)=\mathsf{lab}(e)$, if $\aEv$ is not a relaxed
-  internal read,
-\item $\labelingForm(\aEv)=\TRUE$,
-  % \item ${\le} = {\rob}^?$, where $?$ denotes reflexive closure, and
-\item ${\gtN} = ({\rob} \cup {\reco})^*$, where $*$ denotes reflexive and transitive closure.
-\end{itemize}
 
 \begin{theorem}
-  If $G$ is ARM consistent, the constructed candidate satisfies the
-  requirements for a top-level memory model pomset.
-\end{theorem}
-Any $\lt$-ordering imposed in our model
-is enforced by \armeight, since our notion of semantic dependency is more
-permissive than \armeight 's syntactic dependency.  So, the heart of the proof is showing the acyclicity of $({\rob} \cup {\reco})^*$ for the events under consideration.  Since the cross thread portion of $\reco$ ($\rcoe,\rfre,\rrfe$) is included in $\rob$, this result is really about the influence of $\reco \cap \rpox$.  Our translation of \armeight 's \rrfi\  as silent internal actions removes them from order considerations.   Consequently, we only have to consider the suborder of ${\rob}$ derived without ever using  $\rrfi$ for the following key property demonstrated in \textsection\ref{sec:arm:proof}.
-\begin{lemma}\label{extendob}
-  Let $\aEv, \bEv$ be distinct events and $\bEv'\ (\xob\cap \xpox) \ \bEv\ ((\xeco\cap \xpox) \setminus \xrfi) \  \aEv\ (\xob \cap \xpox)  \ \aEv'$.  Then $\bEv' \xob \aEv'$.
-\end{lemma}
+  \label{thm:ec}
+  Suppose $\aEG_1$ is $({\rco_1}, {\rrfx_1}, {\rgcb_1})$-valid for $\aCmd$
+  under the suboptimal lowering that maps non-relaxed reads to
+  $(\DMBSY\SEMI\LDAR)$.  Then there is a top-level pomset
+  $\aPS_2\in\semrr{\aCmd}$ such that $\aEvs_2=\aEvs_1$,
+  $\labeling_2=\labeling_1$, ${\rrfx_2}={\rrfx_1}$, and ${\le_2}={\rgcb_1}$.
 
-
-
-\begin{remark}[Proof for TSO]
-  The proof for compilation into \tso\ is very similar.  In particular the facts listed above hold for \tso, where $\rob$ is replaced by (the
-  transitive closure of) the propagation relation defined for \tso\ 
-  \citep{alglave}.
-\end{remark}
-
-\section{Proof of compilation for ARMv8}
-\label{sec:arm:proof}
-\textcolor{red}{[This is out of date, from an old submission]}
-
-In this section, we develop the proof of correctness of compilation to \armeight.  In order to ease readability, we reproduce the definitions from the main text. 
-
-
-
-Given a relation $R$, $R^?$ denotes reflexive closure, $R^+$ denotes
-transitive closure and $R^*$ denotes reflexive and transitive closure.  Given relations $R$ and $S$, $R;S$ denotes composition.
-
-
-The ARMv8 model is described using the following relations.
-\begin{itemize}
-\item $\IDR$, $\IDW$, $\IDAcq$, $\IDRel$: identity on reads, writes, acquires
-  and releases.
-  % \item $\IDR$ identity on reads
-  % \item $\IDW$: identity on writes
-  % \item $\IDAcq$: identity on acquires
-  % \item $\IDRel$: identity on releases
-\item $\IDLoc$: relates any two events that touch the same location.
-\item $\rpox$: program order.
-\item $\rdata$, $\rctrl$, $\raddr$: data, control and address dependencies.
-\item $\rrfx$: reads-from. $\rrfx^{-1}$ relates each read to a matching write
-  on the same location.
-\item $\rco$: coherence, which is a total order on the writes to a single
-  location.
-\item ${\rfr}\eqdef{\rco};\rrfx^{-1}$: from-read, which relates reads to
-  subsequent writes.
-\end{itemize}
-For any relation, the cross-thread subrelation is denoted by appending $e$;
-the intra-thread subrelation is denoted by appending $i$.  For example,
-${\rrfe}\eqdef{\rrfx}\setminus{\rpox}$ and ${\rrfi}\eqdef{\rrfx}\cap{\rpox}$.
-The subrelation restriction attention to actions on the same location is
-given by appending $\mathsf{loc}$.  For example, ${\rpoloc}\eqdef{\rpox}\cap{\IDLoc}$.
-
-The ARMv8 model defines the following relations.
-In our presentation, we have elided rules concerning fences and RMW operations.
-\begin{align*}
-  \tag{Extended coherence}
-  {\reco} &\eqdef {\rrf} \cup {\rfr} \cup {\rco}
-  \\
-  \tag{Observed externally}
-  {\robs} &\eqdef \smash{
-    {\rrfe} \cup {\rfre} \cup {\rcoe}
-  }
-  \\
-  \tag{Dependency order}
-  {\rdob} &\eqdef\smash{
-    ({\raddr}\cup{\rdata}); {\rrfi}^?
-    \cup ({\rctrl}\cup{\rdata}); {\IDW}; {\rcoi}^?
-    \cup {\raddr}; {\rpox}; {\IDW}
-  }
-  \\
-  \tag{Barrier order}
-  {\rbob} &\eqdef\smash{
-    {\IDAcq}; {\rpox}
-    \cup {\rpox};{\IDRel}; {\rcoi}^?
-  }
-  \\
-  \tag{Acyclic order}
-  {\rob} &\eqdef\smash{
-    ({\robs} \cup {\rdob} \cup {\rbob})^+
-  }
-\end{align*}
-\begin{definition}
-  An RMW-free and fence-free execution is \emph{ARM-consistent} if
-  \begin{align*}&
-    \tag{\textsc{$\rrfx$-completeness}}\label{rf-comp}
-    \fcodom(\rrfx)=\fdom(\rreads)
-    \\[-1ex]&
-    \tag{\textsc{$\rco$-totality}}\label{co-tot}
-    \text{For every location $\aLoc$, $\rco$ totally orders the writes of $\aLoc$}  
-    \\[-1ex]&
-    \tag{\textsc{sc-per-loc}}\label{sc-per-loc}
-    {\rpoloc} \cup {\rrfx} \cup {\rfr} \cup {\rco}\;\text{is acyclic}
-    \\[-1ex]&
-    \tag{\textsc{external}}\label{external}
-    {\rob}\;\text{is acyclic}
-  \end{align*}
-\end{definition}
-
-% Use these to refer to the rules in text:
-% \ref{rf-comp} 
-% \ref{co-tot}
-% \ref{sc-per-loc}
-% \ref{external}
-
-
-Given an execution graph $G$, we say that $\aEv$ is an \emph{internal read} if
-$\aEv\in\fcodom(\mathsf{po}\cap \mathsf{rf})$.    We are going to translate internal reads of execution graphs into internal reads of the semantics.  
-
-From $G$ we construct a candidate pomset $\aPS$ as follows:
-\begin{itemize}
-\item $\Event= \textsf{E}$,
-\item $\labelingAct(\aEv)=\tau \mathsf{lab}(e)$, if $\aEv$ is a relaxed
-  internal read, 
-\item $\labelingAct(\aEv)=\mathsf{lab}(e)$, if $\aEv$ is not a relaxed
-  internal read,
-\item $\labelingForm(\aEv)=\TRUE$,
-  % \item ${\le} = {\rob}$, and
-\item ${\gtN} = ({\rob} \cup {\reco})^*$
-\end{itemize}
-To reempphasize, in this candidate pomset, $\rob$ is calculated by considering the definition of $\rob$ without $\rrfi$, ie.:
-\begin{align*}
-  \tag{Dependency order}
-  {\rdob} &\eqdef\smash{
-    ({\raddr}\cup{\rdata});
-    \cup ({\rctrl}\cup{\rdata}); {\IDW}; {\rcoi}^?
-    \cup {\raddr}; {\rpox}; {\IDW}
-  }
-  \\
-  \tag{Barrier order}
-  {\rbob} &\eqdef\smash{
-    {\IDAcq}; {\rpox}
-    \cup {\rpox};{\IDRel}; {\rcoi}^?
-  }
-  \\
-  \tag{Acyclic order}
-  {\rob} &\eqdef\smash{
-    ({\robs} \cup {\rdob} \cup {\rbob})^+
-  }
-\end{align*}
-
-
-We show that $\aPS$ is a top-level pomset, reasoning as follows.
-% We establish the criteria for a top-level memory-model pomset:
-\begin{itemize}
-\item ${\le}$ is a partial order.  This holds since $G.{\rar}$ is acyclic.
-  % \item If $\bEv \le \aEv$ then $\bEv \gtN \aEv$.  By construction.
-  % \item If $\bEv \le \aEv$ and $\aEv \gtN \bEv$ then $\bEv = \aEv$.  Proved below.
-  % \item If $\cEv \le \bEv \gtN \aEv$ or $\cEv \gtN \bEv \le \aEv$ then
-  %   $\cEv \gtN \aEv$. By construction.
-  % \end{itemize}
-
-  % Next, we establish the criteria for a 3-valued pomset with preconditions (Definition~\ref{def:3pre}).
-  % \begin{itemize}
-\item $\labelingForm(\aEv)$ implies $\labelingForm(\bEv)$ whenever
-  $\bEv\le\aEv$.   Trivial, since every formula is $\TRUE$.
-  % \item $\aPS$ is $\aLoc$-coherent; that is, when restricted to events that
-  %   read or write $\aLoc$, $\gtN$ forms a partial order.
-  % \end{itemize}
-
-  % Finally, we establish the criteria for a top-level pomset
-  % (Definition~\ref{def:x-closed}).
-  % \begin{itemize}
-\item $\aEv$ is location independent. Trivial, since every formula is $\TRUE$.
-\item If $\aEv$ reads $\aVal$ from $\aLoc$, then there is some $\bEv$ such that
-  \begin{itemize}
-  \item $\bEv \lt \aEv$,  
-  \item $\bEv$ writes $\aVal$ to $\aLoc$, and
-  \item if $\cEv$ writes to $\aLoc$
-    then either $\cEv \gtN \bEv$ or $\aEv \gtN \cEv$.
-  \end{itemize}    
-\end{itemize}
-
-\subsection{Proof that  $({\rob} \cup {\reco})^*$ is irreflexive. }
-
-\paragraph*{Proof of lemma~\ref{extendob}. } 
-
-
-Let $\aEv, \bEv$ be distinct events and $\bEv'\ (\xob\cap \xpox) \ \bEv\ ((\xeco\cap \xpox) \setminus \xrfi) \  \aEv\ (\xob \cap \xpox)  \ \aEv'$.  Then $\bEv' \xob \aEv'$.
-
-\begin{proof}
-  If $\bEv'$ is an acquire,  or $\aEv$ is an release, or $\aEv'$ is a release, result is immediate.
-
-  We next consider the case where $\aEv$ is a read.  In this case,  $\bEv$ is a write.  Since $\bEv\ ((\xeco\cap \xpox) \setminus \xrfi) \  \aEv$, there is a write $\bEv_1$ such that $ \bEv \xcoe\ \bEv_1 \ \xrfe\ \aEv' $.  So, $\bEv \xob \aEv$ and result follows in this case. 
-
-
-  So, it suffices to prove the following assuming that $\bEv'$ is not an acquire and $\aEv'$ is not a release and $\aEv$ is not a release or a read and $\aEv, \bEv$ are distinct.
-  \begin{itemize}
-  \item If $\bEv'\ (\xob\cap \xpox)  \ \bEv(\xeco\cap\xpox)\aEv$ then $\bEv'\xob\aEv$.
-  \item If $\bEv\ (\xeco\cap\xpox) \ \aEv(\xob\cap\xpox)\aEv'$ then $\bEv\xob\aEv'$.
-  \end{itemize}
-
-
-  We first prove that if $\bEv'\ (\xob \cap \xpox) \ \bEv\ (\xeco \cap \xpox) \ \aEv$ then $\bEv'\xob\aEv$.   Proof proceeds by cases on the witness for $\bEv'\ (\xob\cap \xpox) \ \bEv$. 
-  \begin{itemize}
-  \item  If $\bEv' \xbob  \bEv$, then: 
-    \[ \bEv'\ (\smash{
-        {\IDAcq}; {\rpox}
-        \cup {\rpox};{\IDRel}; {\rcoi}^?) \ 
-      }
-      \bEv
-    \]
-    Since $\bEv'$ is not an acquire, $\bEv' ({\rpox};{\IDRel}; {\rcoi}^?) \bEv$, so $\bEv$ is a write.  Since $\aEv$ is not a read,  $\bEv \xcoi\ \aEv$. Thus, result follows.
-
-  \item If $\bEv' \xdob  \bEv$, then: 
-    \[ \bEv'\ 
-      \smash{
-        ( ({\rctrl}\cup{\rdata}); {\IDW}; {\rcoi}^?
-        \cup {\raddr}; {\rpox}; {\IDW}
-      } \
-      \bEv
-    \]
-    So, $\bEv$ is a write.  Since $\aEv$ is also a write, we deduce that 
-    \[ \bEv'\ 
-      \smash{
-        ( ({\rctrl}\cup{\rdata}); {\IDW}; {\rcoi}^?
-        \cup {\raddr}; {\rpox}; {\IDW}
-      } \
-      \aEv
-    \]
-  \end{itemize}
-
-
-  We next prove  that if $\bEv\ (\xeco \cap \xpox) \ \aEv\ (\xob\cap \xpox) \ \aEv'$ then $\bEv\xob\aEv'$, under the assumptions that  $\aEv'$ is not a release and $\aEv$ is not a release or a read and $\aEv, \bEv$ are distinct.
-
-
-  Proof proceeds by cases on the witness for $\aEv (\xob\cap \xpox) \aEv'$.  
-
-  \begin{itemize}
-  \item  If $\aEv \xbob  \aEv'$, then: 
-    \[ \aEv\ (\smash{
-        {\IDAcq}; {\rpox}
-        \cup {\rpox};{\IDRel}; {\rcoi}^?) \ 
-      }
-      \aEv'
-    \]
-    Since $\aEv$ is not a read, $\aEv ({\rpox};{\IDRel}; {\rcoi}^?) \aEv'$.  Result follows since  $\bEv \xpox\ \aEv$.
-
-
-  \item If $\aEv \xdob  \aEv'$, then $\aEv$ is a read.  \qedhere
-
-  \end{itemize}
-\end{proof}
-
-
-\begin{lemma}\label{obeco1}
-  If $\bEv\xob\aEv$ then $\lnot(\aEv\xeco\bEv)$.
-
+  \vspace{-.5\baselineskip}
   \begin{proof}
-    Proof by contradiction.  Let 
-    \[ \aEv \xob \aEv' \xeco \bEv' \xob \bEv \xob \cEv \xob \cEv' \xob \aEv \]
-    where $\aEv' \xpox \bEv'$.
+    First, we establish some lemmas about \armeight.
+    
+    \vspace{-.5\baselineskip}
+    \begin{lemma}
+      \label{lemma:fr}
+      Suppose $\aEG$ is $({\rco}, {\rrfx}, {\rgcb})$-valid.  Then
+      ${\rgcb}\supseteq{\rfr}$.
 
-    By lemma~\ref{extendob}, if $\aEv \not=\aEv'$, we deduce $\aEv \xob \bEv'$, and thus $\aEv \xob \bEv$.  If $\bEv \not=\bEv'$, we deduce $\aEv' \xob \bEv$ and thus $\aEv \xob \bEv$.
+      \vspace{-.5\baselineskip}
+      \begin{proof}
+        Using the definition of ${\rfr}$ from \ref{arm-local}, we have
+        $\aEv\xrfxinv\bEv\xco\cEv$, and therefore $\labeling(\cEv)$ blocks
+        $\labeling(\aEv)$.    
+        Applying \ref{arm-gcb-blocks}, we have that either $\cEv\xgcb\bEv$ or $\aEv\xgcb\cEv$.
+        Since $\rgcb$ includes $\rco$, we have $\bEv\xgcb\cEv$, and therefore it
+        must be that $\aEv\xgcb\cEv$.
+      \end{proof}
+    \end{lemma}
+    
+    \begin{lemma}
+      \label{lemma:wr}
+      Suppose $\aEG$ is $({\rco}, {\rrfx}, {\rgcb})$-valid and
+      $\cEv\xpoloc\aEv$, where $\labeling(\cEv)\rblocks\labeling(\aEv)$.
+      Then $\cEv\xgcb\aEv$.
+      %$\labeling(\cEv)=\DWP{x}{}$ and $\labeling(\aEv)=\DRP{x}{}$.
 
-    Thus, if $\aEv \not=\aEv'$ or $\bEv \not=\bEv'$, then there is a cycle $\aEv \xob \bEv \xob \cEv \xob \cEv' \xob \aEv$.  
+      \vspace{-.5\baselineskip}
+      \begin{proof}
+        By way of contradiction, assume $\aEv\xgcb\cEv$.  If $\cEv\xrfx\aEv$
+        then by \ref{arm-gcb} we must also have $\cEv\xgcb\aEv$,
+        contradicting the assumption that $\rgcb$ is a total order.
+        %
+        Otherwise that there is some $\bEv\neq\cEv$ such that
+        $\bEv\xrfx\aEv$, and therefore $\bEv\xgcb\aEv$.  By transitivity,
+        $\bEv\xgcb\cEv$.  By the definition of $\rfr$, we have
+        $\aEv\xfr\cEv$.  But this contradicts \ref{arm-local}, since
+        $\cEv\xpoloc\aEv$.
+        %Applying \ref{arm-gcb-blocks}, we have that either $\cEv\xgcb\bEv$ or $\aEv\xgcb\cEv$.
+      \end{proof}
+    \end{lemma}
+    We show that all the order required in the pomset is also required by
+    \armeight{}.  \ref{rf-block} holds since ${\rcb_1}$ is consistent with
+    ${\rco_1}$ and ${\rfr_1}$.  As noted \ref{lob-le}, $\rlob$ includes the order
+    required by \ref{seq-kappa} and \ref{seq-le-delays}.  We need only show
+    that the order removed from \ref{arm-gcb-lob} can also be removed from
+    the pomset.  In order for \label{arm-gcb-lob} to remove order from $\aEv$
+    to $\cEv$, we must have $\bEv\xrfx\aEv$ and $\bEv\xpoloc\aEv$ but not
+    $\bEv\xlob\cEv$.  Because of our suboptimal lowering, it must be that
+    $\aEv$ is a relaxed read; otherwise the $\DMBSY$ would require
+    $\bEv\xlob\cEv$.  Thus we know that \ref{seq-le-delays} does not require
+    order from $\aEv$ to $\cEv$.  By chaining \ref{read-tau-ind} and
+    \ref{write-tau}, any dependence on the read can by satisfied without
+    introducing order in \ref{seq-kappa}.
+  \end{proof}  
+\end{theorem}
 
-    So we can assume that  $\aEv' = \aEv$, $\bEv' = \bEv$ and 
-    \[ \aEv  \xeco \bEv \xob \cEv \xob \cEv' \xeco \aEv \]
-    where all of $\aEv, \bEv, \cEv, \cEv'$ access the same location and at least one of $\aEv,\bEv$ is a write, at least one of $\aEv,\cEv'$ is a write, and at least one of $\bEv,\cEv$ is a write.
-
-    We reason by cases.
-    \begin{itemize}
-    \item If $\cEv'$ is a write or both $(\aEv, \bEv)$ are writes.
-
-      We deduce that $\bEv \xeco \cEv' \xeco \aEv$ and thus $\bEv \xeco \aEv$.
-
-    \item $\cEv'$ is a read.  $\aEv$ is a write.  $\bEv$ is a read.
-
-      In this case $\cEv$ is a write.  From $\cEv \xob \aEv$, we deduce $\cEv \xeco \aEv$. Combining with $\bEv \xeco \cEv$, we deduce that $\bEv \xeco \aEv$.  
 
 
-    \end{itemize}
-    In either case, there is a contradiction $\aEv \xeco \bEv \xeco \aEv$.
+% This model compiles correctly to arm using the lowering: Relaxed access is
+% implemented using \texttt{ldr}/\texttt{str}, non-relaxed reads using
+% \texttt{dmb st}\SEMI\texttt{ldar}, non-relaxed writes using \texttt{stlr},
+% acquire fences using \texttt{dmb}.\texttt{ld} and other fences using 
+% \texttt{dmb}.\texttt{sy}.
+% \begin{align*}
+%   \low{\PW[\gemode\mREL]{\REF{\aReg}}{\bReg}} &= \texttt{stlr}\;\bReg,\REF{\aReg}
+%   &
+%   \low{\PR[\mRLX]{\REF{\aReg}}{\bReg}} &= \texttt{ldr}\;\bReg,\REF{\aReg}
+%   \\
+%   \low{\PW[\mRLX]{\REF{\aReg}}{\bReg}} &= \texttt{str}\;\bReg,\REF{\aReg}
+%   &
+%   \low{\PR[\gemode\mACQ]{\REF{\aReg}}{\bReg}} &= \texttt{dmb st}\SEMI\texttt{ldar}\;\bReg,\REF{\aReg}
+% \end{align*}
+
+Downgrading messes up publication:
+\begin{gather*}
+  \PW{x}{\PR{x}{}+1}\SEMI
+  \PW[\mREL]{y}{1}
+  \PAR
+  \PW{x}{1}\SEMI
+  \IF{\PR[\mACQ]{y}{}\AND\PR[\mACQ]{x}{}}\THEN
+  \PR{z}{s}
+  \FI
+  \PAR
+  \PW{z}{1}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{b1}{\DR{x}{1}}{}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
+      \po{b1}{b2}
+      \sync{b2}{b3}
+      \event{a1}{\DW{x}{1}}{right=3em of b3}
+      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \event{a4}{\DR{z}{0}}{right=of a3}
+      \sync{a2}{a3}
+      \sync{a3}{a4}
+      \event{c1}{\DW{z}{1}}{right=3em of a4}
+      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
+      \sync{c1}{c2}
+      \rf[out=-165,in=-15]{a1}{b1}
+      \rf[out=15,in=165]{b3}{a2}
+      \rf[out=-165,in=-15]{c2}{a3}
+      \wk{a4}{c1}
+    \end{tikzinline}}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{b1}{\DR{x}{1}}{}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
+      \po{b1}{b2}
+      \sync{b2}{b3}
+      \event{a1}{\DW{x}{1}}{right=3em of b3}
+      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
+      \event{a3}{\DR{x}{1}}{right=of a2}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \event{a4}{\DR{z}{0}}{right=of a3}
+      \sync{a2}{a3}
+      \sync[out=15,in=165]{a2}{a4}
+      \event{c1}{\DW{z}{1}}{right=3em of a4}
+      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
+      \sync{c1}{c2}
+      \rf[out=-165,in=-15]{a1}{b1}
+      \rf[out=15,in=165]{b3}{a2}
+      \rf[out=-165,in=-15]{c2}{a3}
+      \wk{a4}{c1}
+    \end{tikzinline}}
+\end{gather*}
+
+\subsection{Arm Compilation 2}
+
+\begin{definition}
+  \label{def:sem:frf}
+  Let $\frf{\semrr{}}$ be defined as for $\semrr{}$ in \refdef{def:semrr} and
+  \reffig{fig:sem}, changing \ref{seq-le-rf} and \ref{seq-le-delays}:
+  \begin{itemize}
+  \item[{\labeltext[\frf{\textsc{s}7b}]{(\frf{\textsc{s}7b})}{seq-le-rf-rf}}]
+    if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ then $\bEv\xrfx\aEv$
+    implies $\cEv\le\bEv$,
+  \item[{\labeltext[\frf{\textsc{s}7c}]{(\frf{\textsc{s}7c})}{seq-le-delays-rf}}]
+    if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ then $\bEv\le\aEv$,\\
+    where $\rdelayspdef$ replaces $\eqreorderco$ in \refdef{def:actions} of
+    $\rdelaysdef$ by
+    \begin{math}
+      {\reorderlws}
+      =
+      \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}
+    \end{math}.
+  \end{itemize}  
+\end{definition}
+The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
+\emph{Local Write Successor}.
+
+Note that \reflem{lem:rf:implies:le} fails for $\frf{\semrr{}}$, since
+$\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come from
+different sides of a sequential composition.  This means that $\rrfx$ must be
+verified during pomset construction, rather than post-hoc.  If one wants a
+post-hoc verification technique for $\rrfx$, it is possible to include
+program order ($\rpox$) in the pomset.
+
+\begin{example}
+  The obvious definition of $\rpox$ may be cyclic, due to the conditional. 
+\end{example}
+\begin{lemma}
+  $\aPS$ is top-level iff $\bEv\xrfx\aEv$ implies either
+  \begin{itemize}
+  \item external fulfillment: $\bEv\le\aEv$ and if $\labeling(\cEv)$ blocks
+    $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
+  \item internal fulfillment: $\bEv\xpox\aEv$ and $(\not\exists\cEv)$
+    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv\xpox\cEv\xpox\aEv$.
+  \end{itemize}
+\end{lemma}
+% \begin{enumerate}
+% \item[(\textsc{m}7d)]
+%   if $\labeling(\cEv) \rblocks \labeling(\aEv)$
+%   then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
+%   %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then not $\bEv\le\cEv\xpox\aEv$.
+% \end{enumerate}
+
+
+
+
+% It follows from these that 
+% \begin{itemize}
+% \item if $\bEv\xfr\aEv$ then $\bEv\xgcb\aEv$, where $\bEv\xfr\aEv$ if
+%   $(\exists\cEv)$ $\bEv\xrfxinv\cEv\xco\aEv$.
+% \end{itemize}
+% And therefore
+% \begin{itemize}
+% \item if $\bEv\xeco\aEv$ then $\bEv\xgcb\aEv$.
+% \end{itemize}
+
+\begin{theorem}
+  \label{thm:ec}
+  Suppose $\aEG_1$ %$(\aEvs_1, \labeling_1, {\rpoloc_1}, {\rlob_1})$
+  is \EC-valid for $\aCmd$ via $({\rco_1}, {\rrfx_1}, {\rcb_1})$ and that
+  ${\rcb_1}\supseteq{\rfr_1}$.  Then there is a top-level pomset
+  $\aPS_2\in\frf{\semrr{\aCmd}}$ such that $\aEvs_2=\aEvs_1$,
+  $\labeling_2=\labeling_1$, ${\rrfx_2}={\rrfx_1}$, and ${\le_2}={\rcb_1}$.
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    We show that all the order required in the pomset is also required by
+    \armeight{}.  \ref{rf-block} holds since ${\rcb_1}$ is consistent with
+    ${\rco_1}$ and ${\rfr_1}$.  \ref{seq-le-rf-rf} follows from \ref{arm-rfi}.
+    As noted \ref{lob-le}, $\rlob$ includes the order required by
+    \ref{seq-kappa} and \ref{seq-le-delays-rf}.  
+  \end{proof}
+\end{theorem}
+
+The generality of \refthm{thm:ec} is not limited by the assumption that
+${\rcb_1}\supseteq{\rfr_1}$:
+\begin{lemma}
+  \label{lemma:fr}
+  Suppose $\aEG$ is \EC-valid via $({\rco}, {\rrfx}, {\rcb})$.  Then there a
+  permutation ${\rcbp}$ of ${\rcb}$ such that $\aEG$ is \EC-valid via
+  $({\rco}, {\rrfx}, {\rcbp})$ and ${\rcbp}\supseteq{\rfr}$, where ${\rfr}$
+  is defined in \ref{arm-local}.
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    We show that any ${\rcb}$ order that contradicts ${\rfr}$ is incidental.
+
+    By definition of $\rfr$, %$(\exists\bEv)$
+    $\aEv\xrfxinv\bEv\xco\cEv$, for some $\bEv$.
+    Since ${\rcb}\supseteq{\rco}$, we know that $\bEv\xco\cEv$.
+
+    If \ref{arm-rfe} applies to $\bEv\xrfx\aEv$, then $\aEv\xcb\cEv$, since
+    it cannot be that $\cEv\xco\bEv$.
+
+    Suppose \ref{arm-rfi} applies to $\bEv\xrfx\aEv$ and $\cEv$ is from a
+    different thread.  Because it is a different thread, we cannot have
+    $\aEv\xlob\cEv$, and thus the order in $\rcb$ is incidental.
+
+    Suppose \ref{arm-rfi} applies to $\bEv\xrfx\aEv$ and $\cEv$ is from the
+    same thread.  Since $\cEv\xco\bEv$, it cannot be that $\cEv\xpoloc\bEv$,
+    using \ref{arm-local}.  It also cannot be that
+    $\bEv\xpoloc\cEv\xpoloc\aEv$.  It must be that $\aEv\xpoloc\cEv$.  By
+    \ref{arm-lob-poloc}, we cannot have $\aEv\xlob\cEv$, and thus the order
+    in $\rcb$ is incidental.
   \end{proof}
 \end{lemma}
 
 
-\begin{lemma}\label{obeco2}
-  $({\rob} \cup {\reco})^*$ is irrreflexive.
-\end{lemma}
-\begin{proof}
-  The simple case that $\rob; \reco$ is irreflexive is proved above.  The full proof by contradiction.  
+% Lemma: ${\rpoloc}\cup{\rpre}$ is acyclic.
 
-  Let $n \geq 1$ be the minimum such that:
-  \begin{align*} 
-    &\aEv^0_0 \xob \aEv^0_1 \xeco \bEv^0_0 \xob \bEv^0_1  \\
-    (\xeco \cap \xob) &  \   \aEv^1_0 \xob \aEv^1_1 \xeco \bEv^1_0 \xob \bEv^1_1 \\
-    (\xeco \cap \xob) & \ \ldots \\
-    & \ldots \bEv^n_1 \\
-    (\xeco \cap \xob) & \  \aEv^0_0
-  \end{align*}
-  where  for all $i$, we have:
-  \[ \aEv^i_0 \xpox \aEv^i_1 (\xeco \cap \xpox) \bEv^i_0 \xpox \bEv^i_1\] and 
-  \[ \neg (\bEv^i_1 \xpox (\aEv^{(i+1) \mod n}_0 \]
+% Theorem: per-thread essential ${\le}$ $\subseteq$ ${\rpoloc}\cup{\rpre}$.
 
-  For any $i$, if $\aEv^i_0 \not= \aEv^i_1$ or $\bEv^i_0 \xpox \bEv^i_1$, via lemma~\ref{extendob}, we deduce that $\aEv^i_0  \xob \bEv^i_1$, contradicting minimality of $n$.  
 
-  So, we can assume that $n \geq 1$ is such that:
-  \begin{align*} 
-    &\ \aEv^0 \xeco  \bEv^0 \\
-    (\xeco \cap \xob) &  \   \aEv^1  \xeco \bEv^1 \\
-    (\xeco \cap \xob) & \ \ldots \\
-    & \ldots \bEv^n \\
-    (\xeco \cap \xob) & \ \aEv^0
-  \end{align*}
-  which is a contradiction since it is a cycle in $\xeco$ and since at least one of $\aEv^i ,\bEv^i$ is a write for all $i$. 
-\end{proof}
+Bad example:
+\begin{gather*}
+  \PEXCHG{x}{r}{2}\SEMI 
+  \PR{x}{s}\SEMI
+  \PW{y}{s{-}1} \PAR
+  \PR{y}{r}\SEMI
+  \PW{x}{r}
+  \\
+  \tag{\cmark\armeight}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DR{x}{1}}{}
+      \event{b}{\DW{x}{2}}{right=of a}
+      \event{c}{\DR{x}{2}}{right=of b}
+      \event{d}{\DW{y}{1}}{right=of c}
+      \event{e}{\DR{y}{1}}{right=3em of d}
+      \event{f}{\DW{x}{1}}{right=of e}
+      \pre{a}{b}
+      \rf{b}{c}
+      \lob{c}{d}
+      \rf{d}{e}
+      \pre{e}{f}
+      \rf[out=-165,in=-15]{f}{a}
+    \end{tikzinline}}
+  % \hbox{\begin{tikzinline}[node distance=1.5em]
+  %   \event{a}{\DR{x}{1}}{}
+  %   \event{b}{\DW{x}{2}}{right=of a}
+  %   \event{c}{\DR{x}{2}}{right=of b}
+  %   \event{d}{\DW{y}{1}}{right=of c}
+  %   \event{e}{\DR{y}{1}}{right=3em of d}
+  %   \event{f}{\DW{x}{1}}{right=of e}
+  %   \rmw{a}{b}
+  %   \rfi{b}{c}
+  %   \dob{c}{d}
+  %   \rfe{d}{e}
+  %   \dob{e}{f}
+  %   \rfe[out=-165,in=-15]{f}{a}
+  % \end{tikzinline}}
+  \\
+  \tag{$\le$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DR{x}{1}}{}
+      \event{b}{\DW{x}{2}}{right=of a}
+      \event{c}{\DR{x}{2}}{right=of b}
+      \event{d}{\DW{y}{1}}{right=of c}
+      \event{e}{\DR{y}{1}}{right=3em of d}
+      \event{f}{\DW{x}{1}}{right=of e}
+      \rmw{a}{b}
+      \rf{b}{c}
+      % \po{c}{d}
+      \rf{d}{e}
+      \po{e}{f}
+      \rf[out=-165,in=-15]{f}{a}
+    \end{tikzinline}}
+\end{gather*}
+Anton example 1 \texttt{[rfi-coe-coe]}
+\begin{gather*}
+  \taglabel{rfi-coe-coe}
+  \PW{x}{2}\SEMI 
+  \PR[\mACQ]{x}{r}\SEMI
+  \PW{y}{1} \PAR
+  \PW{y}{2}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \tag{\cmark\armeight}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \rfi{a}{b}
+      \bob{b}{c}
+      \coe{c}{d}
+      \bob{d}{e}
+      \coe[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \event{b}{\DR{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \rf{a}{b}
+      \wk{c}{d}
+      \sync{d}{e}
+      \wk[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+\end{gather*}
 

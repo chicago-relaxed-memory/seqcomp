@@ -206,7 +206,7 @@
           \event{a}{\DR{y}{2}}{}
           \xform{xi}{(2{=}r\lor\RW)\limplies\bForm}{above=of a}
           \xform{xd}{2{=}r\limplies\bForm}{below=of a}
-          \xo{a}{xd}
+          \xo[xright]{a}{xd}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -217,7 +217,7 @@
           \event{b}{r\EQ2\mid\DR{\REF{2}}{1}}{}
           \xform{xd}{(r\EQ2\limplies 1\EQ s) \limplies\bForm}{below=of b}
           \xform{xi}{((r\EQ2\limplies 1\EQ s)\lor\RW) \limplies\bForm}{above=of b}
-          \xo{b}{xd}
+          \xo[xright]{b}{xd}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -805,7 +805,7 @@ $(\exists\aLocs\subseteq\Loc)$
             \raevent{a}{\Qr{*}\land\Qw{*}\land\aExp{=}v\mid\DW[\mREL]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
-            \xo{a}{xd}
+            \xo[xright]{a}{xd}
           \end{tikzinline}}
       \end{gathered}
       \\
@@ -816,7 +816,7 @@ $(\exists\aLocs\subseteq\Loc)$
             \raevent{a}{\Qr{*}\land\Qw{*}\mid\DF{\fREL}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
-            \xo{a}{xd}
+            \xo[xright]{a}{xd}
           \end{tikzinline}}
       \end{gathered}      
     \end{gathered}
@@ -829,7 +829,7 @@ $(\exists\aLocs\subseteq\Loc)$
             \raevent{a}{\Qw{x}\land\Qr{*}\mid\DR[\fACQ]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{v{=}r\limplies\bForm}{below=of a}
-            \xo{a}{xd}
+            \xo[xright]{a}{xd}
           \end{tikzinline}}
       \end{gathered}
       \\
@@ -840,7 +840,7 @@ $(\exists\aLocs\subseteq\Loc)$
             \raevent{a}{\Qr{*}\mid\DF{\fACQ}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
-            \xo{a}{xd}
+            \xo[xright]{a}{xd}
           \end{tikzinline}}
       \end{gathered}
     \end{gathered}
@@ -852,7 +852,7 @@ $(\exists\aLocs\subseteq\Loc)$
           \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DF{\mSC}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm}{below=of a}
-          \xo{a}{xd}
+          \xo[xright]{a}{xd}
         \end{tikzinline}}
     \end{gathered}
     \\
@@ -863,7 +863,7 @@ $(\exists\aLocs\subseteq\Loc)$
           \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\land\aExp{=}\aVal\mid\DW[\fSC]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
-          \xo{a}{xd}
+          \xo[xright]{a}{xd}
         \end{tikzinline}}
     \end{gathered}
     \;
@@ -874,7 +874,7 @@ $(\exists\aLocs\subseteq\Loc)$
           \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DR[\fSC]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
-          \xo{a}{xd}
+          \xo[xright]{a}{xd}
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
@@ -895,7 +895,7 @@ $(\exists\aLocs\subseteq\Loc)$
   %       \event{a}{\DW{x}{2}}{}
   %       \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of a}
   %         %       \xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
-  %       \xo{a}{x1d}
+  %       \xo[xright]{a}{x1d}
   %     \end{tikzinline}}  
   %   \end{gathered}  
   %   &&
@@ -906,7 +906,7 @@ $(\exists\aLocs\subseteq\Loc)$
   %       \raevent{b}{\DR[\mACQ]{x}{2}}{}
   %         %       \xform{x1d}{2{=}r\limplies\bForm}{below=of b}
   %       \xform{x1i}{\Dx{x} \land\bForm[\FALSE/\Qr{x}]}{below=of b} %x1d}
-  %         %       \xo{b}{x1d}
+  %         %       \xo[xright]{b}{x1d}
   %     \end{tikzinline}}  
   %   \end{gathered}  
   %   &&
@@ -917,7 +917,7 @@ $(\exists\aLocs\subseteq\Loc)$
   %       \event{c}{\DW{y}{1}}{}
   %         %       \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of c}
   %         %       \xform{x1i}{\lnot\Qw{y}\land\bForm[\TRUE/\Dx{y}]}{below=of x1d}
-  %         %       \xo{c}{x1d}
+  %         %       \xo[xright]{c}{x1d}
   %     \end{tikzinline}}  
   %   \end{gathered}  
   % \end{align*}
@@ -930,7 +930,7 @@ $(\exists\aLocs\subseteq\Loc)$
   %       \event{a}{\DW{x}{2}}{}
   %       \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{right=.7em of a}
   %         %       \xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
-  %       \xos{a}{x1d}
+  %       \xo{a}{x1d}
   %     \end{tikzinline}}  
   %   \end{gathered}  
   %   &&
@@ -1271,7 +1271,7 @@ rules can be written as follows:
 \end{align*}
 Here we have chosen an alternative formulation for the read rule, which is
 equivalent the more traditional $\bForm[\aLoc/\aReg]$, as long as registers
-occur at most once in a program.  In \refdef{def:pomsets-lir}, the
+are assigned at most once in a program.  In \refdef{def:pomsets-lir}, the
 transformers for the dependent case are as follows:
 \begin{align*}
   \trd{\PW{\aLoc}{\aExp}}{\bForm} &= \bForm[\aExp/\aLoc]
@@ -1332,7 +1332,7 @@ for $\aCmd_1$ can be derived by eliminating the initial write.
   %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
   %     \event{c}{\DW{x}{3}}{}
   %     \xform{xd}{\bForm}{below=of c}
-  %     \xo{c}{xd}
+  %     \xo[xright]{c}{xd}
   %   \end{tikzinline}}
   % \end{gathered}
   % \qquad\quad
@@ -1348,10 +1348,10 @@ for $\aCmd_1$ can be derived by eliminating the initial write.
   %       %     \xform{xdi}{2{=}s \limplies \bForm[s{+}r/x]}{below=of a}
   %       %     \xform{xii}{(2{=}s\lor x{=}s)\limplies\bForm[s{+}r/x]}{above=of b}
   %       %     \xform{xid}{(2{=}s\lor x{=}s)\limplies\bForm[s{+}r/x]}{below=of b}
-  %       %     \xo{a}{xdi}
-  %       %     \xo{b}{xid}
-  %     \xo{a}{xdd}
-  %     \xo{b}{xdd}
+  %       %     \xo[xright]{a}{xdi}
+  %       %     \xo[xright]{b}{xid}
+  %     \xo[xright]{a}{xdd}
+  %     \xo[xright]{b}{xdd}
   %   \end{tikzinline}}
   % \end{gathered}
   % \\[1ex]
@@ -1366,9 +1366,9 @@ for $\aCmd_1$ can be derived by eliminating the initial write.
         \event{b}{2{=}s\limplies(s{+}r){=}7\mid\DW{x}{7}}{right=of a}
         \event{c}{t{=}2\mid\DW{x}{2}}{left=of a}
         \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{below=of a}%below right=.5em and -1em of a}
-        \xos{a}{xdd}
-        \xos{b}{xdd}
-        \xos{c}{xdd}
+        \xo{a}{xdd}
+        \xo{b}{xdd}
+        \xo{c}{xdd}
         \po{a}{b}
         \rf{c}{a}
       \end{tikzinline}}
@@ -1492,7 +1492,7 @@ The predicate transformers are:
 %       \event{a}{\DR{x}{2}}{}
 %       \xform{xi}{\bForm}{above=of a}
 %       \xform{xd}{2{=}s \limplies \bForm}{below=of a}
-%       \xo{a}{xd}
+%       \xo[xright]{a}{xd}
 %     \end{tikzinline}}
 %   \end{gathered}
 %   &&
@@ -1503,7 +1503,7 @@ The predicate transformers are:
 %       \event{a}{(s{+}r){=}7\mid\DW{x}{7}}{}
 %       \xform{xi}{\bForm}{above=of a}
 %       \xform{xd}{\bForm}{below=of a}
-%       \xo{a}{xd}
+%       \xo[xright]{a}{xd}
 %     \end{tikzinline}}
 %   \end{gathered}
 % \end{align*}
@@ -1519,10 +1519,10 @@ The predicate transformers are:
 %       \xform{xdi}{2{=}s \limplies \bForm}{below=of a}
 %       \xform{xii}{\bForm}{above=of b}
 %       \xform{xid}{\bForm}{below=of b}
-%       \xo{a}{xdi}
-%       \xo{b}{xid}
-%       \xo{a}{xdd}
-%       \xo{b}{xdd}
+%       \xo[xright]{a}{xdi}
+%       \xo[xright]{b}{xid}
+%       \xo[xright]{a}{xdd}
+%       \xo[xright]{b}{xdd}
 %     \end{tikzinline}}
 %   \end{gathered}
 % \end{align*}
@@ -1537,7 +1537,7 @@ The predicate transformers are:
 %       \event{a}{\DR{x}{2}}{}
 %       \xform{xi}{(2{=}s\lor x{=}s)\limplies \bForm}{above=of a}
 %       \xform{xd}{2{=}s \limplies \bForm}{below=of a}
-%       \xo{a}{xd}
+%       \xo[xright]{a}{xd}
 %     \end{tikzinline}}
 %   \end{gathered}
 %   &&
@@ -1548,7 +1548,7 @@ The predicate transformers are:
 %       \event{a}{(s{+}r){=}7\mid\DW{x}{7}}{}
 %       \xform{xi}{\bForm[s{+}r/x]}{above=of a}
 %       \xform{xd}{\bForm[s{+}r/x]}{below=of a}
-%       \xo{a}{xd}
+%       \xo[xright]{a}{xd}
 %     \end{tikzinline}}
 %   \end{gathered}
 % \end{align*}
@@ -1785,7 +1785,7 @@ The predicate transformers are:
     % $\labelingForm'_2(\aEv)=\aTr[1]{\{ \bEv \mid \bEv < \aEv
     % \}}{\labelingForm_2(\aEv})$
     \begin{enumerate}
-      \setcounter{enumi}{\value{pomsetXSemiCount}}
+      %\setcounter{enumi}{\value{pomsetXSemiCount}}
     \item[1--\ref{seq-tau})] as for $\sSEMI{}{}$ in \refdef{def:pomsets-trans},
     \item
       \label{seq-reorder} if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ either
@@ -1824,7 +1824,7 @@ The predicate transformers are:
               \event{a}{\aExp{=}v\mid\DW[\mRLX]{x}{v}}{}
               \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
               \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
-              \xo{a}{xd}
+              \xo[xright]{a}{xd}
             \end{tikzinline}}
         \end{gathered}
         \\
@@ -1835,7 +1835,7 @@ The predicate transformers are:
               \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
               \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
               \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
-              \xo{a}{xd}
+              \xo[xright]{a}{xd}
             \end{tikzinline}}
         \end{gathered}
       \end{gathered}
@@ -1848,7 +1848,7 @@ The predicate transformers are:
               \event{a}{\DR[\amode]{x}{v}}{}
               \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
               \xform{xd}{v{=}r\limplies\bForm}{below=of a}
-              \xo{a}{xd}
+              \xo[xright]{a}{xd}
             \end{tikzinline}}
         \end{gathered}
         \\
@@ -1859,7 +1859,7 @@ The predicate transformers are:
               \event{a}{\Q{} \mid \DR[\mSC]{x}{v}}{}
               \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
               \xform{xd}{v{=}r\limplies\bForm}{below=of a}
-              \xo{a}{xd}
+              \xo[xright]{a}{xd}
             \end{tikzinline}}
         \end{gathered}
       \end{gathered}
@@ -1876,7 +1876,7 @@ The predicate transformers are:
             \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
             \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
-            \xo{a}{xd}
+            \xo[xright]{a}{xd}
           \end{tikzinline}}
       \end{gathered}
       &&
@@ -1887,7 +1887,7 @@ The predicate transformers are:
             \event{a}{\DR[\amode]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
             \xform{xd}{v{=}r\limplies\bForm}{below=of a}
-            \xo{a}{xd}
+            \xo[xright]{a}{xd}
           \end{tikzinline}}
       \end{gathered}
     \end{align*}
@@ -3522,7 +3522,7 @@ this.
     $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
     % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
     \begin{enumerate}
-      \setcounter{enumi}{\value{pomsetPreParCount}}
+      %\setcounter{enumi}{\value{pomsetPreParCount}}
     \item[\ref{par-E}--\ref{par-kappa2})]
       as for $\sPAR{}{}$ in \refdef{def:pomsets-pre},
     \item \label{par-tau1}
@@ -3633,7 +3633,7 @@ this.
     \noindent
     If $\aPS \in \sTHREAD{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
     \begin{enumerate}
-      \setcounter{enumi}{\value{pomsetXThreadCount}}
+      %\setcounter{enumi}{\value{pomsetXThreadCount}}
     \item[\ref{thread-E}--\ref{thread-kappa})] as for $\sTHREAD{}$ in \refdef{def:pomsets-group}, %, repeating 3 below,% \reffig{fig:full},    
       % \item[\ref{T3full})]
       %   $\labelingForm(\aEv)$ implies
@@ -3651,7 +3651,7 @@ this.
     If $\aPS \in \sPAR{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$
     $(\exists\aPS_2\in\aPSS_2)$
     \begin{enumerate}
-      \setcounter{enumi}{\value{pomsetPreParCount}}
+      %\setcounter{enumi}{\value{pomsetPreParCount}}
     \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR{}{}$ in
       \refdef{def:pomsets-pre},
     \item \label{par-tick} $\TICK \rimplies \TICK_1\land\TICK_2$.
@@ -3660,7 +3660,7 @@ this.
     \noindent
     If $\aPS \in \sFORKJOIN{\aPSS}$ then $(\exists\aPS_1\in\aPSS)$
     \begin{enumerate}
-      \setcounter{enumi}{\value{pomsetXForkCount}}
+      %\setcounter{enumi}{\value{pomsetXForkCount}}
     \item[\ref{fork-E}--\ref{fork-le})] as for $\sFORK{}$ in \refdef{def:pomsets-group},
     \item
       $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,    
