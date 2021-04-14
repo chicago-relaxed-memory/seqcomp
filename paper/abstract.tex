@@ -20,16 +20,14 @@
 % \end{math}
 Program logics and semantics tell us that when executing ((S1; S2), state0),
 we execute (S1, state0) to arrive at state1, then execute (S2, state1) to
-arrive at the final state2.  This is a delightfully simple story that can be
-explained to children.  It is also a lie.
-%
-Processors execute instructions out of order, due to pipelines and caches.
-Compilers reorder programs even more dramatically.  All of this reordering is
-meant to be unobservable in single-threaded code.  In multi-threaded code,
-however, all bets are off.  A formal attempt to understand the resulting mess
-is known as a ``relaxed memory model.''  The relaxed memory models that have
-been proposed to date either fail to address sequential composition, or
-overly restrict processors and compilers.
+arrive at the final state2.  This is, of course, and abstraction.  Processors
+execute instructions out of order, due to pipelines and caches.  Compilers
+reorder programs even more dramatically.  All of this reordering is meant to
+be unobservable in single-threaded code.  In multi-threaded code, however,
+all bets are off.  A formal attempt to understand the resulting mess is known
+as a ``relaxed memory model.''  The relaxed memory models that have been
+proposed to date either fail to address sequential composition, or overly
+restrict processors and compilers.
 
 To support sequential composition, we propose adding families of predicate
 transformers to the existing model of ``Pomsets with Preconditions,'' which

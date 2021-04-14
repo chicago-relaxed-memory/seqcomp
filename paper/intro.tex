@@ -67,9 +67,8 @@ most once,
 $\aLoc$--$\cLoc$ range over shared memory references, and
 $\aExp$--$\bExp$ range over thread-local expressions, which do \emph{not}
 include
-$\aLoc$--$\cLoc$.\footnote{We wrote \ref{wp-read} using implication rather
-  than substitution; the two formulations are equivalent under the assumption
-  that each register is assigned at most once.}
+$\aLoc$--$\cLoc$.\footnote{Under these assumptions, \eqref{wp-read} is
+  equivalent to $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \bForm[\aLoc/\aReg]$.}
 
 This is quite a pretty explanation of sequential computation in a sequential
 context.  In a concurrent context, however, \ref{wp-read} is unsound!
@@ -83,9 +82,9 @@ either assume exclusive access, as in concurrent separation logic
 altogether, as in the pomset model of
 \citet{DBLP:journals/corr/abs-1804-04214}---this model uses syntactic
 dependencies and thus dramatically limits compiler optimization.  This leaves
-open the question of how to apply logic to programs with data races.
-To understand the solution, one must first understand the constraints imposed
-by hardware and compilers.
+open the question of how to apply logic to racy programs without
+overstraining the implementation.  To understand the solution, one must first
+understand the constraints imposed by hardware and compilers.
 
 
 % Assuming all variables are initialized to $0$,
@@ -122,50 +121,50 @@ expect: programs write to, and read from, memory references.
 This can be thought of as a total order of reads and writes,
 where each read has a matching \emph{fulfilling} write,
 for example:
-  \begin{gather*}
-    \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}\SEMI
+\begin{gather*}
+  \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}\SEMI
     \PR{y}{r}\SEMI \PR{x}{s}}
-    \\[-.4ex]
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wx0}{\DW{x}{0}}{}
-        \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \event{wy2}{\DW{y}{2}}{right=of wx1}
-        \event{ry2}{\DR{y}{2}}{right=3em of wy2}
-        \event{rx1}{\DR{x}{1}}{right=of ry2}
-        \rf[out=15,in=165]{wy2}{ry2}
-        \rf[out=15,in=165]{wx1}{rx1}
-        \po{wx0}{wx1}
-        \po{wx1}{wy2}
-        \po{wy2}{ry2}
-        \po{ry2}{rx1}
-      \end{tikzinline}}
-  \end{gather*}
+  \\[-.4ex]
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{wx0}{\DW{x}{0}}{}
+      \event{wx1}{\DW{x}{1}}{right=of wx0}
+      \event{wy2}{\DW{y}{2}}{right=of wx1}
+      \event{ry2}{\DR{y}{2}}{right=3em of wy2}
+      \event{rx1}{\DR{x}{1}}{right=of ry2}
+      \rf[out=15,in=165]{wy2}{ry2}
+      \rf[out=15,in=165]{wx1}{rx1}
+      \po{wx0}{wx1}
+      \po{wx1}{wy2}
+      \po{wy2}{ry2}
+      \po{ry2}{rx1}
+    \end{tikzinline}}
+\end{gather*}
 % (In examples, $\aReg$--$\bReg$ range over thread-local registers and $\aLoc$-$\cLoc$
 % range over shared memory references.)
 
 This model naturally extends to the case of shared-memory concurrency, leading to a \emph{sequentially consistent}
 semantics \cite{Lamport:1979:MMC:1311099.1311750}, in which \emph{program order} inside a thread implies
 a total \emph{causal order} between read and write events, for example:
-  \begin{gather*}
-    \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
-    \PAR
-    \THREAD{\PR{y}{r}\SEMI \PR{x}{s}}
-    \\[-.4ex]
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wx0}{\DW{x}{0}}{}
-        \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \event{wy2}{\DW{y}{2}}{right=of wx1}
-        \event{ry2}{\DR{y}{2}}{right=3em of wy2}
-        \event{rx1}{\DR{x}{1}}{right=of ry2}
-        \rf[out=15,in=165]{wy2}{ry2}
-        \rf[out=15,in=165]{wx1}{rx1}
-        \po{wx0}{wx1}
-        \po{wx1}{wy2}
-        \po{ry2}{rx1}
-      \end{tikzinline}}
-  \end{gather*}
+\begin{gather*}
+  \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
+  \PAR
+  \THREAD{\PR{y}{r}\SEMI \PR{x}{s}}
+  \\[-.4ex]
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{wx0}{\DW{x}{0}}{}
+      \event{wx1}{\DW{x}{1}}{right=of wx0}
+      \event{wy2}{\DW{y}{2}}{right=of wx1}
+      \event{ry2}{\DR{y}{2}}{right=3em of wy2}
+      \event{rx1}{\DR{x}{1}}{right=of ry2}
+      \rf[out=15,in=165]{wy2}{ry2}
+      \rf[out=15,in=165]{wx1}{rx1}
+      \po{wx0}{wx1}
+      \po{wx1}{wy2}
+      \po{ry2}{rx1}
+    \end{tikzinline}}
+\end{gather*}
 
 Unfortunately, this model does not compile efficiently to commodity
 hardware, resulting in a 37--73\% increase in CPU time on Arm8~\cite{Liu:2019:ASC:3314221.3314611} and,
@@ -179,116 +178,118 @@ This has led to \emph{relaxed memory models}, in which the requirement of
 sequential consistency is weakened to only apply \emph{per-location} and not globally
 over the whole program. This allows executions which
 are inconsistent with program order, such as:
-  \begin{gather*}
-    \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
-    \PAR
-    \THREAD{\PR{y}{r}\SEMI \PR{x}{s}}
-    \\[-.4ex]
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wx0}{\DW{x}{0}}{}
-        \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \event{wy2}{\DW{y}{2}}{right=of wx1}
-        \event{ry2}{\DR{y}{2}}{right=3em of wy2}
-        \event{rx0}{\DR{x}{0}}{right=of ry2}
-        \rf[out=15,in=165]{wy2}{ry2}
-        \rf[out=15,in=165]{wx0}{rx0}
-        \po{wx0}{wx1}
-        \po[out=-165,in=-15]{rx0}{wx1}
-      \end{tikzinline}}
-  \end{gather*}
+\begin{gather*}
+  \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
+  \PAR
+  \THREAD{\PR{y}{r}\SEMI \PR{x}{s}}
+  \\[-.4ex]
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{wx0}{\DW{x}{0}}{}
+      \event{wx1}{\DW{x}{1}}{right=of wx0}
+      \event{wy2}{\DW{y}{2}}{right=of wx1}
+      \event{ry2}{\DR{y}{2}}{right=3em of wy2}
+      \event{rx0}{\DR{x}{0}}{right=of ry2}
+      \rf[out=15,in=165]{wy2}{ry2}
+      \rf[out=15,in=165]{wx0}{rx0}
+      \po{wx0}{wx1}
+      \po[out=-165,in=-15]{rx0}{wx1}
+    \end{tikzinline}}
+\end{gather*}
 
 In such models, the causal order between events is important,
 and includes control and data dependencies, to avoid
 paradoxical ``out of thin air'' examples such as:
-  \begin{gather*}
-    \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}
-    \PAR
-    \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
-    \\[-.4ex]
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx1}{\DR{x}{1}}{}
-        \event{wy1}{\DW{y}{1}}{right=of rx1}
-        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
-        \event{wx1}{\DW{x}{1}}{right=of ry1}
-        \rf[out=15,in=165]{wy1}{ry1}
-        \rf[out=165,in=15]{wx1}{rx1}
-        \po{rx1}{wy1}
-        \po{ry1}{wx1}
-      \end{tikzinline}}
-  \end{gather*}
+\begin{gather*}
+  \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}
+  \PAR
+  \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
+  \\[-.4ex]
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{rx1}{\DR{x}{1}}{}
+      \event{wy1}{\DW{y}{1}}{right=of rx1}
+      \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+      \event{wx1}{\DW{x}{1}}{right=of ry1}
+      \rf[out=15,in=165]{wy1}{ry1}
+      \rf[out=165,in=15]{wx1}{rx1}
+      \po{rx1}{wy1}
+      \po{ry1}{wx1}
+    \end{tikzinline}}
+\end{gather*}
 This candidate execution forms a cycle in causal order, so is disallowed,
 but this depends crucially on the control dependency
 from $(\DR{x}{1})$ to $(\DW{y}{1})$, and the data dependency
 from $(\DR{y}{1})$ to $(\DW{x}{1})$. If either is missing, then this execution
 is acyclic and hence allowed. For example dropping the control dependency
 results in:
-  \begin{gather*}
-    \THREAD{\PR{x}{r}\SEMI \PW{y}{1}}
-    \PAR
-    \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
-    \\[-.4ex]
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx1}{\DR{x}{1}}{}
-        \event{wy1}{\DW{y}{1}}{right=of rx1}
-        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
-        \event{wx1}{\DW{x}{1}}{right=of ry1}
-        \rf[out=15,in=165]{wy1}{ry1}
-        \rf[out=165,in=15]{wx1}{rx1}
-        \po{ry1}{wx1}
-      \end{tikzinline}}
-  \end{gather*}
+\begin{gather*}
+  \THREAD{\PR{x}{r}\SEMI \PW{y}{1}}
+  \PAR
+  \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
+  \\[-.4ex]
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{rx1}{\DR{x}{1}}{}
+      \event{wy1}{\DW{y}{1}}{right=of rx1}
+      \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+      \event{wx1}{\DW{x}{1}}{right=of ry1}
+      \rf[out=15,in=165]{wy1}{ry1}
+      \rf[out=165,in=15]{wx1}{rx1}
+      \po{ry1}{wx1}
+    \end{tikzinline}}
+\end{gather*}
 
-Unfortunately, while a simple syntactic approach to dependency calculation
-suffices for hardware models, it is not preserved by common compiler
-optimizations. For example, if we calculate control dependencies syntactically,
-then there is a dependency from $(\DR{x}{1})$ to $(\DW{y}{1})$, and therefore a cycle in, the candidate execution:
-  \begin{gather*}
-    \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \ELSE \PW{y}{1} \FI}
-    \PAR
-    \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
-    \\[-.4ex]
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx1}{\DR{x}{1}}{}
-        \event{wy1}{\DW{y}{1}}{right=of rx1}
-        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
-        \event{wx1}{\DW{x}{1}}{right=of ry1}
-        \rf[out=15,in=165]{wy1}{ry1}
-        \rf[out=165,in=15]{wx1}{rx1}
-        \po{rx1}{wy1}
-        \po{ry1}{wx1}
-      \end{tikzinline}}
-  \end{gather*}
-An optimizing compiler might lift the assignment $\PW{y}{1}$ out of the conditional,
-thus removing the control dependency.
+While syntactic dependency calculation suffices for hardware models, it is
+not preserved by common compiler optimizations. For example, if we calculate
+control dependencies syntactically, then there is a dependency from
+$(\DR{x}{1})$ to $(\DW{y}{1})$, and therefore a cycle in, the candidate
+execution:
+\begin{gather*}
+  \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \ELSE \PW{y}{1} \FI}
+  \PAR
+  \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
+  \\[-.4ex]
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{rx1}{\DR{x}{1}}{}
+      \event{wy1}{\DW{y}{1}}{right=of rx1}
+      \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+      \event{wx1}{\DW{x}{1}}{right=of ry1}
+      \rf[out=15,in=165]{wy1}{ry1}
+      \rf[out=165,in=15]{wx1}{rx1}
+      \po{rx1}{wy1}
+      \po{ry1}{wx1}
+    \end{tikzinline}}
+\end{gather*}
+A compiler may lift the assignment $\PW{y}{1}$ out of the conditional,
+thus removing the dependency.
 
 To address this, \citet{DBLP:journals/pacmpl/JagadeesanJR20} introduced
 \emph{Pomsets with Preconditions}, where events are labeled with logical
 formulae.  Nontrivial preconditions are introduced by store actions (modeling
 data dependencies) and conditionals (modeling control dependencies):
-  \begin{gather*}
-    \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
-    \\
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
-      \end{tikzinline}}
-  \end{gather*}
+\begin{gather*}
+  \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  \\
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
+    \end{tikzinline}}
+\end{gather*}
 Preconditions are discharged by being ordered after a read:
-  \begin{gather*}
-    \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
-    \\
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx0}{\DR{x}{0}}{}
-        \event{ry0}{\DR{y}{0}}{right=of rx0}
-        \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
-        \po{ry0}{wz0}
-      \end{tikzinline}}
-  \end{gather*}
+\begin{gather*}
+  \tag{$\dagger$}\label{eq1}
+  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  \\
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{rx0}{\DR{x}{0}}{}
+      \event{ry0}{\DR{y}{0}}{right=of rx0}
+      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+      \po{ry0}{wz0}
+    \end{tikzinline}}
+\end{gather*}
 Note that there is dependency order from $(\DR{y}{0})$ to $(\DW{z}{0})$
 so the precondition for $(\DW{z}{0})$ only has to be satisfied assuming the hypothesis
 $(0{=}s)$. There is no matching order from $(\DR{x}{0})$ to $(\DW{z}{0})$
@@ -334,7 +335,7 @@ Then the equivalence holds in any (sequential) context.
 % they often give sequential composition little attention, either ignoring it altogether,
 % or treating it operationally with its usual small-step semantics. This paper
 % investigates how existing models of sequential composition interact with relaxed memory.
-  
+
 % \begin{figure*}
 %   \input{fig-sp.tex}
 %   \caption{Weakest precondition semantics}
@@ -377,11 +378,11 @@ Then the equivalence holds in any (sequential) context.
 % in is the one for sequential composition, which maps sequential composition of programs
 % to function composition of predicate transformers.
 
-Predicate transformers are a good fit to logical models of dependency calculation,
-since both are concerned with preconditions, and how they are transformed by
-sequential composition. Our first attempt is to associate a predicate transformer
-with each pomset. We visualize this in diagrams by showing how $\bForm$ is transformed,
-for example:
+Predicate transformers are a good fit for logical models of dependency
+calculation, since both are concerned with preconditions and how they are
+transformed by sequential composition. Our first attempt is to associate a
+predicate transformer with each pomset. We visualize this in diagrams by
+showing how $\bForm$ is transformed, for example:
 \begin{align*}
   \begin{gathered}
     \PR{x}{r}
@@ -425,7 +426,7 @@ obligation to find a matching write is moved from the sequential semantics of
 % In the rightmost program above, the write to $z$ affects the shared store, not the
 % local state of the thread, therefore we assign it the identity transformer.
 
-For the sequentially consistent semantics, sequential composition is
+For a sequentially consistent semantics, sequential composition is
 straightforward: we apply each predicate transformer to the preconditions of
 subsequent events, composing the predicate transformers.  (In subsequent
 diagrams, we only show predicate transformers for reads.)
@@ -458,68 +459,68 @@ transformer is indexed by the empty set, whereas the \emph{dependent}
 transformer is indexed by the singleton.
 We visualize this by including more than one transformed predicate,
 with an edge leading to the dependent one. For example:
-  \begin{align*}
-    \begin{gathered}
-      \PR{x}{r}
-      \\
-      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{rx0}{\DR{x}{0}}{}
-          \xform{rx0i}{\bForm}{left=.4em of rx0}
-          \xform{rx0d}{(0{=}r) \limplies \bForm}{right=of rx0}
-          \xo{rx0}{rx0d}
-        \end{tikzinline}}
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \PR{y}{s}
-      \\
-      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{ry0}{\DR{y}{0}}{}
-          \xform{ry0i}{\bForm}{left=.4em of ry0}
-          \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
-          \xo{ry0}{ry0d}
-        \end{tikzinline}}
-    \end{gathered}
-    % &&
-    % \begin{gathered}
-    %   \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
-    %   \\
-    %   \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
-    %       \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
-    %       \xform{wz0i}{\bForm}{left=.4em of wz0}
-    %       \xform{wz0d}{\bForm}{right=of wz0}
-    %       \xo{wz0}{wz0d}
-    %   \end{tikzinline}}
-    % \end{gathered}
-  \end{align*}
+\begin{align*}
+  \begin{gathered}
+    \PR{x}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \xform{rx0i}{\bForm}{left=.4em of rx0}
+        \xform{rx0d}{(0{=}r) \limplies \bForm}{right=of rx0}
+        \xo{rx0}{rx0d}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \PR{y}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{ry0}{\DR{y}{0}}{}
+        \xform{ry0i}{\bForm}{left=.4em of ry0}
+        \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
+        \xo{ry0}{ry0d}
+      \end{tikzinline}}
+  \end{gathered}
+  % &&
+  % \begin{gathered}
+  %   \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
+  %     \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
+  %     \xform{wz0i}{\bForm}{left=.4em of wz0}
+  %     \xform{wz0d}{\bForm}{right=of wz0}
+  %     \xo{wz0}{wz0d}
+  %   \end{tikzinline}}
+  % \end{gathered}
+\end{align*}
 The model of sequential composition then picks which
 predicate transformer to apply to an event's precondition by picking
 the one indexed by all the events before it in causal order.
 
 For example, we can recover the expected semantics
-for the above example by choosing
+for \eqref{eq1} by choosing
 the predicate transformer which is independent of $(\DR x0)$
 but dependent on $(\DR y0)$, which is the transformer
 which maps $\bForm$ to $(0{=}s) \limplies \bForm$.
-  \begin{gather*}
-    \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
-    \\[-2ex]
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1ex and 1.2em]
-        \xform{rx0d}{(0{=}r) \limplies \bForm}{}
-        \event{rx0}{\DR{x}{0}}{right=of rx0d}
-        \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{right=of rx0}
-        \event{ry0}{\DR{y}{0}}{right=of rx0ry0d}
-        \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
-        \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0d}
-        \xform{wz0i}{\bForm}{left=of rx0d}
-        \po[out=20,in=170]{ry0}{wz0}
-        \xo{rx0}{rx0d}
-        \xo{ry0}{ry0d}
-        \xo{rx0}{rx0ry0d}
-        \xo{ry0}{rx0ry0d}
-      \end{tikzinline}}
-  \end{gather*}
+\begin{gather*}
+  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  \\[-2ex]
+  \nonumber
+  \hbox{\begin{tikzinline}[node distance=1ex and 1.2em]
+      \xform{rx0d}{(0{=}r) \limplies \bForm}{}
+      \event{rx0}{\DR{x}{0}}{right=of rx0d}
+      \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{right=of rx0}
+      \event{ry0}{\DR{y}{0}}{right=of rx0ry0d}
+      \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
+      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0d}
+      \xform{wz0i}{\bForm}{left=of rx0d}
+      \po[out=20,in=170]{ry0}{wz0}
+      \xo{rx0}{rx0d}
+      \xo{ry0}{ry0d}
+      \xo{rx0}{rx0ry0d}
+      \xo{ry0}{rx0ry0d}
+    \end{tikzinline}}
+\end{gather*}
 As a sanity check, we can see that sequential composition is
 associative in this case, since it does not matter whether we
 associate to the left, with intermediate step:
@@ -558,9 +559,9 @@ This is an instance of the general result that sequential composition forms a mo
 
 \subsection{Contributions}
 
-In this paper, we show how pomsets with
-preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined with
-predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75} to create a
+We show how predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75} can
+be added to pomsets with
+preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} to create a
 compositional semantics for sequential composition.
 \begin{itemize}
 \item \S\ref{sec:model} presents the basic model, which satisfies many
@@ -573,7 +574,7 @@ compositional semantics for sequential composition.
   to validate compiler optimizations.
 \end{itemize}
 % Acknowledgements go here, once we're not double-blinded.
-%The definitions in this paper have been formalized in Agda.
+% The definitions in this paper have been formalized in Agda.
 Because it is closely related, we expect that the memory-model results of
 \cite{DBLP:journals/pacmpl/JagadeesanJR20} apply to our model, including
 compositional reasoning for temporal safety properties and {local} \drfsc{}
@@ -601,7 +602,8 @@ require a fence after every relaxed read on \armeight{}.
 \citet{DBLP:conf/esop/PaviottiCPWOB20} give a denotational semantics,
 calculating dependencies using event structures rather than logic.  They give
 the semantics of sequential composition in continuation passing style,
-whereas we give it in direct style.
+whereas we give it in direct style.  The use step-indexing to account for
+loops; we expect that the same approach could be applied here.
 
 \citet{Pichon-Pharabod:2016:CSR:2837614.2837616} also use event structures to
 calculate dependencies, combined with an operational semantics that

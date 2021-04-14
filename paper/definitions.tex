@@ -1,22 +1,27 @@
-\section{Model}
+\section{The Basic Model}
 \label{sec:model}
+
+After some preliminaries, we define the basic model in \reffig{fig:sem}.  We
+then explain the model using examples and establish some basic properties.
+We encourage readers to skip to the examples, coming back to definitions as
+needed.
 
 %% Batty suggest example where dependencies are added and also go away, perhaps
 %% by store forwarding. Something like:
 %% \texttt{(r=x; y=1); (s=y; z=s+r)}
 
-In this section, we present the mathematical preliminaries for the
-model (which can be skipped on first reading). We then present the
-model incrementally, starting with a model built using
-\emph{partially ordered multisets}
-(\emph{pomsets})~\cite{GISCHER1988199,Plotkin:1997:TSP:266557.266600},
-and then adding preconditions and finally predicate transformers.
+% In this section, we present the mathematical preliminaries for the
+% model (which can be skipped on first reading). We then present the
+% model incrementally, starting with a model built using
+% \emph{partially ordered multisets}
+% (\emph{pomsets})~\cite{GISCHER1988199,Plotkin:1997:TSP:266557.266600},
+% and then adding preconditions and finally predicate transformers.
 
-In later sections, we will discuss extensions to the logic, and to the
-semantics of load, store and thread initialization, in order to model
-relaxed memory more faithfully. We stress that these features do
-\emph{not} change any of the structures of the language: conditionals,
-parallel composition, and sequential composition are as defined in this section.
+% In later sections, we will discuss extensions to the logic, and to the
+% semantics of load, store and thread initialization, in order to model
+% relaxed memory more faithfully. We stress that these features do
+% \emph{not} change any of the structures of the language: conditionals,
+% parallel composition, and sequential composition are as defined in this section.
 
 \subsection{Preliminaries}
 \label{sec:prelim}
@@ -32,7 +37,7 @@ The syntax is built from
 
 \emph{Memory references} are tagged values, written $\REF{\cVal}$.  Let $\Loc$
 be the set of memory references, ranged over by $\aLoc$, $\bLoc$, $\cLoc$.
-
+%
 We require that
 \begin{itemize}
 \item values and registers are disjoint, 
@@ -82,16 +87,36 @@ given mode, as well as the usual structural constructs. Following
 preserving thread state on the left after a join.  In examples and
 sublanguages without join, we use the symmetric $\PAR$ operator.
 
+Throughout \textsection\ref{sec:model}--\ref{sec:arm} we 
+require that
+\begin{itemize}
+\item each register is assigned at most once in a program.
+  % \end{itemize}
+  % In \textsection\ref{sec:complications} and following, we
+  % require instead that
+  % \begin{itemize}
+  % \end{itemize}
+\end{itemize}
+In \textsection\ref{sec:complications}, we drop this restriction, requiring
+instead that
+\begin{itemize}
+\item there are registers
+  $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$, that do not
+  appear in programs: $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.
+\end{itemize}
+% In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
+% assumption.
+
 The semantics is built from the following.
 \begin{itemize}
 \item a set of \emph{events} $\AllEvents$, ranged over by $\aEv$, $\bEv$,
-  $\cEv$, $\dEv$, 
+  $\cEv$, %$\dEv$,
+  and subsets ranged over by $\aEvs$, $\bEvs$, $\cEvs$,  
 \item a set of \emph{logical formulae} $\Formulae$, ranged over by $\aForm$,
   $\bForm$, $\cForm$,
-\item a set of \emph{actions} $\Act$, ranged over by $\aAct$, 
+\item a set of \emph{actions} $\Act$, ranged over by $\aAct$, $\bAct$.
 \end{itemize}
-Subsets of $\AllEvents$ are ranged over by $\aEvs$, $\bEvs$, $\cEvs$,
-$\dEvs$.
+%$\dEvs$.
 
 We require that:
 \begin{itemize}
@@ -108,19 +133,23 @@ We require that:
   $\sreaddef$ and $\sreleasedef$ actions.
 \end{itemize}
 
-Logical formulae include equations over registers, such as
-$(\aReg{=}\bReg{+}1)$.
-For use in \textsection\ref{sec:tc1}, we also include equations over memory references, such as $(\aLoc{=}1)$.
+Logical formulae include equations over registers and memory references, such as
+$(\aReg{=}\bReg{+}1)$ and $(\aLoc{=}1)$.
+%For use in \textsection\ref{sec:tc1}, we also include equations over memory references, such as $(\aLoc{=}1)$.
 % I would like to drop this, an be careful about program vs logical syntax
-Formulae are subject to substitutions; % of the form $[\aExp/\aReg]$ and
-% $[\aExp/\aLoc]$;
-actions are not.
 We use expressions as formulae, coercing $\aExp$ to $\aExp{\neq}0$.
-Equations have precedence over logical operators; thus
-$\aReg{=}\aVal\limplies\bReg{>}\bVal$ is read
-$(\aReg{=}\aVal)\limplies(\bReg{>}\bVal)$.  As usual, implication associates to the
-right; thus $\aForm\limplies\bForm\limplies\cForm$ is read
-$\aForm\limplies(\bForm\limplies\cForm)$.
+% Equations have precedence over logical operators; thus
+% $\aReg{=}\aVal\limplies\bReg{>}\bVal$ is read
+% $(\aReg{=}\aVal)\limplies(\bReg{>}\bVal)$.  As usual, implication associates to the
+% right; thus $\aForm\limplies\bForm\limplies\cForm$ is read
+% $\aForm\limplies(\bForm\limplies\cForm)$.
+As usual, implication associates to the right; thus
+$\aReg{=}\aVal\limplies\bReg{>}\bVal\limplies\bForm$ is read
+$(\aReg{=}\aVal)\limplies((\bReg{>}\bVal)\limplies\bForm)$.
+
+% Formulae are subject to substitutions; % of the form $[\aExp/\aReg]$ and
+% % $[\aExp/\aLoc]$;
+% actions are not.
 
 % \begin{definition}
 %   \label{def:independent}
@@ -140,25 +169,6 @@ $\aForm$ is \emph{unsatisfiable} if $\aForm \rimplies \FALSE$.
 % \end{definition}
 
 
-Throughout \textsection\ref{sec:model}--\ref{sec:arm} we 
-additionally require that
-\begin{itemize}
-\item each register is assigned at most once in a program.
-  % \end{itemize}
-  % In \textsection\ref{sec:complications} and following, we
-  % require instead that
-  % \begin{itemize}
-  % \end{itemize}
-\end{itemize}
-In \textsection\ref{sec:complications}, we drop this restriction, requiring
-instead that
-\begin{itemize}
-\item there are registers
-  $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$,
-\item registers $\uRegs{\AllEvents}$ do not appear in programs: $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.
-\end{itemize}
-% In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
-% assumption.
 
 
 \subsection{Actions in This Paper}
@@ -261,7 +271,12 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
   \end{math}.
 \end{definition}
 
-\subsection{Model}
+\subsection{Pomsets with Predicate Transformers}
+\label{sec:pomsets-trans}
+
+\emph{Predicate transformers} are functions on formulae which preserve
+logical structure, providing a natural model of sequential composition.
+
 
 \begin{definition}
   \label{def:trans}
@@ -348,14 +363,14 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
   A pomset is \emph{top-level} if $\aTerm$ is a tautology and for every $\aEv\in\aEvs$,
   % $\labelingForm(\aEv)$ is a tautology and
   % if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
-  \begin{multicols}{2}
+  %\begin{multicols}{2}
     \begin{enumerate}[label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
     \item \label{top-true}
       $\labelingForm(\aEv)$ is a tautology,    
     \item \label{top-rf}
       if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
     \end{enumerate}
-  \end{multicols}
+  %\end{multicols}
 \end{definition}
 
 We give the semantics of programs in \reffig{fig:sem}.
