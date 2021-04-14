@@ -563,78 +563,77 @@ preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} can be combined with
 predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75} to create a
 compositional semantics for sequential composition.
 \begin{itemize}
-\item \S\ref{sec:model} presents the basic model, with few features
-  required of the logic of preconditions, but a resulting lack of fidelity
-  to exiting models,
-\item \S\ref{sec:q} adds a model of \emph{quiescence} to the logic,
-  required to model coherence (accessing $x$ has a precondition that $x$ is quiescent)
-  and synchronization (a releasing write requires all locations to be quiescent),
-\item \S\ref{sec:arm} adds the features required for efficient compilation
-  to modern architectures: downgrading some synchronized accesses to relaxed,
-  and removing read-read dependencies, and
-\item \S\ref{sec:complications} show how to address common litmus tests.
+\item \S\ref{sec:model} presents the basic model, which satisfies many
+  desiderata, but not all.
+\item \S\ref{sec:arm} shows two approaches for efficient implementation on
+  Arm.  The first uses a suboptimal lowering for acquiring reads.  The second
+  uses an optimal lowering, but requires changes to the definitions of
+  parallel and sequential composition.
+\item \S\ref{sec:variants} generalizes the basic semantics of read and write
+  to validate compiler optimizations.
 \end{itemize}
 % Acknowledgements go here, once we're not double-blinded.
-The definitions in this paper have been formalized in Agda.
-
+%The definitions in this paper have been formalized in Agda.
 Because it is closely related, we expect that the memory-model results of
 \cite{DBLP:journals/pacmpl/JagadeesanJR20} apply to our model, including
 compositional reasoning for temporal safety properties and {local} \drfsc{}
-as in \cite{Dolan:2018:BDR:3192366.3192421,DBLP:conf/ppopp/DongolJR19}.
-In \textsection\ref{sec:arm}, we provide an alternative proof strategy for
-efficient compilation to \armeight{}, which improves upon that of
-\cite{DBLP:journals/pacmpl/JagadeesanJR20} by using a recent alternative
-characterization of \armeight{}.
+as in \cite{Dolan:2018:BDR:3192366.3192421,DBLP:conf/ppopp/DongolJR19,promising-ldrf}.
+% In \textsection\ref{sec:arm}, we provide an alternative proof strategy for
+% efficient compilation to \armeight{}, which improves upon that of
+% \cite{DBLP:journals/pacmpl/JagadeesanJR20} by using a recent alternative
+% characterization of \armeight{}.
 
 \section{Related Work}
 
-Prominent solutions to the problem of dependency calculation include:
-\begin{itemize}
-
-\item \emph{syntactic} methods used in hardware models
-  such as ARM or x86-TSO \cite{alglave},
-\item \emph{speculative execution} methods (which give a semantics based on multiple executions
-  of the same program) such as the Java Memory Model~\cite{Manson:2005:JMM:1047659.1040336} 
-  and related models \cite{Jagadeesan:2010:GOS:2175486.2175503, DBLP:conf/popl/KangHLVD17, DBLP:journals/pacmpl/ChakrabortyV19},
-  % the speculative operational semantics of~\cite{Jagadeesan:2010:GOS:2175486.2175503},
-  % the promising semantics of~\cite{DBLP:conf/popl/KangHLVD17},
-  % or the event structures semantics of~\cite{DBLP:journals/pacmpl/ChakrabortyV19},
-\item \emph{rewriting} methods, which give an operational model
-  up to syntactic rewrites, such as~\cite{Pichon-Pharabod:2016:CSR:2837614.2837616}, and
-\item \emph{logical} methods, such as the pomsets with preconditions
-  model of~\cite{DBLP:journals/pacmpl/JagadeesanJR20}.
-  
-\end{itemize}
-\begin{itemize}
-\item Models with strong dependencies that disallow compiler optimizations
-  and efficient implementation on \armeight{}:
-  \cite{Lamport:1979:MMC:1311099.1311750,
-    DBLP:conf/pldi/LahavVKHD17,
-    Dolan:2018:BDR:3192366.3192421,
-    DBLP:conf/pldi/LahavVKHD17,
-    DBLP:conf/lics/JeffreyR16,
-    Boehm:2014:OGA:2618128.2618134,
-    DBLP:journals/corr/abs-1804-04214}.
-\item Models with weak dependencies that allow some forms of thin-air
-  reasoning:
-  \cite{Manson:2005:JMM:1047659.1040336,
-    DBLP:conf/esop/JagadeesanPR10,
-    DBLP:conf/popl/KangHLVD17,
-    DBLP:journals/pacmpl/ChakrabortyV19}
-\item Models that do not calculate dependencies:
-  \cite{Batty:2011:MCC:1926385.1926394,
-    DBLP:journals/pacmpl/WattRP19,
-    DBLP:conf/pldi/WattPPBDFPG20,
-    goMM}.
-\end{itemize}
-Like us, \citet{DBLP:journals/corr/abs-1804-04214} use pomsets to create a
-compositional account of sequential composition.  However, their model
-requires a fence after every read on \armeight{}, and uses syntactic
-dependencies, thus invalidating many compiler optimizations.
-
 \citet{DBLP:conf/snapl/MarinoMMNS15} argue that the ``silently shifting
-semicolon'' is problematic for programmers, and thus concurrent languages
-should guarantee sequential abstraction.  But processor and language
-implementors balk at the prospect, due to significant costs.
+semicolon'' sufficiently problematic for programmers that concurrent
+languages should guarantee sequential abstraction, despite the performance
+penalties.  In this paper, we have take the opposite approach.  We have
+attempted to find the most intellectually tractable model that encompasses
+all of the messiness of relaxed memory.
+
+There are prior studies of relaxed memory that include sequential
+composition.  \citet{DBLP:journals/corr/abs-1804-04214} define a semantics
+using pomsets without preconditions. Instead, their model uses syntactic
+dependencies, thus invalidating many compiler optimizations.  They also
+require a fence after every relaxed read on \armeight{}.
+
+\citet{DBLP:conf/esop/PaviottiCPWOB20} give a denotational semantics,
+calculating dependencies using event structures rather than logic.  They give
+the semantics of sequential composition in continuation passing style,
+whereas we give it in direct style.
+
+\citet{Pichon-Pharabod:2016:CSR:2837614.2837616} also use event structures to
+calculate dependencies, combined with an operational semantics that
+incorporates program transformations.  This approach seems to require
+whole-program analysis.
+
+Other studies of relaxed memory can be categorized by their approach to
+dependency calculation.  Hardware models use syntactic dependencies
+\cite{alglave}.  Many software models do not bother with dependencies at all
+\cite{Batty:2011:MCC:1926385.1926394, DBLP:journals/pacmpl/WattRP19,
+  DBLP:conf/pldi/WattPPBDFPG20, goMM}.  Others have strong dependencies that
+disallow compiler optimizations and efficient implementation, typically
+requiring fences for every relaxed read on Arm
+\cite{Lamport:1979:MMC:1311099.1311750, DBLP:conf/pldi/LahavVKHD17,
+  Dolan:2018:BDR:3192366.3192421, DBLP:conf/pldi/LahavVKHD17,
+  DBLP:conf/lics/JeffreyR16, Boehm:2014:OGA:2618128.2618134,
+  DBLP:journals/corr/abs-1804-04214}.
+
+Many of the most prominent models are based on speculative execution
+\cite{Manson:2005:JMM:1047659.1040336, DBLP:conf/esop/JagadeesanPR10,
+  DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}.
+In their introduction, \citet{DBLP:journals/pacmpl/JagadeesanJR20} note that
+these models fail to validate compositional reasoning of temporal
+properties---see their examples OOTA4 and OOTA5 (from
+\citep{DBLP:journals/toplas/Lochbihler13}).  The difference with our model
+can be understood in terms of the valid program transformations.  The
+speculative models allow reads to be introduced, with subsequent case
+analysis on the value read---effectively, this can turn one read into two,
+with different choices taken for the values read.  Our model invalidates this
+transformation.  In return, our model enjoys compositionality for temporal
+safety properties.
+
+
 
 
