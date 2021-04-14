@@ -1,9 +1,12 @@
 \section{The Basic Model}
 \label{sec:model}
 
-After some preliminaries, we define the basic model in \reffig{fig:sem}.  We
-explain the model using examples and establish some basic properties.  We
-encourage readers to skip to the examples, coming back as needed.
+After some preliminaries, we define the basic model
+(\textsection\ref{sec:pomsets} and \reffig{fig:sem}).  We explain the model
+using examples (\textsection \ref{sec:ex1}--\ref{sec:ex3}), establish some
+basic properties (\textsection\ref{sec:props}), and discuss program
+transformations (\textsection\ref{sec:valid}--\ref{sec:invalid}).  We encourage
+readers to skip to the examples, coming back as needed.
 
 %% Batty suggest example where dependencies are added and also go away, perhaps
 %% by store forwarding. Something like:
@@ -271,7 +274,7 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 \end{definition}
 
 \subsection{Pomsets with Predicate Transformers}
-\label{sec:pomsets-trans}
+\label{sec:pomsets}
 
 \emph{Predicate transformers} are functions on formulae which preserve
 logical structure, providing a natural model of sequential composition.
@@ -374,6 +377,16 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
 
 We give the semantics of programs in \reffig{fig:sem}.
 \input{fig-sem.tex}
+
+\subsection{Examples: Pomsets}
+\label{sec:ex1}
+\subsection{Examples: Pomsets with Preconditions}
+\label{sec:ex2}
+\subsection{Examples: Pomsets with Predicate Transformers}
+\label{sec:ex3}
+
+\subsection{Basic Properties}
+\label{sec:props}
 
 \begin{lemma}
   \label{lem:rf:implies:le}
@@ -483,3 +496,7 @@ is logically equivalent to
 
 
 
+\subsection{Valid Transformations}
+\label{sec:valid}
+\subsection{Invalid Transformations}
+\label{sec:invalid}
