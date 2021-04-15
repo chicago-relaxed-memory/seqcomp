@@ -1120,7 +1120,7 @@ order.
           \event{a1}{1{=}1\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm[1/x]}{right=of a1}
           \xform{x1i}{\bForm[1/x]}{below=of x1d}
-          \xos{a1}{x1d}
+          \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -1131,7 +1131,7 @@ order.
           \event{a1}{2{=}1\mid\DW{x}{1}}{}
           \xform{x1d}{\bForm[2/x]}{right=of a1}
           \xform{x1i}{\bForm[2/x]}{below=of x1d}
-          \xos{a1}{x1d}
+          \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -1144,7 +1144,7 @@ order.
   %       \event{a1}{\DW{x}{1}}{}
   %       \xform{x1d}{\bForm[1/x]}{right=of a1}
   %       \xform{x1i}{\bForm[1/x]}{right=of x1d}
-  %       \xos{a1}{x1d}
+  %       \xo{a1}{x1d}
   %     \end{tikzinline}}
   %   \end{gathered}
   %   &&
@@ -1155,7 +1155,7 @@ order.
   %       \event{a1}{\FALSE\mid\DW{x}{1}}{}
   %       \xform{x1d}{\FALSE}{right=of a1}
   %       \xform{x1i}{\bForm[2/x]}{right=of x1d}
-  %       \xos{a1}{x1d}
+  %       \xo{a1}{x1d}
   %     \end{tikzinline}}
   %   \end{gathered}
   % \end{align*}
@@ -1167,7 +1167,7 @@ order.
   %     \event{a1}{1{=}1\lor2{=}1\mid\DW{x}{1}}{}
   %     \xform{x1d}{(\bForm[1/x])[2/x]}{below=of a1}
   %     \xform{x1i}{(\bForm[1/x])[2/x]}{below=of x1d}
-  %     \xos{a1}{x1d}
+  %     \xo{a1}{x1d}
   %   \end{tikzinline}}
   % \end{gather*}
   % which simplifies to
@@ -1178,7 +1178,7 @@ order.
   %     \event{a1}{\DW{x}{1}}{}
   %     \xform{x1d}{\bForm[1/x] }{right=of a1}
   %     \xform{x1i}{\bForm[1/x]}{right=of x1d}
-  %     \xos{a1}{x1d}
+  %     \xo{a1}{x1d}
   %   \end{tikzinline}}
   % \end{gather*}
   % which simplifies to
@@ -1189,7 +1189,7 @@ order.
         \event{a1}{1{=}1\lor2{=}1\mid\DW{x}{1}}{}
         \xform{x1d}{(\bForm[2/x])[1/x]}{right=of a1}
         \xform{x1i}{(\bForm[2/x])[1/x]}{right=of x1d}
-        \xos{a1}{x1d}
+        \xo{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
   which simplifies to
@@ -1200,7 +1200,7 @@ order.
         \event{a1}{\DW{x}{1}}{}
         \xform{x1d}{\bForm[2/x]}{right=of a1}
         \xform{x1i}{\bForm[2/x]}{right=of x1d}
-        \xos{a1}{x1d}
+        \xo{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
   % \end{figure}
@@ -1213,7 +1213,7 @@ order.
   %         \event{a1}{1{=}2\mid\DW{x}{1}}{}
   %         \xform{x1d}{\bForm[1/x]}{right=of a1}
   %         \xform{x1i}{\bForm[1/x]}{below=of x1d}
-  %         \xos{a1}{x1d}
+  %         \xo{a1}{x1d}
   %       \end{tikzinline}}
   %     \end{gathered}
   %     &&
@@ -1224,7 +1224,7 @@ order.
   %         \event{a1}{2{=}2\mid\DW{x}{1}}{}
   %         \xform{x1d}{\bForm[2/x]}{right=of a1}
   %         \xform{x1i}{\bForm[2/x]}{below=of x1d}
-  %         \xos{a1}{x1d}
+  %         \xo{a1}{x1d}
   %       \end{tikzinline}}
   %     \end{gathered}
   %   \end{align*}
@@ -1237,7 +1237,7 @@ order.
   %         \event{a1}{\FALSE\mid\DW{x}{2}}{}
   %         \xform{x1d}{\FALSE}{right=of a1}
   %         \xform{x1i}{\bForm[1/x]}{right=of x1d}
-  %         \xos{a1}{x1d}
+  %         \xo{a1}{x1d}
   %       \end{tikzinline}}
   %     \end{gathered}
   %     &&
@@ -1248,7 +1248,7 @@ order.
   %         \event{a1}{\DW{x}{2}}{}
   %         \xform{x1d}{\bForm[2/x]}{right=of a1}
   %         \xform{x1i}{\bForm[2/x]}{right=of x1d}
-  %         \xos{a1}{x1d}
+  %         \xo{a1}{x1d}
   %       \end{tikzinline}}
   %     \end{gathered}
   %   \end{align*}
@@ -1262,7 +1262,7 @@ order.
           \event{a1}{1{=}2\mid\DW{x}{2}}{}
           \xform{x1d}{\bForm[1/x]}{right=of a1}
           \xform{x1i}{\bForm[1/x]}{below=of x1d}
-          \xos{a1}{x1d}
+          \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -1273,7 +1273,7 @@ order.
           \event{a1}{2{=}2\mid\DW{x}{2}}{}
           \xform{x1d}{\bForm[2/x]}{right=of a1}
           \xform{x1i}{\bForm[2/x]}{below=of x1d}
-          \xos{a1}{x1d}
+          \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -1285,7 +1285,7 @@ order.
         \event{a1}{\DW{x}{2}}{}
         \xform{x1d}{\bForm[2/x]}{right=of a1}
         \xform{x1i}{\bForm[2/x]}{right=of x1d}
-        \xos{a1}{x1d}
+        \xo{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
 \end{comment}
@@ -1300,7 +1300,7 @@ order.
           \xform{xd}{\bForm[1/x]}{}
           \xform{xi}{\bForm[1/x]}{below=of xd}
           \event{a1}{1{=}1\mid\DW{x}{1}}{left=of xd}
-          \xos{a1}{xd}
+          \xo{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -1311,7 +1311,7 @@ order.
           \xform{xd}{\bForm[2/x]}{}
           \xform{xi}{\bForm[2/x]}{below=of xd}
           \event{a2}{2{=}2\mid\DW{x}{2}}{left=of xd}      
-          \xos{a2}{xd}
+          \xo{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -1324,7 +1324,7 @@ order.
           \xform{xd}{\bForm[1/x]}{}
           \xform{xi}{\bForm[1/x]}{right=of xd}
           \event{a1}{\DW{x}{1}}{left=of xd}
-          \xos{a1}{xd}
+          \xo{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -1335,7 +1335,7 @@ order.
           \xform{xd}{\bForm[2/x]}{}
           \xform{xi}{\bForm[2/x]}{right=of xd}
           \event{a2}{\DW{x}{2}}{left=of xd}      
-          \xos{a2}{xd}
+          \xo{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -1350,10 +1350,10 @@ order.
         \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
         \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
         \xform{xii}{\bForm[2/x]}{right=of xid}
-        \xos{a1}{xdi}
-        \xos{a2}{xid}
-        \xos{a1}{xdd}
-        \xos{a2}{xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
       \end{tikzinline}}
   \end{gather*}
   Adding order does nothing since the preconditions are tautologies.
@@ -1365,10 +1365,10 @@ order.
   %     \event{a1}{\DW{x}{1}}{above left=.5em and -1em of xdd}
   %     \event{a2}{\DW{x}{2}}{above right=.5em and -1em of xdd}
   %     \xform{xii}{\bForm[1/x]}{right=of xid}
-  %     \xos{a1}{xdi}
-  %     \xos{a2}{xid}
-  %     \xos{a1}{xdd}
-  %     \xos{a2}{xdd}
+  %     \xo{a1}{xdi}
+  %     \xo{a2}{xid}
+  %     \xo{a1}{xdd}
+  %     \xo{a2}{xdd}
   %     \po{a1}{a2}
   %   \end{tikzinline}}
   % \end{gather*}
@@ -1384,7 +1384,7 @@ order.
           \xform{xd}{1{=}r\limplies\bForm}{}
           \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
           \eventl{\bEv}{a1}{\DR{x}{1}}{left=of xd}
-          \xos{a1}{xd}
+          \xo{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -1395,7 +1395,7 @@ order.
           \xform{xd}{r{=}1\land\bForm\noSUB{[r/y]}}{}
           \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
           \eventl{\aEv}{a2}{r{=}1\mid\DW{y}{1}}{left=of xd}      
-          \xos{a2}{xd}
+          \xo{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -1416,10 +1416,10 @@ order.
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
         \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
         \eventl{\aEv}{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{=}1\mid\DW{y}{1}}{above right=.5em and -4em of xdd}
-        \xos{a1}{xdi}
-        \xos{a2}{xid}
-        \xos{a1}{xdd}
-        \xos{a2}{xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
       \end{tikzinline}}
   \end{gather*}
   This pomset's preconditions depend on a bound register, so cannot contribute
@@ -1442,10 +1442,10 @@ order.
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
         \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
         \eventl{\aEv}{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{above right=.5em and -4em of xdd}
-        \xos{a1}{xdi}
-        \xos{a2}{xid}
-        \xos{a1}{xdd}
-        \xos{a2}{xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
@@ -1463,7 +1463,7 @@ order.
           \xform{xd}{1{=}r\limplies\bForm}{}
           \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
           \event{a1}{\DR{x}{1}}{left=of xd}
-          \xos{a1}{xd}
+          \xo{a1}{xd}
         \end{tikzinline}}    
     \end{gathered}
     &&
@@ -1474,7 +1474,7 @@ order.
           \xform{xd}{\bForm\noSUB{[r/y]}}{}
           \xform{xi}{r{=}2\land\bForm\noSUB{[r/y]}}{right=.5em of xd}
           \event{a2}{r{=}2\mid\DW{y}{2}}{left=of xd}      
-          \xos{a2}{xd}
+          \xo{a2}{xd}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -1491,10 +1491,10 @@ order.
         \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
         \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
         \eventl{\aEv}{a2}{1{=}r\limplies r{=}2\mid\DW{y}{2}}{above right=.5em and -4em of xdd}
-        \xos{a1}{xdi}
-        \xos{a2}{xid}
-        \xos{a1}{xdd}
-        \xos{a2}{xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gather*}
@@ -1519,7 +1519,7 @@ order.
           \event{a1}{1{=}1\mid\DW{x}{1}}{}
           \xform{x1d}{1{=}1\land\bForm}{right=of a1}
           \xform{x1i}{\bForm}{right=.5em of x1d}
-          \xos{a1}{x1d}
+          \xo{a1}{x1d}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -1530,7 +1530,7 @@ order.
           \event{a2}{2{=}1\mid\DW{x}{1}}{}
           \xform{x2d}{2{=}1\land\bForm}{right=of a2}
           \xform{x2i}{\bForm}{right=.5em of x2d}
-          \xos{a2}{x2d}
+          \xo{a2}{x2d}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -1543,7 +1543,7 @@ order.
   %%       \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
   %%       \xform{x1d}{\bForm}{below=of a1}
   %%       \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
-  %%       \xo{a1}{x1d}
+  %%       \xo[xright]{a1}{x1d}
   %%     \end{tikzinline}}
   %%   \end{gathered}
   %%   &&
@@ -1554,7 +1554,7 @@ order.
   %%       \event{a2}{\FALSE\mid\DW{x}{1}}{}
   %%       \xform{x2d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
   %%       \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
-  %%       \xo{a2}{x2d}
+  %%       \xo[xright]{a2}{x2d}
   %%     \end{tikzinline}}
   %%   \end{gathered}
   %% \end{align*}
@@ -1566,7 +1566,7 @@ order.
         \event{a1}{\DW{x}{1}}{}
         \xform{x1d}{\FALSE}{right=of a1}
         \xform{x1i}{\bForm}{right=.5em of x1d}
-        \xos{a1}{x1d}
+        \xo{a1}{x1d}
       \end{tikzinline}}
   \end{gather*}
   This pomset cannot be part of a top-level pomset, since

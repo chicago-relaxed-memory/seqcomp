@@ -1,4 +1,5 @@
 \begin{figure}
+  \bookmark{Semantics of programs}
   \raggedright
   \noindent
   Suppose $\aRel_1:\aEvs_1\times\aEvs_1$ and $\aRel_2:\aEvs_2\times\aEvs_2$.
@@ -46,56 +47,6 @@
         % ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$.
         % if $\bEv\xrfx\aEv$ then either $\bEv\xrfx_1\aEv$, $\bEv\xrfx_2\aEv$, or $\bEv\le\aEv$.
         if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
-      \end{enumerate}
-    \end{enumerate}
-  \end{multicols}
-  \medskip
-
-  \noindent
-  If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
-  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
-  \begin{multicols}{2}
-    \begin{enumerate}[topsep=0pt,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
-    \item \label{if-E}
-      $\aEvs = (\aEvs_1\cup\aEvs_2)$,
-    \item \label{if-lambda}
-      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
-      % \item[(\ref{par-E}--\ref{par-le})] as for $\sLPAR{}{}$,
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{c}3]{}{if-kappa}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{if-kappa1}
-        if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \aForm\land\labelingForm_1(\aEv)$,
-      \item \label{if-kappa2}
-        if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \rimplies \neg\aForm\land\labelingForm_2(\aEv)$, 
-      \item \label{if-kappa12}
-        if $\aEv\in\aEvs_1\cap\aEvs_2$\\ then
-        % $\labelingForm(\aEv) \rimplies (\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$,
-        $\labelingForm(\aEv) \rimplies (\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$,
-      \end{enumerate}
-    \item \label{if-tau}
-      % $\aTr{\bEvs}{\bForm} \rimplies (\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$,
-      $\aTr{\bEvs}{\bForm} \rimplies (\aForm\land\aTr[1]{\bEvs}{\bForm})\lor(\neg\aForm\land\aTr[2]{\bEvs}{\bForm})$,
-    \item \label{if-term}
-      % $\aTerm \rimplies (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
-      $\aTerm \rimplies (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$.
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{c}6]{}{if-rf}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{if-rf-extends}
-        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
-      \item \label{if-le-subset}
-        ${\rrfx}\rsubset{\rrfx_1}{\rrfx_2}$,
-      \end{enumerate}
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{c}7]{}{if-le}
-      \begin{enumerate}[leftmargin=0pt]
-        % \item \label{if-le-rf}
-        %   if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
-      \item \label{if-le-extends}
-        ${\le}\rextends{\le_1}{\le_2}$,
-      \item \label{if-le-subset}
-        ${\le}\rsubset{\le_1}{\le_2}$.
       \end{enumerate}
     \end{enumerate}
   \end{multicols}
@@ -165,6 +116,56 @@
       %   % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
       %   % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
       %   % or $\cEv\le\bEv$,
+    \end{enumerate}
+  \end{multicols}
+  \medskip
+
+  \noindent
+  If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+    \item \label{if-E}
+      $\aEvs = (\aEvs_1\cup\aEvs_2)$,
+    \item \label{if-lambda}
+      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+      % \item[(\ref{par-E}--\ref{par-le})] as for $\sLPAR{}{}$,
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{c}3]{}{if-kappa}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{if-kappa1}
+        if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \aForm\land\labelingForm_1(\aEv)$,
+      \item \label{if-kappa2}
+        if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \rimplies \neg\aForm\land\labelingForm_2(\aEv)$, 
+      \item \label{if-kappa12}
+        if $\aEv\in\aEvs_1\cap\aEvs_2$\\ then
+        % $\labelingForm(\aEv) \rimplies (\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$,
+        $\labelingForm(\aEv) \rimplies (\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$,
+      \end{enumerate}
+    \item \label{if-tau}
+      % $\aTr{\bEvs}{\bForm} \rimplies (\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$,
+      $\aTr{\bEvs}{\bForm} \rimplies (\aForm\land\aTr[1]{\bEvs}{\bForm})\lor(\neg\aForm\land\aTr[2]{\bEvs}{\bForm})$,
+    \item \label{if-term}
+      % $\aTerm \rimplies (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
+      $\aTerm \rimplies (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$.
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{c}6]{}{if-rf}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{if-rf-extends}
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+      \item \label{if-le-subset}
+        ${\rrfx}\rsubset{\rrfx_1}{\rrfx_2}$,
+      \end{enumerate}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{c}7]{}{if-le}
+      \begin{enumerate}[leftmargin=0pt]
+        % \item \label{if-le-rf}
+        %   if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
+      \item \label{if-le-extends}
+        ${\le}\rextends{\le_1}{\le_2}$,
+      \item \label{if-le-subset}
+        ${\le}\rsubset{\le_1}{\le_2}$.
+      \end{enumerate}
     \end{enumerate}
   \end{multicols}
   \medskip
@@ -253,17 +254,17 @@
   % $(\exists\bmode\in\{\amode,\mRLX\})$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
-    \item \label{fork-E}
+    \item \label{fence-E}
       % $\aEvs\neq\emptyset$ and
       if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-    \item \label{fork-lambda}
+    \item \label{fence-lambda}
       $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
       % \item%[{\labeltext[F3]{(F3)}{F3}}]
       %   $\labelingForm(\aEv) \rimplies \bigwedge_{\aLoc\in\aLocs}\Dx{\aLoc}$,
       \stepcounter{enumi}
-    \item \label{fork-tau}
+    \item \label{fence-tau}
       $\aTr{\bEvs}{\bForm} \rimplies \bForm$,
-    \item \label{fork-term}
+    \item \label{fence-term}
       if $\aEvs=\emptyset$ then $\aTerm \rimplies \FALSE$.
     \end{enumerate}
   \end{multicols}

@@ -118,8 +118,8 @@ understand the constraints imposed by hardware and compilers.
 
 For single-threaded programs, memory can be thought of as you might
 expect: programs write to, and read from, memory references.
-This can be thought of as a total order of reads and writes,
-where each read has a matching \emph{fulfilling} write,
+This can be thought of as a total order of reads and writes (black arrows),
+where each read has a matching \emph{fulfilling} write (green arrows),
 for example:
 \begin{gather*}
   \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}\SEMI
@@ -140,6 +140,7 @@ for example:
       \po{ry2}{rx1}
     \end{tikzinline}}
 \end{gather*}
+
 % (In examples, $\aReg$--$\bReg$ range over thread-local registers and $\aLoc$-$\cLoc$
 % range over shared memory references.)
 
@@ -193,7 +194,7 @@ are inconsistent with program order, such as:
       \rf[out=15,in=165]{wy2}{ry2}
       \rf[out=15,in=165]{wx0}{rx0}
       \po{wx0}{wx1}
-      \po[out=-165,in=-15]{rx0}{wx1}
+      \wk[out=-165,in=-15]{rx0}{wx1}
     \end{tikzinline}}
 \end{gather*}
 
@@ -593,7 +594,7 @@ penalties.  In this paper, we have take the opposite approach.  We have
 attempted to find the most intellectually tractable model that encompasses
 all of the messiness of relaxed memory.
 
-There are prior studies of relaxed memory that include sequential
+There are few prior studies of relaxed memory that include sequential
 composition and/or precise calculation of semantic dependencies.
 \citet{DBLP:conf/esop/PaviottiCPWOB20} give a denotational semantics,
 calculating dependencies using event structures rather than logic.  They give
@@ -622,20 +623,22 @@ requiring fences for every relaxed read on Arm
 \cite{Lamport:1979:MMC:1311099.1311750, DBLP:conf/pldi/LahavVKHD17,
   Dolan:2018:BDR:3192366.3192421, DBLP:conf/lics/JeffreyR16,
   Boehm:2014:OGA:2618128.2618134}. %, DBLP:journals/corr/abs-1804-04214}.
-
-Many of the most prominent models are based on speculative execution
-\cite{Manson:2005:JMM:1047659.1040336, DBLP:conf/esop/JagadeesanPR10,
+%
+Many of the most prominent models are operational, whole-program models based
+on speculative execution \cite{Manson:2005:JMM:1047659.1040336,
+  DBLP:conf/esop/JagadeesanPR10,
   DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}.
-In their introduction, \citet{DBLP:journals/pacmpl/JagadeesanJR20} note that
-these models fail to validate compositional reasoning of temporal
-properties---see their examples OOTA4 and OOTA5 (from
-\citep{DBLP:journals/toplas/Lochbihler13}).  The difference with our model
-can be understood in terms of the valid program transformations.  The
-speculative models allow reads to be introduced, with subsequent case
-analysis on the value read---effectively, this can turn one read into two,
-with different conditional branches taken for the two copies of the read.
-Our model invalidates this transformation.  In return, our model enjoys
-compositionality for temporal safety properties.
+
+\citet{DBLP:journals/pacmpl/JagadeesanJR20} note that the speculative models
+listed above all, including \cite{DBLP:conf/popl/KangHLVD17}, fail to
+validate compositional reasoning of temporal properties---see their examples
+OOTA4 and OOTA5 (from \citep{DBLP:journals/toplas/Lochbihler13}).  The
+difference with our model can be understood in terms of the valid program
+transformations.  The speculative models allow reads to be introduced, with
+subsequent case analysis on the value read---effectively, this can turn one
+read into two, with different conditional branches taken for the two copies
+of the read.  Our model invalidates this transformation.  In return, our
+model enjoys compositionality for temporal safety properties.
 
 
 

@@ -1,11 +1,11 @@
 \section{The Basic Model}
 \label{sec:model}
 
-After some preliminaries, we define the basic model
-(\textsection\ref{sec:pomsets} and \reffig{fig:sem}).  We explain the model
-using examples (\textsection \ref{sec:ex1}--\ref{sec:ex3}), establish some
-basic properties (\textsection\ref{sec:props}), and discuss program
-transformations (\textsection\ref{sec:valid}--\ref{sec:invalid}).  We encourage
+After some preliminaries (\textsection\ref{sec:prelim}--\ref{sec:actions}),
+we define the basic model and establish some basic properties
+(\textsection\ref{sec:pomsets} and \reffig{fig:sem}).  We then explain the
+model using examples (\textsection\ref{sec:ex:pomset}--\ref{sec:ex:tau}) and
+discuss program transformations (\textsection\ref{sec:valid}).  We encourage
 readers to skip to the examples, coming back as needed.
 
 %% Batty suggest example where dependencies are added and also go away, perhaps
@@ -120,7 +120,7 @@ The semantics is built from the following.
 \end{itemize}
 %$\dEvs$.
 
-We require that:
+We require that
 \begin{itemize}
 \item formulae include $\TRUE$, $\FALSE$ and the equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
 \item formulae are closed under $\lnot$, $\land$, $\lor$, $\limplies$, and
@@ -174,7 +174,7 @@ $\aForm$ is \emph{unsatisfiable} if $\aForm \rimplies \FALSE$.
 
 
 \subsection{Actions in This Paper}
-
+\label{sec:actions}
 In this paper, we let actions be reads and writes and fences:
 \begin{displaymath}
   \aAct,\bAct \BNFDEF \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
@@ -273,7 +273,7 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
   \end{math}.
 \end{definition}
 
-\subsection{Pomsets with Predicate Transformers}
+\subsection{Definition: Pomsets with Predicate Transformers}
 \label{sec:pomsets}
 
 \emph{Predicate transformers} are functions on formulae which preserve
@@ -362,75 +362,51 @@ applied to any event $\aEv$ where if $\bEv\in\bEvs$ then $\bEv<\aEv$.
         if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
     \end{enumerate}
   \end{enumerate}
-  A pomset is \emph{top-level} if $\aTerm$ is a tautology and for every $\aEv\in\aEvs$,
+  A pomset is \emph{top-level} if \labeltext[\textsc{t}1]{(\textsc{t}1)}{top-term} $\aTerm$ is a tautology and \labeltext[\textsc{t}2]{(\textsc{t}2)}{top-ev} for every $\aEv\in\aEvs$,
   % $\labelingForm(\aEv)$ is a tautology and
   % if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
   %\begin{multicols}{2}
     \begin{enumerate}[label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
-    \item \label{top-true}
-      $\labelingForm(\aEv)$ is a tautology,    
-    \item \label{top-rf}
-      if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+      \setcounter{enumi}{2}
+    \item[]
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{top-kappa}
+        $\labelingForm(\aEv)$ is a tautology,    
+      \item \label{top-rf}
+        if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+      \end{enumerate}
     \end{enumerate}
   %\end{multicols}
 \end{definition}
-
-We give the semantics of programs in \reffig{fig:sem}.
 \input{fig-sem.tex}
 
-\subsection{Examples: Pomsets}
-\label{sec:ex1}
-\subsection{Examples: Pomsets with Preconditions}
-\label{sec:ex2}
-\subsection{Examples: Pomsets with Predicate Transformers}
-\label{sec:ex3}
+We give the semantics of programs $\sembase{}$ in \reffig{fig:sem}.
 
-\subsection{Basic Properties}
-\label{sec:props}
+Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
+%Let $\Pom$ be the set of all pomsets.
 
-\begin{lemma}
-  \label{lem:rf:implies:le}
-  For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
-  $\bEv\le\aEv$.
+The model has seven components, which can be daunting at first glance.  To
+aid the reader, we use consistent numbering throughout. For example, item $7$
+always refers to the order relation.
 
-  \vspace{-.5\baselineskip}
-  \begin{proof}
-    Induction on the definition of $\sembase{}$.
-  \end{proof}
-\end{lemma}
+The core of the model is a pomset, which includes a set of events
+\eqref{pom-E}, a labeling \eqref{pom-lambda}, and an order \eqref{pom-le}.
+We also include the \emph{reads-from} relation explicitly in the model
+\eqref{pom-rf}.
 
-The semantics to be closed with respect to \emph{augmentation}
-Augments include more order and stronger formulae; in examples, we typically
-consider pomsets that are augment-minimal.  One intuitive reading of augment
-closure is that adding order can only cause preconditions to weaken.
-\begin{definition}
-  \label{def:augment}
-  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
-  \begin{multicols}{4}
-    \begin{enumerate}
-    \item $\aEvs_2=\aEvs_1$,
-    \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-    \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
-    \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
-    \item $\aTerm[2] \rimplies \aTerm[1]$,
-    \item ${\rrfx_2}={\rrfx_1}$,
-    \item ${\le_2}\supseteq{\le_1}$.
-    \end{enumerate}
-  \end{multicols}
-\end{definition}
+On top of this basic structure, \ref{pom-kappa}--\ref{pom-term} add a layer
+of logic.  For each pomset, \ref{pom-term} provides a termination condition.
+For each event in a pomset, \ref{pom-kappa} provides a precondition.  For
+each set of events in a pomset, \ref{pom-tau} provides a predicate
+transformer.  Sequential dependency is calculated by $\labelingForm'_2$ in
+the semantics of sequential composition.
 
-\begin{lemma}
-  % Suppose $\aPS_1\in\sembase{\aCmd}$.
-  If $\aPS_1\in\sembase{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sembase{\aCmd}$.
-  % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sembase{\aCmd}$.
-  % \end{lemma}
-
-  \vspace{-.5\baselineskip}
-  \begin{proof}
-    Induction on the definition of $\sembase{}$.
-  \end{proof}
-\end{lemma}
-
+Before discussing the details of the model, we note that the semantics
+satisfies the expected monoid laws and is closed with respect to
+\emph{augmentation}.  Augments include more order and stronger formulae; in
+examples, we typically consider pomsets that are augment-minimal.  One
+intuitive reading of augment closure is that adding order can only cause
+preconditions to weaken.
 \begin{lemma}
   $(\aPSS_1\SEMI\aPSS_2)\SEMI\aPSS_3=\aPSS_1\SEMI(\aPSS_2\SEMI\aPSS_3)$
   and    
@@ -446,6 +422,33 @@ closure is that adding order can only cause preconditions to weaken.
     disjunction closure \eqref{tr-or}.
   \end{proof}
 \end{lemma}
+\begin{definition}
+  \label{def:augment}
+  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
+  \begin{multicols}{4}
+    \begin{enumerate}
+    \item $\aEvs_2=\aEvs_1$,
+    \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+    \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
+    \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
+    \item $\aTerm[2] \rimplies \aTerm[1]$,
+    \item ${\rrfx_2}={\rrfx_1}$,
+    \item ${\le_2}\supseteq{\le_1}$.
+    \end{enumerate}
+  \end{multicols}
+\end{definition}
+\begin{lemma}
+  % Suppose $\aPS_1\in\sembase{\aCmd}$.
+  If $\aPS_1\in\sembase{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sembase{\aCmd}$.
+  % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sembase{\aCmd}$.
+  % \end{lemma}
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    Induction on the definition of $\sembase{}$.
+  \end{proof}
+\end{lemma}
+
 
 
 
@@ -457,19 +460,6 @@ closure is that adding order can only cause preconditions to weaken.
 %   $\aRel\cap(\aEvs_1\times \aEvs_1) = \aRel_1$ and
 %   $\aRel\cap(\aEvs_2\times \aEvs_2) = \aRel_2$.
 % \end{definition}
-Note that $\aEvs_1$ and $\aEvs_2$ are not necessarily disjoint.
-In $\sIFTHEN{}{}{}$, the definition of $\rextendsdef{}{}$ stops coalescing the $\rrfx$ in
-\begin{displaymath}
-  \IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI
-\end{displaymath}
-
-
-We have given the semantics of $\sIF{}{}{}$ using 
-disjunctive normal form. \citet{DBLP:journals/cacm/Dijkstra75} used
-conjunctive normal form.  Note that 
-\href{https://www.wolframalpha.com/input/?i=\%28a+and+b\%29+or+\%28not+a+and+c\%29}{$(\aForm\land\cForm_1)\lor(\neg\aForm\land\cForm_2)$}
-is logically equivalent to
-\href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}.
 
 %We include empty sets as prep for adding while loops.
 
@@ -496,7 +486,777 @@ is logically equivalent to
 
 
 
-\subsection{Valid Transformations}
+\subsection{Discussion: Pomsets}
+\label{sec:ex:pomset}
+
+We first explain the core of model, ignoring the logic (rules 3--5).  We
+defer discussion of $\sIF{}$ to \textsection\ref{sec:ex:kappa}.  We defer the
+discussion of $\sLET{}{}$ to \textsection\ref{sec:ex:tau}.
+
+Reads, writes, and fences map to pomsets with at most one event.  $\SKIP$
+maps to the empty pomset.  Ignoring the logic, the definitions are
+straightforward.  Note only that $\sembase{\PW{x}{1}}$ can write any value
+$\aVal$; the fact that $\aVal$ must be $1$ is captured in the logic (see
+\textsection\ref{sec:ex:term}).
+
+The structural rules combine pomsets:  Parallel composition is disjoint
+union, inheriting labeling, order and $\rrfx$ from the two sides.  Any
+$\rrfx$ edges added between the two sides must also be added to the order
+\eqref{par-le-rf}.
+%
+Sequential composition is similar, with two changes: \ref{seq-E} does not
+require disjointness (see \textsection\ref{sec:ex:term}), and
+\ref{seq-le-delays} may require order (see example \ref{pub}, below).
+
+Note that reads-from implies order.
+\begin{lemma}
+  \label{lem:rf:implies:le}
+  For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
+  $\bEv\le\aEv$.
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    Induction on the definition of $\sembase{}$, using \ref{par-le-rf} and \ref{seq-le-rf}.
+  \end{proof}
+\end{lemma}
+In top-level pomsets, every read must have a matching write in $\rrfx$
+\eqref{top-rf}.  Together with \ref{rf-match} and \ref{rf-block}, the lemma
+guarantees that reads are \emph{fulfilled} at top-level, as in
+\cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.\footnote{The
+  basic model would be the same if we move $\rrfx$ from the model itself to
+  be existentially quantified in the definition of top-level pomset, along
+  with \ref{rf-match} and \ref{rf-block}.  This was the approach of
+  \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
+  explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
+  variant semantics $\frf{\semrr{}}$ for which \reflem{lem:rf:implies:le}
+  fails.}
+
+From \refdef{def:actions}, recall that $\aAct \rdelaysdef \bAct$ if
+$\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or
+$\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
+order is enforced between conflicting accesses of the same location
+($\eqreorderco$), into a release and out of an acquire ($\reorderra$) and
+between SC accesses ($\eqreordersc$).  Combined with the fulfillment
+requirements (\ref{rf-match}, \ref{rf-block} and \reflem{lem:rf:implies:le}),
+these ensure coherence, publication, subscription and other idioms.  For
+example, consider the following:
+\begin{gather*}
+  \taglabel{pub}
+  \begin{gathered}    
+    \PW{x}{0}\SEMI 
+    \PW{x}{1}\SEMI \PW[\mRA]{y}{1} \PAR \PR[\mRA]{y}{r}\SEMI \PR{x}{s}
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \event{wy1}{\DWRel{y}{1}}{right=of wx1}
+        \event{ry1}{\DRAcq{y}{1}}{right=2.5em of wy1}
+        \event{rx0}{\DR{x}{0}}{right=of ry1}
+        \sync{wx1}{wy1}
+        \sync{ry1}{rx0}
+        \rf{wy1}{ry1}
+        \wk[out=170,in=10]{rx0}{wx1}
+        \wk{wx0}{wx1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+The execution is allowed due to the evident cycle.  All of the order shown is
+required at top-level: The intra-thread order comes from \ref{seq-le-delays}:
+$\DWP{x}{0}\xwk \DWP{x}{1}$ is required by $\eqreorderco$.
+$\DWP{x}{1}\xwk \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xwk \DRP{x}{0}$ are
+required by $\reorderra$.  The cross-thread order is required by fulfillment:
+\ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
+\ref{rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
+\ref{seq-le-rf} subsequently ensures that
+$\DWP[\mREL]{y}{1}\xwk \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
+$\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{rf-block}.  (Alternatively,
+we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
+
+The semantics gives the expected results for store buffer and load buffering,
+as well as litmus tests involving fences and SC access.  The model of
+coherence is weaker than C11, to support common subexpression elimination,
+and stronger than Java, to support local reasoning about data races.  See
+\cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20} for a discussion.
+
+
+
+\subsection{Discussion: Termination}
+\label{sec:ex:term}
+
+In top-level pomsets, \ref{top-term} requires that $\aTerm$ is a tautology,
+capturing termination.  Roughly, the structural rules take $\aTerm$ to be
+$\aTerm_1\land\aTerm_2$.  The interesting rules are $\sLOAD{}{}$,
+$\sFENCE{}$, and $\sSTORE{}{}$.
+
+
+In $\sLOAD{}{}$, there is no restriction on $\aTerm$.  From this, it is easy
+to see that
+\begin{math}
+  \sembase{\PR{x}{r}}
+  \supseteq
+  \sembase{\SKIP}
+\end{math}
+is a valid refinement.
+
+In $\sFENCE{}$, instead, \ref{fence-term} ensures that all fences are included at
+top-level.
+
+In $\sSTORE{}{}$, \ref{write-term-empty} is similar.  In addition,
+\ref{write-term-nonempty} ensures that top-level pomsets do not include bogus
+writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted above, $\aPS$ can
+include $\DWP{x}{\aVal}$, for any value $\aVal$.  At top-level, however,
+\ref{write-term-nonempty} requires that $\aTerm$ implies $1{=}\aVal$.
+
+In the structural rules, if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, we say
+that $\bEv$ and $\aEv$ \emph{coalesce} if $\bEv=\aEv$.
+
+\ref{seq-E} allows \emph{mumbling} \cite{DBLP:journals/iandc/Brookes96} by
+coalescing events.  For example
+\begin{math}
+  \sembase{\PW{x}{1} \SEMI \PW{x}{1}}
+\end{math}
+includes the singleton pomset
+\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+  \event{a1}{\DW{x}{1}}{}
+\end{tikzinlinesmall}.  From this it is easy to see that
+\begin{math}
+  \sembase{\PW{x}{1}\SEMI\PW{x}{1}}
+  \supseteq
+  \sembase{\PW{x}{1}}
+\end{math}
+is a valid refinement.  It is equally obvious that
+\begin{math}
+  \sem{\PW{\aLoc}{1}} 
+  \not\supseteq
+  \sem{\PW{\aLoc}{1} \SEMI \PW{\aLoc}{1}}
+\end{math}
+is not a valid refinement, since the latter includes a two-element pomset,
+but the former does not.\footnote{These are distinguished by the context:
+\begin{math}
+  \hole{} \PAR
+  \PR{x}{r} \SEMI
+  \PW{x}{2} \SEMI
+  \PR{x}{s}\SEMI
+  \IF{\aReg {=} \bReg} \THEN \PW{\cLoc}{1} \FI.
+\end{math}}
+
+\subsection{Discussion: Preconditions}
+\label{sec:ex:kappa}
+
+In top-level pomsets, \ref{top-kappa} requires that every precondition $\labelingForm(\aEv)$ is a tautology,
+
+
+The definition of $\rextendsdef{}{}$ ensures that no new order
+is introduced between events in $\aEvs_1\cap\aEvs_2$.\footnote{This ensures
+  that
+  \begin{math}
+    \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
+  \end{math}
+  does not include 
+  \begin{tikzinlinesmall}[node distance=1.5em]
+    \event{a}{\DR{x}{1}}{}
+    \event{b}{\DW{x}{1}}{right=of a}
+    \rf[out=170,in=10]{b}{a}
+    \wk{a}{b}
+  \end{tikzinlinesmall}, taking $\xrfx$ from the left and $\le$ from the right.}
+
+We have given the semantics of $\sIF{}{}{}$ using 
+disjunctive normal form. \citet{DBLP:journals/cacm/Dijkstra75} used
+conjunctive normal form.  Note that 
+\href{https://www.wolframalpha.com/input/?i=\%28a+and+b\%29+or+\%28not+a+and+c\%29}{$(\aForm\land\cForm_1)\lor(\neg\aForm\land\cForm_2)$}
+is logically equivalent to
+\href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}.
+
+\begin{example}
+  \label{ex:data}
+  A simple example of a data dependency
+  is a pomset $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$,
+  for which there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\PW{y}{r}}$
+  such as the following, where $\aVal=1$:
+  % \vspace{-.5\baselineskip}
+  \begin{gather*}
+    \PW{y}{r}
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{r{=}1\mid\DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gather*}
+  The value chosen for the read may be different from that chosen for the write:
+  % \vspace{-.5\baselineskip}
+  \begin{gather*}
+    \PR{x}{r}\SEMI \PW{y}{r}
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{wy1}{r{=}0\limplies r{=}1 \mid \DW{y}{1}}{right=of rx0}
+        \po{rx0}{wy1}
+      \end{tikzinline}}
+  \end{gather*}
+  In this case, the pomset's preconditions depend on a bound register, so
+  cannot contribute to a top-level pomset.
+
+  If the values chosen for read and write are compatible, then we have two
+  cases: the independent case, which again cannot be part of a top-level
+  pomset,
+  \begin{gather*}
+    \PR{x}{r}\SEMI \PW{y}{r}
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{wy1}{r{=}1 \mid \DW{y}{1}}{right=of rx1}
+      \end{tikzinline}}
+  \end{gather*}
+  and the dependent case:
+  \begin{gather*}
+    % \PR{x}{r}\SEMI \PW{y}{r}
+    % \\
+    % \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx1}{\DR{x}{1}}{}
+        \event{wy1}{r{=}1\limplies r{=}1 \mid \DW{y}{1}}{right=of rx1}
+        \po{rx1}{wy1}
+      \end{tikzinline}}
+  \end{gather*}
+  Since $r{=}1\limplies r{=}1$ is a tautology, this can be part of
+  a top-level pomset.
+\end{example}
+
+\begin{example}
+  Control dependencies are similar, for example
+  for any $\aPS\in\sem{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}$,
+  there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\IF r \THEN \PW{y}{1} \FI}$
+  such as:
+  \begin{gather*}
+    \IF r \THEN \PW{y}{1} \FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{r{\ne}0\mid\DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gather*}
+  The rest of the reasoning is the same as \refex{ex:data}.
+\end{example}
+
+\begin{example}
+  A simple example of an independency
+  is a pomset $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{1}}$,
+  for which there must be:
+  % an %$\aVal\in\Val$ and
+  % $\aPS'\in \sem{\PW{y}{r}}$
+  % such as:
+  % \vspace{-1\baselineskip}
+  \begin{gather*}
+    \PW{y}{1}
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{1{=}1\mid\DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gather*}
+  In this case it doesn't matter what value the read chooses:
+  \begin{gather*}
+    \PR{x}{r}\SEMI \PW{y}{1}
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{rx0}{\DR{x}{0}}{}
+        \event{wy1}{1{=}1 \mid \DW{y}{1}}{right=of rx0}
+      \end{tikzinline}}
+  \end{gather*}
+  % Since $1{=}1$ is a tautology, this can be part of
+  % a top-level pomset.
+\end{example}
+
+\begin{example}
+  Consider $\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, so
+  there must be $\aPS_1\in\sem{\PW{y}{r}}$,
+  and $\aPS_2\in\sem{\PW{y}{1}}$, such as:
+  \begin{align*}
+    \begin{gathered}
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Since there is no requirement for disjointness in the semantics of conditionals,
+  we can consider the case where the event \emph{coalesces} from the two pomsets,
+  in which case:
+  \begin{gather*}
+    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gather*}
+  Here, the precondition is a tautology, 
+  independent of $r$.
+  % We refer to event sharing as \emph{coalescing} or \emph{merging}.
+\end{example}
+
+\subsection{Discussion: Predicate Transformers}
+\label{sec:ex:tau}
+
+the treatment of sequential composition
+is new.  This uses the usual rule for composition of predicate
+transformers (but preserving the indexing set). For the pomset, we
+take the union of their events, preserving actions, but crucially in
+cases~\ref{seq-kappa2} and~\ref{seq-kappa12} we apply a predicate
+transformer $\aTr[1]{\cEvs}{}$ from the left-hand side to a precondition
+$\labelingForm_2(\aEv)$ from the right-hand side to build the precondition
+$\labelingForm'_2(\aEv)$.  The indexing set $\cEvs$ for the predicate
+transformer is $\{ \cEv\mid \cEv<\aEv \}$, so can depend on the causal
+order.
+\begin{example}
+  For read to write dependency, consider:
+  \begin{align*}
+    \begin{gathered}
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{1{=}r\limplies\bForm}{}
+          \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
+          \eventl{\bEv}{a1}{\DR{x}{1}}{left=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{r{=}1\land\bForm\noSUB{[r/y]}}{}
+          \xform{xi}{\bForm\noSUB{[r/y]}}{right=.5em of xd}
+          \eventl{\aEv}{a2}{r{=}1\mid\DW{y}{1}}{left=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Putting these together without order,
+  we calculate the precondition $\labelingForm(\aEv)$
+  as $\aTr[1]{\cEvs}{\labelingForm_2(\aEv)}$, where $\cEvs$ is $\{\cEv\mid\cEv<\aEv\}$, which is $\emptyset$.
+  Since $\aTr[1]{\emptyset}{\bForm}$ is $\bForm$, this gives that 
+  $\labelingForm(\aEv)$ is $\labelingForm_2(\aEv)$, which is $\aReg{=}1$.
+  This gives the pomsaet with predicate transformers:
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdd}{1{=}r\limplies(r{=}1\land \bForm\noSUB{[r/y]})}{}
+        \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
+        \xform{xid}{r{=}1\land\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
+        \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
+        \eventl{\aEv}{a2}{\noOR{(x{=}r\lor1{=}r)\limplies} r{=}1\mid\DW{y}{1}}{above right=.5em and -4em of xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+      \end{tikzinline}}
+  \end{gather*}
+  This pomset's preconditions depend on a bound register, so cannot contribute
+  to a top-level pomset.
+  
+  Putting them together with order,
+  we calculate the precondition $\labelingForm(\aEv)$
+  as $\aTr[1]{\cEvs}{\labelingForm_2(\aEv)}$, where $\cEvs$ is $\{\cEv\mid\cEv<\aEv\}$, which is $\{\bEv\}$.
+  Since $\aTr[1]{\{\bEv\}}{\bForm}$ is $(1{=}\aReg \limplies \bForm)$, this gives that 
+  $\labelingForm(\aEv)$ is $(1{=}\aReg \limplies \labelingForm_2(\aEv))$, which is $(1{=}\aReg \limplies \aReg{=}1)$.
+  This gives the pomset with predicate transformers:
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdd}{1{=}r\limplies(r{=}1\land \bForm\noSUB{[r/y]})}{}
+        \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
+        \xform{xid}{r{=}1\land\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
+        \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
+        \eventl{\aEv}{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{above right=.5em and -4em of xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+        \po{a1}{a2}
+      \end{tikzinline}}
+  \end{gather*}
+  This pomset's preconditions do not depend on a bound register, so can contribute
+  to a top-level pomset.
+\end{example}
+
+\begin{example}
+  If the read and write choose different values:
+  \begin{align*}
+    \begin{gathered}
+      \PR{x}{r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{1{=}r\limplies\bForm}{}
+          \xform{xi}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm}{right=.5em of xd}
+          \event{a1}{\DR{x}{1}}{left=of xd}
+          \xo{a1}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \xform{xd}{\bForm\noSUB{[r/y]}}{}
+          \xform{xi}{r{=}2\land\bForm\noSUB{[r/y]}}{right=.5em of xd}
+          \event{a2}{r{=}2\mid\DW{y}{2}}{left=of xd}      
+          \xo{a2}{xd}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  Putting these together with order, we have the following, which cannot be
+  part of a top-level pomset:
+  \begin{gather*}
+    \PR{x}{r} \SEMI
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \xform{xdd}{1{=}r\limplies(r{=}2\land \bForm\noSUB{[r/y]})}{}
+        \xform{xdi}{1{=}r\limplies\bForm\noSUB{[r/y]}}{left=of xdd}
+        \xform{xid}{r{=}2\land\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xdd}
+        \xform{xii}{\noOR{(x{=}r\lor1{=}r)\limplies}\bForm\noSUB{[r/y]}}{right=of xid}
+        \eventl{\bEv}{a1}{\DR{x}{1}}{above left=.5em and -2em of xdd}
+        \eventl{\aEv}{a2}{1{=}r\limplies r{=}2\mid\DW{y}{2}}{above right=.5em and -4em of xdd}
+        \xo{a1}{xdi}
+        \xo{a2}{xid}
+        \xo{a1}{xdd}
+        \xo{a2}{xdd}
+        \po{a1}{a2}
+      \end{tikzinline}}
+  \end{gather*}
+
+  % The precondition of $\DWP{y}{2}$ is unsatisfiable if no further assumptions
+  % can be made on $r$; that is the case here, since we assume each register
+  % occurs at most once in source programs. If we choose a pomset that without
+  % the order $\DRP{x}{1}\xpo\DWP{y}{2}$, the precondition of $\DWP{y}{1}$ is
+  % strengthened to $(r{=}2)$, which is also unsatisfiable without further
+  % assumptions on $r$; the predicate transformers are unchanged.
+\end{example}
+
+\begin{example}
+  \label{ex:left-merge}
+  \ref{S4} includes $\aExp{=}\aVal$ to ensure that
+  spurious merges do not go undetected.  Consider the following.
+  \begin{align*}
+    \begin{gathered}
+      \PW{x}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a1}{1{=}1\mid\DW{x}{1}}{}
+          \xform{x1d}{1{=}1\land\bForm}{right=of a1}
+          \xform{x1i}{\bForm}{right=.5em of x1d}
+          \xo{a1}{x1d}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{x}{2}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a2}{2{=}1\mid\DW{x}{1}}{}
+          \xform{x2d}{2{=}1\land\bForm}{right=of a2}
+          \xform{x2i}{\bForm}{right=.5em of x2d}
+          \xo{a2}{x2d}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  % Simplifying
+  %% \begin{align*}
+  %%   \begin{gathered}
+  %%     \PW{x}{1}
+  %%     \\
+  %%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %%       \event{a1}{\Qr{\aLoc}\land\Qw{\aLoc}\mid\DW{x}{1}}{}
+  %%       \xform{x1d}{\bForm}{below=of a1}
+  %%       \xform{x1i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x1d}
+  %%       \xo[xright]{a1}{x1d}
+  %%     \end{tikzinline}}
+  %%   \end{gathered}
+  %%   &&
+  %%   \begin{gathered}
+  %%     \PW{x}{2}
+  %%     \\
+  %%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %%       \event{a2}{\FALSE\mid\DW{x}{1}}{}
+  %%       \xform{x2d}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of a2}
+  %%       \xform{x2i}{\bForm[\FALSE/\Qw{\aLoc}]}{below=of x2d}
+  %%       \xo[xright]{a2}{x2d}
+  %%     \end{tikzinline}}
+  %%   \end{gathered}
+  %% \end{align*}
+  Merging the actions, since $2{=}1$ is unsatisfiable, we have:
+  \begin{gather*}
+    \PW{x}{1}\SEMI \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \xform{x1d}{\FALSE}{right=of a1}
+        \xform{x1i}{\bForm}{right=.5em of x1d}
+        \xo{a1}{x1d}
+      \end{tikzinline}}
+  \end{gather*}
+  This pomset cannot be part of a top-level pomset, since
+  $\aTr{\aEvs}{\aSym}=\FALSE$ for every quiescence symbol $\aSym$.  This is
+  what we would hope: that the program $\PW{x}{1}\SEMI \PW{x}{2}$ should only
+  be top-level if there is a $(\DW{x}{2})$ event.
+\end{example}
+
+\begin{example}
+  \label{ex:skolem}
+  The predicate transformer we have chosen for \ref{L4} is different from the
+  one used traditionally, which is written using substitution.  Substitution
+  is also used in \jjr{}.  Attempting to
+  write the predicate transformers in this style we have:
+  \begin{enumerate}[topsep=0pt]
+  \item[\ref{L4})]
+    $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aVal/\aReg]$, 
+  \item[\ref{L5})]
+    $\aTr{\cEvs}{\bForm} \rimplies (\forall\aReg)\bForm$.
+  \end{enumerate}
+  This phrasing of \ref{L5} says that $\bForm$ must be independent of $\aReg$
+  in order to appear in a top-level pomset.  This choice for \ref{L5} is forced
+  by \refdef{def:family}, which states that the predicate transformer for a
+  small subset of $\aEvs$ must imply the transformer for a larger subset.
+
+  Sadly, this definition fails associativity.
+
+  Consider the following, eliding transformers:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{\BANG r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r{=}0\mid\DW{x}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{\BANG\BANG r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r{\neq}0\mid\DW{x}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{\DW{x}{0}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}  
+  Associating to the right and merging:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{\BANG r} 
+      \SEMI \PW{x}{\BANG\BANG r} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r{=}0 \lor r{\neq}0\mid\DW{x}{1}}{}
+          \event{c}{\DW{x}{0}}{right=of b}
+          \wk{b}{c}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}  
+  The precondition of $\DWP{x}{1}$ is a tautology, thus we have:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI \PW{x}{\BANG r} 
+      \SEMI \PW{x}{\BANG\BANG r} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+          \event{b}{\DW{x}{1}}{right=of a}
+          \event{c}{\DW{x}{0}}{right=of b}
+          \wk{b}{c}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  If, instead, we associate to the left:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI \PW{x}{\BANG r} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+          \event{b}{1{=}0\mid\DW{x}{1}}{right=of a}
+        \end{tikzinline}}    
+    \end{gathered}
+    &&
+    \begin{gathered}[t]
+      \PW{x}{\BANG\BANG r} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{b}{r{\neq}0\mid\DW{x}{1}}{}
+          \event{c}{\DW{x}{0}}{right=of b}
+          \wk{b}{c}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}  
+  Sequencing and merging:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{y}{r}
+      \SEMI \PW{x}{\BANG r} 
+      \SEMI \PW{x}{\BANG\BANG r} 
+      \SEMI \PW{x}{0} 
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a}{\DR{y}{1}}{}
+          \event{b}{1{=}0 \lor r{\neq}0\mid\DW{x}{1}}{right=of a}
+          \event{c}{\DW{x}{0}}{right=of b}
+          \wk{b}{c}
+        \end{tikzinline}}    
+    \end{gathered}
+  \end{align*}
+  In this case, the precondition of $\DWP{x}{1}$ is not a tautology, forcing
+  a dependency $\DRP{y}{1}\xpo \DWP{x}{1}$.
+
+  Our solution is to Skolemize.  We have proven associativity of
+  \refdef{def:pomsets-trans} in Agda.  The proof requires that predicate
+  transformers distribute through disjunction (\refdef{def:trans}).  The
+  attempt to define predicate transformers using substitution fails for
+  \ref{L5} because the predicate transformer
+  $\aTr{}{\bForm}=(\forall\aReg)\bForm$ does not distribute through
+  disjunction:
+  \begin{math}
+    \aTr{}{\bForm_1\lor \bForm_2}=
+    (\forall r)(\bForm_1\lor \bForm_2)
+    \neq
+    ((\forall r)(\bForm_1)) \lor ((\forall r)(\bForm_2))
+    = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+  \end{math}.
+\end{example}
+
+
+\subsection{Discussion: Valid Transformations}
 \label{sec:valid}
-\subsection{Invalid Transformations}
-\label{sec:invalid}
+When $\sem{\aCmd} \supseteq \sem{\aCmd'}$, we say that $\aCmd'$ is a
+\emph{valid transformation} of $\aCmd$.  In this subsection, we show the
+validity of specific optimizations.  
+Let $\free(\aCmd)$ be the set of locations and registers that occur in $\aCmd$.
+
+The semantics validates many peephole optimizations.  Most apply only to
+relaxed access.
+\begin{align*}
+  \taglabel{RR}
+  \sem{\PR{\aLoc}{\aReg} \SEMI \PR{\bLoc}{\bReg}\SEMI\aCmd} &=
+  \sem{\PR{\bLoc}{\bReg}\SEMI \PR{\aLoc}{\aReg}\SEMI\aCmd} &&\text{if } \aReg\neq\bReg
+  \\
+  \taglabel{WW}
+  \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp\SEMI\aCmd} &=
+  \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp\SEMI\aCmd} &&\text{if } \aLoc\neq\bLoc
+  \\
+  \taglabel{RW}
+  \sem{\aLoc \GETS \aExp  \SEMI \PR{\bLoc}{\bReg} \SEMI\aCmd} &=
+  \sem{\PR{\bLoc}{\bReg} \SEMI\aLoc \GETS \aExp\SEMI\aCmd} &&\text{if }
+  \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
+\end{align*}
+% \ref{WW}, \ref{RW} and \ref{RR} require that two sides of the semicolon
+% have disjoint ids; for example, \ref{RW} requires $\disjoint{{\free(\aReg
+%     \GETS \aLoc)}}{{\free(\bLoc \GETS \bExp)}}$. 
+% \ref{RR} requires either $\aReg\neq\bReg$ or
+%   $\aLoc=\bLoc$.  \ref{WW} and \ref{RW} require that two sides of the
+% semicolon have disjoint ids; for example, \ref{RW} requires
+% $\disjoint{{\free(\PR{\aLoc}{\aReg})}}{{\free(\bLoc \GETS \bExp)}}$.
+\ref{5} imposes no order between events in \ref{RR}--\ref{RW}.  %Note that \ref{RR} allows aliasing.
+Using augmentation closure, \ref{5} also validates roach-motel reorderings \cite{SevcikThesis}.  For
+example, on read/write pairs:
+  \begin{align*}
+    \tag{\textsc{roach1}}\label{AcqW}
+    \sem{x^\amode \GETS \aExp \SEMI\PR{y}{\bReg} \SEMI\aCmd} &\supseteq
+    \sem{\PR{y}{\bReg}  \SEMI x^\amode\GETS \aExp \SEMI \aCmd} 
+    &&\text{if }
+    \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
+    \\
+    \tag{\textsc{roach2}}\label{RelW}
+    \sem{x \GETS \aExp \SEMI\PR[\amode]{y}{\bReg} \SEMI\aCmd} &\supseteq
+    \sem{\PR[\amode]{y}{\bReg}  \SEMI x\GETS \aExp \SEMI \aCmd} 
+    &&\text{if }
+    \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
+  \end{align*}
+
+  Redundant load elimination \eqref{RL} follows
+  from \ref{1}, taking $\bEv\in\Event$, regardless of the access mode:
+\begin{align*}
+  \taglabel{RL}
+  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \PR[\amode]{\aLoc}{\bReg}\SEMI\aCmd} &\supseteq 
+  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg\SEMI\aCmd}
+\end{align*}
+
+Many laws hold for the conditional, such as dead code elimination \eqref{DC}
+and code lifting \eqref{CL}:
+\begin{align*}
+  \taglabel{DC}
+  \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &=
+  \sem{\aCmd_1}
+  &&\textif \aExp \text{ is a tautology}
+  \\
+  \taglabel{CL}
+  \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} &\supseteq
+  \sem{\aCmd}
+\end{align*}
+Code lifting also applies to program fragments inside a conditional.  For example:
+\begin{align*}
+  \sem{\IF{\aExp}\THEN x\GETS \bExp \SEMI\aCmd_1\ELSE x\GETS \bExp \SEMI\aCmd_2\FI} &\supseteq
+  \sem{x\GETS \bExp \SEMI \IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI}
+  % \sem{\IF{r{=}1}\THEN \PW{x}{r}\SEMI \PW{x}{1} \ELSE \PW{x}{1}\FI}
+  % \supseteq
+  % \sem{\PW{x}{1} \SEMI \IF{r{=}1}\THEN \PW{x}{r}\FI}
+\end{align*}
+We discuss the inverse of \ref{CL} in \textsection\ref{sec:refine}.
+
+% As expected, %sequential and
+% parallel composition commutes with conditionals and declarations, and
+% conditionals and declarations commute with each other.  For example,
+% we have \emph{scope extrusion}~\cite{Milner:1999:CMS:329902}:
+% \begin{align*}
+%   \taglabel{SE}
+%   \sem{\aCmd\PAR \VAR\aLoc\SEMI\bCmd} &=
+%   \sem{\VAR\aLoc\SEMI(\aCmd\PAR\bCmd)}
+%   &&\text{if } \aLoc\not\in\free(\aCmd)
+% \end{align*}
+

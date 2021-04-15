@@ -230,7 +230,7 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
           \event{a}{\DW{x}{2}}{}
           \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of a}
           % \xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
-          \xo{a}{x1d}
+          \xo[xright]{a}{x1d}
         \end{tikzinline}}  
     \end{gathered}  
     &&
@@ -241,7 +241,7 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
           \raevent{b}{\DR[\mACQ]{x}{2}}{}
           % \xform{x1d}{2{=}r\limplies\bForm}{below=of b}
           \xform{x1i}{\Dx{x} \land\bForm[\FALSE/\Qr{x}]}{below=of b} %x1d}
-          % \xo{b}{x1d}
+          % \xo[xright]{b}{x1d}
         \end{tikzinline}}  
     \end{gathered}  
     &&
@@ -252,7 +252,7 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
           \event{c}{\DW{y}{1}}{}
           % \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of c}
           % \xform{x1i}{\lnot\Qw{y}\land\bForm[\TRUE/\Dx{y}]}{below=of x1d}
-          % \xo{c}{x1d}
+          % \xo[xright]{c}{x1d}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}
@@ -265,7 +265,7 @@ synchronizing stores substitute false for $\Dx{\aLoc}$.
           \event{a}{\DW{x}{2}}{}
           \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{right=.7em of a}
           % \xform{x1i}{\lnot\Qw{x}\land\bForm[\TRUE/\Dx{x}]}{below=of x1d}
-          \xos{a}{x1d}
+          \xo{a}{x1d}
         \end{tikzinline}}  
     \end{gathered}  
     &&
@@ -463,7 +463,7 @@ the best we can do is to emulate skip, as in \ref{L6}.  % In order to
           \event{c}{r\mid\DR{x}{0}}{}
           % \xform{x1d}{\bForm[\TRUE/\Dx{\aLoc}]}{below=of c}
           % \xform{x1i}{\lnot\Qw{y}\land\bForm[\TRUE/\Dx{y}]}{below=of x1d}
-          % \xo{c}{x1d}
+          % \xo[xright]{c}{x1d}
         \end{tikzinline}}  
     \end{gathered}  
   \end{align*}

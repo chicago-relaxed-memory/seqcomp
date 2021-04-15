@@ -357,9 +357,9 @@ of subsequent events, and compose the predicate transformers:
         \xform{rx0ry0d}{(r{=}0) \limplies(s{=}0) \limplies \bForm}{below=of ry0}
         \po{rx0}{ry0}
         \po{ry0}{wz0}
-        \xos{rx0}{rx0ry0d}
-        \xos{ry0}{rx0ry0d}
-        \xos{wz0}{rx0ry0d}
+        \xo{rx0}{rx0ry0d}
+        \xo{ry0}{rx0ry0d}
+        \xo{wz0}{rx0ry0d}
       \end{tikzinline}}
   \end{gather*}
 This model works for the sequentially consistent case, but needs to be
@@ -431,10 +431,10 @@ which maps $\bForm$ to $(s{=}0) \limplies \bForm$.
         \xform{ry0d}{(s{=}0) \limplies \bForm}{right=of rx0d}
         \xform{wz0i}{\bForm}{above=of wz0}
         \po{ry0}{wz0}
-        \xos{rx0}{rx0d}
-        \xos{ry0}{ry0d}
-        \xos{rx0}{rx0ry0d}
-        \xos{ry0}{rx0ry0d}
+        \xo{rx0}{rx0d}
+        \xo{ry0}{ry0d}
+        \xo{rx0}{rx0ry0d}
+        \xo{ry0}{rx0ry0d}
       \end{tikzinline}}
   \end{gather*}
 As a sanity check, we can see that sequential composition is
@@ -452,11 +452,11 @@ associate to the left, with intermediate step:
         \xform{rx0d}{(r{=}0) \limplies \bForm}{left=of rx0}
         \xform{ry0d}{(s{=}0) \limplies \bForm}{right=of ry0}
         \xform{wz0i}{\bForm}{right=of rx0ry0d}
-        \xos{rx0}{rx0d}
-        \xos{ry0}{ry0d}the \emph{independent}
+        \xo{rx0}{rx0d}
+        \xo{ry0}{ry0d}the \emph{independent}
 transformer
-        \xos{rx0}{rx0ry0d}
-        \xos{ry0}{rx0ry0d}
+        \xo{rx0}{rx0ry0d}
+        \xo{ry0}{rx0ry0d}
       \end{tikzinline}}
   \end{gather*}
 or to the right, with intermediate step:
