@@ -10,14 +10,15 @@ but this is not the case.
 
 Introductory programmers are taught \emph{sequential abstraction}: that the
 program $\aCmd_1\SEMI \aCmd_2$ executes $\aCmd_1$ before $\aCmd_2$.  Since
-the late 60s, we've been able to explain this using logic
+the late 1960s, we've been able to explain this using logic
 \citep{Hoare:1969:ABC:363235.363259}.  In
 \citeauthor{DBLP:journals/cacm/Dijkstra75}'s
 [\citeyear{DBLP:journals/cacm/Dijkstra75}] formulation, we think of programs
 as \emph{predicate transformers}, where predicates describe the state of
 memory in the system.  In the calculus of weakest preconditions, programs map
 postconditions to preconditions.  We recall the definition of
-$\fwp{\aCmd}{\bForm}$ for loop-free code below. 
+$\fwp{\aCmd}{\bForm}$ for loop-free code below (where $\aReg$ ranges over thread-local \emph{registers}
+and $\aExp$ ranges over side-effect free \emph{expressions}). 
 \begin{multicols}{2}
   \begin{enumerate}[,label=(\textsc{d}\arabic*),ref=\textsc{d}\arabic*]
   \item
@@ -29,15 +30,15 @@ $\fwp{\aCmd}{\bForm}$ for loop-free code below.
     %     \fwp{\ABORT}{\bForm} = \FALSE
     %   \end{math}
     \stepcounter{enumi}
-  \item[] \labeltext[\textsc{d}2]{}{wp-assign}
-    \begin{enumerate}[leftmargin=0pt]
-    \item \label{wp-write}
-      $\fwp{\PW{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
+  %\item[] \labeltext[\textsc{d}2]{}{wp-assign}
+  %  \begin{enumerate}[leftmargin=0pt]
+  %  \item \label{wp-write}
+  %    $\fwp{\PW{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
     \item \label{wp-let}
       $\fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]$
-    \item \label{wp-read}
-      $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \aLoc{=}\aReg\limplies\bForm$ %\bForm[\aLoc/\aReg]$ %
-    \end{enumerate}
+  %  \item \label{wp-read}
+  %    $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \aLoc{=}\aReg\limplies\bForm$ %\bForm[\aLoc/\aReg]$ %
+  %  \end{enumerate}
     % \item 
     %   \begin{math}
     %     \fwp{\LET{x}{\aExp}}{\bForm} = \bForm[\aExp/x]
@@ -59,22 +60,26 @@ $\fwp{\aCmd}{\bForm}$ for loop-free code below.
 \end{multicols}
 For this language, the Hoare triple
 $\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when $\aForm \limplies
-\fwp{\aCmd}{\bForm}$.  We have split
-\citeauthor{DBLP:journals/cacm/Dijkstra75}'s rule for assignment
-\eqref{wp-assign} into three cases. In our notation,
-$\aReg$--$\bReg$ range over thread-local registers, which may be assigned at
-most once,
-$\aLoc$--$\cLoc$ range over shared memory references, and
-$\aExp$--$\bExp$ range over thread-local expressions, which do \emph{not}
-include
-$\aLoc$--$\cLoc$.\footnote{Under these assumptions, \eqref{wp-read} is
-  equivalent to $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \bForm[\aLoc/\aReg]$.}
-
+\fwp{\aCmd}{\bForm}$.
+%% We have split
+%% \citeauthor{DBLP:journals/cacm/Dijkstra75}'s rule for assignment
+%% \eqref{wp-assign} into three cases. In our notation,
+%% $\aReg$--$\bReg$ range over thread-local registers, which may be assigned at
+%% most once,
+%% $\aLoc$--$\cLoc$ range over shared memory references, and
+%% $\aExp$--$\bExp$ range over thread-local expressions, which do \emph{not}
+%% include
+%% $\aLoc$--$\cLoc$.\footnote{Under these assumptions, \eqref{wp-read} is
+%%   equivalent to $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \bForm[\aLoc/\aReg]$.}
+%%
 This is an elegant explanation of sequential computation in a sequential
-context.  In a concurrent context, however, \ref{wp-read} is unsound!
-\ref{wp-read} assumes that a read from
-$x$ must be fulfilled by a preceding write to
-$x$.  In a concurrent context, writes may come from other threads.
+context.  In a concurrent context, however, generalizing
+\ref{wp-let} from thread-local registers to cross-thread memory locations
+is unsound! \ref{wp-let} is sound because a read from a thread-local
+register must be fulfilled by a preceding write
+in the same thread.  In a concurrent context, aread from a cross-thread
+memory location may be fulfilled by a write
+in another thread.
 
 Existing approaches to sequential composition in the concurrent context
 either assume exclusive access, as in concurrent separation logic
@@ -83,7 +88,7 @@ altogether, as in the pomset model of
 \citet{DBLP:journals/corr/abs-1804-04214}---this model uses syntactic
 dependencies and thus dramatically limits compiler optimization.  This leaves
 open the question of how to apply logic to racy programs without
-overstraining the implementation.  To understand the solution, one must first
+overconstraining the implementation.  To understand the solution, one must first
 understand the constraints imposed by hardware and compilers.
 
 
@@ -329,7 +334,9 @@ composition, we can show:
   \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
   \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} \;\;\text{if}\; \aLoc\neq\bLoc
 \end{align*}
-Then the equivalence holds in any (sequential) context.
+Then the equivalence holds in any
+%% (sequential)
+context.
 
 
 % While existing models of relaxed memory have detailed treatments of parallel composition,
