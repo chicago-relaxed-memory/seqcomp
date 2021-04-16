@@ -1212,16 +1212,16 @@ The semantics validates many peephole optimizations.  Most apply only to
 relaxed access.
 \begin{align*}
   \taglabel{RR}
-  \sem{\PR{\aLoc}{\aReg} \SEMI \PR{\bLoc}{\bReg}\SEMI\aCmd} &=
-  \sem{\PR{\bLoc}{\bReg}\SEMI \PR{\aLoc}{\aReg}\SEMI\aCmd} &&\text{if } \aReg\neq\bReg
+  \sem{\PR{\aLoc}{\aReg} \SEMI \PR{\bLoc}{\bReg}} &=
+  \sem{\PR{\bLoc}{\bReg}\SEMI \PR{\aLoc}{\aReg}} &&\text{if } \aReg\neq\bReg
   \\
   \taglabel{WW}
-  \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp\SEMI\aCmd} &=
-  \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp\SEMI\aCmd} &&\text{if } \aLoc\neq\bLoc
+  \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
+  \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} &&\text{if } \aLoc\neq\bLoc
   \\
   \taglabel{RW}
-  \sem{\aLoc \GETS \aExp  \SEMI \PR{\bLoc}{\bReg} \SEMI\aCmd} &=
-  \sem{\PR{\bLoc}{\bReg} \SEMI\aLoc \GETS \aExp\SEMI\aCmd} &&\text{if }
+  \sem{\aLoc \GETS \aExp  \SEMI \PR{\bLoc}{\bReg}} &=
+  \sem{\PR{\bLoc}{\bReg} \SEMI\aLoc \GETS \aExp} &&\text{if }
   \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
 \end{align*}
 % \ref{WW}, \ref{RW} and \ref{RR} require that two sides of the semicolon
@@ -1236,14 +1236,14 @@ Using augmentation closure, \ref{5} also validates roach-motel reorderings \cite
 example, on read/write pairs:
   \begin{align*}
     \tag{\textsc{roach1}}\label{AcqW}
-    \sem{x^\amode \GETS \aExp \SEMI\PR{y}{\bReg} \SEMI\aCmd} &\supseteq
-    \sem{\PR{y}{\bReg}  \SEMI x^\amode\GETS \aExp \SEMI \aCmd} 
+    \sem{x^\amode \GETS \aExp \SEMI\PR{y}{\bReg}} &\supseteq
+    \sem{\PR{y}{\bReg}  \SEMI x^\amode\GETS \aExp} 
     &&\text{if }
     \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
     \\
     \tag{\textsc{roach2}}\label{RelW}
-    \sem{x \GETS \aExp \SEMI\PR[\amode]{y}{\bReg} \SEMI\aCmd} &\supseteq
-    \sem{\PR[\amode]{y}{\bReg}  \SEMI x\GETS \aExp \SEMI \aCmd} 
+    \sem{x \GETS \aExp \SEMI\PR[\amode]{y}{\bReg}} &\supseteq
+    \sem{\PR[\amode]{y}{\bReg}  \SEMI x\GETS \aExp} 
     &&\text{if }
     \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
   \end{align*}
@@ -1252,8 +1252,8 @@ example, on read/write pairs:
   from \ref{1}, taking $\bEv\in\Event$, regardless of the access mode:
 \begin{align*}
   \taglabel{RL}
-  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \PR[\amode]{\aLoc}{\bReg}\SEMI\aCmd} &\supseteq 
-  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg\SEMI\aCmd}
+  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \PR[\amode]{\aLoc}{\bReg}} &\supseteq 
+  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
 \end{align*}
 
 Many laws hold for the conditional, such as dead code elimination \eqref{DC}
@@ -1262,7 +1262,7 @@ and code lifting \eqref{CL}:
   \taglabel{DC}
   \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &=
   \sem{\aCmd_1}
-  &&\textif \aExp \text{ is a tautology}
+  &&\textif (\aExp\ne0) \text{ is a tautology}
   \\
   \taglabel{CL}
   \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} &\supseteq
