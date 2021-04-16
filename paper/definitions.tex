@@ -797,7 +797,8 @@ be a tautology at top-level.  There are two possibilities.
   $\aForm=(1{=}r\limplies r{=}1)$, a tautology.
 \item If $\bEv\not\le\aEv$ then we apply the independent transformer and
   $\aForm=((x{=}r\lor1{=}r)\limplies r{=}1)$.  Under the assumption that $r$
-  is bound, this is logically equivalent to $(x{=}1)$.
+  is bound, this is logically equivalent to $(x{=}1)$. (We make this more
+  precise in \textsection\ref{sec:semreg}.)
 \end{itemize}
 Eliding transformers, the two outcomes are:
 \begin{align*}
@@ -993,22 +994,22 @@ Reasoning as we did for \eqref{eq2}, there are two possibilities:
 \end{example}
 
 
-The definition of $\rextendsdef{}{}$ ensures that no new order
-is introduced between events in $\aEvs_1\cap\aEvs_2$.\footnote{This ensures
-  that
-  \begin{math}
-    \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
-  \end{math}
-  does not include 
-  \begin{math}
-    \smash{\hbox{\begin{tikzinlinesmaller}[node distance=1.5em]
-          \event{a}{\DR{x}{1}}{}
-          \event{b}{\DW{x}{1}}{right=of a}
-          \rf[out=165,in=15]{b}{a}
-          \wk{a}{b}
-        \end{tikzinlinesmaller}}}
-  \end{math},
-  taking $\xrfx$ from the left and $\le$ from the right.}
+The definition of $\rextendsdef{}{}$ ensures that no new order is introduced
+between events in $\aEvs_1\cap\aEvs_2$.\footnote{For example, using the
+  semantics of \textsection\ref{sec:arm2}, \ref{if-rf-extends} ensures that
+\begin{math}
+  \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
+\end{math}
+does not include 
+\begin{math}
+  \smash{\hbox{\begin{tikzinlinesmaller}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \rf[out=165,in=15]{b}{a}
+        \wk{a}{b}
+      \end{tikzinlinesmaller}}}
+\end{math},
+taking $\xrfx$ from the left and $\le$ from the right.}
 
 \begin{example}
   Control dependencies are similar, for example
@@ -1066,10 +1067,6 @@ example, on read/write pairs:
     \sem{\PR{y}{\bReg}  \SEMI x^\amode\GETS \aExp} 
     &&\text{if }
     \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
-  \end{align*}
-  
-  \begin{align*}
-
     \\
     \tag{\textsc{roach2}}\label{RelW}
     \sem{x \GETS \aExp \SEMI\PR[\amode]{y}{\bReg}} &\supseteq
@@ -1253,8 +1250,13 @@ Sequencing and merging:
 In this case, the precondition of $\DWP{x}{1}$ is not a tautology, forcing
 a dependency $\DRP{y}{1}\xpo \DWP{x}{1}$.
 
-Our solution is to Skolemize.  We have proven associativity of
-\refdef{def:pomsets-trans} in Agda.  The proof requires that predicate
+Our solution is to Skolemize, replacing 
+uses of $\bForm[\aVal/\aReg]$
+by $(\aReg{=}\aVal)\limplies\bForm$,
+for uniquely chosen $\aReg$.
+%  We have proven associativity of
+%  \refdef{def:pomsets-trans} in Agda.
+The proof of associativity requires that predicate
 transformers distribute through disjunction (\refdef{def:trans}).  The
 attempt to define predicate transformers using substitution fails for
 \ref{L5} because the predicate transformer
@@ -1267,6 +1269,10 @@ disjunction:
   ((\forall r)(\bForm_1)) \lor ((\forall r)(\bForm_2))
   = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
 \end{math}.
-
+  Since $\aTr{}\bForm=(\forall\aReg)\bForm$ does not distribute through disjunction,
+  we use $\aTr{}\bForm=\bForm$ instead (which trivially distributes through disjunction).
+  Unforutunately, this change means we cannot use substitution, since
+  $\bForm$ does not imply $\bForm[\aVal/\aReg]$. Fortunately, Skolemizing
+  solves this problem, since $\bForm$ implies $(\aReg{=}\aVal)\limplies\bForm$.
 
 
