@@ -1193,6 +1193,11 @@ order.
     ((\forall r)(\bForm_1)) \lor ((\forall r)(\bForm_2))
     = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
   \end{math}.
+  Since $\aTr{}\bForm=(\forall\aReg)\bForm$ does not distribute through disjunction,
+  we use $\aTr{}\bForm=\bForm$ instead (which trivially distributes through disjunction).
+  Unforutunately, this change means we cannot use substitution, since
+  $\bForm$ does not imply $\bForm[\aVal/\aReg]$. Fortunately, Skolemizing
+  solves this problem, since $\bForm$ implies $(\aReg{=}\aVal)\limplies\bForm$.
 \end{example}
 
 
