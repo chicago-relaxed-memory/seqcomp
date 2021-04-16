@@ -4,6 +4,15 @@
 \subsection{Register Recycling}
 \label{sec:semreg}
 
+Redundant load elimination \eqref{RL} follows
+from \ref{1}, taking $\bEv\in\Event$, regardless of the access mode:
+\begin{align*}
+  \taglabel{RL}
+  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \PR[\amode]{\aLoc}{\bReg}} &\supseteq 
+  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
+\end{align*}
+
+
 \begin{definition}
   Let $\semreg{}$ be defined as for $\semrr{}$ in \refdef{def:semrr} and
   \reffig{fig:sem}, changing \ref{read-tau} of $\sLOAD{}{}$:
@@ -189,6 +198,7 @@ most once in a program.  We relax this by renaming.
 
 
 \subsection{If-Closure}
+\label{sec:semca}
 
 \begin{definition}
   Let $\semca{}$ be defined as for $\semrr{}$ in \refdef{def:semrr} and

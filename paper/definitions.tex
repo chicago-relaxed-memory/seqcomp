@@ -1027,26 +1027,53 @@ taking $\xrfx$ from the left and $\le$ from the right.}
   The rest of the reasoning is the same as \refex{ex:data}.
 \end{example}
 
-\subsection{Valid Transformations}
+% Many laws hold for the conditional, such as dead code elimination
+% and code lifting \eqref{CL}:
+% \begin{align*}
+%   \taglabel{DC}
+%   \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &=
+%   \sem{\aCmd_1}
+%   &&\textif (\aExp\ne0) \text{ is a tautology}
+%   \\
+%   \taglabel{CL}
+% \end{align*}
+% Code lifting also applies to program fragments inside a conditional.  For example:
+% \begin{align*}
+%   \sem{\IF{\aExp}\THEN x\GETS \bExp \SEMI\aCmd_1\ELSE x\GETS \bExp \SEMI\aCmd_2\FI} &\supseteq
+%   \sem{x\GETS \bExp \SEMI \IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI}
+%   % \sem{\IF{r{=}1}\THEN \PW{x}{r}\SEMI \PW{x}{1} \ELSE \PW{x}{1}\FI}
+%   % \supseteq
+%   % \sem{\PW{x}{1} \SEMI \IF{r{=}1}\THEN \PW{x}{r}\FI}
+% \end{align*}
+
+Many laws hold for the conditional.  For example:
+\begin{align*}
+   \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} &\supseteq
+   \sem{\aCmd}
+ \end{align*}
+We discuss the inverse inclusion in \textsection\ref{sec:semca}.
+
+
+\subsection{Reordering Transformations}
 \label{sec:ex:valid}
 
-When $\sem{\aCmd} \supseteq \sem{\aCmd'}$, we say that $\aCmd'$ is a
-\emph{valid transformation} of $\aCmd$.  In this subsection, we show the
-validity of specific optimizations.  
-Let $\free(\aCmd)$ be the set of locations and registers that occur in $\aCmd$.
+% When $\sem{\aCmd} \supseteq \sem{\aCmd'}$, we say that $\aCmd'$ is a
+% \emph{valid transformation} of $\aCmd$.
+% In this subsection, we show the
+% validity of specific optimizations.  
 
 The semantics validates many peephole optimizations.  Most apply only to
 relaxed access.
 \begin{align*}
-  \taglabel{RR}
+  %\taglabel{RR}
   \sem{\PR{\aLoc}{\aReg} \SEMI \PR{\bLoc}{\bReg}} &=
   \sem{\PR{\bLoc}{\bReg}\SEMI \PR{\aLoc}{\aReg}} &&\text{if } \aReg\neq\bReg
   \\
-  \taglabel{WW}
+  %\taglabel{WW}
   \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
   \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} &&\text{if } \aLoc\neq\bLoc
   \\
-  \taglabel{RW}
+  %\taglabel{RW}
   \sem{\aLoc \GETS \aExp  \SEMI \PR{\bLoc}{\bReg}} &=
   \sem{\PR{\bLoc}{\bReg} \SEMI\aLoc \GETS \aExp} &&\text{if }
   \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
@@ -1058,52 +1085,24 @@ relaxed access.
 % $\aLoc=\bLoc$.  \ref{WW} and \ref{RW} require that two sides of the
 % semicolon have disjoint ids; for example, \ref{RW} requires
 % $\disjoint{{\free(\PR{\aLoc}{\aReg})}}{{\free(\bLoc \GETS \bExp)}}$.
-\ref{5} imposes no order between events in \ref{RR}--\ref{RW}.  %Note that \ref{RR} allows aliasing.
-Using augmentation closure, \ref{5} also validates roach-motel reorderings \cite{SevcikThesis}.  For
+%\ref{5} imposes no order between events in \ref{RR}--\ref{RW}.  %Note that \ref{RR} allows aliasing.
+Here $\free(\aCmd)$ is the set of locations and registers that occur in $\aCmd$.
+Using augmentation closure, the semantics also validates roach-motel reorderings \cite{SevcikThesis}.  For
 example, on read/write pairs:
   \begin{align*}
-    \tag{\textsc{roach1}}\label{AcqW}
+    %\tag{\textsc{roach1}}\label{AcqW}
     \sem{x^\amode \GETS \aExp \SEMI\PR{y}{\bReg}} &\supseteq
     \sem{\PR{y}{\bReg}  \SEMI x^\amode\GETS \aExp} 
     &&\text{if }
     \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
     \\
-    \tag{\textsc{roach2}}\label{RelW}
+    %\tag{\textsc{roach2}}\label{RelW}
     \sem{x \GETS \aExp \SEMI\PR[\amode]{y}{\bReg}} &\supseteq
     \sem{\PR[\amode]{y}{\bReg}  \SEMI x\GETS \aExp} 
     &&\text{if }
     \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
   \end{align*}
 
-Redundant load elimination \eqref{RL} follows
-from \ref{1}, taking $\bEv\in\Event$, regardless of the access mode:
-\begin{align*}
-  \taglabel{RL}
-  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \PR[\amode]{\aLoc}{\bReg}} &\supseteq 
-  \sem{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
-\end{align*}
-
-Many laws hold for the conditional, such as dead code elimination \eqref{DC}
-and code lifting \eqref{CL}:
-\begin{align*}
-  \taglabel{DC}
-  \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &=
-  \sem{\aCmd_1}
-  &&\textif (\aExp\ne0) \text{ is a tautology}
-  \\
-  \taglabel{CL}
-  \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} &\supseteq
-  \sem{\aCmd}
-\end{align*}
-Code lifting also applies to program fragments inside a conditional.  For example:
-\begin{align*}
-  \sem{\IF{\aExp}\THEN x\GETS \bExp \SEMI\aCmd_1\ELSE x\GETS \bExp \SEMI\aCmd_2\FI} &\supseteq
-  \sem{x\GETS \bExp \SEMI \IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI}
-  % \sem{\IF{r{=}1}\THEN \PW{x}{r}\SEMI \PW{x}{1} \ELSE \PW{x}{1}\FI}
-  % \supseteq
-  % \sem{\PW{x}{1} \SEMI \IF{r{=}1}\THEN \PW{x}{r}\FI}
-\end{align*}
-We discuss the inverse of \ref{CL} in \textsection\ref{sec:refine}.
 
 % As expected, %sequential and
 % parallel composition commutes with conditionals and declarations, and
@@ -1119,20 +1118,28 @@ We discuss the inverse of \ref{CL} in \textsection\ref{sec:refine}.
 \subsection{Associativity and Skolemization}
 \label{sec:ex:assoc}
 
-The predicate transformer we have chosen for \ref{L4} is different from the
-one used traditionally, which is written using substitution.  Substitution
-is also used in \jjr{}.  Attempting to
-write the predicate transformers in this style we have:
+The predicate transformers we have chosen for \ref{read-tau-dep} and
+\ref{read-tau-ind} are different from the ones used traditionally, which are
+written using substitution \jjr{}.  Attempting to write \ref{read-tau-dep} in
+this style we would have:
 \begin{enumerate}[topsep=0pt]
-\item[\ref{L4})]
-  $\aTr{\bEvs}{\bForm} \rimplies \bForm[\aVal/\aReg]$, 
-\item[\ref{L5})]
-  $\aTr{\cEvs}{\bForm} \rimplies (\forall\aReg)\bForm$.
+\item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-p}}]
+  if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \rimplies    
+    \bForm[\aVal/\aReg]
+  \end{math},    
 \end{enumerate}
-This phrasing of \ref{L5} says that $\bForm$ must be independent of $\aReg$
-in order to appear in a top-level pomset.  This choice for \ref{L5} is forced
-by \refdef{def:family}, which states that the predicate transformer for a
-small subset of $\aEvs$ must imply the transformer for a larger subset.
+Recall that \ref{read-tau-empty} says that $\bForm$ must be independent of
+$\aReg$ in order to appear in a top-level pomset: if $\aEvs=\emptyset$ then
+\begin{math}
+  \aTr{\bEvs}{\bForm} \rimplies
+  % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+  \bForm.
+\end{math}
+This choice for \ref{read-tau-empty} is forced by \refdef{def:family}, which
+states that the predicate transformer for a small subset of $\aEvs$ must
+imply the transformer for a larger subset.
 
 Sadly, this definition fails associativity.
 
@@ -1259,7 +1266,7 @@ for uniquely chosen $\aReg$.
 The proof of associativity requires that predicate
 transformers distribute through disjunction (\refdef{def:trans}).  The
 attempt to define predicate transformers using substitution fails for
-\ref{L5} because the predicate transformer
+\ref{read-tau-empty} because the predicate transformer
 $\aTr{}{\bForm}=(\forall\aReg)\bForm$ does not distribute through
 disjunction:
 \begin{math}
