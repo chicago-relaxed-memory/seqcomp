@@ -18,22 +18,22 @@
 % \begin{math}
 %   (S_2, \sigma_1) \Downarrow \sigma_2.
 % \end{math}
-Program logics and semantics tell us that when executing ((S1; S2), state0),
-we execute (S1, state0) to arrive at state1, then execute (S2, state1) to
-arrive at the final state2.  This is, of course, and abstraction.  Processors
-execute instructions out of order, due to pipelines and caches.  Compilers
+Program logics and semantics tell us that when executing $(S_1; S_2)$ starting in state $s_0$,
+we execute $S_1$ in $s_0$ to arrive at $s_1$, then execute $S_2$ in $s_1$ to
+arrive at the final state $s_2$.  This is, of course, an abstraction.  Processors
+execute instructions out of order, due to pipelines and caches, and compilers
 reorder programs even more dramatically.  All of this reordering is meant to
-be unobservable in single-threaded code.  In multi-threaded code, however,
-all bets are off.  A formal attempt to understand the resulting mess is known
+be unobservable in single-threaded code, but is observable in multi-threaded code.
+A formal attempt to understand the resulting mess is known
 as a ``relaxed memory model.''  The relaxed memory models that have been
 proposed to date either fail to address sequential composition, or overly
 restrict processors and compilers.
 
-To support sequential composition, we propose adding families of predicate
+To support sequential composition while targeing modern hardware, we propose adding families of predicate
 transformers to the existing model of ``Pomsets with Preconditions,'' which
-already supports parallel composition.  When composing (S1;S2), the predicate
-transformer used to validate the precondition of an event in S2 is chosen
-based on the semantic dependencies from S1 into this event.  Our model
+already supports parallel composition.  When composing $(S_1;S_2)$, the predicate
+transformer used to validate the precondition of an event in $S_2$ is chosen
+based on the semantic dependencies from events in $S_1$ into this event in $S_2$.  Our model
 retains the good properties of the prior work, including efficient
 implementation on Arm8, support for compiler optimizations, support for
 logics that prove the absence of thin-air behaviors, and a local data race
