@@ -1174,8 +1174,13 @@ order.
   In this case, the precondition of $\DWP{x}{1}$ is not a tautology, forcing
   a dependency $\DRP{y}{1}\xpo \DWP{x}{1}$.
 
-  Our solution is to Skolemize.  We have proven associativity of
-  \refdef{def:pomsets-trans} in Agda.  The proof requires that predicate
+  Our solution is to Skolemize, replacing 
+  uses of $\bForm[\aVal/\aReg]$
+  by $(\aReg{=}\aVal)\limplies\bForm$,
+  for uniquely chosen $\aReg$.
+%  We have proven associativity of
+%  \refdef{def:pomsets-trans} in Agda.
+  The proof of associativity requires that predicate
   transformers distribute through disjunction (\refdef{def:trans}).  The
   attempt to define predicate transformers using substitution fails for
   \ref{L5} because the predicate transformer
