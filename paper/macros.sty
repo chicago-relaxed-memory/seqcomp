@@ -223,8 +223,9 @@
 \newcommand{\sembase}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_1}
 \newcommand{\semrr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_2}
 \newcommand{\semreg}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_3}
-\newcommand{\semca}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_4}
-\newcommand{\semaddr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_5}
+\newcommand{\semaddr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_4}
+\newcommand{\semca}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_5}
+\newcommand{\semcaaddr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_6}
 \newcommand{\frf}[1]{#1\ensuremath{^{\mathsf{rf}}}}
 \newcommand{\fpo}[1]{\mathsf{po}#1}
 
@@ -234,9 +235,9 @@
 \NewDocumentCommand\DG{O{} m m O{}}{\ifshowSCOPE#4\fi\mathsf{F}^{#2}\ifshowSCOPE_{#1}\fi\,#3}
 \NewDocumentCommand\DGP{O{} m m O{}}{\PBR{\DG[#1]{#2}{#3}[#4]}}
 
-\NewDocumentCommand\PCAS{O{} O{} m O{} m m m}{\ifnotempty{#5}{{#5} \GETS}\CAS^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \texttt{(}#3,#6,#7\texttt{)}}
-\NewDocumentCommand\PFADD{O{} O{} m O{} m m}{\ifnotempty{#5}{{#5} \GETS}\FADD^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \texttt{(}#3,#6\texttt{)}}
-\NewDocumentCommand\PEXCHG{O{} O{} m O{} m m}{\ifnotempty{#5}{{#5} \GETS}\EXCHG^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \texttt{(}#3,#6\texttt{)}}
+\NewDocumentCommand\PCAS{O{} O{} m O{} m m m}{\ifnotempty{#5}{{#5} \GETS}\CAS^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \ifnotempty{#3}{\texttt{(}#3,#6,#7\texttt{)}}}
+\NewDocumentCommand\PFADD{O{} O{} m O{} m m}{\ifnotempty{#5}{{#5} \GETS}\FADD^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \ifnotempty{#3}{\texttt{(}#3,#6\texttt{)}}}
+\NewDocumentCommand\PEXCHG{O{} O{} m O{} m m}{\ifnotempty{#5}{{#5} \GETS}\EXCHG^{#1\ifnotempty{#2}{,#2}}\ifshowSCOPE_{#4}\fi \ifnotempty{#3}{\texttt{(}#3,#6\texttt{)}}}
 
 \NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}\ifshowSCOPE_{#3}\fi}
 \NewDocumentCommand\PRP{O{} m O{} m}{\PBR{\PR[#1]{#2}[#3]{#4}}}
@@ -1110,14 +1111,6 @@
 \newcommand{\raob}{\ensuremath{\mathrel{\textcolor{cyan!0!black}{\mathsf{aob}}}}}%
 \newcommand{\xaob}{\xarrowtikz{rmw}{aob}}%
 
-\tikzstyle{rfint} = [-latex,dashed,color=green!50!black]
-\newcommand{\rfint}[3][]{\draw[rfint,#1](#2)to(#3);}
-\newcommand{\rrfint}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rfi}}}}}%
-\newcommand{\xrfint}{\xarrowtikz{rfint}{\;\;}}%
-\NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfint,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}
-\newcommand{\rrfi}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rfi}}}}}%
-\newcommand{\xrfi}{\xarrowtikz{rfint}{rfi}}%
-
 \tikzstyle{rf} = [->,thick,color=green!50!black,]
 \newcommand{\rf}[3][]{\draw[rf,#1](#2)to(#3);}
 \newcommand{\rrf}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rf}}}}}%
@@ -1129,6 +1122,13 @@
 \NewDocumentCommand \rfe {O{} m O{} m} {\draw[rf,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfe}$}  (#4);}
 \newcommand{\rrfe}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rfe}}}}}%
 \newcommand{\xrfe}{\xarrowtikz{rf}{rfe}}%
+\tikzstyle{rfint} = [->,dashed,thick,color=green!50!black]
+\newcommand{\rfint}[3][]{\draw[rfint,#1](#2)to(#3);}
+\newcommand{\rrfint}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rfi}}}}}%
+\newcommand{\xrfint}{\xarrowtikz{rfint}{\;\;}}%
+\NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfint,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}
+\newcommand{\rrfi}{\ensuremath{\mathrel{\textcolor{green!50!black}{\mathsf{rfi}}}}}%
+\newcommand{\xrfi}{\xarrowtikz{rfint}{rfi}}%
 
 \tikzstyle{wk} = [-latex,thick,color=cyan!0!black,]
 \newcommand{\wk}[3][]{\draw[wk,#1](#2)to(#3);}

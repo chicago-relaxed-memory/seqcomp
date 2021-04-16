@@ -597,14 +597,14 @@ expected: the program terminates if both subprograms terminate.
 The interesting rules are $\sLOAD{}{}$, $\sFENCE{}$, and $\sSTORE{}{}$.
 
 
-In $\sLOAD{}{}$, there is no restriction on $\aTerm$.  From this, it is easy
-to see that
+In $\sLOAD{}{}$, there is no restriction on $\aTerm$ for relaxed reads.  From
+this, it is easy to see that
 \begin{math}
   \sembase{\PR{x}{r}}
   \supseteq
   \sembase{\SKIP}
 \end{math}
-is a valid refinement.
+is a valid refinement (where the default mode is $\mRLX$).
 
 In $\sFENCE{}$, instead, \ref{fence-term} ensures that all fences are included at
 top-level.
@@ -902,15 +902,72 @@ them.  For example, the precondition of $\aEv$ is a tautology in:
 \subsection{Control Dependencies}
 \label{sec:ex:control}
 
-Note that we give the semantics of $\sIF{}{}{}$ using disjunctive normal
-form. \citet{DBLP:journals/cacm/Dijkstra75} used conjunctive normal form.
-Recall that
-\href{https://www.wolframalpha.com/input/?i=\%28a+and+b\%29+or+\%28not+a+and+c\%29}{$(\aForm\land\cForm_1)\lor(\neg\aForm\land\cForm_2)$}
-is logically equivalent to
-\href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}.
+In $\sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$, the predicate transformer
+\eqref{if-tau} is
+$(\aForm\land\aTr[1]{\bEvs}{\bForm})\lor(\neg\aForm\land\aTr[2]{\bEvs}{\bForm})$,
+%$\aTerm \rimplies (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$,
+which is the disjunctive equivalent of \citeauthor{DBLP:journals/cacm/Dijkstra75}'s
+conjunctive formulation: $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$.
+% $\aTerm \rimplies (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
+%  \citet{DBLP:journals/cacm/Dijkstra75} used conjunctive normal form.
+%  Recall that
+%  \href{https://www.wolframalpha.com/input/?i=\%28a+and+b\%29+or+\%28not+a+and+c\%29}{$(\aForm\land\cForm_1)\lor(\neg\aForm\land\cForm_2)$}
+%  is logically equivalent to
+%  \href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}. 
 
-Control dependencies are similar to data dependencies.
-For example, consider:
+For events from $\aEvs_1$, \ref{if-kappa1} requires
+$\aForm\land\labelingForm_1(\aEv)$. For events from $\aEvs_2$,
+\ref{if-kappa2} requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For
+coalescing events in $\aEvs_1\cap\aEvs_2$, \ref{if-kappa12} requires
+$(\aForm\land\labelingForm_1(\aEv)) \lor
+(\lnot\aForm\land\labelingForm_2(\aEv))$.  This semantics allows common code
+to be lifted out of a conditional, validating the transformation
+\begin{math}
+  \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} \supseteq
+  \sem{\aCmd}.
+\end{math}
+%
+The use of $\rextendsdef{}{}$ in \ref{if-le-extends} and \ref{if-rf-extends}
+ensures that no new order is introduced between events in
+$\aEvs_1\cap\aEvs_2$ when coalescing; see \textsection\ref{sec:arm2}.
+
+
+
+By allowing events to coalesce, \ref{if-kappa12} ensures that control
+dependencies are calculated semantically.  For example, consider
+$\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, which is build
+from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
+\begin{align*}
+  \begin{gathered}
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \PW{y}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{align*}
+Here, the precondition in the combined pomset is a tautology, independent of $r$.
+
+
+Control dependencies are eliminated in the same way as data dependencies.
+For example:
 \begin{align*}
   \begin{gathered}
     \PR{x}{r} 
@@ -934,7 +991,7 @@ For example, consider:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-Reasoning as we did for \eqref{eq2}, there are two possibilities:
+Reasoning as we did for \eqref{eq2} in \textsection\ref{sec:ex:data}, there are two possibilities:
 \begin{align*}
   \begin{gathered}
     \PR{x}{r}\SEMI \IF{r{=}1}\THEN\PW{y}{1}\FI
@@ -956,104 +1013,6 @@ Reasoning as we did for \eqref{eq2}, there are two possibilities:
   \end{gathered}
 \end{align*}
 
-\begin{example}
-  Consider $\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, so
-  there must be $\aPS_1\in\sem{\PW{y}{r}}$,
-  and $\aPS_2\in\sem{\PW{y}{1}}$, such as:
-  \begin{align*}
-    \begin{gathered}
-      \PW{y}{r}
-      \\
-      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
-        \end{tikzinline}}
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \PW{y}{1}
-      \\
-      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{align*}
-  Since there is no requirement for disjointness in the semantics of conditionals,
-  we can consider the case where the event \emph{coalesces} from the two pomsets,
-  in which case:
-  \begin{gather*}
-    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
-    \\
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
-      \end{tikzinline}}
-  \end{gather*}
-  Here, the precondition is a tautology, 
-  independent of $r$.
-  % We refer to event sharing as \emph{coalescing} or \emph{merging}.
-\end{example}
-
-
-The definition of $\rextendsdef{}{}$ ensures that no new order is introduced
-between events in $\aEvs_1\cap\aEvs_2$.\footnote{For example, using the
-  semantics of \textsection\ref{sec:arm2}, \ref{if-rf-extends} ensures that
-\begin{math}
-  \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
-\end{math}
-does not include 
-\begin{math}
-  \smash{\hbox{\begin{tikzinlinesmaller}[node distance=1.5em]
-        \event{a}{\DR{x}{1}}{}
-        \event{b}{\DW{x}{1}}{right=of a}
-        \rf[out=165,in=15]{b}{a}
-        \wk{a}{b}
-      \end{tikzinlinesmaller}}}
-\end{math},
-taking $\xrfx$ from the left and $\le$ from the right.}
-
-\begin{example}
-  Control dependencies are similar, for example
-  for any $\aPS\in\sem{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}$,
-  there must be an $\aVal\in\Val$ and $\aPS'\in \sem{\IF r \THEN \PW{y}{1} \FI}$
-  such as:
-  \begin{gather*}
-    \IF r \THEN \PW{y}{1} \FI
-    \\
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{r{\ne}0\mid\DW{y}{1}}{}
-      \end{tikzinline}}
-  \end{gather*}
-  The rest of the reasoning is the same as \refex{ex:data}.
-\end{example}
-
-% Many laws hold for the conditional, such as dead code elimination
-% and code lifting \eqref{CL}:
-% \begin{align*}
-%   \taglabel{DC}
-%   \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &=
-%   \sem{\aCmd_1}
-%   &&\textif (\aExp\ne0) \text{ is a tautology}
-%   \\
-%   \taglabel{CL}
-% \end{align*}
-% Code lifting also applies to program fragments inside a conditional.  For example:
-% \begin{align*}
-%   \sem{\IF{\aExp}\THEN x\GETS \bExp \SEMI\aCmd_1\ELSE x\GETS \bExp \SEMI\aCmd_2\FI} &\supseteq
-%   \sem{x\GETS \bExp \SEMI \IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI}
-%   % \sem{\IF{r{=}1}\THEN \PW{x}{r}\SEMI \PW{x}{1} \ELSE \PW{x}{1}\FI}
-%   % \supseteq
-%   % \sem{\PW{x}{1} \SEMI \IF{r{=}1}\THEN \PW{x}{r}\FI}
-% \end{align*}
-
-Many laws hold for the conditional.  For example:
-\begin{align*}
-   \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} &\supseteq
-   \sem{\aCmd}
- \end{align*}
-We discuss the inverse inclusion in \textsection\ref{sec:semca}.
-
-
 \subsection{Reordering Transformations}
 \label{sec:ex:valid}
 
@@ -1066,16 +1025,16 @@ The semantics validates many peephole optimizations.  Most apply only to
 relaxed access.
 \begin{align*}
   %\taglabel{RR}
-  \sem{\PR{\aLoc}{\aReg} \SEMI \PR{\bLoc}{\bReg}} &=
-  \sem{\PR{\bLoc}{\bReg}\SEMI \PR{\aLoc}{\aReg}} &&\text{if } \aReg\neq\bReg
+  \sembase{\PR{\aLoc}{\aReg} \SEMI \PR{\bLoc}{\bReg}} &=
+  \sembase{\PR{\bLoc}{\bReg}\SEMI \PR{\aLoc}{\aReg}} &&\text{if } \aReg\neq\bReg
   \\
   %\taglabel{WW}
-  \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
-  \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} &&\text{if } \aLoc\neq\bLoc
+  \sembase{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
+  \sembase{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} &&\text{if } \aLoc\neq\bLoc
   \\
   %\taglabel{RW}
-  \sem{\aLoc \GETS \aExp  \SEMI \PR{\bLoc}{\bReg}} &=
-  \sem{\PR{\bLoc}{\bReg} \SEMI\aLoc \GETS \aExp} &&\text{if }
+  \sembase{\aLoc \GETS \aExp  \SEMI \PR{\bLoc}{\bReg}} &=
+  \sembase{\PR{\bLoc}{\bReg} \SEMI\aLoc \GETS \aExp} &&\text{if }
   \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
 \end{align*}
 % \ref{WW}, \ref{RW} and \ref{RR} require that two sides of the semicolon
@@ -1091,14 +1050,14 @@ Using augmentation closure, the semantics also validates roach-motel reorderings
 example, on read/write pairs:
   \begin{align*}
     %\tag{\textsc{roach1}}\label{AcqW}
-    \sem{x^\amode \GETS \aExp \SEMI\PR{y}{\bReg}} &\supseteq
-    \sem{\PR{y}{\bReg}  \SEMI x^\amode\GETS \aExp} 
+    \sembase{x^\amode \GETS \aExp \SEMI\PR{y}{\bReg}} &\supseteq
+    \sembase{\PR{y}{\bReg}  \SEMI x^\amode\GETS \aExp} 
     &&\text{if }
     \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
     \\
     %\tag{\textsc{roach2}}\label{RelW}
-    \sem{x \GETS \aExp \SEMI\PR[\amode]{y}{\bReg}} &\supseteq
-    \sem{\PR[\amode]{y}{\bReg}  \SEMI x\GETS \aExp} 
+    \sembase{x \GETS \aExp \SEMI\PR[\amode]{y}{\bReg}} &\supseteq
+    \sembase{\PR[\amode]{y}{\bReg}  \SEMI x\GETS \aExp} 
     &&\text{if }
     \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
   \end{align*}
@@ -1143,20 +1102,23 @@ imply the transformer for a larger subset.
 
 Sadly, this definition fails associativity.
 
-Consider the following, eliding transformers:
+Consider the following, eliding transformers for the writes:
 \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
+        \xform{xd}{1{=}r\limplies\bForm}{right=of a}
+        \xform{xi}{(y{=}r\lor1{=}r)\limplies\bForm}{left=.5em of a}
+        \xo{a1}{xd}
       \end{tikzinline}}    
   \end{gathered}
   &&
   \begin{gathered}[t]
     \PW{x}{\BANG r} 
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{b}{r{=}0\mid\DW{x}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
@@ -1164,7 +1126,7 @@ Consider the following, eliding transformers:
   \begin{gathered}[t]
     \PW{x}{\BANG\BANG r}
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{b}{r{\neq}0\mid\DW{x}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
@@ -1172,17 +1134,18 @@ Consider the following, eliding transformers:
   \begin{gathered}[t]
     \PW{x}{0} 
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{b}{\DW{x}{0}}{}
       \end{tikzinline}}    
   \end{gathered}
-\end{align*}  
-Associating to the right and merging:
+\end{align*}
+Coalescing the writes and associating to the right,
+we have the following, since $(r{=}0 \lor r{\neq}0)\rimplies\TRUE$:
 \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
@@ -1192,22 +1155,23 @@ Associating to the right and merging:
     \SEMI \PW{x}{\BANG\BANG r} 
     \SEMI \PW{x}{0} 
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{b}{r{=}0 \lor r{\neq}0\mid\DW{x}{1}}{}
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+        \event{b}{\DW{x}{1}}{}
         \event{c}{\DW{x}{0}}{right=of b}
         \wk{b}{c}
       \end{tikzinline}}    
   \end{gathered}
-\end{align*}  
-The precondition of $\DWP{x}{1}$ is a tautology, thus we have:
-\begin{align*}
+  &&
+% \end{align*}  
+% The precondition of $\DWP{x}{1}$ is a tautology, thus we have:
+% \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
-    \SEMI \PW{x}{\BANG r} 
+    \SEMI (\PW{x}{\BANG r} 
     \SEMI \PW{x}{\BANG\BANG r} 
-    \SEMI \PW{x}{0} 
+    \SEMI \PW{x}{0} )
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
         \event{b}{\DW{x}{1}}{right=of a}
         \event{c}{\DW{x}{0}}{right=of b}
@@ -1215,15 +1179,16 @@ The precondition of $\DWP{x}{1}$ is a tautology, thus we have:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-If, instead, we associate to the left:
+The precondition of $\DWP{x}{1}$ is a tautology.
+Associating to the left and the coalescing, instead:
 \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
     \SEMI \PW{x}{\BANG r} 
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \event{b}{1{=}0\mid\DW{x}{1}}{right=of a}
+        \event{b}{(y{=}r\lor1{=}r)\limplies r{=}0\mid\DW{x}{1}}{right=of a}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -1231,31 +1196,33 @@ If, instead, we associate to the left:
     \PW{x}{\BANG\BANG r} 
     \SEMI \PW{x}{0} 
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{b}{r{\neq}0\mid\DW{x}{1}}{}
         \event{c}{\DW{x}{0}}{right=of b}
         \wk{b}{c}
       \end{tikzinline}}    
   \end{gathered}
-\end{align*}  
-Sequencing and merging:
-\begin{align*}
+  &&
+% \end{align*}  
+% Sequencing and merging:
+% \begin{align*}
   \begin{gathered}[t]
-    \PR{y}{r}
-    \SEMI \PW{x}{\BANG r} 
-    \SEMI \PW{x}{\BANG\BANG r} 
-    \SEMI \PW{x}{0} 
+    (\PR{y}{r}
+    \SEMI \PW{x}{\BANG r} )
+    \SEMI (\PW{x}{\BANG\BANG r} 
+    \SEMI \PW{x}{0} )
     \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \event{b}{1{=}0 \lor r{\neq}0\mid\DW{x}{1}}{right=of a}
+        \event{b}{\aForm\mid\DW{x}{1}}{right=of a}
         \event{c}{\DW{x}{0}}{right=of b}
         \wk{b}{c}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-In this case, the precondition of $\DWP{x}{1}$ is not a tautology, forcing
-a dependency $\DRP{y}{1}\xpo \DWP{x}{1}$.
+where $\aForm=((y{=}r\lor1{=}r)\limplies r{=}0)\lor (r{\neq}0)$.  The
+precondition $\aForm$ is not a tautology.  In a top-level pomset, this forces
+dependency order from $\DRP{y}{1}$ to $\DWP{x}{1}$.
 
 Our solution is to Skolemize, replacing 
 uses of $\bForm[\aVal/\aReg]$

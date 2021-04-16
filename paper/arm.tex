@@ -102,8 +102,9 @@ and that $\rlob$ does \emph{not} include
     \end{enumerate}
   \end{enumerate}
 \end{definition}
-\cite{armed} explain \EGC{} and \EC{} using the following example.\footnote{We have
-changed an address dependency in the first thread to a data dependency.}
+\citet{armed} explain \EGC{} and \EC{} using the following example, which is
+allowed by Arm.\footnote{We have changed an address dependency in the first
+  thread to a data dependency.}
 \begin{gather*}
   \PW{x}{1}\SEMI 
   \PR{x}{r}\SEMI
@@ -111,7 +112,7 @@ changed an address dependency in the first thread to a data dependency.}
   \PR[\mACQ]{y}{1}\SEMI
   \PR{x}{s}
   \\
-  \tag{\cmark\armeight}
+  %\tag{\cmark\armeight}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a}{\DW{x}{1}}{}
       \event{b}{\DR{x}{1}}{right=of a}
@@ -169,13 +170,7 @@ $\DWP{x}{1}$ is not $\rlob$-ordered before $\DWP{y}{1}$.
 
 \subsection{Arm Compilation 1}
 
-\citet{DBLP:journals/pacmpl/PodkopaevLV19} lowers to \armeight{} as follows:
-Relaxed access is implemented using \LDR/\STR, non-relaxed access using
-\LDAR/\STLR.  %, acquire and other fences using \DMBLD/\DMBSY.
-In this section, we consider a suboptimal strategy, which lowers non-relaxed
-reads to $(\DMBSY\SEMI\LDAR)$.
-
-We do not distinguish control dependencies from address dependencies, and
+We do not distinguish control dependencies from other dependencies, and
 therefore \ref{lob-rr} forces us to drop all dependencies between reads.  To
 achieve this, we modify the definition of $\labelingForm'_2$ in
 \reffig{fig:sem}.
@@ -200,6 +195,139 @@ achieve this, we modify the definition of $\labelingForm'_2$ in
   \end{displaymath}
 \end{definition}
 
+Even with this small change, the optimal lowering for \armeight{} is unsound
+for our semantics.  The optimal lowering maps relaxed access to \LDR/\STR{} and
+non-relaxed access to \LDAR/\STLR{} \citep{DBLP:journals/pacmpl/PodkopaevLV19}.
+In this section, we consider a suboptimal strategy, which lowers non-relaxed
+reads to $(\DMBSY\SEMI\LDAR)$.  Significantly, we retain the optimal lowering
+for relaxed access.  In the next section we recover the optimal lowering by
+adopting an alternative semantics for \ref{seq-le}.
+
+To see why the optimal lowering fails, consider the following attempted
+execution, where the final values of both $x$ and $y$ are $2$.
+\begin{gather*}
+  %\taglabel{rfi-coe-coe}
+  \PW{x}{2}\SEMI 
+  \PR[\mACQ]{x}{r}\SEMI
+  \PW{y}{r{-}1} \PAR
+  \PW{y}{2}\SEMI
+  \PW[\mREL]{x}{1}
+  %\\
+  %\tag{\cmark\armeight}
+  % \hbox{\begin{tikzinline}[node distance=1.5em]
+  %     \event{a}{\DW{x}{2}}{}
+  %     \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+  %     \event{c}{\DW{y}{1}}{right=of b}
+  %     \event{d}{\DW{y}{2}}{right=2.5em of c}
+  %     \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+  %     \rfi{a}{b}
+  %     \bob{b}{c}
+  %     \coe{c}{d}
+  %     \bob{d}{e}
+  %     \coe[out=-165,in=-15]{e}{a}
+  %   \end{tikzinline}}
+  \\
+  \tag{$\rgcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \gcbz{a}{b}
+      %\sync{b}{c}
+      \gcbz{c}{d}
+      \gcbz{d}{e}
+      \gcbz[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+  \\
+  \tag{$\le$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \rf{a}{b}
+      \sync{b}{c}
+      \wk{c}{d}
+      \sync{d}{e}
+      \wk[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+\end{gather*}
+This attempted execution is allowed by \armeight, but disallowed by our
+semantics.
+
+If the read of $x$ in the execution above is changed from acquiring to
+relaxed, then our semantics allows the execution, using the independent case
+for the read and satisfying the precondition of $\DWP{y}{1}$ by prepending
+$\DWP{x}{2}$.  It may be tempting, therefore to adopt a strategy of
+\emph{downgrading} acquires in certain cases.  Unfortunately, it is not
+possible to do this locally without violating important idioms such as
+publication.  For example, consider that $\DRP[\mRA]{x}{1}$ \emph{not} possible for
+the second thread in the following attempted execution, due to publication of
+$\DWP{x}{2}$ via $y$:
+\begin{gather*}
+  \PW{x}{\PR{x}{}+1}\SEMI
+  \PW[\mREL]{y}{1}
+  \PAR
+  \PW{x}{1}\SEMI
+  \IF{\PR[\mACQ]{y}{}\AND\PR[\mACQ]{x}{}}\THEN
+  \PR{z}{s}
+  \FI
+  \PAR
+  \PW{z}{1}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{b1}{\DR{x}{1}}{}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
+      \po{b1}{b2}
+      \sync{b2}{b3}
+      \event{a1}{\DW{x}{1}}{right=3em of b3}
+      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \event{a4}{\DR{z}{0}}{right=of a3}
+      \sync{a2}{a3}
+      \sync{a3}{a4}
+      \event{c1}{\DW{z}{1}}{right=3em of a4}
+      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
+      \sync{c1}{c2}
+      \rf[out=-165,in=-15]{a1}{b1}
+      \rf[out=15,in=165]{b3}{a2}
+      \rf[out=-165,in=-15]{c2}{a3}
+      \wk{a4}{c1}
+    \end{tikzinline}}
+\end{gather*}
+Instead, if the read of $x$ is relaxed, then the publication via $y$ fails,
+and $\DRP{x}{1}$ in the second thread is possible.
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{b1}{\DR{x}{1}}{}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
+      \po{b1}{b2}
+      \sync{b2}{b3}
+      \event{a1}{\DW{x}{1}}{right=3em of b3}
+      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
+      \event{a3}{\DR{x}{1}}{right=of a2}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \event{a4}{\DR{z}{0}}{right=of a3}
+      \sync{a2}{a3}
+      \sync[out=15,in=165]{a2}{a4}
+      \event{c1}{\DW{z}{1}}{right=3em of a4}
+      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
+      \sync{c1}{c2}
+      \rf[out=-165,in=-15]{a1}{b1}
+      \rf[out=15,in=165]{b3}{a2}
+      \rf[out=-165,in=-15]{c2}{a3}
+      \wk{a4}{c1}
+    \end{tikzinline}}
+\end{gather*}
+
+Using the suboptimal lowering for acquiring reads, our semantics is sound for
+Arm.  The proof uses the characterization of Arm using \EGC{}.
 
 \begin{theorem}
   \label{thm:ec}
@@ -284,70 +412,51 @@ achieve this, we modify the definition of $\labelingForm'_2$ in
 %   \low{\PR[\gemode\mACQ]{\REF{\aReg}}{\bReg}} &= \texttt{dmb st}\SEMI\texttt{ldar}\;\bReg,\REF{\aReg}
 % \end{align*}
 
-Downgrading messes up publication:
-\begin{gather*}
-  \PW{x}{\PR{x}{}+1}\SEMI
-  \PW[\mREL]{y}{1}
-  \PAR
-  \PW{x}{1}\SEMI
-  \IF{\PR[\mACQ]{y}{}\AND\PR[\mACQ]{x}{}}\THEN
-  \PR{z}{s}
-  \FI
-  \PAR
-  \PW{z}{1}\SEMI
-  \PW[\mREL]{x}{1}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{b1}{\DR{x}{1}}{}
-      \event{b2}{\DW{x}{2}}{right=of b1}
-      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
-      \po{b1}{b2}
-      \sync{b2}{b3}
-      \event{a1}{\DW{x}{1}}{right=3em of b3}
-      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
-      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \event{a4}{\DR{z}{0}}{right=of a3}
-      \sync{a2}{a3}
-      \sync{a3}{a4}
-      \event{c1}{\DW{z}{1}}{right=3em of a4}
-      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
-      \sync{c1}{c2}
-      \rf[out=-165,in=-15]{a1}{b1}
-      \rf[out=15,in=165]{b3}{a2}
-      \rf[out=-165,in=-15]{c2}{a3}
-      \wk{a4}{c1}
-    \end{tikzinline}}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{b1}{\DR{x}{1}}{}
-      \event{b2}{\DW{x}{2}}{right=of b1}
-      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
-      \po{b1}{b2}
-      \sync{b2}{b3}
-      \event{a1}{\DW{x}{1}}{right=3em of b3}
-      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
-      \event{a3}{\DR{x}{1}}{right=of a2}
-      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \event{a4}{\DR{z}{0}}{right=of a3}
-      \sync{a2}{a3}
-      \sync[out=15,in=165]{a2}{a4}
-      \event{c1}{\DW{z}{1}}{right=3em of a4}
-      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
-      \sync{c1}{c2}
-      \rf[out=-165,in=-15]{a1}{b1}
-      \rf[out=15,in=165]{b3}{a2}
-      \rf[out=-165,in=-15]{c2}{a3}
-      \wk{a4}{c1}
-    \end{tikzinline}}
-\end{gather*}
 
 \subsection{Arm Compilation 2}
 \label{sec:arm2}
 
+We can achieve optimal lowering for Arm by weakening the semantics of
+sequential composition slightly.  In particular, we must lose
+\reflem{lem:rf:implies:le}, which states that $\bEv\xrfx\aEv$ implies
+$\bEv\le\aEv$.  Revisiting the example in the last subsection, we essentially
+mimic the \EC{} characterization:
+\begin{gather*}
+  \PW{x}{2}\SEMI 
+  \PR[\mACQ]{x}{r}\SEMI
+  \PW{y}{r{-}1} \PAR
+  \PW{y}{2}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \tag{$\rcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \rfint{a}{b}
+      \cbz{b}{c}
+      \cbz{c}{d}
+      \cbz{d}{e}
+      \cbz[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+\end{gather*}
+Here the $\rrfx$ relation \emph{contradicts} order!  We have both
+$\DWP{x}{2}\xrfint\DRP[\mACQ]{x}{2}$ and
+$\DWP{x}{2}\xcbinv\DRP[\mACQ]{x}{2}$.
+
+The change to the semantics is small: we weaken relationship between $\rrfx$
+and $\le$ in \ref{seq-le-rf}.  Rather than ensuring that there is no
+\emph{global} blocker for a sequentially fulfilled read \ref{seq-le-rf}, we
+require only that there is no \emph{thread-local} blocker \ref{seq-le-rf-rf}.
+This change both allows and requires us to weaken the definition of
+\emph{delays} to drop write-to-read order from $\eqreorderco$.
 \begin{definition}
   \label{def:sem:frf}
-  Let $\frf{\semrr{}}$ be defined as for $\semrr{}$ in \refdef{def:semrr} and
-  \reffig{fig:sem}, changing \ref{seq-le-rf} and \ref{seq-le-delays}:
+  Let $\frf{\semrr{}}$ be defined as for $\semrr{}$ in
+  \refdef{def:semrr}/\reffig{fig:sem}, changing \ref{seq-le-rf} and
+  \ref{seq-le-delays}:
   \begin{itemize}
   \item[{\labeltext[\frf{\textsc{s}7b}]{(\frf{\textsc{s}7b})}{seq-le-rf-rf}}]
     if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ then $\bEv\xrfx\aEv$
@@ -366,18 +475,40 @@ Downgrading messes up publication:
 The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
 \emph{Local Write Successor}.
 
-Note that \reflem{lem:rf:implies:le} fails for $\frf{\semrr{}}$, since
-$\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come from
-different sides of a sequential composition.  This means that $\rrfx$ must be
-verified during pomset construction, rather than post-hoc.  If one wants a
-post-hoc verification technique for $\rrfx$, it is possible to include
-program order ($\rpox$) in the pomset.
+With the weakening of \ref{seq-le-rf-rf}, we must be careful not to allow
+spurious pairs to be added to the $\rrfx$ relation.  The use of
+$\rextendsdef{}{}$ in \ref{if-rf-extends} does this, ensuring that no new
+$\rrfx$ is introduced between events in $\aEvs_1\cap\aEvs_2$ when coalescing.
+This is necessary to ensure that
+\begin{math}
+  \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
+\end{math}
+does not include 
+\begin{math}
+  \smash{\hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \rfint[out=165,in=15]{b}{a}
+        \wk{a}{b}
+      \end{tikzinlinesmall}}}
+\end{math}, taking $\rrfx$ from the left and $\le$ from the right.
 
-\begin{example}
-  The obvious definition of $\rpox$ may be cyclic, due to the conditional. 
-\end{example}
+We emphasize that \reflem{lem:rf:implies:le} fails for $\frf{\semrr{}}$,
+since $\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come
+from different sides of a sequential composition.  This means that $\rrfx$
+must be verified during pomset construction, rather than post-hoc.  The
+following lemma gives a post-hoc verification technique for $\rrfx$, using
+program order ($\rpox$).\footnote{It is obvious how to enhance the semantics
+  of most operators to define $\rpox$.  When combining pomsets using the
+  conditional, the obvious definition of $\rpox$ may result in cycles, since
+  $\rpox$-ordered events may coalesce.  In this case we include a separate
+  pomset for each way of breaking these $\rpox$ cycles.}
+% \begin{example}
+%   The obvious definition of $\rpox$ may be cyclic, due to the conditional. 
+% \end{example}
 \begin{lemma}
-  $\aPS$ is top-level iff $\bEv\xrfx\aEv$ implies either
+  Any $\aPS$ in the image of $\frf{\semrr{}}$ is top-level iff
+  for every $\bEv\xrfx\aEv$ either
   \begin{itemize}
   \item external fulfillment: $\bEv\le\aEv$ and if $\labeling(\cEv)$ blocks
     $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
@@ -462,93 +593,58 @@ ${\rcb_1}\supseteq{\rfr_1}$:
 % Theorem: per-thread essential ${\le}$ $\subseteq$ ${\rpoloc}\cup{\rpre}$.
 
 
-Bad example:
-\begin{gather*}
-  \PEXCHG{x}{r}{2}\SEMI 
-  \PR{x}{s}\SEMI
-  \PW{y}{s{-}1} \PAR
-  \PR{y}{r}\SEMI
-  \PW{x}{r}
-  \\
-  \tag{\cmark\armeight}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DR{x}{1}}{}
-      \event{b}{\DW{x}{2}}{right=of a}
-      \event{c}{\DR{x}{2}}{right=of b}
-      \event{d}{\DW{y}{1}}{right=of c}
-      \event{e}{\DR{y}{1}}{right=3em of d}
-      \event{f}{\DW{x}{1}}{right=of e}
-      \pre{a}{b}
-      \rf{b}{c}
-      \lob{c}{d}
-      \rf{d}{e}
-      \pre{e}{f}
-      \rf[out=-165,in=-15]{f}{a}
-    \end{tikzinline}}
-  % \hbox{\begin{tikzinline}[node distance=1.5em]
-  %   \event{a}{\DR{x}{1}}{}
-  %   \event{b}{\DW{x}{2}}{right=of a}
-  %   \event{c}{\DR{x}{2}}{right=of b}
-  %   \event{d}{\DW{y}{1}}{right=of c}
-  %   \event{e}{\DR{y}{1}}{right=3em of d}
-  %   \event{f}{\DW{x}{1}}{right=of e}
-  %   \rmw{a}{b}
-  %   \rfi{b}{c}
-  %   \dob{c}{d}
-  %   \rfe{d}{e}
-  %   \dob{e}{f}
-  %   \rfe[out=-165,in=-15]{f}{a}
-  % \end{tikzinline}}
-  \\
-  \tag{$\le$}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DR{x}{1}}{}
-      \event{b}{\DW{x}{2}}{right=of a}
-      \event{c}{\DR{x}{2}}{right=of b}
-      \event{d}{\DW{y}{1}}{right=of c}
-      \event{e}{\DR{y}{1}}{right=3em of d}
-      \event{f}{\DW{x}{1}}{right=of e}
-      \rmw{a}{b}
-      \rf{b}{c}
-      % \po{c}{d}
-      \rf{d}{e}
-      \po{e}{f}
-      \rf[out=-165,in=-15]{f}{a}
-    \end{tikzinline}}
-\end{gather*}
-Anton example 1 \texttt{[rfi-coe-coe]}
-\begin{gather*}
-  \taglabel{rfi-coe-coe}
-  \PW{x}{2}\SEMI 
-  \PR[\mACQ]{x}{r}\SEMI
-  \PW{y}{1} \PAR
-  \PW{y}{2}\SEMI
-  \PW[\mREL]{x}{1}
-  \\
-  \tag{\cmark\armeight}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DW{x}{2}}{}
-      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
-      \event{c}{\DW{y}{1}}{right=of b}
-      \event{d}{\DW{y}{2}}{right=2.5em of c}
-      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
-      \rfi{a}{b}
-      \bob{b}{c}
-      \coe{c}{d}
-      \bob{d}{e}
-      \coe[out=-165,in=-15]{e}{a}
-    \end{tikzinline}}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DW{x}{2}}{}
-      \event{b}{\DR{x}{2}}{right=of a}
-      \event{c}{\DW{y}{1}}{right=of b}
-      \event{d}{\DW{y}{2}}{right=2.5em of c}
-      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
-      \rf{a}{b}
-      \wk{c}{d}
-      \sync{d}{e}
-      \wk[out=-165,in=-15]{e}{a}
-    \end{tikzinline}}
-\end{gather*}
+% Bad example:
+% \begin{gather*}
+%   \PEXCHG{x}{r}{2}\SEMI 
+%   \PR{x}{s}\SEMI
+%   \PW{y}{s{-}1} \PAR
+%   \PR{y}{r}\SEMI
+%   \PW{x}{r}
+%   \\
+%   \tag{\cmark\armeight}
+%   \hbox{\begin{tikzinline}[node distance=1.5em]
+%       \event{a}{\DR{x}{1}}{}
+%       \event{b}{\DW{x}{2}}{right=of a}
+%       \event{c}{\DR{x}{2}}{right=of b}
+%       \event{d}{\DW{y}{1}}{right=of c}
+%       \event{e}{\DR{y}{1}}{right=3em of d}
+%       \event{f}{\DW{x}{1}}{right=of e}
+%       \pre{a}{b}
+%       \rf{b}{c}
+%       \lob{c}{d}
+%       \rf{d}{e}
+%       \pre{e}{f}
+%       \rf[out=-165,in=-15]{f}{a}
+%     \end{tikzinline}}
+%   % \hbox{\begin{tikzinline}[node distance=1.5em]
+%   %   \event{a}{\DR{x}{1}}{}
+%   %   \event{b}{\DW{x}{2}}{right=of a}
+%   %   \event{c}{\DR{x}{2}}{right=of b}
+%   %   \event{d}{\DW{y}{1}}{right=of c}
+%   %   \event{e}{\DR{y}{1}}{right=3em of d}
+%   %   \event{f}{\DW{x}{1}}{right=of e}
+%   %   \rmw{a}{b}
+%   %   \rfi{b}{c}
+%   %   \dob{c}{d}
+%   %   \rfe{d}{e}
+%   %   \dob{e}{f}
+%   %   \rfe[out=-165,in=-15]{f}{a}
+%   % \end{tikzinline}}
+%   \\
+%   \tag{$\le$}
+%   \hbox{\begin{tikzinline}[node distance=1.5em]
+%       \event{a}{\DR{x}{1}}{}
+%       \event{b}{\DW{x}{2}}{right=of a}
+%       \event{c}{\DR{x}{2}}{right=of b}
+%       \event{d}{\DW{y}{1}}{right=of c}
+%       \event{e}{\DR{y}{1}}{right=3em of d}
+%       \event{f}{\DW{x}{1}}{right=of e}
+%       \rmw{a}{b}
+%       \rf{b}{c}
+%       % \po{c}{d}
+%       \rf{d}{e}
+%       \po{e}{f}
+%       \rf[out=-165,in=-15]{f}{a}
+%     \end{tikzinline}}
+% \end{gather*}
 
