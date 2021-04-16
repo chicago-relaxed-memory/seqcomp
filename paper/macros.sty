@@ -58,8 +58,8 @@
 \newcommand{\aState}{\sigma}
 \newcommand{\bState}{\rho}
 
-\newcommand{\noSUB}[1]{}
-\newcommand{\noOR}[1]{}
+\newcommand{\noSUB}[1]{#1}
+\newcommand{\noOR}[1]{#1}
 \newcommand{\reflem}[1]{Lemma~\ref{#1}}
 \newcommand{\refthm}[1]{Theorem~\ref{#1}}
 \newcommand{\reffig}[1]{Figure~\ref{#1}}
@@ -869,13 +869,14 @@
 \newcommand{\sELSE}{\allowbreak,\,}
 \newcommand{\sFI}{)}
 \NewDocumentCommand\sIFTHEN{m m m}{\textnormal{\textit{IF}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2,\,\allowbreak#3)}}
-\NewDocumentCommand\sSEMI{m m}{#1\SEMI#2}
 \NewDocumentCommand\sPAR{m m}{#1\PAR#2}
 \NewDocumentCommand\sRPAR{m O{} m}{#1\RPAR[#2]#3}
-\NewDocumentCommand\sLPAR{m O{} m}{#1\LPAR[#2]#3}
-% \NewDocumentCommand\sSEMI{m m O{}}{\textnormal{\textit{SEQ}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)_{#3}}}
+% \NewDocumentCommand\sLPAR{m O{} m}{#1\LPAR[#2]#3}
+% \NewDocumentCommand\sSEMI{m m}{#1\SEMI#2}
+\NewDocumentCommand\sLPAR{m O{} m}{\textnormal{\textit{PAR}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak\ifnotempty{#2}{#2,\,\allowbreak}#3)}}
+\NewDocumentCommand\sSEMI{m m}{\textnormal{\textit{SEQ}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)}}
+\NewDocumentCommand\sSEQ{m m}{\textnormal{\textit{SEQ}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)}}
 % \NewDocumentCommand\sPAR{m O{} m O{}}{\sRPAR{#1}[#2]{#3}[#4]}
-% \NewDocumentCommand\sRPAR{m O{} m O{}}{\textnormal{\textit{PAR}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak\ifnotempty{#2}{#2,\,\allowbreak}#3)_{#4}}}
 \NewDocumentCommand\sLET{m m O{}}{\textnormal{\textit{LET}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)_{#3}}}
 \newcommand{\sEXPAND}[1]{\textnormal{\textit{EXPAND}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sFORK}[1]{\textnormal{\textit{FORK}}\ifnotempty{#1}{\allowbreak(#1)}}
