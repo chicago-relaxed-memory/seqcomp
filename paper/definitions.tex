@@ -535,7 +535,7 @@ From \refdef{def:actions}, recall that $\aAct \rdelaysdef \bAct$ if
 $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or
 $\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
 order is enforced between conflicting accesses of the same location
-($\eqreorderco$), into a release and out of an acquire ($\reorderra$) and
+($\eqreorderco$), into a release and out of an acquire ($\reorderra$), and
 between SC accesses ($\eqreordersc$).  Combined with the fulfillment
 requirements (\ref{rf-match}, \ref{rf-block} and \reflem{lem:rf:implies:le}),
 these ensure coherence, publication, subscription and other idioms.  For
@@ -561,7 +561,7 @@ example, consider the following:
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-The execution is allowed due to the evident cycle.  All of the order shown is
+The execution is disallowed due to the evident cycle.  All of the order shown is
 required at top-level: The intra-thread order comes from \ref{seq-le-delays}:
 $\DWP{x}{0}\xwk \DWP{x}{1}$ is required by $\eqreorderco$.
 $\DWP{x}{1}\xwk \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xwk \DRP{x}{0}$ are
@@ -575,8 +575,9 @@ we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
 
 The semantics gives the expected results for store buffer and load buffering,
 as well as litmus tests involving fences and SC access.  The model of
-coherence is weaker than C11, to support common subexpression elimination,
-and stronger than Java, to support local reasoning about data races.  See
+coherence is weaker than C11, in order to support common subexpression
+elimination, and stronger than Java, in order to support local reasoning
+about data races.  See
 \cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20} for a discussion.
 
 
