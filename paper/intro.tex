@@ -17,9 +17,9 @@ the late 1960s, we've been able to explain this using logic
 as \emph{predicate transformers}, where predicates describe the state of
 memory in the system.  In the calculus of weakest preconditions, programs map
 postconditions to preconditions.  We recall the definition of
-$\fwp{\aCmd}{\bForm}$ for loop-free code below (where $\aReg$ ranges over thread-local \emph{registers}
-and $\aExp$ ranges over side-effect free \emph{expressions}). 
-\begin{multicols}{2}
+$\fwp{\aCmd}{\bForm}$ for loop-free code below (where $\aReg$--$\bReg$ range over thread-local \emph{registers}
+and $\aExp$--$\bExp$ range over side-effect free \emph{expressions}). 
+%\begin{multicols}{2}
   \begin{enumerate}[,label=(\textsc{d}\arabic*),ref=\textsc{d}\arabic*]
   \item
     \begin{math}
@@ -53,13 +53,12 @@ and $\aExp$ ranges over side-effect free \emph{expressions}).
     \begin{math}
       \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm}= {}
     \end{math}
-    \\
     \begin{math}
       ((\aExp{\ne}0) \limplies \fwp{\aCmd_1}{\bForm}) \land
       ((\aExp{=}0) \limplies \fwp{\aCmd_2}{\bForm})
     \end{math}
   \end{enumerate}
-\end{multicols}
+%\end{multicols}
 For this language, the Hoare triple
 $\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when $\aForm \limplies
 \fwp{\aCmd}{\bForm}$.
@@ -75,13 +74,21 @@ $\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when $\aForm \limplies
 %%   equivalent to $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \bForm[\aLoc/\aReg]$.}
 %%
 This is an elegant explanation of sequential computation in a sequential
-context.  In a concurrent context, however, generalizing
-\ref{wp-let} from thread-local registers to cross-thread memory locations
-is unsound! \ref{wp-let} is sound because a read from a thread-local
-register must be fulfilled by a preceding write
-in the same thread.  In a concurrent context, a read from a shared
-memory location may be fulfilled by a write
-in another thread.
+context. Note that \ref{wp-let} is sound because a read from a thread-local
+register must be fulfilled by a preceding write in the same thread.
+In a concurrent context, with shared variables
+($\aLoc$--$\cLoc$), the obvious generalizations
+\begin{multicols}{2}
+\begin{itemize}
+\item[{\labeltext[\textsc{d}2b]{(\textsc{d}2b)}{wp-write}}] $\fwp{\LET{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
+\item[{\labeltext[\textsc{d}2c]{(\textsc{d}2c)}{wp-read}}] $\fwp{\LET{\aReg}{\aLoc}}{\bForm} = \bForm[\aLoc/\aReg]$
+\end{itemize}
+\end{multicols}
+\noindent
+are unsound!  In particular, a read from a shared memory location may be fulfilled by a write
+in another thread, invalidating \ref{wp-read}.  (We assume that expressions
+% $\aExp$--$\bExp$
+do \emph{not} include shared variables.) % $\aLoc$--$\cLoc$.)
 
 Existing approaches to sequential composition in the concurrent context
 either assume exclusive access, as in concurrent separation logic
@@ -425,13 +432,14 @@ showing how $\bForm$ is transformed, for example:
   \end{gathered}
 \end{align*}
 The predicate transformer from the write matches
-\citeauthor{DBLP:journals/cacm/Dijkstra75}.  For the reads, however,
-\ref{wp-read} defines the transformer of $\PR{x}{r}$ to be
-$(x{=}r) \limplies \bForm$.  Instead, we use $(0{=}r) \limplies \bForm$,
-reflecting the fact that $0$ may come from a concurrent write.  The
-obligation to find a matching write is moved from the sequential semantics of
-\emph{substitution} and \emph{implication} to the concurrent semantics of
-\emph{fulfillment}.
+\citeauthor{DBLP:journals/cacm/Dijkstra75}'s \ref{wp-write}.  For the reads,
+however, \ref{wp-read} defines the transformer of $\PR{x}{r}$ to be
+$\bForm[x/r]$, which is equivalent to $(x{=}r) \limplies \bForm$ under the
+assumption that registers are assigned at most once.
+Instead, we use $(0{=}r) \limplies \bForm$, reflecting the fact that $0$ may
+come from a concurrent write.  The obligation to find a matching write is
+moved from the sequential semantics of \emph{substitution} and
+\emph{implication} to the concurrent semantics of \emph{fulfillment}.
 
 % In the rightmost program above, the write to $z$ affects the shared store, not the
 % local state of the thread, therefore we assign it the identity transformer.
@@ -634,7 +642,7 @@ compositional semantics for sequential composition.
 \item \S\ref{sec:arm} shows two approaches for efficient implementation on
   Arm.  The first uses a suboptimal lowering for acquiring reads.  The second
   uses an optimal lowering, but requires changes to the definitions of
-  parallel and sequential composition.
+  sequential composition.
 \item \S\ref{sec:variants} generalizes the basic semantics of read and write
   to validate compiler optimizations.
 \end{itemize}
