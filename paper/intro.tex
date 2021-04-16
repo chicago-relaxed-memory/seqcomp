@@ -25,20 +25,22 @@ and $\aExp$ ranges over side-effect free \emph{expressions}).
     \begin{math}
       \fwp{\SKIP}{\bForm} = \bForm
     \end{math}
+  \item \label{wp-let}
+    $\fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]$
     % \item 
     %   \begin{math}
     %     \fwp{\ABORT}{\bForm} = \FALSE
     %   \end{math}
-    \stepcounter{enumi}
-  %\item[] \labeltext[\textsc{d}2]{}{wp-assign}
-  %  \begin{enumerate}[leftmargin=0pt]
-  %  \item \label{wp-write}
-  %    $\fwp{\PW{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
-    \item \label{wp-let}
-      $\fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]$
-  %  \item \label{wp-read}
-  %    $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \aLoc{=}\aReg\limplies\bForm$ %\bForm[\aLoc/\aReg]$ %
-  %  \end{enumerate}
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{d}2]{}{wp-assign}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{wp-write}
+    %     $\fwp{\PW{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
+    %   \item \label{wp-let}
+    %     $\fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]$
+    %   \item \label{wp-read}
+    %     $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \aLoc{=}\aReg\limplies\bForm$ %\bForm[\aLoc/\aReg]$ %
+    %   \end{enumerate}
     % \item 
     %   \begin{math}
     %     \fwp{\LET{x}{\aExp}}{\bForm} = \bForm[\aExp/x]
@@ -77,7 +79,7 @@ context.  In a concurrent context, however, generalizing
 \ref{wp-let} from thread-local registers to cross-thread memory locations
 is unsound! \ref{wp-let} is sound because a read from a thread-local
 register must be fulfilled by a preceding write
-in the same thread.  In a concurrent context, aread from a cross-thread
+in the same thread.  In a concurrent context, a read from a shared
 memory location may be fulfilled by a write
 in another thread.
 

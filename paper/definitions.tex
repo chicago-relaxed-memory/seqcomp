@@ -586,9 +586,11 @@ about data races.  See
 \label{sec:ex:term}
 
 In top-level pomsets, \ref{top-term} requires that $\aTerm$ is a tautology,
-capturing termination.  Roughly, the structural rules take $\aTerm$ to be
-$\aTerm_1\land\aTerm_2$.  The interesting rules are $\sLOAD{}{}$,
-$\sFENCE{}$, and $\sSTORE{}{}$.
+capturing termination.  Ignoring predicate transformers, the structural
+rules, \ref{par-term} and \ref{seq-term}, take $\aTerm$ to be
+$\aTerm_1\land\aTerm_2$.  This is as expected: the program terminates if both
+subprograms terminate.  The interesting rules are $\sLOAD{}{}$, $\sFENCE{}$,
+and $\sSTORE{}{}$.
 
 
 In $\sLOAD{}{}$, there is no restriction on $\aTerm$.  From this, it is easy
@@ -645,8 +647,21 @@ but the former does not.\footnote{These are distinguished by the context:
 \subsection{Discussion: Preconditions}
 \label{sec:ex:kappa}
 
-In top-level pomsets, \ref{top-kappa} requires that every precondition $\labelingForm(\aEv)$ is a tautology,
+% Predicate transformers affect preconditions in the definition of
+% $\labelingForm'_2$, which is used in \ref{seq-kappa2} and \ref{seq-kappa12}
+% to calculate dependencies.  In this subsection we ignore predicate
+% transformers, taking $\labelingForm'_2=\labelingForm_2$.
 
+In top-level pomsets, \ref{top-kappa} requires that every precondition
+$\labelingForm(\aEv)$ is a tautology.
+
+Preconditions are introduced in three places: \ref{write-kappa} introduces
+data dependencies for write actions, \ref{if-kappa} introduces control
+dependencies, and \ref{seq-kappa-release} ensures that writes are up-to-date
+before a release action.
+
+Preconditions are discharged by sequential composition in \ref{seq-kappa2}
+and \ref{seq-kappa12}, discussed \textsection\ref{sec:ex:tau}.
 
 The definition of $\rextendsdef{}{}$ ensures that no new order
 is introduced between events in $\aEvs_1\cap\aEvs_2$.\footnote{This ensures
@@ -655,12 +670,15 @@ is introduced between events in $\aEvs_1\cap\aEvs_2$.\footnote{This ensures
     \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
   \end{math}
   does not include 
-  \begin{tikzinlinesmall}[node distance=1.5em]
-    \event{a}{\DR{x}{1}}{}
-    \event{b}{\DW{x}{1}}{right=of a}
-    \rf[out=170,in=10]{b}{a}
-    \wk{a}{b}
-  \end{tikzinlinesmall}, taking $\xrfx$ from the left and $\le$ from the right.}
+  \begin{math}
+    \smash{\hbox{\begin{tikzinlinesmaller}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \rf[out=165,in=15]{b}{a}
+        \wk{a}{b}
+      \end{tikzinlinesmaller}}}
+  \end{math},
+  taking $\xrfx$ from the left and $\le$ from the right.}
 
 We have given the semantics of $\sIF{}{}{}$ using 
 disjunctive normal form. \citet{DBLP:journals/cacm/Dijkstra75} used
@@ -669,6 +687,56 @@ conjunctive normal form.  Note that
 is logically equivalent to
 \href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}.
 
+\begin{example}
+  Consider $\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, so
+  there must be $\aPS_1\in\sem{\PW{y}{r}}$,
+  and $\aPS_2\in\sem{\PW{y}{1}}$, such as:
+  \begin{align*}
+    \begin{gathered}
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{1}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+          \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Since there is no requirement for disjointness in the semantics of conditionals,
+  we can consider the case where the event \emph{coalesces} from the two pomsets,
+  in which case:
+  \begin{gather*}
+    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gather*}
+  Here, the precondition is a tautology, 
+  independent of $r$.
+  % We refer to event sharing as \emph{coalescing} or \emph{merging}.
+\end{example}
+
+\subsection{Discussion: Predicate Transformers}
+\label{sec:ex:tau}
+
+the treatment of sequential composition
+is new.  This uses the usual rule for composition of predicate
+transformers (but preserving the indexing set). For the pomset, we
+take the union of their events, preserving actions, but crucially in
+cases~\ref{seq-kappa2} and~\ref{seq-kappa12} we apply a predicate
+transformer $\aTr[1]{\cEvs}{}$ from the left-hand side to a precondition
+$\labelingForm_2(\aEv)$ from the right-hand side to build the precondition
+$\labelingForm'_2(\aEv)$.  The indexing set $\cEvs$ for the predicate
+transformer is $\{ \cEv\mid \cEv<\aEv \}$, so can depend on the causal
+order.
 \begin{example}
   \label{ex:data}
   A simple example of a data dependency
@@ -772,56 +840,6 @@ is logically equivalent to
   % a top-level pomset.
 \end{example}
 
-\begin{example}
-  Consider $\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, so
-  there must be $\aPS_1\in\sem{\PW{y}{r}}$,
-  and $\aPS_2\in\sem{\PW{y}{1}}$, such as:
-  \begin{align*}
-    \begin{gathered}
-      \PW{y}{r}
-      \\
-      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
-        \end{tikzinline}}
-    \end{gathered}
-    &&
-    \begin{gathered}
-      \PW{y}{1}
-      \\
-      \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-          \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{align*}
-  Since there is no requirement for disjointness in the semantics of conditionals,
-  we can consider the case where the event \emph{coalesces} from the two pomsets,
-  in which case:
-  \begin{gather*}
-    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
-    \\
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
-      \end{tikzinline}}
-  \end{gather*}
-  Here, the precondition is a tautology, 
-  independent of $r$.
-  % We refer to event sharing as \emph{coalescing} or \emph{merging}.
-\end{example}
-
-\subsection{Discussion: Predicate Transformers}
-\label{sec:ex:tau}
-
-the treatment of sequential composition
-is new.  This uses the usual rule for composition of predicate
-transformers (but preserving the indexing set). For the pomset, we
-take the union of their events, preserving actions, but crucially in
-cases~\ref{seq-kappa2} and~\ref{seq-kappa12} we apply a predicate
-transformer $\aTr[1]{\cEvs}{}$ from the left-hand side to a precondition
-$\labelingForm_2(\aEv)$ from the right-hand side to build the precondition
-$\labelingForm'_2(\aEv)$.  The indexing set $\cEvs$ for the predicate
-transformer is $\{ \cEv\mid \cEv<\aEv \}$, so can depend on the causal
-order.
 \begin{example}
   For read to write dependency, consider:
   \begin{align*}
