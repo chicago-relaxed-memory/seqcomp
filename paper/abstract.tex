@@ -29,11 +29,11 @@ as a ``relaxed memory model.''  The relaxed memory models that have been
 proposed to date either fail to address sequential composition, or overly
 restrict processors and compilers.
 
-To support sequential composition while targeing modern hardware, we propose adding families of predicate
+To support sequential composition while targeting modern hardware, we propose adding families of predicate
 transformers to the existing model of ``Pomsets with Preconditions,'' which
 already supports parallel composition.  When composing $(S_1;S_2)$, the predicate
-transformer used to validate the precondition of an event in $S_2$ is chosen
-based on the semantic dependencies from events in $S_1$ into this event in $S_2$.  Our model
+transformers used to validate the preconditions of events in $S_2$ are chosen
+based on the semantic dependencies from events in $S_1$ to events in $S_2$.  Our model
 retains the good properties of the prior work, including efficient
 implementation on Arm8, support for compiler optimizations, support for
 logics that prove the absence of thin-air behaviors, and a local data race
