@@ -1,11 +1,23 @@
 \section{Future Work}
 
-\citet{DBLP:conf/esop/PaviottiCPWOB20} use step-indexing to account for
-loops; we expect that the same approach could be applied here.
+This paper is the first to present a compositional semantics for
+sequential composition in a relaxed memory model which can be
+efficiently compiled to modern CPUs. There is, as usual, more research
+to be done.
 
-performance analysis for the suboptimal arm implementation strategy.
+We have not treated loops in this model, though we expect that the usual
+approach of showing continuity for all the semantic operations with respect to set inclusion
+would go through. \citet{DBLP:conf/esop/PaviottiCPWOB20} use step-indexing to account for
+loops; a similar approach could be applied here.
 
-formalization in Agda.
+In \S\ref{sec:arm1} we presented a compilation strategy to \armeight{}
+for a simplified model, but which introduces fences to acquiring
+reads. These fences are not required in \S\ref{sec:arm2}, but at the
+cost of model complexity. It would be illuminating to find out what
+the performance penalty is for these fences.
+
+An earlier version of this paper has been mechanized in Agda; it would be
+reassuring to update the mechanization to bring it in line with the current state.
 
 % We have presented the first model of relaxed memory that treats sequential
 % composition as a first-class citizen. The model builds directly on \jjr{}.
