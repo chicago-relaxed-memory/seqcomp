@@ -26,7 +26,7 @@ reorder programs even more dramatically.  All of this reordering is meant to
 be unobservable in single-threaded code, but is observable in multi-threaded code.
 A formal attempt to understand the resulting mess is known
 as a ``relaxed memory model.''  The relaxed memory models that have been
-proposed to date either fail to address sequential composition, or overly
+proposed to date either fail to address sequential composition directly, or overly
 restrict processors and compilers.
 
 To support sequential composition while targeting modern hardware, we propose adding families of predicate
@@ -38,3 +38,27 @@ retains the good properties of the prior work, including efficient
 implementation on Arm8, support for compiler optimizations, support for
 logics that prove the absence of thin-air behaviors, and a local data race
 freedom theorem.
+
+
+\endinput
+
+Program logics and semantics tell us that when executing (C1; C2) starting in
+state s0, we execute C1 in s0 to arrive at s1, then execute C2 in s1 to
+arrive at the final state s2. This is, of course, an abstraction. Processors
+execute instructions out of order, due to pipelines and caches, and compilers
+reorder programs even more dramatically. All of this reordering is meant to
+be unobservable in single-threaded code, but is observable in multi-threaded
+code. A formal attempt to understand the resulting mess is known as a
+"relaxed memory model." The relaxed memory models that have been proposed to
+date either fail to address sequential composition, or overly restrict
+processors and compilers.
+
+To support sequential composition while targeting modern hardware, we propose
+adding families of predicate transformers to the existing model of "Pomsets
+with Preconditions," which already supports parallel composition.  When
+composing (C1;C2), the predicate transformers used to validate the
+preconditions of events in $C2$ are chosen based on the semantic
+dependencies from events in $C1$ to events in $C2$.  Our model retains the
+good properties of the prior work, including efficient implementation on
+Arm8, support for compiler optimizations, support for logics that prove the
+absence of thin-air behaviors, and a local data race freedom theorem.
