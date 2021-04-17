@@ -3,7 +3,7 @@
 
 In the paper so far, we have assumed that registers are assigned at most
 once.  We have done this primarily for readability.  In the first subsection
-of this paper, drop this assumption, instead using substitution to rename
+below, we drop this assumption, instead using substitution to rename
 registers.  We use the set
 $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$.  By assumption
 (\textsection\ref{sec:prelim}), these registers do not appear in programs:
@@ -47,7 +47,7 @@ moved early.''
       \rf[out=169,in=11]{b2}{a1}
     \end{tikzinline}}
 \end{gather*}
-This execution is not allowed by $\sembase{}$: the precondition of
+This execution is not allowed by the semantics $\sembase{}$ of \reffig{fig:sem}: the precondition of
 $\aEv$ in the independent case is
 \begin{displaymath}
   (1{=}r \lor x{=}r)\limplies (1{=}s \lor r{=}s)\limplies (r{=}s),
