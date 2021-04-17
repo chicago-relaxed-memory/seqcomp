@@ -1,0 +1,803 @@
+\section{Differences with ``Pomsets with Preconditions''}
+\label{sec:diff}
+
+\myparagraph{Substitution}
+
+\jjr{} uses substitution rather than Skolemizing.  Indeed our use of
+Skolemization is motivated by disjunction closure for predicate transformers,
+which do not appear in \jjr{}.  In \reffig{fig:sem}, 
+we gave the semantics of read for nonempty pomsets as:
+\begin{enumerate}
+\item[{\labeltext[\textsc{r}4a]{(\textsc{r}4a)}{read-tau-dep-oopsla}}]
+  if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \rimplies
+    \aVal{=}\aReg
+    \limplies \bForm
+  \end{math},    
+\item[{\labeltext[\textsc{r}4b]{(\textsc{r}4b)}{read-tau-ind-oopsla}}]
+  if $(\aEvs\cap\bEvs)=\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \rimplies
+    \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+    \bForm.
+  \end{math}
+\end{enumerate}
+In \jjr{}, the definition is roughly as follows:
+% (adding the case for $\ref{L6}$, which was missing):
+\begin{enumerate}
+\item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-oopsla-sub}}]
+  if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \rimplies
+    \bForm[\aVal/\aReg][\aVal/\aLoc]
+    % \aVal{=}\aReg
+    % \limplies \bForm[\aReg/\aLoc]
+  \end{math},    
+\item[{\labeltext[\textsc{r}4b$'$]{(\textsc{r}4b$'$)}{read-tau-ind-oopsla-sub}}]
+  if $(\aEvs\cap\bEvs)=\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \rimplies
+    \bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]
+  \end{math}
+\end{enumerate}
+The use of conjunction in \ref{read-tau-ind-oopsla-sub} causes disjunction closure to fail
+because the predicate transformer
+% $\aTr{}{\bForm}=\bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]$ does not distribute through
+% disjunction:
+% \begin{math}
+%   \aTr{}{\bForm_1\lor \bForm_2}=
+%   (\bForm_1\lor \bForm_2)[\aVal/\aReg][\aVal/\aLoc]\land(\bForm_1\lor \bForm_2)[\aLoc/\aReg]
+%   \neq
+%   (\bForm_1[\aVal/\aReg][\aVal/\aLoc]\land\bForm_1[\aLoc/\aReg]) \lor
+%   (\bForm_2[\aVal/\aReg][\aVal/\aLoc]\land\bForm_2[\aLoc/\aReg])
+%   = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+% \end{math}
+$\aTr{}{\bForm}=\bForm'\land\bForm''$ does not distribute through
+disjunction, even assuming that the prime operations do:\footnote{%
+  \begin{math}
+    (\bForm_1\lor \bForm_2)'=(\bForm_1'\lor \bForm_2')
+  \end{math}
+  and
+  \begin{math}
+    (\bForm_1\lor \bForm_2)''=(\bForm_1''\lor \bForm_2'')
+  \end{math}.
+}
+\begin{math}
+  \aTr{}{\bForm_1\lor \bForm_2}=
+  \href{https://www.wolframalpha.com/input/?i=\%28a+or+b\%29+and+\%28c+or+d\%29}{(\bForm_1'\lor \bForm_2')\land(\bForm_1''\lor \bForm_2'')}
+  \neq
+  \href{https://www.wolframalpha.com/input/?i=\%28a+and+c\%29+or+\%28b+and+d\%29}{(\bForm_1'\land\bForm_1'') \lor (\bForm_2'\land\bForm_2'')}
+  = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+\end{math}.
+% \begin{math}
+%   (\bForm_{1}^{1}\lor \bForm_{1}^{2}) \land (\bForm_{2}^{1}\lor \bForm_{2}^{2})
+%   \neq
+%   (\bForm_{1}^{1}\land\bForm_{2}^{1}) \lor (\bForm_{1}^{2}\land\bForm_{1}^{2}).
+% \end{math}
+See also \textsection\ref{sec:ex:assoc}.
+
+The substitutions collapse $\aLoc$ and $\aReg$, allowing local invariant
+reasoning, causality test case 1, discussed at the end of
+\textsection\ref{sec:ex:control}.  Without Skolemizing it is necessary to
+substitute $[\aLoc/\aReg]$, since the reverse substitution $[\aReg/\aLoc]$ is
+useless when $\aReg$ is bound---compare with
+\textsection\ref{sec:substitutions}.  As discussed below (\ref{p:downset}),
+including this substitution affects the interaction of \xLIR{} and downset
+closure.
+
+Removing the substitution of $[x/r]$ in the independent case has a technical
+advantage: we no longer require \emph{extended} expressions (which include
+memory references), since substitutions no longer introduce memory
+references.
+
+\begin{scope}
+  The substitution $[x/r]$ does not work with Skolemization, even for the
+  dependent case, since we lose the unique marker for each read.  In effect,
+  this forces the reads to the same values.
+  % To be concrete, the candidate
+  % definition would modify \ref{L4} to be:
+  % \begin{enumerate}
+  % \item[\ref{L4})]
+  %   $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$.
+  %   % \item[\ref{L5})]
+  %   %   $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
+  %   % \item[\ref{L6})] 
+  %   %   $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$, when $\aEvs=\emptyset$.
+  % \end{enumerate}
+  Using this definition, consider the following:
+  \begin{gather*}
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r{<}s}\THEN \PW{y}{1}\FI 
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{x}{2}}{right=of a1}
+        \event{a3}{1{=}x\limplies 2{=}x\limplies x{<} x\mid\DW{y}{1}}{right=of a2}
+        \po[out=20,in=160]{a1}{a3}
+        \po{a2}{a3}
+      \end{tikzinline}}
+  \end{gather*}
+  Although the execution seems reasonable, the precondition on the write is
+  not a tautology.
+\end{scope}
+
+
+% There, item \ref{loadpre-kappa2}  of $\sLOADPRE{}{}{}$ is written 
+% \begin{enumerate}
+% \item[] %[\ref{loadpre-kappa2})]
+%   if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
+%   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
+%   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
+% \end{enumerate}
+
+
+% [Skolemization ensures disjunction closure, which is necessary
+% for associativity. Show example.]
+
+\myparagraph[p:downset]{Downset closure}
+
+\jjr{} enforces downset closure in the prefixing rule.  Even without this,
+downset closure would be different for the two semantics, due to the use of
+substitution in \jjr{}.  Consider the final pomset in the last example of
+\textsection\ref{sec:downset} under the semantics of this paper, which elides
+the middle read event:
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{x}{0} 
+    \SEMI\PR{x}{r} 
+    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        % \event{a1}{\DR{x}{1}}{right=of a0}
+        \event{a2}{r{\geq}0\mid\DW{y}{1}}{right=3em of a1}      
+        % \wk{a0}{a1}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+In \jjr{}, the substitution $[x/r]$ is performed by the middle read
+regardless of whether it is included in the pomset, with the subsequent
+substitution of $[0/x]$ by the preceding write, we have $[x/r][0/x]$, which
+is $[0/r][0/x]$, resulting in:
+\begin{align*}
+  \begin{gathered}[t]
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        % \event{a1}{\DR{x}{1}}{right=of a0}
+        \event{a2}{0{\geq}0\mid\DW{y}{1}}{right=3em of a1}      
+        % \wk{a0}{a1}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+
+
+\myparagraph{Consistency}
+\jjr{} imposes \emph{consistency}, which requires that for every pomset
+$\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.  
+\begin{scope}
+  Associativity requires that we allow pomsets with inconsistent
+  preconditions.  Consider a variant of the example from \textsection\ref{sec:semca}.
+  \begin{scope}
+    \footnotesize
+    \begin{align*}
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{x}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\aExp\mid\DW{x}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\aExp\mid\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\lnot\aExp\mid\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+    \end{align*}
+  \end{scope}
+  Associating left and right, we have:
+  \begin{scope}
+    \footnotesize
+    \begin{align*}
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{x}{1}\FI
+        \SEMI
+        \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\DW{x}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{y}{1}\FI
+        \SEMI
+        \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+    \end{align*}
+  \end{scope}  
+  Associating into the middle, instead, we require:
+  \begin{scope}
+    \footnotesize
+    \begin{align*}
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{x}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\aExp\mid\DW{x}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+        \SEMI
+        \IF{\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
+            \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+          \end{tikzinline}}
+      \end{gathered}
+      &&
+      \begin{gathered}
+        \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\lnot\aExp\mid\DW{y}{1}}{}
+          \end{tikzinline}}
+      \end{gathered}
+    \end{align*}
+  \end{scope}
+  Joining left and right, we have:
+  \begin{scope}
+    \footnotesize
+    \begin{align*}
+      \begin{gathered}
+        \IF{\aExp}\THEN\PW{x}{1}\FI
+        \SEMI
+        \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+        \SEMI
+        \IF{\aExp}\THEN\PW{y}{1}\FI
+        \SEMI
+        \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+        \\
+        \hbox{\begin{tikzinline}[node distance=1em]
+            \event{a}{\DW{x}{1}}{}
+            \event{b}{\DW{y}{1}}{right=of a}
+          \end{tikzinline}}
+      \end{gathered}
+    \end{align*}
+  \end{scope}  
+\end{scope}
+
+\myparagraph{Causal Strengthening}
+\labeltext[]{Causal Strengthening}{xCausal}
+\jjr{} imposes \emph{causal strengthening}, which requires for every pomset
+$\aPS$, if $\bEv\le\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)$. 
+\begin{scope}
+  Associativity requires that we allow pomsets without causal strengthening.
+  Consider the following.
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\aExp\mid\DR{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{r{=}1\mid\DW{y}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Associating left, with causal strengthening:
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \SEMI
+      \PW{y}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\aExp\mid\DR{x}{1}}{}
+          \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+          \po{a}{b}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Finally, merging:
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \SEMI
+      \PW{y}{r}
+      \SEMI
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\DR{x}{1}}{}
+          \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+          \po{a}{b}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Instead, associating right:
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\aExp\mid\DR{x}{1}}{}
+        \end{tikzinline}}
+    \end{gathered}
+    &&
+    \begin{gathered}
+      \PW{y}{r}
+      \SEMI
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
+          \event{b}{r{=}1\mid\DW{y}{1}}{left=of a}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  Merging:
+  \begin{align*}
+    \begin{gathered}
+      \IF{\aExp}\THEN\PR{x}{r}\FI
+      \SEMI
+      \PW{y}{r}
+      \SEMI
+      \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=1em]
+          \event{a}{\DR{x}{1}}{}
+          \event{b}{\DW{y}{1}}{right=of a}
+          \po{a}{b}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  With causal strengthening, the precondition of $\DW{y}{1}$ depends upon how
+  we associate.  This is not an issue in \jjr{}, which always associates to
+  the right.
+\end{scope}
+
+% \myparagraph{Causal Strengthening and Address Dependencies}
+% \labeltext[]{Causal Strengthening and Address Dependencies}{xADDRxRRD}
+
+\begin{scope}  
+  One use of causal strengthening is to ensure that address dependencies do
+  not introduce thin air reads.  Associating to the right, the intermediate
+  state of the example in \textsection\ref{sec:addr} is:
+  \begin{align*}
+    \begin{gathered}[t]
+      \PR{\REF{r}}{s}
+      \SEMI
+      \PW{x}{s}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          \event{a2}{r\EQ2\mid\DR{\REF{2}}{1}}{}
+          \event{a3}{(r\EQ2\limplies 1\EQ s) \limplies s\EQ1\mid\DW{x}{1}}{right=of a2}
+          \po{a2}{a3}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{align*}
+  In \jjr{}, we have, instead:
+  \begin{gather*}
+    % \begin{gathered}[t]
+    %   \PW{x}{s}
+    %   \\
+    %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+    %     \event{b}{s\EQ1\mid\DW{x}{1}}{}
+    %   \end{tikzinline}}
+    % \end{gathered}
+    % \\
+    \begin{gathered}
+      % \PR{y}{r}\SEMI
+      \PR{\REF{r}}{s}\SEMI \PW{x}{s}
+      \\
+      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+          % \event{a1}{\DR{y}{2}}{}
+          \event{a2}{r\EQ2\mid\DR{\REF{2}}{1}}{}%right=of a1}
+          \event{a3}{r\EQ2\land\REF{2}\EQ1\mid\DW{x}{1}}{right=of a2}
+          \po{a2}{a3}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  Without causal strengthening, the precondition of $\DWP{x}{1}$ would be
+  simply $\REF{2}\EQ1$.  The treatment in this paper, using implication
+  rather than conjunction, is more precise.
+\end{scope}
+
+\myparagraph{Parallel Composition}
+
+In \jjr{\textsection2.4}, parallel composition is defined allowing coalescing
+of events.  Here we have forbidden coalescing.  This difference appears to be
+arbitrary.  In \jjr{}, however, there is a mistake in the handling of
+termination actions.  The predicates should be joined using $\land$, not
+$\lor$.
+
+\myparagraph{Internal Acquiring Reads}
+
+The proof of compilation to Arm in \jjr assumes that all internal reads can
+be eliminated.
+% Shortly after publication, \citet{anton}
+% noticed a shortcoming of the implementation on \armeight{} in
+% \jjr{\textsection 7}.  The proof given there assumes that all internal reads
+% can be dropped.
+However, this is not the case for acquiring reds.  For example, \jjr{}
+disallows the following execution, which is allowed by \armeight{} and
+\tso{}.
+\begin{gather*}
+  \PW{x}{2}\SEMI 
+  \PR[\mACQ]{x}{r}\SEMI
+  \PR{y}{s} \PAR
+  \PW{y}{2}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DR{y}{0}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \rf{a}{b}
+      \sync{b}{c}
+      \wk{c}{d}
+      \sync{d}{e}
+      \wk[out=-165,in=-15]{e}{a}
+      % \rfi{a}{b}
+      % \bob{b}{c}
+      % \fre{c}{d}
+      % \bob{d}{e}
+      % \coe[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+\end{gather*}
+We discussed our solution in \textsection\ref{sec:arm}.
+% The solution we have adopted is to allow an acquiring read to be downgraded
+% to a relaxed read when it is preceded (sequentially) by a relaxed write that
+% could fulfill it.  This solution allows executions that are not allowed under
+% \armeight{} since we do not insist that the local relaxed write is actually
+% read from.  This may seem counterintuitive, but we don't see a local way to
+% be more precise.
+
+% As a result, we use a different proof strategy for \armeight{}
+% implementation, which does not rely on read elimination.  The proof idea uses
+% a recent alternative characterization of \armeight{}
+% \citep{alglave-git-alternate,arm-reference-manual}. %,armed-cats}.
+
+\myparagraph{Redundant Read Elimination}
+
+Contrary to the claim, redundant read elimination fails for \jjr{}.
+We discussed redundant read elimination in \textsection\ref{sec:semreg}.
+Consider JMM Causality Test Case 2, which we discussed there.
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r{=}s}\THEN \PW{y}{1}\FI
+  \PAR
+  \PW{x}{y}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{1}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{b1}{\DR{y}{1}}{right=3em of a3}
+      \event{b2}{\DW{x}{1}}{right=of b1}
+      \rf{a3}{b1}
+      \po{b1}{b2}
+      \rf[out=169,in=11]{b2}{a2}
+      \rf[out=169,in=11]{b2}{a1}
+    \end{tikzinline}}
+\end{gather*}
+Under the semantics of \jjr{}, we have
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r{=}s}\THEN \PW{y}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{1}}{right=of a1}
+      \event{a3}{1\EQ1\land1\EQ x \land x\EQ1 \land x=x\mid\DW{y}{1}}{right=of a2}
+    \end{tikzinline}}
+\end{gather*}
+The precondition of $\DWP{y}{1}$ is \emph{not} a tautology, and therefore
+redundant read elimination fails.
+(It is a tautology in
+\begin{math}
+  \PR{x}{r}\SEMI
+  \LET{s}{r}\SEMI
+  \IF{r{=}s}\THEN \PW{y}{1}\FI
+\end{math}.)
+In \jjr{\textsection3.1}, we incorrectly stated that the precondition of
+$\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.  
+
+\begin{comment}
+  Precondition of $\DWP{y}{1}$ is $(r{=}s)$ in
+  \begin{math}
+    \sem{\IF{r{=}s}\THEN \PW{y}{1}\FI}.
+  \end{math}
+  Predicate transformers for $\emptyset$ in $\sem{\PR{x}{r}}$ and $\sem{\PR{x}{s}}$ are
+  \begin{align*}
+    \PREDP{(r{=}1 \lor r{=}x)\limplies\bForm[r/x]},
+    \\
+    \PREDP{(s{=}1 \lor s{=}x)\limplies\bForm[s/x]}.
+  \end{align*}
+  Combining the transformers, we have
+  \begin{displaymath}
+    \PREDP{(r{=}1 \lor r{=}x)\limplies(s{=}1 \lor s{=}r)\limplies\bForm[s/x]}.
+  \end{displaymath}
+  Applying this to $(r{=}s)$, we have
+  \begin{displaymath}
+    \PREDP{(r{=}1 \lor r{=}x)\limplies (s{=}1 \lor s{=}r)\limplies (r{=}s)},
+  \end{displaymath}
+  which is not a tautology.
+
+  Same problem occurs \jjr{}, where we have:
+  \begin{align*}
+    \PREDP{\bForm[v/x,r] \land \bForm[x/r]},
+    \\
+    \PREDP{\bForm[v/x,s] \land \bForm[x/s]}.
+  \end{align*}
+  Combining the transformers, we have
+  \begin{displaymath}
+    \PREDP{\bForm[v/x,r,s] \land \bForm [v/x,r][x/s] \land \bForm[x/r][v/x,s] \land \bForm[x/r,s]}.
+  \end{displaymath}
+  Applying this to $(r{=}s)$, we have
+  \begin{displaymath}
+    \PREDP{v{=}v \land v{=}x \land x{=}v \land x{=}x},
+  \end{displaymath}
+  which is not a tautology.
+
+  The semantics here allows this by coalescing:
+  \begin{gather*}
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r{=}s}\THEN \PW{y}{1}\FI
+    \PAR
+    \PW{x}{y}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a3}{\DW{y}{1}}{right=of a1}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+  \end{gather*}
+
+  In \jjr{\textsection2.6} the semantics of read is defined as follows:
+  \begin{align*}
+    \sem{\PR[\amode]{\aLoc}{\aReg}\SEMI \aCmd} & \eqdef \textstyle\bigcup_\aVal\;
+    (\DRmode\aLoc\aVal) \prefix \sem{\aCmd} [\aLoc/\aReg]
+  \end{align*}
+  The definition of prefixing$((\aForm \mid \aAct) \prefix \aPSS)$ has several clauses.
+  The most relevant are as follows, where $\bEv$ is the new event labeled with
+  $(\aForm \mid \aAct)$ and $\aEv$ is an event from $\aPSS$:
+  \begin{description}
+  \item[{\labeltextsc[P4c]{(P4c)}{4c}}]
+    If $\bEv$ reads $\aVal$ from $\aLoc$ then either $\aEv=\bEv$ or
+    $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)[\aVal/\aLoc]$.
+  \item[{\labeltextsc[P5a]{(P5a)}{5a}}]\labeltextsc[P5]{}{5}%
+    If $\bEv$ reads and $\aEv$ writes then either $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)$ or $\bEv\le'\aEv$.
+    % \item[{\labeltextsc[P5b]{(P5b)}{5b}}]
+    %   If $\bEv$ and $\aEv$ are in conflict then $\bEv\le'\aEv$.
+  \end{description}
+
+  We have discovered two issues with this definition.
+
+  The first issue concerns the substitution $[\aLoc/\aReg]$.  It should be
+  $[\aReg/\aLoc]$.  We noticed this error while developing the alternative
+  characterization presented here.  The error causes redundant read elimination
+  to fail in \jjr{}.  As a result, common subexpression elimination also fails.
+  The problem can be seen in \ref{TC2}.
+  \begin{gather*}
+    \taglabel{TC2}
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r{=}s}\THEN \PW{y}{1}\FI
+    \PAR
+    \PW{x}{y}
+  \end{gather*}
+  % In \jjr{\textsection3.1},
+  We claimed that \ref{TC2} allowed the following
+  execution:
+  \begin{gather*}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{x}{1}}{right=of a1}
+        \event{a3}{\DW{y}{1}}{right=of a2}
+        % \po{a2}{a3}
+        % \po[out=15,in=165]{a1}{a3}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        \rf[out=169,in=11]{b2}{a2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+  \end{gather*}
+  But this execution is not possible using the semantics of \jjr{}:
+  $\DWP{y}{1}$ has precondition $r{=}s$ in
+  \begin{math}
+    \sem{\IF{r{=}s}\THEN \PW{y}{1}\FI}.
+  \end{math}
+  Given the lack of order in the execution, the precondition of $\DWP{y}{1}$
+  must entail $r{=}1\land r{=}x$ in 
+  \begin{math}
+    \sem{\PR{x}{s}\SEMI
+      \IF{r{=}s}\THEN \PW{y}{1}\FI}.
+  \end{math}
+  \ref{4c} imposes $r{=}1$, and \ref{5a} imposes $r{=}x$.  Adding the second
+  read, the precondition of $\DWP{y}{1}$ must entail both $1{=}1\land 1{=}x$
+  and also $x{=}1\land x{=}x$.  This can be simplified to $x{=}1$.  This leaves
+  a requirement that must be satisfied by a preceding write.  Since the
+  preceding write is the initialization to $0$, the requirement cannot be
+  satisfied, and the execution is impossible.\footnote{In \jjr{} we ignore the
+    middle terms, mistakenly simplifying this to $1{=}1\land x{=}x$.
+    Correcting the error, the attempted execution is:
+    \begin{gather*}
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{x}{1}}{}
+          \event{a2}{\DR{x}{1}}{right=of a1}
+          \event{a3}{\DW{y}{1}}{right=of a2}
+          \po{a2}{a3}
+          \po[out=-20,in=-160]{a1}{a3}
+          \event{b1}{\DR{y}{1}}{right=3em of a3}
+          \event{b2}{\DW{x}{1}}{right=of b1}
+          \rf{a3}{b1}
+          \po{b1}{b2}
+          \rf[out=169,in=11]{b2}{a2}
+          \rf[out=169,in=11]{b2}{a1}
+        \end{tikzinline}}
+    \end{gather*}}
+
+  The substitution $[\aLoc/\aReg]$ leaves the obligation on $\aLoc$ to be
+  fulfilled by the preceding write.  Thus, the read does not update the
+  \emph{value} of $\aLoc$ in subsequent predicates.  The substitution
+  $[\aReg/\aLoc]$, instead, does update the value of $\aLoc$, thus removing any
+  obligation on $\aLoc$ for preceding code.
+
+  In order to write this, we must update the definition of prefixing reads to
+  include the register.  Then \ref{4c} becomes:
+  \begin{description}
+  \item[\textsc{(p4c)}] If $\bEv$ reads $\aVal$ from $\aLoc$ then either
+    $\aEv=\bEv$ or $\labelingForm'(\aEv) \rimplies \labelingForm(\aEv)[\aVal/\aReg]$.
+  \end{description}
+
+  We can then reason with \ref{TC2} as follows: $\DWP{y}{1}$ has precondition
+  $r{=}s$ in
+  \begin{math}
+    \sem{\IF{r{=}s}\THEN \PW{y}{1}\FI}.
+  \end{math}
+  To avoid introducing order in the execution, the precondition of $\DWP{y}{1}$
+  must entail $r{=}1\land r{=}s$ in 
+  \begin{math}
+    \sem{\PR{x}{s}\SEMI
+      \IF{r{=}s}\THEN \PW{y}{1}\FI}.
+  \end{math}
+  \ref{4c} imposes $r{=}1$, and \ref{5a} imposes $r{=}x$.  Adding the second
+  read, the precondition of $\DWP{y}{1}$ must entail both $1{=}1\land 1{=}x$
+  and also $x{=}1\land x{=}x$.  This can be simplified to $x{=}1$.  This leaves
+  a requirement that must be satisfied by a preceding write.
+
+
+  With read elimination, the rule for relaxed reads is as follows:
+  \begin{align*}
+    \sem{\PR{\aLoc}{\aReg} \SEMI \aCmd} &\eqdef
+    \sem{\aCmd}[\aLoc/\aReg]
+    \cup
+    \textstyle\bigcup_\aVal\;
+    \DRP{\aLoc}{\aVal} \prefix_{\aReg} %\Rdis{\aLoc}{\aVal}
+    \sem{\aCmd}[\aReg/\aLoc]
+  \end{align*}
+  It is interesting to note that the substitution is $[\aLoc/\aReg]$ on
+  eliminated reads, and $[\aReg/\aLoc]$ on non-eliminated reads.  Intuitively,
+  the subsequent value of $\aLoc$ is fixed by an explicit read, but not for an
+  eliminated read.  In the latter case, the value is fixed by some preceding
+  action.  The preceding action may itself be a read. This gives rise to some
+  fear that we might introduce thin-air reads, since we do not enforce
+  read-read coherence.  But this is not the case.  Consider the following example:
+  \begin{gather*}
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \PW{y}{s}
+    \PAR
+    \PW{x}{y}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{x}{1}}{right=of a1}
+        \event{a3}{\DW{y}{1}}{right=of a2}
+        % \po{a2}{a3}
+        \po[out=-20,in=-160]{a1}{a3}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        \rf[out=169,in=11]{b2}{a2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \internal{a2}{\DR{x}{1}}{right=of a1}
+        \event{a3}{\DW{y}{1}}{right=of a2}
+        % \po{a2}{a3}
+        \po[out=-20,in=-160]{a1}{a3}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        % \rf[out=169,in=11]{b2}{a2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+  \end{gather*}
+  But this is not a problem, since fulfillment requires that $\DWP{x}{1}$
+  precede both reads of $x$.
+\end{comment}
+
+\endinput
+
+\myparagraph{Read-Modify-Write Actions}
+
+In \jjr{}, the atomicity axioms \ref{pom-rmw-atomic} erroneously applies only to
+overlapping writes, not overlapping reads.  The difficulty can be seen in
+\refex{ex:rmw-33}.
+
+\jjr{} does not specify the calculation of dependency for \RMW{}s, as
+discussed in \refex{ex:rmw-dep}.
+
+
+
+\myparagraph{Stupid Bug in LDRF}
+Definition of race is wrong.
+Should say that at least one is relaxed.
+

@@ -490,9 +490,9 @@ preconditions to weaken.
 \subsection{Pomsets}
 \label{sec:ex:pomset}
 
-We first explain the core of model, ignoring the logic (rules 3--5).  We
-defer discussion of $\sIF{}$ to \textsection\ref{sec:ex:kappa}.  We defer the
-discussion of $\sLET{}{}$ to \textsection\ref{sec:ex:tau}.
+We first explain the core of model, ignoring the logic (rules 3--5).
+%We defer the discussion of $\sLET{}{}$ to \textsection\ref{sec:ex:data}.
+We defer discussion of $\sIF{}$ to \textsection\ref{sec:ex:control}.
 
 Reads, writes, and fences map to pomsets with at most one event.  $\SKIP$
 maps to the empty pomset.  Ignoring the logic, the definitions are
@@ -1013,6 +1013,52 @@ Reasoning as we did for \eqref{eq2} in \textsection\ref{sec:ex:data}, there are 
   \end{gathered}
 \end{align*}
 
+As another example, consider JMM causality test case 1 \cite{PughWebsite}:
+\begin{gather*}
+  \begin{gathered}
+    \PW{x}{0} \SEMI
+    (\PR{x}{r}\SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \PAR
+    \PW{x}{y})
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{rx1}{\DR{x}{1}}{right=3em of wx0}
+        \event{wy1}{\aForm\mid\DW{y}{1}}{right=of rx1}
+        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+        \event{wx1}{\DW{x}{1}}{right=of ry1}
+        \po{ry1}{wx1}
+        \rf[out=-168,in=-12]{wx1}{rx1}
+        \rf{wy1}{ry1}
+        \wk[out=10,in=170]{wx0}{wx1}
+        \wk{wx0}{rx1}
+      \end{tikzinline}}
+    % \hbox{\begin{tikzinline}[node distance=1.5em and 2em]
+    %   \event{wy1}{0\geq0\mid\DW{y}{1}}{}
+    %   \event{rx1}{\DR{x}{1}}{left=of wy1}
+    %   \event{wx0}{\DW{x}{0}}{below left=-.2em and 2em of rx1}
+    %   \event{ry1}{\DR{y}{1}}{below=of rx1}
+    %   \event{wx1}{\DW{x}{1}}{right=of ry1}
+    %   \po{ry1}{wx1}
+    %   \rf[out=140,in=-20]{wx1}{rx1}
+    %   \rf{wy1}{ry1}
+    %   \wk[out=10,in=155]{wx0}{wx1}
+    %   \wk{wx0}{rx1}
+    % \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+The precondition $\aForm$ is
+\begin{math}
+  \PBR{(1{=}r \lor x{=}r) \limplies r{\geq}0}[0/x]
+\end{math}
+which is 
+\begin{math}
+  \PBR{(1{=}r \lor 0{=}r) \limplies r{\geq}0}
+\end{math}
+which is a tautology.
+
+
+
 \subsection{Reordering Transformations}
 \label{sec:ex:valid}
 
@@ -1243,10 +1289,506 @@ disjunction:
   ((\forall r)(\bForm_1)) \lor ((\forall r)(\bForm_2))
   = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
 \end{math}.
-  Since $\aTr{}\bForm=(\forall\aReg)\bForm$ does not distribute through disjunction,
-  we use $\aTr{}\bForm=\bForm$ instead (which trivially distributes through disjunction).
-  Unforutunately, this change means we cannot use substitution, since
-  $\bForm$ does not imply $\bForm[\aVal/\aReg]$. Fortunately, Skolemizing
-  solves this problem, since $\bForm$ implies $(\aReg{=}\aVal)\limplies\bForm$.
+Since $\aTr{}\bForm=(\forall\aReg)\bForm$ does not distribute through disjunction,
+we use $\aTr{}\bForm=\bForm$ instead (which trivially distributes through disjunction).
+Unforutunately, this change means we cannot use substitution, since
+$\bForm$ does not imply $\bForm[\aVal/\aReg]$. Fortunately, Skolemizing
+solves this problem, since $\bForm$ implies $(\aReg{=}\aVal)\limplies\bForm$.
+
+
+\subsection{Comparison with Weakest Preconditions}
+
+We compare traditional transformers to the dependent-case transformers of
+\reffig{fig:sem}; thus we consider only totally ordered executions.  Because
+we only consider the dependent case, we drop the superscript $\aEvs$ on
+$\aTr{\aEvs}{}$ throughout this section.  We also assume that each register
+appears at most once in a program, as we did throughout
+\textsection\ref{sec:model}--\ref{sec:arm}.
+
+Because of augment closure, we are not interested in isolating the
+\emph{weakest} precondition.  Thus we think of transformers as Hoare triples.
+In addition, all programs in our language are strongly normalizing, so we
+need not distinguish strong and weak correctness.  In this setting, the Hoare
+triple $\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when
+$\aForm \limplies \fwp{\aCmd}{\bForm}$.
+
+Hoare triples do not distinguish thread-local variables from shared
+variables.  Thus, the assignment rule applies to all types of storage. The
+rules can be written as on the left below
+\begin{align*}
+\begin{aligned}
+  \fwp{\PW{\aLoc}{\aExp}}{\bForm} &= \bForm[\aExp/\aLoc]
+  \\
+  \fwp{\LET{\aReg}{\aExp}}{\bForm} &= \bForm[\aExp/\aReg]
+  \\
+  \fwp{\PR{\aLoc}{\aReg}}{\bForm} &= \aLoc{=}\aReg\limplies\bForm
+\end{aligned}
+&&
+\begin{aligned}
+  \trd{\PW{\aLoc}{\aExp}}{\bForm} &= \bForm[\aExp/\aLoc]
+  \\
+  \trd{\LET{\aReg}{\aExp}}{\bForm} &= \bForm[\aExp/\aReg]
+  \\
+  \trd{\PR{\aLoc}{\aReg}}{\bForm} &= \aVal{=}\aReg\limplies\bForm &&
+  \textwhere \labelingAct(\aEv)=\DR{\aLoc}{\aVal}
+\end{aligned}
+\end{align*}
+Here we have chosen an alternative formulation for the read rule, which is
+equivalent the more traditional $\bForm[\aLoc/\aReg]$, as long as registers
+are assigned at most once in a program.  Our predicate transformers for the
+dependent case are shown on the right above.  Only the read rule differs from
+the traditional one.
+
+For programs where every register is bound and every read is fulfilled, our
+dependent transformers are the same as the traditional ones.  In our
+semantics, thus, we only consider totally-ordered executions where every read
+could be fulfilled by prepending some writes.  For example, we ignore pomsets
+of $\PW{x}{2}\SEMI\PR{x}{r}$ that read $1$ for $x$.
+
+For example, let $\aCmd_i$ be defined:
+% as follows.
+\begin{align*}
+  \aCmd_1&=\PR{x}{s}\SEMI\PW{x}{s{+}r}
+  &  
+  \aCmd_2&=\PW{x}{t}\SEMI\aCmd_1
+  &  
+  \aCmd_3&=\LET{t}{2}\SEMI\LET{r}{5}\SEMI\aCmd_2
+\end{align*}
+% \begin{itemize}
+% \item
+%   \begin{math}
+%     \fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]
+%   \end{math}
+% \item
+%   \begin{math}
+%     \fwp{\PR{\aLoc}{\aReg}\;\,}{\bForm} = %\bForm[x/r]
+%     %     (\forall\bReg)
+%     %     \aLoc{=}\bReg\limplies\bForm [\bReg/\aLoc]
+%     \aLoc{=}\aReg\limplies\bForm
+%   \end{math}
+% \item
+%   \begin{math}
+%     \fwp{\PW{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]
+%   \end{math}
+% \end{itemize}
+% General relation between Hoare triples and $\fwp{}{}$:
+% \begin{itemize}
+% \item $\hoare{\fwp{\aCmd}{\bForm}}{\aCmd}{\bForm}$,
+% \item If $\hoare{\aForm}{\aCmd}{\bForm}$ and $\aCmd$ terminates when starting
+%   in any state satisfying $\aForm$, then $\aForm \limplies \fwp{\aCmd}{\bForm}$.
+% \end{itemize}
+The following pomset appears in the semantics of $\aCmd_2$.  A pomset for
+$\aCmd_3$ can be derived by substituting $[2/t,\allowbreak5/r]$.  A pomset
+for $\aCmd_1$ can be derived by eliminating the initial write.
+\begin{gather*}
+  % \begin{gathered}[t]
+  %   \PW{x}{3}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \event{c}{\DW{x}{3}}{}
+  %     \xform{xd}{\bForm}{below=of c}
+  %     \xo[xright]{c}{xd}
+  %   \end{tikzinline}}
+  % \end{gathered}
+  % \qquad\quad
+  % \begin{gathered}[t]
+  %   \PR{x}{s}\SEMI\PW{x}{s{+}r}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %     \event{a}{\DR{x}{2}}{}
+  %     \event{b}{2{=}s\limplies(s{+}r){=}7\mid\DW{x}{7}}{right=of a}%6.5em of a}
+  %     \po{a}{b}
+  %     \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{below right=.5em and -1em of a}
+  %       %     \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{above=of a}
+  %       %     \xform{xdi}{2{=}s \limplies \bForm[s{+}r/x]}{below=of a}
+  %       %     \xform{xii}{(2{=}s\lor x{=}s)\limplies\bForm[s{+}r/x]}{above=of b}
+  %       %     \xform{xid}{(2{=}s\lor x{=}s)\limplies\bForm[s{+}r/x]}{below=of b}
+  %       %     \xo[xright]{a}{xdi}
+  %       %     \xo[xright]{b}{xid}
+  %     \xo[xright]{a}{xdd}
+  %     \xo[xright]{b}{xdd}
+  %   \end{tikzinline}}
+  % \end{gathered}
+  % \\[1ex]
+  \begin{gathered}[t]
+    % \LET{t}{2}\SEMI
+    % \LET{r}{5}\SEMI
+    \PW{x}{t}\SEMI
+    \PR{x}{s}\SEMI\PW{x}{s{+}r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a}{\DR{x}{2}}{}
+        \event{b}{2{=}s\limplies(s{+}r){=}7\mid\DW{x}{7}}{right=of a}
+        \event{c}{t{=}2\mid\DW{x}{2}}{left=of a}
+        \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{right=of b}%below right=.5em and -1em of a}
+        %\xo{a}{xdd}
+        \xo{b}{xdd}
+        % \xo{c}{xdd}
+        \po{a}{b}
+        \rf{c}{a}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+The predicate transformers are:
+% \begin{align*}
+%   \fwp{\aCmd_1}{\bForm} &= x{=}s\limplies\bForm[s{+}r/x] 
+%   \\
+%   \fwp{\aCmd_2}{\bForm} &= t\,{=}s\limplies\bForm[s{+}r/x] 
+%   \\
+%   \fwp{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+%   \\
+%   \trd{\aCmd_1}{\bForm} = \trd{\aCmd_2}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
+%   \\
+%   \trd{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+% \end{align*}
+\begin{scope}
+  \small
+  \begin{align*}
+    \fwp{\aCmd_1}{\bForm} &= x{=}s\limplies\bForm[s{+}r/x] 
+    &
+    \trd{\aCmd_1}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
+    \\
+    \fwp{\aCmd_2}{\bForm} &= t\,{=}s\limplies\bForm[s{+}r/x] 
+    &
+    \trd{\aCmd_2}{\bForm} &= 2{=}s\limplies\bForm[s{+}r/x] 
+    \\
+    \fwp{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+    &
+    \trd{\aCmd_3}{\bForm} &= 2{=}s\limplies\bForm[s{+}5/x] 
+  \end{align*}
+\end{scope}
+
+% % Let $\rho:\Reg\fun\Val$ and $\chi:\Loc\fun\Val$ be substitutions.
+% Let $\aState$ and $\rho$ range over substitutions $(\Reg\cup\Loc)\fun\Val$.
+% Treating substitutions as states, the big-step operational semantics of
+% programs can be defined as a relation $\bigstep{\aState}{\aCmd}{\bState}$.
+% % Ie, $\aForm\aState$ implies $\bForm\bState$.
+% \begin{align}
+%   \label{wp1}
+%   \bigstep{[5/r,2/x]}{\aCmd_1&}{[5/r,2/s,7/x]}
+%   \\
+%   \label{wp2}
+%   \bigstep{[\NEG5/r,2/x]}{\aCmd_1&}{[\NEG5/r,2/s,\NEG3/x]}
+% \end{align}
+
+% Then the semantics of Hoare triples guarantees that if
+% $\aForm\limplies\fwp{\aCmd}{\bForm}$, $\bigstep{\aState}{\aCmd}{\rho}$ and
+% $\aForm\aState$ is a tautology then $\bForm\bState$ is a tautology.
+% \begin{align*}
+%   \fwp{\aCmd_1}{x{>}0} &= (x{+}r{>}0) 
+% \end{align*}
+% In \eqref{wp1}, the pre- and post-conditions are satisfied.
+% In \eqref{wp2}, they are not.
+
+
+% \begin{itemize}  
+% \item Suppose $\bigstep{\aState}{\aCmd}{\rho}$ and $\aForm\limplies\fwp{\aCmd}{\bForm}$.\\
+%   If $\aForm\aState$ is a tautology then $\bForm\bState$ is a tautology.\\
+%   Ie, $\aForm\aState$ implies $\bForm\bState$.
+% \item Suppose $\bigstep{\aState}{\aCmd}{\rho}$ and $\hoare{\aForm}{\aCmd}{\bForm}$.\\
+%   If $\aForm\aState$ is a tautology then $\bForm\bState$ is a tautology.\\
+%   Ie, $\aForm\aState$ implies $\bForm\bState$.
+% \item Suppose $\bigstep{\aState}{\aCmd}{\rho}$ and $\aForm=\fwp{\aCmd}{\bForm}$.\\
+%   $\aForm\aState$ is a tautology if and only if $\bForm\bState$ is a tautology.\\
+%   Ie, $\aForm\aState$ iff $\bForm\bState$.
+% % \item Weakest: If $\aForm'\aState$ is a tautology, then $\aForm$ implies $\aForm'$.
+% \end{itemize}
+% Weakest preconditions are \emph{sound} in that if $\aForm$ holds in the
+% initial state $\aState$, then $\bForm$ holds in the final state $\bState$.
+% Formally, 
+
+
+\begin{comment}
+  If $\aPS\in\sem{\aCmd}$ is top-level and quiescent then 
+  $\aTr{\aEvs}{\bForm}$ implies $\fwp{\aCmd}{\bForm}$.
+
+  For any substitution $\aSub=[{v_1/r_1},\ldots, {v_n/r_n}]$ there is some
+  $\aPS\in\sem{\aCmd}$ %that is top-level and quiescent
+  such that all preconditions in $\aPS\aSub$ are tautologies then 
+  $\fwp{\aCmd}{\bForm}\aSub$
+\end{comment}
+
+
+% For a language where all programs are
+% terminating, we have for any statement $\aCmd$:
+% \begin{align*}
+%   \hoare{\aForm}{\aCmd}{\bForm} 
+%   \;\;\Leftrightarrow\;\;
+%   \aForm \textimplies \fwp{\aCmd}{\bForm}
+% \end{align*}
+% Interpretation is that if $\aState\models\fwp{\aCmd}{\bForm}$ and
+% $\bigstep{\aState}{\aCmd}{\rho}$
+% then $\bState\models\bForm$.
+
+% Let $\aCmd_0$ be
+% \begin{math}
+%   \PW{\aLoc_1}{\aVal_1}\SEMI\cdots\SEMI \PW{\aLoc_n}{\aVal_n}, 
+% \end{math}
+% such that $\fwp{\aCmd_0}{\aForm}$ is a tautology, and $\aLoc_i=\aLoc_j$
+% implies $i=j$.
+
+% Let $\aSub_\aPS=[{\aVal_1/\aLoc_1},\ldots, {\aVal_n/\aLoc_n}]$ be the final
+% state of $\aPS$.
+
+% Let $\aState$ and $\rho$ range over substitutions $\Loc\fun\Exp$.
+% If we leave the registers free, we have:
+% \begin{align}
+%   \label{wp1x}
+%   \bigstep{[2/x]}{\aCmd&}{[6/x]}
+% \end{align}
+
+% Using \refdef{def:pomsets-trans}:
+% \begin{align*}
+%   \begin{gathered}[t]
+%     %     \PR{x}{s}\SEMI\PW{x}{s{+}r}
+%     \PR{x}{s}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{\DR{x}{2}}{}
+%       \xform{xi}{\bForm}{above=of a}
+%       \xform{xd}{2{=}s \limplies \bForm}{below=of a}
+%       \xo[xright]{a}{xd}
+%     \end{tikzinline}}
+%   \end{gathered}
+%   &&
+%   \begin{gathered}[t]
+%     \PW{x}{s{+}r}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{(s{+}r){=}7\mid\DW{x}{7}}{}
+%       \xform{xi}{\bForm}{above=of a}
+%       \xform{xd}{\bForm}{below=of a}
+%       \xo[xright]{a}{xd}
+%     \end{tikzinline}}
+%   \end{gathered}
+% \end{align*}
+% Composing
+% \begin{align*}
+%   \begin{gathered}[t]
+%     \PR{x}{s}\SEMI\PW{x}{s{+}r}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{\DR{x}{2}}{}
+%       \event{b}{(s{+}r){=}7\mid\DW{x}{7}}{right=of a}
+%       \xform{xdd}{2{=}s \limplies \bForm}{above=of a}
+%       \xform{xdi}{2{=}s \limplies \bForm}{below=of a}
+%       \xform{xii}{\bForm}{above=of b}
+%       \xform{xid}{\bForm}{below=of b}
+%       \xo[xright]{a}{xdi}
+%       \xo[xright]{b}{xid}
+%       \xo[xright]{a}{xdd}
+%       \xo[xright]{b}{xdd}
+%     \end{tikzinline}}
+%   \end{gathered}
+% \end{align*}
+
+% Using \refdef{def:pomsets-lir}:
+% \begin{align*}
+%   \begin{gathered}[t]
+%     %     \PR{x}{s}\SEMI\PW{x}{s{+}r}
+%     \PR{x}{s}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{\DR{x}{2}}{}
+%       \xform{xi}{(2{=}s\lor x{=}s)\limplies \bForm}{above=of a}
+%       \xform{xd}{2{=}s \limplies \bForm}{below=of a}
+%       \xo[xright]{a}{xd}
+%     \end{tikzinline}}
+%   \end{gathered}
+%   &&
+%   \begin{gathered}[t]
+%     \PW{x}{s{+}r}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+%       \event{a}{(s{+}r){=}7\mid\DW{x}{7}}{}
+%       \xform{xi}{\bForm[s{+}r/x]}{above=of a}
+%       \xform{xd}{\bForm[s{+}r/x]}{below=of a}
+%       \xo[xright]{a}{xd}
+%     \end{tikzinline}}
+%   \end{gathered}
+% \end{align*}
+% Composing
+
+% For example, let $\aCmd_1=\PR{x}{r}$ and $\aCmd_2=\PW{x}{r{+}1}$ and
+% $\aCmd=\aCmd_1\SEMI \aCmd_2$.
+% \begin{align*}
+%   \fwp{\aCmd_2}{x{>}1}&=(r{+}1{>}1) = (r{>}0)
+%   \\
+%   \fwp{\aCmd_1}{r{>}0}=\fwp{\aCmd_0}{x{>}1}&=(x{>}0)
+% \end{align*}
+% Let $\aPS_i\in\sem{\aCmd_i}$.
+% \begin{align*}
+%   \aTr[2]{\aEvs_2}{x{>}1}&=(r{+}1{>}1) = (r{>}0)
+%   \\
+%   \aTr[0]{\aEvs_0}{x{>}1}&=(0{=}\aReg \limplies r{>}0)
+%   \\
+%   \aTr[0]{\aEvs_0}{x{>}1}&=(1{=}\aReg \limplies r{>}0)
+%   \\
+%   \aTr[0]{\aEvs_0}{x{>}1}&=(2{=}\aReg \limplies r{>}0)
+% \end{align*}
+
+% \begin{proposition}
+%   If $\aPS\in\sem{\aCmd}$ is top-level and quiescent then 
+%   $\aTr{\aEvs}{\aForm}$ implies $\fwp{\aCmd}{\aForm}$.
+
+%   For any substitution $\aSub=[{\aVal_1/\aReg_1},\ldots, {\aVal_n/\aReg_n}]$ there is some
+%   $\aPS\in\sem{\aCmd}$ %that is top-level and quiescent
+%   such that all preconditions in $\aPS\aSub$ are tautologies then 
+%   $\fwp{\aCmd}{\aForm}\aSub$
+% \end{proposition}
+
+% \subsection{Fences}
+% \label{sec:fences}
+
+
+\subsection{Substitutions}
+\label{sec:substitutions}
+
+In $\sLOAD{}{}$, it is also possible to collapse $\aLoc$ and $\aReg$ via substitution:
+\begin{enumerate}
+\item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-sub}}]
+  if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \rimplies
+    \aVal{=}\aReg
+    \limplies \bForm[\aReg/\aLoc]
+  \end{math},    
+\item[{\labeltext[\textsc{r}4b$'$]{(\textsc{r}4b$'$)}{read-tau-ind-sub}}]
+  if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \rimplies
+    \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+    \bForm[\aReg/\aLoc],
+  \end{math}
+\item[{\labeltext[\textsc{r}4c$'$]{(\textsc{r}4c$'$)}{read-tau-empty-sub}}]
+  if $\aEvs=\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \rimplies
+    % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+    \bForm[\aReg/\aLoc],
+  \end{math}
+\end{enumerate}
+Perhaps surprisingly, this semantics is incomparable with that of
+\reffig{fig:sem}.  Consider the following:
+\begin{gather*}
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a3}{r\land s\;\mathsf{even}\mid\DW{y}{1}}{}
+      \event{a4}{r\land s\mid\DW{z}{1}}{right=of a3}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PRP{x}{s}$, we get the same result regardless of whether we
+substitute $[s/x]$, since $x$ does not occur in either precondition.  Here
+we show the independent case:
+\begin{gather*}
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a2}{\DR{x}{2}}{}
+      \event{a3}{(2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
+      \event{a4}{(2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+    \end{tikzinline}}
+\end{gather*}
+Since the preconditions mention $x$, prepending $\PRP{x}{r}$, we now get
+different results depending on whether we perform the substitution.  Without
+any substitution, we have:
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\[-2ex]
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
+      \event{a4}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+      \po[out=12,in=168]{a1}{a3}
+      \po[out=10,in=170]{a1}{a4}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PWP{x}{0}$, which substitutes $[0/x]$, the precondition of
+$\DWP{y}{1}$ becomes
+$(1{=}r\limplies (2{=}s\lor0{=}s)\limplies (r\land s\;\mathsf{even}))$, which
+is a tautology, whereas the precondition of $\DW{z}{1}$ becomes
+$(1{=}r\limplies(2{=}s\lor0{=}s)\limplies (r\land s))$, which is not.  In
+order to be top-level, $\DWP{z}{1}$ must be dependency ordered after
+$\DRP{x}{2}$; in this case the precondition becomes
+$(1{=}r\limplies2{=}s\limplies (r\land s))$, which is a tautology.
+\begin{gather*}
+  % \PW{x}{0}\SEMI
+  % \PR{x}{r}\SEMI
+  % \PR{x}{s}\SEMI
+  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  % \IF{r\land s}\THEN \PW{z}{1}\FI
+  % \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a0}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=of a0}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \wk{a0}{a1}
+      % \wk[out=-20,in=-160]{a0}{a2}
+      \po[out=20,in=160]{a1}{a3}
+      \po[out=20,in=160]{a1}{a4}
+      \po[out=-20,in=-160]{a2}{a4}
+    \end{tikzinline}}
+\end{gather*}
+The situation reverses with the substitution $[r/x]$:
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\[-2ex]
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
+      \event{a4}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+      \po[out=12,in=168]{a1}{a3}
+      \po[out=10,in=170]{a1}{a4}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PWP{x}{0}$:
+\begin{gather*}
+  % \PW{x}{0}\SEMI
+  % \PR{x}{r}\SEMI
+  % \PR{x}{s}\SEMI
+  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  % \IF{r\land s}\THEN \PW{z}{1}\FI
+  % \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a0}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=of a0}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \wk{a0}{a1}
+      % \wk[out=-20,in=-160]{a0}{a2}
+      \po[out=20,in=160]{a1}{a3}
+      \po[out=20,in=160]{a1}{a4}
+      \po{a2}{a3}
+    \end{tikzinline}}
+\end{gather*}
+The dependency has changed from $\DRP{x}{2}\xpo\DWP{z}{1}$ to
+$\DRP{x}{2}\xpo\DWP{y}{1}$.  The resulting sets of pomsets are
+incomparable.
+
+
+Thinking in terms of hardware, the difference is whether reads update the
+cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
+cache, whereas without the substitution, they do not.  Since most caches work
+this way, the model with $[r/x]$ is likely preferred for modeling hardware.
+However, this substitution only makes sense in a model with read-read
+coherence and read-read dependencies, which will see is not case for Arm.  By
+leaving out the substitution, we also ensure that downgraded reads are
+fulfilled by preceding writes, not reads.
+
 
 

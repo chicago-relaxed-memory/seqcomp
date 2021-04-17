@@ -330,7 +330,7 @@ Using the suboptimal lowering for acquiring reads, our semantics is sound for
 Arm.  The proof uses the characterization of Arm using \EGC{}.
 
 \begin{theorem}
-  \label{thm:ec}
+  \label{thm:egc}
   Suppose $\aEG_1$ is $({\rco_1}, {\rrfx_1}, {\rgcb_1})$-valid for $\aCmd$
   under the suboptimal lowering that maps non-relaxed reads to
   $(\DMBSY\SEMI\LDAR)$.  Then there is a top-level pomset
@@ -343,7 +343,7 @@ Arm.  The proof uses the characterization of Arm using \EGC{}.
     
     \vspace{-.5\baselineskip}
     \begin{lemma}
-      \label{lemma:fr}
+      \label{lemma:fr1}
       Suppose $\aEG$ is $({\rco}, {\rrfx}, {\rgcb})$-valid.  Then
       ${\rgcb}\supseteq{\rfr}$.
 
@@ -384,7 +384,7 @@ Arm.  The proof uses the characterization of Arm using \EGC{}.
     ${\rco_1}$ and ${\rfr_1}$.  As noted \ref{lob-le}, $\rlob$ includes the order
     required by \ref{seq-kappa} and \ref{seq-le-delays}.  We need only show
     that the order removed from \ref{arm-gcb-lob} can also be removed from
-    the pomset.  In order for \label{arm-gcb-lob} to remove order from $\aEv$
+    the pomset.  In order for \ref{arm-gcb-lob} to remove order from $\aEv$
     to $\cEv$, we must have $\bEv\xrfx\aEv$ and $\bEv\xpoloc\aEv$ but not
     $\bEv\xlob\cEv$.  Because of our suboptimal lowering, it must be that
     $\aEv$ is a relaxed read; otherwise the $\DMBSY$ would require
@@ -557,7 +557,7 @@ program order ($\rpox$).\footnote{It is obvious how to enhance the semantics
 The generality of \refthm{thm:ec} is not limited by the assumption that
 ${\rcb_1}\supseteq{\rfr_1}$:
 \begin{lemma}
-  \label{lemma:fr}
+  \label{lemma:fr2}
   Suppose $\aEG$ is \EC-valid via $({\rco}, {\rrfx}, {\rcb})$.  Then there a
   permutation ${\rcbp}$ of ${\rcb}$ such that $\aEG$ is \EC-valid via
   $({\rco}, {\rrfx}, {\rcbp})$ and ${\rcbp}\supseteq{\rfr}$, where ${\rfr}$

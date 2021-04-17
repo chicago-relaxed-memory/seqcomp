@@ -195,8 +195,8 @@
 \newcommand{\classD}{\texttt{D}}
 
 \newcounter{mybookmark}
-%\newcommand{\myparagraph}[2][]{\subsubsection*{#2}\stepcounter{mybookmark}\belowpdfbookmark{#2}{mybookmark\arabic{mybookmark}}\ifnotempty{#1}{\labeltext[#2]{}{#1}}}
-\newcommand{\myparagraph}[2][]{\subsection{#2}\ifnotempty{#1}{\label{sec:#1}\labeltext[\textsection\ref{sec:#1}]{}{#1}}}
+\newcommand{\myparagraph}[2][]{\subsubsection*{#2}\stepcounter{mybookmark}\belowpdfbookmark{#2}{mybookmark\arabic{mybookmark}}\ifnotempty{#1}{\labeltext[#2]{}{#1}}}
+%\newcommand{\myparagraph}[2][]{\subsection{#2}\ifnotempty{#1}{\label{sec:#1}\labeltext[\textsection\ref{sec:#1}]{}{#1}}}
 \newcommand{\bookmark}[1]{\stepcounter{mybookmark}\belowpdfbookmark{#1}{mybookmark\arabic{mybookmark}}}
 
 
