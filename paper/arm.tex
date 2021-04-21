@@ -28,7 +28,7 @@ sequential composition, it is sufficient to note that $\rlob$ includes
 \item read-write dependencies, required by \ref{seq-kappa},
 \item synchronization delay of ${\reorderra}$, required by \ref{seq-le-delays},
 \item $\mSC$ access delay of ${\eqreordersc}$, required by \ref{seq-le-delays},
-\item write-write and read-to-write coherence delay of ${\reorderco}$, required by \ref{seq-le-delays},
+\item write-write and read-to-write coherence delay of ${\eqreorderco}$, required by \ref{seq-le-delays},
 \end{enumerate}
 and that $\rlob$ does \emph{not} include
 \begin{enumerate}[resume,label=(\textsc{l}\arabic*),ref=\textsc{l}\arabic*]
@@ -37,7 +37,7 @@ and that $\rlob$ does \emph{not} include
 \item \label{lob-rf}
   write-to-read order of $\rrfx$, required by \ref{seq-le-rf},
 \item \label{lob-wr}
-  write-to-read coherence delay of ${\reorderco}$, required by \ref{seq-le-delays}.
+  write-to-read coherence delay of ${\eqreorderco}$, required by \ref{seq-le-delays}.
 \end{enumerate}
 
 \begin{definition}
@@ -102,9 +102,10 @@ and that $\rlob$ does \emph{not} include
     \end{enumerate}
   \end{enumerate}
 \end{definition}
-\citet{armed} explain \EGC{} and \EC{} using the following example, which is
-allowed by Arm.\footnote{We have changed an address dependency in the first
-  thread to a data dependency.}
+\citet{armed} show that \EGC{} and \EC{} are both equivalent to the standard
+definition of Arm8.  They explain \EGC{} and \EC{} using the following
+example, which is allowed by Arm8.\footnote{We have changed an address
+  dependency in the first thread to a data dependency.}
 \begin{gather*}
   \PW{x}{1}\SEMI 
   \PR{x}{r}\SEMI
@@ -123,7 +124,7 @@ allowed by Arm.\footnote{We have changed an address dependency in the first
       \lob{b}{c}
       \rfx{c}{d}
       \lob{d}{e}
-      \co[out=-165,in=-15]{e}[above right]{a}
+      \co[out=-165,in=-15]{e}[above,pos=.375]{a}
     \end{tikzinline}}
 \end{gather*}
 \EGC{} drops $\rlob$-order in the first thread using \ref{arm-gcb-lob}, since
@@ -447,10 +448,10 @@ Here the $\rrfx$ relation \emph{contradicts} order!  We have both
 $\DWP{x}{2}\xrfint\DRP[\mACQ]{x}{2}$ and
 $\DWP{x}{2}\xcbinv\DRP[\mACQ]{x}{2}$.
 
-The change to the semantics is small: we weaken relationship between $\rrfx$
+The change to the semantics is small: we weaken the relationship between $\rrfx$
 and $\le$ in \ref{seq-le-rf}.  Rather than ensuring that there is no
-\emph{global} blocker for a sequentially fulfilled read \ref{seq-le-rf}, we
-require only that there is no \emph{thread-local} blocker \ref{seq-le-rf-rf}.
+\emph{global} blocker for a sequentially fulfilled read \eqref{seq-le-rf}, we
+require only that there is no \emph{thread-local} blocker \eqref{seq-le-rf-rf}.
 This change both allows and requires us to weaken the definition of
 \emph{delays} to drop write-to-read order from $\eqreorderco$.
 \begin{definition}
@@ -478,8 +479,8 @@ The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
 
 With the weakening of \ref{seq-le-rf-rf}, we must be careful not to allow
 spurious pairs to be added to the $\rrfx$ relation.  The use of
-$\rextendsdef{}{}$ in \ref{if-rf-extends} does this, ensuring that no new
-$\rrfx$ is introduced between events in $\aEvs_1\cap\aEvs_2$ when coalescing.
+$\rextendsdef{}{}$ in \ref{if-rf-extends} does this, ensuring that new
+$\rrfx$ is not introduced between events in $\aEvs_1\cap\aEvs_2$ when coalescing.
 This is necessary to ensure that
 \begin{math}
   \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
@@ -490,7 +491,7 @@ does not include
         \event{a}{\DR{x}{1}}{}
         \event{b}{\DW{x}{1}}{right=of a}
         \rfint[out=165,in=15]{b}{a}
-        \wk{a}{b}
+        \wki{a}{b}
       \end{tikzinlinesmall}}}
 \end{math}, taking $\rrfx$ from the left and $\le$ from the right.
 

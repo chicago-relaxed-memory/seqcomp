@@ -50,6 +50,7 @@ moved early.''
 This execution is not allowed by the semantics $\sembase{}$ of \reffig{fig:sem}: the precondition of
 $\aEv$ in the independent case is
 \begin{displaymath}
+  \tag{$*$}\label{pre1}
   (1{=}r \lor x{=}r)\limplies (1{=}s \lor r{=}s)\limplies (r{=}s),
 \end{displaymath}
 which is not a tautology, and thus $\sembase{}$ requires order from
@@ -60,9 +61,14 @@ event names to register names.  By using this renaming, coalesced events must
 choose the same register name.  In the above example, the precondition of
 $\aEv$ in the independent case becomes
 \begin{displaymath}
+  \tag{$**$}\label{pre2}
   (1{=}\uReg{\aEv} \lor x{=}\uReg{\aEv})\limplies (1{=}\uReg{\aEv} \lor \uReg{\aEv}{=}\uReg{\aEv})\limplies (\uReg{\aEv}{=}\uReg{\aEv}),
 \end{displaymath}
-which is a tautology.
+which is a tautology.  In \eqref{pre2}, the first read resolves the
+nondeterminism in both the first and the second read.  Given the choice of
+event names, the outcome of the second read is predetermined!  In
+\eqref{pre1}, the second read remains nondeterministic, even in the case that
+the events are destined to coalesce.  
 
 \begin{definition}
   Let $\semreg{}$ be defined as in \reffig{fig:sem}, changing \ref{read-tau}
@@ -114,6 +120,7 @@ elimination is sound:
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \PR[\amode]{\aLoc}{\bReg}} \supseteq 
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
 \end{displaymath}
+
 
 \subsection{Address Calculation}
 \label{sec:addr}
@@ -218,9 +225,11 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
       if $\aEvs=\emptyset$ then 
       \begin{math}
         \aTr{\bEvs}{\bForm} \rimplies 
-        \bForm[\bReg/\aReg].
+        \bForm[\bReg/\aReg],
       \end{math}  
     \end{enumerate}  
+  \item \label{read-term-addr}
+    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \rimplies \FALSE$. 
   \end{enumerate}
 \end{definition}
 
@@ -237,18 +246,18 @@ disallowing the attempted execution below:
     \PR{y}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{x}{s}
     \PAR
     \PR{x}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{y}{s}
-    \\
+    \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DR{y}{2}}{}
         \event{a2}{\DR{\REF{2}}{1}}{right=of a1}
         \event{a3}{\DW{x}{1}}{right=of a2}
         \po{a2}{a3}
-        \po[out=10,in=170]{a1}{a3}
+        \po[out=15,in=165]{a1}{a3}
         \event{b1}{\DR{x}{1}}{right=3em of a3}
         \event{b2}{\DR{\REF{1}}{2}}{right=of b1}
         \event{b3}{\DW{y}{2}}{right=of b2}
         \po{b2}{b3}
-        \po[out=10,in=170]{b1}{b3}
+        \po[out=15,in=165]{b1}{b3}
         \rf[out=-170,in=-10]{b3}{a1}
         \rf{a3}{b1}
       \end{tikzinline}}
@@ -442,8 +451,9 @@ disjoint preconditions.
 Coalescing events gives the desired result.
 
 
-This is not simply a theoretical question; it is observable.
-For example, $\sembase{}$ does not allow the following.
+This is not simply a theoretical question; it is observable.  For example,
+$\sembase{}$ does not allow the following, since it must add order in the
+first thread from the read of $y$ to one of the writes to $x$.
 \begin{gather*}
   \begin{gathered}
     \PR{y}{r}\SEMI
@@ -457,22 +467,22 @@ For example, $\sembase{}$ does not allow the following.
     \IF{x}\THEN \PW{y}{1} \FI
     \FI
   \end{gathered}    
-  \\
+  \\[-1ex]
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DW{x}{1}}{}
       \event{a2}{\DW{x}{1}}{right=of a1}
-      \wk{a1}{a2}
       \event{a0}{\DR{y}{1}}{left=of a1}
       \event{a3}{\DW{z}{1}}{right=of a2}
-      \po[out=20,in=160]{a0}{a3}
+      \wki{a1}{a2}
+      \po[out=15,in=165]{a0}{a3}
       \event{b0}{\DR{x}{1}}{below right=1em and -1em of a0}
       \event{b1}{\DW{x}{0}}{right=of b0}
       \event{b2}{\DR{x}{1}}{right=of b1}
       \event{b3}{\DW{y}{1}}{right=of b2}
-      \wk{b0}{b1}
-      \wk{b1}{b2}
+      \wki{b0}{b1}
+      \wki{b1}{b2}
       \po{b2}{b3}
-      \rf{b3}{a0}
+      \rf[out=158,in=-22]{b3}{a0}
       \rf{a1}{b0}
       \rf{a2}{b2}
       \wk{b1}{a2}
@@ -634,9 +644,11 @@ For example, $\sembase{}$ does not allow the following.
         % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
         (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
-        \bForm[\bReg/\aReg].
+        \bForm[\bReg/\aReg],
       \end{math}  
     \end{enumerate}  
+  \item \label{read-term-ca}
+    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \rimplies \FALSE$. 
   \end{enumerate}
   % \begin{multicols}{2}
   %   \noindent
@@ -892,9 +904,11 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         \aTr{\bEvs}{\bForm} \rimplies 
         (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
-        \bForm[\bReg/\aReg].
+        \bForm[\bReg/\aReg],
       \end{math}  
     \end{enumerate}  
+  \item \label{read-term-ca-addr}
+    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \rimplies \FALSE$. 
   \end{enumerate}
   % \medskip Similarly, let $\frf{\semaddr{}}$ be defined as for $\frf{\semrr{}}$
   % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
@@ -954,8 +968,7 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
 
   Extend the definition of par, if, seq to include:
   \begin{enumerate}
-    \setcounter{enumi}{7}
-  \item[(\textsc{p}0)] (\textsc{s}0)\; (\textsc{c}0)\; ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
+  \item[(\textsc{p}8)] (\textsc{s}8)\; (\textsc{c}8)\; ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
   \end{enumerate}
 \end{definition}
 
@@ -1150,49 +1163,50 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 % unavailable by the first thread's successful \RMW{}.
 
 
-For case analysis of RMWs, we can use a general purpose expansion operator:
+\begin{comment}
+  For case analysis of RMWs, we can use a general purpose expansion operator:
 
-\begin{definition}
-\noindent
-If $\aPS \in \sEXPAND\aPSS$ then
-$(\exists\aPS_1,\ldots,\aPS_n\in\aPSS)$
-$(\exists\cForm_1,\ldots,\cForm_n\in\Formulae)$
-% \\ let $\aPS_\aEv=\aPS_i$ if $\aEv\in\aEvs_i$ and $\cForm_\aEv=\cForm_i$ if $\aEv\in\aEvs_i$
-\begin{multicols}{2}
-  \begin{enumerate}[topsep=0pt,label=(\textsc{e}\arabic*),ref=\textsc{e}\arabic*]
-  \item[] \label{ca-psi}
-    \begin{enumerate}[leftmargin=0pt]
-    \item if $\cForm_i\land\cForm_j$ is satisfiable then $i=j$,        
-    \item $\bigvee_i\cForm_i\rimplies\TRUE$,        
-    \end{enumerate}
-    \stepcounter{enumi}
-  \item[] \label{ca-E}
-    \begin{enumerate}[leftmargin=0pt]
-    \item if $\aEvs_i\cap\aEvs_j\neq\emptyset$ then $i=j$,
-    \item $\aEvs=\bigcup_i\aEvs_i$, %(\aEvs_1\cup\cdots\cup\aEvs_n)$,
-      % \item if $\cForm_\aEv\land\cForm_\bEv$ is satisfiable then
-      %   $(\exists i)$ $\aEv,\bEv\in\aEvs_i$,
-    \end{enumerate}
-  \item \label{ca-lambda}
-    ${\labeling}=\bigcup_i{\labeling_i}$,%\PBR{{\labeling_1}\cup\cdots \cup {\labeling_n}}$,       
-  \item \label{ca-kappa}
-    \begin{math}
-      \labelingForm(\aEv) \rimplies
-      \cForm_\aEv\land \labelingForm_\aEv(\aEv)
-    \end{math},
-  \item \label{ca-tau}
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \rimplies 
-      \bigvee_i (\cForm_i\land \aTr[i]{\bEvs}{\bForm})
-    \end{math},
-  \item \label{ca-term}
-    $\aTerm \rimplies \bigvee_i (\cForm_i\land \aTerm[i])$,
-  \item ${\rrfx}=\bigcup_i{\rrfx_i}$,
-  \item ${\le}=\bigcup_i{\le_i}$.
-  \end{enumerate}
-\end{multicols}
-\end{definition}
-
+  \begin{definition}
+    \noindent
+    If $\aPS \in \sEXPAND\aPSS$ then
+    $(\exists\aPS_1,\ldots,\aPS_n\in\aPSS)$
+    $(\exists\cForm_1,\ldots,\cForm_n\in\Formulae)$
+    % \\ let $\aPS_\aEv=\aPS_i$ if $\aEv\in\aEvs_i$ and $\cForm_\aEv=\cForm_i$ if $\aEv\in\aEvs_i$
+    \begin{multicols}{2}
+      \begin{enumerate}[topsep=0pt,label=(\textsc{e}\arabic*),ref=\textsc{e}\arabic*]
+      \item[] \label{ca-psi}
+        \begin{enumerate}[leftmargin=0pt]
+        \item if $\cForm_i\land\cForm_j$ is satisfiable then $i=j$,        
+        \item $\bigvee_i\cForm_i\rimplies\TRUE$,        
+        \end{enumerate}
+        \stepcounter{enumi}
+      \item[] \label{ca-E}
+        \begin{enumerate}[leftmargin=0pt]
+        \item if $\aEvs_i\cap\aEvs_j\neq\emptyset$ then $i=j$,
+        \item $\aEvs=\bigcup_i\aEvs_i$, %(\aEvs_1\cup\cdots\cup\aEvs_n)$,
+          % \item if $\cForm_\aEv\land\cForm_\bEv$ is satisfiable then
+          %   $(\exists i)$ $\aEv,\bEv\in\aEvs_i$,
+        \end{enumerate}
+      \item \label{ca-lambda}
+        ${\labeling}=\bigcup_i{\labeling_i}$,%\PBR{{\labeling_1}\cup\cdots \cup {\labeling_n}}$,       
+      \item \label{ca-kappa}
+        \begin{math}
+          \labelingForm(\aEv) \rimplies
+          \cForm_\aEv\land \labelingForm_\aEv(\aEv)
+        \end{math},
+      \item \label{ca-tau}
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \rimplies 
+          \bigvee_i (\cForm_i\land \aTr[i]{\bEvs}{\bForm})
+        \end{math},
+      \item \label{ca-term}
+        $\aTerm \rimplies \bigvee_i (\cForm_i\land \aTerm[i])$,
+      \item ${\rrfx}=\bigcup_i{\rrfx_i}$,
+      \item ${\le}=\bigcup_i{\le_i}$.
+      \end{enumerate}
+    \end{multicols}
+  \end{definition}
+\end{comment}
 
 \subsection{Access Elimination}
 % For writes, change the label rules of sequential composition to:
@@ -1231,7 +1245,7 @@ validates elimination of irrelevant relaxed reads.  In
 \reffig{fig:sem} also validates elimination of writes of the same value.
 However, \reffig{fig:sem} does not validate general write elimination, where,
 for example, $\PW{x}{1}\SEMI\PW{x}{2}$ can be refined to $\PW{x}{2}$.  A list
-of valid merge operations can be found in \cite[\textsection
+of safe merges can be found in \cite[\textsection
 E]{DBLP:conf/cgo/ChakrabortyV17} and \cite[\textsection7.1]{Kang19}.  For
 examples of unsafe merges and reorderings, see \cite[\textsection
 D]{DBLP:conf/cgo/ChakrabortyV17}.
@@ -1274,8 +1288,20 @@ Then we can replace \ref{seq-lambda} in \reffig{fig:sem} by:
     \fmerge{\labeling_1(\aEv)}{\labeling_2(\aEv)}$, the first has no rf,
   \end{enumerate}
 \end{enumerate}
-For associativity, it is important that merge takes the join of two modes.
+%For associativity, it is important that merge takes the join of two modes.
 
+If $\aAct_0\in\fmerge{\aAct_1}{\aAct_2}$, then $\aAct_1$ and $\aAct_2$ can
+coalesce, resulting in $\aAct_0$.  This allows optimizations such as
+$(\PW{x}{1}\SEMI \PW{x}{2})$ to $(\PW{x}{2})$ and
+$(\PW{x}{1}\SEMI \PR{x}{r})$ to $(\PW{x}{1}\SEMI \PR{1}{r})$.  For
+associativity of sequential composition, it is important that $\fmerge{}{}$
+always take an upper bound on the modes of the two actions.  For example, it
+would invalidate associativity to allow
+$\DWP{\aLoc}{\aVal}\in\fmerge{\DW{\aLoc}{\aVal}}{\DR[\mACQ]{\aLoc}{\aVal}}$,
+although this is considered safe.% \footnote{A list of safe merge operations
+  % can be found in \cite[\textsection E]{DBLP:conf/cgo/ChakrabortyV17} and
+  % \cite[\textsection7.1]{Kang19}.  For examples of unsafe merges and
+  % reorderings, see \cite[\textsection D]{DBLP:conf/cgo/ChakrabortyV17}.}
 
 \endinput
 

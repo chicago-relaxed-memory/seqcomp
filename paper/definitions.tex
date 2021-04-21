@@ -558,19 +558,19 @@ example, consider the following:
         \sync{ry1}{rx0}
         \rf{wy1}{ry1}
         \wk[out=170,in=10]{rx0}{wx1}
-        \wk{wx0}{wx1}
+        \wki{wx0}{wx1}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
 The execution is disallowed due to the evident cycle.  All of the order shown is
 required at top-level: The intra-thread order comes from \ref{seq-le-delays}:
-$\DWP{x}{0}\xwk \DWP{x}{1}$ is required by $\eqreorderco$.
-$\DWP{x}{1}\xwk \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xwk \DRP{x}{0}$ are
+$\DWP{x}{0}\xwki \DWP{x}{1}$ is required by $\eqreorderco$.
+$\DWP{x}{1}\xsync \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xsync \DRP{x}{0}$ are
 required by $\reorderra$.  The cross-thread order is required by fulfillment:
 \ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
 \ref{rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
 \ref{seq-le-rf} subsequently ensures that
-$\DWP[\mREL]{y}{1}\xwk \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
+$\DWP[\mREL]{y}{1}\xpo \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
 $\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{rf-block}.  (Alternatively,
 we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
 
@@ -1031,7 +1031,7 @@ As another example, consider JMM causality test case 1 \cite{PughWebsite}:
         \rf[out=-168,in=-12]{wx1}{rx1}
         \rf{wy1}{ry1}
         \wk[out=10,in=170]{wx0}{wx1}
-        \wk{wx0}{rx1}
+        \wki{wx0}{rx1}
       \end{tikzinline}}
     % \hbox{\begin{tikzinline}[node distance=1.5em and 2em]
     %   \event{wy1}{0\geq0\mid\DW{y}{1}}{}

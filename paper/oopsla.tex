@@ -94,7 +94,7 @@ references.
 \begin{scope}
   The substitution $[x/r]$ does not work with Skolemization, even for the
   dependent case, since we lose the unique marker for each read.  In effect,
-  this forces the reads to the same values.
+  this forces all reads of a location to see the same values.
   % To be concrete, the candidate
   % definition would modify \ref{L4} to be:
   % \begin{enumerate}
@@ -295,7 +295,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
 \end{scope}
 
 \myparagraph{Causal Strengthening}
-\labeltext[]{Causal Strengthening}{xCausal}
+%\labeltext[]{Causal Strengthening}{xCausal}
 \jjr{} imposes \emph{causal strengthening}, which requires for every pomset
 $\aPS$, if $\bEv\le\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)$. 
 \begin{scope}
@@ -547,7 +547,7 @@ redundant read elimination fails.
   \LET{s}{r}\SEMI
   \IF{r{=}s}\THEN \PW{y}{1}\FI
 \end{math}.)
-\jjr{\textsection3.1}, incorrectly stated that the precondition of
+\jjr{\textsection3.1} incorrectly stated that the precondition of
 $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.  
 
 \myparagraph{Parallel Composition}
