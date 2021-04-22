@@ -733,6 +733,7 @@
 \newcommand{\ltNsp}{\mathrel{\,\mid\!\!\!<}}
 \newcommand{\geN}{<}
 \newcommand{\lesync}{\le}
+\newcommand{\lesyncpo}{\le_{\mathsf{po}}}
 \newcommand{\ltsync}{<}
 \newcommand{\ledep}{\trianglelefteq}
 \newcommand{\ltdep}{\vartriangleleft}
@@ -1116,6 +1117,10 @@
 \NewDocumentCommand \bob {O{} m O{} m} {\draw[sync,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{bob}$}  (#4);}
 \newcommand{\rbob}{\ensuremath{\mathrel{\textcolor{\synccolor}{\mathsf{bob}}}}}%
 \newcommand{\xbob}{\xarrowtikz{sync}{bob}}%
+
+\tikzstyle{close} = [-latex,double,color=\synccolor]
+\newcommand{\close}[3][]{\draw[close,#1](#2)to(#3);}
+\newcommand{\xclose}{\xarrowtikz{close}{\;\;}}%
 
 \tikzstyle{rf} = [->,thick,color=\rfcolor,]
 \newcommand{\rf}[3][]{\draw[rf,#1](#2)to(#3);}

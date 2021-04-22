@@ -569,12 +569,12 @@ $\DWP{x}{1}\xsync \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xsync \DRP{x}{0}$ ar
 required by $\reorderra$.  The cross-thread order is required by fulfillment:
 \ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
 \ref{rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
-\ref{seq-le-rf} subsequently ensures that
-$\DWP[\mREL]{y}{1}\xpo \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
+\reflem{lem:rf:implies:le} subsequently ensures that
+$\DWP[\mREL]{y}{1}\le \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
 $\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{rf-block}.  (Alternatively,
 we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
 
-The semantics gives the expected results for store buffer and load buffering,
+The semantics gives the expected results for store buffering and load buffering,
 as well as litmus tests involving fences and SC access.  The model of
 coherence is weaker than C11, in order to support common subexpression
 elimination, and stronger than Java, in order to support local reasoning

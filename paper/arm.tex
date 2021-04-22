@@ -124,7 +124,7 @@ example, which is allowed by Arm8.\footnote{We have changed an address
       \lob{b}{c}
       \rfx{c}{d}
       \lob{d}{e}
-      \co[out=-165,in=-15]{e}[above,pos=.375]{a}
+      \fr[out=-165,in=-15]{e}[above,pos=.375]{a}
     \end{tikzinline}}
 \end{gather*}
 \EGC{} drops $\rlob$-order in the first thread using \ref{arm-gcb-lob}, since
@@ -261,7 +261,7 @@ This attempted execution is allowed by \armeight, but disallowed by our
 semantics.
 
 If the read of $x$ in the execution above is changed from acquiring to
-relaxed, then our semantics allows the execution, using the independent case
+relaxed, then our semantics allows the $\rgcb$ execution, using the independent case
 for the read and satisfying the precondition of $\DWP{y}{1}$ by prepending
 $\DWP{x}{2}$.  It may be tempting, therefore to adopt a strategy of
 \emph{downgrading} acquires in certain cases.  Unfortunately, it is not

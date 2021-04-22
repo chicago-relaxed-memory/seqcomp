@@ -245,6 +245,75 @@ the precondition of $\DWP{y}{1}$ is not a tautology:
 \end{comment}
 
 
+\section{Another Arm Example}
+
+The following execution is allowed by Arm.
+\begin{gather*}
+  {
+    \PW{x}{1}
+    \SEMI
+    \PW[\mREL]{y}{1}
+  }\PAR{
+    \PR{y}{r}
+    \SEMI
+    \PW{y}{2}
+    \SEMI
+    \PR[\mACQ]{y}{s}
+     \SEMI
+    \PR{x}{t}
+  }
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \raevent{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR{y}{1}}{right=3em of b}
+      \event{d}{\DW{y}{2}}{right=of c}
+      \raevent{e}{\DR[\mACQ]{y}{2}}{right=of d}
+      \event{f}{\DR{x}{0}}{right=of e}
+      \lob{a}{b}
+      \rfx{b}{c}
+      %\sync[out=15,in=165]{c}{e}
+      \lob{c}{d}
+      \rfx{d}{e}
+      \lob{e}{f}
+      \fr[out=-165,in=-15]{f}[above,pos=.45]{a}
+      %\close[out=-15,in=-165]{b}{e}
+    \end{tikzinline}}
+  \\
+  \tag{$\rgcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \raevent{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR{y}{1}}{right=3em of b}
+      \event{d}{\DW{y}{2}}{right=of c}
+      \raevent{e}{\DR[\mACQ]{y}{2}}{right=of d}
+      \event{f}{\DR{x}{0}}{right=of e}
+      \gcbz{a}{b}
+      \gcbz{b}{c}
+      \gcbz{c}{d}
+      \gcbz{d}{e}
+      %\gcbz{e}{f}
+      \gcbz[out=-165,in=-15]{f}{a}
+    \end{tikzinline}}
+  \\
+  \tag{$\rcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \raevent{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR{y}{1}}{right=3em of b}
+      \event{d}{\DW{y}{2}}{right=of c}
+      \raevent{e}{\DR[\mACQ]{y}{2}}{right=of d}
+      \event{f}{\DR{x}{0}}{right=of e}
+      \cbz{a}{b}
+      \cbz{b}{c}
+      \cbz{c}{d}
+      %\cbz{d}{e}
+      \cbz{e}{f}
+      \cbz[out=-165,in=-15]{f}{a}
+    \end{tikzinline}}
+\end{gather*}
+
+
 \endinput
 \section{More Stuff}
 
