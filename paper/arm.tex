@@ -203,7 +203,7 @@ non-relaxed access to \LDAR/\STLR{} \citep{DBLP:journals/pacmpl/PodkopaevLV19}.
 In this section, we consider a suboptimal strategy, which lowers non-relaxed
 reads to $(\DMBSY\SEMI\LDAR)$.  Significantly, we retain the optimal lowering
 for relaxed access.  In the next section we recover the optimal lowering by
-adopting an alternative semantics for \ref{seq-le}.
+adopting an alternative semantics for \ref{seq-le-rf} and \ref{seq-le-delays}.
 
 To see why the optimal lowering fails, consider the following attempted
 execution, where the final values of both $x$ and $y$ are $2$.

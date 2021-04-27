@@ -1265,15 +1265,16 @@ validates elimination of irrelevant relaxed reads.  In
 \textsection\ref{sec:semreg}, we discussed redundant read elimination.
 \reffig{fig:sem} also validates elimination of writes of the same value.
 However, \reffig{fig:sem} does not validate general write elimination, where,
-for example, $\PW{x}{1}\SEMI\PW{x}{2}$ can be refined to $\PW{x}{2}$.  A list
-of safe merges can be found in \cite[\textsection
+for example, $\PW{x}{1}\SEMI\PW{x}{2}$ can be refined to $\PW{x}{2}$.
+Elimination can be justified in pomset by \emph{merging} actions with
+different labels.  A list of safe merges can be found in \cite[\textsection
 E]{DBLP:conf/cgo/ChakrabortyV17} and \cite[\textsection7.1]{Kang19}.  For
 examples of unsafe merges and reorderings, see \cite[\textsection
 D]{DBLP:conf/cgo/ChakrabortyV17}.
 
-To accommodate such merges, define $\fmerge{}{}:\Act\times\Act\fun2^{\Act}$
-as follows, where $\lubmode$ is the least upper bound with respect the order
-on modes from \textsection\ref{sec:actions}.
+Define $\fmerge{}{}:\Act\times\Act\fun2^{\Act}$ as follows, where $\lubmode$
+is the least upper bound with respect the order on modes from
+\textsection\ref{sec:actions}.
 \begin{align*}
   \begin{aligned}
     \fmerge{\DR[\amode]{\aLoc}{\aVal}}{\DR[\bmode]{\aLoc}{\aVal}}
@@ -1306,7 +1307,7 @@ Then we can replace \ref{seq-lambda} in \reffig{fig:sem} by:
     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labeling(\aEv)=\labeling_2(\aEv)$,
   \item \label{seq-lambda12}
     if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labeling(\aEv)\in
-    \fmerge{\labeling_1(\aEv)}{\labeling_2(\aEv)}$, the first has no rf,
+    \fmerge{\labeling_1(\aEv)}{\labeling_2(\aEv)}$, %the first has no rf,
   \end{enumerate}
 \end{enumerate}
 %For associativity, it is important that merge takes the join of two modes.
