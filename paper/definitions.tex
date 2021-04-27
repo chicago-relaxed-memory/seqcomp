@@ -51,13 +51,17 @@ We require that
 We model the following language.
 \begin{gather*}
   \begin{aligned}
-    \amode \BNFDEF& \mRLX
-    \BNFSEP \mRA 
+    \amode,\bmode \BNFDEF& \mRLX
+    \BNFSEP \mREL
+    \BNFSEP \mACQ
     \BNFSEP \mSC
-    &\mkern100mu
-    \fmode \BNFDEF& \fACQ 
-    \BNFSEP \fREL
-    \BNFSEP \fSC
+    % \amode \BNFDEF& \mRLX
+    % \BNFSEP \mRA 
+    % \BNFSEP \mSC
+    % &\mkern100mu
+    % \fmode \BNFDEF& \fACQ 
+    % \BNFSEP \fREL
+    % \BNFSEP \fSC
   \end{aligned}
   \\
   \aCmd
@@ -75,13 +79,42 @@ We model the following language.
   % \BNFSEP \PEXCHG[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
 \end{gather*}
 
-\emph{Memory modes}, $\amode$, are {relaxed} ($\mRLX$), {release-acquire}
-($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed mode is the
-default; we regularly elide it from examples.  $\mRA$/$\mSC$ accesses are
-collectively known as \emph{synchronized accesses}.  
+% \emph{Memory modes}, $\amode$, are {relaxed} ($\mRLX$), {release-acquire}
+% ($\mRA$), and {sequentially consistent} ($\mSC$).  Relaxed mode is the
+% default; we regularly elide it from examples.  $\mRA$/$\mSC$ accesses are
+% collectively known as \emph{synchronized accesses}.  
 
-\emph{Fence modes}, $\bmode$, are {acquire} ($\fACQ$), {release} ($\fREL$), 
-and {acquire-release} ($\fSC$).  
+% \emph{Fence modes}, $\bmode$, are {acquire} ($\fACQ$), {release} ($\fREL$), 
+% and {acquire-release} ($\fSC$).  
+
+\emph{Access modes}, $\amode$, are {relaxed} ($\mRLX$),
+{release} ($\mREL$), {acquire} ($\mACQ$), and
+{sequentially consistent} ($\mSC$).
+%
+Let expressions ($\LET{\aReg}{\aExp}$) only affect thread-local state and
+thus do not have a mode.
+%
+Reads ($\PR[\amode]{\REF{\cExp}}[\ascope]{\aReg}$) support
+%$\mWK$,
+$\mRLX$,
+%$\mREL$,
+$\mACQ$,
+%$\mRA$, 
+$\mSC$. 
+Writes ($\PW[\amode]{\REF{\cExp}}[\ascope]{\aReg}$) support
+%$\mWK$,
+$\mRLX$,
+$\mREL$,
+%$\mACQ$,
+%$\mRA$, 
+$\mSC$. 
+Fences ($\PF[\ascope]{\fmode}$) support
+%$\mWK$,
+%$\mRLX$,
+$\mREL$,
+$\mACQ$,
+%$\mRA$,
+$\mSC$.
 
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs. Following
@@ -193,8 +226,9 @@ of actions, using defaults.
 % $\DRP[\amode]{}[\ascope]{}[\aThrd]$.
 % 
 Let $\lemode$ be the least order over access and fence modes such that
-$\mRLX\lemode\mRA\lemode\mSC$ and $\fREL\lemode\fSC$ and $\fACQ\lemode\fSC$.
-We write $\DWP[\gemode\mRA]{}{}$ to stand for either $\DWP[\mRA]{}{}$ or
+%$\mRLX\lemode\mRA\lemode\mSC$ and $\fREL\lemode\fSC$ and $\fACQ\lemode\fSC$.
+$\mRLX\lemode\mRA\lemode\mSC$ and $\mREL\lemode\mSC$ and $\mACQ\lemode\mSC$.
+We write $\DWP[\gemode\mREL]{}{}$ to stand for either $\DWP[\mREL]{}{}$ or
 $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 
 % We also define shorthand for sets of
@@ -545,14 +579,14 @@ example, consider the following:
   \taglabel{pub}
   \begin{gathered}    
     \PW{x}{0}\SEMI 
-    \PW{x}{1}\SEMI \PW[\mRA]{y}{1} \PAR \PR[\mRA]{y}{r}\SEMI \PR{x}{s}
+    \PW{x}{1}\SEMI \PW[\mREL]{y}{1} \PAR \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
     \\[-.4ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
         \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \event{wy1}{\DWRel{y}{1}}{right=of wx1}
-        \event{ry1}{\DRAcq{y}{1}}{right=2.5em of wy1}
+        \event{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
+        \event{ry1}{\DR[\mACQ]{y}{1}}{right=2.5em of wy1}
         \event{rx0}{\DR{x}{0}}{right=of ry1}
         \sync{wx1}{wy1}
         \sync{ry1}{rx0}
@@ -1299,11 +1333,12 @@ solves this problem, since $\bForm$ implies $(\aReg{=}\aVal)\limplies\bForm$.
 \subsection{Comparison with Weakest Preconditions}
 
 We compare traditional transformers to the dependent-case transformers of
-\reffig{fig:sem}; thus we consider only totally ordered executions.  Because
-we only consider the dependent case, we drop the superscript $\aEvs$ on
-$\aTr{\aEvs}{}$ throughout this section.  We also assume that each register
-appears at most once in a program, as we did throughout
-\textsection\ref{sec:model}--\ref{sec:arm}.
+\reffig{fig:sem}. %; thus we consider only totally ordered executions.
+% Because
+% we only consider the dependent case, we drop the superscript $\aEvs$ on
+% $\aTr{\aEvs}{}$ throughout this section.  We also assume that each register
+% appears at most once in a program, as we did throughout
+% \textsection\ref{sec:model}--\ref{sec:arm}.
 
 Because of augment closure, we are not interested in isolating the
 \emph{weakest} precondition.  Thus we think of transformers as Hoare triples.
@@ -1314,7 +1349,7 @@ $\aForm \limplies \fwp{\aCmd}{\bForm}$.
 
 Hoare triples do not distinguish thread-local variables from shared
 variables.  Thus, the assignment rule applies to all types of storage. The
-rules can be written as on the left below
+rules can be written as on the left below:
 \begin{align*}
 \begin{aligned}
   \fwp{\PW{\aLoc}{\aExp}}{\bForm} &= \bForm[\aExp/\aLoc]
@@ -1756,6 +1791,7 @@ The situation reverses with the substitution $[r/x]$:
     \end{tikzinline}}
 \end{gather*}
 Prepending $\PWP{x}{0}$:
+%\vspace{-.5\baselineskip}
 \begin{gather*}
   % \PW{x}{0}\SEMI
   % \PR{x}{r}\SEMI

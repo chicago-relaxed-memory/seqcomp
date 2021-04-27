@@ -263,10 +263,10 @@ disallowing the attempted execution below:
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-This execution is possible, however, if we replace
+This execution would become possible, however, if we were to replace
 $(\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})$ by $(\aVal{=}\uReg{\aEv})$ in
-\ref{read-tau-dep-addr}.  In this case, there is not necessarily a dependency
-order from $\DRP{y}{2}$ to $\DWP{x}{1}$.
+\ref{read-tau-dep-addr}.  In this case, $\DRP{y}{2}$ would not necessarily be dependency
+ordered before $\DWP{x}{1}$.
 % % 
 % In isolation, the precondition of $\DWP{x}{1}$ is $(s=1)$.  Using the erroneous
 % definition of \ref{read-tau-dep-addr}, the precondition becomes $(1{=}s)\limplies (s=1)$
@@ -919,7 +919,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 
 \subsection{Read-Modify-Write Operations}
 
-We give the semantics of \RMW{}s without address calculation or if-closure.
+%We give the semantics of \RMW{}s without address calculation or if-closure.
 
 From the data model, we require an additional binary relation over
 $\Act\times\Act$: $\roverlapsdef$.  For the actions in this paper, we say
@@ -976,11 +976,11 @@ To define specific operations, we extend the syntax:
 \begin{align*}
   \aCmd
   \BNFDEF& \cdots 
-  \BNFSEP \PCAS[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
-  \BNFSEP \PFADD[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
-  \BNFSEP \PEXCHG[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  \BNFSEP \PCAS[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
+  \BNFSEP \PFADD[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  \BNFSEP \PEXCHG[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
 \end{align*}
-The corresponding semantic functions are as follows.
+We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic functions are as follows.
 \begin{definition}
   Let $\sLOADP{}{}$ be defined as for $\sLOAD{}{}$, adding the constraint:
   \begin{itemize}
@@ -991,38 +991,60 @@ The corresponding semantic functions are as follows.
       \bForm.
     \end{math}
   \end{itemize}
-  If $\aPS\in\mathit{FADD}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aReg{+}\aExp}})$
+  If $\aPS\in\mathit{FADD}(\aReg,\cExp,\aExp,\amode,\bmode)$ then
+  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sSTORE[\bmode]{\cExp}{\aReg{+}\aExp}})$
   \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
   \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
     $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
     $\bEv\xrmw\aEv$.
-    % \item if $\labeling_1(\bEv)$ is a read, then there is a write $\labeling_1(\aEv)$ such that 
-    %   $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and 
-    %   $\bEv\xrmw\aEv$.
   \end{enumerate}
-  If $\aPS\in\mathit{EXCHG}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aExp}})$
+  If $\aPS\in\mathit{EXCHG}(\aReg,\cExp,\aExp,\amode,\bmode)$ then
+  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sSTORE[\bmode]{\cExp}{\aExp}})$
   \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
   \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
     $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
     $\bEv\xrmw\aEv$.
-    % \item if $\labeling_1(\bEv)$ is a read, then there is a write $\labeling_1(\aEv)$ such that 
-    %   $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and 
-    %   $\bEv\xrmw\aEv$.
   \end{enumerate}
-  If $\aPS\in\mathit{CAS}(\aReg,\aLoc,\aExp,\bExp,\amode_1,\amode_2)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\amode_2]{\aLoc}{\bExp}\sELSE\sSKIP\sFI})$
+  If $\aPS\in\mathit{CAS}(\aReg,\cExp,\aExp,\bExp,\amode,\bmode)$ then
+  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\bmode]{\cExp}{\bExp}\sELSE\sSKIP\sFI})$
   \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
   \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
     $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
     $\bEv\xrmw\aEv$.
-    % \item if $\labeling_1(\bEv)$ is a read, then either
-    %   \begin{enumerate}
-    %   \item there is a write $\labeling_1(\aEv)$ such that $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and $\bEv\xrmw\aEv$, or
-    %   \item 
-    %   \end{enumerate}
   \end{enumerate}
+\end{definition}
+  % If $\aPS\in\mathit{FADD}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
+  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aReg{+}\aExp}})$
+  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+  %   $\bEv\xrmw\aEv$.
+  %   % \item if $\labeling_1(\bEv)$ is a read, then there is a write $\labeling_1(\aEv)$ such that 
+  %   %   $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and 
+  %   %   $\bEv\xrmw\aEv$.
+  % \end{enumerate}
+  % If $\aPS\in\mathit{EXCHG}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
+  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aExp}})$
+  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+  %   $\bEv\xrmw\aEv$.
+  %   % \item if $\labeling_1(\bEv)$ is a read, then there is a write $\labeling_1(\aEv)$ such that 
+  %   %   $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and 
+  %   %   $\bEv\xrmw\aEv$.
+  % \end{enumerate}
+  % If $\aPS\in\mathit{CAS}(\aReg,\aLoc,\aExp,\bExp,\amode_1,\amode_2)$ then
+  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\amode_2]{\aLoc}{\bExp}\sELSE\sSKIP\sFI})$
+  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+  %   $\bEv\xrmw\aEv$.
+  %   % \item if $\labeling_1(\bEv)$ is a read, then either
+  %   %   \begin{enumerate}
+  %   %   \item there is a write $\labeling_1(\aEv)$ such that $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and $\bEv\xrmw\aEv$, or
+  %   %   \item 
+  %   %   \end{enumerate}
+  % \end{enumerate}
   % \begin{multicols}{2}
   %   \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
   %   \item if $\labeling_1(\aEv)$ is a write, then $(\exists\bEv)$ such that
@@ -1043,7 +1065,6 @@ The corresponding semantic functions are as follows.
   %     \end{enumerate}
   %   \end{enumerate}
   % \end{multicols}
-\end{definition}
 
 This definition ensures atomicity and supports lowering to Arm load/store
 exclusive operations.  See \jjr{} for examples.
