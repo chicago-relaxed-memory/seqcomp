@@ -568,6 +568,10 @@ In addition, \jjr{} uses $\sLOAD{}{}$ instead of $\sLOADP{}{}$ when
 calculating of dependency for \RMW{}s.  For a discussion, see the example at
 the end of \textsection\ref{sec:rmw}.
 
+\myparagraph{Definition of Data Race}
+
+The definition of data race is wrong in \jjr{}.  It should require that that
+at least one action is relaxed.
 
 \section{A Note on Mixed-Mode Data Races}
 
@@ -852,9 +856,6 @@ is a downset of \eqref{mix1}.
 
 \endinput
 
-\myparagraph{Stupid Bug in LDRF}
-Definition of race is wrong.
-Should say that at least one is relaxed.
 
 
 
