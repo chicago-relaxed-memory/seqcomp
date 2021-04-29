@@ -382,7 +382,7 @@ $\aCmd=(\PW{x}{1})$, then $\sembase{}$ does \emph{not} allow:
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a}{\DW{x}{1}}{}
       \event{b}{\DW{x}{1}}{right=of a}
-      \wk{a}{b}
+      \wki{a}{b}
     \end{tikzinline}}
 \end{gather*}
 However, if
@@ -715,7 +715,7 @@ following example:
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \eventl{d}{a}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{}
         \eventl{e}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of a}
-        \wk{a}{b}
+        \wki{a}{b}
       \end{tikzinline}}
   \end{gathered}
 \end{align*}
@@ -733,7 +733,7 @@ Merging, we have:
         \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
         \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
         \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
-        \wk{b}{c}
+        \wki{b}{c}
       \end{tikzinline}}
   \end{gathered}
 \end{align*}
@@ -788,7 +788,7 @@ Sequencing and merging:
         \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
         \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
         \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
-        \wk{b}{c}
+        \wki{b}{c}
       \end{tikzinline}}
   \end{gathered}
 \end{align*}
@@ -918,6 +918,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 
 
 \subsection{Read-Modify-Write Operations}
+\label{sec:rmw}
 
 %We give the semantics of \RMW{}s without address calculation or if-closure.
 
@@ -1096,7 +1097,7 @@ relaxed variant of the \textsc{cdrf} example from
         \rmw{b0}{b0b}
         \rf{i}{b0}
         \rf[out=-165,in=-12]{a2}{b1}
-        \wk[out=20,in=160]{b0b}{b2}
+        \wki[out=20,in=160]{b0b}{b2}
         % \sync{a1}{a2}
         % \sync{b0}{b1}
         \po{b1}{b2}

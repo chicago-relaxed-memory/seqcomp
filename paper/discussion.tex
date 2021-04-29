@@ -187,7 +187,7 @@ Revisiting JMM causality test case 1 from the end of \textsection\ref{sec:ex:con
         \event{a0}{\DW{x}{0}}{}
         \event{a1}{\DR{x}{1}}{right=of a0}
         \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}      
-        \wk{a0}{a1}
+        \wki{a0}{a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -245,7 +245,7 @@ the precondition of $\DWP{y}{1}$ is not a tautology:
 \end{comment}
 
 
-\section{Another Arm Example}
+\section{Additional Arm Example}
 
 The following execution is allowed by Arm.
 \begin{gather*}
@@ -313,129 +313,8 @@ The following execution is allowed by Arm.
     \end{tikzinline}}
 \end{gather*}
 
-
 \endinput
 \section{More Stuff}
-
-\subsection{A Note on Mixed-Mode Data Races}
-
-In preparing this paper, we came across the following example, which appears
-to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
-\begin{gather}
-  \nonumber
-  \PW{x}{1}\SEMI
-  \PW[\mREL]{y}{1}\SEMI
-  \PR[\mACQ]{x}{r}
-  \PAR
-  \IF{\PR[\mACQ]{y}{}}\THEN \PW[\mREL]{x}{2}\FI
-  \\
-  \label{mix1}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
-      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
-      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
-      \wk[out=-20,in=-160]{a3}{b2}
-      \sync{b1}{b2}
-      % \node(ai)[left=3em of a1]{};
-      % \bgoval[yellow!50]{(ai)}{P}
-      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
-      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
-    \end{tikzinline}}
-  \\
-  \label{mix2}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
-      \raevent{a3}{\DR[\mACQ]{x}{2}}{right=of a2}
-      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
-      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      \rf[out=20,in=160]{a2}{b1}
-      \rf[out=160,in=20]{b2}{a3}
-      \sync{b1}{b2}
-    \end{tikzinline}}
-\end{gather}
-The program is data-race free.  The two executions shown are the only
-top-level executions that include $\DWP[\mREL]{x}{2}$.
-
-Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19} is stated by extending
-execution sequences.  In the terminology of
-\cite{DBLP:conf/ppopp/DongolJR19}, a read is \emph{$L$-weak} if it is
-sequentially stale.  Let
-\begin{math}
-  \rho=\DWP{x}{1}
-  \DWP[\mREL]{y}{1}
-  \DRP[\mACQ]{y}{1}
-  \DWP[\mREL]{x}{2}
-\end{math}
-be a sequence and
-\begin{math}
-  \alpha=\DRP[\mACQ]{x}{1}.
-\end{math}
-$\rho$ is $L$-sequential and $\alpha$ is $L$-weak in $\rho\alpha$.  But there
-is no execution of this program that includes a data race, contradicting the
-theorem.  The error seems to be in Lemma A.4 of
-\cite{DBLP:conf/ppopp/DongolJR19}, which states that if $\alpha$ is $L$-weak
-after an $L$-sequential $\rho$, then $\alpha$ must be in a data race.  That
-is clearly false here, since $\DRP[\mACQ]{x}{1}$ is stale, but the program is
-data race free.
-
-In proving the SC-LDRF result in \jjr{\textsection8}, we noted that our proof
-technique is more robust than that of \cite{DBLP:conf/ppopp/DongolJR19},
-because it limits the prefixes that must be considered.  In \eqref{mix1}, the
-induction hypothesis requires that we add $\DRP[\mACQ]{x}{1}$ before
-$\DWP[\mREL]{x}{2}$ since $\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  In
-particular,
-\begin{gather*}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
-      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
-      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      % \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
-      % \wk[out=-20,in=-160]{a3}{b2}
-      \sync{b1}{b2}
-      % \node(ai)[left=3em of a1]{};
-      % \bgoval[yellow!50]{(ai)}{P}
-      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
-      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
-    \end{tikzinline}}
-\end{gather*}
-is not a downset of \eqref{mix1}, because
-$\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  As we noted in \jjr{\textsection8},
-this affects the inductive order in which we move across pomsets, but does
-not affect the set of pomsets that are considered.  In particular,
-\begin{gather*}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
-      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
-      % \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      % \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
-      % \wk[out=-20,in=-160]{a3}{b2}
-      % \sync{b1}{b2}
-      % \node(ai)[left=3em of a1]{};
-      % \bgoval[yellow!50]{(ai)}{P}
-      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
-      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
-    \end{tikzinline}}
-\end{gather*}
-is a downset of \eqref{mix1}.
-
 
 \subsection{If Closure and Address Dependencies}
 \label{sec:addr}
@@ -469,7 +348,6 @@ Do sequencing and if commute?
 Hypothesis: gcb cannot contradict (poloc minus RxR).
 
 
-\endinput
 \subsection{Completed Pomsets and Fork}
 \label{sec:fork}
 
@@ -492,7 +370,7 @@ is different from being downset-maximal.
       \event{b}{\DW{x}{1}}{right=of a}
       \event{c}{\DR{x}{1}}{right=3em of b}
       \event{d}{\DR{x}{0}}{right=of c}
-      \wk{a}{b}
+      \wki{a}{b}
       \rf{b}{c}
       \rf[out=-20,in=-160]{a}{d}
     \end{tikzinline}}
@@ -505,7 +383,7 @@ is different from being downset-maximal.
       \event{d}{\DR{x}{1}}{right=of c}
       \event{e}{\DW{y}{1}}{right=of d}
       \po{d}{e}
-      \wk{a}{b}
+      \wki{a}{b}
       \rf[out=-20,in=-160]{a}{c}
       \rf[out=-20,in=-160]{b}{d}
     \end{tikzinline}}
@@ -552,7 +430,7 @@ then $\sem{\aGrp}$ run concurrently with $\sem{\aCmd_2\SEMI\aCmd_3}$.
       \event{a}{\DW{x}{1}}{}
       \event{b}{\DW{y}{1}}{right=of a}
       \event{c}{\DW{x}{2}}{right=3em of b}
-      \wk[out=-20,in=-160]{a}{c}
+      \wki[out=-20,in=-160]{a}{c}
     \end{tikzinline}}
 \end{gather*}
 % In fact, perhaps surprisingly,
@@ -1216,96 +1094,6 @@ Extend the definition of par, if, seq to include:
 \item ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
 \end{enumerate}
 
-\begin{example}
-  This definition ensures atomicity, disallowing executions such as
-  \cite[Ex.~3.2]{DBLP:journals/pacmpl/PodkopaevLV19}:
-  \begin{gather*}
-    % \taglabel{RMW1}
-    \begin{gathered}
-      \PW{x}{0}\SEMI \PFADD[\mRLX][\mRLX]{x}{s}{1}
-      \PAR
-      \PW{x}{2}\SEMI \PR{x}{s}
-      \\
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{a2}{\DR{x}{0}}{}
-          \event{a1}{\DW{x}{0}}{left=of a2}
-          \rf{a1}{a2}
-          \event{a3}{\DW{x}{2}}{right=of a2}
-          \wk{a2}{a3}
-          \event{b2}{\DW{x}{1}}{right=of a3}
-          \event{b3}{\DR{x}{1}}{right=of b2}
-          \rmw[out=-15,in=-165]{a2}[below]{b2}
-          \wk{a3}{b2}
-          \rf{b2}{b3}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-  By \ref{pom-rmw-atomic1}, since $\DWP{x}{2}\xwk\DWP{x}{1}$, it must be that
-  $\DWP{x}{2}\xwk\DRP{x}{0}$, creating a cycle.
-\end{example}
-
-\begin{example}
-  \label{ex:rmw-33}
-  Two successful \RMW{}s cannot see the same write:
-  \begin{gather*}
-    \begin{gathered}
-      \PW{x}{0}\SEMI (\FADD^{\mRLX,\mRLX}(\aLoc,1)\PAR \FADD^{\mRLX,\mRLX}(\aLoc,1))
-      \\
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{i}{\DW{x}{0}}{}
-          \event{a1}{a{:}\DR{x}{0}}{right=3em of i}
-          \event{a2}{b{:}\DW{x}{1}}{right=of a1}
-          \event{b1}{c{:}\DR{x}{0}}{right=3em of a2}
-          \event{b2}{d{:}\DW{x}{1}}{right=of b1}
-          \rmw{a1}{a2}
-          \rmw{b1}{b2}
-          \rf{i}{a1}
-          \rf[out=15,in=165]{i}{b1}
-          \wk[out=-15,in=-165]{a1}{b2}
-          % \wk{a1}{b2}
-          \wk{b1}{a2}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-  The order from read-to-write is required by fulfillment.  
-  Apply \ref{A1} to $a\xwk d$, we have that $a\xwk c$.  Subsequently
-  applying \ref{A2}, we have $b \xwk c$, creating a cycle.
-\end{example}
-
-\begin{example}
-  By using two actions rather than one, the definition allows examples such as the
-  following, which is allowed by \armeight{} 
-  \cite[Ex.~3.10]{DBLP:journals/pacmpl/PodkopaevLV19}:
-  \begin{gather*}
-    % \taglabel{RMW2}
-    \begin{gathered}
-      \PR{y}{r}\SEMI
-      \PW{z}{r}
-      \PAR
-      \PR{z}{r}\SEMI
-      \PW{x}{0}\SEMI
-      \PFADD[\mRLX][\mREL]{x}{s}{1} \SEMI
-      \PW{y}{s}{+}1
-      \\[-1ex]
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{a1}{\DR{y}{1}}{}
-          \event{a2}{\DW{z}{1}}{right=of a1}
-          \po{a1}{a2}
-          \event{b1}{\DR{z}{1}}{right=3em of a2}
-          \rf{a2}{b1}
-          \event{b2}{\DW{x}{0}}{right=of b1}
-          \event{b3}{\DR{x}{0}}{right=of b2}
-          \rf{b2}{b3}
-          \event{b4}{\DWRel{x}{1}}{right=2em of b3}
-          \rmw{b3}{b4}
-          \event{b5}{\DW{y}{1}}{right=of b4}
-          \sync[out=-15,in=-165]{b1}{b4}
-          \po[out=-20,in=-160]{b3}{b5}
-          \rf[out=170,in=10]{b5}{a1}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-\end{example}
 
 \begin{example}
   \label{ex:rmw-dep}
@@ -1349,7 +1137,7 @@ Extend the definition of par, if, seq to include:
           \rmw{b0}{b0b}
           \rf{i}{b0}
           \rf[out=-165,in=-12]{a2}{b1}
-          \wk[out=20,in=160]{b0b}{b2}
+          \wki[out=20,in=160]{b0b}{b2}
           % \sync{a1}{a2}
           % \sync{b0}{b1}
           \po{b1}{b2}
@@ -1402,64 +1190,6 @@ an \RMW{}.
 
 [Todo: write out the rules.]
 
-\begin{example}
-  Consider the \textsc{cdrf} example from \cite{DBLP:conf/pldi/LeeCPCHLV20}:
-  \begin{gather*}
-    \begin{gathered}
-      \begin{aligned}
-        &\PFADD[\mACQ][\mREL]{x}{r}{1}\SEMI \IF{r{=}0}\THEN \PW{y}{1} \FI
-        \\\PAR\;\;&
-        \PFADD[\mACQ][\mREL]{x}{r}{1}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
-      \end{aligned}
-      \\
-      \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
-          \raevent{a1}{\DR[\mACQ]{x}{0}}{}
-          \raevent{a1b}{\DW[\mREL]{x}{1}}{right=of a1}
-          \event{a2}{\DW{y}{1}}{right=of a1b}
-          \raevent{b0}{\DR[\mACQ]{x}{0}}{right=3em of a2}
-          \raevent{b0b}{\DW[\mREL]{x}{1}}{right=of b0}
-          \event{b1}{\DR{y}{1}}{right=of b0b}
-          \event{b2}{\DW{x}{0}}{right=of b1}
-          \rmw{a1}{a1b}
-          \rmw{b0}{b0b}
-          \rf[out=-13,in=-163]{a2}{b1}
-          \sync[out=20,in=160]{a1}{a2}
-          \sync[out=20,in=160]{b0}{b1}
-          \po{b1}{b2}
-          \rf[out=-165,in=-12]{b2}{a1}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-\end{example}
-\begin{example}
-  Consider this example from \cite[\textsection C]{DBLP:conf/pldi/LeeCPCHLV20}:
-  \begin{gather*}
-    \begin{gathered}
-      \begin{aligned}
-        &\PCAS[\mRLX][\mRLX]{x}{r}{0}{1}\SEMI \IF{r{\leq}1}\THEN \PW{y}{1} \FI
-        \\\PAR\;\;&
-        \PCAS[\mRLX][\mRLX]{x}{r}{0}{2}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
-      \end{aligned}
-      \\
-      \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
-          \event{a1}{\DR{x}{0}}{}
-          \event{a1b}{\DW{x}{1}}{right=of a1}
-          \event{a2}{\DW{y}{1}}{right=of a1b}
-          \event{b0}{\DR{x}{0}}{right=3em of a2}
-          \event{b0b}{\DW{x}{2}}{right=of b0}
-          \event{b1}{\DR{y}{1}}{right=of b0b}
-          \event{b2}{\DW{x}{0}}{right=of b1}
-          \rmw{a1}{a1b}
-          \rmw{b0}{b0b}
-          \rf[out=-13,in=-163]{a2}{b1}
-          \sync[out=20,in=160]{a1}{a2}
-          \sync[out=20,in=160]{b0}{b1}
-          \po{b1}{b2}
-          \rf[out=-165,in=-12]{b2}{a1}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-\end{example}
 % \begin{example}
 %   Let $\CAS$ return the value read, which is sufficient to determine whether
 %   the $\CAS$ succeeded.
@@ -2181,7 +1911,7 @@ as:
       \rf{b}{a}
     \end{tikzinline}}
 \end{gather*}
-Item \ref{seq-reorder} would require $\DRP{x}{1} \xwk \DWP{x}{1}$, forbidding
+Item \ref{seq-reorder} would require $\DRP{x}{1} \xwki \DWP{x}{1}$, forbidding
 this.
 
 % , since \ref{T3full} substitutes

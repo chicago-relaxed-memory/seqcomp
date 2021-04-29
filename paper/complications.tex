@@ -28,7 +28,7 @@
         \rf[out=-168,in=-12]{wx1}{rx1}
         \rf{wy1}{ry1}
         \wk[out=10,in=170]{wx0}{wx1}
-        \wk{wx0}{rx1}
+        \wki{wx0}{rx1}
         \po{rx1}{wy1}
       \end{tikzinline}}
   \end{gather*}
@@ -55,7 +55,7 @@
         \rf[out=-168,in=-12]{wx1}{rx1}
         \rf{wy1}{ry1}
         \wk[out=10,in=170]{wx0}{wx1}
-        \wk{wx0}{rx1}
+        \wki{wx0}{rx1}
       \end{tikzinline}}
   \end{gather*}
 \end{example}
@@ -138,7 +138,7 @@ transformer for the empty pomset.
           \event{a0}{\DW{x}{0}}{}
           \event{a1}{\DR{x}{1}}{right=of a0}
           \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}      
-          \wk{a0}{a1}
+          \wki{a0}{a1}
         \end{tikzinline}}    
     \end{gathered}
   \end{align*}
@@ -154,7 +154,7 @@ transformer for the empty pomset.
         \event{wx0}{\DW{x}{0}}{}
         \event{rx1}{\DR{x}{\NEG1}}{right=of wx0}
         \event{wy1}{\DW{y}{1}}{right=of rx1}
-        \wk{wx0}{rx1}
+        \wki{wx0}{rx1}
       \end{tikzinline}}
   \end{gather*}
   But this would violate the expected local invariant: that all values seen
@@ -355,7 +355,7 @@ most once in a program.  We relax this by renaming.
     \hbox{\begin{tikzinline}[node distance=1em]
         \event{a}{\DW{x}{1}}{}
         \event{b}{\DW{x}{1}}{right=of a}
-        \wk{a}{b}
+        \wki{a}{b}
       \end{tikzinline}}
   \end{gather*}
   However, if
@@ -413,7 +413,7 @@ most once in a program.  We relax this by renaming.
     \hbox{\begin{tikzinline}[node distance=1em]
         \event{a1}{\DW{x}{1}}{}
         \event{a2}{\DW{x}{1}}{right=of a1}
-        \wk{a1}{a2}
+        \wki{a1}{a2}
         \event{a0}{\DR{y}{1}}{left=of a1}
         \event{a3}{\DW{z}{1}}{right=of a2}
         \po[out=20,in=160]{a0}{a3}
@@ -421,8 +421,8 @@ most once in a program.  We relax this by renaming.
         \event{b1}{\DW{x}{0}}{right=of b0}
         \event{b2}{\DR{x}{1}}{right=of b1}
         \event{b3}{\DW{y}{1}}{right=of b2}
-        \wk{b0}{b1}
-        \wk{b1}{b2}
+        \wki{b0}{b1}
+        \wki{b1}{b2}
         \po{b2}{b3}
         \rf{b3}{a0}
         \rf{a1}{b0}
