@@ -17,14 +17,15 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
 
   record _≲_ (P P′ : PomsetWithPredicateTransformers) : Set₁ where
 
-    open PomsetWithPredicateTransformers P using (E ; ℓ ; κ ; _≤_ ; ↓ ; τ)
-    open PomsetWithPredicateTransformers P′ using () renaming (E to E′ ; ℓ to ℓ′ ; κ to κ′ ; _≤_ to _≤′_; ≤-refl to ≤′-refl ; ↓ to ↓′ ; τ to τ′)
+    open PomsetWithPredicateTransformers P using (E ; ℓ ; κ ; _≤_ ; ↓ ; τ ; ✓)
+    open PomsetWithPredicateTransformers P′ using () renaming (E to E′ ; ℓ to ℓ′ ; κ to κ′ ; _≤_ to _≤′_; ≤-refl to ≤′-refl ; ↓ to ↓′ ; τ to τ′ ; ✓ to ✓′)
 
     field E′⊆E : (E′ ⊆ E)
     field E⊆E′ : (E ⊆ E′)
     field ℓ=ℓ′ : ∀ e → (e ∈ E) → (ℓ(e) ≡ ℓ′(e))
     field κ′⊨κ : ∀ e → (e ∈ E) → (κ′(e) ⊨ κ(e))
     field τ′⊨τ : ∀ C ϕ → (τ′(C)(ϕ) ⊨ τ(C)(ϕ))
+    field ✓′⊨✓ : (✓′ ⊨ ✓)
     field ≤⊆≤′ : ∀ d e → (d ≤ e) → (d ≤′ e)
     
     ↓⊆↓' : ∀ e → (e ∈ E) → (↓(e) ⊆ ↓′(e))
@@ -49,7 +50,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; κ to κ₂)
     open PomsetWithPredicateTransformers P₀ using () renaming (↓ to ↓₀)
     open PomsetWithPredicateTransformers P′₀ using () renaming (↓ to ↓′₀)
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ↓⊆↓' to ↓₀⊆↓'₀) 
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀ ;  ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀ ; ↓⊆↓' to ↓₀⊆↓'₀) 
 
     rhs′₀ : Event → Formula
     rhs′₀(e) = τ₁(↓′₀(e))(κ₂(e))
@@ -74,12 +75,14 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                       ; ℓ₀=ℓ₁ = λ e e∈E₁ → ≡-trans (≡-symm (ℓ₀=ℓ′₀ e (E₁⊆E₀ e e∈E₁))) (ℓ₀=ℓ₁ e e∈E₁)
                       ; ℓ₀=ℓ₂ =  λ e e∈E₂ → ≡-trans (≡-symm (ℓ₀=ℓ′₀ e (E₂⊆E₀ e e∈E₂))) (ℓ₀=ℓ₂ e e∈E₂)
                       ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨τ₁τ₂ϕ C ϕ)
+                      ; ✓₀⊨✓₁ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨✓₁
+                      ; ✓₀⊨τ₁✓₂ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨τ₁✓₂
                       }
     
   sem-resp-≲ {P₀} {P′₀} (if ψ then C₁ else C₂) P₀≲P′₀ P₀∈IF = P′₀∈IF where
 
     open IF P₀∈IF
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀)
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀)
     
     P′₀∈IF : P′₀ ∈ (IF ψ ⟦ C₁ ⟧ ⟦ C₂ ⟧)
     P′₀∈IF = record
@@ -99,6 +102,8 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                ; ℓ₀=ℓ₂ = λ e e∈E₂ → ≡-trans (≡-symm (ℓ₀=ℓ′₀ e (E₂⊆E₀ e e∈E₂))) (ℓ₀=ℓ₂ e e∈E₂)
                ; τ₀ϕ⊨τ₁ϕ = λ C ϕ → ⊨-trans (⊨-resp-∧ ⊨-refl (τ′₀⊨τ₀ C ϕ)) (τ₀ϕ⊨τ₁ϕ C ϕ)
                ; τ₀ϕ⊨τ₂ϕ =  λ C ϕ → ⊨-trans (⊨-resp-∧ ⊨-refl (τ′₀⊨τ₀ C ϕ)) (τ₀ϕ⊨τ₂ϕ C ϕ)
+               ; ψ∧✓₀⊨✓₁ = ⊨-trans (⊨-resp-∧ ⊨-refl ✓′₀⊨✓₀) ψ∧✓₀⊨✓₁
+               ; ¬ψ∧✓₀⊨✓₂ = ⊨-trans (⊨-resp-∧ ⊨-refl ✓′₀⊨✓₀) ¬ψ∧✓₀⊨✓₂
                }
 
 
@@ -116,6 +121,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                 ; τC⊨τLOADD = λ C ϕ a e e∈E′ e∈C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADD C ϕ a e (E′⊆E e e∈E′) e∈C)
                 ; τC⊨τLOADI = λ C ϕ a e e∈E′ e∉C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOADI C ϕ a e (E′⊆E e e∈E′) e∉C)
                 ; τC⊨τLOAD∅ = λ C ϕ a s χ χ⊨¬ψ → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOAD∅ C ϕ a s χ (λ e e∈E → χ⊨¬ψ e (E⊆E′ e e∈E)))
+                ; ✓LOAD = λ χ χ⊨¬ψ μ≠rlx → ⊨-trans ✓′⊨✓ (✓LOAD χ (λ e e∈E → χ⊨¬ψ e (E⊆E′ e e∈E)) μ≠rlx)
                 }
 
   sem-resp-≲ {P} {P′} ([ L ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where
@@ -131,6 +137,8 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                 ; κ⊨κSTORE = λ e e∈E′ → ⊨-trans (κ′⊨κ e (E′⊆E e e∈E′)) (κ⊨κSTORE e (E′⊆E e e∈E′))
                 ; τC⊨τSTORED = λ C ϕ a e e∈E′ e∈C → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τSTORED C ϕ a e (E′⊆E e e∈E′) e∈C)
                 ; τC⊨τSTOREI = λ C ϕ a χ χ⊨¬ψ → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τSTOREI C ϕ a χ (λ e e∈E e∉C → χ⊨¬ψ e (E⊆E′ e e∈E) e∉C))
+                ; ✓STOREa = λ e e∈E′ → ⊨-trans ✓′⊨✓ (✓STOREa e (E′⊆E e e∈E′))
+                ; ✓STOREb = λ χ χ⊨¬ψ → ⊨-trans ✓′⊨✓ (✓STOREb χ (λ e e∈E → χ⊨¬ψ e (E⊆E′ e e∈E)))
                 }
                 
   sem-resp-≲ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where
@@ -147,7 +155,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
   sem-resp-≲ {P₀} {P′₀} (C₁ ∥ C₂) P₀≲P′₀ P₀∈⟦C₁⟧|||⟦C₂⟧ = P′₀∈⟦C₁⟧|||⟦C₂⟧ where
 
     open _|||_ P₀∈⟦C₁⟧|||⟦C₂⟧
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ≤⊆≤′ to ≤₀⊆≤′₀) 
+    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ✓′⊨✓ to ✓′₀⊨✓₀ ; ≤⊆≤′ to ≤₀⊆≤′₀) 
 
     P′₀∈⟦C₁⟧|||⟦C₂⟧ : P′₀ ∈ (⟦ C₁ ⟧ ||| ⟦ C₂ ⟧)
     P′₀∈⟦C₁⟧|||⟦C₂⟧ = record
@@ -163,6 +171,8 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                         ; ≤₂⊆≤₀ = λ d e d≤₂e → ≤₀⊆≤′₀ d e (≤₂⊆≤₀ d e d≤₂e)
                         ; κ₀⊨κ₁ = λ e e∈E₁ → ⊨-trans (κ′₀⊨κ₀ e (E₁⊆E₀ e e∈E₁)) (κ₀⊨κ₁ e e∈E₁)
                         ; κ₀⊨κ₂ = λ e e∈E₂ → ⊨-trans (κ′₀⊨κ₀ e (E₂⊆E₀ e e∈E₂)) (κ₀⊨κ₂ e e∈E₂)
+                        ; ✓₀⊨✓₁ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨✓₁
+                        ; ✓₀⊨✓₂ = ⊨-trans ✓′₀⊨✓₀ ✓₀⊨✓₂
                         ; ℓ₀=ℓ₁ =  λ e e∈E₁ → ≡-trans (≡-symm (ℓ₀=ℓ′₀ e (E₁⊆E₀ e e∈E₁))) (ℓ₀=ℓ₁ e e∈E₁)
                         ; ℓ₀=ℓ₂ = λ e e∈E₂ → ≡-trans (≡-symm (ℓ₀=ℓ′₀ e (E₂⊆E₀ e e∈E₂))) (ℓ₀=ℓ₂ e e∈E₂)
                         }

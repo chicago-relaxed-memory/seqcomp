@@ -43,6 +43,8 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
     field τC⊨τLOADI : ∀ C ϕ a e → (e ∈ E) → (e ∉ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ (L == address a) ⇒ τLOADI r (r[ e ]) a μ ϕ))
     field τC⊨τLOAD∅ : ∀ C ϕ a s χ → (∀ e → (e ∈ E) → (χ ⊨ ¬(ψ(e)))) → (τ(C)(ϕ) ⊨ (χ ⇒ (L == address a) ⇒ τLOAD∅ r s a μ ϕ))
 
+    field ✓LOAD : ∀ χ → (∀ e → (e ∈ E) → (χ ⊨ ¬(ψ(e)))) → (μ ≢ rlx) → (✓ ⊨ χ)
+
   κSTORE : AccessMode → Expression → Address → Value → Formula
   κSTORE rlx M a v = (M == value v) ∧ Q[ a ]
   κSTORE ra  M a v = (M == value v) ∧ Q
@@ -68,6 +70,9 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
     field κ⊨κSTORE :  ∀ e → (e ∈ E) → (κ(e) ⊨ (ψ(e) ∧ (L == address (a(e))) ∧ κSTORE μ M (a(e)) (v(e))))
     field τC⊨τSTORED : ∀ C ϕ a e → (e ∈ E) → (e ∈ C) → (τ(C)(ϕ) ⊨ (ψ(e) ⇒ (L == address a) ⇒ τSTORED μ M a (v(e)) ϕ))
     field τC⊨τSTOREI : ∀ C ϕ a χ → (∀ e → (e ∈ E) → (e ∈ C) → (χ ⊨ ¬(ψ(e)))) → (τ(C)(ϕ) ⊨ (χ ⇒ (L == address a) ⇒ τSTOREI μ M a ϕ))
+
+    field ✓STOREa : ∀ e → (e ∈ E) → (✓ ⊨ (ψ(e) ⇒ ((L == address(a(e))) ∧ (M == value(v(e))))))
+    field ✓STOREb : ∀ χ → (∀ e → (e ∈ E) → (χ ⊨ ¬(ψ(e)))) → (✓ ⊨ χ)
 
   record LET (r : Register) (M : Expression) (P : PomsetWithPredicateTransformers) : Set₁ where
 

@@ -7,11 +7,6 @@ module parcomp (Event : Set) (DM : DataModel(Event)) where
   open DataModel DM
   open pomset(Event)(DM)
    
-  record NIL (P₀ : PomsetWithPredicateTransformers) : Set₁ where
-  
-   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀)
-   field E₀⊆∅ :  (E₀ ⊆ ∅)
-
   record _|||_ (𝒫₁ 𝒫₂ : PomsetWithPredicateTransformers → Set₁) (P₀ : PomsetWithPredicateTransformers) : Set₁ where
 
    field P₁ : PomsetWithPredicateTransformers
@@ -20,9 +15,9 @@ module parcomp (Event : Set) (DM : DataModel(Event)) where
    field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
-   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; ℓ to ℓ₀ ; κ to κ₀ ; _≤_ to _≤₀_)
-   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; _≤_ to _≤₁_)
-   open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; _≤_ to _≤₂_)
+   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; ℓ to ℓ₀ ; κ to κ₀ ; _≤_ to _≤₀_ ; ✓ to ✓₀)
+   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; _≤_ to _≤₁_ ; ✓ to ✓₁)
+   open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; _≤_ to _≤₂_ ; ✓ to ✓₂)
 
    field E₀⊆E₁⊎E₂ : (E₀ ⊆ (E₁ ⊎ E₂))
    field E₁⊆E₀ : (E₁ ⊆ E₀)
@@ -35,21 +30,8 @@ module parcomp (Event : Set) (DM : DataModel(Event)) where
    field κ₀⊨κ₁ : ∀ e → (e ∈ E₁) → (κ₀(e) ⊨ κ₁(e))
    field κ₀⊨κ₂ : ∀ e → (e ∈ E₂) → (κ₀(e) ⊨ κ₂(e))
    
+   field ✓₀⊨✓₁ : (✓₀ ⊨ ✓₁)
+   field ✓₀⊨✓₂ : (✓₀ ⊨ ✓₂)
+   
    field ℓ₀=ℓ₁ : ∀ e → (e ∈ E₁) → (ℓ₀(e) ≡ ℓ₁(e))
    field ℓ₀=ℓ₂ : ∀ e → (e ∈ E₂) → (ℓ₀(e) ≡ ℓ₂(e))
-
-  record THREAD (𝒫 : PomsetWithPredicateTransformers → Set₁) (P₀ : PomsetWithPredicateTransformers) : Set₁ where
-
-   field P₁ : PomsetWithPredicateTransformers
-   field P₁∈𝒫 : P₁ ∈ 𝒫
-   
-   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; ℓ to ℓ₀ ; κ to κ₀ ; _≤_ to _≤₀_)
-   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; _≤_ to _≤₁_ ; τ to τ₁)
-
-   field E₁⊆E₀ : (E₁ ⊆ E₀)
-   field E₀⊆E₁ : (E₀ ⊆ E₁)
-   
-   field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
-   
-   field κ₀⊨κ₁ : ∀ e → (e ∈ E₁) → (κ₀(e) ⊨ κ₁(e))
-   field ℓ₀=ℓ₁ : ∀ e → (e ∈ E₁) → (ℓ₀(e) ≡ ℓ₁(e))

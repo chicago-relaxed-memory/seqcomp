@@ -21,9 +21,9 @@ module seqcomp (Event : Set) (DM : DataModel(Event)) where
    field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
-   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; ℓ to ℓ₀ ; κ to κ₀ ; _≤_ to _≤₀_ ; ↓ to ↓₀ ; τ to τ₀)
-   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; _≤_ to _≤₁_ ; ↓ to ↓₁ ; τ to τ₁)
-   open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; _≤_ to _≤₂_ ; ↓ to ↓₂ ; τ to τ₂)
+   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; ℓ to ℓ₀ ; κ to κ₀ ; ✓ to ✓₀ ; _≤_ to _≤₀_ ; ↓ to ↓₀ ; τ to τ₀)
+   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; ✓ to ✓₁ ; _≤_ to _≤₁_ ; ↓ to ↓₁ ; τ to τ₁)
+   open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; ✓ to ✓₂ ; _≤_ to _≤₂_ ; ↓ to ↓₂ ; τ to τ₂)
 
    field E₀⊆E₁∪E₂ : (E₀ ⊆ (E₁ ∪ E₂))
    field E₁⊆E₀ : (E₁ ⊆ E₀)
@@ -47,7 +47,10 @@ module seqcomp (Event : Set) (DM : DataModel(Event)) where
    
    field ℓ₀=ℓ₁ : ∀ e → (e ∈ E₁) → (ℓ₀(e) ≡ ℓ₁(e))
    field ℓ₀=ℓ₂ : ∀ e → (e ∈ E₂) → (ℓ₀(e) ≡ ℓ₂(e))
-   
+
+   field ✓₀⊨✓₁ : ✓₀ ⊨ ✓₁
+   field ✓₀⊨τ₁✓₂ : ✓₀ ⊨ τ₁(E₁)(✓₂)
+
    field τ₀ϕ⊨τ₁τ₂ϕ : ∀ C ϕ → τ₀(C)(ϕ) ⊨ τ₁(C)(τ₂(C)(ϕ))
   
   record IF (ψ : Formula) (𝒫₁ 𝒫₂ : PomsetWithPredicateTransformers → Set₁) (P₀ : PomsetWithPredicateTransformers) : Set₁ where
@@ -57,9 +60,9 @@ module seqcomp (Event : Set) (DM : DataModel(Event)) where
    field P₁∈𝒫₁ : P₁ ∈ 𝒫₁
    field P₂∈𝒫₂ : P₂ ∈ 𝒫₂
    
-   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; ℓ to ℓ₀ ; κ to κ₀ ; _≤_ to _≤₀_ ; τ to τ₀)
-   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; _≤_ to _≤₁_ ; τ to τ₁)
-   open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; _≤_ to _≤₂_ ; τ to τ₂)
+   open PomsetWithPredicateTransformers P₀ using () renaming (E to E₀ ; ℓ to ℓ₀ ; κ to κ₀ ; _≤_ to _≤₀_ ; τ to τ₀ ; ✓ to ✓₀)
+   open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; _≤_ to _≤₁_ ; τ to τ₁ ; ✓ to ✓₁)
+   open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; _≤_ to _≤₂_ ; τ to τ₂ ; ✓ to ✓₂)
 
    field E₀⊆E₁∪E₂ : (E₀ ⊆ (E₁ ∪ E₂))
    field E₁⊆E₀ : (E₁ ⊆ E₀)
@@ -74,7 +77,10 @@ module seqcomp (Event : Set) (DM : DataModel(Event)) where
    field κ₀⊨lhs₀ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (κ₀(e) ⊨ lhs₀(e))
    field κ₀⊨rhs₀ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (κ₀(e) ⊨ rhs₀(e))
    field κ₀⊨lhs₀∨rhs₀ : ∀ e → (e ∈ E₁) → (e ∈ E₂) → (κ₀(e) ⊨ (lhs₀(e) ∨ rhs₀(e)))
-   
+
+   field ψ∧✓₀⊨✓₁ : (ψ ∧ ✓₀) ⊨ ✓₁
+   field ¬ψ∧✓₀⊨✓₂ : (¬ ψ ∧ ✓₀) ⊨ ✓₂
+
    field ℓ₀=ℓ₁ : ∀ e → (e ∈ E₁) → (ℓ₀(e) ≡ ℓ₁(e))
    field ℓ₀=ℓ₂ : ∀ e → (e ∈ E₂) → (ℓ₀(e) ≡ ℓ₂(e))
    
