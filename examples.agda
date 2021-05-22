@@ -13,26 +13,14 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
   open seqcomp(Event)(DM)
   open semantics(Event)(MM)
 
-  -- The canonical pomset in ⟪ nil ⟫
-  
-  nilP : (Event → Action) → PomsetWithPreconditions
-  nilP ℓ = record
-            { E = ∅
-            ; PO = ≡PO
-            ; κ = λ e → ff
-            ; ℓ = ℓ
-            }
-
-  nilP∈⟪nil⟫ : ∀ ℓ → nilP ℓ ∈ ⟪ nil ⟫
-  nilP∈⟪nil⟫ ℓ = record
-                  { E₀⊆∅ = λ e ()
-                  }
-  
   -- The canonical pomset in ⟦ skip ⟧
   
   skipP : (Event → Action) → PomsetWithPredicateTransformers
   skipP ℓ = record
-            { PwP = nilP ℓ
+            { E = ∅
+            ; PO = ≡PO
+            ; κ = λ e → ff
+            ; ℓ = ℓ
             ; τ = λ C ϕ → ϕ
             ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-refl
             ; τ-resp-⊨ = λ ϕ⊨ψ → ϕ⊨ψ
@@ -66,17 +54,12 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
      κ₀ e | yes (both _ _)  = lhs₀(e) ∨ rhs₀(e)
      κ₀ e | no _ = ff
 
-     PwP₀ : PomsetWithPreconditions
-     PwP₀ = record
-              { E = E₀
-              ; PO = PO₀
-              ; κ = κ₀
-              ; ℓ = ℓ₀
-              }
-               
      P₀ : PomsetWithPredicateTransformers
      P₀ = record
-             { PwP = PwP₀
+             { E = E₀
+             ; PO = PO₀
+             ; κ = κ₀
+             ; ℓ = ℓ₀
              ; τ = λ C ϕ → τ₁(C)(τ₂(C)(ϕ))
              ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-trans (τ₁-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-left-∪) C∩E⊆D)) (τ₁-resp-⊨ (τ₂-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-right-∪) C∩E⊆D)))
              ; τ-resp-⊨ = λ ϕ⊨ψ → τ₁-resp-⊨ (τ₂-resp-⊨ ϕ⊨ψ)

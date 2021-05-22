@@ -12,13 +12,13 @@ module main (Event : Set) (MM : MemoryModel(Event)) where
   open pomset(Event)(DM)
   open semantics(Event)(MM)
 
-  open import augmentation(Event)(MM) as augmentation using (_≲p_ ; _≲τ_)
+  open import augmentation(Event)(MM) as augmentation using (_≲_)
   import monoid(Event)(MM) as monoid
 
   -- PROPOSITION: semantics is augment-closed
 
-  sem-resp-≲τ : ∀ {P P′} C → (P ≲τ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
-  sem-resp-≲p : ∀ {P P′} G → (P ≲p P′) → (P ∈ ⟪ G ⟫) → (P′ ∈ ⟪ G ⟫)
+  sem-resp-≲τ : ∀ {P P′} C → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
+  sem-resp-≲p : ∀ {P P′} G → (P ≲ P′) → (P ∈ ⟪ G ⟫) → (P′ ∈ ⟪ G ⟫)
 
   -- PROOF in augmentation.agda  
 
