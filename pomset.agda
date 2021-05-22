@@ -29,12 +29,15 @@ module pomset (Event : Set) (DM : DataModel(Event)) where
     field PO : PartialOrder
     field ℓ : Event → Action
     field κ : Event → Formula
-    
     field τ : (Event → Set) → Formula → Formula
 
     field τ-resp-∩⊆ : ∀ {C D ϕ} → ((C ∩ E) ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     field τ-resp-⊨ : ∀ {C ϕ ψ} → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
     field τ-resp-∨ : ∀ {C ϕ ψ} → (τ(C)(ϕ ∨ ψ) ⊨ (τ(C)(ϕ) ∨ τ(C)(ψ)))
+
+    -- Not needed in proofs, but Dijskstra has them
+    field τ-resp-ff : ∀ {C} → (τ(C)(ff) ⊨ ff)
+    field τ-refl-∧ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∧ τ(C)(ψ)) ⊨ τ(C)(ϕ ∧ ψ))
 
     open PartialOrder PO public
 
@@ -49,3 +52,9 @@ module pomset (Event : Set) (DM : DataModel(Event)) where
     
     τ-refl-∨ : ∀ {C ϕ ψ} → ((τ(C)(ϕ) ∨ τ(C)(ψ)) ⊨ τ(C)(ϕ ∨ ψ))
     τ-refl-∨ = ⊨-elim-∨ (τ-resp-⊨ ⊨-left-∨) (τ-resp-⊨ ⊨-right-∨)
+    
+    τ-refl-ff : ∀ {C} → (ff ⊨ τ(C)(ff))
+    τ-refl-ff = ⊨-elim-ff
+
+    τ-resp-∧ : ∀ {C ϕ ψ} → (τ(C)(ϕ ∧ ψ) ⊨ (τ(C)(ϕ) ∧ τ(C)(ψ)))
+    τ-resp-∧ = ⊨-intro-∧ (τ-resp-⊨ ⊨-left-∧) (τ-resp-⊨ ⊨-right-∧)
