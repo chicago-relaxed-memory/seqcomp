@@ -25,6 +25,8 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
             ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-refl
             ; τ-resp-⊨ = λ ϕ⊨ψ → ϕ⊨ψ
             ; τ-resp-∨ = ⊨-refl
+            ; τ-refl-∧ = ⊨-refl
+            ; τ-resp-ff = ⊨-refl
             }
 
   skipP∈⟦skip⟧ : ∀ ℓ → skipP ℓ ∈ ⟦ skip ⟧
@@ -32,14 +34,14 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
                   { E₀⊆∅ = λ e ()
                   ; τ₀ϕ⊨ϕ = λ C ϕ → ⊨-refl }
   
-  -- The caconical way to build a pomset in ⟦ C₁ ∙ C₂ ⟧ from pomsets in ⟦ C₁ ⟧ and ⟦ C₂ ⟧
+  -- The caonical way to build a pomset in ⟦ C₁ ∙ C₂ ⟧ from pomsets in ⟦ C₁ ⟧ and ⟦ C₂ ⟧
 
   compP : (Event → Action) → PartialOrder → PomsetWithPredicateTransformers → PomsetWithPredicateTransformers → PomsetWithPredicateTransformers
   compP ℓ₀ PO₀ P₁ P₂ = P₀ where
 
      open PartialOrder PO₀ using () renaming (_≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym)
-     open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨ ; τ-refl-∨ to τ₁-refl-∨)
-     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨ ; τ-resp-∨ to τ₂-resp-∨ ; τ-refl-∨ to τ₂-refl-∨)
+     open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; τ to τ₁ ; ✓ to ✓₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨ ; τ-refl-∨ to τ₁-refl-∨n ; τ-resp-ff to τ₁-resp-ff; τ-refl-∧ to τ₁-refl-∧)
+     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; τ to τ₂ ; ✓ to ✓₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨ ; τ-resp-∨ to τ₂-resp-∨ ; τ-refl-∨ to τ₂-refl-∨ ; τ-resp-ff to τ₂-resp-ff ; τ-refl-∧ to τ₂-refl-∧)
 
      E₀ = E₁ ∪ E₂
      dec-E₀ = λ e → EXCLUDED_MIDDLE(e ∈ E₀)
@@ -64,6 +66,8 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
              ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-trans (τ₁-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-left-∪) C∩E⊆D)) (τ₁-resp-⊨ (τ₂-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-right-∪) C∩E⊆D)))
              ; τ-resp-⊨ = λ ϕ⊨ψ → τ₁-resp-⊨ (τ₂-resp-⊨ ϕ⊨ψ)
              ; τ-resp-∨ = ⊨-trans (τ₁-resp-⊨ τ₂-resp-∨) τ₁-resp-∨
+             ; τ-resp-ff = ⊨-trans (τ₁-resp-⊨ τ₂-resp-ff) τ₁-resp-ff
+             ; τ-refl-∧ = ⊨-trans τ₁-refl-∧ (τ₁-resp-⊨ τ₂-refl-∧)
              }
 
   record Compatible (ℓ₀ : Event → Action) (PO₀ : PartialOrder) (P₁ P₂ : PomsetWithPredicateTransformers) : Set₁ where
