@@ -72,7 +72,7 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
               ; ≤⊆≤′ = ≤₁⊆≤₀
               }
     
-    P₀∈⟦C⟧ = sem-resp-≲τ C P₁≲P₀ P₁∈⟦C⟧
+    P₀∈⟦C⟧ = sem-resp-≲ C P₁≲P₀ P₁∈⟦C⟧
 
   -- PROOF that skip is a left unit
 
@@ -118,7 +118,7 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
               ; ≤⊆≤′ =  ≤₂⊆≤₀
               }
     
-    P₀∈⟦C⟧ = sem-resp-≲τ C P₂≲P₀ P₂∈⟦C⟧
+    P₀∈⟦C⟧ = sem-resp-≲ C P₂≲P₀ P₂∈⟦C⟧
   
   -- PROOF of associativity
 
@@ -244,7 +244,7 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
                  }
 
      P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₀ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
-     P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = sem-resp-≲τ ((C₁ ∙ C₂) ∙ C₃) P₁₂₃≲P₀ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧
+     P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = sem-resp-≲ ((C₁ ∙ C₂) ∙ C₃) P₁₂₃≲P₀ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧
      
   ⟦⟨C₁∙C₂⟩∙C₃⟧⊆⟦C₁∙⟨C₂∙C₃⟩⟧ C₁ C₂ C₃ P₀ P₀∈⟦⟨C₁∙C₂⟩∙C₃⟧ = P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ where
 
@@ -368,6 +368,6 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
                 }
 
      P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ : P₀ ∈ ⟦ C₁ ∙ (C₂ ∙ C₃) ⟧
-     P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ = sem-resp-≲τ (C₁ ∙ (C₂ ∙ C₃)) P₁₂₃≲P₀ P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧
+     P₀∈⟦C₁∙⟨C₂∙C₃⟩⟧ = sem-resp-≲ (C₁ ∙ (C₂ ∙ C₃)) P₁₂₃≲P₀ P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧
      
   -- QED

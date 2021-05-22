@@ -30,10 +30,9 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
     ↓⊆↓' : ∀ e → (e ∈ E) → (↓(e) ⊆ ↓′(e))
     ↓⊆↓' e e∈E d (d∈E , d≤e) = (E⊆E′ d d∈E , ≤⊆≤′ d e d≤e)
     
-  sem-resp-≲τ : ∀ {P P′} C → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
-  sem-resp-≲p : ∀ {P P′} G → (P ≲ P′) → (P ∈ ⟪ G ⟫) → (P′ ∈ ⟪ G ⟫)
+  sem-resp-≲ : ∀ {P P′} C → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
 
-  sem-resp-≲τ {P₀} {P′₀} skip P₀≲P′₀ P₀∈SKIP = P′₀∈SKIP where
+  sem-resp-≲ {P₀} {P′₀} skip P₀≲P′₀ P₀∈SKIP = P′₀∈SKIP where
 
     open SKIP P₀∈SKIP using (E₀⊆∅ ; τ₀ϕ⊨ϕ)
     open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; τ′⊨τ to τ′₀⊨τ₀)
@@ -43,7 +42,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                 { E₀⊆∅ = λ e e∈E′₀ → E₀⊆∅ e (E′₀⊆E₀ e e∈E′₀)
                 ; τ₀ϕ⊨ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ϕ C ϕ) }
 
-  sem-resp-≲τ {P₀} {P′₀} (C₁ ∙ C₂) P₀≲P′₀ P₀∈⟦C₁⟧●⟦C₂⟧ = P′₀∈⟦C₁⟧●⟦C₂⟧ where
+  sem-resp-≲ {P₀} {P′₀} (C₁ ∙ C₂) P₀≲P′₀ P₀∈⟦C₁⟧●⟦C₂⟧ = P′₀∈⟦C₁⟧●⟦C₂⟧ where
 
     open _●_ P₀∈⟦C₁⟧●⟦C₂⟧
     open PomsetWithPredicateTransformers P₁ using () renaming (τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆)
@@ -77,7 +76,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                       ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨τ₁τ₂ϕ C ϕ)
                       }
     
-  sem-resp-≲τ {P₀} {P′₀} (if ψ then C₁ else C₂) P₀≲P′₀ P₀∈IF = P′₀∈IF where
+  sem-resp-≲ {P₀} {P′₀} (if ψ then C₁ else C₂) P₀≲P′₀ P₀∈IF = P′₀∈IF where
 
     open IF P₀∈IF
     open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀)
@@ -103,7 +102,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                }
 
 
-  sem-resp-≲τ {P} {P′} (r :=[ L ]^ μ) P≲P′ P∈LOAD = P′∈LOAD where
+  sem-resp-≲ {P} {P′} (r :=[ L ]^ μ) P≲P′ P∈LOAD = P′∈LOAD where
 
     open LOAD P∈LOAD
     open _≲_ P≲P′
@@ -119,7 +118,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                 ; τC⊨τLOAD∅ = λ C ϕ a s χ χ⊨¬ψ → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τLOAD∅ C ϕ a s χ (λ e e∈E → χ⊨¬ψ e (E⊆E′ e e∈E)))
                 }
 
-  sem-resp-≲τ {P} {P′} ([ L ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where
+  sem-resp-≲ {P} {P′} ([ L ]^ μ := M) P≲P′ P∈STORE = P′∈STORE where
 
     open STORE P∈STORE
     open _≲_ P≲P′
@@ -134,7 +133,7 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
                 ; τC⊨τSTOREI = λ C ϕ a χ χ⊨¬ψ → ⊨-trans (τ′⊨τ C ϕ) (τC⊨τSTOREI C ϕ a χ (λ e e∈E e∉C → χ⊨¬ψ e (E⊆E′ e e∈E) e∉C))
                 }
                 
-  sem-resp-≲τ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where
+  sem-resp-≲ {P} {P′} (r := M) P≲P′ P∈LET = P′∈LET where
     
     open LET P∈LET
     open _≲_ P≲P′
@@ -145,54 +144,13 @@ module augmentation (Event : Set) (MM : MemoryModel(Event)) where
               ; τϕ⊨ϕ[M/r] = λ C ϕ → ⊨-trans (τ′⊨τ C ϕ) (τϕ⊨ϕ[M/r] C ϕ)
               }
 
-  sem-resp-≲τ {P₀} {P′₀} (fork G) P₀≲P′₀ P₀∈FORK = sem-resp-≲p G P₀≲P′₀ P₀∈FORK
+  sem-resp-≲ {P₀} {P′₀} (C₁ ∥ C₂) P₀≲P′₀ P₀∈⟦C₁⟧|||⟦C₂⟧ = P′₀∈⟦C₁⟧|||⟦C₂⟧ where
 
-    -- open FORK P₀∈FORK
-    -- open _≲τ_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ≤⊆≤′ to ≤₀⊆≤′₀ ; τ′⊨τ to τ′₀⊨τ₀)
-    
-    -- P′₀∈FORK : P′₀ ∈ FORK ⟪ G ⟫
-    -- P′₀∈FORK = record
-    --               { P₁ = P₁
-    --               ; P₁∈𝒫 = P₁∈𝒫
-    --               ; E₁⊆E₀ = ⊆-trans E₁⊆E₀ E₀⊆E′₀
-    --               ; E₀⊆E₁ = ⊆-trans E′₀⊆E₀ E₀⊆E₁
-    --               ; ≤₁⊆≤₀ = λ d e d≤₁e → ≤₀⊆≤′₀ d e (≤₁⊆≤₀ d e d≤₁e)
-    --               ; κ₀⊨κ₁ = λ e e∈E₁ → ⊨-trans (κ′₀⊨κ₀ e (E₁⊆E₀ e e∈E₁)) (κ₀⊨κ₁ e e∈E₁)
-    --               ; ℓ₀=ℓ₁ = λ e e∈E₁ → ≡-trans (≡-symm (ℓ₀=ℓ′₀ e (E₁⊆E₀ e e∈E₁))) (ℓ₀=ℓ₁ e e∈E₁)
-    --               ; τ₀ϕ⊨ϕ = λ C ϕ → ⊨-trans (τ′₀⊨τ₀ C ϕ) (τ₀ϕ⊨ϕ C ϕ)
-    --               }
-
-  sem-resp-≲p {P} {P′} nil P≲P′ P∈NIL = P′∈NIL where
-
-    open NIL P∈NIL
-    open _≲_ P≲P′
-    
-    P′∈NIL : P′ ∈ NIL
-    P′∈NIL = record { E₀⊆∅ = ⊆-trans E′⊆E E₀⊆∅ }
-    
-  sem-resp-≲p {P₀} {P′₀} (thread C) P₀≲P′₀ P₀∈THREAD = P′₀∈THREAD where
-
-    open THREAD P₀∈THREAD
-    open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ≤⊆≤′ to ≤₀⊆≤′₀) 
-    
-    P′₀∈THREAD : P′₀ ∈ THREAD ⟦ C ⟧
-    P′₀∈THREAD = record
-                  { P₁ = P₁
-                  ; P₁∈𝒫 = P₁∈𝒫
-                  ; E₁⊆E₀ = ⊆-trans E₁⊆E₀ E₀⊆E′₀
-                  ; E₀⊆E₁ = ⊆-trans E′₀⊆E₀ E₀⊆E₁
-                  ; ≤₁⊆≤₀ = λ d e d≤₁e → ≤₀⊆≤′₀ d e (≤₁⊆≤₀ d e d≤₁e)
-                  ; κ₀⊨κ₁ = λ e e∈E₁ → ⊨-trans (κ′₀⊨κ₀ e (E₁⊆E₀ e e∈E₁)) (κ₀⊨κ₁ e e∈E₁)
-                  ; ℓ₀=ℓ₁ = λ e e∈E₁ → ≡-trans (≡-symm (ℓ₀=ℓ′₀ e (E₁⊆E₀ e e∈E₁))) (ℓ₀=ℓ₁ e e∈E₁)
-                  }
-    
-  sem-resp-≲p {P₀} {P′₀} (G₁ ∥ G₂) P₀≲P′₀ P₀∈⟪G₁⟫|||⟪G₂⟫ = P′₀∈⟪G₁⟫|||⟪G₂⟫ where
-
-    open _|||_ P₀∈⟪G₁⟫|||⟪G₂⟫
+    open _|||_ P₀∈⟦C₁⟧|||⟦C₂⟧
     open _≲_ P₀≲P′₀ using () renaming (E′⊆E to E′₀⊆E₀ ; E⊆E′ to E₀⊆E′₀ ; ℓ=ℓ′ to ℓ₀=ℓ′₀ ; κ′⊨κ to κ′₀⊨κ₀ ; ≤⊆≤′ to ≤₀⊆≤′₀) 
 
-    P′₀∈⟪G₁⟫|||⟪G₂⟫ : P′₀ ∈ (⟪ G₁ ⟫ ||| ⟪ G₂ ⟫)
-    P′₀∈⟪G₁⟫|||⟪G₂⟫ = record
+    P′₀∈⟦C₁⟧|||⟦C₂⟧ : P′₀ ∈ (⟦ C₁ ⟧ ||| ⟦ C₂ ⟧)
+    P′₀∈⟦C₁⟧|||⟦C₂⟧ = record
                         { P₁ = P₁
                         ; P₂ = P₂
                         ; P₁∈𝒫₁ = P₁∈𝒫₁

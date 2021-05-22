@@ -8,10 +8,7 @@ module command (Event : Set) (MM : MemoryModel(Event)) where
   open MemoryModel MM
   open data-model(Event)
 
-  data Command : Set
-  data ThreadGroup : Set
-
-  data Command where
+  data Command : Set where
 
     skip : Command
     _∙_ : Command → Command → Command
@@ -19,10 +16,4 @@ module command (Event : Set) (MM : MemoryModel(Event)) where
     [_]^_:=_ : Expression → AccessMode → Expression → Command
     _:=[_]^_ : Register → Expression → AccessMode → Command
     _:=_ : Register → Expression → Command
-    fork : ThreadGroup → Command
-    
-  data ThreadGroup where
-
-    nil : ThreadGroup
-    thread : Command → ThreadGroup
-    _∥_ : ThreadGroup → ThreadGroup → ThreadGroup
+    _∥_ : Command → Command → Command

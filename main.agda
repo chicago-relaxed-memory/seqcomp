@@ -17,13 +17,11 @@ module main (Event : Set) (MM : MemoryModel(Event)) where
 
   -- PROPOSITION: semantics is augment-closed
 
-  sem-resp-≲τ : ∀ {P P′} C → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
-  sem-resp-≲p : ∀ {P P′} G → (P ≲ P′) → (P ∈ ⟪ G ⟫) → (P′ ∈ ⟪ G ⟫)
+  sem-resp-≲ : ∀ {P P′} C → (P ≲ P′) → (P ∈ ⟦ C ⟧) → (P′ ∈ ⟦ C ⟧)
 
   -- PROOF in augmentation.agda  
 
-  sem-resp-≲τ = augmentation.sem-resp-≲τ
-  sem-resp-≲p = augmentation.sem-resp-≲p
+  sem-resp-≲ = augmentation.sem-resp-≲
 
   -- PROPOSITION: sequential composition forms a monoid
   

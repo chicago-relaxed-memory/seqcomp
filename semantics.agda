@@ -77,7 +77,6 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
     field τϕ⊨ϕ[M/r] : ∀ C ϕ → τ(C)(ϕ) ⊨ (ϕ [ M / r ])
 
   ⟦_⟧ : Command → PomsetWithPredicateTransformers → Set₁
-  ⟪_⟫ : ThreadGroup → PomsetWithPredicateTransformers → Set₁
 
   ⟦ skip ⟧ = SKIP
   ⟦ C₁ ∙ C₂ ⟧ = ⟦ C₁ ⟧ ● ⟦ C₂ ⟧
@@ -85,9 +84,5 @@ module semantics (Event : Set) (MM : MemoryModel(Event)) where
   ⟦ r :=[ L ]^ μ ⟧ = LOAD r L μ
   ⟦ [ L ]^ μ := M ⟧ = STORE L μ M
   ⟦ r := M ⟧ = LET r M
-  ⟦ fork G ⟧ = ⟪ G ⟫
-
-  ⟪ nil ⟫ = NIL
-  ⟪ thread C ⟫ = THREAD ⟦ C ⟧
-  ⟪ G₁ ∥ G₂ ⟫ = ⟪ G₁ ⟫ ||| ⟪ G₂ ⟫
+  ⟦ C₁ ∥ C₂ ⟧ = ⟦ C₁ ⟧ ||| ⟦ C₂ ⟧
   
