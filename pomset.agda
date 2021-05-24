@@ -31,7 +31,8 @@ module pomset (Event : Set) (DM : DataModel(Event)) where
     field κ : Event → Formula
     field τ : (Event → Set) → Formula → Formula
     field ✓ : Formula
-   
+    field rf : (Event × Event) → Set
+
     field τ-resp-∩⊆ : ∀ {C D ϕ} → ((C ∩ E) ⊆ D) → (τ(C)(ϕ) ⊨ τ(D)(ϕ))
     field τ-resp-⊨ : ∀ {C ϕ ψ} → (ϕ ⊨ ψ) → (τ(C)(ϕ) ⊨ τ(C)(ψ))
     field τ-resp-∨ : ∀ {C ϕ ψ} → (τ(C)(ϕ ∨ ψ) ⊨ (τ(C)(ϕ) ∨ τ(C)(ψ)))
@@ -39,6 +40,8 @@ module pomset (Event : Set) (DM : DataModel(Event)) where
     field τ-resp-ff : ∀ {C} → (τ(C)(ff) ⊨ ff)
 
     field ✓⊨τtt : ✓ ⊨ τ(E)(tt)
+
+    field rf-match : ∀ {d e} → ((d , e) ∈ rf) → ((ℓ(d) , ℓ(e)) ∈ Matches)
 
     open PartialOrder PO public
 

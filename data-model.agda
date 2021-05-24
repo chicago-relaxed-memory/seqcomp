@@ -28,6 +28,10 @@ module data-model (Event : Set) where
     field ⊨-intro-¬¬ : ∀ {ϕ} → (ϕ ⊨ ¬(¬ ϕ)) 
     field ⊨-elim-ff : ∀ {ϕ} → (ff ⊨ ϕ)
 
+    field Matches : (Action × Action) → Set
+    field Blocks : (Action × Action) → Set
+    field Delays : (Action × Action) → Set
+    
     tt = ¬ ff
     _∧_ = λ ϕ ψ → ¬((¬ ϕ) ∨ (¬ ψ))
     _⇒_ = λ ϕ ψ → (¬ ϕ) ∨ ψ

@@ -23,12 +23,14 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
             ; ℓ = ℓ
             ; τ = λ C ϕ → ϕ
             ; ✓ = tt
+            ; rf = ∅
             ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-refl
             ; τ-resp-⊨ = λ ϕ⊨ψ → ϕ⊨ψ
             ; τ-resp-∨ = ⊨-refl
             ; τ-refl-∧ = ⊨-refl
             ; τ-resp-ff = ⊨-refl
             ; ✓⊨τtt = ⊨-refl
+            ; rf-match = λ ()
             }
 
   skipP∈⟦skip⟧ : ∀ ℓ → skipP ℓ ∈ ⟦ skip ⟧
@@ -38,45 +40,47 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
   
   -- The canonical way to build a pomset in ⟦ C₁ ∙ C₂ ⟧ from pomsets in ⟦ C₁ ⟧ and ⟦ C₂ ⟧
 
-  compP : (Event → Action) → PartialOrder → PomsetWithPredicateTransformers → PomsetWithPredicateTransformers → PomsetWithPredicateTransformers
-  compP ℓ₀ PO₀ P₁ P₂ = P₀ where
+  compP : PomsetWithPredicateTransformers → PomsetWithPredicateTransformers → PomsetWithPredicateTransformers → PomsetWithPredicateTransformers
+  compP P₀ P₁ P₂ = P₁₂ where
 
-     open PartialOrder PO₀ using () renaming (_≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym)
-     open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; τ to τ₁ ; ✓ to ✓₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨ ; τ-refl-∨ to τ₁-refl-∨n ; τ-resp-ff to τ₁-resp-ff; τ-refl-∧ to τ₁-refl-∧)
-     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; τ to τ₂ ; ✓ to ✓₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨ ; τ-resp-∨ to τ₂-resp-∨ ; τ-refl-∨ to τ₂-refl-∨ ; τ-resp-ff to τ₂-resp-ff ; τ-refl-∧ to τ₂-refl-∧ ; ✓⊨τtt to ✓₂⊨τ₂tt)
+     open PomsetWithPredicateTransformers P₀ using () renaming (ℓ to ℓ₁₂ ; rf to rf₁₂ ; rf-match to rf₁₂-match ; PO to PO₁₂ ; _≤_ to _≤₁₂_ ; ≤-refl to ≤₁₂-refl ; ≤-trans to ≤₁₂-trans ; ≤-asym to ≤₁₂-asym)
+     open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; τ to τ₁ ; ✓ to ✓₁ ; rf to rf₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-∩⊆ to τ₁-resp-∩⊆ ; τ-resp-⊨ to τ₁-resp-⊨ ; τ-resp-∨ to τ₁-resp-∨ ; τ-refl-∨ to τ₁-refl-∨n ; τ-resp-ff to τ₁-resp-ff; τ-refl-∧ to τ₁-refl-∧ ; rf-match to rf₁-match)
+     open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; τ to τ₂ ; ✓ to ✓₂ ; rf to rf₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-∩⊆ to τ₂-resp-∩⊆ ; τ-resp-⊨ to τ₂-resp-⊨ ; τ-resp-∨ to τ₂-resp-∨ ; τ-refl-∨ to τ₂-refl-∨ ; τ-resp-ff to τ₂-resp-ff ; τ-refl-∧ to τ₂-refl-∧ ; ✓⊨τtt to ✓₂⊨τ₂tt ; rf-match to rf₂-match)
 
-     E₀ = E₁ ∪ E₂
-     dec-E₀ = λ e → EXCLUDED_MIDDLE(e ∈ E₀)
-     ↓₀ = λ e → E₀ ∩ (λ d → (d ≤₀ e))
-     lhs₀ = κ₁
-     rhs₀ = λ e → τ₁(↓₀(e))(κ₂(e))
+     E₁₂ = E₁ ∪ E₂
+     dec-E₁₂ = λ e → EXCLUDED_MIDDLE(e ∈ E₁₂)
+     ↓₁₂ = λ e → E₁₂ ∩ (λ d → (d ≤₁₂ e))
+     lhs₁₂ = κ₁
+     rhs₁₂ = λ e → τ₁(↓₁₂(e))(κ₂(e))
 
-     κ₀ : Event → Formula
-     κ₀ e with dec-E₀(e)
-     κ₀ e | yes (left _ _)  = lhs₀(e)
-     κ₀ e | yes (right _ _) = rhs₀(e)
-     κ₀ e | yes (both _ _)  = lhs₀(e) ∨ rhs₀(e)
-     κ₀ e | no _ = ff
+     κ₁₂ : Event → Formula
+     κ₁₂ e with dec-E₁₂(e)
+     κ₁₂ e | yes (left _ _)  = lhs₁₂(e)
+     κ₁₂ e | yes (right _ _) = rhs₁₂(e)
+     κ₁₂ e | yes (both _ _)  = lhs₁₂(e) ∨ rhs₁₂(e)
+     κ₁₂ e | no _ = ff
 
-     P₀ : PomsetWithPredicateTransformers
-     P₀ = record
-             { E = E₀
-             ; PO = PO₀
-             ; κ = κ₀
-             ; ℓ = ℓ₀
+     P₁₂ : PomsetWithPredicateTransformers
+     P₁₂ = record
+             { E = E₁₂
+             ; PO = PO₁₂
+             ; κ = κ₁₂
+             ; ℓ = ℓ₁₂
              ; τ = λ C ϕ → τ₁(C)(τ₂(C)(ϕ))
              ; ✓ = ✓₁ ∧ τ₁(E₁)(✓₂)
+             ; rf = rf₁₂
              ; τ-resp-∩⊆ = λ C∩E⊆D → ⊨-trans (τ₁-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-left-∪) C∩E⊆D)) (τ₁-resp-⊨ (τ₂-resp-∩⊆ (⊆-trans (⊆-resp-∩ ⊆-refl ⊆-right-∪) C∩E⊆D)))
              ; τ-resp-⊨ = λ ϕ⊨ψ → τ₁-resp-⊨ (τ₂-resp-⊨ ϕ⊨ψ)
              ; τ-resp-∨ = ⊨-trans (τ₁-resp-⊨ τ₂-resp-∨) τ₁-resp-∨
              ; τ-resp-ff = ⊨-trans (τ₁-resp-⊨ τ₂-resp-ff) τ₁-resp-ff
              ; τ-refl-∧ = ⊨-trans τ₁-refl-∧ (τ₁-resp-⊨ τ₂-refl-∧)
              ; ✓⊨τtt = ⊨-trans ⊨-right-∧ (⊨-trans (τ₁-resp-⊆ ⊆-left-∪) (τ₁-resp-⊨ (⊨-trans ✓₂⊨τ₂tt (τ₂-resp-⊆ ⊆-right-∪))))
+             ; rf-match = rf₁₂-match
              }
 
-  record Compatible (ℓ₀ : Event → Action) (PO₀ : PartialOrder) (P₁ P₂ : PomsetWithPredicateTransformers) : Set₁ where
+  record Compatible (P₀ P₁ P₂ : PomsetWithPredicateTransformers) : Set₁ where
   
-     open PartialOrder PO₀ using () renaming (_≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym)
+     open PomsetWithPredicateTransformers P₀ using () renaming (ℓ to ℓ₀ ; _≤_ to _≤₀_ ; ≤-refl to ≤₀-refl ; ≤-trans to ≤₀-trans ; ≤-asym to ≤₀-asym)
      open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; ℓ to ℓ₁ ; _≤_ to _≤₁_)
      open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; ℓ to ℓ₂ ; _≤_ to _≤₂_)
 
@@ -85,46 +89,46 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
      field ≤₁⊆≤₀ : ∀ d e → (d ≤₁ e) → (d ≤₀ e)
      field ≤₂⊆≤₀ : ∀ d e → (d ≤₂ e) → (d ≤₀ e)
             
-  compP∈⟦C₁∙C₂⟧ : ∀ C₁ C₂ ℓ₀ PO₀ P₁ P₂ →
+  compP∈⟦C₁∙C₂⟧ : ∀ C₁ C₂ P₀ P₁ P₂ →
       (P₁ ∈ ⟦ C₁ ⟧) → (P₂ ∈ ⟦ C₂ ⟧) →
-      (Compatible ℓ₀ PO₀ P₁ P₂) →
-      (compP ℓ₀ PO₀ P₁ P₂ ∈ ⟦ C₁ ∙ C₂ ⟧)
-  compP∈⟦C₁∙C₂⟧ C₁ C₂ ℓ₀ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompatP₁P₂ = P₀∈⟦C₁∙C₂⟧ where
+      (Compatible P₀ P₁ P₂) →
+      (compP P₀ P₁ P₂ ∈ ⟦ C₁ ∙ C₂ ⟧)
+  compP∈⟦C₁∙C₂⟧ C₁ C₂ P₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ P₀∈CompatP₁P₂ = P₁₂∈⟦C₁∙C₂⟧ where
 
-     open Compatible PO₀∈CompatP₁P₂
+     open Compatible P₀∈CompatP₁P₂
      
-     P₀ = compP ℓ₀ PO₀ P₁ P₂
+     P₁₂ = compP P₀ P₁ P₂
 
-     open PomsetWithPredicateTransformers P₀ using () renaming (dec-E to dec-E₀ ; κ to κ₀ ; ↓ to ↓₀)
+     open PomsetWithPredicateTransformers P₁₂ using () renaming (dec-E to dec-E₁₂ ; κ to κ₁₂ ; ↓ to ↓₁₂)
      open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁ ; dec-E to dec-E₁ ; ℓ to ℓ₁ ; κ to κ₁ ; τ to τ₁ ; τ-resp-⊆ to τ₁-resp-⊆ ; τ-resp-⊨ to τ₁-resp-⊨)
      open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂ ; dec-E to dec-E₂ ; ℓ to ℓ₂ ; κ to κ₂ ; τ to τ₂ ; τ-resp-⊆ to τ₂-resp-⊆ ; τ-resp-⊨ to τ₂-resp-⊨)
 
-     lhs₀ = κ₁
-     rhs₀ = λ e → τ₁(↓₀(e))(κ₂(e))
+     lhs₁₂ = κ₁
+     rhs₁₂ = λ e → τ₁(↓₁₂(e))(κ₂(e))
      
-     κ₀⊨lhs₀ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (κ₀(e) ⊨ lhs₀(e))
-     κ₀⊨lhs₀ e e∈E₁ e∉E₂ with dec-E₀(e)
-     κ₀⊨lhs₀ e e∈E₁ e∉E₂ | yes (left _ _) = ⊨-refl
-     κ₀⊨lhs₀ e e∈E₁ e∉E₂ | yes (right _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
-     κ₀⊨lhs₀ e e∈E₁ e∉E₂ | yes (both _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
-     κ₀⊨lhs₀ e e∈E₁ e∉E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (left e∈E₁ e∉E₂))
+     κ₁₂⊨lhs₁₂ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (κ₁₂(e) ⊨ lhs₁₂(e))
+     κ₁₂⊨lhs₁₂ e e∈E₁ e∉E₂ with dec-E₁₂(e)
+     κ₁₂⊨lhs₁₂ e e∈E₁ e∉E₂ | yes (left _ _) = ⊨-refl
+     κ₁₂⊨lhs₁₂ e e∈E₁ e∉E₂ | yes (right _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     κ₁₂⊨lhs₁₂ e e∈E₁ e∉E₂ | yes (both _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     κ₁₂⊨lhs₁₂ e e∈E₁ e∉E₂ | no e∉E₁₂ = CONTRADICTION (e∉E₁₂ (left e∈E₁ e∉E₂))
 
-     κ₀⊨rhs₀ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (κ₀(e) ⊨ rhs₀(e))
-     κ₀⊨rhs₀ e e∉E₁ e∈E₂ with dec-E₀(e)
-     κ₀⊨rhs₀ e e∉E₁ e∈E₂ | yes (left e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
-     κ₀⊨rhs₀ e e∉E₁ e∈E₂ | yes (right _ _) = ⊨-refl
-     κ₀⊨rhs₀ e e∉E₁ e∈E₂ | yes (both e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
-     κ₀⊨rhs₀ e e∉E₁ e∈E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (right e∉E₁ e∈E₂))
+     κ₁₂⊨rhs₁₂ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (κ₁₂(e) ⊨ rhs₁₂(e))
+     κ₁₂⊨rhs₁₂ e e∉E₁ e∈E₂ with dec-E₁₂(e)
+     κ₁₂⊨rhs₁₂ e e∉E₁ e∈E₂ | yes (left e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     κ₁₂⊨rhs₁₂ e e∉E₁ e∈E₂ | yes (right _ _) = ⊨-refl
+     κ₁₂⊨rhs₁₂ e e∉E₁ e∈E₂ | yes (both e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     κ₁₂⊨rhs₁₂ e e∉E₁ e∈E₂ | no e∉E₁₂ = CONTRADICTION (e∉E₁₂ (right e∉E₁ e∈E₂))
      
-     κ₀⊨lhs₀∨rhs₀ : ∀ e → (e ∈ E₁) → (e ∈ E₂) → (κ₀(e) ⊨ (lhs₀(e) ∨ rhs₀(e)))
-     κ₀⊨lhs₀∨rhs₀ e e∈E₁ e∈E₂ with dec-E₀(e)
-     κ₀⊨lhs₀∨rhs₀ e e∈E₁ e∈E₂ | yes (left _ e∉E₂) = CONTRADICTION (e∉E₂ e∈E₂)
-     κ₀⊨lhs₀∨rhs₀ e e∈E₁ e∈E₂ | yes (right e∉E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
-     κ₀⊨lhs₀∨rhs₀ e e∈E₁ e∈E₂ | yes (both _ _) = ⊨-refl
-     κ₀⊨lhs₀∨rhs₀ e e∈E₁ e∈E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (both e∈E₁ e∈E₂))
+     κ₁₂⊨lhs₁₂∨rhs₁₂ : ∀ e → (e ∈ E₁) → (e ∈ E₂) → (κ₁₂(e) ⊨ (lhs₁₂(e) ∨ rhs₁₂(e)))
+     κ₁₂⊨lhs₁₂∨rhs₁₂ e e∈E₁ e∈E₂ with dec-E₁₂(e)
+     κ₁₂⊨lhs₁₂∨rhs₁₂ e e∈E₁ e∈E₂ | yes (left _ e∉E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     κ₁₂⊨lhs₁₂∨rhs₁₂ e e∈E₁ e∈E₂ | yes (right e∉E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     κ₁₂⊨lhs₁₂∨rhs₁₂ e e∈E₁ e∈E₂ | yes (both _ _) = ⊨-refl
+     κ₁₂⊨lhs₁₂∨rhs₁₂ e e∈E₁ e∈E₂ | no e∉E₁₂ = CONTRADICTION (e∉E₁₂ (both e∈E₁ e∈E₂))
      
-     P₀∈⟦C₁∙C₂⟧ : P₀ ∈ ⟦ C₁ ∙ C₂ ⟧
-     P₀∈⟦C₁∙C₂⟧ = record
+     P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
+     P₁₂∈⟦C₁∙C₂⟧ = record
                      { P₁ = P₁
                      ; P₂ = P₂
                      ; P₁∈𝒫₁ = P₁∈⟦C₁⟧
@@ -134,9 +138,9 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
                      ; E₂⊆E₀ = ⊆-right-∪
                      ; ≤₁⊆≤₀ = ≤₁⊆≤₀
                      ; ≤₂⊆≤₀ = ≤₂⊆≤₀
-                     ; κ₀⊨lhs₀ = κ₀⊨lhs₀
-                     ; κ₀⊨rhs₀ = κ₀⊨rhs₀
-                     ; κ₀⊨lhs₀∨rhs₀ = κ₀⊨lhs₀∨rhs₀
+                     ; κ₀⊨lhs₀ = κ₁₂⊨lhs₁₂
+                     ; κ₀⊨rhs₀ = κ₁₂⊨rhs₁₂
+                     ; κ₀⊨lhs₀∨rhs₀ = κ₁₂⊨lhs₁₂∨rhs₁₂
                      ; ℓ₀=ℓ₁ = ℓ₀=ℓ₁
                      ; ℓ₀=ℓ₂ = ℓ₀=ℓ₂
                      ; τ₀ϕ⊨τ₁τ₂ϕ = λ C ϕ → ⊨-refl
@@ -144,42 +148,42 @@ module examples (Event : Set) (MM : MemoryModel(Event)) where
                      ; ✓₀⊨τ₁✓₂ = ⊨-right-∧
                      }
 
-  record compLemmas (C₁ C₂ : Command) (ℓ₀ : Event → Action) (PO₀ : PartialOrder) (P₁ P₂ : PomsetWithPredicateTransformers) : Set₁ where
+  record compLemmas (C₁ C₂ : Command) (P₀ P₁ P₂ : PomsetWithPredicateTransformers) : Set₁ where
 
      field P₁∈⟦C₁⟧ : (P₁ ∈ ⟦ C₁ ⟧)
      field P₂∈⟦C₂⟧ : (P₂ ∈ ⟦ C₂ ⟧)
-     field PO₀∈CompP₁P₂ : (Compatible ℓ₀ PO₀ P₁ P₂)
+     field PO₀∈CompP₁P₂ : (Compatible P₀ P₁ P₂)
  
      open Compatible PO₀∈CompP₁P₂
      
-     P₀ = compP ℓ₀ PO₀ P₁ P₂
+     P₁₂ = compP P₀ P₁ P₂
      
-     open PomsetWithPredicateTransformers P₀ using () renaming (dec-E to dec-E₀ ; κ to κ₀)
+     open PomsetWithPredicateTransformers P₁₂ using () renaming (dec-E to dec-E₁₂ ; κ to κ₁₂)
      open PomsetWithPredicateTransformers P₁ using () renaming (E to E₁)
      open PomsetWithPredicateTransformers P₂ using () renaming (E to E₂)
 
-     P₀∈⟦C₁∙C₂⟧ : P₀ ∈ ⟦ C₁ ∙ C₂ ⟧
-     P₀∈⟦C₁∙C₂⟧ = compP∈⟦C₁∙C₂⟧ C₁ C₂ ℓ₀ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
+     P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
+     P₁₂∈⟦C₁∙C₂⟧ = compP∈⟦C₁∙C₂⟧ C₁ C₂ P₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
 
-     open _●_ P₀∈⟦C₁∙C₂⟧ using (lhs₀ ; rhs₀)
+     open _●_ P₁₂∈⟦C₁∙C₂⟧ using () renaming (lhs₀ to lhs₁₂ ; rhs₀ to rhs₁₂)
      
-     lhs₀⊨κ₀ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (lhs₀(e) ⊨ κ₀(e))
-     lhs₀⊨κ₀ e e∈E₁ e∉E₂ with dec-E₀(e)
-     lhs₀⊨κ₀ e e∈E₁ e∉E₂ | yes (left _ _) = ⊨-refl
-     lhs₀⊨κ₀ e e∈E₁ e∉E₂ | yes (right _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
-     lhs₀⊨κ₀ e e∈E₁ e∉E₂ | yes (both _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
-     lhs₀⊨κ₀ e e∈E₁ e∉E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (left e∈E₁ e∉E₂))
+     lhs₁₂⊨κ₁₂ : ∀ e → (e ∈ E₁) → (e ∉ E₂) → (lhs₁₂(e) ⊨ κ₁₂(e))
+     lhs₁₂⊨κ₁₂ e e∈E₁ e∉E₂ with dec-E₁₂(e)
+     lhs₁₂⊨κ₁₂ e e∈E₁ e∉E₂ | yes (left _ _) = ⊨-refl
+     lhs₁₂⊨κ₁₂ e e∈E₁ e∉E₂ | yes (right _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     lhs₁₂⊨κ₁₂ e e∈E₁ e∉E₂ | yes (both _ e∈E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     lhs₁₂⊨κ₁₂ e e∈E₁ e∉E₂ | no e∉E₁₂ = CONTRADICTION (e∉E₁₂ (left e∈E₁ e∉E₂))
 
-     rhs₀⊨κ₀ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (rhs₀(e) ⊨ κ₀(e))
-     rhs₀⊨κ₀ e e∉E₁ e∈E₂ with dec-E₀(e)
-     rhs₀⊨κ₀ e e∉E₁ e∈E₂ | yes (left e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
-     rhs₀⊨κ₀ e e∉E₁ e∈E₂ | yes (right _ _) = ⊨-refl
-     rhs₀⊨κ₀ e e∉E₁ e∈E₂ | yes (both e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
-     rhs₀⊨κ₀ e e∉E₁ e∈E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (right e∉E₁ e∈E₂))
+     rhs₁₂⊨κ₁₂ : ∀ e → (e ∉ E₁) → (e ∈ E₂) → (rhs₁₂(e) ⊨ κ₁₂(e))
+     rhs₁₂⊨κ₁₂ e e∉E₁ e∈E₂ with dec-E₁₂(e)
+     rhs₁₂⊨κ₁₂ e e∉E₁ e∈E₂ | yes (left e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     rhs₁₂⊨κ₁₂ e e∉E₁ e∈E₂ | yes (right _ _) = ⊨-refl
+     rhs₁₂⊨κ₁₂ e e∉E₁ e∈E₂ | yes (both e∈E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     rhs₁₂⊨κ₁₂ e e∉E₁ e∈E₂ | no e∉E₁₂ = CONTRADICTION (e∉E₁₂ (right e∉E₁ e∈E₂))
 
-     lhs₀∨rhs₀⊨κ₀ : ∀ e → (e ∈ E₁) → (e ∈ E₂) → ((lhs₀(e) ∨ rhs₀(e)) ⊨ κ₀(e))
-     lhs₀∨rhs₀⊨κ₀ e e∈E₁ e∈E₂ with dec-E₀(e)
-     lhs₀∨rhs₀⊨κ₀ e e∈E₁ e∈E₂ | yes (left _ e∉E₂) = CONTRADICTION (e∉E₂ e∈E₂)
-     lhs₀∨rhs₀⊨κ₀ e e∈E₁ e∈E₂ | yes (right e∉E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
-     lhs₀∨rhs₀⊨κ₀ e e∈E₁ e∈E₂ | yes (both _ _) = ⊨-refl
-     lhs₀∨rhs₀⊨κ₀ e e∈E₁ e∈E₂ | no e∉E₀ = CONTRADICTION (e∉E₀ (both e∈E₁ e∈E₂))
+     lhs₁₂∨rhs₁₂⊨κ₁₂ : ∀ e → (e ∈ E₁) → (e ∈ E₂) → ((lhs₁₂(e) ∨ rhs₁₂(e)) ⊨ κ₁₂(e))
+     lhs₁₂∨rhs₁₂⊨κ₁₂ e e∈E₁ e∈E₂ with dec-E₁₂(e)
+     lhs₁₂∨rhs₁₂⊨κ₁₂ e e∈E₁ e∈E₂ | yes (left _ e∉E₂) = CONTRADICTION (e∉E₂ e∈E₂)
+     lhs₁₂∨rhs₁₂⊨κ₁₂ e e∈E₁ e∈E₂ | yes (right e∉E₁ _) = CONTRADICTION (e∉E₁ e∈E₁)
+     lhs₁₂∨rhs₁₂⊨κ₁₂ e e∈E₁ e∈E₂ | yes (both _ _) = ⊨-refl
+     lhs₁₂∨rhs₁₂⊨κ₁₂ e e∈E₁ e∈E₂ | no e∉E₁₂ = CONTRADICTION (e∉E₁₂ (both e∈E₁ e∈E₂))

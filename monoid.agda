@@ -140,10 +140,10 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
      open PomsetWithPredicateTransformers P₂₃ using () renaming (E to E₂₃ ; τ to τ₂₃ ; κ to κ₂₃; ↓ to ↓₂₃)
 
      P₁₂ : PomsetWithPredicateTransformers
-     P₁₂ = compP ℓ₀ PO₀ P₁ P₂
+     P₁₂ = compP P₀ P₁ P₂
 
      P₁₂₃ : PomsetWithPredicateTransformers
-     P₁₂₃ = compP ℓ₀ PO₀ P₁₂ P₃
+     P₁₂₃ = compP P₀ P₁₂ P₃
 
      open PomsetWithPredicateTransformers P₁₂ using () renaming (E to E₁₂ ; κ to κ₁₂ ; ✓ to ✓₁₂ ; dec-E to dec-E₁₂ ; ↓ to ↓₁₂)
      open PomsetWithPredicateTransformers P₁₂₃ using () renaming (E to E₁₂₃ ; κ to κ₁₂₃ ; ✓ to ✓₁₂₃ ; dec-E to dec-E₁₂₃ ; ↓ to ↓₁₂₃)
@@ -154,7 +154,7 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
      ℓ₀=ℓ₃ : ∀ e → (e ∈ E₃) → (ℓ₀(e) ≡ ℓ₃(e))
      ℓ₀=ℓ₃ e e∈E₃ = ≡-trans (ℓ₀=ℓ₂₃ e (E₃⊆E₂₃ e e∈E₃)) (ℓ₂₃=ℓ₃ e e∈E₃)
 
-     PO₀∈CompP₁P₂ : Compatible ℓ₀ PO₀ P₁ P₂
+     PO₀∈CompP₁P₂ : Compatible P₀ P₁ P₂
      PO₀∈CompP₁P₂ = record
                       { ℓ₀=ℓ₁ = ℓ₀=ℓ₁
                       ; ℓ₀=ℓ₂ = ℓ₀=ℓ₂
@@ -162,7 +162,7 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
                       ; ≤₂⊆≤₀ = λ d e d≤₂e → ≤₂₃⊆≤₀ d e (≤₂⊆≤₂₃ d e d≤₂e)
                       }
      
-     PO₀∈CompP₁₂P₃ : Compatible ℓ₀ PO₀ P₁₂ P₃
+     PO₀∈CompP₁₂P₃ : Compatible P₀ P₁₂ P₃
      PO₀∈CompP₁₂P₃ = record
                        { ℓ₀=ℓ₁ = λ e e∈E₁₂ → refl
                        ; ℓ₀=ℓ₂ = ℓ₀=ℓ₃
@@ -171,22 +171,22 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
                        }
      
      P₁₂∈⟦C₁∙C₂⟧ : P₁₂ ∈ ⟦ C₁ ∙ C₂ ⟧
-     P₁₂∈⟦C₁∙C₂⟧ = compP∈⟦C₁∙C₂⟧ C₁ C₂ ℓ₀ PO₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
+     P₁₂∈⟦C₁∙C₂⟧ = compP∈⟦C₁∙C₂⟧ C₁ C₂ P₀ P₁ P₂ P₁∈⟦C₁⟧ P₂∈⟦C₂⟧ PO₀∈CompP₁P₂
      
      P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ : P₁₂₃ ∈ ⟦ (C₁ ∙ C₂) ∙ C₃ ⟧
-     P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ = compP∈⟦C₁∙C₂⟧ (C₁ ∙ C₂) C₃ ℓ₀ PO₀ P₁₂ P₃ P₁₂∈⟦C₁∙C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₁₂P₃
+     P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ = compP∈⟦C₁∙C₂⟧ (C₁ ∙ C₂) C₃ P₀ P₁₂ P₃ P₁₂∈⟦C₁∙C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₁₂P₃
 
      open _●_ P₁₂∈⟦C₁∙C₂⟧ using () renaming (E₁⊆E₀ to E₁⊆E₁₂ ; E₂⊆E₀ to E₂⊆E₁₂ ; rhs₀ to rhs₁₂ ; κ₀⊨rhs₀ to κ₁₂⊨rhs₁₂)
      open _●_ P₁₂₃∈⟦⟨C₁∙C₂⟩∙C₃⟧ using () renaming (lhs₀ to lhs₁₂₃ ; rhs₀ to rhs₁₂₃ ; κ₀⊨rhs₀ to κ₁₂₃⊨rhs₁₂₃)
 
-     lemmas₁₂ : compLemmas C₁ C₂ ℓ₀ PO₀ P₁ P₂
+     lemmas₁₂ : compLemmas C₁ C₂ P₀ P₁ P₂
      lemmas₁₂ = record { P₁∈⟦C₁⟧ = P₁∈⟦C₁⟧ ; P₂∈⟦C₂⟧ = P₂∈⟦C₂⟧ ; PO₀∈CompP₁P₂ = PO₀∈CompP₁P₂ }
      
-     lemmas₁₂₃ : compLemmas (C₁ ∙ C₂) C₃ ℓ₀ PO₀ P₁₂ P₃
+     lemmas₁₂₃ : compLemmas (C₁ ∙ C₂) C₃ P₀ P₁₂ P₃
      lemmas₁₂₃ = record { P₁∈⟦C₁⟧ = P₁₂∈⟦C₁∙C₂⟧ ; P₂∈⟦C₂⟧ = P₃∈⟦C₃⟧ ; PO₀∈CompP₁P₂ = PO₀∈CompP₁₂P₃ }
 
-     open compLemmas lemmas₁₂ using () renaming (lhs₀⊨κ₀ to lhs₁₂⊨κ₁₂; rhs₀⊨κ₀ to rhs₁₂⊨κ₁₂ ; lhs₀∨rhs₀⊨κ₀ to lhs₁₂∨rhs₁₂⊨κ₁₂)
-     open compLemmas lemmas₁₂₃ using () renaming (lhs₀⊨κ₀ to lhs₁₂₃⊨κ₁₂₃; rhs₀⊨κ₀ to rhs₁₂₃⊨κ₁₂₃ ; lhs₀∨rhs₀⊨κ₀ to lhs₁₂₃∨rhs₁₂₃⊨κ₁₂₃)
+     open compLemmas lemmas₁₂ using (lhs₁₂⊨κ₁₂ ; rhs₁₂⊨κ₁₂ ; lhs₁₂∨rhs₁₂⊨κ₁₂)
+     open compLemmas lemmas₁₂₃ using () renaming (lhs₁₂⊨κ₁₂ to lhs₁₂₃⊨κ₁₂₃ ; rhs₁₂⊨κ₁₂ to rhs₁₂₃⊨κ₁₂₃ ; lhs₁₂∨rhs₁₂⊨κ₁₂ to lhs₁₂₃∨rhs₁₂₃⊨κ₁₂₃)
 
      E₁₂⊆E₀ : E₁₂ ⊆ E₀
      E₁₂⊆E₀ = ⊆-elim-∪ E₁⊆E₀ (⊆-trans E₂⊆E₂₃ E₂₃⊆E₀)
@@ -268,10 +268,10 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
      open PomsetWithPredicateTransformers P₁₂ using () renaming (E to E₁₂ ; τ to τ₁₂ ; κ to κ₁₂; ↓ to ↓₁₂ ; τ-resp-⊨ to τ₁₂-resp-⊨ ; τ-resp-∨ to τ₁₂-resp-∨)
      
      P₂₃ : PomsetWithPredicateTransformers
-     P₂₃ = compP ℓ₀ PO₀ P₂ P₃
+     P₂₃ = compP P₀ P₂ P₃
 
      P₁₂₃ : PomsetWithPredicateTransformers
-     P₁₂₃ = compP ℓ₀ PO₀ P₁ P₂₃
+     P₁₂₃ = compP P₀ P₁ P₂₃
 
      open PomsetWithPredicateTransformers P₂₃ using () renaming (E to E₂₃ ; κ to κ₂₃ ; dec-E to dec-E₂₃ ; ↓ to ↓₂₃ ; τ-resp-⊨ to τ₂₃-resp-⊨)
      open PomsetWithPredicateTransformers P₁₂₃ using () renaming (E to E₁₂₃ ; κ to κ₁₂₃ ; ✓ to ✓₁₂₃ ; dec-E to dec-E₁₂₃ ; ↓ to ↓₁₂₃)
@@ -282,7 +282,7 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
      ℓ₀=ℓ₂ : ∀ e → (e ∈ E₂) → (ℓ₀(e) ≡ ℓ₂(e))
      ℓ₀=ℓ₂ e e∈E₂ = ≡-trans (ℓ₀=ℓ₁₂ e (E₂⊆E₁₂ e e∈E₂)) (ℓ₁₂=ℓ₂ e e∈E₂)
 
-     PO₀∈CompP₂P₃ : Compatible ℓ₀ PO₀ P₂ P₃
+     PO₀∈CompP₂P₃ : Compatible P₀ P₂ P₃
      PO₀∈CompP₂P₃ = record
                       { ℓ₀=ℓ₁ = ℓ₀=ℓ₂
                       ; ℓ₀=ℓ₂ = ℓ₀=ℓ₃
@@ -290,7 +290,7 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
                       ; ≤₂⊆≤₀ = ≤₃⊆≤₀
                       }
      
-     PO₀∈CompP₁P₂₃ : Compatible ℓ₀ PO₀ P₁ P₂₃
+     PO₀∈CompP₁P₂₃ : Compatible P₀ P₁ P₂₃
      PO₀∈CompP₁P₂₃ = record
                        { ℓ₀=ℓ₁ = ℓ₀=ℓ₁
                        ; ℓ₀=ℓ₂ = λ e e∈E₂₃ → refl
@@ -299,22 +299,22 @@ module monoid (Event : Set) (MM : MemoryModel(Event)) where
                        }
      
      P₂₃∈⟦C₂∙C₃⟧ : P₂₃ ∈ ⟦ C₂ ∙ C₃ ⟧
-     P₂₃∈⟦C₂∙C₃⟧ = compP∈⟦C₁∙C₂⟧ C₂ C₃ ℓ₀ PO₀ P₂ P₃ P₂∈⟦C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₂P₃
+     P₂₃∈⟦C₂∙C₃⟧ = compP∈⟦C₁∙C₂⟧ C₂ C₃ P₀ P₂ P₃ P₂∈⟦C₂⟧ P₃∈⟦C₃⟧ PO₀∈CompP₂P₃
      
      P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧ : P₁₂₃ ∈ ⟦ C₁ ∙ (C₂ ∙ C₃) ⟧
-     P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧ = compP∈⟦C₁∙C₂⟧ C₁ (C₂ ∙ C₃) ℓ₀ PO₀ P₁ P₂₃ P₁∈⟦C₁⟧ P₂₃∈⟦C₂∙C₃⟧ PO₀∈CompP₁P₂₃
+     P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧ = compP∈⟦C₁∙C₂⟧ C₁ (C₂ ∙ C₃) P₀ P₁ P₂₃ P₁∈⟦C₁⟧ P₂₃∈⟦C₂∙C₃⟧ PO₀∈CompP₁P₂₃
 
      open _●_ P₂₃∈⟦C₂∙C₃⟧ using () renaming (E₁⊆E₀ to E₂⊆E₂₃ ; E₂⊆E₀ to E₃⊆E₂₃ ; rhs₀ to rhs₂₃ ; κ₀⊨lhs₀ to κ₂₃⊨lhs₂₃)
      open _●_ P₁₂₃∈⟦C₁∙⟨C₂∙C₃⟩⟧ using () renaming (lhs₀ to lhs₁₂₃ ; rhs₀ to rhs₁₂₃ ; κ₀⊨rhs₀ to κ₁₂₃⊨rhs₁₂₃)
      
-     lemmas₂₃ : compLemmas C₂ C₃ ℓ₀ PO₀ P₂ P₃
+     lemmas₂₃ : compLemmas C₂ C₃ P₀ P₂ P₃
      lemmas₂₃ = record { P₁∈⟦C₁⟧ = P₂∈⟦C₂⟧ ; P₂∈⟦C₂⟧ = P₃∈⟦C₃⟧ ; PO₀∈CompP₁P₂ = PO₀∈CompP₂P₃ }
      
-     lemmas₁₂₃ : compLemmas C₁ (C₂ ∙ C₃) ℓ₀ PO₀ P₁ P₂₃
+     lemmas₁₂₃ : compLemmas C₁ (C₂ ∙ C₃) P₀ P₁ P₂₃
      lemmas₁₂₃ = record { P₁∈⟦C₁⟧ = P₁∈⟦C₁⟧ ; P₂∈⟦C₂⟧ = P₂₃∈⟦C₂∙C₃⟧ ; PO₀∈CompP₁P₂ = PO₀∈CompP₁P₂₃ }
 
-     open compLemmas lemmas₂₃ using () renaming (lhs₀⊨κ₀ to lhs₂₃⊨κ₂₃; rhs₀⊨κ₀ to rhs₂₃⊨κ₂₃ ; lhs₀∨rhs₀⊨κ₀ to lhs₂₃∨rhs₂₃⊨κ₂₃)
-     open compLemmas lemmas₁₂₃ using () renaming (lhs₀⊨κ₀ to lhs₁₂₃⊨κ₁₂₃; rhs₀⊨κ₀ to rhs₁₂₃⊨κ₁₂₃ ; lhs₀∨rhs₀⊨κ₀ to lhs₁₂₃∨rhs₁₂₃⊨κ₁₂₃)
+     open compLemmas lemmas₂₃ using () renaming (lhs₁₂⊨κ₁₂ to lhs₂₃⊨κ₂₃; rhs₁₂⊨κ₁₂ to rhs₂₃⊨κ₂₃ ; lhs₁₂∨rhs₁₂⊨κ₁₂ to lhs₂₃∨rhs₂₃⊨κ₂₃)
+     open compLemmas lemmas₁₂₃ using () renaming (lhs₁₂⊨κ₁₂ to lhs₁₂₃⊨κ₁₂₃; rhs₁₂⊨κ₁₂ to rhs₁₂₃⊨κ₁₂₃ ; lhs₁₂∨rhs₁₂⊨κ₁₂ to lhs₁₂₃∨rhs₁₂₃⊨κ₁₂₃)
 
      E₂₃⊆E₀ : E₂₃ ⊆ E₀
      E₂₃⊆E₀ = ⊆-elim-∪ (⊆-trans E₂⊆E₁₂ E₁₂⊆E₀) E₃⊆E₀
