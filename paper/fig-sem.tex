@@ -43,10 +43,12 @@
       \begin{enumerate}[leftmargin=0pt]
       \item \label{par-le-extends}
         ${\le}\rextends{\le_1}{\le_2}$,
-      \item \label{par-le-rf}
+      \item \label{par-le-rf1}
         % ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$.
         % if $\bEv\xrfx\aEv$ then either $\bEv\xrfx_1\aEv$, $\bEv\xrfx_2\aEv$, or $\bEv\le\aEv$.
-        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
+        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
+      \item \label{par-le-rf2}
+        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\xrfx\bEv$ then $\aEv\le\bEv$.
       \end{enumerate}
     \end{enumerate}
   \end{multicols}

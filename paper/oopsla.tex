@@ -461,7 +461,7 @@ be eliminated.
 % noticed a shortcoming of the implementation on \armeight{} in
 % \jjr{\textsection 7}.  The proof given there assumes that all internal reads
 % can be dropped.
-However, this is not the case for acquiring reds.  For example, \jjr{}
+However, this is not the case for acquiring reads.  For example, \jjr{}
 disallows the following execution, where the final values of $x$ is $2$ and
 the final value of $y$ is $2$.  This execution is allowed by \armeight{} and
 \tso{}.
@@ -568,10 +568,16 @@ In addition, \jjr{} uses $\sLOAD{}{}$ instead of $\sLOADP{}{}$ when
 calculating of dependency for \RMW{}s.  For a discussion, see the example at
 the end of \textsection\ref{sec:rmw}.
 
-\myparagraph{Definition of Data Race}
+\myparagraph{Data Race Freedom}
 
 The definition of data race is wrong in \jjr{}.  It should require that that
 at least one action is relaxed.
+
+Not that the definition of \emph{$L$-stable} applies in the case that
+conflicting writes are totally ordered.  This gives a result more in the
+spirit of \cite{Dolan:2018:BDR:3192366.3192421}.  In particular, this special
+case of the theorem clarifies the discussion of \ref{past}.
+
 
 \section{A Note on Mixed-Mode Data Races}
 
@@ -694,158 +700,6 @@ not affect the set of pomsets that are considered.  In particular,
 \end{gather*}
 is a downset of \eqref{mix1}.
 
-\section{Additional RMW Examples}
-\begin{example}
-  This definition ensures atomicity, disallowing executions such as
-  \cite[Ex.~3.2]{DBLP:journals/pacmpl/PodkopaevLV19}:
-  \begin{gather*}
-    % \taglabel{RMW1}
-    \begin{gathered}
-      \PW{x}{0}\SEMI \PFADD[\mRLX][\mRLX]{x}{s}{1}
-      \PAR
-      \PW{x}{2}\SEMI \PR{x}{s}
-      \\
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{a2}{\DR{x}{0}}{}
-          \event{a1}{\DW{x}{0}}{left=of a2}
-          \rf{a1}{a2}
-          \event{a3}{\DW{x}{2}}{right=of a2}
-          \wk{a2}{a3}
-          \event{b2}{\DW{x}{1}}{right=of a3}
-          \event{b3}{\DR{x}{1}}{right=of b2}
-          \rmw[out=-15,in=-165]{a2}[below]{b2}
-          \wk{a3}{b2}
-          \rf{b2}{b3}
-          \liftrmw[out=165,in=15]{a3}{a2}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-  By \ref{pom-rmw-atomic1}, since $\DWP{x}{2}\xwk\DWP{x}{1}$, it must be that
-  $\DWP{x}{2}\xwk\DRP{x}{0}$, creating a cycle.
-\end{example}
-
-\begin{example}
-  \label{ex:rmw-33}
-  Two successful \RMW{}s cannot see the same write:
-  \begin{gather*}
-    \begin{gathered}
-      \PW{x}{0}\SEMI (\FADD^{\mRLX,\mRLX}(\aLoc,1)\PAR \FADD^{\mRLX,\mRLX}(\aLoc,1))
-      \\
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{i}{\DW{x}{0}}{}
-          \event{a1}{a{:}\DR{x}{0}}{right=3em of i}
-          \event{a2}{b{:}\DW{x}{1}}{right=of a1}
-          \event{b1}{c{:}\DR{x}{0}}{right=3em of a2}
-          \event{b2}{d{:}\DW{x}{1}}{right=of b1}
-          \rmw{a1}{a2}
-          \rmw{b1}{b2}
-          \rf{i}{a1}
-          \rf[out=15,in=165]{i}{b1}
-          \wk[out=-15,in=-165]{a1}{b2}
-          \liftrmw[out=-15,in=-165]{a2}{b1}
-          % \wk{a1}{b2}
-          \wk{b1}{a2}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-  The order from read-to-write is required by fulfillment.  
-  Apply \ref{pom-rmw-atomic1} of the second \RMW{} to $a\xwk d$, we have that $a\xwk c$.  Subsequently
-  applying \ref{pom-rmw-atomic2} of the first \RMW{}, we have $b \xwk c$, creating a cycle.
-\end{example}
-
-\begin{example}
-  By using two actions rather than one, the definition allows examples such as the
-  following, which is allowed by \armeight{} 
-  \cite[Ex.~3.10]{DBLP:journals/pacmpl/PodkopaevLV19}:
-  \begin{gather*}
-    % \taglabel{RMW2}
-    \begin{gathered}
-      \PR{y}{r}\SEMI
-      \PW{z}{r}
-      \PAR
-      \PR{z}{r}\SEMI
-      \PW{x}{0}\SEMI
-      \PFADD[\mRLX][\mREL]{x}{s}{1} \SEMI
-      \PW{y}{s}{+}1
-      \\[-1ex]
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{a1}{\DR{y}{1}}{}
-          \event{a2}{\DW{z}{1}}{right=of a1}
-          \po{a1}{a2}
-          \event{b1}{\DR{z}{1}}{right=3em of a2}
-          \rf{a2}{b1}
-          \event{b2}{\DW{x}{0}}{right=of b1}
-          \event{b3}{\DR{x}{0}}{right=of b2}
-          \rf{b2}{b3}
-          \event{b4}{\DWRel{x}{1}}{right=2em of b3}
-          \rmw{b3}{b4}
-          \event{b5}{\DW{y}{1}}{right=of b4}
-          \sync[out=-15,in=-165]{b1}{b4}
-          \po[out=-20,in=-160]{b3}{b5}
-          \rf[out=170,in=10]{b5}{a1}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-\end{example}
-
-\begin{example}
-  Consider the \textsc{cdrf} example from \cite{DBLP:conf/pldi/LeeCPCHLV20}:
-  \begin{gather*}
-    \begin{gathered}
-      \begin{aligned}
-        &\PFADD[\mACQ][\mREL]{x}{r}{1}\SEMI \IF{r{=}0}\THEN \PW{y}{1} \FI
-        \\\PAR\;\;&
-        \PFADD[\mACQ][\mREL]{x}{r}{1}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
-      \end{aligned}
-      \\
-      \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
-          \raevent{a1}{\DR[\mACQ]{x}{0}}{}
-          \raevent{a1b}{\DW[\mREL]{x}{1}}{right=of a1}
-          \event{a2}{\DW{y}{1}}{right=of a1b}
-          \raevent{b0}{\DR[\mACQ]{x}{0}}{right=3em of a2}
-          \raevent{b0b}{\DW[\mREL]{x}{1}}{right=of b0}
-          \event{b1}{\DR{y}{1}}{right=of b0b}
-          \event{b2}{\DW{x}{0}}{right=of b1}
-          \rmw{a1}{a1b}
-          \rmw{b0}{b0b}
-          \rf[out=-13,in=-163]{a2}{b1}
-          \sync[out=20,in=160]{a1}{a2}
-          \sync[out=20,in=160]{b0}{b1}
-          \po{b1}{b2}
-          \rf[out=-165,in=-12]{b2}{a1}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-\end{example}
-\begin{example}
-  Consider this example from \cite[\textsection C]{DBLP:conf/pldi/LeeCPCHLV20}:
-  \begin{gather*}
-    \begin{gathered}
-      \begin{aligned}
-        &\PCAS[\mRLX][\mRLX]{x}{r}{0}{1}\SEMI \IF{r{\leq}1}\THEN \PW{y}{1} \FI
-        \\\PAR\;\;&
-        \PCAS[\mRLX][\mRLX]{x}{r}{0}{2}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
-      \end{aligned}
-      \\
-      \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
-          \event{a1}{\DR{x}{0}}{}
-          \event{a1b}{\DW{x}{1}}{right=of a1}
-          \event{a2}{\DW{y}{1}}{right=of a1b}
-          \event{b0}{\DR{x}{0}}{right=3em of a2}
-          \event{b0b}{\DW{x}{2}}{right=of b0}
-          \event{b1}{\DR{y}{1}}{right=of b0b}
-          \event{b2}{\DW{x}{0}}{right=of b1}
-          \rmw{a1}{a1b}
-          \rmw{b0}{b0b}
-          \rf[out=-13,in=-163]{a2}{b1}
-          \po[out=20,in=160]{a1}{a2}
-          \po[out=20,in=160]{b0}{b1}
-          \po{b1}{b2}
-          \rf[out=-165,in=-12]{b2}{a1}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-\end{example}
 
 
 

@@ -227,7 +227,7 @@ of actions, using defaults.
 % 
 Let $\lemode$ be the least order over access and fence modes such that
 %$\mRLX\lemode\mRA\lemode\mSC$ and $\fREL\lemode\fSC$ and $\fACQ\lemode\fSC$.
-$\mRLX\lemode\mRA\lemode\mSC$ and $\mREL\lemode\mSC$ and $\mACQ\lemode\mSC$.
+$\mRLX\lemode\mREL\lemode\mSC$ and $\mRLX\lemode\mACQ\lemode\mSC$.
 We write $\DWP[\gemode\mREL]{}{}$ to stand for either $\DWP[\mREL]{}{}$ or
 $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 
@@ -348,7 +348,7 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
 
 \begin{definition}
   \label{def:family}
-  A \emph{family of predicate transformers} for $\aEvs$ consists of a
+  A \emph{family of predicate transformers} over $\aEvs$ consists of a
   predicate transformer $\aTr{\bEvs}{}$ for each $\bEvs\subseteq\AllEvents$,
   such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}
   \rimplies \aTr{\bEvs}{\bForm}$.
@@ -361,20 +361,29 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
   A \emph{pomset with predicate transformers} over $\Act$
   is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\rrfx}, {\le})$ where
   \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
-  \item \label{pom-E}
+    \makecounter{BE}
+  \item \label{pom-E} \makecounter{E}
     $\Event\subseteq\AllEvents$ is a set of \emph{events},
-  \item \label{pom-lambda}
+    \makecounter{Blambda}
+  \item \label{pom-lambda} \makecounter{lambda}
     $\labeling: \Event \fun \Act$ defines a \emph{label} for each event,
-  \item \label{pom-kappa}
+    \makecounter{Bkappa}
+  \item \label{pom-kappa} \makecounter{kappa}
     $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
-  \item \label{pom-tau}
-    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of
-      predicate transformers} over $\aEvs$, %defines a \emph{predicate transformer} for each set of events,
-  \item \label{pom-term}
-    $\aTerm:\Formulae$ defines a \emph{termination condition},
-  \item \label{pom-rf}
+    \makecounter{Btau}
+  \item \label{pom-tau} \makecounter{tau}
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of predicate transformers} over $\aEvs$, 
+    \makecounter{Bterm}
+  \item \label{pom-term} \makecounter{term}
+    $\aTerm:\Formulae$ is a \emph{termination condition}, such that 
+    \begin{enumerate}
+    \item \label{pom-term-tau}
+      $\aTr{}{\TRUE}\rimplies\aTerm$,
+    \end{enumerate}
+    \makecounter{Brf}
+  \item \label{pom-rf} \makecounter{rf}
     ${\rrfx} : \Event\fun\Event$ is an injective relation capturing
-    \emph{reads-from} such that 
+    \emph{reads-from}, such that 
     % \end{enumerate}
     % A pomset is a \emph{candidate} if there is an injective relation
     % ${\rrfx} : \Event\times\Event$, capturing \emph{reads-from}, such that
@@ -382,36 +391,53 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
       % \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
       % \item \label{rf-injective}
       %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is, ${\rrfx}$ is injective,
-    \item \label{rf-match}
+    \item \label{pom-rf-match}
       if $\bEv\xrfx\aEv$ then $\labeling(\bEv) \rmatches \labeling(\aEv)$,
       % \item \label{rf-block}
       %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
       % \item \label{rf-le}
       %   if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
     \end{enumerate}
-  \item \label{pom-le}
+    \makecounter{Ble}
+  \item \label{pom-le} \makecounter{le}
     ${\le} : \Event\times\Event$, is a partial order capturing
     \emph{causality}, such that
     \begin{enumerate}
-    \item \label{rf-block}
+    \item \label{pom-le-match}
+      if $\bEv\xrfx\aEv$ then either $\bEv\le\bEv$ or $\aEv\le\bEv$,
+    \item \label{pom-le-block}
       if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
     \end{enumerate}
   \end{enumerate}
-  A pomset is \emph{top-level} if \labeltext[\textsc{t}1]{(\textsc{t}1)}{top-term} $\aTerm$ is a tautology and \labeltext[\textsc{t}2]{(\textsc{t}2)}{top-ev} for every $\aEv\in\aEvs$,
-  % $\labelingForm(\aEv)$ is a tautology and
-  % if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  A pomset is \emph{top-level} if
   % \begin{multicols}{2}
-  \begin{enumerate}[label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
-    \setcounter{enumi}{2}
-  \item[]
-    \begin{enumerate}[leftmargin=0pt]
-    \item \label{top-kappa}
-      $\labelingForm(\aEv)$ is a tautology,    
-    \item \label{top-rf}
-      if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
-    \end{enumerate}
+  \begin{enumerate}[,label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
+    \setcounter{enumi}{\value{Blambda}}
+  \item \label{top-rf}
+    if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$,
+    \setcounter{enumi}{\value{Bkappa}}
+  \item \label{top-kappa}
+    $\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
+    \setcounter{enumi}{\value{Bterm}}
+  \item \label{top-term}
+    $\aTerm$ is a tautology.
   \end{enumerate}
   % \end{multicols}
+  % \labeltext[\textsc{t}1]{(\textsc{t}1)}{top-term} $\aTerm$ is a tautology and \labeltext[\textsc{t}2]{(\textsc{t}2)}{top-ev} for every $\aEv\in\aEvs$,
+  % % $\labelingForm(\aEv)$ is a tautology and
+  % % if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  % % \begin{multicols}{2}
+  % \begin{enumerate}[label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
+  %   \setcounter{enumi}{2}
+  % \item[]
+  %   \begin{enumerate}[leftmargin=0pt]
+  %   \item \label{top-kappa}
+  %     $\labelingForm(\aEv)$ is a tautology,    
+  %   \item \label{top-rf}
+  %     if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  %   \end{enumerate}
+  % \end{enumerate}
+  % % \end{multicols}
 \end{definition}
 \input{fig-sem.tex}
 
@@ -443,18 +469,90 @@ examples, we typically consider pomsets that are augment-minimal.  One
 intuitive reading of augment closure is that adding order can only cause
 preconditions to weaken.
 \begin{lemma}
-  $(\aPSS_1\SEMI\aPSS_2)\SEMI\aPSS_3=\aPSS_1\SEMI(\aPSS_2\SEMI\aPSS_3)$
-  and    
-  $\aPSS\SEMI\SKIP=\aPSS=\SKIP\SEMI\aPSS$.
+  \begin{math}
+    \aPSS
+    =
+    \xLPARP{\aPSS}{\sSKIP}
+    =
+    \xSEMIP{\aPSS}{\sSKIP}
+    =
+    \xSEMIP{\sSKIP}{\aPSS}
+  \end{math}
 
-  $(\aPSS_1\LPAR\aPSS_2)\LPAR\aPSS_3=\aPSS_1\LPAR(\aPSS_2\LPAR\aPSS_3)$
-  and    
-  $\aPSS\LPAR\SKIP=\aPSS$.  
+  \begin{math}
+    \xLPAR{\xLPARP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
+    =
+    \xLPAR{\aPSS_1}{\xLPARP{\aPSS_2}{\aPSS_3}}
+  \end{math}
+
+  \begin{math}
+    \xSEMI{\xSEMIP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
+    =
+    \xSEMI{\aPSS_1}{\xSEMIP{\aPSS_2}{\aPSS_3}}
+  \end{math}
+
+  \begin{math}
+    \xIFTHEN{\aForm}{
+      \xIFTHEN{\bForm}{\aPSS_1}{}
+    }{}
+    =
+    \xIFTHEN{\aForm\land\bForm}{\aPSS_1}{}
+  \end{math}
+
+  \begin{math}
+    \xSEMI{
+      \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+    }{
+      \aPSS_3
+    }
+    =
+    \xIFTHEN{\aForm}{
+      \xSEMI{\aPSS_1}{\aPSS_3}
+    }{
+      \xSEMI{\aPSS_2}{\aPSS_3}
+    }
+  \end{math}
+
+  \begin{math}
+    \xSEMI{
+      \aPSS_1
+    }{
+      \xIFTHEN{\aForm}{\aPSS_2}{\aPSS_3}
+    }
+    =
+    \xIFTHEN{\aForm}{
+      \xSEMI{\aPSS_1}{\aPSS_2}
+    }{
+      \xSEMI{\aPSS_1}{\aPSS_3}
+    }
+  \end{math}
+
+  \begin{math}
+    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+    \supseteq
+    \xSEMI{
+      \xIFTHEN{\aForm}{\aPSS_1}{}
+    }{
+      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+    }
+  \end{math}
+
+  \begin{math}
+    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+    \supseteq
+    \xSEMI{
+      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+    }{
+      \xIFTHEN{\aForm}{\aPSS_1}{}
+    }
+  \end{math}
 
   \vspace{-.5\baselineskip}
   \begin{proof}
-    Straightforward calculation.  Associativity of $\SEMI\!$ requires
-    disjunction closure \eqref{tr-or}.
+    Straightforward calculation.  Associativity of $\SEMI\!$ requires both
+    conjunction closure \eqref{tr-and} (for termination) and disjunction
+    closure \eqref{tr-or} (for the predicate transformers themselves).  Right
+    unit of $\sSKIP$ for $\SEMI\!$ requires \ref{pom-term-tau}.
   \end{proof}
 \end{lemma}
 \begin{definition}
@@ -465,7 +563,7 @@ preconditions to weaken.
     \item $\aEvs_2=\aEvs_1$,
     \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
     \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
-    \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
+    \item $\aTr[2]{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\bForm}$,
     \item $\aTerm[2] \rimplies \aTerm[1]$,
     \item ${\rrfx_2}={\rrfx_1}$,
     \item ${\le_2}\supseteq{\le_1}$.
@@ -537,7 +635,7 @@ $\aVal$; the fact that $\aVal$ must be $1$ is captured in the logic (see
 The structural rules combine pomsets:  Parallel composition is disjoint
 union, inheriting labeling, order and $\rrfx$ from the two sides.  Any
 $\rrfx$ edges added between the two sides must also be added to the order
-\eqref{par-le-rf}.
+(\ref{par-le-rf1} and \ref{par-le-rf2}).
 % 
 Sequential composition is similar, with two changes: \ref{seq-E} does not
 require disjointness (see \textsection\ref{sec:ex:term}), and
@@ -551,16 +649,16 @@ Note that reads-from implies order.
 
   \vspace{-.5\baselineskip}
   \begin{proof}
-    Induction on the definition of $\sembase{}$, using \ref{par-le-rf} and \ref{seq-le-rf}.
+    Induction on the definition of $\sembase{}$, using \ref{par-le-rf1}, \ref{par-le-rf2}, and \ref{seq-le-rf}.
   \end{proof}
 \end{lemma}
 In top-level pomsets, every read must have a matching write in $\rrfx$
-\eqref{top-rf}.  Together with \ref{rf-match} and \ref{rf-block}, the lemma
+\eqref{top-rf}.  Together with \ref{pom-le-match} and \ref{pom-le-block}, the lemma
 guarantees that reads are \emph{fulfilled} at top-level, as in
 \cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.\footnote{The
   basic model would be the same if we move $\rrfx$ from the model itself to
   be existentially quantified in the definition of top-level pomset, along
-  with \ref{rf-match} and \ref{rf-block}.  This was the approach of
+  with \ref{pom-le-match} and \ref{pom-le-block}.  This was the approach of
   \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
   explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
   variant semantics $\frf{\semrr{}}$ for which \reflem{lem:rf:implies:le}
@@ -572,7 +670,7 @@ $\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
 order is enforced between conflicting accesses of the same location
 ($\eqreorderco$), into a release and out of an acquire ($\reorderra$), and
 between SC accesses ($\eqreordersc$).  Combined with the fulfillment
-requirements (\ref{rf-match}, \ref{rf-block} and \reflem{lem:rf:implies:le}),
+requirements (\ref{pom-le-match}, \ref{pom-le-block} and \reflem{lem:rf:implies:le}),
 these ensure coherence, publication, subscription and other idioms.  For
 example, consider the following:
 \begin{gather*}
@@ -596,16 +694,16 @@ example, consider the following:
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-The execution is disallowed due to the evident cycle.  All of the order shown is
+The execution is disallowed due to the cycle.  All of the order shown is
 required at top-level: The intra-thread order comes from \ref{seq-le-delays}:
 $\DWP{x}{0}\xwki \DWP{x}{1}$ is required by $\eqreorderco$.
 $\DWP{x}{1}\xsync \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xsync \DRP{x}{0}$ are
 required by $\reorderra$.  The cross-thread order is required by fulfillment:
 \ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
-\ref{rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
+\ref{pom-le-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
 \reflem{lem:rf:implies:le} subsequently ensures that
 $\DWP[\mREL]{y}{1}\le \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
-$\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{rf-block}.  (Alternatively,
+$\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{pom-le-block}.  (Alternatively,
 we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
 
 The semantics gives the expected results for store buffering and load buffering,
@@ -615,6 +713,38 @@ elimination, and stronger than Java, in order to support local reasoning
 about data races.  See
 \cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20} for a discussion.
 
+In the structural rules $\sSEMI{}{}$ and $\sIF{}$, we say that
+$\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ \emph{coalesce} if $\bEv=\aEv$.
+
+\ref{seq-E} allows \emph{mumbling} \cite{DBLP:journals/iandc/Brookes96} by
+coalescing events.  For example
+\begin{math}
+  \sembase{\PW{x}{1} \SEMI \PW{x}{1}}
+\end{math}
+includes the singleton pomset
+\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+  \event{a1}{\DW{x}{1}}{}
+\end{tikzinlinesmall}.  From this it is easy to see that
+\begin{math}
+  \sembase{\PW{x}{1}\SEMI\PW{x}{1}}
+  \supseteq
+  \sembase{\PW{x}{1}}
+\end{math}
+is a valid refinement.  It is equally obvious that
+\begin{math}
+  \sem{\PW{\aLoc}{1}} 
+  \not\supseteq
+  \sem{\PW{\aLoc}{1} \SEMI \PW{\aLoc}{1}}
+\end{math}
+is not a valid refinement, since the latter includes a two-element pomset,
+but the former does not.\footnote{These are distinguished by the context:
+  \begin{math}
+    \hole{} \PAR
+    \PR{x}{r} \SEMI
+    \PW{x}{2} \SEMI
+    \PR{x}{s}\SEMI
+    \IF{\aReg {=} \bReg} \THEN \PW{\cLoc}{1} \FI.
+  \end{math}}
 
 
 \subsection{Termination}
@@ -649,38 +779,6 @@ writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted above, $\aPS$ can
 include $\DWP{x}{\aVal}$, for any value $\aVal$.  At top-level, however,
 \ref{write-term-nonempty} requires that $\aTerm$ implies $1{=}\aVal$.
 
-In the structural rules, if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$, we say
-that $\bEv$ and $\aEv$ \emph{coalesce} if $\bEv=\aEv$.
-
-\ref{seq-E} allows \emph{mumbling} \cite{DBLP:journals/iandc/Brookes96} by
-coalescing events.  For example
-\begin{math}
-  \sembase{\PW{x}{1} \SEMI \PW{x}{1}}
-\end{math}
-includes the singleton pomset
-\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-  \event{a1}{\DW{x}{1}}{}
-\end{tikzinlinesmall}.  From this it is easy to see that
-\begin{math}
-  \sembase{\PW{x}{1}\SEMI\PW{x}{1}}
-  \supseteq
-  \sembase{\PW{x}{1}}
-\end{math}
-is a valid refinement.  It is equally obvious that
-\begin{math}
-  \sem{\PW{\aLoc}{1}} 
-  \not\supseteq
-  \sem{\PW{\aLoc}{1} \SEMI \PW{\aLoc}{1}}
-\end{math}
-is not a valid refinement, since the latter includes a two-element pomset,
-but the former does not.\footnote{These are distinguished by the context:
-  \begin{math}
-    \hole{} \PAR
-    \PR{x}{r} \SEMI
-    \PW{x}{2} \SEMI
-    \PR{x}{s}\SEMI
-    \IF{\aReg {=} \bReg} \THEN \PW{\cLoc}{1} \FI.
-  \end{math}}
 
 \subsection{Data Dependencies, Preconditions, and Predicate Transformers}
 \label{sec:ex:data}
@@ -748,7 +846,7 @@ present before a release, even for incomplete pomsets (see
 
 A simple example of a data dependency is a pomset
 $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$.  If $\aPS$ is complete, it must have
-two events. Then $\sSEQ{}{}$ requires that there are %$\aVal,\bVal\in\Val$ and
+two events. Then $\sSEMI{}{}$ requires that there are %$\aVal,\bVal\in\Val$ and
 $\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
 \begin{align*}
   \tag{$\ddagger$}\label{eq2}
@@ -976,7 +1074,7 @@ from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{r{=}1 \mid \DW{y}{1}}{}
+        \eventr{e}{wy1}{r{=}1 \mid \DW{y}{1}}{}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -984,7 +1082,7 @@ from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
     \PW{y}{1}
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{1{=}1 \mid \DW{y}{1}}{}
+        \eventr{e}{wy1}{1{=}1 \mid \DW{y}{1}}{}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -993,7 +1091,7 @@ from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
+        \eventr{e}{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
       \end{tikzinline}}
   \end{gathered}  
 \end{align*}
