@@ -1291,7 +1291,9 @@ $\bmode\lemode\amode$, using the order on modes from
   \end{aligned}
   &&
   \begin{aligned}[t]
-    \fmerge{\DF[\ascope]{\amode}[\aThrd]}{\DF[\ascope]{\bmode}[\aThrd]} &= \{ \DF[\ascope]{\amode\lubmode\bmode}[\aThrd] \}
+    \fmerge{\DF[\ascope]{\amode}[\aThrd]}{\DF[\ascope]{\bmode}[\aThrd]} &= \{ \DF[\ascope]{\amode}[\aThrd] \}
+    \\
+    \fmerge{\DF[\ascope]{\bmode}[\aThrd]}{\DF[\ascope]{\amode}[\aThrd]} &= \{ \DF[\ascope]{\amode}[\aThrd] \}
     \\
     \fmerge{\aAct}{\bAct} &= \emptyset, \textotherwise
   \end{aligned}
@@ -1341,7 +1343,7 @@ $\bmode\lemode\amode$, using the order on modes from
 %     \fmerge{\aAct}{\bAct} &= \emptyset, \textotherwise
 %   \end{aligned}
 % \end{align*}
-Then we can replace \ref{seq-lambda} in \reffig{fig:sem} by:
+Then we can replace \ref{seq-lambda}-\ref{seq-kappa} in \reffig{fig:sem} by:
 % \begin{enumerate}[topsep=0pt,label=(\textsc{s}\arabic*),ref=\textsc{s}\arabic*]
 %   \setcounter{enumi}{2}
 % \item[] 
@@ -1375,11 +1377,14 @@ Then we can replace \ref{seq-lambda} in \reffig{fig:sem} by:
   \item \label{seq-kappa-merge12}
     if $\aEv\in\aEvs_1\cap\aEvs_2$ then either
     \begin{itemize}
-    \item $\labeling_1(\aEv)=\labeling_2(\aEv)$ and $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
-    \item $\labeling_1(\aEv)\neq\labeling_2(\aEv)$ and $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)\land\labelingForm'_2(\aEv)$,
+    \item $\labeling(\aEv)=\labeling_1(\aEv)=\labeling_2(\aEv)$ and $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
+    \item $\labeling(\aEv)=\labeling_1(\aEv)\neq\labeling_2(\aEv)$ and $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
+    \item $\labeling(\aEv)=\labeling_2(\aEv)\neq\labeling_1(\aEv)$ and $\labelingForm(\aEv) \rimplies \labelingForm'_2(\aEv)$.
     \end{itemize}
   \end{enumerate}
 \end{enumerate}
+% (For $\labelingForm$, we could also take the predicate of the ``winner'',
+% assuming it is implied by the ``loser''.)
 
 If $\aAct_0\in\fmerge{\aAct_1}{\aAct_2}$, then $\aAct_1$ and $\aAct_2$ can
 coalesce, resulting in $\aAct_0$.  This allows optimizations such as
