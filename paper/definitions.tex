@@ -404,7 +404,7 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     \emph{causality}, such that
     \begin{enumerate}
     \item \label{pom-le-match}
-      if $\bEv\xrfx\aEv$ then either $\bEv\le\bEv$ or $\aEv\le\bEv$,
+      if $\bEv\xrfx\aEv$ then either $\bEv\le\aEv$ or $\aEv\le\bEv$,
     \item \label{pom-le-block}
       if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
     \end{enumerate}
@@ -672,7 +672,18 @@ order is enforced between conflicting accesses of the same location
 between SC accesses ($\eqreordersc$).  Combined with the fulfillment
 requirements (\ref{pom-le-match}, \ref{pom-le-block} and \reflem{lem:rf:implies:le}),
 these ensure coherence, publication, subscription and other idioms.  For
-example, consider the following:
+example, consider the following:\footnote{We use different colors for arrows representing order:
+  \begin{itemize}  
+  \item \makebox{$\bEv\xpo\aEv$} arises from control/data/address \emph{dependency} (\ref{seq-kappa}, definition of $\labelingForm'_2(\bEv)$),
+  \item \makebox{$\bEv\xsync\aEv$} arises from $\reorderra$ or $\eqreordersc$ \eqref{seq-le-delays},
+  \item \makebox{$\bEv\xwki\aEv$} arises from $\eqreorderco$ \eqref{seq-le-delays},
+  \item \makebox{$\bEv\xrf\aEv$} arises from \emph{reads-from} \eqref{pom-le-match},
+  %\item \makebox{$\bEv\xsyncsc\aEv$} arises from \emph{strong fencing} \eqref{cand-lesync-sc},
+  \item \makebox{$\bEv\xwk\aEv$} arises from \emph{blocking} \eqref{pom-le-block}.
+  \end{itemize}
+  In \textsection\ref{sec:arm2}, it is possible for $\rrf$ to contradict
+  $\le$.  In this case, we use a dotted arrow for $\rrf$: $\bEv\xrfint\aEv$
+  indicates that $\aEv\le\bEv$.}
 \begin{gather*}
   \taglabel{pub}
   \begin{gathered}    
