@@ -485,70 +485,113 @@ examples, we typically consider pomsets that are augment-minimal.  One
 intuitive reading of augment closure is that adding order can only cause
 preconditions to weaken.
 \begin{lemma}
-  \begin{math}
-    \aPSS
-    =
-    \xLPARP{\aPSS}{\sSKIP}
-    =
-    \xSEMIP{\aPSS}{\sSKIP}
-    =
-    \xSEMIP{\sSKIP}{\aPSS}
-  \end{math}
+  \label{lem:monoid}
+  \begin{enumerate*}[label=(\alph*),ref=\alph*]
+  \item \label{monoid:unit}
+    \begin{math}
+      \aPSS
+      =
+      \xLPARP{\aPSS}{\sSKIP}
+      =
+      \xSEMIP{\aPSS}{\sSKIP}
+      =
+      \xSEMIP{\sSKIP}{\aPSS}.
+    \end{math}
 
-  \begin{math}
-    \xLPAR{\xLPARP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
-    =
-    \xLPAR{\aPSS_1}{\xLPARP{\aPSS_2}{\aPSS_3}}
-  \end{math}
+  \\\item \label{monoid:par}
+    \begin{math}
+      \xLPAR{\xLPARP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
+      =
+      \xLPAR{\aPSS_1}{\xLPARP{\aPSS_2}{\aPSS_3}}.
+    \end{math}
 
-  \begin{math}
-    \xSEMI{\xSEMIP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
-    =
-    \xSEMI{\aPSS_1}{\xSEMIP{\aPSS_2}{\aPSS_3}}
-  \end{math}
+  \\\item \label{monoid:seq}
+    \begin{math}
+      \xSEMI{\xSEMIP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
+      =
+      \xSEMI{\aPSS_1}{\xSEMIP{\aPSS_2}{\aPSS_3}}.
+    \end{math}
 
-  \begin{math}
-    \xIFTHEN{\aForm}{
-      \xIFTHEN{\bForm}{\aPSS_1}{}
-    }{}
-    =
-    \xIFTHEN{\aForm\land\bForm}{\aPSS_1}{}
-  \end{math}
+  \\\item \label{monoid:if:seq}
+    \begin{math}
+      \xSEMI{
+        \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+      }{
+        \aPSS_3
+      }
+      =
+      \xIFTHEN{\aForm}{
+        \xSEMI{\aPSS_1}{\aPSS_3}
+      }{
+        \xSEMI{\aPSS_2}{\aPSS_3}
+      }.
+    \end{math}
 
-  \begin{math}
-    \xSEMI{
+  \\\item \label{monoid:seq:if}
+    \begin{math}
+      \xSEMI{
+        \aPSS_1
+      }{
+        \xIFTHEN{\aForm}{\aPSS_2}{\aPSS_3}
+      }
+      =
+      \xIFTHEN{\aForm}{
+        \xSEMI{\aPSS_1}{\aPSS_2}
+      }{
+        \xSEMI{\aPSS_1}{\aPSS_3}
+      }.
+    \end{math}
+
+  \\\item
+    \begin{math} \label{monoid:ifelse:if:if}
       \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-    }{
-      \aPSS_3
-    }
-    =
-    \xIFTHEN{\aForm}{
-      \xSEMI{\aPSS_1}{\aPSS_3}
-    }{
-      \xSEMI{\aPSS_2}{\aPSS_3}
-    }
-  \end{math}
+      =
+      \xSEMI{
+        \xIFTHEN{\aForm}{\aPSS_1}{}
+      }{
+        \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+      }
+      =
+      \xSEMI{
+        \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+      }{
+        \xIFTHEN{\aForm}{\aPSS_1}{}
+      }.
+    \end{math}
 
-  \begin{math}
-    \xSEMI{
+  \\\item \label{monoid:if:dead}
+    \begin{math}
+      \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+      =
       \aPSS_1
-    }{
-      \xIFTHEN{\aForm}{\aPSS_2}{\aPSS_3}
-    }
-    =
-    \xIFTHEN{\aForm}{
-      \xSEMI{\aPSS_1}{\aPSS_2}
-    }{
-      \xSEMI{\aPSS_1}{\aPSS_3}
-    }
-  \end{math}
+    \end{math}
+    if $\aForm$ is a tautology.
 
+  \\\item \label{monoid:if:if}
+    \begin{math}
+      \xIFTHEN{\aForm}{
+        \xIFTHEN{\bForm}{\aPSS}{}
+      }{}
+      =
+      \xIFTHEN{\aForm\land\bForm}{\aPSS}{}.
+    \end{math}
+
+  \\\item \label{monoid:if:elim}
+    \begin{math}
+      \xIFTHEN{\aForm}{\aPSS}{\aPSS}
+      \supseteq
+      \aPSS.
+    \end{math}
+  \end{enumerate*}      
   \vspace{-.5\baselineskip}
   \begin{proof}
-    Straightforward calculation.  Associativity of $\SEMI\!$ requires both
+    Straightforward calculation.
+    \eqref{monoid:unit} requires \ref{pom-term-tau} for
+    termination of the right
+    unit of $\sSKIP$ for $\SEMI\!$.
+    \eqref{monoid:seq} requires both
     conjunction closure (\ref{tr-and}, for termination) and disjunction
-    closure (\ref{tr-or}, for the predicate transformers themselves).  Right
-    unit of $\sSKIP$ for $\SEMI\!$ requires \ref{pom-term-tau}.
+    closure (\ref{tr-or}, for the predicate transformers themselves).  
   \end{proof}
 \end{lemma}
 \begin{definition}
@@ -1273,6 +1316,8 @@ example, on read/write pairs:
 
 \subsection{Conditional and Coherence}
 \label{sec:if:seq}
+
+[This is out of date.]
 
 \begin{lemma}
   \label{lem:if:seq}

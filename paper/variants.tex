@@ -1443,6 +1443,14 @@ Consider
   \IF{\BANG\aExp}\THEN\PW{x}{2}\FI
 \end{math}
 
+Dissatisfying thing: read elimination is a mess.  Can't do the nice thing and
+use
+\begin{math}
+  \aTr{\bEvs}{\bForm} \riff \aLoc{=}\aReg  \limplies  \bForm
+\end{math}
+for \ref{read-tau-empty} because there may be a release-acquire pair between
+the read and the matching write.
+
 \endinput
 
 \begin{example}

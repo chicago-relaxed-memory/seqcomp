@@ -16,14 +16,6 @@ reads. These fences are not required in \S\ref{sec:arm2}, but at the
 cost of model complexity. It would be illuminating to find out what
 the performance penalty is for these fences.
 
-Dissatisfying thing: read elimination is a mess.  Can't do the nice thing and
-use
-\begin{math}
-  \aTr{\bEvs}{\bForm} \riff \aLoc{=}\aReg \limplies \bForm
-\end{math}
-for \ref{read-tau-empty} because there may be a release-acquire pair between
-the read and the matching write.
-
 An earlier version of this paper has been mechanized in Agda; it would be
 reassuring to update the mechanization to bring it in line with the current state.
 
