@@ -53,6 +53,10 @@ $\aEv$ in the independent case is
   \tag{$*$}\label{pre1}
   (1{=}r \lor x{=}r)\limplies (1{=}s \lor r{=}s)\limplies (r{=}s),
 \end{displaymath}
+which is equivalent to
+\begin{math}
+  (x{=}r)\limplies (1{=}s)\limplies (r{=}s),
+\end{math}
 which is not a tautology, and thus $\sembase{}$ requires order from
 $\bEv$  to $\aEv$.
 
@@ -88,21 +92,21 @@ the events are destined to coalesce.
     \item \label{read-tau-dep-reg}
       if $(\aEvs\cap\bEvs)\neq\emptyset$ then
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         \aVal{=}\uReg{\aEv}
         \limplies \bForm[\uReg{\aEv}/\aReg]
       \end{math},    
     \item \label{read-tau-ind-reg}
       if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         \PBR{\aVal{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}} \limplies
         \bForm[\uReg{\aEv}/\aReg],
       \end{math}
     \item \label{read-tau-empty-reg}
       if $\aEvs=\emptyset$ then $(\forall\bReg)$
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         \bForm[\bReg/\aReg].
       \end{math}
     \end{enumerate}
@@ -142,7 +146,7 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
       $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal}[\aThrd]$,
     \item \label{write-kappa-addr}
       \begin{math}
-        \labelingForm(\aEv) \rimplies
+        \labelingForm(\aEv) \riff
         \cExp{=}\cVal
         \land \aExp{=}\aVal
       \end{math},      
@@ -152,7 +156,7 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
       \item \label{write-tau-dep-addr}
         if $\aEvs\neq\emptyset$ then 
         \begin{math}
-          \aTr{\bEvs}{\bForm} \rimplies 
+          \aTr{\bEvs}{\bForm} \riff 
           (\cExp{=}\cVal)
           \limplies 
           \bForm[\aExp/\REF{\cVal}]
@@ -163,7 +167,7 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
           (\forall\dVal)
         \end{math}        
         \begin{math}
-          \aTr{\bEvs}{\bForm} \rimplies 
+          \aTr{\bEvs}{\bForm} \riff 
           (\cExp{=}\dVal)
           \limplies 
           \bForm
@@ -174,9 +178,9 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
     \item[] \labeltext[\textsc{w}5]{}{write-term-addr}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{write-term-nonempty-addr}
-        if $\aEvs\neq\emptyset$ then $\aTerm \rimplies \cExp{=}\cVal \land \aExp{=}\aVal$,
+        if $\aEvs\neq\emptyset$ then $\aTerm \riff \cExp{=}\cVal \land \aExp{=}\aVal$,
       \item \label{write-term-empty-addr}
-        if $\aEvs=\emptyset$ then $\aTerm \rimplies \FALSE$.
+        if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
       \end{enumerate}
     \end{enumerate}
   \end{multicols}
@@ -204,7 +208,7 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
         (\forall\aEv\in\aEvs\cap\bEvs)
       \end{math}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
         \limplies \bForm[\uReg{\aEv}/\aReg]
       \end{math},      
@@ -213,7 +217,7 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
         (\forall\aEv\in\aEvs\setminus\bEvs)
       \end{math}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         \PBR{(\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv}) \lor (\cExp{=}\cVal\limplies\REF{\cVal}{=}\uReg{\aEv})}
         \limplies
         \bForm[\uReg{\aEv}/\aReg]
@@ -224,12 +228,12 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
       \end{math}
       if $\aEvs=\emptyset$ then 
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies 
+        \aTr{\bEvs}{\bForm} \riff 
         \bForm[\bReg/\aReg],
       \end{math}  
     \end{enumerate}  
   \item \label{read-term-addr}
-    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \rimplies \FALSE$. 
+    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}
 \end{definition}
 
@@ -537,7 +541,7 @@ first thread from the read of $y$ to one of the writes to $x$.
     $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
   \item \label{write-kappa-ca}
     \begin{math}
-      \labelingForm(\aEv) \rimplies
+      \labelingForm(\aEv) \riff
       \cForm_\aEv
       \land \aExp{=}\aVal_\aEv
     \end{math},
@@ -549,7 +553,7 @@ first thread from the read of $y$ to one of the writes to $x$.
     %   (\forall\aEv\in\aEvs)
     % \end{math}
     \begin{math}
-      \aTr{\bEvs}{\bForm} \rimplies 
+      \aTr{\bEvs}{\bForm} \riff 
       \cForm_\aEv
       \limplies 
       \bForm[\aExp/\aLoc]
@@ -580,14 +584,14 @@ first thread from the read of $y$ to one of the writes to $x$.
     %   }
     %   \end{math}.
   \item \label{write-term-ca}
-    $\aTerm \rimplies \cForm_\aEv \limplies \aExp{=}\aVal_\aEv$,
+    $\aTerm \riff \cForm_\aEv \limplies \aExp{=}\aVal_\aEv$,
     % \stepcounter{enumi}
     % \item[] \labeltext[\textsc{w}5]{}{write-term-ca}
     %   \begin{enumerate}[leftmargin=0pt]
     %   \item \label{write-term-nonempty-ca}
-    %     $\aTerm \rimplies \cForm_\aEv \limplies \aExp{=}\aVal_\aEv$,
+    %     $\aTerm \riff \cForm_\aEv \limplies \aExp{=}\aVal_\aEv$,
     %   \item \label{write-term-empty-ca}
-    %     $\aTerm \rimplies \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
+    %     $\aTerm \riff \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
     %   \end{enumerate}
   \end{enumerate}
   % \end{multicols}
@@ -605,7 +609,7 @@ first thread from the read of $y$ to one of the writes to $x$.
     $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
   \item \label{read-kappa-ca}
     \begin{math}
-      \labelingForm(\aEv) \rimplies
+      \labelingForm(\aEv) \riff
       \cForm_\aEv
     \end{math},
     \stepcounter{enumi}
@@ -616,7 +620,7 @@ first thread from the read of $y$ to one of the writes to $x$.
         (\forall\aEv\in\aEvs\cap\bEvs)
       \end{math}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         \cForm_\aEv
         \limplies \aVal_\aEv{=}\uReg{\aEv}
         \limplies \bForm[\uReg{\aEv}/\aReg]
@@ -627,7 +631,7 @@ first thread from the read of $y$ to one of the writes to $x$.
         (\forall\aEv\in\aEvs\setminus\bEvs)
       \end{math}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         \cForm_\aEv 
         \limplies
         \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
@@ -640,7 +644,7 @@ first thread from the read of $y$ to one of the writes to $x$.
         (\forall\bReg)
       \end{math}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies 
+        \aTr{\bEvs}{\bForm} \riff 
         % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
         (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
@@ -648,7 +652,7 @@ first thread from the read of $y$ to one of the writes to $x$.
       \end{math}  
     \end{enumerate}  
   \item \label{read-term-ca}
-    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \rimplies \FALSE$. 
+    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}
   % \begin{multicols}{2}
   %   \noindent
@@ -659,7 +663,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   %     $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
   %   \item \label{read-kappa-x}
   %     \begin{math}
-  %       \labelingForm(\aEv) \rimplies
+  %       \labelingForm(\aEv) \riff
   %       \cForm_\aEv
   %     \end{math},
   %   \end{enumerate}
@@ -670,7 +674,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   %     $\labelingAct(\aEv) = \DR[\mRLX]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
   %   \item \label{read-kappa-x}
   %     \begin{math}
-  %       \labelingForm(\aEv) \rimplies
+  %       \labelingForm(\aEv) \riff
   %       \cForm_\aEv\land \aLoc{=}\aVal_\aEv
   %     \end{math},
   %   \end{enumerate}
@@ -681,7 +685,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   %   (\forall\aEv\in\aEvs\setminus\bEvs)
   % \end{math}
   % \begin{math}
-  %   \aTr{\bEvs}{\bForm} \rimplies
+  %   \aTr{\bEvs}{\bForm} \riff
   %   \cForm_\aEv 
   %   \limplies
   %   \PBR{\aVal_\aEv{=}\uReg{\aEv} \land \aLoc{=}\uReg{\aEv}}
@@ -812,7 +816,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
       $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$,
     \item \label{write-kappa-ca-addr}
       \begin{math}
-        \labelingForm(\aEv) \rimplies
+        \labelingForm(\aEv) \riff
         \cForm_\aEv
         \land \cExp{=}\cVal_\aEv
         \land \aExp{=}\aVal_\aEv
@@ -822,7 +826,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
       \begin{enumerate}[leftmargin=0pt]
       \item \label{write-tau-dep-ca-addr}
         \begin{math}
-          \aTr{\bEvs}{\bForm} \rimplies 
+          \aTr{\bEvs}{\bForm} \riff 
           \cForm_\aEv
           \limplies (\cExp{=}\cVal)
           \limplies 
@@ -834,7 +838,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         \end{math}
         \\
         \begin{math}
-          \aTr{\bEvs}{\bForm} \rimplies 
+          \aTr{\bEvs}{\bForm} \riff 
           % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
           (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
           \limplies (\cExp{=}\dVal)
@@ -847,9 +851,9 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
     \item[] \labeltext[\textsc{w}5]{}{write-term-ca-addr}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{write-term-nonempty-ca-addr}
-        $\aTerm \rimplies \cForm_\aEv \limplies \cExp{=}\cVal_\aEv \land \aExp{=}\aVal_\aEv$,
+        $\aTerm \riff \cForm_\aEv \limplies \cExp{=}\cVal_\aEv \land \aExp{=}\aVal_\aEv$,
       \item \label{write-term-empty-ca-addr}
-        $\aTerm \rimplies \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
+        $\aTerm \riff \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
       \end{enumerate}
     \end{enumerate}
   \end{multicols}
@@ -867,7 +871,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
     $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$
   \item \label{read-kappa-ca-addr}
     \begin{math}
-      \labelingForm(\aEv) \rimplies
+      \labelingForm(\aEv) \riff
       \cForm_\aEv
       \land \cExp{=}\cVal_\aEv
     \end{math},
@@ -879,7 +883,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         (\forall\aEv\in\aEvs\cap\bEvs)
       \end{math}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         \cForm_\aEv
         \limplies (\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv})
         \limplies \bForm[\uReg{\aEv}/\aReg]
@@ -889,7 +893,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         (\forall\aEv\in\aEvs\setminus\bEvs)
       \end{math}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies
+        \aTr{\bEvs}{\bForm} \riff
         \cForm_\aEv 
         \limplies
         \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}{=}\uReg{\aEv})}
@@ -901,14 +905,14 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         (\forall\bReg)
       \end{math}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \rimplies 
+        \aTr{\bEvs}{\bForm} \riff 
         (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
         \bForm[\bReg/\aReg],
       \end{math}  
     \end{enumerate}  
   \item \label{read-term-ca-addr}
-    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \rimplies \FALSE$. 
+    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}
   % \medskip Similarly, let $\frf{\semaddr{}}$ be defined as for $\frf{\semrr{}}$
   % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
@@ -947,7 +951,7 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
   \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
     \setcounter{enumi}{7}
   \item \label{pom-rmw}
-    ${\rrmw} : \Event\fun\Event$ is a partial function capturing
+    ${\rrmw} : \aEvs\fun\aEvs$ is a partial function capturing
     read-modify-write \emph{atomicity}, such that
     \begin{enumerate}
     \item \label{pom-rmw-block}
@@ -969,7 +973,7 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
 
   Extend the definition of par, if, seq to include:
   \begin{enumerate}
-  \item[(\textsc{p}8)] (\textsc{s}8)\; (\textsc{c}8)\; ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
+  \item[(\textsc{p}8)] (\textsc{s}8)\; (\textsc{i}8)\; ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
   \end{enumerate}
 \end{definition}
 
@@ -1199,7 +1203,7 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
       \item[] \label{ca-psi}
         \begin{enumerate}[leftmargin=0pt]
         \item if $\cForm_i\land\cForm_j$ is satisfiable then $i=j$,        
-        \item $\bigvee_i\cForm_i\rimplies\TRUE$,        
+        \item $\bigvee_i\cForm_i\riff\TRUE$,        
         \end{enumerate}
         \stepcounter{enumi}
       \item[] \label{ca-E}
@@ -1213,16 +1217,16 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
         ${\labeling}=\bigcup_i{\labeling_i}$,%\PBR{{\labeling_1}\cup\cdots \cup {\labeling_n}}$,       
       \item \label{ca-kappa}
         \begin{math}
-          \labelingForm(\aEv) \rimplies
+          \labelingForm(\aEv) \riff
           \cForm_\aEv\land \labelingForm_\aEv(\aEv)
         \end{math},
       \item \label{ca-tau}
         \begin{math}
-          \aTr{\bEvs}{\bForm} \rimplies 
+          \aTr{\bEvs}{\bForm} \riff 
           \bigvee_i (\cForm_i\land \aTr[i]{\bEvs}{\bForm})
         \end{math},
       \item \label{ca-term}
-        $\aTerm \rimplies \bigvee_i (\cForm_i\land \aTerm[i])$,
+        $\aTerm \riff \bigvee_i (\cForm_i\land \aTerm[i])$,
       \item ${\rrfx}=\bigcup_i{\rrfx_i}$,
       \item ${\le}=\bigcup_i{\le_i}$.
       \end{enumerate}
@@ -1231,6 +1235,7 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 \end{comment}
 
 \subsection{Access Elimination}
+\label{sec:access:elimination}
 % For writes, change the label rules of sequential composition to:
 % \begin{enumerate}
 % \item %\label{par-lambda1}
@@ -1371,15 +1376,24 @@ Then we can replace \ref{seq-lambda}-\ref{seq-kappa} in \reffig{fig:sem} by:
 \item[] \setcounter{enumi}{\value{kappa}} \labeltextX{3}{s}{seq-kappa-merge}
   \begin{enumerate}[leftmargin=0pt]
   \item \label{seq-kappa-merge1}
-    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
+    if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$,
   \item \label{seq-kappa-merge2}
-    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \rimplies \labelingForm'_2(\aEv)$,
+    if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm'_2(\aEv)$,
   \item \label{seq-kappa-merge12}
     if $\aEv\in\aEvs_1\cap\aEvs_2$ then either
+    % \begin{itemize}
+    % \item $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)\land\labelingForm'_2(\aEv)$, or
+    % \item $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$ and $\labeling(\aEv)=\labeling_1(\aEv)=\labeling_2(\aEv)$.
+    % \end{itemize}
     \begin{itemize}
-    \item $\labeling(\aEv)=\labeling_1(\aEv)=\labeling_2(\aEv)$ and $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
-    \item $\labeling(\aEv)=\labeling_1(\aEv)\neq\labeling_2(\aEv)$ and $\labelingForm(\aEv) \rimplies \labelingForm_1(\aEv)$,
-    \item $\labeling(\aEv)=\labeling_2(\aEv)\neq\labeling_1(\aEv)$ and $\labelingForm(\aEv) \rimplies \labelingForm'_2(\aEv)$.
+    \item $\labeling(\aEv)=\labeling_1(\aEv)=\labeling_2(\aEv)$ and $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)$,
+    \item $\labeling(\aEv)=\labeling_1(\aEv)\neq\labeling_2(\aEv)$ and
+      $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$ and
+      $\labelingForm_2'(\aEv) \riff \labelingForm_1(\aEv)$,
+    \item $\labeling(\aEv)=\labeling_2(\aEv)\neq\labeling_1(\aEv)$ and
+      $\labelingForm(\aEv) \riff \labelingForm'_2(\aEv)$ and 
+      $\labelingForm_1(\aEv) \riff \labelingForm'_2(\aEv)$.
+      %if $\labeling_1(\aEv)$ is a write then $\labelingForm_1(\aEv) \riff \labelingForm'_2(\aEv)$.
     \end{itemize}
   \end{enumerate}
 \end{enumerate}
@@ -1398,6 +1412,36 @@ although this is considered safe.% \footnote{A list of safe merge operations
   % can be found in \cite[\textsection E]{DBLP:conf/cgo/ChakrabortyV17} and
   % \cite[\textsection7.1]{Kang19}.  For examples of unsafe merges and
   % reorderings, see \cite[\textsection D]{DBLP:conf/cgo/ChakrabortyV17}.}
+
+You can't just take the precondition of the winner, but also don't need to preserve the condition of the loser.
+
+Allowed:
+\begin{math}
+  \IF{\aExp}\THEN\PW{x}{1}\FI\SEMI\PW{x}{2}.
+\end{math}
+Not allowed:
+\begin{math}
+  \PW{x}{1}\SEMI\IF{\aExp}\THEN\PW{x}{2}\FI.
+\end{math}
+
+Allowed:
+\begin{math}
+  \PW{x}{1}\SEMI\IF{\aExp}\THEN\PR{x}{r}\FI.
+\end{math}
+Not allowed:
+\begin{math}
+  \IF{\aExp}\THEN\PW{x}{1}\FI\SEMI\PR{x}{r}.
+\end{math}
+
+Associativity is a pain.
+Consider
+\begin{math}
+  \PW{x}{1}
+  \SEMI
+  \IF{\aExp}\THEN\PW{x}{2}\FI
+  \SEMI
+  \IF{\BANG\aExp}\THEN\PW{x}{2}\FI
+\end{math}
 
 \endinput
 

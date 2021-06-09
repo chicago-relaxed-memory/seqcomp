@@ -122,6 +122,16 @@ given mode, as well as the usual structural constructs. Following
 preserving thread state on the left after a join.  In examples and
 sublanguages without join, we use the symmetric $\PAR$ operator.
 
+We use common syntax sugar, such as \emph{extended expressions}, $\aEExp$,
+which include memory locations.  For example, if $\aEExp$ includes a single
+occurrence of $\aLoc$, then $\bLoc\GETS\aEExp\SEMI \aCmd$ is shorthand for
+$\aReg\GETS\aLoc\SEMI\bLoc\GETS\aEExp[\aReg/\aLoc]\SEMI \aCmd$.  Each
+occurrence of $\aLoc$ in an extended expression corresponds to an separate
+read.  We also write $\IF{\aExp} \THEN \aCmd \FI$ as shorthand for
+$\IF{\aExp} \THEN \aCmd\ELSE \SKIP\FI$.
+
+
+
 Throughout \textsection\ref{sec:intro}--\ref{sec:arm} we 
 require that
 \begin{itemize}
@@ -196,11 +206,13 @@ $(\aReg{=}\aVal)\limplies((\bReg{>}\bVal)\limplies\bForm)$.
 %   We say
 %   $\aForm$ \emph{implies} $\bForm$ if $\aForm\vDash\bForm$.
 %   We say that
+We write $\aForm\riff\bForm$ when $\aForm\rimplies\bForm$ and $\bForm\rimplies\aForm$.
 We say
 $\aForm$ is a \emph{tautology} if $\TRUE \rimplies \aForm$.
 % We say that
 We say
-$\aForm$ is \emph{unsatisfiable} if $\aForm \rimplies \FALSE$.
+$\aForm$ is \emph{unsatisfiable} if $\aForm \rimplies \FALSE$, and
+\emph{satisfiable} otherwise.
 % \end{definition}
 
 
@@ -363,13 +375,17 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
   \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
     \makecounter{BE}
   \item \label{pom-E} \makecounter{E}
-    $\Event\subseteq\AllEvents$ is a set of \emph{events},
+    $\aEvs\subseteq\AllEvents$ is a set of \emph{events},
     \makecounter{Blambda}
   \item \label{pom-lambda} \makecounter{lambda}
-    $\labeling: \Event \fun \Act$ defines a \emph{label} for each event,
+    $\labeling: \aEvs \fun \Act$ defines a \emph{label} for each event,
     \makecounter{Bkappa}
   \item \label{pom-kappa} \makecounter{kappa}
-    $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
+    $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event, such that
+    \begin{enumerate}
+    \item \label{pom-kappa-sat}
+      $\labelingForm(\aEv)$ is satisfiable,
+    \end{enumerate}
     \makecounter{Btau}
   \item \label{pom-tau} \makecounter{tau}
     $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of predicate transformers} over $\aEvs$, 
@@ -378,17 +394,17 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     $\aTerm:\Formulae$ is a \emph{termination condition}, such that 
     \begin{enumerate}
     \item \label{pom-term-tau}
-      $\aTr{}{\TRUE}\rimplies\aTerm$,
+      $\aTerm\rimplies\aTr{}{\TRUE}$,
     \end{enumerate}
     \makecounter{Brf}
   \item \label{pom-rf} \makecounter{rf}
-    ${\rrfx} : \Event\fun\Event$ is an injective relation capturing
+    ${\rrfx} : \aEvs\fun\aEvs$ is an injective relation capturing
     \emph{reads-from}, such that 
     % \end{enumerate}
     % A pomset is a \emph{candidate} if there is an injective relation
-    % ${\rrfx} : \Event\times\Event$, capturing \emph{reads-from}, such that
+    % ${\rrfx} : \aEvs\times\aEvs$, capturing \emph{reads-from}, such that
     \begin{enumerate}
-      % \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+      % \begin{enumerate}[,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
       % \item \label{rf-injective}
       %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is, ${\rrfx}$ is injective,
     \item \label{pom-rf-match}
@@ -400,7 +416,7 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     \end{enumerate}
     \makecounter{Ble}
   \item \label{pom-le} \makecounter{le}
-    ${\le} : \Event\times\Event$, is a partial order capturing
+    ${\le} : \aEvs\times\aEvs$, is a partial order capturing
     \emph{causality}, such that
     \begin{enumerate}
     \item \label{pom-le-match}
@@ -409,9 +425,9 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
       if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
     \end{enumerate}
   \end{enumerate}
-  A pomset is \emph{top-level} if
+  A pomset is \emph{complete} if
   % \begin{multicols}{2}
-  \begin{enumerate}[,label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
+  \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
     \setcounter{enumi}{\value{Blambda}}
   \item \label{top-rf}
     if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$,
@@ -527,26 +543,6 @@ preconditions to weaken.
     }
   \end{math}
 
-  \begin{math}
-    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-    \supseteq
-    \xSEMI{
-      \xIFTHEN{\aForm}{\aPSS_1}{}
-    }{
-      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
-    }
-  \end{math}
-
-  \begin{math}
-    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-    \supseteq
-    \xSEMI{
-      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
-    }{
-      \xIFTHEN{\aForm}{\aPSS_1}{}
-    }
-  \end{math}
-
   \vspace{-.5\baselineskip}
   \begin{proof}
     Straightforward calculation.  Associativity of $\SEMI\!$ requires both
@@ -562,10 +558,10 @@ preconditions to weaken.
     \begin{enumerate}
     \item $\aEvs_2=\aEvs_1$,
     \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-    \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
-    \item $\aTr[2]{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\bForm}$,
-    \item $\aTerm[2] \rimplies \aTerm[1]$,
-    \item ${\rrfx_2}={\rrfx_1}$,
+    \item $\labelingForm_2(\aEv) \riff \labelingForm_1(\aEv)$,
+    \item $\aTr[2]{\bEvs}{\bForm}\riff \aTr[1]{\bEvs}{\bForm}$,
+    \item $\aTerm[2] \riff \aTerm[1]$,
+    \item ${\rrfx_2}\supseteq{\rrfx_1}$,
     \item ${\le_2}\supseteq{\le_1}$.
     \end{enumerate}
   \end{multicols}
@@ -782,7 +778,11 @@ this, it is easy to see that
 is a valid refinement (where the default mode is $\mRLX$).
 
 In $\sFENCE{}$, instead, \ref{fence-term} ensures that all fences are included at
-top-level.
+top-level.  This also ensures
+$\sembase{\PF{\amode}}\not\supseteq\sembase{\IF{\aExp}\THEN\PF{\amode}\FI}$,
+since $\sembase{\IF{\aExp}\THEN\PF{\amode}\FI}$ includes the empty set with
+termination condition $\not\aExp$, but $\sembase{\PF{\amode}}$ can only
+include the empty set with termination condition $\FALSE$.
 
 In $\sSTORE{}{}$, \ref{write-term-empty} is similar.  In addition,
 \ref{write-term-nonempty} ensures that top-level pomsets do not include bogus
@@ -1058,6 +1058,14 @@ conjunctive formulation: $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aFor
 %  is logically equivalent to
 %  \href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}. 
 
+This semantics validates dead code elimination:
+if $\aExp{\neq}0$ is a tautology then
+\begin{math}
+  \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} \supseteq
+  \sem{\aCmd_1}.
+\end{math}
+The reverse inclusion does not hold.
+
 For events from $\aEvs_1$, \ref{if-kappa1} requires
 $\aForm\land\labelingForm_1(\aEv)$. For events from $\aEvs_2$,
 \ref{if-kappa2} requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For
@@ -1263,6 +1271,196 @@ example, on read/write pairs:
 %   &&\text{if } \aLoc\not\in\free(\aCmd)
 % \end{align*}
 
+\subsection{Conditional and Coherence}
+\label{sec:if:seq}
+
+\begin{lemma}
+  \label{lem:if:seq}
+  \begin{math}
+    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+    \supseteq
+    \xSEMI{
+      \xIFTHEN{\aForm}{\aPSS_1}{}
+    }{
+      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+    }
+  \end{math}
+
+  \begin{math}
+    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+    \supseteq
+    \xSEMI{
+      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+    }{
+      \xIFTHEN{\aForm}{\aPSS_1}{}
+    }
+  \end{math}
+\end{lemma}
+
+Reverse direction does not hold, due to \ref{seq-le-delays}.
+\begin{enumerate}
+\item[\eqref{seq-le-delays}] if
+  $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$.  
+\end{enumerate}
+ An alternate phrasing might be attractive:
+\begin{enumerate}
+\item[{\labeltext[\textsc{s}7c$'$]{(\textsc{s}7c$'$)}{seq-le-delays'}}] if
+  $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
+  $\labelingForm(\bEv)\land\labelingForm(\aEv)$ is satisfiable then
+  $\bEv\le\aEv$.
+\end{enumerate}
+But \ref{seq-le-delays'} is incompatible with the ability to strengthen
+preconditions using augment closure.  Consider the following.
+\begin{align*}
+  \begin{gathered}[t]
+    \IF{r}\THEN\PW{x}{2}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \PW{x}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a2}{            \DW{x}{1}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a3}{            \DW{x}{2}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a4}{r{=}0   \mid\DW{x}{1}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+% \begin{align*}
+%   \begin{gathered}[t]
+%     \IF{r}\THEN\PW{x}{2}\FI
+%     \SEQ
+%     \PW{x}{1}
+%     \SEQ
+%     \PW{x}{2}
+%     \SEQ
+%     \IF{\BANG r}\THEN\PW{x}{1}\FI
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%         \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+%         \event{a2}{            \DW{x}{1}}{right=of a1}
+%         \event{a3}{            \DW{x}{2}}{right=of a2}
+%         \event{a4}{r{=}0   \mid\DW{x}{1}}{right=of a3}
+%       \end{tikzinline}}    
+%   \end{gathered}
+% \end{align*}
+Augmenting the middle preconditions and then using sequential composition, we have:
+\begin{align*}
+  \begin{gathered}[t]
+    \IF{r}\THEN\PW{x}{2}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \PW{x}{1}
+    \SEQ
+    \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a2}{r{\neq}0\mid\DW{x}{1}}{}
+        \event{a3}{r{=}0   \mid\DW{x}{2}}{right=of a1}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a4}{r{=}0   \mid\DW{x}{1}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+Note that \ref{seq-le-delays'} does not require any order between the two
+writes of the middle pomset.
+% \begin{align*}
+%   \begin{gathered}[t]
+%     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+%         \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+%         \event{a2}{r{=}0   \mid\DW{x}{1}}{right=of a1}
+%         \event{a3}{r{\neq}0\mid\DW{x}{2}}{right=of a2}
+%         \event{a4}{r{=}0   \mid\DW{x}{1}}{right=of a3}
+%       \end{tikzinline}}    
+%   \end{gathered}
+% \end{align*}
+Merging left and right, we have:
+\begin{align*}
+  \begin{gathered}[t]
+    \IF{r}\THEN\PW{x}{2}\FI
+    \SEQ
+    \PW{x}{1}
+    \SEQ
+    \PW{x}{2}
+    \SEQ
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DW{x}{2}}{}
+        \event{a4}{\DW{x}{1}}{right=of a1}
+        \wki{a1}{a4}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+As shown by the following single-threaded code, allowing this outcome would violate \drfsc{}.
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{y}{1}
+    \SEQ
+    \PR{y}{r}
+    \SEQ
+    \IF{r}\THEN\PW{x}{2}\FI
+    \SEQ
+    \PW{x}{1}
+    \SEQ
+    \PW{x}{2}
+    \SEQ
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DW{x}{2}}{}
+        \event{a4}{\DW{x}{1}}{right=of a1}
+        \wki{a1}{a4}
+        \event{b2}{\DR{y}{1}}{left=of a1}
+        \event{b1}{\DW{y}{1}}{left=of b2}
+        \rf{b1}{b2}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+
+To validate the reverse direction of \reflem{lem:if:seq}, it may be tempting
+to define the semantics using \emph{weakest} preconditions, rather than
+preconditions.  But in this case the notion of program refinement could not be
+simple set inclusion---for example, in general we would \emph{not} have
+\begin{math}
+  \aPSS_1
+  \supseteq
+  \xIFTHEN{\aForm}{\aPSS_1}{}.
+\end{math}
+
+As a result, we leave \reflem{lem:if:seq} as an inequation.  The equational
+form may be valid using some notion of \emph{observational} or
+\emph{contextual} refinement, but we do not pursue that here.
+
 \subsection{Associativity and Skolemization}
 \label{sec:ex:assoc}
 
@@ -1274,14 +1472,14 @@ this style we would have:
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-p}}]
   if $(\aEvs\cap\bEvs)\neq\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \rimplies    
+    \aTr{\bEvs}{\bForm} \riff    
     \bForm[\aVal/\aReg]
   \end{math},    
 \end{enumerate}
 Recall that \ref{read-tau-empty} says that $\bForm$ must be independent of
 $\aReg$ in order to appear in a top-level pomset: if $\aEvs=\emptyset$ then
 \begin{math}
-  \aTr{\bEvs}{\bForm} \rimplies
+  \aTr{\bEvs}{\bForm} \riff
   % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
   \bForm.
 \end{math}
@@ -1329,7 +1527,7 @@ Consider the following, eliding transformers for the writes:
   \end{gathered}
 \end{align*}
 Coalescing the writes and associating to the right,
-we have the following, since $(r{=}0 \lor r{\neq}0)\rimplies\TRUE$:
+we have the following, since $(r{=}0 \lor r{\neq}0)\riff\TRUE$:
 \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
@@ -1484,10 +1682,11 @@ dependent case are shown on the right above.  Only the read rule differs from
 the traditional one.
 
 For programs where every register is bound and every read is fulfilled, our
-dependent transformers are the same as the traditional ones.  In our
-semantics, thus, we only consider totally-ordered executions where every read
-could be fulfilled by prepending some writes.  For example, we ignore pomsets
-of $\PW{x}{2}\SEMI\PR{x}{r}$ that read $1$ for $x$.
+dependent transformers are the same as the traditional ones.  Thus, when
+comparing to weakest preconditions, let us only consider totally-ordered
+executions of our semantics where every read could be fulfilled by prepending
+some writes.  For example, we ignore pomsets of $\PW{x}{2}\SEMI\PR{x}{r}$
+that read $1$ for $x$.
 
 For example, let $\aCmd_i$ be defined:
 % as follows.
@@ -1793,21 +1992,21 @@ In $\sLOAD{}{}$, it is also possible to collapse $\aLoc$ and $\aReg$ via substit
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-sub}}]
   if $(\aEvs\cap\bEvs)\neq\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \rimplies
+    \aTr{\bEvs}{\bForm} \riff
     \aVal{=}\aReg
     \limplies \bForm[\aReg/\aLoc]
   \end{math},    
 \item[{\labeltext[\textsc{r}4b$'$]{(\textsc{r}4b$'$)}{read-tau-ind-sub}}]
   if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \rimplies
+    \aTr{\bEvs}{\bForm} \riff
     \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
     \bForm[\aReg/\aLoc],
   \end{math}
 \item[{\labeltext[\textsc{r}4c$'$]{(\textsc{r}4c$'$)}{read-tau-empty-sub}}]
   if $\aEvs=\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \rimplies
+    \aTr{\bEvs}{\bForm} \riff
     % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
     \bForm[\aReg/\aLoc],
   \end{math}

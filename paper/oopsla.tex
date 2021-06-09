@@ -11,14 +11,14 @@ we gave the semantics of read for nonempty pomsets as:
 \item[{\labeltext[\textsc{r}4a]{(\textsc{r}4a)}{read-tau-dep-oopsla}}]
   if $(\aEvs\cap\bEvs)\neq\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \rimplies
+    \aTr{\bEvs}{\bForm} \riff
     \aVal{=}\aReg
     \limplies \bForm
   \end{math},    
 \item[{\labeltext[\textsc{r}4b]{(\textsc{r}4b)}{read-tau-ind-oopsla}}]
   if $(\aEvs\cap\bEvs)=\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \rimplies
+    \aTr{\bEvs}{\bForm} \riff
     \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
     \bForm.
   \end{math}
@@ -29,7 +29,7 @@ In \jjr{}, the definition is roughly as follows:
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-oopsla-sub}}]
   if $(\aEvs\cap\bEvs)\neq\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \rimplies
+    \aTr{\bEvs}{\bForm} \riff
     \bForm[\aVal/\aReg][\aVal/\aLoc]
     % \aVal{=}\aReg
     % \limplies \bForm[\aReg/\aLoc]
@@ -37,7 +37,7 @@ In \jjr{}, the definition is roughly as follows:
 \item[{\labeltext[\textsc{r}4b$'$]{(\textsc{r}4b$'$)}{read-tau-ind-oopsla-sub}}]
   if $(\aEvs\cap\bEvs)=\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \rimplies
+    \aTr{\bEvs}{\bForm} \riff
     \bForm[\aVal/\aReg][\aVal/\aLoc]\land\bForm[\aLoc/\aReg]
   \end{math}
 \end{enumerate}
@@ -99,11 +99,11 @@ references.
   % definition would modify \ref{L4} to be:
   % \begin{enumerate}
   % \item[\ref{L4})]
-  %   $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$.
+  %   $\aTr{\bEvs}{\bForm} \riff \aVal{=}\aLoc\limplies\bForm[\aLoc/\aReg]$.
   %   % \item[\ref{L5})]
-  %   %   $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
+  %   %   $\aTr{\cEvs}{\bForm} \riff (\aVal{=}\aLoc\lor\TRUE)\limplies\bForm[\aLoc/\aReg]$. %, when $\aEvs\neq\emptyset$,
   %   % \item[\ref{L6})] 
-  %   %   $\aTr{\dEvs}{\bForm}\; \rimplies \bForm$, when $\aEvs=\emptyset$.
+  %   %   $\aTr{\dEvs}{\bForm}\; \riff \bForm$, when $\aEvs=\emptyset$.
   % \end{enumerate}
   Using this definition, consider the following:
   \begin{gather*}
@@ -128,8 +128,8 @@ references.
 % \begin{enumerate}
 % \item[] %[\ref{loadpre-kappa2})]
 %   if $\aEv\in\aEvs_2\setminus\aEvs_1$ then either \\
-%   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
-%   $\labelingForm(\aEv) \rimplies \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
+%   $\labelingForm(\aEv) \riff \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc]$ and $(\exists\bEv\in\aEvs_1)\bEv{<}\aEv$, or \\
+%   $\labelingForm(\aEv) \riff \labelingForm_2(\aEv)[\aLoc/\aReg][\aVal/\aLoc] \land \labelingForm_2(\aEv)[\aLoc/\aReg]$.
 % \end{enumerate}
 
 

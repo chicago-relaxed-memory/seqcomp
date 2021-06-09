@@ -29,14 +29,14 @@ instead is given by control and data dependencies.
 \subsection{Pomsets}
 
 \begin{definition}
-  A \emph{poimet} with alphabet $\Alphabet$ is a tuple
-  $(\Event, {\le}, \labeling)$ where
+  A \emph{pomset} with alphabet $\Alphabet$ is a tuple
+  $(\aEvs, {\le}, \labeling)$ where
   \begin{enumerate}
-  \item $\Event$ is a set of \emph{events}
+  \item $\aEvs$ is a set of \emph{events}
   \item
-    ${\le} \subseteq (\Event\times\Event)$ is the \emph{causality} partial order, and
+    ${\le} \subseteq (\aEvs\times\aEvs)$ is the \emph{causality} partial order, and
   \item
-    $\labeling: \Event \fun \Alphabet$ is a \emph{labeling}.
+    $\labeling: \aEvs \fun \Alphabet$ is a \emph{labeling}.
   \end{enumerate}
 \end{definition}
 

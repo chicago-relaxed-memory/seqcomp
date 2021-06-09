@@ -65,8 +65,8 @@ strings.
     \begin{enumerate}
     \item $\aEvs_2\subseteq\aEvs_1$,
     \item $(\forall \aEv\in\aEvs_2)$ $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-    \item $(\forall \aEv\in\aEvs_2)$ $\labelingForm_2(\aEv)=\labelingForm_1(\aEv)$,
-    \item $(\forall \aEv\in\aEvs_2)$ $\aTr[2]{\bEvs}{\aEv}=\aTr[1]{\bEvs}{\aEv}$,
+    \item $(\forall \aEv\in\aEvs_2)$ $\labelingForm_2(\aEv)\riff\labelingForm_1(\aEv)$,
+    \item $(\forall \aEv\in\aEvs_2)$ $\aTr[2]{\bEvs}{\aEv}\riff\aTr[1]{\bEvs}{\aEv}$,
     \item $\aTerm[2] \rimplies \aTerm[1]$,
     \item $(\forall \bEv\in\aEvs_2)$ $(\forall \aEv\in\aEvs_2)$ $\bEv\rrfx_2\aEv$ iff $\bEv\rrfx_1\aEv$,, 
       \stepcounter{enumi}
@@ -170,9 +170,12 @@ Revisiting JMM causality test case 1 from the end of \textsection\ref{sec:ex:con
   &&
   \begin{gathered}[t]
     \IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \SEMI
+    \PW{z}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a2}{r{\geq}0\mid\DW{y}{1}}{}      
+        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}      
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -182,11 +185,15 @@ Revisiting JMM causality test case 1 from the end of \textsection\ref{sec:ex:con
     \PW{x}{0} 
     \SEMI\PR{x}{r} 
     \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \SEMI
+    \PW{z}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a0}{\DW{x}{0}}{}
         \event{a1}{\DR{x}{1}}{right=of a0}
         \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}      
+        \event{a3}{1{=}r\limplies r{=}1\mid\DW{z}{1}}{right=of a2}
+        \po[out=-15,in=-165]{a1}{a3}
         \wki{a0}{a1}
       \end{tikzinline}}    
   \end{gathered}
@@ -200,12 +207,35 @@ the precondition of $\DWP{y}{1}$ is not a tautology:
     \PW{x}{0} 
     \SEMI\PR{x}{r} 
     \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \SEMI
+    \PW{z}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a0}{\DW{x}{0}}{}
         % \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{r{\geq}0\mid\DW{y}{1}}{right=3em of a1}      
+        \event{a2}{r{\geq}0\mid\DW{y}{1}}{right=6em of a0}      
+        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}
         % \wk{a0}{a1}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+The second issue goes away if one allows general access elimination to merge
+$\DWP{x}{0}$ and $\DRP{x}{0}$, as in \textsection\ref{sec:access:elimination}.
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{x}{0} 
+    \SEMI\PR{x}{r} 
+    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \SEMI
+    \PW{z}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        %\event{a1}{\DR{x}{1}}{right=of a0}
+        \event{a2}{(0{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=6em of a0}      
+        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}
+        %\po[out=-15,in=-165]{a1}{a3}
+        %\wki{a0}{a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1793,7 +1823,7 @@ Extend the definition of a pomset as follows. % where two actions \emph{overlap}
 \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
   \setcounter{enumi}{-1}
 \item \label{pom-rmw}
-  ${\rrmw} : \Event\fun\Event$ is a partial function capturing
+  ${\rrmw} : \aEvs\fun\aEvs$ is a partial function capturing
   read-modify-write \emph{atomicity}, such that
   \begin{enumerate}
   \item \label{pom-rmw-block}

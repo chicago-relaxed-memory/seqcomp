@@ -9,11 +9,11 @@ fences\footnote{Fences are not actions in \armeight{}, which complicates the
   An \emph{\armeight{} execution graph}, $\aEG$, is tuple
   $(\aEvs, \labeling, {\rpoloc}, {\rlob})$ such that
   \begin{enumerate}[,label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
-  \item $\Event\subseteq\AllEvents$ is a set of {events},
-  \item $\labeling: \Event \fun \Act$ defines a {label} for each event,
-  \item ${\rpoloc} : \Event\times\Event$, is a per-thread, per-location total
+  \item $\aEvs\subseteq\AllEvents$ is a set of {events},
+  \item $\labeling: \aEvs \fun \Act$ defines a {label} for each event,
+  \item ${\rpoloc} : \aEvs\times\aEvs$, is a per-thread, per-location total
     order, capturing \emph{per-location program order},
-  \item ${\rlob} : \Event\times\Event$, is a per-thread partial order capturing
+  \item ${\rlob} : \aEvs\times\aEvs$, is a per-thread partial order capturing
     \emph{locally-ordered-before}, such that
     \begin{enumerate}
     \item \label{arm-lob-poloc}
@@ -48,10 +48,10 @@ and that $\rlob$ does \emph{not} include
     \setcounter{enumi}{4}
   %\item[\eqref{arm-co}] and \eqref{arm-rf}, as for \EC,
   \item \label{arm-co}
-    ${\rco} : \Event\times\Event$, is a per-location total order on
+    ${\rco} : \aEvs\times\aEvs$, is a per-location total order on
     writes, capturing \emph{coherence}, 
   \item \label{arm-rf}
-    ${\rrfx} : \Event\times\Event$, is a surjective and injective
+    ${\rrfx} : \aEvs\times\aEvs$, is a surjective and injective
     relation on reads, capturing \emph{reads-from}, such that
     \begin{enumerate}
     \item \label{arm-match}
@@ -66,7 +66,7 @@ and that $\rlob$ does \emph{not} include
     % \item ${\rpoloc} \cup {\rco} \cup {\rrfx} \cup {\rfr}$ is acyclic, where
     %   $\bEv\xfr\aEv$ if $(\exists\cEv)$ $\bEv\xrfxinv\cEv\xco\aEv$,
   \item \label{arm-gcb}
-    ${\rgcb}\supseteq\PBR{{\rco}\cup{\rrfx}}$ is a linear order %, capturing \emph{globally completes before}, %$\rcb : % \Event\times\Event$
+    ${\rgcb}\supseteq\PBR{{\rco}\cup{\rrfx}}$ is a linear order %, capturing \emph{globally completes before}, %$\rcb : % \aEvs\times\aEvs$
     such that 
     \begin{enumerate}%[leftmargin=0pt]
       % \item if $\bEv\xco\aEv$ then $\bEv\xgcb\aEv$,
@@ -84,7 +84,7 @@ and that $\rlob$ does \emph{not} include
   \begin{enumerate}[resume,label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
   \item[\eqref{arm-co}] and \eqref{arm-rf}, as for \EGC,
   \item \label{arm-cb}
-    ${\rcb}\supseteq\PBR{{\rco}\cup{\rlob}}$ is a linear order %, capturing \emph{completes before}, %$\rcb : % \Event\times\Event$
+    ${\rcb}\supseteq\PBR{{\rco}\cup{\rlob}}$ is a linear order %, capturing \emph{completes before}, %$\rcb : % \aEvs\times\aEvs$
     such that if $\bEv\xrfx\aEv$ then either
     \begin{enumerate}%[leftmargin=0pt]
     \item \label{arm-rfe}
