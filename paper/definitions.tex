@@ -512,36 +512,6 @@ preconditions to weaken.
       \xSEMI{\aPSS_1}{\xSEMIP{\aPSS_2}{\aPSS_3}}.
     \end{math}
 
-  \\\item \label{monoid:if:seq}
-    \begin{math}
-      \xSEMI{
-        \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-      }{
-        \aPSS_3
-      }
-      =
-      \xIFTHEN{\aForm}{
-        \xSEMI{\aPSS_1}{\aPSS_3}
-      }{
-        \xSEMI{\aPSS_2}{\aPSS_3}
-      }.
-    \end{math}
-
-  \\\item \label{monoid:seq:if}
-    \begin{math}
-      \xSEMI{
-        \aPSS_1
-      }{
-        \xIFTHEN{\aForm}{\aPSS_2}{\aPSS_3}
-      }
-      =
-      \xIFTHEN{\aForm}{
-        \xSEMI{\aPSS_1}{\aPSS_2}
-      }{
-        \xSEMI{\aPSS_1}{\aPSS_3}
-      }.
-    \end{math}
-
   \\\item
     \begin{math} \label{monoid:ifelse:if:if}
       \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
@@ -576,6 +546,36 @@ preconditions to weaken.
       \xIFTHEN{\aForm\land\bForm}{\aPSS}{}.
     \end{math}
 
+  \\\item \label{monoid:if:seq}
+    \begin{math}
+      \xIFTHEN{\aForm}{
+        \xSEMI{\aPSS_1}{\aPSS_3}
+      }{
+        \xSEMI{\aPSS_2}{\aPSS_3}
+      }
+      \supseteq
+      \xSEMI{
+        \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+      }{
+        \aPSS_3
+      }.
+    \end{math}
+
+  \\\item \label{monoid:seq:if}
+    \begin{math}
+      \xIFTHEN{\aForm}{
+        \xSEMI{\aPSS_1}{\aPSS_2}
+      }{
+        \xSEMI{\aPSS_1}{\aPSS_3}
+      }
+      \supseteq
+      \xSEMI{
+        \aPSS_1
+      }{
+        \xIFTHEN{\aForm}{\aPSS_2}{\aPSS_3}
+      }.
+    \end{math}
+
   \\\item \label{monoid:if:elim}
     \begin{math}
       \xIFTHEN{\aForm}{\aPSS}{\aPSS}
@@ -587,11 +587,23 @@ preconditions to weaken.
   \begin{proof}
     Straightforward calculation.
     \eqref{monoid:unit} requires \ref{pom-term-tau} for
-    termination of the right
-    unit of $\sSKIP$ for $\SEMI\!$.
+    the termination condition in $\xSEMIP{\aPSS}{\sSKIP}$.
+
     \eqref{monoid:seq} requires both
-    conjunction closure (\ref{tr-and}, for termination) and disjunction
-    closure (\ref{tr-or}, for the predicate transformers themselves).  
+    conjunction closure (\ref{tr-and}, for the termination condition) and disjunction
+    closure (\ref{tr-or}, for the predicate transformers themselves).
+
+    \eqref{monoid:ifelse:if:if} requires \ref{seq-le-delays} not impose order
+    when $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is
+    unsatisfiable, which in turn requires that $\labelingForm$ calculates
+    \emph{weakest} preconditions, rather than simple preconditions (see
+    \textsection\ref{sec:if:seq}).
+
+    \eqref{monoid:if:dead} requires \ref{pom-kappa-sat}.
+
+    In \textsection\ref{sec:semca}, we refine the semantics to validate the
+    reverse inclusions for \eqref{monoid:if:seq}, \eqref{monoid:seq:if}, and
+    \eqref{monoid:if:elim}.
   \end{proof}
 \end{lemma}
 \begin{definition}
