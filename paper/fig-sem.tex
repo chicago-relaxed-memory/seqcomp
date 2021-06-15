@@ -2,7 +2,7 @@
   \bookmark{Semantics of programs}
   \raggedright
   \noindent
-  Suppose $\aRel_1:\aEvs_1\times\aEvs_1$ and $\aRel_2:\aEvs_2\times\aEvs_2$.
+  Suppose $\aRel_1\subseteq\aEvs_1\times\aEvs_1$ and $\aRel_2\subseteq\aEvs_2\times\aEvs_2$.
 
   We say $\aRel \rextendsdef{\aRel_1}{\aRel_2}$ if
   $\aRel\supseteq (\aRel_1\cup \aRel_2)$ and
@@ -198,7 +198,7 @@
     \item[] \labeltext[\textsc{r}4]{}{read-tau}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-tau-dep}
-        if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+        if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
         \begin{math}
           \aTr{\bEvs}{\bForm} \riff
           \aVal{=}\aReg

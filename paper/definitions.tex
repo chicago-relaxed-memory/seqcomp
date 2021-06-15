@@ -188,9 +188,9 @@ We use expressions as formulae, coercing $\aExp$ to $\aExp{\neq}0$.
 % $(\aReg{=}\aVal)\limplies(\bReg{>}\bVal)$.  As usual, implication associates to the
 % right; thus $\aForm\limplies\bForm\limplies\cForm$ is read
 % $\aForm\limplies(\bForm\limplies\cForm)$.
-As usual, implication associates to the right; thus
-$\aReg{=}\aVal\limplies\bReg{>}\bVal\limplies\bForm$ is read
-$(\aReg{=}\aVal)\limplies((\bReg{>}\bVal)\limplies\bForm)$.
+% As usual, implication associates to the right; thus
+% $\aReg{=}\aVal\limplies\bReg{>}\bVal\limplies\bForm$ is read
+% $(\aReg{=}\aVal)\limplies((\bReg{>}\bVal)\limplies\bForm)$.
 
 % Formulae are subject to substitutions; % of the form $[\aExp/\aReg]$ and
 % % $[\aExp/\aLoc]$;
@@ -237,7 +237,7 @@ of actions, using defaults.
 % stand for $\DWP[\amode]{}[\ascope]{}[\aThrd]$ or
 % $\DRP[\amode]{}[\ascope]{}[\aThrd]$.
 % 
-Let $\lemode$ be the least order over access and fence modes such that
+Let $\lemode$ be the smallest order over access and fence modes such that
 %$\mRLX\lemode\mRA\lemode\mSC$ and $\fREL\lemode\fSC$ and $\fACQ\lemode\fSC$.
 $\mRLX\lemode\mREL\lemode\mSC$ and $\mRLX\lemode\mACQ\lemode\mSC$.
 We write $\DWP[\gemode\mREL]{}{}$ to stand for either $\DWP[\mREL]{}{}$ or
@@ -287,8 +287,6 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
   % Let two actions \emph{overlap} if they access the same location.
   % We say $\aAct \roverlapsdef \bAct$ if they access the same location.
 
-  We say $\aAct \rdelaysdef \bAct$ if $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or $\aAct\eqreordersc\bAct$.
-
   Let ${\eqreorderco}$ capture write-write, read-write coherence:
   \begin{math}
     {\eqreorderco}
@@ -296,7 +294,7 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
     \{(\DW{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DR{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DW{\aLoc}{}\Cb \DR{\aLoc}{})\}
   \end{math}.
 
-  Let ${\reorderra}$ capture order due to synchronization:
+  Let ${\reorderra}$ capture conflict due to synchronization:
   \begin{math}
     {\reorderra}
     =
@@ -310,19 +308,21 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
     (\DW[\gemode\mREL]{\aLoc}{}\Cb\DW{\aLoc}{})\}
   \end{math}.
 
-  Let ${\eqreordersc}$ capture order due to $\mSC$ access:
+  Let ${\eqreordersc}$ capture conflict due to $\mSC$ access:
   \begin{math}
     {\eqreordersc}
     =
     % \{(\DX[\mSC]{}{}\Cb\DX[\mSC]{}{})\}
     \{(\DW[\mSC]{}{}\Cb \DW[\mSC]{}{})\Cc(\DR[\mSC]{}{}\Cb \DW[\mSC]{}{}) \Cc(\DW[\mSC]{}{}\Cb \DR[\mSC]{}{})\Cc(\DR[\mSC]{}{}\Cb \DR[\mSC]{}{})\}
   \end{math}.
+
+  We say $\aAct \rdelaysdef \bAct$ if $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or $\aAct\eqreordersc\bAct$.
 \end{definition}
 
 \subsection{The Semantic Domain} %: Pomsets with Predicate Transformers}
 \label{sec:pomsets}
 
-\emph{Predicate transformers} are functions on formulae which preserve
+\emph{Predicate transformers} are functions on formulae that preserve
 logical structure, providing a natural model of sequential composition.
 The definition comes from \citet{DBLP:journals/cacm/Dijkstra75}:
 
@@ -365,7 +365,7 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
   such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}
   \rimplies \aTr{\bEvs}{\bForm}$.
 
-  We write $\aTr{}{}$ as an abbreviation of $\aTr{\aEvs}{}$.
+  We write $\aTr{}{\bForm}$ as an abbreviation of $\aTr{\aEvs}{\bForm}$.
 \end{definition}
 
 \begin{definition}
@@ -398,7 +398,7 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     \end{enumerate}
     \makecounter{Brf}
   \item \label{pom-rf} \makecounter{rf}
-    ${\rrfx} : \aEvs\fun\aEvs$ is an injective relation capturing
+    ${\rrfx} \subseteq \aEvs\times\aEvs$ is an injective relation capturing
     \emph{reads-from}, such that 
     % \end{enumerate}
     % A pomset is a \emph{candidate} if there is an injective relation
@@ -416,7 +416,7 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     \end{enumerate}
     \makecounter{Ble}
   \item \label{pom-le} \makecounter{le}
-    ${\le} : \aEvs\times\aEvs$, is a partial order capturing
+    ${\le} \subseteq \aEvs\times\aEvs$, is a partial order capturing
     \emph{causality}, such that
     \begin{enumerate}
     \item \label{pom-le-match}
@@ -836,15 +836,62 @@ In $\sFENCE{}$, instead, \ref{fence-term} ensures that all fences are included a
 top-level.  This also ensures
 $\sembase{\PF{\amode}}\not\supseteq\sembase{\IF{\aExp}\THEN\PF{\amode}\FI}$,
 since $\sembase{\IF{\aExp}\THEN\PF{\amode}\FI}$ includes the empty set with
-termination condition $\not\aExp$, but $\sembase{\PF{\amode}}$ can only
+termination condition $\lnot\aExp$, but $\sembase{\PF{\amode}}$ can only
 include the empty set with termination condition $\FALSE$.
 
 In $\sSTORE{}{}$, \ref{write-term-empty} is similar.  In addition,
 \ref{write-term-nonempty} ensures that top-level pomsets do not include bogus
 writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted above, $\aPS$ can
-include $\DWP{x}{\aVal}$, for any value $\aVal$.  At top-level, however,
-\ref{write-term-nonempty} requires that $\aTerm$ implies $1{=}\aVal$.
-
+include $(1{=}\aVal\mid\DW{x}{\aVal})$, for any value $\aVal$.  At top-level,
+however, \ref{write-term-nonempty} requires that $\aTerm$ implies
+$1{=}\aVal$.  In this case, \ref{pom-kappa-sat} would filter the pomset,
+since preconditions must be satisfiable.  However, unsatisfiable writes can be become satisfiable via
+merging:
+% Nonetheless, it is important that
+% \ref{write-term-nonempty} specifies $\aTerm\riff\aExp{=}\aVal$ rather than
+% $\aTerm\riff\TRUE$, since 
+\begin{align*}
+  \begin{gathered}
+    \PW{x}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a}{\DW{x}{1}}{}      
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{b}{2{=}3\mid\DW{x}{3}}{}      
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \IF{\aExp}\THEN\PW{x}{3}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{c}{\aExp\mid\DW{x}{3}}{}      
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+By merging, the semantics allows the following:
+\begin{align*}
+  \begin{gathered}
+    \PW{x}{1}
+    \SEMI
+    \PW{x}{2}
+    \SEMI
+    \IF{\aExp}\THEN\PW{x}{3}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a}{\DW{x}{1}}{}      
+        \event{c}{\aExp\mid\DW{x}{3}}{right=of a}
+        \wki{a}{c}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+This pomset is incomplete, however, since $\aTerm\riff2{=}3$.
 
 \subsection{Data Dependencies, Preconditions, and Predicate Transformers}
 \label{sec:ex:data}
@@ -961,7 +1008,7 @@ First we consider the case that $\aVal=\bVal$.  For example if $\aVal=\bVal=1$, 
 For the read, the dependent transformer $\smash{\aTr[1]{\{\bEv\}}{}}$ is
 $1{=}r\limplies\bForm$; the independent transformer $\aTr[1]{\emptyset}{}$ is
 $(x{=}r\lor1{=}r)\limplies\bForm$.  These are determined by
-\ref{read-tau-dep} and \ref{read-tau-ind}, respectively.  For the write both
+\ref{read-tau-dep} and \ref{read-tau-ind}, respectively.  For the write, both
 % the dependent transformer
 $\smash{\aTr[2]{\{\aEv\}}{}}$ and
 % the independent transformer
@@ -1019,7 +1066,7 @@ Eliding transformers, the two outcomes are:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-The independent case on the left can only participate in a top-level pomset
+The independent case on the right can only participate in a top-level pomset
 if the precondition $(x{=}1)$ is discharged.  To do so, we must prepend a
 pomset $\aPS_0$ that writes $1$ to $x$:
 \begin{align*}
@@ -1546,7 +1593,8 @@ imply the transformer for a larger subset.
 
 Sadly, this definition fails associativity.
 
-Consider the following, eliding transformers for the writes:
+Consider the following, eliding transformers for the writes (``$\BANG$''
+represents logical negation):
 \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
@@ -1733,7 +1781,7 @@ rules can be written as on the left below:
 \end{aligned}
 \end{align*}
 Here we have chosen an alternative formulation for the read rule, which is
-equivalent the more traditional $\bForm[\aLoc/\aReg]$, as long as registers
+equivalent to the more traditional $\bForm[\aLoc/\aReg]$, as long as registers
 are assigned at most once in a program.  Our predicate transformers for the
 dependent case are shown on the right above.  Only the read rule differs from
 the traditional one.
@@ -2187,7 +2235,7 @@ cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
 cache, whereas without the substitution, they do not.  Since most caches work
 this way, the model with $[r/x]$ is likely preferred for modeling hardware.
 However, this substitution only makes sense in a model with read-read
-coherence and read-read dependencies, which will see is not case for Arm.  By
+coherence and read-read dependencies, which we will see is not the case for Arm.  By
 leaving out the substitution, we also ensure that downgraded reads are
 fulfilled by preceding writes, not reads.
 

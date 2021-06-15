@@ -1,0 +1,112 @@
+Thanks for reading our paper!  All of the reviews are perfectly sensible.
+But it does seem like the big picture of the paper has gotten lost a bit in
+the grungy details of relaxed memory...
+
+The paper includes a _novel_ and _transferable_ idea: families of predicate
+transformers can be used to calculate relaxed dependencies in a way that is
+_compositional_ and _direct_.
+
+This idea is not tied to the vagaries of ARM, or any particular compiler
+optimization, or DRF-SC.
+
+There has only been one previous attempt to compute dependencies in a relaxed
+memory model compositionally [Paviotti et al. 2020], and that semantics uses
+continuation passing to encode sequential composition.  As an example of
+transferability: it would be relatively straightforward to adapt our
+technique to [Paviotti et al. 2020] in order to arrive a semantics of C11
+that avoids thin air results.  This would swap the event structures of
+[Paviotti et al. 2020] for preconditions and predicate transformers.
+
+The other methods of computing dependencies are:
+- not bothering (as in C11)
+- using syntax (as in hardware models)
+- using complex non-compositional operational models such as the JMM,
+  promising semantics, weakestMO, etc
+
+REFEREE A:
+----------
+
+> You don't explicitly state whether your model is intended to capture C11,
+> Java, both, or neither. It looks pretty similar to C11 but not quite the
+> same. Could you clarify?
+
+You could think of our model as a variant of C11 that allows more
+optimizations on relaxed atomics.  (C11 fails to validate
+common-subexpression-elimination on relaxed atomics without alias analysis.)
+Java fails time-wise LDRF (races from the past can pollute the future).
+
+> On line 503, I couldn't get my head around why the independent transformer
+> is $(x{=}r \vee 1{=}r) \Rightarrow \psi$. Could you explain the intuition
+> behind that? (I can see that it comes from R4b but I don't see why there is
+> a disjunction.)
+
+This was discussed in the PwP paper, using non-skolemized substitutions
+rather than implication (see appendix D of this paper).  In this paper, we
+discussed JMM TC1 briefly at lines 564-569.  In that example, the
+precondition of Wy1 is ((1=r ∨ 0=r) ⇒ r≥0).  You need that (1=r ⇒ r≥0) to
+ensure that the preceding read consumes an admissible value.  You need that
+(0=r ⇒ r≥0) to ensure that the preceding write produces an admissible value.
+
+
+REFEREE B:
+----------
+
+> On the other hand, the model is way too complicated,
+
+We were quite pleased that Fig 1 fit on a single page.  Allocating another
+page for definitions 2.1-2.4, this still compares quite favorably to any other
+relaxed model.  
+
+> and does not appear particularly useful for verification
+
+Work-in-progress suggests otherwise.
+
+> I wonder, is there one model that incorporates all the desired
+> adaptations/extensions, that satisfies all the properties discussed in the
+> paper?
+
+Yes.  Pick the variant from section 3 that gives the compilation strategy you
+want to ARM.  The additional features of section 4 are cumulative, so take
+the last model there and add RMWs.
+
+> The paper does not really discuss the programmability results, such as DRF
+> theorems or the temporal logic from the "Pomset with Preconditions" paper,
+> while the abstract mentions these results.  Is it because of lack of space
+> or are they straightforward?
+
+We shall remove this from the abstract.  
+
+The results of section 6 and 8 of PwP need to be rephrased to match the
+details of this paper. But we expect the proofs to be nearly identical.  We
+have not worked through the details yet.
+
+At a high-level, emphasizing these detracts from the main point of the paper.
+
+
+REFEREE C:
+----------
+
+> The detailed account is also well-explained, but massive enough that few
+> people will carefully read all of it.
+
+We hope that the introduction has a kernel of an idea which is applicable
+beyond the details of the model.
+
+> It would improve confidence to also consider POWER, RISC-V, and/or others as
+> a cross-check on too little vs too much generalization.
+
+Work-in-progress demonstrates that the idea of this paper is indeed
+transferable to these architectures.  These models require more than one
+order, but no changes to preconditions or predicate transformers.  The
+dependency calculation is the same!
+
+> I gather that the authors have checked these with ARM architects; if so they
+> should be clearer about this.
+
+We are using a (just published!) characterization of ARM [Alglave et al
+2021].  The authors of that paper have seen a preprint of section 3.
+
+> My only hesitance is that this paper, plus possibly follow-ons might be
+> better suited to straight-to-journal submission.
+
+But isn't PACM-PL a journal? :-)

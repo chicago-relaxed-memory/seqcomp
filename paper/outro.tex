@@ -1,6 +1,6 @@
 \section{Future Work}
 
-This paper is the first to present a direct compositional semantics for
+This paper is the first to present a direct denotational semantics for
 sequential composition in a relaxed memory model which can be
 efficiently compiled to modern CPUs. There is, as usual, more research
 to be done.
@@ -18,6 +18,8 @@ the performance penalty is for these fences.
 
 An earlier version of this paper has been mechanized in Agda; it would be
 reassuring to update the mechanization to bring it in line with the current state.
+
+We don't handle access elimination.
 
 % We have presented the first model of relaxed memory that treats sequential
 % composition as a first-class citizen. The model builds directly on \jjr{}.

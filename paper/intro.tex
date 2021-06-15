@@ -18,7 +18,7 @@ as \emph{predicate transformers}, where predicates describe the state of
 memory in the system.  In the calculus of weakest preconditions, programs map
 postconditions to preconditions.  We recall the definition of
 $\fwp{\aCmd}{\bForm}$ for loop-free code below (where $\aReg$--$\bReg$ range over thread-local \emph{registers}
-and $\aExp$--$\bExp$ range over side-effect free \emph{expressions}). 
+and $\aExp$--$\bExp$ range over side-effect-free \emph{expressions}). 
 %\begin{multicols}{2}
   \begin{enumerate}[,label=(\textsc{d}\arabic*),ref=\textsc{d}\arabic*]
   \item
@@ -94,11 +94,11 @@ Existing approaches to sequential composition in the concurrent context
 either assume exclusive access, as in concurrent separation logic
 \cite{OHearn:2007:RCL:1235896.1236121}, or abandon the logical approach
 altogether, as in the pomset model of
-\citet{DBLP:journals/corr/abs-1804-04214}---this model uses syntactic
-dependencies and thus dramatically limits compiler optimization.  This leaves
-open the question of how to apply logic to racy programs without
-overconstraining the implementation.  To understand the solution, one must first
-understand the constraints imposed by hardware and compilers.
+\citet{DBLP:journals/corr/abs-1804-04214}, which enforces syntactic
+dependencies.  This leaves open the question of how to apply logic to racy
+programs without overconstraining the implementation.  To understand the
+solution, one must first understand the constraints imposed by hardware and
+compilers.
 
 
 % Assuming all variables are initialized to $0$,
@@ -160,7 +160,8 @@ for example:
 
 This model naturally extends to the case of shared-memory concurrency, leading to a \emph{sequentially consistent}
 semantics \cite{Lamport:1979:MMC:1311099.1311750}, in which \emph{program order} inside a thread implies
-a total \emph{causal order} between read and write events, for example:
+a total \emph{causal order} between read and write events, for example
+(where $\SEMI\!$ has higher precedence than $\PAR$):
 \begin{gather*}
   \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
   \PAR
@@ -191,7 +192,7 @@ many have chosen to prioritize efficiency over elegance.
 
 This has led to \emph{relaxed memory models}, in which the requirement of
 sequential consistency is weakened to only apply \emph{per-location} and not globally
-over the whole program. This allows executions which
+over the whole program. This allows executions that
 are inconsistent with program order, such as:
 \begin{gather*}
   \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
@@ -292,7 +293,8 @@ data dependencies) and conditionals (modeling control dependencies):
       \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
     \end{tikzinline}}
 \end{gather*}
-Preconditions are discharged by being ordered after a read:
+Preconditions are discharged by being ordered after a read (we assume the
+usual precedence for logical operators---$\lnot$, $\land$, $\lor$, $\limplies$): 
 \begin{gather*}
   \tag{$\dagger$}\label{eq1}
   \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
@@ -580,7 +582,7 @@ This is an instance of the general result that sequential composition forms a mo
 \citet{DBLP:conf/snapl/MarinoMMNS15} argue that the ``silently shifting
 semicolon'' is sufficiently problematic for programmers that concurrent
 languages should guarantee sequential abstraction, despite the performance
-penalties.  In this paper, we have taken the opposite approach.  We have
+penalties.  In this paper, we take the opposite approach.  We have
 attempted to find the most intellectually tractable model that encompasses
 all of the messiness of relaxed memory.
 

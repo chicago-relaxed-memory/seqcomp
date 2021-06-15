@@ -263,7 +263,7 @@ semantics.
 If the read of $x$ in the execution above is changed from acquiring to
 relaxed, then our semantics allows the $\rgcb$ execution, using the independent case
 for the read and satisfying the precondition of $\DWP{y}{1}$ by prepending
-$\DWP{x}{2}$.  It may be tempting, therefore to adopt a strategy of
+$\DWP{x}{2}$.  It may be tempting, therefore, to adopt a strategy of
 \emph{downgrading} acquires in certain cases.  Unfortunately, it is not
 possible to do this locally without invalidating important idioms such as
 publication.  For example, consider that $\DRP[\mRA]{x}{1}$ is \emph{not} possible for
