@@ -1,0 +1,68 @@
+\section{Future Work}
+
+This paper is the first to present a direct denotational semantics for
+sequential composition in a relaxed memory model which can be
+efficiently compiled to modern CPUs. There is, as usual, more research
+to be done.
+
+We have not treated loops in this model, though we expect that the usual
+approach of showing continuity for all the semantic operations with respect to set inclusion
+would go through. \citet{DBLP:conf/esop/PaviottiCPWOB20} use step-indexing to account for
+loops; a similar approach could be applied here.
+
+In \S\ref{sec:arm1} we presented a compilation strategy to \armeight{}
+for a simplified model, but which introduces fences to acquiring
+reads. These fences are not required in \S\ref{sec:arm2}, but at the
+cost of model complexity. It would be illuminating to find out what
+the performance penalty is for these fences.
+
+An earlier version of this paper has been mechanized in Agda; it would be
+reassuring to update the mechanization to bring it in line with the current state.
+
+We don't handle access elimination.
+
+% We have presented the first model of relaxed memory that treats sequential
+% composition as a first-class citizen. The model builds directly on \jjr{}.
+
+% For sequential composition, parallel composition and the conditional, we
+% believe that the definition is \emph{natural}, even \emph{canonical}.
+% For stores and loads, instead, the definition in \reffig{fig:no-addr} is a
+% Frankenstein's monster of features.  This complexity is \emph{essential},
+% however, not just an accident of our poor choices.  Relaxed memory models must
+% please many audiences: compiler writers want one thing, hardware designers
+% another, and programmers yet another still.  The result is inevitably full of
+% compromise.
+
+% Given that \emph{complexity} cannot be eliminated from relaxed memory models,
+% the best one can do is attempt to understand its causes.  We have broken the
+% problem into seven manageable pieces, discussed throughout
+% \textsection\ref{sec:q}--\ref{sec:complications}.  \refdef{def:pomsets-arm}
+% summarizes all the features necessary for efficient implementation on
+% \armeight{}.  We discuss address calculation, read-modify-write operations
+% and fences in the appendix.
+
+% {Logic} is the thread that sews these features together.
+
+% %A unique feature of our model is the centrality of logic: 
+
+% % study each feature in isolation, as a small delta to the base definition
+% % given in \textsection\ref{sec:model}.
+% % In we studied eight such
+% % features.
+
+
+% % seem staggeringly complex, we argue that this complexity is unavoidable if
+% % one wants all the features that it embodies.  By breaking the definition into
+% % its constituent parts, we have shown how each of eight
+
+
+% \subsection*{Acknowledgements}
+% % This paper has been greatly improved by the comments of the anonymous reviewers.
+% Riely was supported by the National Science Foundation under
+% grant No.~CCR-1617175.
+
+% % It is based upon work supported by the National Science Foundation under
+% % Grant No. CCR-1617175. Any opinions, findings, and conclusions or
+% % recommendations expressed in this material are those of the author and do
+% % not necessarily reflect the views of the NSF.}
+

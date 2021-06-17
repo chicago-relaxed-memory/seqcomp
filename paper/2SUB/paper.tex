@@ -1,0 +1,195 @@
+%SPLASH 
+% Fri 16 Apr 2021 Paper Submissions - 1st round
+% Sun 13 Jun 2021 Reviews - 1st round
+% Mon 14 - Wed 16 Jun 2021 Author Response
+% Fri 2 Jul 2021 Notifications -- 1st round
+% Fri 13 Aug 2021 Paper Submission -- 2nd
+% Mon 30 Aug 2021 Notifications - final
+% Mon 13 Sep 2021 Camera-ready submissions
+% Oct 17-22 conference.
+
+% Submitted papers may be at most 23 pages in 10 point font, excluding
+% bibliographic references and appendices.
+
+% Sophia Drossopoulou
+% Erika Abraham RWTH Aachen University
+% Karim Ali University of Alberta
+% Davide Ancona DIBRIS, University of Genova, Italy
+% Gavin Bierman Oracle Labs
+% Judith Bishop Stellenbosch University
+% Steve Blackburn Australian National University
+% Michael D. Bond Ohio State University, USA
+% Edwin Brady University of St Andrews, UK
+% Michael Carbin Massachusetts Institute of Technology
+% Sarah E. Chasins University of California, Berkeley
+% James Cheney University of Edinburgh, UK
+% Shigeru Chiba The University of Tokyo
+% Mike Dodds Galois, Inc.
+% Kathi Fisler Brown University
+% Colin Gordon Drexel University
+% Justin Gottschlich Intel Labs / Penn
+% Michael Greenberg Pomona College
+% David Grove IBM Research
+% Arjun Guha Northeastern University
+% Michael Hicks University of Maryland at College Park
+% Marieke Huisman University of Twente
+% Atsushi Igarashi Kyoto University, Japan
+% Daniel Jackson MIT
+% Jeehoon Kang KAIST
+% Sarfraz Khurshid University of Texas at Austin
+% Viktor Kunčak EPFL, Switzerland
+% Yonghwi Kwon University of Virginia
+% Doug Lea State University of New York (SUNY) Oswego
+% Mohsen Lesani University of California at Riverside, USA
+% Crista Lopes University of California, Irvine
+% Mira Mezini TU Darmstadt, Germany
+% Todd Millstein University of California at Los Angeles
+% Sasa Misailovic University of Illinois at Urbana-Champaign
+% Andrew C. Myers Cornell University
+% Iulian Neamtiu New Jersey Institute of Technology
+% James Noble Victoria University of Wellington
+% Hakjoo Oh Korea University
+% Klaus Ostermann University of Tübingen
+% Nadia Polikarpova University of California at San Diego
+% Polyvios Pratikakis University of Crete
+% Gregor Richards University of Waterloo
+% Aritra Sengupta Amazon Web Services, USA
+% Yannis Smaragdakis University of Athens
+% Gustavo Soares Microsoft
+% Diomidis Spinellis Athens University of Economics and Business & TU Delft
+% Manu Sridharan University of California at Riverside
+% Alexander J. Summers University of British Columbia
+% Frank Tip Northeastern University
+% Laurence Tratt King's College London
+% Viktor Vafeiadis MPI-SWS
+% Jan Vitek Northeastern University / Czech Technical University
+% Mitchell Wand Northeastern University, USA
+% Weihang Wang University at Buffalo, SUNY
+% Adam Welc Uber Technologies
+% John Wickerson Imperial College London
+% Yunhui Zheng IBM Research
+
+
+\RequirePackage{amssymb}  %% bizarre error previous def of Bbbk if after documentclass
+\documentclass[acmsmall,screen,anonymous,review]{acmart}\settopmatter{printfolios=true}
+\hypersetup{bookmarksnumbered,bookmarksopen=true,bookmarksdepth=3}
+\settopmatter{printfolios=true}
+\AtEndPreamble{%
+  % \theoremstyle{acmdefinition}
+  % \theoremstyle{plain}
+  % \newtheorem{theorem}{Theorem}[section]
+  % \newtheorem{proposition}[theorem]{Proposition}
+  % \theoremstyle{acmdefinition}
+  % \newtheorem{definition}[theorem]{Definition}
+  \theoremstyle{acmdefinition}
+  \newtheorem{remark}[theorem]{Remark}
+  \newtheorem{candidate}[theorem]{Candidate}
+  \renewcommand{\theequation}{\fnsymbol{equation}}
+}
+\bibliographystyle{ACM-Reference-Format}
+\citestyle{acmauthoryear}   %% For author/year citations
+
+\setcopyright{rightsretained}
+\acmPrice{}
+\acmDOI{}
+\acmYear{2021}
+\copyrightyear{2021}
+\acmSubmissionID{}
+\acmJournal{PACMPL}
+\acmVolume{0}
+\acmNumber{OOPSLA}
+\acmArticle{0}
+\acmMonth{10}
+\startPage{1}
+
+% \begin{makeatletter}
+%   \gdef\@copyrightpermission{%
+%     This paper is published under the Creative Commons Attribution~4.0
+%     International (CC-BY~4.0) license.
+%   }
+% \end{makeatletter}
+% \acmYear{2020}
+% \acmDOI{XX.XXXX/XXXXXXX.XXXXXXX}
+
+\usepackage{macros}
+%\showRAfalse
+\showSCOPEfalse
+\begin{document}
+
+\title{Predicate Transformers for Relaxed Memory:  Sequential
+  Composition for Concurrency Using Semantic Dependencies}
+% \author{Radha Jagadeesan}
+% \orcid{0000-0002-4525-1589}
+% \affiliation{
+%   %\department{School of Computing}
+%   \institution{DePaul University}
+%   \city{Chicago}
+%   \country{USA}
+% }
+% %\email{rjagadeesan@cs.depaul.edu}
+
+\author{Alan Jeffrey}
+\orcid{0000-0001-6342-0318}
+\affiliation{
+  \institution{Roblox}
+  \city{Chicago}
+  \country{USA}
+}
+%\email{ajeffrey@mozilla.com}
+
+\author{James Riely}
+\orcid{0000-0002-8731-1463}
+\affiliation{
+  %\department{School of Computing}
+  \institution{DePaul University}
+  \city{Chicago}
+  \country{USA}
+}
+%\email{jriely@cs.depaul.edu}
+
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10003752.10003753.10003761.10003762</concept_id>
+       <concept_desc>Theory of computation~Parallel computing models</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10003752.10010124.10010138.10010141</concept_id>
+       <concept_desc>Theory of computation~Pre- and post-conditions</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10003752.10010124.10010131.10010133</concept_id>
+       <concept_desc>Theory of computation~Denotational semantics</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Theory of computation~Parallel computing models}
+\ccsdesc[300]{Theory of computation~Preconditions}
+%\ccsdesc[300]{Theory of computation~Denotational semantics}
+
+\keywords{Concurrency, Relaxed Memory Models, Multi-Copy Atomicity, ARMv8, Pomsets, Preconditions, 
+  Temporal Safety Properties, Thin-Air Reads, Compiler Optimizations} %% \keywords is optional
+\maketitle
+\input{intro.tex}
+\input{definitions.tex}
+\input{arm.tex}
+\input{variants.tex}
+\input{outro.tex}
+\bibliography{bib}
+\appendix
+\input{discussion.tex}
+\input{oopsla.tex}
+\end{document}
+
+% Local Variables:
+% mode: latex
+% TeX-master: t
+% End:

@@ -1,0 +1,652 @@
+\section{Arm}
+\label{sec:arm}
+For simplicity, we restrict to top level parallel composition and ignore
+fences\footnote{Fences are not actions in \armeight{}, which complicates the
+  theorem statements.}.
+
+\subsection{Arm executions}
+\begin{definition}
+  An \emph{\armeight{} execution graph}, $\aEG$, is tuple
+  $(\aEvs, \labeling, {\rpoloc}, {\rlob})$ such that
+  \begin{enumerate}[,label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
+  \item $\aEvs\subseteq\AllEvents$ is a set of {events},
+  \item $\labeling: \aEvs \fun \Act$ defines a {label} for each event,
+  \item ${\rpoloc} : \aEvs\times\aEvs$, is a per-thread, per-location total
+    order, capturing \emph{per-location program order},
+  \item ${\rlob} : \aEvs\times\aEvs$, is a per-thread partial order capturing
+    \emph{locally-ordered-before}, such that
+    \begin{enumerate}
+    \item \label{arm-lob-poloc}
+      ${\rpoloc} \cup {\rlob}$ is acyclic.
+    \end{enumerate}
+  \end{enumerate}
+\end{definition}
+
+The definition of $\rlob$ is complex.  Comparing with our definition of
+sequential composition, it is sufficient to note that $\rlob$ includes
+\begin{enumerate}[label=(\textsc{l}\arabic*),ref=\textsc{l}\arabic*]
+\item read-write dependencies, required by \ref{seq-kappa},
+\item synchronization delay of ${\reorderra}$, required by \ref{seq-le-delays},
+\item $\mSC$ access delay of ${\eqreordersc}$, required by \ref{seq-le-delays},
+\item write-write and read-to-write coherence delay of ${\eqreorderco}$, required by \ref{seq-le-delays},
+\end{enumerate}
+and that $\rlob$ does \emph{not} include
+\begin{enumerate}[resume,label=(\textsc{l}\arabic*),ref=\textsc{l}\arabic*]
+\item \label{lob-rr} \labeltext[above]{}{lob-le}
+  read-read control dependencies, required by \ref{seq-kappa},
+\item \label{lob-rf}
+  write-to-read order of $\rrfx$, required by \ref{seq-le-rf},
+\item \label{lob-wr}
+  write-to-read coherence delay of ${\eqreorderco}$, required by \ref{seq-le-delays}.
+\end{enumerate}
+
+\begin{definition}
+  Execution $\aEG$ is
+  \emph{$({\rco}, {\rrfx}, {\rgcb})$-valid}, under \emph{External Global
+    Consistency} (\EGC{}) if
+  \begin{enumerate}[label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
+    \setcounter{enumi}{4}
+  %\item[\eqref{arm-co}] and \eqref{arm-rf}, as for \EC,
+  \item \label{arm-co}
+    ${\rco} : \aEvs\times\aEvs$, is a per-location total order on
+    writes, capturing \emph{coherence}, 
+  \item \label{arm-rf}
+    ${\rrfx} : \aEvs\times\aEvs$, is a surjective and injective
+    relation on reads, capturing \emph{reads-from}, such that
+    \begin{enumerate}
+    \item \label{arm-match}
+      if $\bEv\xrfx\aEv$ then $\labeling(\bEv) \rmatches \labeling(\aEv)$,      
+    \item \label{arm-local}
+      ${\rpoloc} \cup {\rco} \cup {\rrfx} \cup {\rfr}$ is acyclic,
+      where $\aEv\xfr\cEv$ if %$(\exists\bEv)$
+      $\aEv\xrfxinv\bEv\xco\cEv$, for some $\bEv$,
+      % \stepcounter{enumi}
+      % \item[] \labeltext[\textsc{a}2]{}{arm-cb}
+    \end{enumerate}
+    % \item ${\rpoloc} \cup {\rco} \cup {\rrfx} \cup {\rfr}$ is acyclic, where
+    %   $\bEv\xfr\aEv$ if $(\exists\cEv)$ $\bEv\xrfxinv\cEv\xco\aEv$,
+  \item \label{arm-gcb}
+    ${\rgcb}\supseteq\PBR{{\rco}\cup{\rrfx}}$ is a linear order %, capturing \emph{globally completes before}, %$\rcb : % \aEvs\times\aEvs$
+    such that 
+    \begin{enumerate}%[leftmargin=0pt]
+      % \item if $\bEv\xco\aEv$ then $\bEv\xgcb\aEv$,
+      % \item if $\bEv\xrfx\aEv$ then $\bEv\xgcb\aEv$,
+    \item \label{arm-gcb-blocks}
+      if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\xgcb\bEv$ or $\aEv\xgcb\cEv$, 
+    \item \label{arm-gcb-lob}
+      if $\aEv\xlob\cEv$ then either $\aEv\xgcb\cEv$ or $(\exists\bEv)$
+      $\bEv\xrfx\aEv$ and $\bEv\xpoloc\aEv$ but not $\bEv\xlob\cEv$.
+    \end{enumerate}
+  \end{enumerate}
+  
+  Execution $\aEG$ is
+  \emph{$({\rco}, {\rrfx}, {\rcb})$-valid} under \emph{External Consistency} (\EC{}) if
+  \begin{enumerate}[resume,label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
+  \item[\eqref{arm-co}] and \eqref{arm-rf}, as for \EGC,
+  \item \label{arm-cb}
+    ${\rcb}\supseteq\PBR{{\rco}\cup{\rlob}}$ is a linear order %, capturing \emph{completes before}, %$\rcb : % \aEvs\times\aEvs$
+    such that if $\bEv\xrfx\aEv$ then either
+    \begin{enumerate}%[leftmargin=0pt]
+    \item \label{arm-rfe}
+      % $\bEv\xcb\aEv$ and $\cEv\rblocks\aEv$ then either $\cEv\xcb\bEv$ or $\aEv\xcb\cEv$, or 
+      $\bEv\xcb\aEv$ and if $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\xcb\bEv$ or $\aEv\xcb\cEv$, or
+      % $\bEv\xcb\aEv$ and $(\not\exists\cEv)$ such that $\bEv\xcb\cEv\xcb\aEv$ and $\cEv\rblocks\aEv$, or 
+    \item \label{arm-rfi}
+      $\bEv\xcbinv\aEv$ and $\bEv\xpoloc\aEv$ and $(\not\exists\cEv)$ $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv\xpoloc\cEv\xpoloc\aEv$.
+      % $\bEv\xpoloc\aEv$ and $(\not\exists\cEv)$ such that $\bEv\xpoloc\cEv\xpoloc\aEv$ and $\cEv\rblocks\aEv$.
+      % \item if $\bEv\xco\aEv$ then $\bEv\xgcb\aEv$,
+      % \item if $\bEv\xrfx\aEv$ then $\bEv\xgcb\aEv$,
+      % \item if $\bEv\xrfx\aEv$ and $\cEv\rblocks\aEv$ then either $\cEv\xgcb\bEv$ or $\aEv\xgcb\cEv$,
+      % \item if $\bEv\xlob\aEv$ then either $\bEv\xgcb\aEv$ or $(\exists\cEv)$
+      %   $\cEv\xrfx\bEv$ and $\cEv\xpoloc\bEv$ but not $\cEv\xlob\aEv$.
+    \end{enumerate}
+  \end{enumerate}
+\end{definition}
+\citet{armed} show that \EGC{} and \EC{} are both equivalent to the standard
+definition of Arm8.  They explain \EGC{} and \EC{} using the following
+example, which is allowed by Arm8.\footnote{We have changed an address
+  dependency in the first thread to a data dependency.}
+\begin{gather*}
+  \PW{x}{1}\SEMI 
+  \PR{x}{r}\SEMI
+  \PW{y}{r} \PAR
+  \PR[\mACQ]{y}{1}\SEMI
+  \PR{x}{s}
+  \\
+  %\tag{\cmark\armeight}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \event{b}{\DR{x}{1}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \raevent{d}{\DR[\mACQ]{y}{1}}{right=2.5em of c}
+      \event{e}{\DR{x}{0}}{right=of d}
+      \rfx{a}{b}
+      \lob{b}{c}
+      \rfx{c}{d}
+      \lob{d}{e}
+      \fr[out=-165,in=-15]{e}[above,pos=.375]{a}
+    \end{tikzinline}}
+\end{gather*}
+\EGC{} drops $\rlob$-order in the first thread using \ref{arm-gcb-lob}, since
+$\DWP{x}{1}$ is not $\rlob$-ordered before $\DWP{y}{1}$.
+\begin{gather*}
+  \tag{$\rgcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \event{b}{\DR{x}{1}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \raevent{d}{\DR[\mACQ]{y}{1}}{right=2.5em of c}
+      \event{e}{\DR{x}{0}}{right=of d}
+      \gcbz{a}{b}
+      \gcbz{c}{d}
+      \gcbz{d}{e}
+      \gcbz[out=-165,in=-15]{e}{a}
+      % \rfx{a}{b}
+      % %\lob{b}{c}
+      % \rfx{c}{d}
+      % \lob{d}{e}
+      % \co[out=-165,in=-15]{e}[above right]{a}
+    \end{tikzinline}}
+\end{gather*}
+\EC{} drops $\rrfx$-order in the first thread using \ref{arm-rfi}.
+\begin{gather*}
+  \tag{$\rcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \event{b}{\DR{x}{1}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \raevent{d}{\DR[\mACQ]{y}{1}}{right=2.5em of c}
+      \event{e}{\DR{x}{0}}{right=of d}
+      \cbz{b}{c}
+      \cbz{c}{d}
+      \cbz{d}{e}
+      \cbz[out=-165,in=-15]{e}{a}
+      % %\rfx{a}{b}
+      % \lob{b}{c}
+      % \rfx{c}{d}
+      % \lob{d}{e}
+      % \co[out=-165,in=-15]{e}[above right]{a}
+    \end{tikzinline}}
+\end{gather*}
+
+\subsection{Arm Compilation 1}
+\label{sec:arm1}
+
+We do not distinguish control dependencies from other dependencies, and
+therefore \ref{lob-rr} forces us to drop all dependencies between reads.  To
+achieve this, we modify the definition of $\labelingForm'_2$ in
+\reffig{fig:sem}.
+\begin{definition}
+  \label{def:semrr}
+  Let $\semrr{}$ be defined as in \reffig{fig:sem}, replacing the definition
+  of $\labelingForm'_2$ with:
+  \begin{displaymath}
+    \labelingForm'_2(\aEv)=
+    \begin{cases}
+      \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a read}
+      \\
+      \aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv)} & \text{otherwise, where}\; \Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}
+    \end{cases}
+    % $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
+    % \Cdown{\aEv}=
+    % \begin{cases}
+    %   \{ \cEv \mid \cEv \lt \aEv \} & \textif \labeling(\aEv) \;\text{is a write}
+    %   \\
+    %   \aEvs_1 & \textotherwise
+    % \end{cases}
+  \end{displaymath}
+\end{definition}
+
+Even with this small change, the optimal lowering for \armeight{} is unsound
+for our semantics.  The optimal lowering maps relaxed access to \LDR/\STR{} and
+non-relaxed access to \LDAR/\STLR{} \citep{DBLP:journals/pacmpl/PodkopaevLV19}.
+In this section, we consider a suboptimal strategy, which lowers non-relaxed
+reads to $(\DMBSY\SEMI\LDAR)$.  Significantly, we retain the optimal lowering
+for relaxed access.  In the next section we recover the optimal lowering by
+adopting an alternative semantics for \ref{seq-le-rf} and \ref{seq-le-delays}.
+
+To see why the optimal lowering fails, consider the following attempted
+execution, where the final values of both $x$ and $y$ are $2$.
+\begin{gather*}
+  %\taglabel{rfi-coe-coe}
+  \PW{x}{2}\SEMI 
+  \PR[\mACQ]{x}{r}\SEMI
+  \PW{y}{r{-}1} \PAR
+  \PW{y}{2}\SEMI
+  \PW[\mREL]{x}{1}
+  %\\
+  %\tag{\cmark\armeight}
+  % \hbox{\begin{tikzinline}[node distance=1.5em]
+  %     \event{a}{\DW{x}{2}}{}
+  %     \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+  %     \event{c}{\DW{y}{1}}{right=of b}
+  %     \event{d}{\DW{y}{2}}{right=2.5em of c}
+  %     \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+  %     \rfi{a}{b}
+  %     \bob{b}{c}
+  %     \coe{c}{d}
+  %     \bob{d}{e}
+  %     \coe[out=-165,in=-15]{e}{a}
+  %   \end{tikzinline}}
+  \\
+  \tag{$\rgcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \gcbz{a}{b}
+      %\sync{b}{c}
+      \gcbz{c}{d}
+      \gcbz{d}{e}
+      \gcbz[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+  \\
+  \tag{$\le$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \rf{a}{b}
+      \sync{b}{c}
+      \wk{c}{d}
+      \sync{d}{e}
+      \wk[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+\end{gather*}
+This attempted execution is allowed by \armeight, but disallowed by our
+semantics.
+
+If the read of $x$ in the execution above is changed from acquiring to
+relaxed, then our semantics allows the $\rgcb$ execution, using the independent case
+for the read and satisfying the precondition of $\DWP{y}{1}$ by prepending
+$\DWP{x}{2}$.  It may be tempting, therefore, to adopt a strategy of
+\emph{downgrading} acquires in certain cases.  Unfortunately, it is not
+possible to do this locally without invalidating important idioms such as
+publication.  For example, consider that $\DRP[\mRA]{x}{1}$ is \emph{not} possible for
+the second thread in the following attempted execution, due to publication of
+$\DWP{x}{2}$ via $y$:
+\begin{gather*}
+  \PW{x}{\PR{x}{}+1}\SEMI
+  \PW[\mREL]{y}{1}
+  \PAR
+  \PW{x}{1}\SEMI
+  \IF{\PR[\mACQ]{y}{}\AND\PR[\mACQ]{x}{}}\THEN
+  \PR{z}{s}
+  \FI
+  \PAR
+  \PW{z}{1}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{b1}{\DR{x}{1}}{}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
+      \po{b1}{b2}
+      \sync{b2}{b3}
+      \event{a1}{\DW{x}{1}}{right=3em of b3}
+      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \event{a4}{\DR{z}{0}}{right=of a3}
+      \sync{a2}{a3}
+      \sync{a3}{a4}
+      \event{c1}{\DW{z}{1}}{right=3em of a4}
+      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
+      \sync{c1}{c2}
+      \rf[out=-165,in=-15]{a1}{b1}
+      \rf[out=15,in=165]{b3}{a2}
+      \rf[out=-165,in=-15]{c2}{a3}
+      \wk{a4}{c1}
+    \end{tikzinline}}
+\end{gather*}
+Instead, if the read of $x$ is relaxed, then the publication via $y$ fails,
+and $\DRP{x}{1}$ in the second thread is possible.
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{b1}{\DR{x}{1}}{}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \raevent{b3}{\DW[\mREL]{y}{1}}{right=of b2}
+      \po{b1}{b2}
+      \sync{b2}{b3}
+      \event{a1}{\DW{x}{1}}{right=3em of b3}
+      \raevent{a2}{\DR[\mACQ]{y}{1}}{right=of a1}
+      \event{a3}{\DR{x}{1}}{right=of a2}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \event{a4}{\DR{z}{0}}{right=of a3}
+      \sync{a2}{a3}
+      \sync[out=15,in=165]{a2}{a4}
+      \event{c1}{\DW{z}{1}}{right=3em of a4}
+      \raevent{c2}{\DW[\mREL]{x}{1}}{right=of c1}
+      \sync{c1}{c2}
+      \rf[out=-165,in=-15]{a1}{b1}
+      \rf[out=15,in=165]{b3}{a2}
+      \rf[out=-165,in=-15]{c2}{a3}
+      \wk{a4}{c1}
+    \end{tikzinline}}
+\end{gather*}
+
+Using the suboptimal lowering for acquiring reads, our semantics is sound for
+Arm.  The proof uses the characterization of Arm using \EGC{}.
+
+\begin{theorem}
+  \label{thm:egc}
+  Suppose $\aEG_1$ is $({\rco_1}, {\rrfx_1}, {\rgcb_1})$-valid for $\aCmd$
+  under the suboptimal lowering that maps non-relaxed reads to
+  $(\DMBSY\SEMI\LDAR)$.  Then there is a top-level pomset
+  $\aPS_2\in\semrr{\aCmd}$ such that $\aEvs_2=\aEvs_1$,
+  $\labeling_2=\labeling_1$, ${\rrfx_2}={\rrfx_1}$, and ${\le_2}={\rgcb_1}$.
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    First, we establish some lemmas about \armeight.
+    
+    \vspace{-.5\baselineskip}
+    \begin{lemma}
+      \label{lemma:fr1}
+      Suppose $\aEG$ is $({\rco}, {\rrfx}, {\rgcb})$-valid.  Then
+      ${\rgcb}\supseteq{\rfr}$.
+
+      \vspace{-.5\baselineskip}
+      \begin{proof}
+        Using the definition of ${\rfr}$ from \ref{arm-local}, we have
+        $\aEv\xrfxinv\bEv\xco\cEv$, and therefore $\labeling(\cEv)$ blocks
+        $\labeling(\aEv)$.    
+        Applying \ref{arm-gcb-blocks}, we have that either $\cEv\xgcb\bEv$ or $\aEv\xgcb\cEv$.
+        Since $\rgcb$ includes $\rco$, we have $\bEv\xgcb\cEv$, and therefore it
+        must be that $\aEv\xgcb\cEv$.
+      \end{proof}
+    \end{lemma}
+    
+    \begin{lemma}
+      \label{lemma:wr}
+      Suppose $\aEG$ is $({\rco}, {\rrfx}, {\rgcb})$-valid and
+      $\cEv\xpoloc\aEv$, where $\labeling(\cEv)\rblocks\labeling(\aEv)$.
+      Then $\cEv\xgcb\aEv$.
+      %$\labeling(\cEv)=\DWP{x}{}$ and $\labeling(\aEv)=\DRP{x}{}$.
+
+      \vspace{-.5\baselineskip}
+      \begin{proof}
+        By way of contradiction, assume $\aEv\xgcb\cEv$.  If $\cEv\xrfx\aEv$
+        then by \ref{arm-gcb} we must also have $\cEv\xgcb\aEv$,
+        contradicting the assumption that $\rgcb$ is a total order.
+        %
+        Otherwise that there is some $\bEv\neq\cEv$ such that
+        $\bEv\xrfx\aEv$, and therefore $\bEv\xgcb\aEv$.  By transitivity,
+        $\bEv\xgcb\cEv$.  By the definition of $\rfr$, we have
+        $\aEv\xfr\cEv$.  But this contradicts \ref{arm-local}, since
+        $\cEv\xpoloc\aEv$.
+        %Applying \ref{arm-gcb-blocks}, we have that either $\cEv\xgcb\bEv$ or $\aEv\xgcb\cEv$.
+      \end{proof}
+    \end{lemma}
+    We show that all the order required in the pomset is also required by
+    \armeight{}.  \ref{pom-le-block} holds since ${\rcb_1}$ is consistent with
+    ${\rco_1}$ and ${\rfr_1}$.  As noted \ref{lob-le}, $\rlob$ includes the order
+    required by \ref{seq-kappa} and \ref{seq-le-delays}.  We need only show
+    that the order removed from \ref{arm-gcb-lob} can also be removed from
+    the pomset.  In order for \ref{arm-gcb-lob} to remove order from $\aEv$
+    to $\cEv$, we must have $\bEv\xrfx\aEv$ and $\bEv\xpoloc\aEv$ but not
+    $\bEv\xlob\cEv$.  Because of our suboptimal lowering, it must be that
+    $\aEv$ is a relaxed read; otherwise the $\DMBSY$ would require
+    $\bEv\xlob\cEv$.  Thus we know that \ref{seq-le-delays} does not require
+    order from $\aEv$ to $\cEv$.  By chaining \ref{read-tau-ind} and
+    \ref{write-tau}, any dependence on the read can by satisfied without
+    introducing order in \ref{seq-kappa}.
+  \end{proof}  
+\end{theorem}
+
+
+
+% This model compiles correctly to arm using the lowering: Relaxed access is
+% implemented using \texttt{ldr}/\texttt{str}, non-relaxed reads using
+% \texttt{dmb st}\SEMI\texttt{ldar}, non-relaxed writes using \texttt{stlr},
+% acquire fences using \texttt{dmb}.\texttt{ld} and other fences using 
+% \texttt{dmb}.\texttt{sy}.
+% \begin{align*}
+%   \low{\PW[\gemode\mREL]{\REF{\aReg}}{\bReg}} &= \texttt{stlr}\;\bReg,\REF{\aReg}
+%   &
+%   \low{\PR[\mRLX]{\REF{\aReg}}{\bReg}} &= \texttt{ldr}\;\bReg,\REF{\aReg}
+%   \\
+%   \low{\PW[\mRLX]{\REF{\aReg}}{\bReg}} &= \texttt{str}\;\bReg,\REF{\aReg}
+%   &
+%   \low{\PR[\gemode\mACQ]{\REF{\aReg}}{\bReg}} &= \texttt{dmb st}\SEMI\texttt{ldar}\;\bReg,\REF{\aReg}
+% \end{align*}
+
+
+\subsection{Arm Compilation 2}
+\label{sec:arm2}
+
+We can achieve optimal lowering for Arm by weakening the semantics of
+sequential composition slightly.  In particular, we must lose
+\reflem{lem:rf:implies:le}, which states that $\bEv\xrfx\aEv$ implies
+$\bEv\le\aEv$.  Revisiting the example in the last subsection, we essentially
+mimic the \EC{} characterization:
+\begin{gather*}
+  \PW{x}{2}\SEMI 
+  \PR[\mACQ]{x}{r}\SEMI
+  \PW{y}{r{-}1} \PAR
+  \PW{y}{2}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \tag{$\rcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \rfint{a}{b}
+      \cbz{b}{c}
+      \cbz{c}{d}
+      \cbz{d}{e}
+      \cbz[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+\end{gather*}
+Here the $\rrfx$ relation \emph{contradicts} order!  We have both
+$\DWP{x}{2}\xrfint\DRP[\mACQ]{x}{2}$ and
+$\DWP{x}{2}\xcbinv\DRP[\mACQ]{x}{2}$.
+
+The change to the semantics is small: we weaken the relationship between $\rrfx$
+and $\le$ in \ref{seq-le-rf}.  Rather than ensuring that there is no
+\emph{global} blocker for a sequentially fulfilled read \eqref{seq-le-rf}, we
+require only that there is no \emph{thread-local} blocker \eqref{seq-le-rf-rf}.
+This change both allows and requires us to weaken the definition of
+\emph{delays} to drop write-to-read order from $\eqreorderco$.
+\begin{definition}
+  \label{def:sem:frf}
+  Let $\frf{\semrr{}}$ be defined as for $\semrr{}$ in
+  \refdef{def:semrr}/\reffig{fig:sem}, changing \ref{seq-le-rf} and
+  \ref{seq-le-delays}:
+  \begin{itemize}
+  \item[{\labeltext[\frf{\textsc{s}7b}]{(\frf{\textsc{s}7b})}{seq-le-rf-rf}}]
+    if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ then $\bEv\xrfx\aEv$
+    implies $\cEv\le\bEv$,
+  \item[{\labeltext[\frf{\textsc{s}7c}]{(\frf{\textsc{s}7c})}{seq-le-delays-rf}}]
+    if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ then $\bEv\le\aEv$,\\
+    where $\rdelayspdef$ replaces $\eqreorderco$ in \refdef{def:actions} of
+    $\rdelaysdef$ by
+    \begin{math}
+      {\reorderlws}
+      =
+      \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}
+    \end{math}.
+  \end{itemize}  
+\end{definition}
+The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
+\emph{Local Write Successor}.
+
+With the weakening of \ref{seq-le-rf-rf}, we must be careful not to allow
+spurious pairs to be added to the $\rrfx$ relation.  The use of
+$\rextendsdef{}{}$ in \ref{if-rf-extends} does this, ensuring that new
+$\rrfx$ is not introduced between events in $\aEvs_1\cap\aEvs_2$ when coalescing.
+This is necessary to ensure that
+\begin{math}
+  \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
+\end{math}
+does not include 
+\begin{math}
+  \smash{\hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \rfint[out=165,in=15]{b}{a}
+        \wki{a}{b}
+      \end{tikzinlinesmall}}}
+\end{math}, taking $\rrfx$ from the left and $\le$ from the right.
+
+We emphasize that \reflem{lem:rf:implies:le} fails for $\frf{\semrr{}}$,
+since $\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come
+from different sides of a sequential composition.  This means that $\rrfx$
+must be verified during pomset construction, rather than post-hoc.  The
+following lemma gives a post-hoc verification technique for $\rrfx$, using
+program order ($\rpox$).\footnote{It is obvious how to enhance the semantics
+  of most operators to define $\rpox$.  When combining pomsets using the
+  conditional, the obvious definition of $\rpox$ may result in cycles, since
+  $\rpox$-ordered events may coalesce.  In this case we include a separate
+  pomset for each way of breaking these $\rpox$ cycles.}
+% \begin{example}
+%   The obvious definition of $\rpox$ may be cyclic, due to the conditional. 
+% \end{example}
+\begin{lemma}
+  Any $\aPS$ in the image of $\frf{\semrr{}}$ is top-level iff
+  for every $\bEv\xrfx\aEv$ either
+  \begin{itemize}
+  \item external fulfillment: $\bEv\le\aEv$ and if $\labeling(\cEv)$ blocks
+    $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
+  \item internal fulfillment: $\bEv\xpox\aEv$ and $(\not\exists\cEv)$
+    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv\xpox\cEv\xpox\aEv$.
+  \end{itemize}
+\end{lemma}
+% \begin{enumerate}
+% \item[(\textsc{m}7d)]
+%   if $\labeling(\cEv) \rblocks \labeling(\aEv)$
+%   then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
+%   %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then not $\bEv\le\cEv\xpox\aEv$.
+% \end{enumerate}
+
+
+
+
+% It follows from these that 
+% \begin{itemize}
+% \item if $\bEv\xfr\aEv$ then $\bEv\xgcb\aEv$, where $\bEv\xfr\aEv$ if
+%   $(\exists\cEv)$ $\bEv\xrfxinv\cEv\xco\aEv$.
+% \end{itemize}
+% And therefore
+% \begin{itemize}
+% \item if $\bEv\xeco\aEv$ then $\bEv\xgcb\aEv$.
+% \end{itemize}
+
+\begin{theorem}
+  \label{thm:ec}
+  Suppose $\aEG_1$ %$(\aEvs_1, \labeling_1, {\rpoloc_1}, {\rlob_1})$
+  is \EC-valid for $\aCmd$ via $({\rco_1}, {\rrfx_1}, {\rcb_1})$ and that
+  ${\rcb_1}\supseteq{\rfr_1}$.  Then there is a top-level pomset
+  $\aPS_2\in\frf{\semrr{\aCmd}}$ such that $\aEvs_2=\aEvs_1$,
+  $\labeling_2=\labeling_1$, ${\rrfx_2}={\rrfx_1}$, and ${\le_2}={\rcb_1}$.
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    We show that all the order required in the pomset is also required by
+    \armeight{}.  \ref{pom-le-block} holds since ${\rcb_1}$ is consistent with
+    ${\rco_1}$ and ${\rfr_1}$.  \ref{seq-le-rf-rf} follows from \ref{arm-rfi}.
+    As noted \ref{lob-le}, $\rlob$ includes the order required by
+    \ref{seq-kappa} and \ref{seq-le-delays-rf}.  
+  \end{proof}
+\end{theorem}
+
+The generality of \refthm{thm:ec} is not limited by the assumption that
+${\rcb_1}\supseteq{\rfr_1}$:
+\begin{lemma}
+  \label{lemma:fr2}
+  Suppose $\aEG$ is \EC-valid via $({\rco}, {\rrfx}, {\rcb})$.  Then there a
+  permutation ${\rcbp}$ of ${\rcb}$ such that $\aEG$ is \EC-valid via
+  $({\rco}, {\rrfx}, {\rcbp})$ and ${\rcbp}\supseteq{\rfr}$, where ${\rfr}$
+  is defined in \ref{arm-local}.
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    We show that any ${\rcb}$ order that contradicts ${\rfr}$ is incidental.
+
+    By definition of $\rfr$, %$(\exists\bEv)$
+    $\aEv\xrfxinv\bEv\xco\cEv$, for some $\bEv$.
+    Since ${\rcb}\supseteq{\rco}$, we know that $\bEv\xco\cEv$.
+
+    If \ref{arm-rfe} applies to $\bEv\xrfx\aEv$, then $\aEv\xcb\cEv$, since
+    it cannot be that $\cEv\xco\bEv$.
+
+    Suppose \ref{arm-rfi} applies to $\bEv\xrfx\aEv$ and $\cEv$ is from a
+    different thread.  Because it is a different thread, we cannot have
+    $\aEv\xlob\cEv$, and thus the order in $\rcb$ is incidental.
+
+    Suppose \ref{arm-rfi} applies to $\bEv\xrfx\aEv$ and $\cEv$ is from the
+    same thread.  Since $\cEv\xco\bEv$, it cannot be that $\cEv\xpoloc\bEv$,
+    using \ref{arm-local}.  It also cannot be that
+    $\bEv\xpoloc\cEv\xpoloc\aEv$.  It must be that $\aEv\xpoloc\cEv$.  By
+    \ref{arm-lob-poloc}, we cannot have $\aEv\xlob\cEv$, and thus the order
+    in $\rcb$ is incidental.
+  \end{proof}
+\end{lemma}
+
+
+% Lemma: ${\rpoloc}\cup{\rpre}$ is acyclic.
+
+% Theorem: per-thread essential ${\le}$ $\subseteq$ ${\rpoloc}\cup{\rpre}$.
+
+
+% Bad example:
+% \begin{gather*}
+%   \PEXCHG{x}{r}{2}\SEMI 
+%   \PR{x}{s}\SEMI
+%   \PW{y}{s{-}1} \PAR
+%   \PR{y}{r}\SEMI
+%   \PW{x}{r}
+%   \\
+%   \tag{\cmark\armeight}
+%   \hbox{\begin{tikzinline}[node distance=1.5em]
+%       \event{a}{\DR{x}{1}}{}
+%       \event{b}{\DW{x}{2}}{right=of a}
+%       \event{c}{\DR{x}{2}}{right=of b}
+%       \event{d}{\DW{y}{1}}{right=of c}
+%       \event{e}{\DR{y}{1}}{right=3em of d}
+%       \event{f}{\DW{x}{1}}{right=of e}
+%       \pre{a}{b}
+%       \rf{b}{c}
+%       \lob{c}{d}
+%       \rf{d}{e}
+%       \pre{e}{f}
+%       \rf[out=-165,in=-15]{f}{a}
+%     \end{tikzinline}}
+%   % \hbox{\begin{tikzinline}[node distance=1.5em]
+%   %   \event{a}{\DR{x}{1}}{}
+%   %   \event{b}{\DW{x}{2}}{right=of a}
+%   %   \event{c}{\DR{x}{2}}{right=of b}
+%   %   \event{d}{\DW{y}{1}}{right=of c}
+%   %   \event{e}{\DR{y}{1}}{right=3em of d}
+%   %   \event{f}{\DW{x}{1}}{right=of e}
+%   %   \rmw{a}{b}
+%   %   \rfi{b}{c}
+%   %   \dob{c}{d}
+%   %   \rfe{d}{e}
+%   %   \dob{e}{f}
+%   %   \rfe[out=-165,in=-15]{f}{a}
+%   % \end{tikzinline}}
+%   \\
+%   \tag{$\le$}
+%   \hbox{\begin{tikzinline}[node distance=1.5em]
+%       \event{a}{\DR{x}{1}}{}
+%       \event{b}{\DW{x}{2}}{right=of a}
+%       \event{c}{\DR{x}{2}}{right=of b}
+%       \event{d}{\DW{y}{1}}{right=of c}
+%       \event{e}{\DR{y}{1}}{right=3em of d}
+%       \event{f}{\DW{x}{1}}{right=of e}
+%       \rmw{a}{b}
+%       \rf{b}{c}
+%       % \po{c}{d}
+%       \rf{d}{e}
+%       \po{e}{f}
+%       \rf[out=-165,in=-15]{f}{a}
+%     \end{tikzinline}}
+% \end{gather*}
+
