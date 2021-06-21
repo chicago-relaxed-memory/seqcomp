@@ -35,7 +35,7 @@ and that $\rlob$ does \emph{not} include
 \item \label{lob-rr} \labeltext[above]{}{lob-le}
   read-read control dependencies, required by \ref{seq-kappa},
 \item \label{lob-rf}
-  write-to-read order of $\rrfx$, required by \ref{seq-le-rf},
+  write-to-read order of $\rrfx$, required by \ref{seq-rf-le},
 \item \label{lob-wr}
   write-to-read coherence delay of ${\eqreorderco}$, required by \ref{seq-le-delays}.
 \end{enumerate}
@@ -203,7 +203,7 @@ non-relaxed access to \LDAR/\STLR{} \citep{DBLP:journals/pacmpl/PodkopaevLV19}.
 In this section, we consider a suboptimal strategy, which lowers non-relaxed
 reads to $(\DMBSY\SEMI\LDAR)$.  Significantly, we retain the optimal lowering
 for relaxed access.  In the next section we recover the optimal lowering by
-adopting an alternative semantics for \ref{seq-le-rf} and \ref{seq-le-delays}.
+adopting an alternative semantics for \ref{seq-rf-le} and \ref{seq-le-delays}.
 
 To see why the optimal lowering fails, consider the following attempted
 execution, where the final values of both $x$ and $y$ are $2$.
@@ -382,7 +382,7 @@ Arm.  The proof uses the characterization of Arm using \EGC{}.
       \end{proof}
     \end{lemma}
     We show that all the order required in the pomset is also required by
-    \armeight{}.  \ref{pom-le-block} holds since ${\rcb_1}$ is consistent with
+    \armeight{}.  \ref{pom-rf-block} holds since ${\rcb_1}$ is consistent with
     ${\rco_1}$ and ${\rfr_1}$.  As noted \ref{lob-le}, $\rlob$ includes the order
     required by \ref{seq-kappa} and \ref{seq-le-delays}.  We need only show
     that the order removed from \ref{arm-gcb-lob} can also be removed from
@@ -449,21 +449,21 @@ $\DWP{x}{2}\xrfint\DRP[\mACQ]{x}{2}$ and
 $\DWP{x}{2}\xcbinv\DRP[\mACQ]{x}{2}$.
 
 The change to the semantics is small: we weaken the relationship between $\rrfx$
-and $\le$ in \ref{seq-le-rf}.  Rather than ensuring that there is no
-\emph{global} blocker for a sequentially fulfilled read \eqref{seq-le-rf}, we
-require only that there is no \emph{thread-local} blocker \eqref{seq-le-rf-rf}.
+and $\le$ in \ref{seq-rf-le}.  Rather than ensuring that there is no
+\emph{global} blocker for a sequentially fulfilled read \eqref{seq-rf-le}, we
+require only that there is no \emph{thread-local} blocker \eqref{seq-rf-le-rf}.
 This change both allows and requires us to weaken the definition of
 \emph{delays} to drop write-to-read order from $\eqreorderco$.
 \begin{definition}
   \label{def:sem:frf}
   Let $\frf{\semrr{}}$ be defined as for $\semrr{}$ in
-  \refdef{def:semrr}/\reffig{fig:sem}, changing \ref{seq-le-rf} and
+  \refdef{def:semrr}/\reffig{fig:sem}, changing \ref{seq-rf-le} and
   \ref{seq-le-delays}:
   \begin{itemize}
-  \item[{\labeltext[\frf{\textsc{s}7b}]{(\frf{\textsc{s}7b})}{seq-le-rf-rf}}]
+  \item[{\labeltext[\frf{\textsc{s}7b}]{(\frf{\textsc{s}7b})}{seq-rf-le-rf}}]
     if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ then $\bEv\xrfx\aEv$
     implies $\cEv\le\bEv$,
-  \item[{\labeltext[\frf{\textsc{s}7c}]{(\frf{\textsc{s}7c})}{seq-le-delays-rf}}]
+  \item[{\labeltext[\frf{\textsc{s}6b}]{(\frf{\textsc{s}6b})}{seq-le-delays-rf}}]
     if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ then $\bEv\le\aEv$,\\
     where $\rdelayspdef$ replaces $\eqreorderco$ in \refdef{def:actions} of
     $\rdelaysdef$ by
@@ -477,7 +477,7 @@ This change both allows and requires us to weaken the definition of
 The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
 \emph{Local Write Successor}.
 
-With the weakening of \ref{seq-le-rf-rf}, we must be careful not to allow
+With the weakening of \ref{seq-rf-le-rf}, we must be careful not to allow
 spurious pairs to be added to the $\rrfx$ relation.  The use of
 $\rextendsdef{}{}$ in \ref{if-rf-extends} does this, ensuring that new
 $\rrfx$ is not introduced between events in $\aEvs_1\cap\aEvs_2$ when coalescing.
@@ -549,8 +549,8 @@ program order ($\rpox$).\footnote{It is obvious how to enhance the semantics
   \vspace{-.5\baselineskip}
   \begin{proof}
     We show that all the order required in the pomset is also required by
-    \armeight{}.  \ref{pom-le-block} holds since ${\rcb_1}$ is consistent with
-    ${\rco_1}$ and ${\rfr_1}$.  \ref{seq-le-rf-rf} follows from \ref{arm-rfi}.
+    \armeight{}.  \ref{pom-rf-block} holds since ${\rcb_1}$ is consistent with
+    ${\rco_1}$ and ${\rfr_1}$.  \ref{seq-rf-le-rf} follows from \ref{arm-rfi}.
     As noted \ref{lob-le}, $\rlob$ includes the order required by
     \ref{seq-kappa} and \ref{seq-le-delays-rf}.  
   \end{proof}

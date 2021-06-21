@@ -77,7 +77,7 @@ This is an elegant explanation of sequential computation in a sequential
 context. Note that \ref{wp-let} is sound because a read from a thread-local
 register must be fulfilled by a preceding write in the same thread.
 In a concurrent context, with shared variables
-($\aLoc$--$\cLoc$), the obvious generalizations
+($\aLoc$--$\cLoc$), the obvious generalization
 \begin{multicols}{2}
 \begin{itemize}
 \item[{\labeltext[\textsc{d}2b]{(\textsc{d}2b)}{wp-write}}] $\fwp{\LET{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
@@ -85,7 +85,7 @@ In a concurrent context, with shared variables
 \end{itemize}
 \end{multicols}
 \noindent
-are unsound!  In particular, a read from a shared memory location may be fulfilled by a write
+is unsound!  In particular, a read from a shared memory location may be fulfilled by a write
 in another thread, invalidating \ref{wp-read}.  (We assume that expressions
 % $\aExp$--$\bExp$
 do \emph{not} include shared variables.) % $\aLoc$--$\cLoc$.)

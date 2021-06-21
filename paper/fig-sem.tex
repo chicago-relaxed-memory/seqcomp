@@ -36,18 +36,19 @@
       $\aTr{\bEvs}{\bForm} \riff \aTr[1]{\bEvs}{\bForm}$,
     \item \label{par-term}
       $\aTerm \riff \aTerm[1]\land\aTerm[2]$,
-    \item \label{par-rf}
-      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{p}7]{}{par-le}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{par-le-extends}
+    \item \label{par-le}
         ${\le}\rextends{\le_1}{\le_2}$,
-      \item \label{par-le-rf1}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{p}7]{}{par-rf}
+      \begin{enumerate}[leftmargin=0pt]
+      \item
+        \label{par-rf-extends}
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+      \item \label{par-rf-le1}
         % ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$.
         % if $\bEv\xrfx\aEv$ then either $\bEv\xrfx_1\aEv$, $\bEv\xrfx_2\aEv$, or $\bEv\le\aEv$.
         if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
-      \item \label{par-le-rf2}
+      \item \label{par-rf-le2}
         if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\xrfx\bEv$ then $\aEv\le\bEv$.
       \end{enumerate}
     \end{enumerate}
@@ -105,21 +106,25 @@
       $\aTr{\bEvs}{\bForm} \riff \aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
     \item \label{seq-term}
       $\aTerm \riff \aTerm[1]\land\aTr[1]{}{\aTerm[2]}$,
-    \item \label{seq-rf}
-      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
       \stepcounter{enumi}
-    \item[] \labeltext[\textsc{s}7]{}{seq-le}
+    \item[] \labeltext[\textsc{s}6]{}{seq-le}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-le-extends}
         ${\le}\rextends{\le_1}{\le_2}$, 
-      \item \label{seq-le-rf}
-        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
       \item \label{seq-le-delays}
         if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
-        $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
-        $\bEv\le\aEv$.
+        %$\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
+        $\bEv\le\aEv$,
         % either $\bEv\le\aEv$ or $\labelingForm(\bEv)\land\labelingForm(\aEv)$
         % is unsatisfiable.
+      \end{enumerate}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{s}7]{}{seq-rf}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{seq-rf-extends}
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+      \item \label{seq-rf-le}
+        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
       \end{enumerate}
       %   % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
       %   % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
@@ -157,22 +162,22 @@
       % $\aTerm \riff (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
       $\aTerm \riff (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$.
       \stepcounter{enumi}
-    \item[] \labeltext[\textsc{i}6]{}{if-rf}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{if-rf-extends}
-        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
-      \item \label{if-rf-le}
-        ${\rrfx}\rsubset{\rrfx_1}{\rrfx_2}$,
-      \end{enumerate}
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{i}7]{}{if-le}
+    \item[] \labeltext[\textsc{i}6]{}{if-le}
       \begin{enumerate}[leftmargin=0pt]
         % \item \label{if-le-rf}
         %   if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
       \item \label{if-le-extends}
         ${\le}\rextends{\le_1}{\le_2}$,
       \item \label{if-le-subset}
-        ${\le}\rsubset{\le_1}{\le_2}$.
+        ${\le}\rsubset{\le_1}{\le_2}$,
+      \end{enumerate}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{i}7]{}{if-rf}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{if-rf-extends}
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+      \item \label{if-rf-le}
+        ${\rrfx}\rsubset{\rrfx_1}{\rrfx_2}$.
       \end{enumerate}
     \end{enumerate}
   \end{multicols}

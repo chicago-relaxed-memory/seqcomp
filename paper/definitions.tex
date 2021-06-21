@@ -333,15 +333,15 @@ The definition comes from \citet{DBLP:journals/cacm/Dijkstra75}:
   $\aTr{}{}:\Formulae\fun\Formulae$ such that
   \begin{multicols}{2}
     \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
-    \item \label{tr-false}
-      $\aTr{}{\FALSE}$ is $\FALSE$,    
-    \item \label{tr-and}
-      $\aTr{}{\bForm_1\land\bForm_2}$ is $\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
-    \item \label{tr-or}
-      $\aTr{}{\bForm_1\lor\bForm_2}$ is $\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$, 
     \item \label{tr-implies}
       if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies
-      \aTr{}{\bForm}$.
+      \aTr{}{\bForm}$,
+    \item \label{tr-and}
+      $\aTr{}{\bForm_1\land\bForm_2}\riff\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
+    \item \label{tr-or}
+      $\aTr{}{\bForm_1\lor\bForm_2}\riff\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$.
+    % \item \label{tr-false}
+    %   $\aTr{}{\FALSE}$ is $\FALSE$,    
     \end{enumerate}
   \end{multicols}
 \end{definition}
@@ -381,11 +381,12 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     $\labeling: \aEvs \fun \Act$ defines a \emph{label} for each event,
     \makecounter{Bkappa}
   \item \label{pom-kappa} \makecounter{kappa}
-    $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event, such that
-    \begin{enumerate}
-    \item \label{pom-kappa-sat}
-      $\labelingForm(\aEv)$ is satisfiable,
-    \end{enumerate}
+    $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
+    % such that
+    % \begin{enumerate}
+    % \item \label{pom-kappa-sat}
+    %   $\labelingForm(\aEv)$ is satisfiable,
+    % \end{enumerate}
     \makecounter{Btau}
   \item \label{pom-tau} \makecounter{tau}
     $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of predicate transformers} over $\aEvs$, 
@@ -396,6 +397,17 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     \item \label{pom-term-tau}
       $\aTerm\rimplies\aTr{}{\TRUE}$,
     \end{enumerate}
+    \makecounter{Ble}
+  \item \label{pom-le} \makecounter{le}
+    ${\le} \subseteq \aEvs\times\aEvs$, is a partial order capturing
+    \emph{causality},
+    % such that
+    % \begin{enumerate}
+    % \item \label{pom-le-match}
+    %   if $\bEv\xrfx\aEv$ then either $\bEv\le\aEv$ or $\aEv\le\bEv$,
+    % \item \label{pom-le-block}
+    %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+    % \end{enumerate}
     \makecounter{Brf}
   \item \label{pom-rf} \makecounter{rf}
     ${\rrfx} \subseteq \aEvs\times\aEvs$ is an injective relation capturing
@@ -409,20 +421,10 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
       %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is, ${\rrfx}$ is injective,
     \item \label{pom-rf-match}
       if $\bEv\xrfx\aEv$ then $\labeling(\bEv) \rmatches \labeling(\aEv)$,
-      % \item \label{rf-block}
-      %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
-      % \item \label{rf-le}
-      %   if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
-    \end{enumerate}
-    \makecounter{Ble}
-  \item \label{pom-le} \makecounter{le}
-    ${\le} \subseteq \aEvs\times\aEvs$, is a partial order capturing
-    \emph{causality}, such that
-    \begin{enumerate}
-    \item \label{pom-le-match}
-      if $\bEv\xrfx\aEv$ then either $\bEv\le\aEv$ or $\aEv\le\bEv$,
-    \item \label{pom-le-block}
+    \item \label{pom-rf-block}
       if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+    \item \label{pom-rf-le}
+      if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
     \end{enumerate}
   \end{enumerate}
   A pomset is \emph{complete} if
@@ -458,7 +460,17 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
 \input{fig-seq.tex}
 \input{fig-sem.tex}
 
-We give the semantics of programs $\sembase{}$ in \reffig{fig:sem}.
+
+\begin{enumerate}
+\item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
+  $\labelingForm(\aEv)$ is satisfiable.
+\item[{\labeltext[\textsc{s}6b$'$]{(\textsc{s}6b$'$)}{pom-kappa-sat}}]
+  if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
+  $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
+  $\bEv\le\aEv$.  
+\end{enumerate}
+
+We give the semantics of programs $\sembase{}$ in \reffig{fig:sem}. \ref{par-le}
 
 Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
 % Let $\Pom$ be the set of all pomsets.
@@ -687,7 +699,7 @@ $\aVal$; the fact that $\aVal$ must be $1$ is captured in the logic (see
 The structural rules combine pomsets:  Parallel composition is disjoint
 union, inheriting labeling, order and $\rrfx$ from the two sides.  Any
 $\rrfx$ edges added between the two sides must also be added to the order
-(\ref{par-le-rf1} and \ref{par-le-rf2}).
+(\ref{par-rf-le1} and \ref{par-rf-le2}).
 % 
 Sequential composition is similar, with two changes: \ref{seq-E} does not
 require disjointness (see \textsection\ref{sec:ex:term}), and
@@ -701,16 +713,16 @@ Note that reads-from implies order.
 
   \vspace{-.5\baselineskip}
   \begin{proof}
-    Induction on the definition of $\sembase{}$, using \ref{par-le-rf1}, \ref{par-le-rf2}, and \ref{seq-le-rf}.
+    Induction on the definition of $\sembase{}$, using \ref{par-rf-le1}, \ref{par-rf-le2}, and \ref{seq-rf-le}.
   \end{proof}
 \end{lemma}
 In top-level pomsets, every read must have a matching write in $\rrfx$
-\eqref{top-rf}.  Together with \ref{pom-le-match} and \ref{pom-le-block}, the lemma
+\eqref{top-rf}.  Together with \ref{pom-rf-match} and \ref{pom-rf-block}, the lemma
 guarantees that reads are \emph{fulfilled} at top-level, as in
 \cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.\footnote{The
   basic model would be the same if we move $\rrfx$ from the model itself to
   be existentially quantified in the definition of top-level pomset, along
-  with \ref{pom-le-match} and \ref{pom-le-block}.  This was the approach of
+  with \ref{pom-rf-match} and \ref{pom-rf-block}.  This was the approach of
   \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
   explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
   variant semantics $\frf{\semrr{}}$ for which \reflem{lem:rf:implies:le}
@@ -722,16 +734,16 @@ $\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
 order is enforced between conflicting accesses of the same location
 ($\eqreorderco$), into a release and out of an acquire ($\reorderra$), and
 between SC accesses ($\eqreordersc$).  Combined with the fulfillment
-requirements (\ref{pom-le-match}, \ref{pom-le-block} and \reflem{lem:rf:implies:le}),
+requirements (\ref{pom-rf-match}, \ref{pom-rf-block} and \reflem{lem:rf:implies:le}),
 these ensure coherence, publication, subscription and other idioms.  For
 example, consider the following:\footnote{We use different colors for arrows representing order:
   \begin{itemize}  
   \item \makebox{$\bEv\xpo\aEv$} arises from control/data/address \emph{dependency} (\ref{seq-kappa}, definition of $\labelingForm'_2(\bEv)$),
   \item \makebox{$\bEv\xsync\aEv$} arises from $\reorderra$ or $\eqreordersc$ \eqref{seq-le-delays},
   \item \makebox{$\bEv\xwki\aEv$} arises from $\eqreorderco$ \eqref{seq-le-delays},
-  \item \makebox{$\bEv\xrf\aEv$} arises from \emph{reads-from} \eqref{pom-le-match},
+  \item \makebox{$\bEv\xrf\aEv$} arises from \emph{reads-from} \eqref{pom-rf-match},
   %\item \makebox{$\bEv\xsyncsc\aEv$} arises from \emph{strong fencing} \eqref{cand-lesync-sc},
-  \item \makebox{$\bEv\xwk\aEv$} arises from \emph{blocking} \eqref{pom-le-block}.
+  \item \makebox{$\bEv\xwk\aEv$} arises from \emph{blocking} \eqref{pom-rf-block}.
   \end{itemize}
   In \textsection\ref{sec:arm2}, it is possible for $\rrf$ to contradict
   $\le$.  In this case, we use a dotted arrow for $\rrf$: $\bEv\xrfint\aEv$
@@ -763,10 +775,10 @@ $\DWP{x}{0}\xwki \DWP{x}{1}$ is required by $\eqreorderco$.
 $\DWP{x}{1}\xsync \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xsync \DRP{x}{0}$ are
 required by $\reorderra$.  The cross-thread order is required by fulfillment:
 \ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
-\ref{pom-le-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
+\ref{pom-rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
 \reflem{lem:rf:implies:le} subsequently ensures that
 $\DWP[\mREL]{y}{1}\le \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
-$\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{pom-le-block}.  (Alternatively,
+$\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{pom-rf-block}.  (Alternatively,
 we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
 
 The semantics gives the expected results for store buffering and load buffering,
@@ -931,7 +943,7 @@ discuss address dependencies in \textsection\ref{sec:addr}.)
 \begin{multicols}{2}
   Preconditions are introduced in: 
   \begin{itemize}
-  \item[\eqref{seq-kappa-release}] for release actions,
+  \item[\eqref{seq-kappa}] for release actions,
   \item[\eqref{if-kappa}] for control dependencies, 
   \item[\eqref{write-kappa}] for data dependencies on writes.
   \end{itemize}
@@ -954,7 +966,7 @@ The rules track dependencies.  We discuss data dependencies \eqref{write-kappa}
 here and control dependencies \eqref{if-kappa} in
 \textsection\ref{sec:ex:control}.  Unless otherwise noted, we assume pomsets
 are \emph{complete} and \emph{augment-minimal}.  We do not discuss
-\ref{seq-kappa-release} further.  It simply ensures that all writes are
+\ref{seq-kappa} further.  It simply ensures that all writes are
 present before a release, even for incomplete pomsets (see
 \textsection\ref{sec:ex:term}).
 
@@ -1407,9 +1419,9 @@ Reverse direction does not hold, due to \ref{seq-le-delays}.
 \item[\eqref{seq-le-delays}] if
   $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$.  
 \end{enumerate}
- An alternate phrasing might be attractive:
+An alternate phrasing might be attractive:
 \begin{enumerate}
-\item[{\labeltext[\textsc{s}7c$'$]{(\textsc{s}7c$'$)}{seq-le-delays'}}] if
+\item[{\labeltext[\textsc{s}6b$'$]{(\textsc{s}6b$'$)}{seq-le-delays'}}] if
   $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
   $\labelingForm(\bEv)\land\labelingForm(\aEv)$ is satisfiable then
   $\bEv\le\aEv$.
