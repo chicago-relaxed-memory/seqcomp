@@ -367,7 +367,7 @@ Redundant read after read elimination example from \cite[\textsection6.4]{DBLP:c
         \phevent{d1}{\DR{y}{1}}{}               %x{d_1}
         \phevent{d2}{1{=}r\limplies r{=}1\mid\DR{y}{1}}{right=of d1}    %x{e_1}
         \phevent{e1}{1{=}r\limplies 1{=}s\limplies (r{=}1\land s{=}1)\mid\DW{x}{1}}{right=of d2}    %x{d_2}
-        \phevent{e2}{r{\neq}1\mid\DW{x}{1}}{right=of e1}    %x{e_2}
+        \phevent{e2}{1{=}r\limplies r{\neq}1\mid\DW{x}{1}}{right=of e1}    %x{e_2}
         \event{d}{\DR{y}{1}}{above=of d1}
         \event{e}{\DW{x}{1}}{above=of e2}
         \pox{d1}[above]{d2}

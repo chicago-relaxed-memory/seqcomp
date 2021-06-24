@@ -270,7 +270,7 @@
         \begin{math}
           \aTr{\bEvs}{\bForm} \riff 
           \bForm
-          [\aExp/\aLoc][(\aExp{=}\aVal\land\Q{\aLoc})/\Q{\aLoc}]
+          [\aExp/\aLoc][\aExp{=}\aVal/\Q{\aLoc}]
         \end{math}}
       \item \label{write-tau-empty}
         if $\aEvs=\emptyset$ then 
@@ -341,6 +341,6 @@
       \sembase{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &= \sIFTHEN{\aExp{\neq}0}{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
     \end{aligned}
   \end{align*}
-  \caption{Semantics of programs}
+  \caption{Semantics of Programs}
   \label{fig:sem}
 \end{figure}

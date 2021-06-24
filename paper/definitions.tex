@@ -438,7 +438,7 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     \setcounter{enumi}{\value{Bkappa}}
   \item \label{top-kappa}
     %$\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
-    $\labelingForm(\aEv)[\TRUE/\Qstar]$ is a tautology (for every $\aEv\in\aEvs$),
+    $\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
     \setcounter{enumi}{\value{Bterm}}
   \item \label{top-term}
     $\aTerm$ is a tautology.
@@ -462,6 +462,58 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
 \end{definition}
 \input{fig-seq.tex}
 \input{fig-sem.tex}
+Preconditions are doing two things:
+\begin{itemize}
+\item determining which events can appear in a pomset, and which ones can go
+  together
+\item helping to calculate dependencies.
+\end{itemize}
+Empty set is used for code that does not run in any given execution.  To get
+a complete pomset for $\sem{\IF{\FALSE}\THEN\PW{x}{1}\FI}$ you need to take
+the empty set for $\sem{\PW{x}{1}}$.
+
+Idea behind $\Q{\aLoc}$:
+\begin{itemize}
+\item most recent prior write to $\aLoc$ must be in the pomset in order to read $\aLoc$...
+\item similar to release/termination: all prior writes must be in the pomset
+  in order to release...
+\item terminology: ``prior'' means sequentially before, different from $\le$,
+  which is ``ordered before''.
+\item \eqref{top-kappa} requires tautologies, which means that all variables
+  are initialized sequentially in order to get rid of $\Q{\aLoc}$.
+\end{itemize}
+Sanity check:
+\begin{align*}
+  \begin{gathered}    
+    \PR{y}{r}
+    \SEMI
+    \IF{r}\THEN
+      \PW{x}{1}
+    \FI
+    \SEMI
+    \PR{x}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a1}{\DR{y}{1}}{}
+        \event{a2}{1{=}r\limplies r{\neq}0\mid\DW{x}{1}}{right=of a1}
+        \event{a3}{1{=}r\limplies (r{\neq}0\land\Q{x})\mid\DR{x}{2}}{right=of a2}
+        \po{a1}{a2}
+        \wki{a2}{a3}
+      \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a1}{\DR{y}{0}}{}
+        \event{a3}{0{=}r\limplies \aTr{}{\Q{x}}\mid\DR{x}{2}}{right=of a1}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{align*}
+where
+\begin{math}
+  \aTr{}{\bForm}=
+  (r{\neq}0 \land \bForm[1/x][\FALSE/\Q{x}])
+  \lor
+  (r{=}0 \land \bForm)
+\end{math}
 
 We give the semantics of programs $\sembase{}$ in \reffig{fig:sem}. \ref{par-le}
 
@@ -492,6 +544,8 @@ intuitive reading of augment closure is that adding order can only cause
 preconditions to weaken.
 \begin{lemma}
   \label{lem:monoid}
+  [This is out of date.]
+  
   \begin{enumerate*}[label=(\alph*),ref=\alph*]
   \item \label{monoid:unit}
     \begin{math}
