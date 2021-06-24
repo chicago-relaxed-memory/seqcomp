@@ -126,8 +126,9 @@
     \item \label{read-lambda}
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
     \item \label{read-kappa}
-      $\labelingForm(\aEv) \riff \TRUE$,
-      \stepcounter{enumi}
+      %$\labelingForm(\aEv) \riff \TRUE$,
+      $\labelingForm(\aEv) \riff \Q{\aLoc}$,
+     \stepcounter{enumi}
     \item[] \labeltext[\textsc{r}4]{}{read-tau}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-tau-dep}
@@ -141,8 +142,8 @@
         if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
         \begin{math}
           \aTr{\bEvs}{\bForm} \riff
-          \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
-          \bForm,
+          \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}
+          \limplies \bForm,
         \end{math}
       \item \label{read-tau-empty}
         if $\aEvs=\emptyset$ then
@@ -180,14 +181,33 @@
         \labelingForm(\aEv) \riff
         \aExp{=}\aVal
       \end{math},    
-    \item \label{write-tau}
-      % if $(\aEvs\cap\bEvs)\neq\emptyset$ then
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff 
-        \bForm
-        [\aExp/\aLoc]
-        % \land\aExp{=}\aVal
-      \end{math},
+    % \item \label{write-tau}
+    %   % if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+    %   \begin{math}
+    %     \aTr{\bEvs}{\bForm} \riff 
+    %     \bForm
+    %     [\aExp/\aLoc]
+    %     % \land\aExp{=}\aVal
+    %   \end{math},
+      \stepcounter{enumi}      
+    \item[] \labeltext[\textsc{w}5]{}{write-tau}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{write-tau-nonempty}
+        if $\aEvs\neq\emptyset$ then 
+        \makebox[0cm][l]{%
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \riff 
+          \bForm
+          [\aExp/\aLoc][(\aExp{=}\aVal\land\Q{\aLoc})/\Q{\aLoc}]
+        \end{math}}
+      \item \label{write-tau-empty}
+        if $\aEvs=\emptyset$ then 
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \riff 
+          \bForm
+          [\aExp/\aLoc][\FALSE/\Q{\aLoc}]
+        \end{math}
+      \end{enumerate}
       \stepcounter{enumi}      
     \item[] \labeltext[\textsc{w}5]{}{write-term}
       \begin{enumerate}[leftmargin=0pt]

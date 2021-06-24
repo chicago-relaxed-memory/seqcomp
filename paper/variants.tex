@@ -1,4 +1,4 @@
-\section{Additional Features} %Case Analysis, Address Calculation, RMWs, Elimination}
+\section{Refinements and Additional Features} %Case Analysis, Address Calculation, RMWs, Elimination}
 \label{sec:additional}
 
 In the paper so far, we have assumed that registers are assigned at most
@@ -125,6 +125,107 @@ elimination is sound:
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
 \end{displaymath}
 
+
+\subsection{Register Consistency}
+\label{sec:false}
+
+
+
+We would like:
+\begin{enumerate}
+\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
+  $\aTr{}{\FALSE}\riff\FALSE$.
+\item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
+  $\labelingForm(\aEv)$ is satisfiable.
+\item[{\labeltext[\textsc{s}6b$''$]{(\textsc{s}6b$''$)}{seq-le-delays''}}]
+  if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
+  $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
+  $\bEv\le\aEv$.  
+\end{enumerate}
+
+% \eqref{tr-false'} is too strong.
+% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
+% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
+% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
+% for some $\aVal$.
+% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
+% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
+% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
+
+% We require the following:
+% \begin{enumerate}
+% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
+%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
+% \end{enumerate}
+
+% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
+% for both reads):
+% \begin{gather*}
+%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
+%   \\
+%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
+%   \lor  
+%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
+% \end{gather*}
+
+Define
+\begin{displaymath}
+  \cForm_\labeling=
+  \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
+  \textwhere \aEvs=\fdom(\labeling)
+\end{displaymath}
+We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\cForm_\labeling$ is satisfiable.
+We say that it is \emph{$\labeling$-inconsistent} otherwise.
+
+
+
+
+%tau maps (things incompatible with chi) to (things incompatible with chi)
+
+\begin{definition}
+  \label{def:trans'}
+  A \emph{$\labeling$-predicate transformer} is a %monotone
+  function
+  $\aTr{}{}:\Formulae\fun\Formulae$ such that
+  \begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
+    \item[\eqref{tr-implies}]
+      if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies
+      \aTr{}{\bForm}$,
+    \item[\eqref{tr-and}]
+      $\aTr{}{\bForm_1\land\bForm_2}\riff\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
+    \item[\eqref{tr-or}]
+      $\aTr{}{\bForm_1\lor\bForm_2}\riff\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$.
+    \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
+    %\item[\eqref{tr-false}]
+      if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+    \end{enumerate}
+  \end{multicols}
+
+  \label{def:family'}
+  A \emph{family of $\labeling$-predicate transformers} over consists of a
+  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
+  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
+  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
+
+  
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \setcounter{enumi}{\value{Btau}}
+  \item \label{pom-tau'}
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
+  \end{enumerate}
+\end{definition}
+
+\begin{enumerate}
+% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
+%   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+\item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
+  $\labelingForm(\aEv)$ is $\labeling$-consistent.
+\item[{\labeltext[\textsc{s}6b$'$]{(\textsc{s}6b$'$)}{seq-le-delays'}}] if
+  $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
+  $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is
+  $\labeling$-consistent then $\bEv\le\aEv$.
+\end{enumerate}
 
 \subsection{Address Calculation}
 \label{sec:addr}
@@ -369,6 +470,320 @@ ordered before $\DWP{x}{1}$.
 %   \end{gathered}
 % \end{gather*}
 % All the preconditions are now tautologies.
+
+\subsection{Read-Modify-Write Operations}
+\label{sec:rmw}
+
+%We give the semantics of \RMW{}s without address calculation or if-closure.
+
+From the data model, we require an additional binary relation over
+$\Act\times\Act$: $\roverlapsdef$.  For the actions in this paper, we say
+$\aAct \roverlapsdef \bAct$ if they access the same location.
+
+\RMW{} operations are formalized by adding a relation
+${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
+\RMW{} to the succeeding write.
+% Let two actions \emph{overlap} if they access the same location.
+% \begin{enumerate}
+% \item
+%   ${\rrmw} \subseteq {\le}$ is a relation capturing
+%   \emph{read-modify-write atomicity}, such that for any $\cEv$, $\bEv$, $\aEv\in\aEvs$,
+%   where $\labeling(\cEv)$ and
+%   $\labeling(\bEv)$ access the same location:
+%   \begin{itemize}
+%   \item if $\bEv \xrmw \aEv$ and $\cEv\le \aEv$ then $\cEv\le \bEv$,
+%   \item if $\bEv \xrmw \aEv$ and $\bEv\le \cEv$ then $\aEv\le \cEv$.
+%   \end{itemize}
+% \end{enumerate}
+
+\begin{definition}
+  Extend the definition of a pomset as follows. % where two actions \emph{overlap} if they access the same location:
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+    \setcounter{enumi}{9}
+  \item \label{pom-rmw}
+    ${\rrmw} : \aEvs\fun\aEvs$ is a partial function capturing
+    read-modify-write \emph{atomicity}, such that
+    \begin{enumerate}
+    \item \label{pom-rmw-block}
+      if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$,
+    \item \label{pom-rmw-le}
+      if $\bEv\xrmw\aEv$ then $\bEv \le \aEv$,    
+    \item \label{pom-rmw-atomic}
+      if $\labeling(\cEv) \roverlaps \labeling(\bEv)$ then
+      \begin{enumerate}        
+      \item \label{pom-rmw-atomic1}
+        if $\bEv \xrmw \aEv$ then
+        $\cEv\le \aEv$ implies $\cEv\le \bEv$,
+      \item \label{pom-rmw-atomic2}
+        if $\bEv \xrmw \aEv$ then
+        $\bEv\le \cEv$ implies $\aEv\le \cEv$.
+      \end{enumerate}
+    \end{enumerate}
+  \end{enumerate}
+
+  Extend the definition of par, if, seq to include:
+  \begin{enumerate}
+  \item[(\textsc{p}10)] (\textsc{s}10)\; (\textsc{i}10)\; ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
+  \end{enumerate}
+\end{definition}
+
+To define specific operations, we extend the syntax:
+\begin{align*}
+  \aCmd
+  \BNFDEF& \cdots 
+  \BNFSEP \PCAS[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
+  \BNFSEP \PFADD[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  \BNFSEP \PEXCHG[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+\end{align*}
+We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic functions are as follows.
+\begin{definition}
+  Let $\sLOADP{}{}$ be defined as for $\sLOAD{}{}$, adding the constraint:
+  \begin{itemize}
+  \item[{\labeltext[\textsc{r}4d]{(\textsc{r}4d)}{read-tau-rmw}}]
+    if $(\aEvs\cap\bEvs)=\emptyset$ then
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \rimplies
+      \bForm.
+    \end{math}
+  \end{itemize}
+  If $\aPS\in\mathit{FADD}(\aReg,\cExp,\aExp,\amode,\bmode)$ then
+  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sSTORE[\bmode]{\cExp}{\aReg{+}\aExp}})$
+  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+    $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+    $\bEv\xrmw\aEv$.
+  \end{enumerate}
+  If $\aPS\in\mathit{EXCHG}(\aReg,\cExp,\aExp,\amode,\bmode)$ then
+  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sSTORE[\bmode]{\cExp}{\aExp}})$
+  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+    $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+    $\bEv\xrmw\aEv$.
+  \end{enumerate}
+  If $\aPS\in\mathit{CAS}(\aReg,\cExp,\aExp,\bExp,\amode,\bmode)$ then
+  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\bmode]{\cExp}{\bExp}\sELSE\sSKIP\sFI})$
+  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+    $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+    $\bEv\xrmw\aEv$.
+  \end{enumerate}
+\end{definition}
+  % If $\aPS\in\mathit{FADD}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
+  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aReg{+}\aExp}})$
+  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+  %   $\bEv\xrmw\aEv$.
+  %   % \item if $\labeling_1(\bEv)$ is a read, then there is a write $\labeling_1(\aEv)$ such that 
+  %   %   $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and 
+  %   %   $\bEv\xrmw\aEv$.
+  % \end{enumerate}
+  % If $\aPS\in\mathit{EXCHG}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
+  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aExp}})$
+  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+  %   $\bEv\xrmw\aEv$.
+  %   % \item if $\labeling_1(\bEv)$ is a read, then there is a write $\labeling_1(\aEv)$ such that 
+  %   %   $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and 
+  %   %   $\bEv\xrmw\aEv$.
+  % \end{enumerate}
+  % If $\aPS\in\mathit{CAS}(\aReg,\aLoc,\aExp,\bExp,\amode_1,\amode_2)$ then
+  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\amode_2]{\aLoc}{\bExp}\sELSE\sSKIP\sFI})$
+  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
+  %   $\bEv\xrmw\aEv$.
+  %   % \item if $\labeling_1(\bEv)$ is a read, then either
+  %   %   \begin{enumerate}
+  %   %   \item there is a write $\labeling_1(\aEv)$ such that $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and $\bEv\xrmw\aEv$, or
+  %   %   \item 
+  %   %   \end{enumerate}
+  % \end{enumerate}
+  % \begin{multicols}{2}
+  %   \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+  %   \item if $\labeling_1(\aEv)$ is a write, then $(\exists\bEv)$ such that
+  %     \begin{enumerate}
+  %     \item $\labeling_1(\aEv)\rblocks \labeling_1(\bEv)$,
+  %     \item $\bEv\xrmw\aEv$,
+  %     \end{enumerate}
+  %     \columnbreak
+  %   \item if $\labeling_1(\bEv)$ is a read, then $(\exists\aEv)$ such that
+  %     \begin{enumerate}
+  %     \item $\labeling_1(\aEv)\rblocks \labeling_1(\bEv)$,
+  %     \item $\bEv\xrmw\aEv$,
+  %     \item
+  %       if $(\aEvs\cap\bEvs)=\emptyset$ then
+  %       \begin{math}
+  %         \aTr{\bEvs}{\bForm} \rimplies \bForm[\aExp/\aLoc].
+  %       \end{math}
+  %     \end{enumerate}
+  %   \end{enumerate}
+  % \end{multicols}
+
+This definition ensures atomicity and supports lowering to Arm load/store
+exclusive operations.  See \jjr{} for examples.
+
+One subtlety of the definition is that we use $\sLOADP{}{}$ rather than
+$\sLOAD{}{}$.  Thus, for \RMW{} operations, the independent case for a read
+is the same as the empty case.  To see why this should be, consider the
+relaxed variant of the \textsc{cdrf} example from
+\cite{DBLP:conf/pldi/LeeCPCHLV20}, using $\sLOAD{}{}$ rather than $\sLOADP{}{}$.
+\begin{gather*}
+  \begin{gathered}
+    \PW{x}{0}\SEMI
+    \begin{aligned}[t]
+      (&\PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI \;\;\PAR
+      \\&
+      \PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \PW{y}{1} \FI)
+    \end{aligned}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{i}{\DW{x}{0}}{}
+        \event{b0}{\DR{x}{0}}{right=3em of i}
+        \event{b0b}{\DW{x}{1}}{right=of b0}
+        \event{b1}{\DR{y}{1}}{right=of b0b}
+        \event{b2}{\DW{x}{0}}{right=of b1}
+        \event{a1}{\DR{x}{0}}{right=3em of b2}
+        \event{a1b}{\DW{x}{1}}{right=of a1}
+        \event{a2}{\DW{y}{1}}{right=of a1b}
+        \rmw{a1}{a1b}
+        \rmw{b0}{b0b}
+        \rf{i}{b0}
+        \rf[out=-165,in=-12]{a2}{b1}
+        \wki[out=20,in=160]{b0b}{b2}
+        % \sync{a1}{a2}
+        % \sync{b0}{b1}
+        \po{b1}{b2}
+        \rf{b2}{a1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+A write should only be visible to one $\PFADD{}{}{}$ instruction, but here
+the write of $0$ is visible to two.  This is allowed because no order is
+required from $\DRP{x}{0}$ to $\DWP{y}{1}$ in the last thread.  To see why,
+consider the independent transformers of the last thread and initializer:
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{x}{0}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em]
+        \event{a}{\DW{x}{0}}{}      
+        \xform{xi}{\bForm[0/x]}{left=of a}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \smash{\FADD^{\mRLX,\mRLX}(x,1)}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a0}{\DR{x}{0}}{}
+        %\node(a)[right=of a0]{};
+        \event{a1}{\DW{x}{1}}{right=of a0}
+        \rmw{a0}{a1}
+        \xform{xi}{(0{=}r\lor x{=}r)\limplies\bForm[1/x]}{left=.5em of a0}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \IF{\BANG r}\THEN \PW{y}{1} \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em]
+        \event{a2}{r{=}0\mid\DW{y}{1}}{}      
+        \xform{xi}{\bForm[1/y]}{left=of a2}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+After sequencing, the precondition of $\DWP{y}{1}$ is a tautology:
+$(0{=}r\lor 0{=}r)\limplies r{=}0$.
+
+By including \ref{read-tau-rmw}, $\sLOADP{}{}$ constrains the independent
+predicate transformer of the $\PFADD{}{}{}$:
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{x}{0}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em]
+        \event{a}{\DW{x}{0}}{}      
+        \xform{xi}{\bForm[0/x]}{left=of a}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \smash{\FADD^{\mRLX,\mRLX}(x,1)}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a0}{\DR{x}{0}}{}
+        %\node(a)[right=of a0]{};
+        \event{a1}{\DW{x}{1}}{right=of a0}
+        \rmw{a0}{a1}
+        \xform{xi}{\bForm[1/x]}{left=.5em of a0}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \IF{\BANG r}\THEN \PW{y}{1} \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em]
+        \event{a2}{r{=}0\mid\DW{y}{1}}{}      
+        \xform{xi}{\bForm[1/y]}{left=of a2}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+After sequencing, the precondition of $\DWP{y}{1}$ is $r{=}0$, which is
+\emph{not} a tautology.  This forces any top-level pomset to include
+dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
+
+% Here, local invariant reasoning is using the initializing write to $x$ to
+% justify the independence of the write to $y$.  But this write is made
+% unavailable by the first thread's successful \RMW{}.
+
+
+\begin{comment}
+  For case analysis of RMWs, we can use a general purpose expansion operator:
+
+  \begin{definition}
+    \noindent
+    If $\aPS \in \sEXPAND\aPSS$ then
+    $(\exists\aPS_1,\ldots,\aPS_n\in\aPSS)$
+    $(\exists\cForm_1,\ldots,\cForm_n\in\Formulae)$
+    % \\ let $\aPS_\aEv=\aPS_i$ if $\aEv\in\aEvs_i$ and $\cForm_\aEv=\cForm_i$ if $\aEv\in\aEvs_i$
+    \begin{multicols}{2}
+      \begin{enumerate}[topsep=0pt,label=(\textsc{e}\arabic*),ref=\textsc{e}\arabic*]
+      \item[] \label{ca-psi}
+        \begin{enumerate}[leftmargin=0pt]
+        \item if $\cForm_i\land\cForm_j$ is satisfiable then $i=j$,        
+        \item $\bigvee_i\cForm_i\riff\TRUE$,        
+        \end{enumerate}
+        \stepcounter{enumi}
+      \item[] \label{ca-E}
+        \begin{enumerate}[leftmargin=0pt]
+        \item if $\aEvs_i\cap\aEvs_j\neq\emptyset$ then $i=j$,
+        \item $\aEvs=\bigcup_i\aEvs_i$, %(\aEvs_1\cup\cdots\cup\aEvs_n)$,
+          % \item if $\cForm_\aEv\land\cForm_\bEv$ is satisfiable then
+          %   $(\exists i)$ $\aEv,\bEv\in\aEvs_i$,
+        \end{enumerate}
+      \item \label{ca-lambda}
+        ${\labeling}=\bigcup_i{\labeling_i}$,%\PBR{{\labeling_1}\cup\cdots \cup {\labeling_n}}$,       
+      \item \label{ca-kappa}
+        \begin{math}
+          \labelingForm(\aEv) \riff
+          \cForm_\aEv\land \labelingForm_\aEv(\aEv)
+        \end{math},
+      \item \label{ca-tau}
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \riff 
+          \bigvee_i (\cForm_i\land \aTr[i]{\bEvs}{\bForm})
+        \end{math},
+      \item \label{ca-term}
+        $\aTerm \riff \bigvee_i (\cForm_i\land \aTerm[i])$,
+      \item ${\rrfx}=\bigcup_i{\rrfx_i}$,
+      \item ${\le}=\bigcup_i{\le_i}$.
+      \end{enumerate}
+    \end{multicols}
+  \end{definition}
+\end{comment}
+
 
 \subsection{If-Closure}
 \label{sec:semca}
@@ -919,320 +1334,6 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   % $\sLOAD{}{}$.
 \end{definition}
 
-
-
-\subsection{Read-Modify-Write Operations}
-\label{sec:rmw}
-
-%We give the semantics of \RMW{}s without address calculation or if-closure.
-
-From the data model, we require an additional binary relation over
-$\Act\times\Act$: $\roverlapsdef$.  For the actions in this paper, we say
-$\aAct \roverlapsdef \bAct$ if they access the same location.
-
-\RMW{} operations are formalized by adding a relation
-${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
-\RMW{} to the succeeding write.
-% Let two actions \emph{overlap} if they access the same location.
-% \begin{enumerate}
-% \item
-%   ${\rrmw} \subseteq {\le}$ is a relation capturing
-%   \emph{read-modify-write atomicity}, such that for any $\cEv$, $\bEv$, $\aEv\in\aEvs$,
-%   where $\labeling(\cEv)$ and
-%   $\labeling(\bEv)$ access the same location:
-%   \begin{itemize}
-%   \item if $\bEv \xrmw \aEv$ and $\cEv\le \aEv$ then $\cEv\le \bEv$,
-%   \item if $\bEv \xrmw \aEv$ and $\bEv\le \cEv$ then $\aEv\le \cEv$.
-%   \end{itemize}
-% \end{enumerate}
-
-\begin{definition}
-  Extend the definition of a pomset as follows. % where two actions \emph{overlap} if they access the same location:
-  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
-    \setcounter{enumi}{7}
-  \item \label{pom-rmw}
-    ${\rrmw} : \aEvs\fun\aEvs$ is a partial function capturing
-    read-modify-write \emph{atomicity}, such that
-    \begin{enumerate}
-    \item \label{pom-rmw-block}
-      if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$,
-    \item \label{pom-rmw-le}
-      if $\bEv\xrmw\aEv$ then $\bEv \le \aEv$,    
-    \item \label{pom-rmw-atomic}
-      if $\labeling(\cEv) \roverlaps \labeling(\bEv)$ then
-      \begin{enumerate}        
-      \item \label{pom-rmw-atomic1}
-        if $\bEv \xrmw \aEv$ then
-        $\cEv\le \aEv$ implies $\cEv\le \bEv$,
-      \item \label{pom-rmw-atomic2}
-        if $\bEv \xrmw \aEv$ then
-        $\bEv\le \cEv$ implies $\aEv\le \cEv$.
-      \end{enumerate}
-    \end{enumerate}
-  \end{enumerate}
-
-  Extend the definition of par, if, seq to include:
-  \begin{enumerate}
-  \item[(\textsc{p}8)] (\textsc{s}8)\; (\textsc{i}8)\; ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
-  \end{enumerate}
-\end{definition}
-
-To define specific operations, we extend the syntax:
-\begin{align*}
-  \aCmd
-  \BNFDEF& \cdots 
-  \BNFSEP \PCAS[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
-  \BNFSEP \PFADD[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
-  \BNFSEP \PEXCHG[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
-\end{align*}
-We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic functions are as follows.
-\begin{definition}
-  Let $\sLOADP{}{}$ be defined as for $\sLOAD{}{}$, adding the constraint:
-  \begin{itemize}
-  \item[{\labeltext[\textsc{r}4d]{(\textsc{r}4d)}{read-tau-rmw}}]
-    if $(\aEvs\cap\bEvs)=\emptyset$ then
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \rimplies
-      \bForm.
-    \end{math}
-  \end{itemize}
-  If $\aPS\in\mathit{FADD}(\aReg,\cExp,\aExp,\amode,\bmode)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sSTORE[\bmode]{\cExp}{\aReg{+}\aExp}})$
-  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
-    $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
-    $\bEv\xrmw\aEv$.
-  \end{enumerate}
-  If $\aPS\in\mathit{EXCHG}(\aReg,\cExp,\aExp,\amode,\bmode)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sSTORE[\bmode]{\cExp}{\aExp}})$
-  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
-    $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
-    $\bEv\xrmw\aEv$.
-  \end{enumerate}
-  If $\aPS\in\mathit{CAS}(\aReg,\cExp,\aExp,\bExp,\amode,\bmode)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\bmode]{\cExp}{\bExp}\sELSE\sSKIP\sFI})$
-  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
-    $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
-    $\bEv\xrmw\aEv$.
-  \end{enumerate}
-\end{definition}
-  % If $\aPS\in\mathit{FADD}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
-  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aReg{+}\aExp}})$
-  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
-  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
-  %   $\bEv\xrmw\aEv$.
-  %   % \item if $\labeling_1(\bEv)$ is a read, then there is a write $\labeling_1(\aEv)$ such that 
-  %   %   $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and 
-  %   %   $\bEv\xrmw\aEv$.
-  % \end{enumerate}
-  % If $\aPS\in\mathit{EXCHG}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
-  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aExp}})$
-  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
-  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
-  %   $\bEv\xrmw\aEv$.
-  %   % \item if $\labeling_1(\bEv)$ is a read, then there is a write $\labeling_1(\aEv)$ such that 
-  %   %   $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and 
-  %   %   $\bEv\xrmw\aEv$.
-  % \end{enumerate}
-  % If $\aPS\in\mathit{CAS}(\aReg,\aLoc,\aExp,\bExp,\amode_1,\amode_2)$ then
-  % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\amode_2]{\aLoc}{\bExp}\sELSE\sSKIP\sFI})$
-  % \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  % \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
-  %   $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
-  %   $\bEv\xrmw\aEv$.
-  %   % \item if $\labeling_1(\bEv)$ is a read, then either
-  %   %   \begin{enumerate}
-  %   %   \item there is a write $\labeling_1(\aEv)$ such that $\labelingForm(\bEv)\rimplies\labelingForm(\aEv)$ and $\bEv\xrmw\aEv$, or
-  %   %   \item 
-  %   %   \end{enumerate}
-  % \end{enumerate}
-  % \begin{multicols}{2}
-  %   \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  %   \item if $\labeling_1(\aEv)$ is a write, then $(\exists\bEv)$ such that
-  %     \begin{enumerate}
-  %     \item $\labeling_1(\aEv)\rblocks \labeling_1(\bEv)$,
-  %     \item $\bEv\xrmw\aEv$,
-  %     \end{enumerate}
-  %     \columnbreak
-  %   \item if $\labeling_1(\bEv)$ is a read, then $(\exists\aEv)$ such that
-  %     \begin{enumerate}
-  %     \item $\labeling_1(\aEv)\rblocks \labeling_1(\bEv)$,
-  %     \item $\bEv\xrmw\aEv$,
-  %     \item
-  %       if $(\aEvs\cap\bEvs)=\emptyset$ then
-  %       \begin{math}
-  %         \aTr{\bEvs}{\bForm} \rimplies \bForm[\aExp/\aLoc].
-  %       \end{math}
-  %     \end{enumerate}
-  %   \end{enumerate}
-  % \end{multicols}
-
-This definition ensures atomicity and supports lowering to Arm load/store
-exclusive operations.  See \jjr{} for examples.
-
-One subtlety of the definition is that we use $\sLOADP{}{}$ rather than
-$\sLOAD{}{}$.  Thus, for \RMW{} operations, the independent case for a read
-is the same as the empty case.  To see why this should be, consider the
-relaxed variant of the \textsc{cdrf} example from
-\cite{DBLP:conf/pldi/LeeCPCHLV20}, using $\sLOAD{}{}$ rather than $\sLOADP{}{}$.
-\begin{gather*}
-  \begin{gathered}
-    \PW{x}{0}\SEMI
-    \begin{aligned}[t]
-      (&\PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI \;\;\PAR
-      \\&
-      \PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \PW{y}{1} \FI)
-    \end{aligned}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{i}{\DW{x}{0}}{}
-        \event{b0}{\DR{x}{0}}{right=3em of i}
-        \event{b0b}{\DW{x}{1}}{right=of b0}
-        \event{b1}{\DR{y}{1}}{right=of b0b}
-        \event{b2}{\DW{x}{0}}{right=of b1}
-        \event{a1}{\DR{x}{0}}{right=3em of b2}
-        \event{a1b}{\DW{x}{1}}{right=of a1}
-        \event{a2}{\DW{y}{1}}{right=of a1b}
-        \rmw{a1}{a1b}
-        \rmw{b0}{b0b}
-        \rf{i}{b0}
-        \rf[out=-165,in=-12]{a2}{b1}
-        \wki[out=20,in=160]{b0b}{b2}
-        % \sync{a1}{a2}
-        % \sync{b0}{b1}
-        \po{b1}{b2}
-        \rf{b2}{a1}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-A write should only be visible to one $\PFADD{}{}{}$ instruction, but here
-the write of $0$ is visible to two.  This is allowed because no order is
-required from $\DRP{x}{0}$ to $\DWP{y}{1}$ in the last thread.  To see why,
-consider the independent transformers of the last thread and initializer:
-\begin{align*}
-  \begin{gathered}[t]
-    \PW{x}{0}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em]
-        \event{a}{\DW{x}{0}}{}      
-        \xform{xi}{\bForm[0/x]}{left=of a}
-      \end{tikzinline}}    
-  \end{gathered}
-  &&
-  \begin{gathered}[t]
-    \smash{\FADD^{\mRLX,\mRLX}(x,1)}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a0}{\DR{x}{0}}{}
-        %\node(a)[right=of a0]{};
-        \event{a1}{\DW{x}{1}}{right=of a0}
-        \rmw{a0}{a1}
-        \xform{xi}{(0{=}r\lor x{=}r)\limplies\bForm[1/x]}{left=.5em of a0}
-      \end{tikzinline}}    
-  \end{gathered}
-  &&
-  \begin{gathered}[t]
-    \IF{\BANG r}\THEN \PW{y}{1} \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em]
-        \event{a2}{r{=}0\mid\DW{y}{1}}{}      
-        \xform{xi}{\bForm[1/y]}{left=of a2}
-      \end{tikzinline}}    
-  \end{gathered}
-\end{align*}
-After sequencing, the precondition of $\DWP{y}{1}$ is a tautology:
-$(0{=}r\lor 0{=}r)\limplies r{=}0$.
-
-By including \ref{read-tau-rmw}, $\sLOADP{}{}$ constrains the independent
-predicate transformer of the $\PFADD{}{}{}$:
-\begin{align*}
-  \begin{gathered}[t]
-    \PW{x}{0}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em]
-        \event{a}{\DW{x}{0}}{}      
-        \xform{xi}{\bForm[0/x]}{left=of a}
-      \end{tikzinline}}    
-  \end{gathered}
-  &&
-  \begin{gathered}[t]
-    \smash{\FADD^{\mRLX,\mRLX}(x,1)}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a0}{\DR{x}{0}}{}
-        %\node(a)[right=of a0]{};
-        \event{a1}{\DW{x}{1}}{right=of a0}
-        \rmw{a0}{a1}
-        \xform{xi}{\bForm[1/x]}{left=.5em of a0}
-      \end{tikzinline}}    
-  \end{gathered}
-  &&
-  \begin{gathered}[t]
-    \IF{\BANG r}\THEN \PW{y}{1} \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em]
-        \event{a2}{r{=}0\mid\DW{y}{1}}{}      
-        \xform{xi}{\bForm[1/y]}{left=of a2}
-      \end{tikzinline}}    
-  \end{gathered}
-\end{align*}
-After sequencing, the precondition of $\DWP{y}{1}$ is $r{=}0$, which is
-\emph{not} a tautology.  This forces any top-level pomset to include
-dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
-
-% Here, local invariant reasoning is using the initializing write to $x$ to
-% justify the independence of the write to $y$.  But this write is made
-% unavailable by the first thread's successful \RMW{}.
-
-
-\begin{comment}
-  For case analysis of RMWs, we can use a general purpose expansion operator:
-
-  \begin{definition}
-    \noindent
-    If $\aPS \in \sEXPAND\aPSS$ then
-    $(\exists\aPS_1,\ldots,\aPS_n\in\aPSS)$
-    $(\exists\cForm_1,\ldots,\cForm_n\in\Formulae)$
-    % \\ let $\aPS_\aEv=\aPS_i$ if $\aEv\in\aEvs_i$ and $\cForm_\aEv=\cForm_i$ if $\aEv\in\aEvs_i$
-    \begin{multicols}{2}
-      \begin{enumerate}[topsep=0pt,label=(\textsc{e}\arabic*),ref=\textsc{e}\arabic*]
-      \item[] \label{ca-psi}
-        \begin{enumerate}[leftmargin=0pt]
-        \item if $\cForm_i\land\cForm_j$ is satisfiable then $i=j$,        
-        \item $\bigvee_i\cForm_i\riff\TRUE$,        
-        \end{enumerate}
-        \stepcounter{enumi}
-      \item[] \label{ca-E}
-        \begin{enumerate}[leftmargin=0pt]
-        \item if $\aEvs_i\cap\aEvs_j\neq\emptyset$ then $i=j$,
-        \item $\aEvs=\bigcup_i\aEvs_i$, %(\aEvs_1\cup\cdots\cup\aEvs_n)$,
-          % \item if $\cForm_\aEv\land\cForm_\bEv$ is satisfiable then
-          %   $(\exists i)$ $\aEv,\bEv\in\aEvs_i$,
-        \end{enumerate}
-      \item \label{ca-lambda}
-        ${\labeling}=\bigcup_i{\labeling_i}$,%\PBR{{\labeling_1}\cup\cdots \cup {\labeling_n}}$,       
-      \item \label{ca-kappa}
-        \begin{math}
-          \labelingForm(\aEv) \riff
-          \cForm_\aEv\land \labelingForm_\aEv(\aEv)
-        \end{math},
-      \item \label{ca-tau}
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff 
-          \bigvee_i (\cForm_i\land \aTr[i]{\bEvs}{\bForm})
-        \end{math},
-      \item \label{ca-term}
-        $\aTerm \riff \bigvee_i (\cForm_i\land \aTerm[i])$,
-      \item ${\rrfx}=\bigcup_i{\rrfx_i}$,
-      \item ${\le}=\bigcup_i{\le_i}$.
-      \end{enumerate}
-    \end{multicols}
-  \end{definition}
-\end{comment}
 
 
 \endinput

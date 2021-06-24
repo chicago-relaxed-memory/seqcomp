@@ -116,17 +116,31 @@
 \showSCOPEfalse
 \begin{document}
 
-\title{Predicate Transformers for Relaxed Memory:  Sequential
-  Composition for Concurrency Using Semantic Dependencies}
-% \author{Radha Jagadeesan}
-% \orcid{0000-0002-4525-1589}
-% \affiliation{
-%   %\department{School of Computing}
-%   \institution{DePaul University}
-%   \city{Chicago}
-%   \country{USA}
-% }
-% %\email{rjagadeesan@cs.depaul.edu}
+%\title{Denoting Efficient Sequential Composition}
+\title{The Leaky Semicolon---A Compositional Semantics}
+%\title{Efficient Sequential Composition}
+%\title{A High-Level Abstraction of Efficient Sequential Composition}
+%Predicate Transformers for Relaxed Memory
+\subtitle{Predicate Transformers and Semantic Dependencies in Relaxed-Memory Concurrency}
+\author{Mark Batty}
+\orcid{0000-0001-7053-4364}
+\affiliation{
+  %\department{School of Computing}
+  \institution{University of Kent}
+  \city{Canterbury}
+  \country{UK}
+}
+%\email{m.j.batty@kent.ac.uk}
+
+\author{Simon Cooksey}
+\orcid{}
+\affiliation{
+  %\department{School of Computing}
+  \institution{University of Kent}
+  \city{Canterbury}
+  \country{UK}
+}
+%\email{sjc205@kent.ac.uk}
 
 \author{Alan Jeffrey}
 \orcid{0000-0001-6342-0318}
@@ -136,6 +150,26 @@
   \country{USA}
 }
 %\email{ajeffrey@mozilla.com}
+
+\author{Ilya Kaysin}
+\orcid{}
+\affiliation{
+  %\department{School of Computing}
+  \institution{}
+  \city{}
+  \country{}
+}
+%\email{}
+
+\author{Anton Podkopaev}
+\orcid{}
+\affiliation{
+  %\department{School of Computing}
+  \institution{}
+  \city{}
+  \country{}
+}
+%\email{}
 
 \author{James Riely}
 \orcid{0000-0002-8731-1463}
@@ -180,11 +214,13 @@
 \maketitle
 \input{intro.tex}
 \input{definitions.tex}
-\input{arm.tex}
 \input{variants.tex}
+\input{mrd.tex}
 \input{outro.tex}
 \bibliography{bib}
 \appendix
+\input{arm.tex}
+\input{drf.tex}
 \input{discussion.tex}
 \input{oopsla.tex}
 \end{document}

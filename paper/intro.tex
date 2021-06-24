@@ -1,6 +1,59 @@
 \section{Introduction}
 \label{sec:intro}
 
+\emph{Sequentiality} is a \emph{leaky abstraction} \cite{leaky}.  For
+example, sequentiality tells us that when executing
+$(\PR{x}{r_1}\SEMI\PW{y}{r_2}),$ the assignment $\PR{x}{r_1}$ is executed
+before $\PW{y}{r_2}$.  Thus, one might reasonably expect that the final value
+of $r_1$ is independent of the initial value of $r_2$.  In most modern
+languages, however, this fails to hold when the program is run concurrently
+with $(\PR{y}{s}\SEMI\PW{x}{s})$,
+%$\PW{x}{\PR{y}{}}$,
+which copies $y$ to $x$.
+
+In certain cases it is possible to ban concurrent access using separation
+\cite{OHearn:2007:RCL:1235896.1236121}, or to accept inefficiency in order to
+obtain sequential consistency \cite{DBLP:conf/snapl/MarinoMMNS15}.  When
+these approaches are not available, however, we are left with an enormous gap
+in our understanding of one of the most basic elements of computing: the
+humble semicolon.
+Existing approaches either
+\begin{itemize}
+\item don't bother tracking dependencies, allowing ``thin air'' executions \cite{DBLP:phd/ethos/Batty15},
+\item use syntactic dependencies
+  \cite{alglave,DBLP:journals/corr/abs-1804-04214}, disabling compiler optimizations,
+\item use complex non-compositional operational models  \cite{Manson:2005:JMM:1047659.1040336,
+    DBLP:conf/esop/JagadeesanPR10,
+    DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}, 
+  %JMM, promising semantics, weakestMO, etc
+\item use prefixing \cite{DBLP:journals/pacmpl/JagadeesanJR20} or
+  continuation-passing \cite{DBLP:conf/esop/PaviottiCPWOB20} rather than
+  a direct presentation of sequential composition.
+\end{itemize}
+
+In this paper, we show that families of predicate transformers can be used to
+calculate semantic dependencies in a way that is \emph{compositional} and
+\emph{direct}: \emph{compositional} in that the denotation of
+$(\aCmd_1\SEMI \aCmd_2)$ can be computed from the denotation of $\aCmd_1$ and
+the denotation of $\aCmd_2$, and \emph{direct} in that these can be
+calculated independently.
+
+Our contributions:
+\begin{itemize}
+\item We define a denotational model for calculating dependencies.
+\item We apply the model to the \PwP{} semantics of
+  \cite{DBLP:journals/pacmpl/JagadeesanJR20} and to the \MRD{} semantics of
+  \cite{DBLP:conf/esop/PaviottiCPWOB20}.
+\item We provide a tool to execute litmus tests for both models.
+\item We prove \drfsc{} for \PwP{}; \MRD{} inherits the result from \rcXI.
+\item We prove a lowering result for \PwP{}.
+\item We extend the model to include many features.
+\end{itemize}
+
+
+\section{Overview}
+\label{sec:overview}
+
 This paper is about the interaction of two of the fundamental building blocks
 of computing: sequential composition and mutable state. One would like to
 think that these are well-worn topics, where every issue has been settled,

@@ -1,3 +1,6 @@
+\newcommand{\MRD}{{\sc mrd-c11}}
+\newcommand{\PwP}{{\sc pwp}}
+\newcommand{\PwT}{{\sc pwt}}
 \newcommand{\DEP@COLOR}[1]{\mathrel{{\color{purple}#1}}}
 \newcommand{\LOC@COLOR}[1]{\mathrel{{\color{red}#1}}}
 \newcommand{\SYNC@COLOR}[1]{\mathrel{{\color{magenta}#1}}}
@@ -61,6 +64,7 @@
 \newcommand{\sread}{\LABEL@COLOR@REL{{read}}}
 \newcommand{\srelease}{\LABEL@COLOR@REL{{release}}}
 \newcommand{\rimplies}{\mathrel{\vDash}}%{\LABEL@COLOR@REL{{implies}}}}
+\newcommand{\rnotimplies}{\mathrel{\not\vDash}}%{\LABEL@COLOR@REL{{implies}}}}
 \newcommand{\riff}{\mathrel{\equiv}}
 %\newcommand{\riff}{\mathrel{\Dashv\vDash}}
 \newcommand{\rextends}[2]{\LABEL@REL{{extends}}\ifnotempty{#1#2}{{#1}\textand{#2}}}
@@ -117,6 +121,7 @@
 \newcommand{\RW}{\mathsf{W}}
 \newcommand{\RO}{\lnot\mathsf{W}}
 \newcommand{\Q}[1]{\mathsf{Q}_{#1}}
+\newcommand{\Qstar}{\mathsf{Q}^{*}}
 \newcommand{\D}{\Dx{\texttt{*}}}
 \newcommand{\Dx}[1]{\mathord{\downarrow^{#1}}}
 \newcommand{\Qx}[1]{\mathsf{Q}_{\mathsf{rw}}^{#1}}
@@ -130,6 +135,7 @@
 \newcommand{\QwREF}[1]{\Qw{\REF{#1}}}
 \newcommand{\SB}[1]{}%_{#1}}
 \newcommand{\limplies}{\mathbin{\Rightarrow}}
+\newcommand{\lassume}[1]{\underline{#1}}
 
 % \begin{wrapfigure}{r}{0mm}%
 %   \centering\rule{3cm}{7cm}
@@ -273,7 +279,7 @@
 \newcommand{\DRreg}[3]{#1\DR{#2}{#3}}
 \NewDocumentCommand\PR{O{} m O{} m}{\ifnotempty{#4}{{#4} \GETS}{#2}^{#1}\ifshowSCOPE_{#3}\fi}
 \NewDocumentCommand\PRP{O{} m O{} m}{\PBR{\PR[#1]{#2}[#3]{#4}}}
-\NewDocumentCommand\DR{O{} m O{} m O{}}{\ifshowSCOPE#5\fi\mathsf{R}^{\ifshowRA#1\fi}\ifshowSCOPE_{#3}\fi\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}
+\NewDocumentCommand\DR{O{} m O{} m O{}}{\ifshowSCOPE#5\fi\mathsf{R}^{\ifshowRA#1\fi}\ifshowSCOPE_{#3}\fi\ifnotempty{#2}{\mkern1mu#2}\ifnotempty{#4}{\mkern1mu#4}}
 \NewDocumentCommand\DRP{O{} m O{} m O{}}{\PBR{\DR[#1]{#2}[#3]{#4}[#5]}}
 
 \NewDocumentCommand\DX{O{} m O{} m O{}}{\ifshowSCOPE#5\fi\mathsf{A}^{\ifshowRA#1\fi}\ifshowSCOPE_{#3}\fi\ifnotempty{#2}{\mkern1mu#2\ifnotempty{#4}{\mkern1mu#4}}}
@@ -541,7 +547,10 @@
 \newcommand{\testP}[2]{{\tt test}^{#1}_{#2}}
 \newcommand{\freshaval}{\aVal_{{\tt fr}}}
 
-\newcommand{\jjr}[1]{\cite[#1]{DBLP:journals/pacmpl/JagadeesanJR20}}%[JJR\ifnotempty{#1}{, #1}]}
+%\newcommand{\jjr}[1]{\cite[#1]{DBLP:journals/pacmpl/JagadeesanJR20}}%[JJR\ifnotempty{#1}{, #1}]}
+\newcommand{\jjr}[1]{\PwP\ifnotempty{#1}{(#1)}}
+\newcommand{\CNF}{{\sc cnf}}
+\newcommand{\DNF}{{\sc dnf}}
 \newcommand{\UMA}{{\sc uma}}
 \newcommand{\GPU}{{\sc gpu}}
 \newcommand{\CPU}{{\sc cpu}}
@@ -595,8 +604,8 @@
 \newenvironment{tikzdisplay}[1][]{\bgroup\footnotesize\begin{displaymath}\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}\end{displaymath}\egroup\ignorespacesafterend}
 \newenvironment{tikzdisplaysmall}[1][]{\bgroup\tiny\begin{displaymath}\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}\end{displaymath}\egroup\ignorespacesafterend}
 \newenvironment{tikzcenter}[1][]{\begin{tikzpicture}[baselinecenter,#1]\ignorespaces}{\end{tikzpicture}}
-\newcommand{\fdom}{\mathsf{domain}}
-\newcommand{\fran}{\mathsf{range}}
+\newcommand{\fdom}{\mathsf{dom}}
+\newcommand{\fran}{\mathsf{ran}}
 \newcommand{\fcodom}{\mathsf{codom}}
 \newcommand{\semClosed}[1]{\closed\sem{#1}}
 \newcommand{\closed}{\mathsf{closed}}
@@ -776,10 +785,14 @@
 \newcommand{\DB}[1]{\mathsf{B}\ifnotempty{#1}{\,#1}}
 \newcommand{\DC}[1]{\mathsf{C}\ifnotempty{#1}{\,#1}}
 
-\newcommand{\umEvs}{\overline{\dmEvs}}
-\newcommand{\dmEvs}{G}
-\newcommand{\phEvs}{F}
-\newcommand{\reEvs}{\overline{\phEvs}}
+% \newcommand{\umEvs}{\overline{\dmEvs}}
+% \newcommand{\dmEvs}{G}
+% \newcommand{\phEvs}{F}
+% \newcommand{\reEvs}{\overline{\phEvs}}
+\newcommand{\dmEvs}{\overline{\umEvs}}
+\newcommand{\umEvs}{S}
+\newcommand{\reEvs}{R}
+\newcommand{\phEvs}{\overline{\reEvs}}
 %\newcommand{\umEv}{b}
 
 \newcommand{\aEvs}{E}
@@ -1108,6 +1121,19 @@
         }
     }
 }
+\tikzset{phnonevent/.style={
+        phevent, 
+        append after command={
+            node [
+                fit=(\tikzlastnode),
+                draw=red!50!black,
+                thick,
+                inner sep=-2\pgflinewidth,
+                cross out
+            ] {}
+        }
+    }
+}
 \tikzset{nonfinal/.style={
         final, 
         append after command={
@@ -1140,6 +1166,7 @@
 %     postaction={-stealth,draw,,#3,line width=(#1)/3,shorten <=(#1)/3,shorten >=2*(#1)/3},
 %   },
 % }
+\newcommand{\phnonevent}[3]{\node[phnonevent](#1)[#3]{$\mathstrut#2$};}
 \newcommand{\nonevent}[3]{\node[nonevent](#1)[#3]{$\mathstrut#2$};}
 \newcommand{\nonfinal}[3]{\node[nonfinal](#1)[#3]{$\mathstrut#2$};}
 \tikzstyle{race} = [-,thick,decorate,decoration={zigzag,segment length = 0.2cm, amplitude = 0.5mm},color=red!50!black]
@@ -1185,7 +1212,9 @@
 % \newcommand{\xclose}{\xarrowtikz{close}{\;\;}}%
 
 \tikzstyle{mrg} = [-stealth,thick,dotted,color=\mrgcolor,]
-\NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{m}$}  (#4);}
+%\NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{m}$}  (#4);}
+\NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to (#4);}
+\newcommand{\fmrg}[1]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{m}}\ifnotempty{#1}{(#1)}}}%
 \newcommand{\rmrg}{\ensuremath{\mathrel{\textcolor{\mrgcolor}{\mathsf{m}}}}}%
 \newcommand{\xmrg}{\xarrowtikz{mrg}{m}}%
 

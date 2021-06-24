@@ -159,19 +159,21 @@ The semantics is built from the following.
   and subsets ranged over by $\aEvs$, $\bEvs$, $\cEvs$,  
 \item a set of \emph{logical formulae} $\Formulae$, ranged over by $\aForm$,
   $\bForm$, $\cForm$,
-\item a set of \emph{actions} $\Act$, ranged over by $\aAct$, $\bAct$.
+\item a set of \emph{actions} $\Act$, ranged over by $\aAct$, $\bAct$,
+\item a family of \emph{quiescence symbols} $\Q{\aLoc}$, indexed by location.
 \end{itemize}
 % $\dEvs$.
 
 We require that
 \begin{itemize}
-\item formulae include $\TRUE$, $\FALSE$ and the equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
+\item formulae include $\TRUE$, $\FALSE$, $\Q{\aLoc}$, and the equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
 \item formulae are closed under $\lnot$, $\land$, $\lor$, $\limplies$, and
-  substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$,
+  substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$, $[\aForm/\Q{\aLoc}]$
 \item there is a relation $\rimpliesdef$ between
   formulae, capturing entailment, %\subseteq(\Formulae\times\Formulae)$ %
 \item $\rimpliesdef$ has the expected semantics for $=$, $\lnot$,
-  $\land$, $\lor$, $\limplies$ and substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$,
+  $\land$, $\lor$, $\limplies$ and substitutions $[\aExp/\aReg]$,
+  $[\aExp/\aLoc]$, $[\aForm/\Q{\aLoc}]$,
 \item there are three binary relations over $\Act\times\Act$:
   $\rmatchesdef$, $\rblocksdef$, and $\rdelaysdef$,
 \item there are two subsets of $\Act$, distinguishing
@@ -435,7 +437,8 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$,
     \setcounter{enumi}{\value{Bkappa}}
   \item \label{top-kappa}
-    $\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
+    %$\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
+    $\labelingForm(\aEv)[\TRUE/\Qstar]$ is a tautology (for every $\aEv\in\aEvs$),
     \setcounter{enumi}{\value{Bterm}}
   \item \label{top-term}
     $\aTerm$ is a tautology.
@@ -459,16 +462,6 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
 \end{definition}
 \input{fig-seq.tex}
 \input{fig-sem.tex}
-
-
-\begin{enumerate}
-\item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
-  $\labelingForm(\aEv)$ is satisfiable.
-\item[{\labeltext[\textsc{s}6b$'$]{(\textsc{s}6b$'$)}{pom-kappa-sat}}]
-  if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
-  $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
-  $\bEv\le\aEv$.  
-\end{enumerate}
 
 We give the semantics of programs $\sembase{}$ in \reffig{fig:sem}. \ref{par-le}
 
@@ -629,8 +622,8 @@ preconditions to weaken.
     \item $\labelingForm_2(\aEv) \riff \labelingForm_1(\aEv)$,
     \item $\aTr[2]{\bEvs}{\bForm}\riff \aTr[1]{\bEvs}{\bForm}$,
     \item $\aTerm[2] \riff \aTerm[1]$,
-    \item ${\rrfx_2}\supseteq{\rrfx_1}$,
-    \item ${\le_2}\supseteq{\le_1}$.
+    \item ${\le_2}\supseteq{\le_1}$,
+    \item ${\rrfx_2}\supseteq{\rrfx_1}$.
     \end{enumerate}
   \end{multicols}
 \end{definition}
