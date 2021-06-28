@@ -66,7 +66,7 @@
     \end{enumerate}
   \end{multicols}
   where
-  $\labelingForm'_2(\aEv)=\aTr[1]{}{\labelingForm_2(\aEv})$ if $\labeling(\aEv)$ is a $\sread$---otherwise
+  %$\labelingForm'_2(\aEv)=\aTr[1]{}{\labelingForm_2(\aEv})$ if $\labeling(\aEv)$ is a $\sread$---otherwise
   $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$, where
   $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$;\\
   where
@@ -267,6 +267,6 @@
       \sembase{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &= \sIFTHEN{\aExp{\neq}0}{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
     \end{aligned}
   \end{align*}
-  \caption{Sequential Semantics}
+  \caption{PwT Semantics}
   \label{fig:seq}
 \end{figure}

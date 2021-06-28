@@ -1,0 +1,888 @@
+\section{Additional Examples}
+
+\subsection{Arm}
+The following execution is allowed by Arm.
+\begin{gather*}
+  {
+    \PW{x}{1}
+    \SEMI
+    \PW[\mREL]{y}{1}
+  }\PAR{
+    \PR{y}{r}
+    \SEMI
+    \PW{y}{2}
+    \SEMI
+    \PR[\mACQ]{y}{s}
+     \SEMI
+    \PR{x}{t}
+  }
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \raevent{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR{y}{1}}{right=3em of b}
+      \event{d}{\DW{y}{2}}{right=of c}
+      \raevent{e}{\DR[\mACQ]{y}{2}}{right=of d}
+      \event{f}{\DR{x}{0}}{right=of e}
+      \lob{a}{b}
+      \rfx{b}{c}
+      %\sync[out=15,in=165]{c}{e}
+      \lob{c}{d}
+      \rfx{d}{e}
+      \lob{e}{f}
+      \fr[out=-165,in=-15]{f}[above,pos=.45]{a}
+      %\close[out=-15,in=-165]{b}{e}
+    \end{tikzinline}}
+  \\
+  \tag{$\rgcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \raevent{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR{y}{1}}{right=3em of b}
+      \event{d}{\DW{y}{2}}{right=of c}
+      \raevent{e}{\DR[\mACQ]{y}{2}}{right=of d}
+      \event{f}{\DR{x}{0}}{right=of e}
+      \gcbz{a}{b}
+      \gcbz{b}{c}
+      \gcbz{c}{d}
+      \gcbz{d}{e}
+      %\gcbz{e}{f}
+      \gcbz[out=-165,in=-15]{f}{a}
+    \end{tikzinline}}
+  \\
+  \tag{$\rcb$}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \raevent{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR{y}{1}}{right=3em of b}
+      \event{d}{\DW{y}{2}}{right=of c}
+      \raevent{e}{\DR[\mACQ]{y}{2}}{right=of d}
+      \event{f}{\DR{x}{0}}{right=of e}
+      \cbz{a}{b}
+      \cbz{b}{c}
+      \cbz{c}{d}
+      %\cbz{d}{e}
+      \cbz{e}{f}
+      \cbz[out=-165,in=-15]{f}{a}
+    \end{tikzinline}}
+\end{gather*}
+
+\subsection{RMWs}
+It is not possible for two \RMW{}s to see the same write.
+\begin{gather*}
+  \begin{gathered}
+    \PW{x}{0} \SEMI \bigl(\PFADD[\mRLX][\mRLX]{x}{}{1} \PAR \PFADD[\mRLX][\mRLX]{x}{}{1}\bigr)
+    \\
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a0}{\DW{x}{0}}{}
+        \event{a1}{\DR{x}{0}}{right=3em of a0}
+        \event{a2}{\DW{x}{1}}{right=of a1}
+        \event{b1}{\DR{x}{0}}{right=3em of a2}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rmw{a1}{a2}
+        \rf{a0}{a1}
+        \rf[out=-15,in=-165]{a0}{b1}
+        \wk[out=-15,in=-165]{a1}{b2}
+        \wk{b1}{a2}
+        \graywk[bend left]{a2}{b1}
+        \rmw{b1}{b2}
+      \end{tikzinline}}
+  \end{gathered}
+  \taglabel{rmw0}
+\end{gather*}
+The gray arrow is required the \RMW{} atomicity axioms.
+
+\citet{DBLP:conf/pldi/LeeCPCHLV20} introduce \PS{2.0} to refine the treatment of
+\RMW{}s in the promising semantics (\PS{}).  Their examples have the expected
+results here, with far less work.  First they recall that \PS{} requires
+quantification over multiple futures in order to disallow executions such as
+\ref{CDRF}:
+\begin{gather*}
+  \taglabel{CDRF}
+    \begin{gathered}
+      \PFADD[\mACQ][\mREL]{x}{r}{1}\SEMI \IF{r{=}0}\THEN \PW{y}{1} \FI
+      \PAR
+      \PFADD[\mACQ][\mREL]{x}{r}{1}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
+      \\
+      \hbox{\begin{tikzinline}[node distance=2em]
+          \event{a1}{\DR[\mACQ]{x}{0}}{}
+          \event{a1b}{\DW[\mREL]{x}{1}}{below=1em of a1}
+          \event{a2}{\DW{y}{1}}{right=of a1}
+          \event{b0}{\DR[\mACQ]{x}{0}}{right=3em of a2}
+          \event{b0b}{\DW[\mREL]{x}{1}}{below=1em of b0}
+          \event{b1}{\DR{y}{1}}{right=of b0}
+          \event{b2}{\DW{x}{0}}{right=of b1}
+          \rmw{a1}{a1b}
+          \rmw{b0}{b0b}
+          \rf[out=-13,in=-163]{a2}{b1}
+          \po{a1}{a2}
+          \sync{b0}{b1}
+          \po{b1}{b2}
+          \rf[out=-165,in=-12]{b2}{a1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+This execution is clearly impossible, due to the cycle above.  In this
+diagram, we have not drawn order adjacent to the writes of the \RMW{}s, since
+this is not necessary to produce the cycle.
+If \ref{CDRF} is allowed then \drfra{} fails.
+
+
+  
+\PS{} does not support global value range analysis, as modeled by \ref{GA+E} below.  Our
+semantics permits \ref{GA+E}:
+\begin{gather*}
+  \taglabel{GA+E}
+    \begin{gathered}
+      \PW{x}{0} \SEMI
+      \bigl(
+        \PCAS[\mRLX][\mRLX]{x}{r}{0}{1}\SEMI \IF{r{<}10}\THEN \PW{y}{1} \FI
+        \PAR
+        \PW{x}{42}\SEMI \PW{x}{y}
+      \bigr)
+      \\
+      \hbox{\begin{tikzinline}[node distance=2em]
+          \event{a0}{\DW{x}{0}}{}
+          \event{a1}{\DR{x}{1}}{right=3em of a0}
+          \event{a2}{0{<}10\mid\DW{y}{1}}{right=of a1}
+          \event{b0}{\DW{x}{42}}{right=3em of a2}
+          \event{b1}{\DR{y}{1}}{right=of b0}
+          \event{b2}{\DW{x}{1}}{right=of b1}
+          %\rmw{a1}{a2}
+          \rf[out=-15,in=-160]{a2}{b1}
+          \po{b1}{b2}
+          \rf[out=-165,in=-15]{b2}{a1}
+          \wk[out=10,in=170]{a0}{b0}
+          \wk[out=15,in=165]{b0}{b2}
+        \end{tikzinline}}
+    \end{gathered}
+\end{gather*}
+\PS{} also does not support register promotion, as modeled by \ref{RP} below.    Our
+semantics permits \ref{RP}:
+\begin{gather*}
+  \taglabel{RP}
+    \begin{gathered}
+      \PR{x}{r}\SEMI
+      \PFADD[\mRLX][\mRLX]{z}{s}{r}\SEMI \PW{y}{s{+}1}
+      \PAR
+      \PW{x}{y}
+      \\
+      \hbox{\begin{tikzinline}[node distance=2em]
+          \event{a0}{\DR{x}{1}}{}
+          \event{a1}{\DR{z}{0}}{right=of a0}
+          \event{a1b}{\DW{z}{1}}{right=of a1}
+          \event{a2}{\DW{y}{1}}{right=of a1b}
+          \event{b0}{\DR{y}{1}}{right=3em of a2}
+          \event{b1}{\DW{x}{1}}{right=of b0}
+          \rmw{a1}{a1b}
+          \po[out=20,in=160]{a0}{a1b}
+          \po[out=20,in=160]{a1}{a2}
+          \po{b0}{b1}
+          \rf{a2}{b0}
+          \rf[out=-165,in=-15]{b1}{a0}
+        \end{tikzinline}}
+    \end{gathered}
+\end{gather*}
+
+
+
+These following examples are from ``Modular Data-Race-Freedom Guarantees in
+the Promising Semantics'' to appear in PLDI21.
+
+\ref{CDRF} shows that our semantics is not too permissive for $\mRA$-\RMW{}s.
+But what about $\mRLX$-\RMW{}s.  The following execution is allowed by \armeight,
+and \PS{2.0}, but disallowed by \PS{2.1}.
+\begin{gather*}
+  \taglabel{RMW-W}
+  \begin{gathered}
+    \PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \PW{y}{1}
+    \PAR
+    \PR{y}{r}\SEMI \PFADD[\mRLX][\mRLX]{x}{s}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a1b}{\DW{x}{2}}{below=1em of a1}
+        \event{a2}{\DW{y}{1}}{right=of a1}
+        \event{b1}{\DR{y}{1}}{right=3em of a2}
+        \event{b2}{\DR{x}{0}}{right=of b1}
+        \event{b2b}{\DW{x}{1}}{below=1em of b2}
+        \rmw{a1}{a1b}
+        \rmw{b2}{b2b}
+        \rf{a2}{b1}
+        \po{b1}{b2b}
+        \rf[out=-175,in=-20]{b2b}{a1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+If this $\ldrfra{z}$?
+\begin{gather*}
+  \taglabel{Naive-LDRF-RA-Fail}
+  \begin{gathered}
+    \IF{y}\THEN \PW{x}{z} \ELSE \PW{x}{1} \FI
+    \PAR
+    \PR{x}{r}\SEMI \PW{z}{1}\SEMI \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DR{y}{1}}{}
+        \event{a2}{\DR{z}{1}}{right=of a1}
+        \event{a3}{\DW{x}{1}}{right=of a2}
+        \event{b1}{\DR{x}{1}}{right=3em of a3}
+        \event{b2}{\DW{z}{1}}{right=of b1}
+        \event{b3}{\DW{y}{1}}{right=of b2}
+        \po{a2}{a3}
+        \po[in=165,out=15]{b1}{b3}
+        \rf[out=-165,in=-15]{b2}{a2}
+        \rf[out=-165,in=-15]{b3}{a1}
+        \rf{a3}{b1}
+      \end{tikzinline}}
+  \end{gathered}
+\intertext{Interpreting $\{z\}$ as $\mRA$:}
+    \\
+  \begin{gathered}
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DR{y}{1}}{}
+        \event{a2}{\DR[\mACQ]{z}{1}}{right=of a1}
+        \event{a3}{\DW{x}{1}}{right=of a2}
+        \event{b1}{\DR{x}{1}}{right=3em of a3}
+        \event{b2}{\DW[\mREL]{z}{1}}{right=of b1}
+        \event{b3}{\DW{y}{1}}{right=of b2}
+        \po{a2}{a3}
+        \po[in=165,out=15]{b1}{b3}
+        \rf[out=-165,in=-15]{b2}{a2}
+        \rf[out=-165,in=-15]{b3}{a1}
+        \rf{a3}{b1}
+        \sync{a1}{a2}
+        \sync{b2}{b3}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+Our semantics already disallows \ref{LDRF-Fail-PS}, which is similar to \ref{OOTA4}.
+\begin{gather*}  
+  \taglabel{LDRF-Fail-PS}
+  \begin{gathered}
+  \IF{x}\THEN
+    \PFADD{w}{}{1}\SEMI
+    \PW{y}{1}\SEMI
+    \PW{z}{1}
+  \FI
+  \PAR
+  \IF{\BANG z}\THEN
+    \PW{x}{1}
+  \ELSE
+    \IF{\BANG \PFADD{w}{}{1}}\THEN
+      \PW{x}{\PR{y}{}}
+    \FI
+  \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{w}{1}}{right=of a1}
+        \event{a3}{\DW{w}{2}}{right=of a2}
+        \event{a4}{\DW{y}{1}}{right=of a3}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \event{b1}{\DR{z}{1}}{right=5em of a5}
+        \event{b2}{\DR{w}{0}}{right=of b1}
+        \event{b3}{\DW{w}{1}}{right=of b2}
+        \event{b4}{\DR{y}{1}}{right=of b3}
+        \event{b5}{\DW{x}{1}}{right=of b4}
+        \rmw{a2}{a3}
+        \po[out=15,in=165]{a1}{a3}
+        \po[out=15,in=165]{a1}{a4}
+        \po[out=15,in=165]{a1}{a5}        
+        \rmw{b2}{b3}
+        \po{b4}{b5}
+        \po[out=15,in=165]{b2}{b5}        
+        \po[out=15,in=165]{b1}{b3}
+        \rf{a5}{b1}
+        \rf[out=15,in=165]{a4}{b4}
+        \rf[out=-165,in=-15]{b3}{a2}
+        \rf[out=-165,in=-15]{b5}{a1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+\begin{gather}
+  \taglabel{OOTA4}
+  \begin{gathered}
+    \PW{y}{x}
+    \PAR
+    \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
+    \PAR
+    \PW{b}{1}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx}{\DR{x}{1}}{}
+        \event{wy}{\DW{y}{1}}{right=of rx}
+        \po{rx}{wy}
+        \event{ry}{\DR{y}{1}}{right=3em of wy} 
+        \event{wx}{\DW{x}{1}}{right=of ry}
+        \event{wz}{\DW{z}{1}}{right=of wx}
+        \event{rb}{\DR{b}{1}}{right=of wz}
+        \event{wb1}{\DW{b}{1}}{right=3em of rb}
+        \po{ry}{wx}
+        \rf{wb1}{rb}
+        \rf{wy}{ry}
+        \rf[out=-170,in=-10]{wx}{rx}
+        \po{rb}{wz}
+        \po[out=15,in=165]{ry}{wz}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{gather}
+\begin{example}
+  This definition ensures atomicity, disallowing executions such as
+  \cite[Ex.~3.2]{DBLP:journals/pacmpl/PodkopaevLV19}:
+  \begin{gather*}
+    % \taglabel{RMW1}
+    \begin{gathered}
+      \PW{x}{0}\SEMI \PINC[\mRLX][\mRLX]{x}{}
+      \PAR
+      \PW{x}{2}\SEMI \PR{x}{r}
+      \\
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a2}{\DR{x}{0}}{}
+          \event{a1}{\DW{x}{0}}{left=of a2}
+          \rf{a1}{a2}
+          \event{a3}{\DW{x}{2}}{right=of a2}
+          \wk{a2}{a3}
+          \event{b2}{\DW{x}{1}}{right=of a3}
+          \event{b3}{\DR{x}{1}}{right=of b2}
+          \rmw[out=-15,in=-165]{a2}[below]{b2}
+          \wk{a3}{b2}
+          \rf{b2}{b3}
+          \liftrmw[out=165,in=15]{a3}{a2}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  By \ref{pom-rmw-atomic1}, since $\DWP{x}{2}\xwk\DWP{x}{1}$, it must be that
+  $\DWP{x}{2}\xwk\DRP{x}{0}$, creating a cycle.
+\end{example}
+
+\begin{example}
+  \label{ex:rmw-33}
+  Two successful \RMW{}s cannot see the same write:
+  \begin{gather*}
+    \begin{gathered}
+      \PW{x}{0}\SEMI (\PINC[\mRLX][\mRLX]{x}{} \PAR \PINC[\mRLX][\mRLX]{x}{})
+      \\
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{i}{\DW{x}{0}}{}
+          \event{a1}{a{:}\DR{x}{0}}{right=3em of i}
+          \event{a2}{b{:}\DW{x}{1}}{right=of a1}
+          \event{b1}{c{:}\DR{x}{0}}{right=3em of a2}
+          \event{b2}{d{:}\DW{x}{1}}{right=of b1}
+          \rmw{a1}{a2}
+          \rmw{b1}{b2}
+          \rf{i}{a1}
+          \rf[out=15,in=165]{i}{b1}
+          \wk[out=-15,in=-165]{a1}{b2}
+          \liftrmw[out=-15,in=-165]{a2}{b1}
+          % \wk{a1}{b2}
+          \wk{b1}{a2}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  The order from read-to-write is required by fulfillment.  
+  Apply \ref{pom-rmw-atomic1} of the second \RMW{} to $a\xwk d$, we have that $a\xwk c$.  Subsequently
+  applying \ref{pom-rmw-atomic2} of the first \RMW{}, we have $b \xwk c$, creating a cycle.
+\end{example}
+
+\begin{example}
+  By using two actions rather than one, the definition allows examples such as the
+  following, which is allowed by \armeight{} 
+  \cite[Ex.~3.10]{DBLP:journals/pacmpl/PodkopaevLV19}:
+  \begin{gather*}
+    % \taglabel{RMW2}
+    \begin{gathered}
+      \PR{z}{r}\SEMI
+      % \PW{x}{0}\SEMI
+      \PINC[\mRLX][\mREL]{x}{s} \SEMI
+      \PW{y}{s}{+}1
+      \PAR
+      \PR{y}{r}\SEMI
+      \PW{z}{r}
+      \\[-1ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{b1}{\DR{z}{1}}{}
+          % \event{b2}{\DW{x}{0}}{right=of b1}
+          \event{b3}{\DR{x}{0}}{right=of b1}
+          %\rf{b2}{b3}
+          \event{b4}{\DWRel{x}{1}}{right=2em of b3}
+          \rmw{b3}{b4}
+          \event{b5}{\DW{y}{1}}{right=of b4}
+          \sync[out=-20,in=-160]{b1}{b4}
+          \po[out=-20,in=-160]{b3}{b5}
+          \event{a1}{\DR{y}{1}}{right=3em of b5}
+          \event{a2}{\DW{z}{1}}{right=of a1}
+          \po{a1}{a2}
+          \rf{b5}{a1}
+          \rf[out=170,in=10]{a2}{b1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  A similar example, also allowed by \armeight{}
+  \cite[Fig.~6]{DBLP:journals/pacmpl/ChakrabortyV19}:
+  \begin{gather*}
+    % \taglabel{RMW2}
+    \begin{gathered}
+      \PR{z}{r}\SEMI
+      % \PW{x}{0}\SEMI
+      \PFADD[\mRLX][\mRLX]{x}{s}{r} \SEMI
+      \PW{y}{s}{+}1
+      \PAR
+      \PR{y}{r}\SEMI
+      \PW{z}{r}
+      \\[-1ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{b1}{\DR{z}{1}}{}
+          %\event{b2}{\DW{x}{0}}{right=of b1}
+          \event{b3}{\DR{x}{0}}{right=of b1}
+          %\rf{b2}{b3}
+          \event{b4}{\DW{x}{1}}{right=2em of b3}
+          \rmw{b3}{b4}
+          \event{b5}{\DW{y}{1}}{right=of b4}
+          \po[out=-20,in=-160]{b1}{b4}
+          \po[out=-20,in=-160]{b3}{b5}
+          \event{a1}{\DR{y}{1}}{right=3em of b5}
+          \event{a2}{\DW{z}{1}}{right=of a1}
+          \po{a1}{a2}
+          \rf{b5}{a1}
+          \rf[out=170,in=10]{a2}{b1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+\end{example}
+This is allowed by \weakestmo{}, but not \PS{}.
+
+\begin{example}
+  Consider the \textsc{cdrf} example from \cite{DBLP:conf/pldi/LeeCPCHLV20}:
+  \begin{gather*}
+    \begin{gathered}
+      \begin{aligned}
+        &\PINC[\mACQ][\mREL]{x}{r}\SEMI \IF{r{=}0}\THEN \PW{y}{1} \FI
+        \\\PAR\;\;&
+        \PINC[\mACQ][\mREL]{x}{r}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
+      \end{aligned}
+      \\
+      \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
+          \raevent{a1}{\DR[\mACQ]{x}{0}}{}
+          \raevent{a1b}{\DW[\mREL]{x}{1}}{right=of a1}
+          \event{a2}{\DW{y}{1}}{right=of a1b}
+          \raevent{b0}{\DR[\mACQ]{x}{0}}{right=3em of a2}
+          \raevent{b0b}{\DW[\mREL]{x}{1}}{right=of b0}
+          \event{b1}{\DR{y}{1}}{right=of b0b}
+          \event{b2}{\DW{x}{0}}{right=of b1}
+          \rmw{a1}{a1b}
+          \rmw{b0}{b0b}
+          \rf[out=-13,in=-163]{a2}{b1}
+          \sync[out=20,in=160]{a1}{a2}
+          \sync[out=20,in=160]{b0}{b1}
+          \po{b1}{b2}
+          \rf[out=-165,in=-12]{b2}{a1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+\end{example}
+
+\begin{example}
+  Consider this example from \cite[\textsection C]{DBLP:conf/pldi/LeeCPCHLV20}:
+  \begin{gather*}
+    \begin{gathered}
+      \begin{aligned}
+        &\PCAS[\mRLX][\mRLX]{x}{r}{0}{1}\SEMI \IF{r{\leq}1}\THEN \PW{y}{1} \FI
+        \\\PAR\;\;&
+        \PCAS[\mRLX][\mRLX]{x}{r}{0}{2}\SEMI \IF{r{=}0}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI
+      \end{aligned}
+      \\
+      \hbox{\footnotesize\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{x}{0}}{}
+          \event{a1b}{\DW{x}{1}}{right=of a1}
+          \event{a2}{\DW{y}{1}}{right=of a1b}
+          \event{b0}{\DR{x}{0}}{right=3em of a2}
+          \event{b0b}{\DW{x}{2}}{right=of b0}
+          \event{b1}{\DR{y}{1}}{right=of b0b}
+          \event{b2}{\DW{x}{0}}{right=of b1}
+          \rmw{a1}{a1b}
+          \rmw{b0}{b0b}
+          \rf[out=-13,in=-163]{a2}{b1}
+          \po[out=20,in=160]{a1}{a2}
+          \po[out=20,in=160]{b0}{b1}
+          \po{b1}{b2}
+          \rf[out=-165,in=-12]{b2}{a1}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+\end{example}
+
+\subsection{Coherence}
+
+The following execution is disallowed by fulfillment.
+\begin{gather*}
+  \tag{\textsc{coh}}
+  \begin{gathered}
+    \PW{x}{1}\SEMI
+    \PR{x}{r}
+    \PAR
+    \PW{x}{2}\SEMI
+    \PR{x}{s}
+    \\\nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \event{a2}{\DR{x}{2}}{right=of a1}
+        \event{b1}{\DW{x}{2}}{right=3em of a2}
+        \event{b2}{\DR{x}{1}}{right=of b1}
+        \wki{a1}{a2}
+        \wki{b1}{b2}
+        \rf{b1}{a2}
+        \rf[out=20,in=160]{a1}{b2}
+        \wk[out=15,in=155]{a1}{b1}
+        \wk[out=-155,in=-15]{b1}{a1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+Our model is more coherent than Java, which permits the following:
+\begin{gather*}
+  \taglabel{TC16}
+  \begin{gathered}
+    \PR{x}{r}\SEMI \PW{x}{1}
+    \PAR
+    \PR{x}{s}\SEMI \PW{x}{2}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{x}{2}}{}
+        \event{a2}{\DW{x}{1}}{right=of a1}
+        \wki{a1}{a2}
+        \event{b1}{\DR{x}{1}}{right=3em of a2}
+        \event{b2}{\DW{x}{2}}{right=of b1}
+        \wki{b1}{b2}
+        \rf{a2}{b1}
+        \rf[out=-165,in=-15]{b2}{a1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+We also forbid the following, which Java allows:
+\begin{gather*}
+  \taglabel{Co3}
+  \begin{gathered}
+    \PW{x}{1}\SEMI \PW[\mRA]{y}{1}
+    \PAR
+    \PW{x}{2}\SEMI \PW[\mRA]{z}{1}
+    \PAR
+    \PR[\mRA]{z}{r} \SEMI 
+    \PR[\mRA]{y}{r} \SEMI 
+    \PR{x}{r} \SEMI 
+    \PR{x}{r}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \event{a2}{\DW[\mRA]{y}{1}}{right=of a1}
+        \sync{a1}{a2}
+        \event{b1}{\DW{x}{2}}{right=3em of a2}
+        \event{b2}{\DW[\mRA]{\,z}{1}}{right=of b1}
+        \sync{b1}{b2}
+        \event{c1}{\DR[\mRA]{\,z}{1}}{right=3em of b2}
+        \event{c2}{\DR[\mRA]{y}{1}}{right=of c1}
+        \event{c3}{\DR{x}{2}}{right=of c2}
+        \event{c4}{\DR{x}{1}}{right=of c3}
+        \sync{c1}{c2}
+        \sync{c2}{c3}
+        \sync[out=20,in=160]{c2}{c4}
+        \rf[out=8,in=172]{a2}{c2}
+        \rf{b2}{c1}
+        \wk[out=19,in=161]{a1}{b1}
+        \wk[out=-172,in=-8]{c4}{b1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+
+The following outcome is allowed by the promising semantics
+\cite{DBLP:conf/popl/KangHLVD17}, but not in \weakestmo{}
+\cite[Fig.~3]{DBLP:journals/pacmpl/ChakrabortyV19} nor in our semantics, due
+to the cycle:
+\begin{gather*}
+  \tag{\textsc{coh-cyc}}
+  \begin{gathered}
+    x\GETS 2\SEMI
+    \IF{x\NOTEQ2}\THEN y\GETS 1 \FI
+    \PAR
+    x\GETS 1\SEMI
+    r\GETS x\SEMI
+    \IF{y}\THEN x\GETS 3 \FI
+    \\\nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx2}{\DW{x}{2}}{}
+        \event{rx3}{\DR{x}{3}}{right=of wx2}
+        \wki{wx2}{rx3}
+        \event{wy1}{\DW{y}{1}}{right=of rx3}
+        \po{rx3}{wy1}
+        \event{wx1}{\DW{x}{1}}{right=2em of wy1}
+        \event{rx2}{\DR{x}{2}}{right=of wx1}
+        \wki{wx1}{rx2}
+        \event{ry1}{\DR{y}{1}}{right=of rx2}
+        \event{wx3}{\DW{x}{3}}{right=of ry1}
+        \po{ry1}{wx3}
+        \wki[in=165,out=15]{rx2}{wx3}
+        \rf[in=-170,out=-10]{wy1}{ry1}
+        \rf[in=170,out=10]{wx2}{rx2}
+        \rf[out=-170,in=-10]{wx3}{rx3}
+        \wk[out=-170,in=-10]{wx1}{wx2}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+Since reads are not ordered by intra-thread coherence,
+we {allow} the following unintuitive behavior. C11 includes read-read
+coherence between relaxed atomics in order to forbid this:
+\begin{gather*}
+  \taglabel{Co2}
+  \begin{gathered}
+    \PW{x}{1}\SEMI \PW{x}{2}
+    \PAR
+    \PW{y}{x} \SEMI \PW{z}{x}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a}{\DW{x}{1}}{}
+        \event{b}{\DW{x}{2}}{right=of a}
+        \wki{a}{b}
+        \event{c}{\DR{x}{2}}{right=3em of b}
+        \event{d}{\DW{y}{2}}{right=of c}
+        \po{c}{d}
+        \event{e}{\DR{x}{1}}{right=of d}
+        \event{f}{\DW{z}{1}}{right=of e}
+        \po{e}{f}
+        \rf{b}{c}
+        \rf[out=10,in=170]{a}{e}
+        \wk[out=-165,in=-15]{e}{b}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+Here, the reader sees $2$ then $1$, although they are written in the reverse
+order.
+This behavior is allowed by Java in order to validate CSE without requiring
+aliasing analysis.
+
+\subsection{MCA}
+
+\begin{gather*}
+  \taglabel{MCA1}
+  \begin{gathered}
+    \IF{z}\THEN \PW{x}{0} \FI \SEMI \PW{x}{1}
+    {\PAR}
+    \IF{x}\THEN \PW{y}{0} \FI \SEMI \PW{y}{1}
+    {\PAR}
+    \IF{y}\THEN \PW{z}{0} \FI \SEMI \PW{z}{1}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{z}{1}}{}
+        \event{a2}{\DW{x}{0}}{right=of a1}
+        \po{a1}{a2}
+        \event{a3}{\DW{x}{1}}{right=of a2}
+        \wki{a2}{a3}
+        \event{b1}{\DR{x}{1}}{right=3em of a3}
+        \event{b2}{\DW{y}{0}}{right=of b1}
+        \po{b1}{b2}
+        \event{b3}{\DW{y}{1}}{right=of b2}
+        \wki{b2}{b3}
+        \event{c1}{\DR{y}{1}}{right=3em of b3}
+        \event{c2}{\DW{z}{0}}{right=of c1}
+        \po{c1}{c2}
+        \event{c3}{\DW{z}{1}}{right=of c2}
+        \wki{c2}{c3}
+        \rf{a3}{b1}
+        \rf{b3}{c1}
+        \rf[out=173,in=7]{c3}{a1}  
+      \end{tikzinline}}
+  \end{gathered}
+  \\[1ex]
+  \taglabel{MCA2}
+  \begin{gathered}
+    \PW{x}{0}\SEMI \PW{x}{1}
+    \PAR
+    \PW{y}{x}
+    \PAR
+    \PR[\mRA]{y}{r} \SEMI \PR{x}{s}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \wki{wx0}{wx1}
+        \event{rx1}{\DR{x}{1}}{right=3em of wx1}
+        \event{wy1}{\DW{y}{1}}{right=of rx1}
+        \po{rx1}{wy1}
+        \event{ry1}{\DRAcq{y}{1}}{right=3em of wy1}
+        \event{rx0}{\DR{x}{0}}{right=of ry1}
+        \rf{wx1}{rx1}
+        \rf{wy1}{ry1}
+        \sync{ry1}{rx0}
+        \wk[out=170,in=10]{rx0}{wx1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+These candidate executions are invalid, due to cycles.
+
+\subsection{IRIW}
+Status of IRIW is unclear in our model, since we allow everything allowed by
+power...
+\begin{gather*}
+  \begin{gathered}
+    % \PW{x}{0}\SEMI
+    \PW{x}{1}
+    \PAR
+    \PR[\mRA]{x}{r}\SEMI \PR{y}{s}
+    \PAR
+    % \PW{y}{0}\SEMI
+    \PW{y}{1}
+    \PAR
+    \PR[\mRA]{y}{s} \SEMI \PR{x}{r}
+    \\
+    %\smash[b]{
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          % \event{wx0}{\DW{x}{0}}{}
+          % \event{wx1}{\DW{x}{1}}{right=of wx0}
+          % \event{wy0}{\DW{y}{0}}{below=4ex of wx0}
+          % \event{wy1}{\DW{y}{1}}{right=of wy0}
+          \event{wx1}{\DW{x}{1}}{}
+          \event{rx1}{\DR[\mRA]{x}{1}}{right=3em of wx1}
+          \event{ry0}{\DR{y}{0}}{right=of rx1}
+          \event{wy1}{\DW{y}{1}}{right=3em of ry0}
+          \event{ry1}{\DR[\mRA]{y}{1}}{right=3em of wy1}
+          \event{rx0}{\DR{x}{0}}{right=of ry1}
+          % \wk{wx0}{wx1}
+          % \wk{wy0}{wy1}
+          % \rf[bend left]{wy0}{ry0}
+          % \rf[bend right]{wx0}{rx0}
+          \sync{rx1}{ry0}
+          \sync{ry1}{rx0}
+          \rf{wx1}{rx1}
+          \rf{wy1}{ry1}
+          \wk[out=170,in=10]{rx0}{wx1}
+          \wk{ry0}{wy1}
+        \end{tikzinline}}
+    %}
+  \end{gathered}
+\end{gather*}
+
+
+\section{A Note on Mixed-Mode Data Races}
+
+In preparing this paper, we came across the following example, which appears
+to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
+\begin{gather}
+  \nonumber
+  \PW{x}{1}\SEMI
+  \PW[\mREL]{y}{1}\SEMI
+  \PR[\mACQ]{x}{r}
+  \PAR
+  \IF{\PR[\mACQ]{y}{}}\THEN \PW[\mREL]{x}{2}\FI
+  \\
+  \tag{\P}
+  \label{mix1}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      \rf[out=20,in=160]{a1}{a3}
+      \rf[out=20,in=160]{a2}{b1}
+      \wk[out=-20,in=-160]{a3}{b2}
+      \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
+    \end{tikzinline}}
+  \\
+  \nonumber
+  %\label{mix2}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{2}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      \rf[out=20,in=160]{a2}{b1}
+      \rf[out=160,in=20]{b2}{a3}
+      \sync{b1}{b2}
+    \end{tikzinline}}
+\end{gather}
+The program is data-race free.  The two executions shown are the only
+top-level executions that include $\DWP[\mREL]{x}{2}$.
+
+Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19} is stated by extending
+execution sequences.  In the terminology of
+\cite{DBLP:conf/ppopp/DongolJR19}, a read is \emph{$L$-weak} if it is
+sequentially stale.  Let
+\begin{math}
+  \rho=\DWP{x}{1}\allowbreak
+  \DWP[\mREL]{y}{1}\allowbreak
+  \DRP[\mACQ]{y}{1}\allowbreak
+  \DWP[\mREL]{x}{2}
+\end{math}
+be a sequence and
+\begin{math}
+  \alpha=\DRP[\mACQ]{x}{1}.
+\end{math}
+$\rho$ is $L$-sequential and $\alpha$ is $L$-weak in $\rho\alpha$.  But there
+is no execution of this program that includes a data race, contradicting the
+theorem.  The error seems to be in Lemma A.4 of
+\cite{DBLP:conf/ppopp/DongolJR19}, which states that if $\alpha$ is $L$-weak
+after an $L$-sequential $\rho$, then $\alpha$ must be in a data race.  That
+is clearly false here, since $\DRP[\mACQ]{x}{1}$ is stale, but the program is
+data race free.
+
+In proving the SC-LDRF result in \jjr{\textsection8}, we noted that our proof
+technique is more robust than that of \cite{DBLP:conf/ppopp/DongolJR19},
+because it limits the prefixes that must be considered.  In \eqref{mix1}, the
+induction hypothesis requires that we add $\DRP[\mACQ]{x}{1}$ before
+$\DWP[\mREL]{x}{2}$ since $\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  In
+particular,
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      % \rf[out=20,in=160]{a1}{a3}
+      \rf[out=20,in=160]{a2}{b1}
+      % \wk[out=-20,in=-160]{a3}{b2}
+      \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
+    \end{tikzinline}}
+\end{gather*}
+is not a downset of \eqref{mix1}, because
+$\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  As we noted in \jjr{\textsection8},
+this affects the inductive order in which we move across pomsets, but does
+not affect the set of pomsets that are considered.  In particular,
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      % \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      % \rf[out=20,in=160]{a1}{a3}
+      \rf[out=20,in=160]{a2}{b1}
+      % \wk[out=-20,in=-160]{a3}{b2}
+      % \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
+    \end{tikzinline}}
+\end{gather*}
+is a downset of \eqref{mix1}.

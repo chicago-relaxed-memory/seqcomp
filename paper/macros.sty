@@ -1,6 +1,8 @@
 \newcommand{\MRD}{{\sc mrd-c11}}
 \newcommand{\PwP}{{\sc pwp}}
 \newcommand{\PwT}{{\sc pwt}}
+\newcommand{\PwTmca}{{\sc pwt-mca}}
+\newcommand{\PwTc}{{\sc pwt-c11}}
 \newcommand{\DEP@COLOR}[1]{\mathrel{{\color{purple}#1}}}
 \newcommand{\LOC@COLOR}[1]{\mathrel{{\color{red}#1}}}
 \newcommand{\SYNC@COLOR}[1]{\mathrel{{\color{magenta}#1}}}
@@ -59,6 +61,7 @@
 \newcommand{\rsoverlap}{\LABEL@COLOR@REL{{strongly-overlap}}}
 \newcommand{\rdelaysp}{\LABEL@COLOR@REL{{delays}}'}
 \newcommand{\rdelays}{\LABEL@COLOR@REL{{delays}}}
+\newcommand{\rdelay}{\LABEL@COLOR@REL{{delay}}}
 \newcommand{\rcodelays}{\LABEL@COLOR@REL{{co-delays}}}
 \newcommand{\rsyncdelays}{\LABEL@COLOR@REL{{sync-delays}}}
 \newcommand{\sread}{\LABEL@COLOR@REL{{read}}}
@@ -914,8 +917,9 @@
 \newcommand{\FORKJOINP}[1]{\FORKJOIN{#1}}%\!\THEN#1\FI}}
 \newcommand{\JOIN}{\texttt{join}}
 \newcommand{\STOP}{\texttt{stop}}
+\newcommand{\OR}{\mathbin{\texttt{|\!\!|}}}%\land}
 \newcommand{\AND}{\mathbin{\texttt{\&\!\&}}}%\land}
-\newcommand{\BANG}{\texttt{\!!\!}}%\lnot}%\texttt{!!}\mkern-1mu}
+\newcommand{\BANG}{\texttt{\!!}}%\lnot}%\texttt{!!}\mkern-1mu}
 \newcommand{\GETS}{\mkern1mu\texttt{:}\mkern-1mu\texttt{=}\,}
 \newcommand{\SEQ}{\texttt{;}\,\allowbreak}
 \newcommand{\SEMI}{\texttt{;}\,\allowbreak}

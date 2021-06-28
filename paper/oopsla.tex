@@ -1,8 +1,41 @@
-\section{Differences with ``Pomsets with Preconditions''}
+\subsection{Comparison to ``A Promising Semantics 2.1'' [POPL 2017]}
+\label{sec:promising}
+
+[Todo.]
+
+Case analysis gives very weak results when combined with thread inlining.
+See \cite[\textsection B.1]{DBLP:journals/pacmpl/ChakrabortyV19appendix}.
+These happen by performing transformations that: 
+(1) introduce conditionals,
+(2) inline two threads on both sides of the introduced conditional,
+(3) choose different orders for the two threads for the two sides of the conditional.
+
+Case analysis gives very weak results when combined with read introduction.
+See \cite{promising-ldrf}.
+These happen by performing transformations that: 
+(1) introduce reads,
+(2) introduce conditionals,
+(3) choose different values for the reads on the two sides of the conditional.
+
+
+The fact that the semantics is not verifiable a posteriori is something it
+shares with \weakestmo{}, where the justification relation must be built
+inductively.
+
+\weakestmo{} admits FADD, but \PS{} does not.
+\PS{} admits CohCYC, but \weakestmo{} does not.
+
+
+
+\subsection{Comparison to ``Pomsets with Preconditions'' [OOPSLA 2020]}
 \label{sec:diff}
 
-We compare the model of this paper (\PwT) with that of
-\citep{DBLP:journals/pacmpl/JagadeesanJR20} (\PwP).
+\PwTmca{} is closely related to \PwP{} model of
+\citep{DBLP:journals/pacmpl/JagadeesanJR20}.  The major difference is that
+\PwTmca{} supports sequential composition.  In the remainder of this section,
+we discuss other differences.  We also point out some errors in
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}, all of which have been confirmed
+by the authors.
 
 \myparagraph{Substitution}
 
@@ -21,7 +54,7 @@ we gave the semantics of read for nonempty pomsets as:
 \item[{\labeltext[\textsc{r}4b]{(\textsc{r}4b)}{read-tau-ind-oopsla}}]
   if $(\aEvs\cap\bEvs)=\emptyset$ then
   \begin{math}
-    \aTr{\bEvs}{\bForm} \riff
+   \aTr{\bEvs}{\bForm} \riff
     \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
     \bForm.
   \end{math}
@@ -175,6 +208,19 @@ is $[0/r][0/x]$, resulting in:
   \end{gathered}
 \end{align*}
 
+
+\myparagraph{Augmentation of Preconditions}
+\jjr{} allows augmentation of preconditions.
+As discussed in \textsection\ref{sec:delay}, this causes associativity to fail
+for $\rdelay$, at least when attempting to validate \reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2}
+Thus, we use \emph{weakest} preconditions, rather than general preconditions.
+As a result, we fail to validate the following
+refinement:
+\begin{math}
+  \aPSS_1
+  \not\supseteq
+  \xIFTHEN{\aForm}{\aPSS_1}{}.
+\end{math}
 
 \myparagraph{Consistency}
 \jjr{} imposes \emph{consistency}, which requires that for every pomset
@@ -583,126 +629,6 @@ case of the theorem clarifies the discussion of the \textsc{past} example
 in \jjr{};
 
 
-\section{A Note on Mixed-Mode Data Races}
-
-In preparing this paper, we came across the following example, which appears
-to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
-\begin{gather}
-  \nonumber
-  \PW{x}{1}\SEMI
-  \PW[\mREL]{y}{1}\SEMI
-  \PR[\mACQ]{x}{r}
-  \PAR
-  \IF{\PR[\mACQ]{y}{}}\THEN \PW[\mREL]{x}{2}\FI
-  \\
-  \tag{\P}
-  \label{mix1}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
-      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
-      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
-      \wk[out=-20,in=-160]{a3}{b2}
-      \sync{b1}{b2}
-      % \node(ai)[left=3em of a1]{};
-      % \bgoval[yellow!50]{(ai)}{P}
-      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
-      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
-    \end{tikzinline}}
-  \\
-  \nonumber
-  %\label{mix2}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
-      \raevent{a3}{\DR[\mACQ]{x}{2}}{right=of a2}
-      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
-      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      \rf[out=20,in=160]{a2}{b1}
-      \rf[out=160,in=20]{b2}{a3}
-      \sync{b1}{b2}
-    \end{tikzinline}}
-\end{gather}
-The program is data-race free.  The two executions shown are the only
-top-level executions that include $\DWP[\mREL]{x}{2}$.
-
-Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19} is stated by extending
-execution sequences.  In the terminology of
-\cite{DBLP:conf/ppopp/DongolJR19}, a read is \emph{$L$-weak} if it is
-sequentially stale.  Let
-\begin{math}
-  \rho=\DWP{x}{1}\allowbreak
-  \DWP[\mREL]{y}{1}\allowbreak
-  \DRP[\mACQ]{y}{1}\allowbreak
-  \DWP[\mREL]{x}{2}
-\end{math}
-be a sequence and
-\begin{math}
-  \alpha=\DRP[\mACQ]{x}{1}.
-\end{math}
-$\rho$ is $L$-sequential and $\alpha$ is $L$-weak in $\rho\alpha$.  But there
-is no execution of this program that includes a data race, contradicting the
-theorem.  The error seems to be in Lemma A.4 of
-\cite{DBLP:conf/ppopp/DongolJR19}, which states that if $\alpha$ is $L$-weak
-after an $L$-sequential $\rho$, then $\alpha$ must be in a data race.  That
-is clearly false here, since $\DRP[\mACQ]{x}{1}$ is stale, but the program is
-data race free.
-
-In proving the SC-LDRF result in \jjr{\textsection8}, we noted that our proof
-technique is more robust than that of \cite{DBLP:conf/ppopp/DongolJR19},
-because it limits the prefixes that must be considered.  In \eqref{mix1}, the
-induction hypothesis requires that we add $\DRP[\mACQ]{x}{1}$ before
-$\DWP[\mREL]{x}{2}$ since $\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  In
-particular,
-\begin{gather*}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
-      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
-      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      % \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
-      % \wk[out=-20,in=-160]{a3}{b2}
-      \sync{b1}{b2}
-      % \node(ai)[left=3em of a1]{};
-      % \bgoval[yellow!50]{(ai)}{P}
-      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
-      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
-    \end{tikzinline}}
-\end{gather*}
-is not a downset of \eqref{mix1}, because
-$\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  As we noted in \jjr{\textsection8},
-this affects the inductive order in which we move across pomsets, but does
-not affect the set of pomsets that are considered.  In particular,
-\begin{gather*}
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
-      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
-      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
-      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
-      % \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
-      \sync{a1}{a2}
-      % \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
-      % \wk[out=-20,in=-160]{a3}{b2}
-      % \sync{b1}{b2}
-      % \node(ai)[left=3em of a1]{};
-      % \bgoval[yellow!50]{(ai)}{P}
-      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
-      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
-    \end{tikzinline}}
-\end{gather*}
-is a downset of \eqref{mix1}.
 
 
 

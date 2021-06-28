@@ -1,16 +1,18 @@
-%SPLASH 
-% Fri 16 Apr 2021 Paper Submissions - 1st round
-% Sun 13 Jun 2021 Reviews - 1st round
-% Mon 14 - Wed 16 Jun 2021 Author Response
+% POPL
+% 25 Pages, excluding bibliographic references and appendices.
+% Thu 8 Jul 2021 Submission Deadline
+% Sat 4 - Wed 8 Sep 2021 Author Response Period
+% Wed 29 Sep 2021 Notification
+% Mon 8 Nov 2021 Camera Ready Deadline
+% Hongseok Yang
+
+% SPLASH21 Program Committee
+% 23 pages, excluding bibliographic references and appendices.
 % Fri 2 Jul 2021 Notifications -- 1st round
 % Fri 13 Aug 2021 Paper Submission -- 2nd
 % Mon 30 Aug 2021 Notifications - final
 % Mon 13 Sep 2021 Camera-ready submissions
 % Oct 17-22 conference.
-
-% Submitted papers may be at most 23 pages in 10 point font, excluding
-% bibliographic references and appendices.
-
 % Sophia Drossopoulou
 % Erika Abraham RWTH Aachen University
 % Karim Ali University of Alberta
@@ -69,6 +71,43 @@
 % John Wickerson Imperial College London
 % Yunhui Zheng IBM Research
 
+% LICS21 Program Committee 
+% Leonid Libkin (Univ. of Edinburgh/ENS-Paris)
+% Christoph Berkholz (Humboldt-University Berlin)
+% Meghyn Bienvenu (CNRS, University of Bordeaux)
+% Filippo Bonchi (University of Pisa)
+% Véronique Bruyère (University of Mons)
+% Yu-Fang Chen (Academia Sinica)
+% Dmitry Chistikov (University of Warwick)
+% Silvia Crafa (University of Padova)
+% Amina Doumane (CNRS-ENS de Lyon)
+% Stéphanie Delaune (University Rennes, CNRS, IRISA)
+% Ekaterina Fokina (TU Wien)
+% Marco Gaboardi (Boston University)
+% Adria Gascon (Google UK)
+% Lauri Hella (Tampere University)
+% Ekaterina Komendantskaya (Heriott-Watt University)
+% Shankara Narayanan Krishna (IIT, Bombay)
+% Benoit Larose (UQAM, Montréal)
+% Jérôme Leroux (CNRS, University of Bordeaux)
+% Wim Martens (University of Bayreuth)
+% Peter O’Hearn (UCL/Facebook)
+% Daniela Petrisan (Université de Paris, CNRS, IRIF)
+% Miguel Romero (Universidad Adolfo Ibáñez)
+% Philippe Schnoebelen (CNRS & ENS Paris-Saclay)
+% Olivier Serre (Université de Paris, CNRS, IRIF)
+% Sebastian Siebertz (University of Bremen)
+% Kristina Sojakova (INRIA)
+% Alwen Tiu (Australian National University)
+% Patrick Totzke (University of Liverpool)
+% Szymon Torunczyk (University of Warsaw)
+% Takeshi Tsukada (University of Tokyo)
+% Jamie Vicary (University of Cambridge)
+% Michael Zakharyaschev (Birkbeck)
+% Anna Zamansky (Haifa University)
+% Georg Zetzsche (Max Planck Institute for Software Systems)
+% Thomas Zeume (Ruhr-Universität Bochum)
+
 
 \RequirePackage{amssymb}  %% bizarre error previous def of Bbbk if after documentclass
 \documentclass[acmsmall,screen,anonymous,review]{acmart}\settopmatter{printfolios=true}
@@ -122,7 +161,7 @@
 %Predicate Transformers for Relaxed Memory
 % \title{The Leaky Semicolon---A Compositional Semantics}
 % \subtitle{Predicate Transformers and Semantic Dependencies in Relaxed-Memory Concurrency}
-\title{Understanding The Leaky Semicolon}
+\title{The Leaky Semicolon}
 \subtitle{Compositional Semantic Dependencies for Relaxed-Memory Concurrency}
 %\subtitle{Predicate Transformers and Semantic Dependencies in Relaxed-Memory Concurrency}
 \author{Mark Batty}
@@ -218,14 +257,16 @@
 \input{intro.tex}
 \input{definitions.tex}
 \input{variants.tex}
-\input{mrd.tex}
+\input{c11.tex}
+\input{mca.tex}
 \input{outro.tex}
 \bibliography{bib}
 \appendix
-\input{arm.tex}
-\input{drf.tex}
 \input{discussion.tex}
 \input{oopsla.tex}
+\input{arm.tex}
+\input{drf.tex}
+\input{extra.tex}
 \end{document}
 
 % Local Variables:

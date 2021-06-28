@@ -19,6 +19,36 @@ We state the extensions with respect to the base semantics of
 \reffig{fig:sem}, but they apply equally to the variants described in
 \textsection\ref{sec:arm}.
 
+\subsection{Read-Read Independencies}
+\label{sec:read-read}
+
+To avoid stalling the \CPU{} pipeline unnecessarily, hardware does not
+enforce control dependencies between reads.  To support if-closure
+(\textsection{sec:semca}), software models must not distinguish control
+dependencies from other dependencies.  Thus, we are forced to drop all
+dependencies between reads.  To achieve this, we modify the definition of
+$\labelingForm'_2$ in \reffig{fig:seq}.
+\begin{definition}
+  \label{def:semrr}
+  Let $\semrr{}$ be defined as in \reffig{fig:sem}, replacing the definition
+  of $\labelingForm'_2$ with:
+  \begin{displaymath}
+    \labelingForm'_2(\aEv)=
+    \begin{cases}
+      \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a read}
+      \\
+      \aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv)} & \text{otherwise, where}\; \Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}
+    \end{cases}
+    % $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
+    % \Cdown{\aEv}=
+    % \begin{cases}
+    %   \{ \cEv \mid \cEv \lt \aEv \} & \textif \labeling(\aEv) \;\text{is a write}
+    %   \\
+    %   \aEvs_1 & \textotherwise
+    % \end{cases}
+  \end{displaymath}
+\end{definition}
+
 \subsection{Register Recycling and Redundant Read Elimination}
 \label{sec:semreg}
 
@@ -129,20 +159,19 @@ elimination is sound:
 \subsection{Register Consistency}
 \label{sec:false}
 
-
-
 We would like:
+\begin{enumerate}
+\item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
+  $\labelingForm(\aEv)$ is satisfiable.
+\end{enumerate}
+For associativity, \eqref{pom-kappa-sat'} in turn requires
 \begin{enumerate}
 \item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
   $\aTr{}{\FALSE}\riff\FALSE$.
-\item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
-  $\labelingForm(\aEv)$ is satisfiable.
-\item[{\labeltext[\textsc{s}6b$''$]{(\textsc{s}6b$''$)}{seq-le-delays''}}]
-  if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
-  $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
-  $\bEv\le\aEv$.  
 \end{enumerate}
-
+But that does not quite hold in our setting.
+In this subsection, we refine these requirements into ones that do hold.
+%
 % \eqref{tr-false'} is too strong.
 % We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
 % if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
@@ -151,13 +180,13 @@ We would like:
 % We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
 % $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
 % $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
-
+%
 % We require the following:
 % \begin{enumerate}
 % \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
 %   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
 % \end{enumerate}
-
+%
 % When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
 % for both reads):
 % \begin{gather*}
@@ -167,8 +196,8 @@ We would like:
 %   \lor  
 %   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
 % \end{gather*}
-
-Define
+%
+First we define $\cForm_\labeling$, which captures the register state of a pomset:
 \begin{displaymath}
   \cForm_\labeling=
   \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
@@ -187,20 +216,17 @@ We say that it is \emph{$\labeling$-inconsistent} otherwise.
   A \emph{$\labeling$-predicate transformer} is a %monotone
   function
   $\aTr{}{}:\Formulae\fun\Formulae$ such that
-  \begin{multicols}{2}
-    \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
-    \item[\eqref{tr-implies}]
-      if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies
-      \aTr{}{\bForm}$,
-    \item[\eqref{tr-and}]
-      $\aTr{}{\bForm_1\land\bForm_2}\riff\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
-    \item[\eqref{tr-or}]
-      $\aTr{}{\bForm_1\lor\bForm_2}\riff\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$.
-    \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
-    %\item[\eqref{tr-false}]
-      if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-    \end{enumerate}
-  \end{multicols}
+  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
+  % \item \label{tr-implies'}
+  %   \labeltextXX{2}{x}{tr-and'}
+  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
+  \item[\eqref{tr-implies}]
+    \eqref{tr-and}\;
+    \eqref{tr-or}\; as in \refdef{def:trans},
+  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
+    % \item[\eqref{tr-false}]
+    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+  \end{enumerate}
 
   \label{def:family'}
   A \emph{family of $\labeling$-predicate transformers} over consists of a
@@ -216,16 +242,15 @@ We say that it is \emph{$\labeling$-inconsistent} otherwise.
   \end{enumerate}
 \end{definition}
 
+We add this:
 \begin{enumerate}
 % \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
 %   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
 \item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
   $\labelingForm(\aEv)$ is $\labeling$-consistent.
-\item[{\labeltext[\textsc{s}6b$'$]{(\textsc{s}6b$'$)}{seq-le-delays'}}] if
-  $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
-  $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is
-  $\labeling$-consistent then $\bEv\le\aEv$.
 \end{enumerate}
+
+
 
 \subsection{Address Calculation}
 \label{sec:addr}
@@ -470,6 +495,37 @@ ordered before $\DWP{x}{1}$.
 %   \end{gathered}
 % \end{gather*}
 % All the preconditions are now tautologies.
+
+\subsection{Fences Operations}
+\label{sec:fences}
+
+  \noindent
+  If $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
+  % $(\exists\aLocs\subseteq\Loc)$
+  % $(\exists\bmode\in\{\amode,\mRLX\})$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
+    \item \label{fence-E}
+      % $\aEvs\neq\emptyset$ and
+      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    \item \label{fence-lambda}
+      $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
+    \item \label{fence-kappa}
+      $\labelingForm(\aEv) \riff \TRUE$,
+    \item \label{fence-tau}
+      $\aTr{\bEvs}{\bForm} \riff \bForm$,
+      \stepcounter{enumi}      
+    \item[] \labeltext[\textsc{f}5]{}{fence-term}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{fence-term-nonempty}
+        if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
+      \item \label{fence-term-empty}
+        if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+      \end{enumerate}
+    % \item \label{fence-term}
+    %   if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+    \end{enumerate}
+  \end{multicols}
 
 \subsection{Read-Modify-Write Operations}
 \label{sec:rmw}
@@ -1108,228 +1164,6 @@ first thread from the read of $y$ to one of the writes to $x$.
   %   \bForm[\uReg{\aEv}/\aReg][\uReg{\aEv}/\aLoc]
   % \end{math},
   % \medskip Similarly, let $\frf{\semca{}}$ be defined as for $\frf{\semrr{}}$
-  % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
-  % $\sLOAD{}{}$.
-\end{definition}
-
-
-
-\subsection{Combining Address Calculation and If-Closure}
-
-\refdef{def:semaddr} is naive with respect to merging events.  Consider the
-following example:
-\begin{align*}
-  \begin{gathered}
-    \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-        \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}
-    \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{d}{a}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{}
-        \eventl{e}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of a}
-        \wki{a}{b}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-Merging, we have:
-% Thus, the disjunction closure also includes both of the following: % By using \!$\PAR$\!, it also includes:
-\begin{align*}
-  \begin{gathered}
-    \IF{\aExp}\THEN
-    \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
-    \ELSE
-    \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
-    \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-        \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-        \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
-        \wki{b}{c}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-% \begin{align*}
-%   \begin{gathered}
-%     \IF{\aExp}\THEN
-%     \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
-%     \ELSE
-%     \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
-%     \FI
-%     \\
-%     \hbox{\begin{tikzinline}[node distance=1em]
-%       \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-%       \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-%     \end{tikzinline}}
-%   \end{gathered}
-% \end{align*}
-The precondition of $\DWREF{0}{0}$ is a tautology; however, this is not
-possible for $(\PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r})$ alone, using \refdef{def:semaddr}.
-
-\refdef{def:semcaaddr}, enables this execution using if-closure.  Under this
-semantics, we have:
-\begin{align*}
-  \begin{gathered}
-    \PW{\REF{r}}{0}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-        \eventl{d}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}
-    \PW{\REF{0}}{\BANG r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{}
-        \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-% These pomsets contain inconsistent preconditions.  This is disallowed in
-% \jjr{}, but allowed here.
-Sequencing and merging: 
-\begin{align*}
-  \begin{gathered}
-    \PW{\REF{r}}{0}
-    \SEMI
-    \PW{\REF{0}}{\BANG r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-        \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-        \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
-        \wki{b}{c}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
-
-\begin{definition}
-  \label{def:semcaaddr}
-  Let $\semcaaddr{}$ be defined as in \reffig{fig:sem}, changing
-  $\sSTORE{}{}$ and $\sLOAD{}{}$:
-
-  \noindent
-  If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
-  $(\exists\cVal:\aEvs\fun\Val)$
-  $(\exists\aVal:\aEvs\fun\Val)$
-  $(\exists\cForm:\aEvs\fun\Formulae)$
-  \begin{multicols}{2}
-    \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
-    \item \label{write-E-ca-addr}
-      if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-    \item \label{write-lambda-ca-addr}
-      $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$,
-    \item \label{write-kappa-ca-addr}
-      \begin{math}
-        \labelingForm(\aEv) \riff
-        \cForm_\aEv
-        \land \cExp{=}\cVal_\aEv
-        \land \aExp{=}\aVal_\aEv
-      \end{math},      
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{w}4]{}{write-tau-ca-addr}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{write-tau-dep-ca-addr}
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff 
-          \cForm_\aEv
-          \limplies (\cExp{=}\cVal)
-          \limplies 
-          \bForm[\aExp/\REF{\cVal}]
-        \end{math},
-      \item \label{write-tau-empty-ca-addr}
-        \begin{math}
-          (\forall\dVal)
-        \end{math}
-        \\
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff 
-          % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-          (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
-          \limplies (\cExp{=}\dVal)
-          \limplies 
-          \bForm
-          [\aExp/\REF{\dVal}]
-        \end{math}  
-      \end{enumerate}  
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{w}5]{}{write-term-ca-addr}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{write-term-nonempty-ca-addr}
-        $\aTerm \riff \cForm_\aEv \limplies \cExp{=}\cVal_\aEv \land \aExp{=}\aVal_\aEv$,
-      \item \label{write-term-empty-ca-addr}
-        $\aTerm \riff \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
-      \end{enumerate}
-    \end{enumerate}
-  \end{multicols}
-
-  \medskip
-  \noindent
-  If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\cExp}[\aThrd]$ then
-  $(\exists\cVal:\aEvs\fun\Val)$
-  $(\exists\aVal:\aEvs\fun\Val)$
-  $(\exists\cForm:\aEvs\fun\Formulae)$ 
-  \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-  \item \label{read-E-ca-addr}
-    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-  \item \label{read-lambda-ca-addr}
-    $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$
-  \item \label{read-kappa-ca-addr}
-    \begin{math}
-      \labelingForm(\aEv) \riff
-      \cForm_\aEv
-      \land \cExp{=}\cVal_\aEv
-    \end{math},
-    \stepcounter{enumi}
-  \item[] \labeltext[\textsc{r}4]{}{read-tau-ca-addr}
-    \begin{enumerate}[leftmargin=0pt]
-    \item \label{read-tau-dependent-ca-addr}
-      \begin{math}
-        (\forall\aEv\in\aEvs\cap\bEvs)
-      \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff
-        \cForm_\aEv
-        \limplies (\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv})
-        \limplies \bForm[\uReg{\aEv}/\aReg]
-      \end{math},      
-    \item \label{read-tau-independent-ca-addr}
-      \begin{math}
-        (\forall\aEv\in\aEvs\setminus\bEvs)
-      \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff
-        \cForm_\aEv 
-        \limplies
-        \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}{=}\uReg{\aEv})}
-        \limplies
-        \bForm[\uReg{\aEv}/\aReg]
-      \end{math},      
-    \item \label{read-tau-empty-ca-addr}
-      \begin{math}
-        (\forall\bReg)
-      \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff 
-        (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
-        \limplies 
-        \bForm[\bReg/\aReg],
-      \end{math}  
-    \end{enumerate}  
-  \item \label{read-term-ca-addr}
-    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
-  \end{enumerate}
-  % \medskip Similarly, let $\frf{\semaddr{}}$ be defined as for $\frf{\semrr{}}$
   % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
   % $\sLOAD{}{}$.
 \end{definition}

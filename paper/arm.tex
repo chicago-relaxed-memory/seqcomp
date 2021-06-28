@@ -1,4 +1,4 @@
-\section{Arm}
+\section{Lowering PwT-MCA to Arm}
 \label{sec:arm}
 For simplicity, we restrict to top level parallel composition and ignore
 fences\footnote{Fences are not actions in \armeight{}, which complicates the
@@ -169,36 +169,11 @@ $\DWP{x}{1}$ is not $\rlob$-ordered before $\DWP{y}{1}$.
     \end{tikzinline}}
 \end{gather*}
 
-\subsection{Arm Compilation 1}
+\subsection{PwT-MCA Lowering 1}
 \label{sec:arm1}
 
-We do not distinguish control dependencies from other dependencies, and
-therefore \ref{lob-rr} forces us to drop all dependencies between reads.  To
-achieve this, we modify the definition of $\labelingForm'_2$ in
-\reffig{fig:sem}.
-\begin{definition}
-  \label{def:semrr}
-  Let $\semrr{}$ be defined as in \reffig{fig:sem}, replacing the definition
-  of $\labelingForm'_2$ with:
-  \begin{displaymath}
-    \labelingForm'_2(\aEv)=
-    \begin{cases}
-      \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a read}
-      \\
-      \aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv)} & \text{otherwise, where}\; \Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}
-    \end{cases}
-    % $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
-    % \Cdown{\aEv}=
-    % \begin{cases}
-    %   \{ \cEv \mid \cEv \lt \aEv \} & \textif \labeling(\aEv) \;\text{is a write}
-    %   \\
-    %   \aEvs_1 & \textotherwise
-    % \end{cases}
-  \end{displaymath}
-\end{definition}
-
-Even with this small change, the optimal lowering for \armeight{} is unsound
-for our semantics.  The optimal lowering maps relaxed access to \LDR/\STR{} and
+The optimal lowering for \armeight{} is unsound
+for \PwTmca.  The optimal lowering maps relaxed access to \LDR/\STR{} and
 non-relaxed access to \LDAR/\STLR{} \citep{DBLP:journals/pacmpl/PodkopaevLV19}.
 In this section, we consider a suboptimal strategy, which lowers non-relaxed
 reads to $(\DMBSY\SEMI\LDAR)$.  Significantly, we retain the optimal lowering
@@ -415,7 +390,7 @@ Arm.  The proof uses the characterization of Arm using \EGC{}.
 % \end{align*}
 
 
-\subsection{Arm Compilation 2}
+\subsection{PwT-MCA Lowering 2}
 \label{sec:arm2}
 
 We can achieve optimal lowering for Arm by weakening the semantics of
