@@ -16,7 +16,7 @@ elimination.
 
 These extensions preserve all of the valid transformations discussed thus far.
 We state the extensions with respect to the base semantics of
-\reffig{fig:sem}, but they apply equally to the variants described in
+\reffig{fig:seq}, but they apply equally to the variants described in
 \textsection\ref{sec:arm}.
 
 \subsection{Read-Read Independencies}
@@ -24,18 +24,18 @@ We state the extensions with respect to the base semantics of
 
 To avoid stalling the \CPU{} pipeline unnecessarily, hardware does not
 enforce control dependencies between reads.  To support if-closure
-(\textsection{sec:semca}), software models must not distinguish control
+(\textsection\ref{sec:semca}), software models must not distinguish control
 dependencies from other dependencies.  Thus, we are forced to drop all
 dependencies between reads.  To achieve this, we modify the definition of
 $\labelingForm'_2$ in \reffig{fig:seq}.
 \begin{definition}
   \label{def:semrr}
-  Let $\semrr{}$ be defined as in \reffig{fig:sem}, replacing the definition
+  Let $\semrr{}$ be defined as in \reffig{fig:seq}, replacing the definition
   of $\labelingForm'_2$ with:
   \begin{displaymath}
     \labelingForm'_2(\aEv)=
     \begin{cases}
-      \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a read}
+      \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a}\; \sread
       \\
       \aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv)} & \text{otherwise, where}\; \Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}
     \end{cases}
@@ -77,7 +77,7 @@ moved early.''
       \rf[out=169,in=11]{b2}{a1}
     \end{tikzinline}}
 \end{gather*}
-This execution is not allowed by the semantics $\sembase{}$ of \reffig{fig:sem}: the precondition of
+This execution is not allowed by the semantics $\sembase{}$ of \reffig{fig:seq}: the precondition of
 $\aEv$ in the independent case is
 \begin{displaymath}
   \tag{$*$}\label{pre1}
@@ -105,7 +105,7 @@ event names, the outcome of the second read is predetermined!  In
 the events are destined to coalesce.  
 
 \begin{definition}
-  Let $\semreg{}$ be defined as in \reffig{fig:sem}, changing \ref{read-tau}
+  Let $\semreg{}$ be defined as in \reffig{fig:seq}, changing \ref{read-tau}
   of $\sLOAD{}{}$:
 
   \noindent
@@ -258,7 +258,7 @@ We add this:
 Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and $\sLOAD{}{}$.
 \begin{definition}
   \label{def:semaddr}
-  Let $\semaddr{}$ be defined as in \reffig{fig:sem}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
+  Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
 
   \noindent
   If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
@@ -368,7 +368,7 @@ calculation is somewhat delicate.
 % , in
 % \ref{read-tau-dep-addr}.  The subsection of \textsection\ref{sec:diff} on
 % \ref{xCausal} discusses this example using the semantics of \jjr{}.
-Consider the following program, from \jjr{\textsection5}, where initially $x=0$, $y=0$, $\REF{0}=0$,
+Consider the following program, from \cite[\textsection5]{DBLP:journals/pacmpl/JagadeesanJR20}, where initially $x=0$, $y=0$, $\REF{0}=0$,
 $\REF{1}=2$, and $\REF{2}=1$.  It should only be possible to read $0$,
 disallowing the attempted execution below:
 \begin{gather*}
@@ -496,45 +496,51 @@ ordered before $\DWP{x}{1}$.
 % \end{gather*}
 % All the preconditions are now tautologies.
 
-\subsection{Fences Operations}
+\subsection{Fence Operations}
 \label{sec:fences}
 
-  \noindent
-  If $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
-  % $(\exists\aLocs\subseteq\Loc)$
-  % $(\exists\bmode\in\{\amode,\mRLX\})$
-  \begin{multicols}{2}
-    \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
-    \item \label{fence-E}
-      % $\aEvs\neq\emptyset$ and
-      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-    \item \label{fence-lambda}
-      $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
-    \item \label{fence-kappa}
-      $\labelingForm(\aEv) \riff \TRUE$,
-    \item \label{fence-tau}
-      $\aTr{\bEvs}{\bForm} \riff \bForm$,
-      \stepcounter{enumi}      
-    \item[] \labeltext[\textsc{f}5]{}{fence-term}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{fence-term-nonempty}
-        if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
-      \item \label{fence-term-empty}
-        if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
-      \end{enumerate}
+The semantics of fences is straightforward.
+Let
+\begin{math}
+  \sembase{\PF[\ascope]{\fmode}} = \sFENCE[\ascope]{\fmode}[\aThrd],
+\end{math}
+where
+if $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
+% $(\exists\aLocs\subseteq\Loc)$
+% $(\exists\bmode\in\{\amode,\mRLX\})$
+\begin{multicols}{2}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
+  \item \label{fence-E}
+    % $\aEvs\neq\emptyset$ and
+    % if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    if $\fcard{\aEvs}\leq 1$,
+  \item \label{fence-lambda}
+    $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
+  \item \label{fence-kappa}
+    $\labelingForm(\aEv) \riff \TRUE$,
+  \item \label{fence-tau}
+    $\aTr{\bEvs}{\bForm} \riff \bForm$,
+    \stepcounter{enumi}      
+  \item[] \labeltext[\textsc{f}5]{}{fence-term}
+    \begin{enumerate}[leftmargin=0pt]
+    \item \label{fence-term-nonempty}
+      if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
+    \item \label{fence-term-empty}
+      if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+    \end{enumerate}
     % \item \label{fence-term}
     %   if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
-    \end{enumerate}
-  \end{multicols}
+  \end{enumerate}
+\end{multicols}
 
 \subsection{Read-Modify-Write Operations}
 \label{sec:rmw}
 
 %We give the semantics of \RMW{}s without address calculation or if-closure.
 
-From the data model, we require an additional binary relation over
-$\Act\times\Act$: $\roverlapsdef$.  For the actions in this paper, we say
-$\aAct \roverlapsdef \bAct$ if they access the same location.
+% From the data model, we require an additional binary relation over
+% $\Act\times\Act$: $\roverlapsdef$.  For the actions in this paper, we say
+% $\aAct \roverlapsdef \bAct$ if they access the same location.
 
 \RMW{} operations are formalized by adding a relation
 ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
@@ -577,9 +583,10 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
     \end{enumerate}
   \end{enumerate}
 
-  Extend the definition of par, if, seq to include:
+  Extend the definition of $\sSEMI{}{}$ and $\sIF{}{}{}$ to include:
   \begin{enumerate}
-  \item[(\textsc{p}10)] (\textsc{s}10)\; (\textsc{i}10)\; ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
+  \item[(\textsc{s}10)] (\textsc{i}10)\; % (\textsc{p}10)\; 
+    ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
   \end{enumerate}
 \end{definition}
 
@@ -678,7 +685,7 @@ We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic f
   % \end{multicols}
 
 This definition ensures atomicity and supports lowering to Arm load/store
-exclusive operations.  See \jjr{} for examples.
+exclusive operations.  See \cite{DBLP:journals/pacmpl/JagadeesanJR20} for examples.
 
 One subtlety of the definition is that we use $\sLOADP{}{}$ rather than
 $\sLOAD{}{}$.  Thus, for \RMW{} operations, the independent case for a read
@@ -845,7 +852,8 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 \label{sec:semca}
 
 In order to model sequential composition, we must allow inconsistent
-predicates in a single pomset, unlike \jjr{}.  For example, if
+predicates in a single pomset, unlike \PwP{}
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}.  For example, if
 $\aCmd=(\PW{x}{1})$, then $\sembase{}$ does \emph{not} allow:
 \begin{gather*}
   \IF{\aExp}\THEN\PW{x}{1}\FI
@@ -997,7 +1005,7 @@ first thread from the read of $y$ to one of the writes to $x$.
 
 \begin{definition}
   \label{def:semca}
-  Let $\semca{}$ be defined as in \reffig{fig:sem}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
+  Let $\semca{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
 
   
   \noindent

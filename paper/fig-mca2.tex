@@ -1,13 +1,13 @@
 \begin{figure}
-  \bookmark{Semantics of programs}
+  \bookmark{PwT-MCA Semantics 2}
   \raggedright
   \noindent
-  Suppose $\aRel_1\subseteq\aEvs_1\times\aEvs_1$ and $\aRel_2\subseteq\aEvs_2\times\aEvs_2$.
-
-  We say $\aRel \rextendsdef{\aRel_1}{\aRel_2}$ if
-  $\aRel\supseteq (\aRel_1\cup \aRel_2)$ and
-  $\aRel\cap(\aEvs_1\times \aEvs_1) = \aRel_1$ and
-  $\aRel\cap(\aEvs_2\times \aEvs_2) = \aRel_2$.
+  Suppose $\aRel_1$ is a relation over $\aEvs_1$.  %\subseteq\aEvs_1\times\aEvs_1$. % and $\aRel_2\subseteq\aEvs_2\times\aEvs_2$.
+  We say $\aRel \rextendsdef{\aRel_1}{}$ %{\aRel_2}$
+  if
+  % $\aRel\supseteq (\aRel_1\cup \aRel_2)$ and
+  $\aRel\cap(\aEvs_1\times \aEvs_1) = \aRel_1$.
+  %and $\aRel\cap(\aEvs_2\times \aEvs_2) = \aRel_2$.
   \medskip
   
   % \noindent
@@ -20,36 +20,50 @@
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{p}\arabic*),ref=\textsc{p}\arabic*]
-    \item \label{par-E}
-      $\aEvs = (\aEvs_1\uplus\aEvs_2)$,
-    \item \label{par-lambda}
-      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{p}3]{}{par-kappa}
+    \item[\eqref{par-E}]
+      \eqref{par-lambda}\,
+      \eqref{par-kappa}\,
+      \eqref{par-tau}\, 
+      \eqref{par-term}\, 
+      \eqref{par-le}\,
+      \eqref{par-rf}
+      as in \reffig{fig:mca1},
+      \setcounter{enumi}{\value{le}}
+    % \item \label{par-E}
+    %   $\aEvs = (\aEvs_1\uplus\aEvs_2)$,
+    % \item \label{par-lambda}
+    %   ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{p}3]{}{par-kappa}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{par-kappa1}
+    %     if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$,
+    %   \item \label{par-kappa2}
+    %     if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_2(\aEv)$,
+    %   \end{enumerate}
+    % \item \label{par-tau}
+    %   $\aTr{\bEvs}{\bForm} \riff \aTr[1]{\bEvs}{\bForm}$,
+    % \item \label{par-term}
+    %   $\aTerm \riff \aTerm[1]\land\aTerm[2]$,
+    % \item \label{par-le}
+    %     ${\le}\rextends{\le_1}{\le_2}$,
+    \item[] 
       \begin{enumerate}[leftmargin=0pt]
-      \item \label{par-kappa1}
-        if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$,
-      \item \label{par-kappa2}
-        if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_2(\aEv)$,
-      \end{enumerate}
-    \item \label{par-tau}
-      $\aTr{\bEvs}{\bForm} \riff \aTr[1]{\bEvs}{\bForm}$,
-    \item \label{par-term}
-      $\aTerm \riff \aTerm[1]\land\aTerm[2]$,
-    \item \label{par-le}
-        ${\le}\rextends{\le_1}{\le_2}$,
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{p}7]{}{par-rf}
-      \begin{enumerate}[leftmargin=0pt]
-      \item
-        \label{par-rf-extends}
-        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+        % \label{par-le-extends}
+        % ${\le}\rextends{\le_1}{\le_2}$,
       \item \label{par-rf-le1}
         % ${\rrfx}\subseteq\PBR{{\rrfx_1}\cup{\rrfx_2}\cup{\le}}$.
         % if $\bEv\xrfx\aEv$ then either $\bEv\xrfx_1\aEv$, $\bEv\xrfx_2\aEv$, or $\bEv\le\aEv$.
         if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
       \item \label{par-rf-le2}
-        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\xrfx\bEv$ then $\aEv\le\bEv$.
+        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\xrfx\bEv$ then $\aEv\le\bEv$,
+      \end{enumerate}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{p}7]{}{par-rf2}
+      \begin{enumerate}[leftmargin=0pt]
+      \item
+        \label{par-rf-extends}
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
       \end{enumerate}
     \end{enumerate}
   \end{multicols}
@@ -83,10 +97,13 @@
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{s}\arabic*),ref=\textsc{s}\arabic*]
     \item[\eqref{seq-E}]
-      \eqref{seq-lambda}\;
-      \eqref{seq-kappa}\;
-      \eqref{seq-tau}\;
-      \eqref{seq-term}\; as in \reffig{fig:seq},
+      \eqref{seq-lambda}\,
+      \eqref{seq-kappa}\,
+      \eqref{seq-tau}\,
+      \eqref{seq-term}\,
+      \eqref{seq-le}\, 
+      \eqref{seq-rf}
+      as in \reffig{fig:mca1},
       \setcounter{enumi}{\value{le}}
     % \item \label{seq-E}
     %   $\aEvs = (\aEvs_1\cup\aEvs_2)$,
@@ -117,22 +134,33 @@
     \item[]
       % \labeltext[\textsc{s}6]{}{seq-le}
       \begin{enumerate}[leftmargin=0pt]
-      \item \label{seq-le-extends}
-        ${\le}\rextends{\le_1}{\le_2}$, 
-      \item \label{seq-le-delays}
-        if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ and
+      % \item \label{seq-le-extends}
+      %   ${\le}\rextends{\le_1}{\le_2}$, 
+      \item \label{seq-le-delays-rf}
+        if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ and
         %$\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
         $\bEv\le\aEv$,
         % either $\bEv\le\aEv$ or $\labelingForm(\bEv)\land\labelingForm(\aEv)$
         % is unsatisfiable.
+      \item \label{seq-le-blocks}
+        if $\labeling_1(\bEv) \rblocks \labeling_2(\aEv)$ then either
+        %$\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
+        \makebox[0cm][l]{$\bEv\le\aEv$
+        or
+        $\aEv\le\bEv$,}
+        % either $\bEv\le\aEv$ or $\labelingForm(\bEv)\land\labelingForm(\aEv)$
+        % is unsatisfiable.
       \end{enumerate}
       \stepcounter{enumi}
-    \item[] \labeltext[\textsc{s}7]{}{seq-rf}
+    \item[]
+      %\labeltext[\textsc{s}7]{}{seq-rf}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-rf-extends}
         ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
-      \item \label{seq-rf-le}
-        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
+      \item \label{seq-rf-le-rf}
+        if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\le\bEv$ then $\bEv\xrfx\aEv$.
+        % if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ and $\bEv\xrfx\aEv$
+        % then $\cEv\le\bEv$,
       \end{enumerate}
       %   % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
       %   % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
@@ -147,10 +175,13 @@
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
     \item[\eqref{if-E}]
-      \eqref{if-lambda}\;
-      \eqref{if-kappa}\;
-      \eqref{if-tau}\;
-      \eqref{if-term}\; as in \reffig{fig:seq},
+      \eqref{if-lambda}\,
+      \eqref{if-kappa}\,
+      \eqref{if-tau}\,
+      \eqref{if-term}\,
+      \eqref{if-le}\, 
+      \eqref{if-rf}
+      as in \reffig{fig:mca1},
       \setcounter{enumi}{\value{le}}
     % \item \label{if-E}
     %   $\aEvs = (\aEvs_1\cup\aEvs_2)$,
@@ -176,23 +207,31 @@
     %   % $\aTerm \riff (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
     %   $\aTerm \riff (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$.
     %   \stepcounter{enumi}
-    \item[]
-      % \labeltext[\textsc{i}6]{}{if-le}
-      \begin{enumerate}[leftmargin=0pt]
-        % \item \label{if-le-rf}
-        %   if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
-      \item \label{if-le-extends}
-        ${\le}\rextends{\le_1}{\le_2}$,
-      \item \label{if-le-subset}
-        ${\le}\rsubset{\le_1}{\le_2}$,
-      \end{enumerate}
+    % \item[]
+    %   % \labeltext[\textsc{i}6]{}{if-le}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %     % \item \label{if-le-rf}
+    %     %   if $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$,
+    %   \item \label{if-le-extends}
+    %     ${\le}\rextends{\le_1}{\le_2}$,
+    %   \item \label{if-le-subset}
+    %     ${\le}\rsubset{\le_1}{\le_2}$,
+    %   \end{enumerate}
+    %  \stepcounter{enumi}
+    % \item[]
+    %   %\labeltext[\textsc{i}7]{}{if-le}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{if-le-extends}
+    %     ${\le}\rextends{\le_1}{\le_2}$.
+    %   \end{enumerate}
       \stepcounter{enumi}
-    \item[] \labeltext[\textsc{i}7]{}{if-rf}
+    \item[]
+      %\labeltext[\textsc{i}7]{}{if-rf}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{if-rf-extends}
-        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
-      \item \label{if-rf-le}
-        ${\rrfx}\rsubset{\rrfx_1}{\rrfx_2}$.
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
+      % \item \label{if-rf-le}
+      %   ${\rrfx}\rsubset{\rrfx_1}{\rrfx_2}$.
       \end{enumerate}
     \end{enumerate}
   \end{multicols}
@@ -335,27 +374,6 @@
   %   \end{enumerate}
   % \end{multicols}
 
-  \begin{align*}
-  %   \begin{aligned}
-  %     \sembase{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
-  %     \\
-  %     \sembase{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
-  %     \\
-  %     \sembase{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]
-  %     \\
-  %     \sembase{\PF[\ascope]{\fmode}} &= \sFENCE[\ascope]{\fmode}[\aThrd]
-  %   \end{aligned}
-  %   &&
-  %   \begin{aligned}
-  %     \sembase{\SKIP} &= \sSKIP 
-  %     \\
-      \sembase{\aCmd_1 \LPAR[\bThrd] \aCmd_2} &= \sLPAR{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
-  %     \\
-  %     \sembase{\aCmd_1 \SEMI \aCmd_2} &= \sSEMI{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
-  %     \\
-  %     \sembase{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &= \sIFTHEN{\aExp{\neq}0}{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
-  %   \end{aligned}
-  \end{align*}
-  \caption{PwT-MCA Semantics}
-  \label{fig:sem}
+  \caption{PwT-MCA Semantics 2} 
+  \label{fig:mca2}
 \end{figure}

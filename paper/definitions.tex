@@ -175,7 +175,7 @@ We require that
   $\land$, $\lor$, $\limplies$ and substitutions $[\aExp/\aReg]$,
   $[\aExp/\aLoc]$, $[\aForm/\Q{\aLoc}]$,
 \item there are three binary relations over $\Act\times\Act$:
-  $\rmatchesdef$, $\rblocksdef$, and $\rdelaysdef$,
+  $\roverlapsdef$, $\rmatchesdef$, and $\rblocksdef$,
 \item there are two subsets of $\Act$, distinguishing
   $\sreaddef$ and $\sreleasedef$ actions.
 \end{itemize}
@@ -278,6 +278,8 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
   Actions $\DWP[\gemode\mREL]{}{}$ and $\DFP{\gemode\fREL}$ are
   $\sreleasedef$ actions.
 
+  We say $\aAct \roverlapsdef \bAct$ if they access the same location.
+  
   We say $\aAct \rmatchesdef \bAct$ if $\aAct=\DWP{\aLoc}{\aVal}$ and $\bAct=\DRP{\aLoc}{\aVal}$.
   % We say $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
   % Action $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
@@ -288,37 +290,6 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 
   % Let two actions \emph{overlap} if they access the same location.
   % We say $\aAct \roverlapsdef \bAct$ if they access the same location.
-
-  Let ${\eqreorderco}$ capture write-write, read-write coherence:
-  \begin{math}
-    {\eqreorderco}
-    =
-    \{(\DW{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DR{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DW{\aLoc}{}\Cb \DR{\aLoc}{})\}
-  \end{math}.
-
-  Let ${\reorderra}$ capture conflict due to synchronization:
-  \begin{math}
-    {\reorderra}
-    =
-    \{(\aAct\Cb             \DW[\gemode\mREL]{}{}     )\Cc
-    (\aAct\Cb               \DF{\gemode\fREL}        )\Cc
-    (\DR{}{}\Cb             \DF{\gemode\fACQ}        )\Cc
-    % (\DR{\aLoc}{}\Cb        \DR[\gemode\mACQ]{\aLoc}{})\Cc
-    (\DR[\gemode\mACQ]{}{}\Cb\aAct                    )\Cc
-    (\DF{\gemode\fACQ}\Cb   \aAct                    )\Cc
-    (\DF{\gemode\fREL}\Cb   \DW{}{}                  )\Cc
-    (\DW[\gemode\mREL]{\aLoc}{}\Cb\DW{\aLoc}{})\}
-  \end{math}.
-
-  Let ${\eqreordersc}$ capture conflict due to $\mSC$ access:
-  \begin{math}
-    {\eqreordersc}
-    =
-    % \{(\DX[\mSC]{}{}\Cb\DX[\mSC]{}{})\}
-    \{(\DW[\mSC]{}{}\Cb \DW[\mSC]{}{})\Cc(\DR[\mSC]{}{}\Cb \DW[\mSC]{}{}) \Cc(\DW[\mSC]{}{}\Cb \DR[\mSC]{}{})\Cc(\DR[\mSC]{}{}\Cb \DR[\mSC]{}{})\}
-  \end{math}.
-
-  We say $\aAct \rdelaysdef \bAct$ if $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or $\aAct\eqreordersc\bAct$.
 \end{definition}
 
 \subsection{The Semantic Domain} %: Pomsets with Predicate Transformers}
@@ -411,30 +382,10 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.
     %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
     % \end{enumerate}
     \makecounter{Brf}
-  \item \label{pom-rf} \makecounter{rf}
-    ${\rrfx} \subseteq \aEvs\times\aEvs$ is an injective relation capturing
-    \emph{reads-from}, such that 
-    % \end{enumerate}
-    % A pomset is a \emph{candidate} if there is an injective relation
-    % ${\rrfx} : \aEvs\times\aEvs$, capturing \emph{reads-from}, such that
-    \begin{enumerate}
-      % \begin{enumerate}[,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
-      % \item \label{rf-injective}
-      %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is, ${\rrfx}$ is injective,
-    \item \label{pom-rf-match}
-      if $\bEv\xrfx\aEv$ then $\labeling(\bEv) \rmatches \labeling(\aEv)$,
-    \item \label{pom-rf-block}
-      if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
-    \item \label{pom-rf-le}
-      if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
-    \end{enumerate}
   \end{enumerate}
   A pomset is \emph{complete} if
   % \begin{multicols}{2}
   \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
-    \setcounter{enumi}{\value{Blambda}}
-  \item \label{top-rf}
-    if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$,
     \setcounter{enumi}{\value{Bkappa}}
   \item \label{top-kappa}
     %$\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
@@ -764,17 +715,17 @@ Sequential composition is similar, with two changes: \ref{seq-E} does not
 require disjointness (see \textsection\ref{sec:ex:term}), and
 \ref{seq-le-delays} may require order (see example \ref{pub}, below).
 
-Note that reads-from implies order.
-\begin{lemma}
-  \label{lem:rf:implies:le}
-  For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
-  $\bEv\le\aEv$.
+Note that reads-from implies order by \eqref{pom-rf-le}.
+% \begin{lemma}
+%   \label{lem:rf:implies:le}
+%   For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
+%   $\bEv\le\aEv$.
 
-  \vspace{-.5\baselineskip}
-  \begin{proof}
-    Induction on the definition of $\sembase{}$, using \ref{par-rf-le1}, \ref{par-rf-le2}, and \ref{seq-rf-le}.
-  \end{proof}
-\end{lemma}
+%   \vspace{-.5\baselineskip}
+%   \begin{proof}
+%     Induction on the definition of $\sembase{}$, using \ref{par-rf-le1}, \ref{par-rf-le2}, and \ref{pom-rf-le}.
+%   \end{proof}
+% \end{lemma}
 In top-level pomsets, every read must have a matching write in $\rrfx$
 \eqref{top-rf}.  Together with \ref{pom-rf-match} and \ref{pom-rf-block}, the lemma
 guarantees that reads are \emph{fulfilled} at top-level, as in
@@ -784,8 +735,7 @@ guarantees that reads are \emph{fulfilled} at top-level, as in
   with \ref{pom-rf-match} and \ref{pom-rf-block}.  This was the approach of
   \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
   explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
-  variant semantics $\frf{\semrr{}}$ for which \reflem{lem:rf:implies:le}
-  fails.}
+  variant semantics $\frf{\semrr{}}$ where \ref{pom-rf-le} is not required.}
 
 From \refdef{def:actions}, recall that $\aAct \rdelaysdef \bAct$ if
 $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or
@@ -793,7 +743,7 @@ $\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
 order is enforced between conflicting accesses of the same location
 ($\eqreorderco$), into a release and out of an acquire ($\reorderra$), and
 between SC accesses ($\eqreordersc$).  Combined with the fulfillment
-requirements (\ref{pom-rf-match}, \ref{pom-rf-block} and \reflem{lem:rf:implies:le}),
+requirements (\ref{pom-rf-match}, \ref{pom-rf-block} and \ref{pom-rf-le}),
 these ensure coherence, publication, subscription and other idioms.  For
 example, consider the following:\footnote{We use different colors for arrows representing order:
   \begin{itemize}  
@@ -835,7 +785,7 @@ $\DWP{x}{1}\xsync \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xsync \DRP{x}{0}$ ar
 required by $\reorderra$.  The cross-thread order is required by fulfillment:
 \ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
 \ref{pom-rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
-\reflem{lem:rf:implies:le} subsequently ensures that
+\ref{pom-rf-le} subsequently ensures that
 $\DWP[\mREL]{y}{1}\le \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
 $\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{pom-rf-block}.  (Alternatively,
 we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
@@ -1252,8 +1202,8 @@ to be lifted out of a conditional, validating the transformation
   \sem{\aCmd}.
 \end{math}
 %
-The use of $\rextendsdef{}{}$ in \ref{if-le-extends} and \ref{if-rf-extends}
-ensures that no new order is introduced between events in
+The use of $\rextendsdef{}{}$ in \ref{if-rf-extends}
+ensures that no $\rrfx$ is introduced between events in
 $\aEvs_1\cap\aEvs_2$ when coalescing; see \textsection\ref{sec:arm2}.
 
 

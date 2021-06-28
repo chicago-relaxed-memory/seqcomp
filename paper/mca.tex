@@ -1,4 +1,130 @@
 \section{PwT-MCA}
 
-\input{fig-sem.tex}
-See \reffig{fig:seq}.
+From the data model, we require an additional binary relation over
+$\rdelays\subseteq(\Act\times\Act)$.  For the actions in this paper, we
+define this as follows.
+
+\begin{scope}
+  Let ${\eqreorderco}$ capture write-write, read-write coherence:
+  \begin{math}
+    {\eqreorderco}
+    =
+    \{(\DW{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DR{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DW{\aLoc}{}\Cb \DR{\aLoc}{})\}
+  \end{math}.
+
+  Let ${\reorderra}$ capture conflict due to synchronization:
+  \begin{math}
+    {\reorderra}
+    =
+    \{(\aAct\Cb             \DW[\gemode\mREL]{}{}     )\Cc
+    (\aAct\Cb               \DF{\gemode\fREL}        )\Cc
+    (\DR{}{}\Cb             \DF{\gemode\fACQ}        )\Cc
+    % (\DR{\aLoc}{}\Cb        \DR[\gemode\mACQ]{\aLoc}{})\Cc
+    (\DR[\gemode\mACQ]{}{}\Cb\aAct                    )\Cc
+    (\DF{\gemode\fACQ}\Cb   \aAct                    )\Cc
+    (\DF{\gemode\fREL}\Cb   \DW{}{}                  )\Cc
+    (\DW[\gemode\mREL]{\aLoc}{}\Cb\DW{\aLoc}{})\}
+  \end{math}.
+
+  Let ${\eqreordersc}$ capture conflict due to $\mSC$ access:
+  \begin{math}
+    {\eqreordersc}
+    =
+    % \{(\DX[\mSC]{}{}\Cb\DX[\mSC]{}{})\}
+    \{(\DW[\mSC]{}{}\Cb \DW[\mSC]{}{})\Cc(\DR[\mSC]{}{}\Cb \DW[\mSC]{}{}) \Cc(\DW[\mSC]{}{}\Cb \DR[\mSC]{}{})\Cc(\DR[\mSC]{}{}\Cb \DR[\mSC]{}{})\}
+  \end{math}.
+
+  We say $\aAct \rdelaysdef \bAct$ if $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or $\aAct\eqreordersc\bAct$.
+\end{scope}
+
+\begin{scope}
+  Add the following to the definition \emph{pomset} and \emph{complete
+    pomset} from \refdef{def:pomset}:
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+    \setcounter{enumi}{\value{Brf}}
+  \item \label{pom-rf} \makecounter{rf} ${\rrfx} \subseteq \aEvs\times\aEvs$
+    is an injective relation capturing \emph{reads-from}, such that
+    % \end{enumerate}
+    % A pomset is a \emph{candidate} if there is an injective relation
+    % ${\rrfx} : \aEvs\times\aEvs$, capturing \emph{reads-from}, such that
+    \begin{enumerate}
+      % \begin{enumerate}[,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
+      % \item \label{rf-injective}
+      %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is,
+      %   ${\rrfx}$ is injective,
+    \item \label{pom-rf-match} if $\bEv\xrfx\aEv$ then
+      $\labeling(\bEv) \rmatches \labeling(\aEv)$,
+    \item \label{pom-rf-block} if $\bEv\xrfx\aEv$ and
+      $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or
+      $\aEv\le\cEv$,
+    \item \label{pom-rf-le} if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
+    \end{enumerate}
+  \end{enumerate}
+  \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+    \setcounter{enumi}{\value{Brf}}
+  \item \label{top-rf}
+    if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  \end{enumerate}
+\end{scope}
+
+% To include \RMW{}s, also add
+% \begin{enumerate}
+% \item[(\textsc{p}10)]\;
+%   ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
+% \end{enumerate}
+
+\input{fig-mca1.tex}
+\input{fig-mca2.tex}
+The semantic rules are given in \reffig{fig:mca1}.  Let
+\begin{math}
+  \sembase{\aCmd_1 \LPAR[\bThrd] \aCmd_2} = \sLPAR{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}.
+\end{math}
+
+
+In the second semantics, we weaken the relationship between $\rrfx$
+and $\le$ in \ref{pom-rf-le}.  Rather than ensuring that there is no
+\emph{global} blocker for a sequentially fulfilled read \eqref{pom-rf-le}, we
+require only that there is no \emph{thread-local} blocker
+\eqref{seq-rf-le-rf}.
+This change both allows and requires us to weaken the definition of
+\emph{delays} to drop write-to-read order from $\eqreorderco$.
+
+With the weakening of \ref{seq-rf-le-rf}, we must be careful not to allow
+spurious pairs to be added to the $\rrfx$ relation.  The use of
+$\rextendsdef{}{}$ in \ref{if-rf-extends} does this, ensuring that new
+$\rrfx$ is not introduced between events in $\aEvs_1\cap\aEvs_2$ when coalescing.
+This is necessary to ensure that
+\begin{math}
+  \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
+\end{math}
+does not include 
+\begin{math}
+  \smash{\hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \rfint[out=165,in=15]{b}{a}
+        \wki{a}{b}
+      \end{tikzinlinesmall}}}
+\end{math}, taking $\rrfx$ from the left and $\le$ from the right.
+
+Replace \eqref{pom-rf-le} by
+\begin{enumerate}
+\item[{\labeltext[\textsc{m}7c$'$]{(\textsc{m}7c$'$)}{pom-rf-le'}}]
+ if $\bEv\xrfx\aEv$ then either $\bEv\le\aEv$ or $\aEv\le\bEv$.
+\end{enumerate}
+Derive $\rdelayspdef$ from $\rdelaysdef$ by replacing $\eqreorderco$ with
+\begin{math}
+  {\reorderlws}
+  =
+  \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}.
+\end{math}
+The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
+\emph{Local Write Successor}.
+
+The semantic rules are given in \reffig{fig:mca2}.
+
+A derived property of sequential composition:
+\begin{center}
+  if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ and $\bEv\xrfx\aEv$
+  then $\cEv\le\bEv$.  
+\end{center}

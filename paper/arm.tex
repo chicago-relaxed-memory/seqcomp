@@ -35,7 +35,7 @@ and that $\rlob$ does \emph{not} include
 \item \label{lob-rr} \labeltext[above]{}{lob-le}
   read-read control dependencies, required by \ref{seq-kappa},
 \item \label{lob-rf}
-  write-to-read order of $\rrfx$, required by \ref{seq-rf-le},
+  write-to-read order of $\rrfx$, required by \ref{pom-rf-le},
 \item \label{lob-wr}
   write-to-read coherence delay of ${\eqreorderco}$, required by \ref{seq-le-delays}.
 \end{enumerate}
@@ -178,7 +178,7 @@ non-relaxed access to \LDAR/\STLR{} \citep{DBLP:journals/pacmpl/PodkopaevLV19}.
 In this section, we consider a suboptimal strategy, which lowers non-relaxed
 reads to $(\DMBSY\SEMI\LDAR)$.  Significantly, we retain the optimal lowering
 for relaxed access.  In the next section we recover the optimal lowering by
-adopting an alternative semantics for \ref{seq-rf-le} and \ref{seq-le-delays}.
+adopting an alternative semantics for \ref{pom-rf-le} and \ref{seq-le-delays}.
 
 To see why the optimal lowering fails, consider the following attempted
 execution, where the final values of both $x$ and $y$ are $2$.
@@ -393,6 +393,7 @@ Arm.  The proof uses the characterization of Arm using \EGC{}.
 \subsection{PwT-MCA Lowering 2}
 \label{sec:arm2}
 
+
 We can achieve optimal lowering for Arm by weakening the semantics of
 sequential composition slightly.  In particular, we must lose
 \reflem{lem:rf:implies:le}, which states that $\bEv\xrfx\aEv$ implies
@@ -423,54 +424,37 @@ Here the $\rrfx$ relation \emph{contradicts} order!  We have both
 $\DWP{x}{2}\xrfint\DRP[\mACQ]{x}{2}$ and
 $\DWP{x}{2}\xcbinv\DRP[\mACQ]{x}{2}$.
 
-The change to the semantics is small: we weaken the relationship between $\rrfx$
-and $\le$ in \ref{seq-rf-le}.  Rather than ensuring that there is no
-\emph{global} blocker for a sequentially fulfilled read \eqref{seq-rf-le}, we
-require only that there is no \emph{thread-local} blocker \eqref{seq-rf-le-rf}.
-This change both allows and requires us to weaken the definition of
-\emph{delays} to drop write-to-read order from $\eqreorderco$.
-\begin{definition}
-  \label{def:sem:frf}
-  Let $\frf{\semrr{}}$ be defined as for $\semrr{}$ in
-  \refdef{def:semrr}/\reffig{fig:sem}, changing \ref{seq-rf-le} and
-  \ref{seq-le-delays}:
-  \begin{itemize}
-  \item[{\labeltext[\frf{\textsc{s}7b}]{(\frf{\textsc{s}7b})}{seq-rf-le-rf}}]
-    if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ then $\bEv\xrfx\aEv$
-    implies $\cEv\le\bEv$,
-  \item[{\labeltext[\frf{\textsc{s}6b}]{(\frf{\textsc{s}6b})}{seq-le-delays-rf}}]
-    if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ then $\bEv\le\aEv$,\\
-    where $\rdelayspdef$ replaces $\eqreorderco$ in \refdef{def:actions} of
-    $\rdelaysdef$ by
-    \begin{math}
-      {\reorderlws}
-      =
-      \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}
-    \end{math}.
-  \item \textcolor{red}{TODO: I think this should order W->R if there is no
-      rf the other way}
-  \end{itemize}  
-\end{definition}
-The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
-\emph{Local Write Successor}.
+% The change to the semantics is small: we weaken the relationship between $\rrfx$
+% and $\le$ in \ref{seq-rf-le}.  Rather than ensuring that there is no
+% \emph{global} blocker for a sequentially fulfilled read \eqref{seq-rf-le}, we
+% require only that there is no \emph{thread-local} blocker \eqref{seq-rf-le-rf}.
+% This change both allows and requires us to weaken the definition of
+% \emph{delays} to drop write-to-read order from $\eqreorderco$.
+% \begin{definition}
+%   \label{def:sem:frf}
+%   Let $\frf{\semrr{}}$ be defined as for $\semrr{}$ in
+%   \refdef{def:semrr}/\reffig{fig:sem}, changing \ref{seq-rf-le} and
+%   \ref{seq-le-delays}:
+%   \begin{itemize}
+%   \item[{\labeltext[\frf{\textsc{s}7b}]{(\frf{\textsc{s}7b})}{seq-rf-le-rf}}]
+%     if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ and $\bEv\xrfx\aEv$
+%     then $\cEv\le\bEv$,
+%   \item[{\labeltext[\frf{\textsc{s}6b}]{(\frf{\textsc{s}6b})}{seq-le-delays-rf}}]
+%     if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ then $\bEv\le\aEv$,\\
+%     where $\rdelayspdef$ replaces $\eqreorderco$ in \refdef{def:actions} of
+%     $\rdelaysdef$ by
+%     \begin{math}
+%       {\reorderlws}
+%       =
+%       \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}
+%     \end{math}.
+%   \item \textcolor{red}{TODO: I think this should order W->R if there is no
+%       rf the other way}
+%   \end{itemize}  
+% \end{definition}
+% The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
+% \emph{Local Write Successor}.
 
-With the weakening of \ref{seq-rf-le-rf}, we must be careful not to allow
-spurious pairs to be added to the $\rrfx$ relation.  The use of
-$\rextendsdef{}{}$ in \ref{if-rf-extends} does this, ensuring that new
-$\rrfx$ is not introduced between events in $\aEvs_1\cap\aEvs_2$ when coalescing.
-This is necessary to ensure that
-\begin{math}
-  \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
-\end{math}
-does not include 
-\begin{math}
-  \smash{\hbox{\begin{tikzinlinesmall}[node distance=1.5em]
-        \event{a}{\DR{x}{1}}{}
-        \event{b}{\DW{x}{1}}{right=of a}
-        \rfint[out=165,in=15]{b}{a}
-        \wki{a}{b}
-      \end{tikzinlinesmall}}}
-\end{math}, taking $\rrfx$ from the left and $\le$ from the right.
 
 We emphasize that \reflem{lem:rf:implies:le} fails for $\frf{\semrr{}}$,
 since $\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come

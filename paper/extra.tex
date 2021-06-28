@@ -837,7 +837,7 @@ after an $L$-sequential $\rho$, then $\alpha$ must be in a data race.  That
 is clearly false here, since $\DRP[\mACQ]{x}{1}$ is stale, but the program is
 data race free.
 
-In proving the SC-LDRF result in \jjr{\textsection8}, we noted that our proof
+In proving the SC-LDRF result in \cite[\textsection8]{DBLP:journals/pacmpl/JagadeesanJR20}, we noted that our proof
 technique is more robust than that of \cite{DBLP:conf/ppopp/DongolJR19},
 because it limits the prefixes that must be considered.  In \eqref{mix1}, the
 induction hypothesis requires that we add $\DRP[\mACQ]{x}{1}$ before
@@ -863,7 +863,7 @@ particular,
     \end{tikzinline}}
 \end{gather*}
 is not a downset of \eqref{mix1}, because
-$\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  As we noted in \jjr{\textsection8},
+$\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  As noted in \cite[\textsection8]{DBLP:journals/pacmpl/JagadeesanJR20},
 this affects the inductive order in which we move across pomsets, but does
 not affect the set of pomsets that are considered.  In particular,
 \begin{gather*}

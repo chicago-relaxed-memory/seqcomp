@@ -50,7 +50,7 @@
 \newcommand{\sreaddef}{\LABEL@COLOR@REL{\emph{read}}}
 \newcommand{\sreleasedef}{\LABEL@COLOR@REL{\emph{release}}}
 \newcommand{\rimpliesdef}{\mathrel{\vDash}}%{\LABEL@COLOR@REL{\emph{implies}}}
-\newcommand{\rextendsdef}[2]{\LABEL@REL{\emph{extends}}\ifnotempty{#1#2}{{#1}\;\allowbreak\textnormal{\emph{and}}\;\allowbreak{#2}}}
+\newcommand{\rextendsdef}[2]{\LABEL@REL{\emph{respects}}\ifnotempty{#1#2}{{#1}\ifnotempty{#2}{\;\allowbreak\textnormal{\emph{and}}\;\allowbreak{#2}}}}
 
 \newcommand{\roverlaps}{\LABEL@COLOR@REL{{overlaps}}}
 \newcommand{\rmatches}{\LABEL@COLOR@REL{{matches}}}
@@ -70,8 +70,9 @@
 \newcommand{\rnotimplies}{\mathrel{\not\vDash}}%{\LABEL@COLOR@REL{{implies}}}}
 \newcommand{\riff}{\mathrel{\equiv}}
 %\newcommand{\riff}{\mathrel{\Dashv\vDash}}
-\newcommand{\rextends}[2]{\LABEL@REL{{extends}}\ifnotempty{#1#2}{{#1}\textand{#2}}}
+\newcommand{\rextends}[2]{\LABEL@REL{{respects}}\ifnotempty{#1#2}{{#1}\ifnotempty{#2}{\textand{#2}}}}
 %\newcommand{\rextends}[2]{\supseteq({#1}\cup{#2})}
+\newcommand{\rsupset}[2]{\supseteq({#1}\cup{#2})}
 \newcommand{\rsubset}[2]{\subseteq({#1}\cup{#2})}
 
 \newcommand{\Cb}{,\allowbreak}
@@ -100,7 +101,7 @@
 \newcommand{\noOR}[1]{#1}
 \newcommand{\reflem}[1]{Lemma~\ref{#1}}
 \newcommand{\refthm}[1]{Theorem~\ref{#1}}
-\newcommand{\reffig}[1]{Figure~\ref{#1}}
+\newcommand{\reffig}[1]{Fig.~\ref{#1}}
 \newcommand{\refdef}[1]{Definition~\ref{#1}}
 \newcommand{\refex}[1]{Example~\ref{#1}}
 \newcommand{\refexs}[2]{Examples~\ref{#1}/\ref{#2}}

@@ -9,6 +9,13 @@
 
   \noindent
   If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$\\
+  let
+  %$\labelingForm'_2(\aEv)=\aTr[1]{}{\labelingForm_2(\aEv})$ if $\labeling(\aEv)$ is a $\sread$---otherwise
+  $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$, where
+  $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$,\\
+  and
+  $\aTerm[1](\aEv) = \aTerm[1]$ if $\labeling(\aEv)$ is a $\srelease$---otherwise
+  $\aTerm[1](\aEv) = \TRUE$.
   % let $\aTerm[1](\aEv) = \aTerm[1]$ if $\labeling_2(\aEv)$ is a $\srelease$
   % and $\aTerm[1](\aEv) = \TRUE$ otherwise,\\
   % let $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,
@@ -65,13 +72,6 @@
       ${\le}\supseteq{\le_1}\cup{\le_2}$,
     \end{enumerate}
   \end{multicols}
-  where
-  %$\labelingForm'_2(\aEv)=\aTr[1]{}{\labelingForm_2(\aEv})$ if $\labeling(\aEv)$ is a $\sread$---otherwise
-  $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$, where
-  $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$;\\
-  where
-  $\aTerm[1](\aEv) = \aTerm[1]$ if $\labeling(\aEv)$ is a $\srelease$---otherwise
-  $\aTerm[1](\aEv) = \TRUE$.
   \medskip
 
   \noindent

@@ -6,7 +6,7 @@
 
 The predicate transformers we have chosen for \ref{read-tau-dep} and
 \ref{read-tau-ind} are different from the ones used traditionally, which are
-written using substitution \jjr{}.  Attempting to write \ref{read-tau-dep} in
+written using substitution \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  Attempting to write \ref{read-tau-dep} in
 this style we would have:
 \begin{enumerate}[topsep=0pt]
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-p}}]
@@ -181,7 +181,7 @@ $(\aReg{=}\aVal)\limplies\bForm$.
 \subsection{Comparison with Weakest Preconditions}
 
 We compare traditional transformers to the dependent-case transformers of
-\reffig{fig:sem}. %; thus we consider only totally ordered executions.
+\reffig{fig:seq}. %; thus we consider only totally ordered executions.
 % Because
 % we only consider the dependent case, we drop the superscript $\aEvs$ on
 % $\aTr{\aEvs}{}$ throughout this section.  We also assume that each register
@@ -553,7 +553,7 @@ In $\sLOAD{}{}$, it is also possible to collapse $\aLoc$ and $\aReg$ via substit
   \end{math}
 \end{enumerate}
 Perhaps surprisingly, this semantics is incomparable with that of
-\reffig{fig:sem}.  Consider the following:
+\reffig{fig:seq}.  Consider the following:
 \begin{gather*}
   \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
   \IF{r\land s}\THEN \PW{z}{1}\FI
@@ -1057,7 +1057,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 
 \begin{definition}
   \label{def:semcaaddr}
-  Let $\semcaaddr{}$ be defined as in \reffig{fig:sem}, changing
+  Let $\semcaaddr{}$ be defined as in \reffig{fig:seq}, changing
   $\sSTORE{}{}$ and $\sLOAD{}{}$:
 
   \noindent
