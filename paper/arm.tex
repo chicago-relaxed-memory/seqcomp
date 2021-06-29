@@ -1,6 +1,6 @@
 \section{Lowering \PwTmcaTITLE{} to Arm}
 \label{sec:arm}
-For simplicity, we restrict to top level parallel composition.
+For simplicity, we restrict to top-level parallel composition.
 % and ignore
 % fences\footnote{Fences are not actions in \armeight{}, which complicates the
 %   theorem statements.%
@@ -15,9 +15,9 @@ For simplicity, we restrict to top level parallel composition.
   \begin{enumerate}[,label=(\textsc{a}\arabic*),ref=\textsc{a}\arabic*]
   \item $\aEvs\subseteq\AllEvents$ is a set of {events},
   \item $\labeling: \aEvs \fun \Act$ defines a {label} for each event,
-  \item ${\rpoloc} : \aEvs\times\aEvs$, is a per-thread, per-location total
+  \item ${\rpoloc} \subseteq \aEvs{\times}\aEvs$, is a per-thread, per-location total
     order, capturing \emph{per-location program order},
-  \item ${\rlob} : \aEvs\times\aEvs$, is a per-thread partial order capturing
+  \item ${\rlob} \subseteq \aEvs\times\aEvs$, is a per-thread partial order capturing
     \emph{locally-ordered-before}, such that
     \begin{enumerate}
     \item \label{arm-lob-poloc}
@@ -52,12 +52,13 @@ and that $\rlob$ does \emph{not} include
     \setcounter{enumi}{4}
   %\item[\eqref{arm-co}] and \eqref{arm-rf}, as for \EC,
   \item \label{arm-co}
-    ${\rco} : \aEvs\times\aEvs$, is a per-location total order on
+    ${\rco} \subseteq \aEvs\times\aEvs$, is a per-location total order on
     writes, capturing \emph{coherence}, 
   \item \label{arm-rf}
-    ${\rrfx} : \aEvs\times\aEvs$, is a surjective and injective
-    relation on reads, capturing \emph{reads-from}, such that
+    ${\rrfx} \subseteq \aEvs\times\aEvs$, is a relation, capturing \emph{reads-from}, such that
     \begin{enumerate}
+    \item \label{arm-rf-reads}
+      ${\rrfx}$ is surjective and injective relation on $\{\aEv\in\aEvs\mid\labeling(\aEv)\;\text{is a}\;\sread\}$,
     \item \label{arm-match}
       if $\bEv\xrfx\aEv$ then $\labeling(\bEv) \rmatches \labeling(\aEv)$,      
     \item \label{arm-local}
