@@ -1,8 +1,14 @@
+\newcommand{\existsone}{\exists!}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
 \newcommand{\MRD}{{\sc mrd-c11}}
-\newcommand{\PwP}{{\sc pwp}}
-\newcommand{\PwT}{{\sc pwt}}
-\newcommand{\PwTmca}{{\sc pwt-mca}}
-\newcommand{\PwTc}{{\sc pwt-c11}}
+\newcommand{\PwP}{P\lowercase{w}P}
+\newcommand{\PwT}{P\lowercase{w}T}
+\newcommand{\PwTmca}[1]{\PwT-MCA\ifnotempty{#1}{$_{#1}$}}
+\newcommand{\PwTc}{\PwT-C11}
+\newcommand{\PwTTITLE}{P\lowercase{w}T}
+\newcommand{\PwTmcaTITLE}[1]{\PwT-MCA{#1}}
+\newcommand{\PwTcTITLE}{\PwT-C11}
 \newcommand{\DEP@COLOR}[1]{\mathrel{{\color{purple}#1}}}
 \newcommand{\LOC@COLOR}[1]{\mathrel{{\color{red}#1}}}
 \newcommand{\SYNC@COLOR}[1]{\mathrel{{\color{magenta}#1}}}
@@ -260,13 +266,13 @@
 \NewDocumentCommand\PWField{O{} m m O{} m}{{#2.#3}^{#1}_{#4} \GETS #5}
 
 \newcommand{\sem}[2][]{\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket\ifshowSCOPE_{#1}\fi}
-\newcommand{\sembase}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_1}
-\newcommand{\semrr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_2}
-\newcommand{\semreg}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_3}
-\newcommand{\semaddr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_4}
-\newcommand{\semca}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_5}
-\newcommand{\semcaaddr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket_6}
-\newcommand{\frf}[1]{#1\ensuremath{^{\mathsf{rf}}}}
+\newcommand{\sembase}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_1}
+\newcommand{\semrr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_2}
+\newcommand{\semreg}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_3}
+\newcommand{\semaddr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_4}
+\newcommand{\semca}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_5}
+\newcommand{\semcaaddr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_6}
+\newcommand{\frf}[1]{#1}%\ensuremath{^{\mathsf{rf}}}}
 \newcommand{\fpo}[1]{\mathsf{po}#1}
 
 \NewDocumentCommand\PF{O{} m}{\texttt{F}^{#2}\ifshowSCOPE_{#1}\fi}

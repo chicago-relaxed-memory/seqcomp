@@ -1,5 +1,5 @@
 \begin{figure}
-  \bookmark{Sequential Semantics}
+  \bookmark{PwT Semantics}
   \raggedright
   
   \noindent
@@ -43,7 +43,7 @@
     \item \label{seq-E}
       $\aEvs = (\aEvs_1\cup\aEvs_2)$,
     \item \label{seq-lambda}
-      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+      ${\labeling}\supseteq\PBR{{\labeling_1}\cup {\labeling_2}}$, 
       \stepcounter{enumi}
     \item[] \labeltext[\textsc{s}3]{}{seq-kappa}
       \begin{enumerate}[leftmargin=0pt]
@@ -82,7 +82,7 @@
     \item \label{if-E}
       $\aEvs = (\aEvs_1\cup\aEvs_2)$,
     \item \label{if-lambda}
-      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+      ${\labeling}\supseteq\PBR{{\labeling_1}\cup {\labeling_2}}$, 
       % \item[(\ref{par-E}--\ref{par-le})] as for $\sLPAR{}{}$,
       \stepcounter{enumi}
     \item[] \labeltext[\textsc{i}3]{}{if-kappa}
@@ -122,7 +122,8 @@
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
     \item \label{read-E}
-      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+      $\fcard{\aEvs}\leq1$,
+      %if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
     \item \label{read-lambda}
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
     \item \label{read-kappa}
@@ -173,7 +174,8 @@
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
     \item \label{write-E}
-      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+      $\fcard{\aEvs}\leq1$,
+      %if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
     \item \label{write-lambda}
       $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
     \item \label{write-kappa}

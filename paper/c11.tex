@@ -1,4 +1,4 @@
-\section{PwT-C11}
+\section{\PwTcTITLE: Pomsets with Predicate Transformers for C11}
 
 Restrict the syntax to top-level parallel composition.
 
@@ -55,9 +55,9 @@ Restrict the syntax to top-level parallel composition.
 % \end{comment}
 \begin{definition}
   \label{def:po}
-  A \emph{pomset with program order} is a tuple $(\aPS,\rmrg,\rpox)$,
-  where $\aPS=(\aEvs, \labeling, \labelingForm, \aTr{}{}, {\aTerm}, {\le})$ %, {\ledep}, {\lesync}, {\leloc}, {\rrmw})$ 
-  is a pomset with predicate transformers and
+  A \PwTc{} is a \PwT{} (\refdef{def:pomset}) equipped
+  with relations $\rmrg$ and
+  $\rpox$ such that 
   \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
     \setcounter{enumi}{7}
     \makecounter{Bm}
@@ -77,33 +77,18 @@ Restrict the syntax to top-level parallel composition.
     is the set of \emph{simple} (rather than \emph{compound}) events.
   \end{enumerate}
 \end{definition}
+We write $\phEvs$ for the set of \emph{phantom} events $(\aEvs\setminus\reEvs)$.
 
+\input{fig-c11.tex}
+
+
+The semantic rules are given in \reffig{fig:c11}.  As usual, we write
+$\existsone$ to mean ``there exists exactly one''.
 %Let $\phEvs=\aEvs\setminus\reEvs$ and $\dmEvs=\aEvs\setminus\umEvs$.
 
-Lots of fiddly details.  Intuitively, (1) compute the preconditions and order
-for $\reEvs$ as before, (2) create new events for the merged ones, compute
-preconditions for events outside $\reEvs$ by applying all of the dependent
-transformers of the preceding $\umEvs$.
-
-[Incomplete] Rules for computing preconditions during sequential composition:
-\begin{itemize}
-\item if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv)=\labelingForm_1(\aEv)$,
-\item if $\aEv\in\aEvs_2\cap\reEvs$ then $\labelingForm(\aEv)$ computed as before, restricted to $\reEvs$,
-\item if $\aEv\in\aEvs_2\setminus\reEvs$ then $\labelingForm(\aEv) \riff \aTr[1]{\umEvs}{\labelingForm_1(\aEv)}$.
-\end{itemize}
-% \begin{enumerate}
-%   \setcounter{enumi}{\value{Bkappa}}
-% \item[] 
-%   \begin{enumerate}[leftmargin=0pt]
-%     \setcounter{enumii}{3}
-%   \item \label{ph-seq-kappa1}
-%     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$,
-%   \item \label{ph-seq-kappa2}
-%     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm'_2(\aEv) \land \aTerm[1](\aEv)$,
-%   \item \label{ph-seq-kappa12}
-%     if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv) \riff (\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)) \land \aTerm[1](\aEv)$,
-%   \end{enumerate}
-% \end{enumerate}
+% Lots of fiddly details.  Intuitively, (1) compute the preconditions and order
+% for $\reEvs$ as before, (2) create new events for the merged ones, compute
+% preconditions for events outside $\reEvs$ by applying $\aTr[1]{}{}$.
 
 $\rpox$ can have cycles when interpreted on merged events. For example:
 % \begin{align*}

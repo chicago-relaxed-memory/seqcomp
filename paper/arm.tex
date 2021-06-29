@@ -1,4 +1,4 @@
-\section{Lowering PwT-MCA to Arm}
+\section{Lowering \PwTmcaTITLE{} to Arm}
 \label{sec:arm}
 For simplicity, we restrict to top level parallel composition and ignore
 fences\footnote{Fences are not actions in \armeight{}, which complicates the
@@ -169,11 +169,11 @@ $\DWP{x}{1}$ is not $\rlob$-ordered before $\DWP{y}{1}$.
     \end{tikzinline}}
 \end{gather*}
 
-\subsection{PwT-MCA Lowering 1}
+\subsection{Lowering \PwTmcaTITLE{1} to Arm}
 \label{sec:arm1}
 
 The optimal lowering for \armeight{} is unsound
-for \PwTmca.  The optimal lowering maps relaxed access to \LDR/\STR{} and
+for \PwTmca{1}.  The optimal lowering maps relaxed access to \LDR/\STR{} and
 non-relaxed access to \LDAR/\STLR{} \citep{DBLP:journals/pacmpl/PodkopaevLV19}.
 In this section, we consider a suboptimal strategy, which lowers non-relaxed
 reads to $(\DMBSY\SEMI\LDAR)$.  Significantly, we retain the optimal lowering
@@ -390,7 +390,7 @@ Arm.  The proof uses the characterization of Arm using \EGC{}.
 % \end{align*}
 
 
-\subsection{PwT-MCA Lowering 2}
+\subsection{Lowering \PwTmcaTITLE{2} to Arm}
 \label{sec:arm2}
 
 
