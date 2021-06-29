@@ -67,7 +67,7 @@
       \item \label{seq-po-include}
         ${\rpox}\supseteq {\rpox_1}\cup {\rpox_2}$,
       \item \label{seq-po-seq}
-        if $\cEv\in\umEvs_1$ and $\aEv\in\umEvs_2$ then $\cEv\xpox\aEv$,
+        if $\bEv\in\umEvs_1$ and $\aEv\in\umEvs_2$ then $\bEv\xpox\aEv$,
       \end{enumerate}
     \end{enumerate}
     where
@@ -102,7 +102,7 @@
       \eqref{seq-lambda-phantom1}\;
       \eqref{seq-lambda-phantom2}\;
       \eqref{seq-m}\;
-      \eqref{seq-po-include}\;
+      %\eqref{seq-po-include}\;
       as for $\sSEMI{}{}$,
 
     \item[\eqref{if-lambda}]
@@ -112,6 +112,7 @@
       \eqref{if-le}\;
       as in \reffig{fig:seq},
 
+      \columnbreak
       \setcounter{enumi}{\value{kappa}}
     \item[] 
       \begin{enumerate}[leftmargin=0pt]
@@ -121,6 +122,11 @@
       \item \label{if-kappa-phantom2} 
         if $\cEv\in \phEvs_2$ then $\labelingForm(\cEv) \riff \lnot\aForm\land\labelingForm_2(\aEv)$.
       \end{enumerate}      
+
+      \setcounter{enumi}{\value{Bpo}}
+    \item \label{if-po}
+        ${\rpox}= {\rpox_1}\cup {\rpox_2}$.
+      
     \end{enumerate}
   \end{multicols}
   \medskip
