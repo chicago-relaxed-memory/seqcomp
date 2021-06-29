@@ -1,0 +1,117 @@
+\begin{figure}
+  \bookmark{\PwTcTITLE{} Semantics}
+  \raggedright
+  
+  \noindent
+  If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  $(\exists\phEvs_1\subseteq\AllEvents)$ $(\exists\phEvs_2\subseteq\AllEvents)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{s}\arabic*),ref=\textsc{s}\arabic*]
+      \setcounter{enumi}{\value{BE}}
+    \item \label{seq-E-phantom}
+      $\aEvs=(\aEvs_1\cup\aEvs_2)\uplus\phEvs_1 \uplus\phEvs_2$,
+
+    \item[\eqref{seq-lambda}]
+      \eqref{seq-kappa}\;
+      \eqref{seq-tau}\;
+      \eqref{seq-term}\;
+      \eqref{seq-le}\;
+      as in \reffig{fig:seq},
+
+      \setcounter{enumi}{\value{lambda}}
+    \item[] 
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{seq-lambda-phantom1}
+        if $\bEv\in \phEvs_1$ then $\labeling(\bEv)=\labeling_1(\fmrg{\bEv})$,
+      \item \label{seq-lambda-phantom2}
+        if $\bEv\in \phEvs_2$ then $\labeling(\bEv)=\labeling_2(\fmrg{\bEv})$,
+      \end{enumerate}
+
+      \setcounter{enumi}{\value{kappa}}
+    \item[] 
+      \begin{enumerate}[leftmargin=0pt]
+        \setcounter{enumii}{3}
+      \item \label{seq-kappa-phantom1}
+        if $\bEv\in \phEvs_1$ then $\labelingForm(\bEv)\riff\labelingForm_1(\fmrg{\bEv})$,
+      \item \label{seq-kappa-phantom2}
+        if $\bEv\in \phEvs_2$ then $\labelingForm(\bEv)\riff\aTr[1]{}{\labelingForm_2(\fmrg{\bEv})}$,
+      \end{enumerate}
+
+      \columnbreak
+      \setcounter{enumi}{\value{m}}
+    \item[] \labeltext[\textsc{s}8]{}{seq-m}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{seq-m-real-cup}
+        if $\aEv\in(\aEvs_1\cup\aEvs_2)$ then $\fmrg{\aEv}=\aEv$,
+      \item \label{seq-m-real-cap}
+        if $\fmrg{\aEv}=\aEv$ then $\aEv\not\in(\aEvs_1\cap\aEvs_2)$,
+      \item \label{seq-m-phantom-forall}
+        if $\bEv\in (\phEvs_1\cup\phEvs_2)$ then
+        $\fmrg{\bEv}\in (\aEvs_1\cap\aEvs_2)$,
+      \item \label{seq-m-phantom-exists}
+        if $\aEv\in (\aEvs_1\cap\aEvs_2)$ then
+        $(\existsone\bEv_1\in\phEvs_1)$ $(\existsone\bEv_2\in\phEvs_1)$
+        $\fmrg{\bEv_1}=\fmrg{\bEv_2}=\aEv$,
+      \end{enumerate}
+
+      \setcounter{enumi}{\value{Bpo}}
+    \item \label{seq-po}
+      if $\bEv\in\umEvs_1$ and $\aEv\in\umEvs_2$ then $\bEv\xpox\aEv$,
+      
+    \end{enumerate}
+    where
+    \makebox[0cm][l]{\begin{math}
+      \umEvs_1= \phEvs_1 \cup (\aEvs_1\setminus\aEvs_2)
+    \end{math}
+    and
+    \begin{math}
+      \umEvs_2= \phEvs_2 \cup (\aEvs_2\setminus\aEvs_1).
+    \end{math}}
+
+  \end{multicols}
+  \medskip
+
+  \noindent
+  If $\aPS \in \sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ then
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  $(\exists\phEvs_1\subseteq\AllEvents)$ $(\exists\phEvs_2\subseteq\AllEvents)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
+    % \item[(\textsc{i}1)]
+    %   (\textsc{i}2a)\;
+    %   (\textsc{i}2b)\;
+    %   (\textsc{i}8)\;
+    %   (\textsc{i}9)\;
+    %   as for $\sSEMI{}{}$,
+
+    \item[\eqref{seq-E-phantom}]
+      \eqref{seq-lambda-phantom1}\;
+      \eqref{seq-lambda-phantom2}\;
+      \eqref{seq-m}\;
+      \eqref{seq-po}\;
+      as for $\sSEMI{}{}$,
+
+    \item[\eqref{if-lambda}]
+      \eqref{if-kappa}\;
+      \eqref{if-tau}\;
+      \eqref{if-term}\; 
+      \eqref{if-le}\;
+      as in \reffig{fig:seq},
+
+      \setcounter{enumi}{\value{kappa}}
+    \item[] 
+      \begin{enumerate}[leftmargin=0pt]
+        \setcounter{enumii}{3}
+      \item \label{if-kappa-phantom1}
+        if $\bEv\in \phEvs_1$ then $\labelingForm(\bEv) \riff \aForm\land\labelingForm_1(\aEv)$,
+      \item \label{if-kappa-phantom2} 
+        if $\bEv\in \phEvs_2$ then $\labelingForm(\bEv) \riff \lnot\aForm\land\labelingForm_2(\aEv)$.
+      \end{enumerate}      
+    \end{enumerate}
+  \end{multicols}
+  \medskip
+
+  \caption{\PwTcTITLE{} Semantics}
+  \label{fig:c11}
+\end{figure}
