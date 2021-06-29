@@ -396,7 +396,7 @@ Arm.  The proof uses the characterization of Arm using \EGC{}.
 
 We can achieve optimal lowering for Arm by weakening the semantics of
 sequential composition slightly.  In particular, we must lose
-\reflem{lem:rf:implies:le}, which states that $\bEv\xrfx\aEv$ implies
+\ref{pom-rf-le}, which states that $\bEv\xrfx\aEv$ implies
 $\bEv\le\aEv$.  Revisiting the example in the last subsection, we essentially
 mimic the \EC{} characterization:
 \begin{gather*}
@@ -456,8 +456,8 @@ $\DWP{x}{2}\xcbinv\DRP[\mACQ]{x}{2}$.
 % \emph{Local Write Successor}.
 
 
-We emphasize that \reflem{lem:rf:implies:le} fails for $\frf{\semrr{}}$,
-since $\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come
+We emphasize that \ref{pom-rf-le} does not hold for $\frf{\semrr{}}$:
+ $\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come
 from different sides of a sequential composition.  This means that $\rrfx$
 must be verified during pomset construction, rather than post-hoc.  The
 following lemma gives a post-hoc verification technique for $\rrfx$, using
