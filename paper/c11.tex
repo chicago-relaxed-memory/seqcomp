@@ -66,22 +66,22 @@ Restrict the syntax to top-level parallel composition.
     $\fmrg{} : (\aEvs\fun\aEvs)$
     is a function capturing \emph{merging}, such that 
     \\
-    % let $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$ be \emph{real} events,
-    % let $\phEvs=(\aEvs\setminus\reEvs)$ be \emph{phantom} events,\\
-    % let $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$ be \emph{simple} events,
-    % let $\dmEvs=(\aEvs\setminus\umEvs)$ be \emph{compound} events,
-    % \\
-    let $\phEvs=\{\aEv\mid\fmrg{\aEv}{\neq}\aEv\}$ be \emph{phantom} events,
-    let $\reEvs=(\aEvs\setminus\phEvs)$ be \emph{real} events,\\
-    let $\dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}$ be \emph{compound} events,
-    let $\umEvs=(\aEvs\setminus\dmEvs)$ be \emph{simple} events,
+    let $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$ be \emph{real} events,
+    let $\phEvs=(\aEvs\setminus\reEvs)$ be \emph{phantom} events,\\
+    let $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$ be \emph{simple} events,
+    let $\dmEvs=(\aEvs\setminus\umEvs)$ be \emph{compound} events,
+    % % \\
+    % let $\phEvs=\{\aEv\mid\fmrg{\aEv}{\neq}\aEv\}$ be \emph{phantom} events,
+    % let $\reEvs=(\aEvs\setminus\phEvs)$ be \emph{real} events,\\
+    % let $\dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}$ be \emph{compound} events,
+    % let $\umEvs=(\aEvs\setminus\dmEvs)$ be \emph{simple} events,
     \begin{multicols}{2}
     \begin{enumerate}%[leftmargin=0pt]
     \item \label{pom-m-chain}
       $\fmrg{\aEv}\in\reEvs$,
       %where $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$,
-    \item \label{pom-m-phantom-compount}
-      if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$,
+    % \item \label{pom-m-phantom-compount}
+    %   if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$,
     \item \label{pom-m-lambda} 
       $\labeling(\aEv)=\labeling(\fmrg{\aEv})$,
     \item \label{pom-m-kappa} 
@@ -139,15 +139,18 @@ Restrict the syntax to top-level parallel composition.
 \end{definition}
 Note that
 \begin{math}
-  \reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}
+  \phEvs=\{\aEv\mid\fmrg{\aEv}{\neq}\aEv\}
+  %\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}
 \end{math}
 and
 \begin{math}
-  \umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}.
+  \dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}.
+  %\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}.
 \end{math}
 
 From \ref{pom-m-chain}, it follows that all phantom events are simple
-($\phEvs\subseteq\umEvs$).
+($\phEvs\subseteq\umEvs$).  Also all phantom events map to compound events
+(if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 
 \ref{pom-m-tau} states that predicate transformers are insensitive to phantom
 events---the reverse implication holds from \refdef{def:family}.
