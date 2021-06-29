@@ -29,12 +29,18 @@ We drop the subscript when referring to both models.
     \item \label{pom-rf-le} if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
     \end{enumerate}
   \end{enumerate}
-  A \PwTmca{} is \emph{complete} if it is a complete \PwT{} (\refdef{def:pomset}) and
-  \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
-    \setcounter{enumi}{\value{Brf}}
-  \item \label{top-rf}
-    if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
-  \end{enumerate}
+
+  A \PwTmca{} is \emph{complete} if %it is a complete \PwT{} (\refdef{def:pomset}) and
+  \begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+    \item[\eqref{top-kappa}]
+      \eqref{top-term}\;
+      as in \refdef{def:pomset},
+      \setcounter{enumi}{\value{Brf}}
+    \item \label{top-rf}
+      if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+    \end{enumerate}
+  \end{multicols}
 \end{definition}
 
 % To include \RMW{}s, also add

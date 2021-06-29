@@ -23,9 +23,9 @@
     \item[] 
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-lambda-phantom1}
-        if $\bEv\in \phEvs_1$ then $\labeling(\bEv)=\labeling_1(\fmrg{\bEv})$,
+        if $\cEv\in \phEvs_1$ then $\labeling(\cEv)=\labeling_1(\fmrg{\cEv})$,
       \item \label{seq-lambda-phantom2}
-        if $\bEv\in \phEvs_2$ then $\labeling(\bEv)=\labeling_2(\fmrg{\bEv})$,
+        if $\cEv\in \phEvs_2$ then $\labeling(\cEv)=\labeling_2(\fmrg{\cEv})$,
       \end{enumerate}
 
       \setcounter{enumi}{\value{kappa}}
@@ -33,32 +33,41 @@
       \begin{enumerate}[leftmargin=0pt]
         \setcounter{enumii}{3}
       \item \label{seq-kappa-phantom1}
-        if $\bEv\in \phEvs_1$ then $\labelingForm(\bEv)\riff\labelingForm_1(\fmrg{\bEv})$,
+        if $\cEv\in \phEvs_1$ then $\labelingForm(\cEv)\riff\labelingForm_1(\fmrg{\cEv})$,
       \item \label{seq-kappa-phantom2}
-        if $\bEv\in \phEvs_2$ then $\labelingForm(\bEv)\riff\aTr[1]{}{\labelingForm_2(\fmrg{\bEv})}$,
+        if $\cEv\in \phEvs_2$ then $\labelingForm(\cEv)\riff\aTr[1]{}{\labelingForm_2(\fmrg{\cEv})}$,
       \end{enumerate}
 
-      \columnbreak
+      %\columnbreak
       \setcounter{enumi}{\value{m}}
     \item[] \labeltext[\textsc{s}8]{}{seq-m}
       \begin{enumerate}[leftmargin=0pt]
-      \item \label{seq-m-real-cup}
-        if $\aEv\in(\aEvs_1\cup\aEvs_2)$ then $\fmrg{\aEv}=\aEv$,
-      \item \label{seq-m-real-cap}
-        if $\fmrg{\aEv}=\aEv$ then $\aEv\not\in(\aEvs_1\cap\aEvs_2)$,
+      \item \label{seq-m-include}
+        $\fmrg{}\supseteq\fmrg[1]{}\cup\fmrg[2]{}$,
+      \item \label{seq-m-exclude}
+        if $\aEv\in (\aEvs_1\cap\aEvs_2)$
+        then $\fmrg[1]{\aEv}=\fmrg[2]{\aEv}=\aEv$,
+      % \item \label{seq-m-real-cup}
+      %   if $\aEv\in(\aEvs_1\cup\aEvs_2)$ then $\fmrg{\aEv}=\aEv$,
+      % \item \label{seq-m-real-cap}
+      %   if $\fmrg{\aEv}=\aEv$ then $\aEv\not\in(\aEvs_1\cap\aEvs_2)$,
       \item \label{seq-m-phantom-forall}
-        if $\bEv\in (\phEvs_1\cup\phEvs_2)$ then
-        $\fmrg{\bEv}\in (\aEvs_1\cap\aEvs_2)$,
+        if $\cEv\in (\phEvs_1\cup\phEvs_2)$ then
+        $\fmrg{\cEv}\in (\aEvs_1\cap\aEvs_2)$,
       \item \label{seq-m-phantom-exists}
         if $\aEv\in (\aEvs_1\cap\aEvs_2)$ then
-        $(\existsone\bEv_1\in\phEvs_1)$ $(\existsone\bEv_2\in\phEvs_1)$
-        $\fmrg{\bEv_1}=\fmrg{\bEv_2}=\aEv$,
+        $(\existsone\cEv_1\in\phEvs_1)$ $(\existsone\cEv_2\in\phEvs_1)$
+        $\fmrg{\cEv_1}=\fmrg{\cEv_2}=\aEv$,
       \end{enumerate}
 
-      \setcounter{enumi}{\value{Bpo}}
-    \item \label{seq-po}
-      if $\bEv\in\umEvs_1$ and $\aEv\in\umEvs_2$ then $\bEv\xpox\aEv$,
-      
+      \setcounter{enumi}{\value{po}}
+    \item[] \labeltext[\textsc{s}9]{}{seq-po}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{seq-po-include}
+        ${\rpox}\supseteq {\rpox_1}\cup {\rpox_2}$,
+      \item \label{seq-po-seq}
+        if $\cEv\in\umEvs_1$ and $\aEv\in\umEvs_2$ then $\cEv\xpox\aEv$,
+      \end{enumerate}
     \end{enumerate}
     where
     \makebox[0cm][l]{\begin{math}
@@ -89,7 +98,7 @@
       \eqref{seq-lambda-phantom1}\;
       \eqref{seq-lambda-phantom2}\;
       \eqref{seq-m}\;
-      \eqref{seq-po}\;
+      \eqref{seq-po-include}\;
       as for $\sSEMI{}{}$,
 
     \item[\eqref{if-lambda}]
@@ -104,9 +113,9 @@
       \begin{enumerate}[leftmargin=0pt]
         \setcounter{enumii}{3}
       \item \label{if-kappa-phantom1}
-        if $\bEv\in \phEvs_1$ then $\labelingForm(\bEv) \riff \aForm\land\labelingForm_1(\aEv)$,
+        if $\cEv\in \phEvs_1$ then $\labelingForm(\cEv) \riff \aForm\land\labelingForm_1(\aEv)$,
       \item \label{if-kappa-phantom2} 
-        if $\bEv\in \phEvs_2$ then $\labelingForm(\bEv) \riff \lnot\aForm\land\labelingForm_2(\aEv)$.
+        if $\cEv\in \phEvs_2$ then $\labelingForm(\cEv) \riff \lnot\aForm\land\labelingForm_2(\aEv)$.
       \end{enumerate}      
     \end{enumerate}
   \end{multicols}

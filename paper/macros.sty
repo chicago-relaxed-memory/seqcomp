@@ -1225,7 +1225,7 @@
 \tikzstyle{mrg} = [-stealth,thick,dotted,color=\mrgcolor,]
 %\NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{m}$}  (#4);}
 \NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to (#4);}
-\newcommand{\fmrg}[1]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{m}}\ifnotempty{#1}{(#1)}}}%
+\newcommand{\fmrg}[2][]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{m}}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}}%
 \newcommand{\rmrg}{\ensuremath{\mathrel{\textcolor{\mrgcolor}{\mathsf{m}}}}}%
 \newcommand{\xmrg}{\xarrowtikz{mrg}{m}}%
 

@@ -66,8 +66,22 @@ Restrict the syntax to top-level parallel composition.
     is a function capturing \emph{merging}, such that 
     \begin{enumerate}%[leftmargin=0pt]
     \item \label{pom-m-real} 
-      ${\le}\subseteq(\reEvs\times\reEvs)$, where $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$ is the set of
+      ${\le}\subseteq(\reEvs\times\reEvs)$,
+      where $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$ is the set of
       \emph{real} (rather than \emph{phantom}) events,
+    \item \label{pom-m-lambda} 
+      $\labeling(\cEv)=\labeling(\fmrg{\cEv})$,
+    \item \label{pom-m-kappa} 
+      if $\aEv\in\reEvs$ then 
+      \begin{math}
+        \labelingForm(\aEv)\rimplies
+        \bigvee_{\{\cEv\mid\fmrg{\cEv}=\aEv\}}\labelingForm(\cEv),
+      \end{math}
+    \item \label{pom-m-tau} 
+      if $\cEv\in(\aEvs\setminus\reEvs)$ then
+      \begin{math}
+        \aTr{\bEvs\cup\{\cEv\}}{\bForm}\rimplies \aTr{\bEvs}{\bForm},
+      \end{math}
     \end{enumerate}
     \makecounter{Bpo}
   \item \label{pom-po} \makecounter{po}
@@ -76,14 +90,50 @@ Restrict the syntax to top-level parallel composition.
     $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$
     is the set of \emph{simple} (rather than \emph{compound}) events.
   \end{enumerate}
+  
+  We write $\phEvs$ for the set of \emph{phantom} events $(\aEvs\setminus\reEvs)$
+  and $\dmEvs$ for the set of \emph{compound} events $(\aEvs\setminus\umEvs)$.
+
+  A \PwTc{} is \emph{complete} if 
+  %\begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+
+      \setcounter{enumi}{\value{kappa}}
+    \item[]
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{top-kappa-real}
+        if $\aEv\in\reEvs$ then $\labelingForm(\aEv)$ is a tautology,
+      \item \label{top-kappa-phantom}
+        if $\aEv\in\dmEvs$ %(\aEvs\setminus\umEvs)$
+        then
+        $\labelingForm(\cEv)$
+        \makebox[0cm][l]{is a tautology,
+          for some $\cEv\in\phEvs$ %\aEvs\setminus\reEvs)$
+          such that $\fmrg{\cEv}=\aEv$,
+        }
+      \end{enumerate}
+
+      %\columnbreak
+      \setcounter{enumi}{\value{Bterm}}
+    \item \label{top-term-c11}
+      $\aTerm$ is a tautology.
+    \end{enumerate}
+  %\end{multicols}
 \end{definition}
-We write $\phEvs$ for the set of \emph{phantom} events $(\aEvs\setminus\reEvs)$.
+
+\ref{pom-m-tau} states that predicate transformers are insensitive to phantom
+events---the reverse implication holds from \refdef{def:family}.
 
 \input{fig-c11.tex}
 
-
 The semantic rules are given in \reffig{fig:c11}.  As usual, we write
 $\existsone$ to mean ``there exists exactly one''.
+
+\ref{seq-m-exclude} states that phantom events cannot merge.
+\ref{seq-m-phantom-forall} states that new phantom events must correspond to merges.
+\ref{seq-m-phantom-exists} states that every merged event must have
+corresponding phantom events.
+
 %Let $\phEvs=\aEvs\setminus\reEvs$ and $\dmEvs=\aEvs\setminus\umEvs$.
 
 % Lots of fiddly details.  Intuitively, (1) compute the preconditions and order
