@@ -1,3 +1,4 @@
+\newpage
 \section{\PwTcTITLE: Pomsets with Predicate Transformers for C11}
 
 Restrict the syntax to top-level parallel composition.
@@ -64,35 +65,51 @@ Restrict the syntax to top-level parallel composition.
   \item \label{pom-m} \makecounter{m}
     $\fmrg{} : (\aEvs\fun\aEvs)$
     is a function capturing \emph{merging}, such that 
+    \\
+    % let $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$ be \emph{real} events,
+    % let $\phEvs=(\aEvs\setminus\reEvs)$ be \emph{phantom} events,\\
+    % let $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$ be \emph{simple} events,
+    % let $\dmEvs=(\aEvs\setminus\umEvs)$ be \emph{compound} events,
+    % \\
+    let $\phEvs=\{\aEv\mid\fmrg{\aEv}{\neq}\aEv\}$ be \emph{phantom} events,
+    let $\reEvs=(\aEvs\setminus\phEvs)$ be \emph{real} events,\\
+    let $\dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}$ be \emph{compound} events,
+    let $\umEvs=(\aEvs\setminus\dmEvs)$ be \emph{simple} events,
+    \begin{multicols}{2}
     \begin{enumerate}%[leftmargin=0pt]
-    \item \label{pom-m-real} 
-      ${\le}\subseteq(\reEvs\times\reEvs)$,
-      where $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$ is the set of
-      \emph{real} (rather than \emph{phantom}) events,
+    \item \label{pom-m-chain}
+      $\fmrg{\aEv}\in\reEvs$,
+      %where $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$,
+    \item \label{pom-m-phantom-compount}
+      if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$,
     \item \label{pom-m-lambda} 
-      $\labeling(\cEv)=\labeling(\fmrg{\cEv})$,
+      $\labeling(\aEv)=\labeling(\fmrg{\aEv})$,
     \item \label{pom-m-kappa} 
-      if $\aEv\in\reEvs$ then 
-      \begin{math}
-        \labelingForm(\aEv)\rimplies
-        \bigvee_{\{\cEv\mid\fmrg{\cEv}=\aEv\}}\labelingForm(\cEv),
-      \end{math}
+      if $\aEv\in\dmEvs$ then 
+      \makebox[0pt][l]{\begin{math}
+          \smash{\labelingForm(\aEv)\rimplies
+        \bigvee{}\!\!\!_{\{\cEv\in\phEvs\mid\fmrg{\cEv}=\aEv\}}\labelingForm(\cEv),}
+      \end{math}}
     \item \label{pom-m-tau} 
-      if $\cEv\in(\aEvs\setminus\reEvs)$ then
+      if $\aEv\in\phEvs$ then
       \begin{math}
-        \aTr{\bEvs\cup\{\cEv\}}{\bForm}\rimplies \aTr{\bEvs}{\bForm},
+        \aTr{\bEvs\cup\{\aEv\}}{\bForm}\rimplies \aTr{\bEvs}{\bForm},
       \end{math}
+    \item \label{pom-m-le} 
+      ${\le}\subseteq(\reEvs\times\reEvs)$,
     \end{enumerate}
+    \end{multicols}
+
     \makecounter{Bpo}
   \item \label{pom-po} \makecounter{po}
     ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a partial order capturing
-    \emph{program order}, where 
-    $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$
-    is the set of \emph{simple} (rather than \emph{compound}) events.
+    \emph{program order}.
+    % , where 
+    % $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$.
+    % is the set of \emph{simple} %(rather than \emph{compound})
+    % events.
   \end{enumerate}
-  
-  We write $\phEvs$ for the set of \emph{phantom} events $(\aEvs\setminus\reEvs)$
-  and $\dmEvs$ for the set of \emph{compound} events $(\aEvs\setminus\umEvs)$.
+
 
   A \PwTc{} is \emph{complete} if 
   %\begin{multicols}{2}
@@ -120,6 +137,17 @@ Restrict the syntax to top-level parallel composition.
     \end{enumerate}
   %\end{multicols}
 \end{definition}
+Note that
+\begin{math}
+  \reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}
+\end{math}
+and
+\begin{math}
+  \umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}.
+\end{math}
+
+From \ref{pom-m-chain}, it follows that all phantom events are simple
+($\phEvs\subseteq\umEvs$).
 
 \ref{pom-m-tau} states that predicate transformers are insensitive to phantom
 events---the reverse implication holds from \refdef{def:family}.
@@ -134,6 +162,12 @@ $\existsone$ to mean ``there exists exactly one''.
 newly compound event.
 \ref{seq-m-phantom-exists} states that every newly compound event must have two
 corresponding phantom events.
+
+
+\begin{definition}
+  A \cXI{} \emph{pre-execution} is a projection of a \PwTc{}, taking all of
+  the simple events whose preconditions are tautologies.
+\end{definition}
 
 %Let $\phEvs=\aEvs\setminus\reEvs$ and $\dmEvs=\aEvs\setminus\umEvs$.
 

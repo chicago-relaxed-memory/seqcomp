@@ -795,14 +795,14 @@
 \newcommand{\DB}[1]{\mathsf{B}\ifnotempty{#1}{\,#1}}
 \newcommand{\DC}[1]{\mathsf{C}\ifnotempty{#1}{\,#1}}
 
-% \newcommand{\umEvs}{\overline{\dmEvs}}
-% \newcommand{\dmEvs}{G}
-% \newcommand{\phEvs}{F}
-% \newcommand{\reEvs}{\overline{\phEvs}}
-\newcommand{\dmEvs}{\overline{\umEvs}}
-\newcommand{\umEvs}{S}
-\newcommand{\reEvs}{R}
-\newcommand{\phEvs}{\overline{\reEvs}}
+\newcommand{\umEvs}{\overline{\dmEvs}}
+\newcommand{\dmEvs}{G}
+\newcommand{\phEvs}{F}
+\newcommand{\reEvs}{\overline{\phEvs}}
+% \newcommand{\dmEvs}{\overline{\umEvs}}
+% \newcommand{\umEvs}{S}
+% \newcommand{\reEvs}{R}
+% \newcommand{\phEvs}{\overline{\reEvs}}
 %\newcommand{\umEv}{b}
 
 \newcommand{\aEvs}{E}
@@ -1225,9 +1225,9 @@
 \tikzstyle{mrg} = [-stealth,thick,dotted,color=\mrgcolor,]
 %\NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{m}$}  (#4);}
 \NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to (#4);}
-\newcommand{\fmrg}[2][]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{m}}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}}%
-\newcommand{\rmrg}{\ensuremath{\mathrel{\textcolor{\mrgcolor}{\mathsf{m}}}}}%
-\newcommand{\xmrg}{\xarrowtikz{mrg}{m}}%
+\newcommand{\fmrg}[2][]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{\pi}}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}}%
+\newcommand{\rmrg}{\ensuremath{\mathrel{\textcolor{\mrgcolor}{\mathsf{\pi}}}}}%
+\newcommand{\xmrg}{\xarrowtikz{mrg}{\pi}}%
 
 \tikzstyle{pox} = [-stealth,thick,dotted,color=\pocolor,]
 \NewDocumentCommand \pox {O{} m O{} m} {\draw[pox,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{po}$}  (#4);}
