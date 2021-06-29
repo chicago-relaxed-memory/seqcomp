@@ -70,13 +70,16 @@
       \end{enumerate}
     \end{enumerate}
     where
-    \makebox[0cm][l]{\begin{math}
-      \umEvs_1= \phEvs_1 \cup (\aEvs_1\setminus\aEvs_2)
-    \end{math}
-    and
     \begin{math}
-      \umEvs_2= \phEvs_2 \cup (\aEvs_2\setminus\aEvs_1).
-    \end{math}}
+      \umEvs_i= \phEvs_i \cup \{\aEv\in\aEvs_i\mid\forall\bEv.\;\fmrg[i]{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}
+    \end{math}
+    % \makebox[0cm][l]{\begin{math}
+    %   \umEvs_1= \phEvs_1 \cup (\aEvs_1\setminus\aEvs_2)
+    % \end{math}
+    % and
+    % \begin{math}
+    %   \umEvs_2= \phEvs_2 \cup (\aEvs_2\setminus\aEvs_1).
+    % \end{math}}
 
   \end{multicols}
   \medskip
