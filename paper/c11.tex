@@ -1,5 +1,6 @@
 \newpage
 \section{\PwTcTITLE: Pomsets with Predicate Transformers for C11}
+\label{sec:c11}
 
 Restrict the syntax to top-level parallel composition.
 
@@ -77,8 +78,12 @@ Restrict the syntax to top-level parallel composition.
     % let $\umEvs=(\aEvs\setminus\dmEvs)$ be \emph{simple} events,
     \begin{multicols}{2}
     \begin{enumerate}%[leftmargin=0pt]
-    \item \label{pom-m-chain}
-      $\fmrg{\aEv}\in\reEvs$,
+    \item \label{pom-m-idempotent}
+      $\fmrg{}$ is idempotent:
+      \begin{math}
+        \fmrg{\fmrg{\aEv}} = \fmrg{\aEv},
+      \end{math}
+      % $\fmrg{\aEv}\in\reEvs$,
       %where $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$,
     % \item \label{pom-m-phantom-compount}
     %   if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$,
@@ -158,10 +163,11 @@ and
 \end{math}
 
 
-From \ref{pom-m-chain}, it follows that all phantom events are simple
-($\phEvs\subseteq\umEvs$) and all compound events are real
-($\dmEvs\subseteq\reEvs$).  In addition, all phantom events map to compound events
-(if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
+Equivalent to \ref{pom-m-idempotent}, we could require
+$\fmrg{\aEv}\in\reEvs$.  From \ref{pom-m-idempotent}, it follows that all
+phantom events are simple ($\phEvs\subseteq\umEvs$) and all compound events
+are real ($\dmEvs\subseteq\reEvs$).  In addition, all phantom events map to
+compound events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 
 % \ref{pom-m-tau} states that predicate transformers are insensitive to phantom
 % events---the reverse implication holds from \refdef{def:family}.
@@ -183,7 +189,8 @@ From \ref{pom-m-chain}, it follows that all phantom events are simple
 
 
 The semantic rules are given in \reffig{fig:c11}.  As usual, we write
-$\existsone$ to mean ``there exists exactly one''.
+$\existsone$ to mean ``there exists exactly one''.  For base cases, take
+$\fmrg{}$ to be the identity and $\rpox$ to be empty.
 
 \ref{seq-m-phantom-forall} states that new phantom events must merge into a
 newly compound event.

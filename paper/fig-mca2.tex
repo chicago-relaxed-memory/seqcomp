@@ -1,14 +1,14 @@
 \begin{figure}
   \bookmark{\PwTmcaTITLE{2} Semantics}
   \raggedright
-  \noindent
-  Suppose $\aRel_1$ is a relation over $\aEvs_1$ and $\aRel$ is a relation over $\aEvs\supseteq\aEvs_1$.  %\subseteq\aEvs_1\times\aEvs_1$. % and $\aRel_2\subseteq\aEvs_2\times\aEvs_2$.
-  \\We say $\aRel \rextendsdef{\aRel_1}{}$ %{\aRel_2}$
-  if
-  % $\aRel\supseteq (\aRel_1\cup \aRel_2)$ and
-  $\aRel\cap(\aEvs_1\times \aEvs_1) = \aRel_1$.
-  %and $\aRel\cap(\aEvs_2\times \aEvs_2) = \aRel_2$.
-  \medskip
+  % \noindent
+  % Suppose $\rrfx_i$ is a relation in $\aEvs_i\times\aEvs_i$. % and $\rrfx$ is a relation over $\aEvs\supseteq\aEvs_i$.  %\subseteq\aEvs_i\times\aEvs_i$. % and $\rrfx_2\subseteq\aEvs_2\times\aEvs_2$.
+  % We say ${\rrfx} \rextendsdef{\rrfx_i}{}$ %{\rrfx_2}$
+  % if
+  % % $\rrfx\supseteq (\rrfx_i\cup \rrfx_2)$ and
+  % ${\rrfx}\cap(\aEvs_i\times \aEvs_i) = {\rrfx_i}$.
+  % %and $\rrfx\cap(\aEvs_2\times \aEvs_2) = \rrfx_2$.
+  % \medskip
   
   % \noindent
   % If $\aPS\in\sSKIP$ then $\aEvs = \emptyset$ and
@@ -63,7 +63,8 @@
       \begin{enumerate}[leftmargin=0pt]
       \item
         \label{par-rf-extends}
-        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
+        ${\rrfx_i}={\rrfx}\cap(\aEvs_i\times \aEvs_i)$, for $i\in\{1,2\}$.
+        %${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
       \end{enumerate}
     \end{enumerate}
   \end{multicols}
@@ -136,31 +137,39 @@
       \begin{enumerate}[leftmargin=0pt]
       % \item \label{seq-le-extends}
       %   ${\le}\rextends{\le_1}{\le_2}$, 
+      % \item \label{seq-le-delays-rf}
+      %   if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ and
+      %   %$\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
+      %   $\bEv\le\aEv$,
+      %   % either $\bEv\le\aEv$ or $\labelingForm(\bEv)\land\labelingForm(\aEv)$
+      %   % is unsatisfiable.
+      % \item \label{seq-le-blocks}
+      %   if $\labeling_1(\bEv) \rblocks \labeling_2(\aEv)$ then %either
+      %   %$\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
+      %   \makebox[0cm][l]{$\bEv\le\aEv$
+      %   or
+      %   $\aEv\le\bEv$,}
+      %   % either $\bEv\le\aEv$ or $\labelingForm(\bEv)\land\labelingForm(\aEv)$
+      %   % is unsatisfiable.
+      % \item \label{seq-rf-le-rf}
+      %   %if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\le\bEv$ then $\bEv\xrfx\aEv$.
+      %   if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ and $\bEv\xrfx\aEv$
+      %   then $\cEv\le\bEv$,
       \item \label{seq-le-delays-rf}
-        if $\labeling_1(\bEv) \rdelaysp \labeling_2(\aEv)$ and
-        %$\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
-        $\bEv\le\aEv$,
-        % either $\bEv\le\aEv$ or $\labelingForm(\bEv)\land\labelingForm(\aEv)$
-        % is unsatisfiable.
-      \item \label{seq-le-blocks}
-        if $\labeling_1(\bEv) \rblocks \labeling_2(\aEv)$ then %either
-        %$\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is satisfiable then
-        \makebox[0cm][l]{$\bEv\le\aEv$
-        or
-        $\aEv\le\bEv$,}
-        % either $\bEv\le\aEv$ or $\labelingForm(\bEv)\land\labelingForm(\aEv)$
-        % is unsatisfiable.
+        if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then either
+        $\bEv\xrfx\aEv$ or $\bEv\le\aEv$,
       \item \label{seq-rf-le-rf}
         %if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\le\bEv$ then $\bEv\xrfx\aEv$.
         if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ and $\bEv\xrfx\aEv$
-        then $\cEv\le\bEv$,
+        \\then $\cEv\le\bEv$,
       \end{enumerate}
       \stepcounter{enumi}
     \item[]
       %\labeltext[\textsc{s}7]{}{seq-rf}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-rf-extends}
-        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
+        %${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
+        ${\rrfx_i}={\rrfx}\cap(\aEvs_i\times \aEvs_i)$, for $i\in\{1,2\}$.
       \end{enumerate}
       %   % if $\cEv\in\aEvs_1$ and $(\bEv,\aEv)\in\PBR{{\rrfx}\cap(\aEvs_1\times \aEvs_2)}$ then 
       %   % either $\labeling(\cEv) \reorderca \labeling(\bEv)$
@@ -229,7 +238,8 @@
       %\labeltext[\textsc{i}7]{}{if-rf}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{if-rf-extends}
-        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
+        ${\rrfx_i}={\rrfx}\cap(\aEvs_i\times \aEvs_i)$, for $i\in\{1,2\}$.
+        %${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
       % \item \label{if-rf-le}
       %   ${\rrfx}\rsubset{\rrfx_1}{\rrfx_2}$.
       \end{enumerate}

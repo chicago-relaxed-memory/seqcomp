@@ -394,7 +394,7 @@
 \newcommand{\taglabelp}[1]{\tag{\textsc{\lowercase{#1}}$'$}\label{#1p}}
 \newcommand{\taglabelpp}[1]{\tag{\textsc{\lowercase{#1}}$''$}\label{#1pp}}
 \newcommand{\ignore}[1]{}
-\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\todo}[1]{\textcolor{red}{[Todo: #1]}}
 \newcommand{\slt}{\vartriangleleft}
 \newcommand{\sle}{\trianglelefteq}
 \newcommand{\tvalpom}{modal pomset}
@@ -1102,7 +1102,7 @@
 \newcommand{\xform}[3]{\node[xform](#1)[#3]{$\mathstrut#2$};}%\mid\aForm$};}
 \tikzstyle{zlbl} = [gray!70!black]
 %\newcommand{\@zz}[1]{\makebox[0ex]{\smash{\raisebox{-.5ex}{{${#1}{:}\;$}}}}}
-\newcommand{\@zz}[1]{\makebox[0ex]{\smash{{${}^{#1}$}}}}
+\newcommand{\@zz}[1]{\makebox[0ex]{\smash{\raisebox{.5ex}{{${}^{#1}$}}}}}
 \newcommand{\@zzl}[1]{\makebox[0ex][r]{\smash{\raisebox{-.5ex}{{${#1}{:}$}}}}}
 \newcommand{\eventl}[4]{\node[event](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
 \newcommand{\eventr}[4]{\node[event](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}

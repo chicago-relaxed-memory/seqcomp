@@ -1,9 +1,10 @@
 \section{\PwTmcaTITLE{}: Pomsets with Predicate Transformers for MCA}
-
+\label{sec:mca}
 We define two models for \mca{} architectures: \PwTmca{1} and \PwTmca{2}.
 We drop the subscript when referring to both models.
 
 \subsection{First Semantics}
+\label{sec:mca1}
 
 \begin{definition}
   \label{def:pwt:mca1}
@@ -95,20 +96,22 @@ define this as follows.
 \end{scope}
 
 \subsection{Second Semantics}
+\label{sec:mca2}
 
 In the second semantics, we weaken the relationship between $\rrfx$
 and $\le$ in \ref{pom-rf-le}.  Rather than ensuring that there is no
 \emph{global} blocker for a sequentially fulfilled read \eqref{pom-rf-le}, we
 require only that there is no \emph{thread-local} blocker
 \eqref{seq-rf-le-rf}.
-This change both allows and requires us to weaken the definition of
-\emph{delays} to drop write-to-read order from $\eqreorderco$.
+% This change both allows and requires us to weaken the definition of
+% \emph{delays} to drop write-to-read order from $\eqreorderco$.
 
 With the weakening of \ref{seq-rf-le-rf}, we must be careful not to allow
-spurious pairs to be added to the $\rrfx$ relation.  The use of
-$\rextendsdef{}{}$ in \ref{if-rf-extends} does this, ensuring that new
-$\rrfx$ is not introduced between events in $\aEvs_1\cap\aEvs_2$ when coalescing.
-This is necessary to ensure that
+spurious pairs to be added to the $\rrfx$ relation.  Thus we add
+\ref{par-rf-extends},
+\ref{seq-rf-extends}, and
+\ref{if-rf-extends}.
+For example, \ref{if-rf-extends} ensure that
 \begin{math}
   \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
 \end{math}
@@ -149,14 +152,14 @@ does not include
     \end{multicols}
   \end{enumerate}
 \end{definition}
-Derive $\rdelayspdef$ from $\rdelaysdef$ by replacing $\eqreorderco$ with
-\begin{math}
-  {\reorderlws}
-  =
-  \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}.
-\end{math}
-The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
-\emph{Local Write Successor}.
+% Derive $\rdelayspdef$ from $\rdelaysdef$ by replacing $\eqreorderco$ with
+% \begin{math}
+%   {\reorderlws}
+%   =
+%   \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}.
+% \end{math}
+% The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
+% \emph{Local Write Successor}.
 
 The semantic rules are given in \reffig{fig:mca2}.
 

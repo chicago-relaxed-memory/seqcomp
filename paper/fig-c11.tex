@@ -40,13 +40,21 @@
     %     if $\cEv\in \phEvs_2$ then $\labelingForm(\cEv)\riff\aTr[1]{}{\labelingForm_2(\fmrg{\cEv})}$,
     %   \end{enumerate}
 
+      \setcounter{enumi}{\value{le}}
+    \item[] 
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{seq-le-phantom}
+        if $\cEv\in \phEvs_i$ and $\bEv\le_i\cEv$ then $\bEv\le\cEv$,
+      \end{enumerate}
+
       \setcounter{enumi}{\value{m}}
     \item[] \labeltext[\textsc{s}8]{}{seq-m}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-m-include}
         $\fmrg{}\supseteq\fmrg[1]{}\cup\fmrg[2]{}$,
       \item \label{seq-m-phantom-forall}
-        if $\cEv\in {\phEvs_1\cup\phEvs_2}$ then
+        %if $\cEv\in {\phEvs_1\cup\phEvs_2}$ then
+        if $\cEv\in {\phEvs_i}$ then
         $\fmrg{\cEv}\in {\aEvs_1\cap\aEvs_2}$,
       \columnbreak
       \item \label{seq-m-exclude}
@@ -107,6 +115,7 @@
 
     \item[\eqref{seq-E-phantom}]
       \eqref{seq-lambda}\;
+      \eqref{seq-le-phantom}\;
       \eqref{seq-m}\;
       \eqref{seq-po-include}\;
       as for $\sSEMI{}{}$,

@@ -453,46 +453,62 @@ $\DWP{x}{2}\xcbinv\DRP[\mACQ]{x}{2}$.
 %       =
 %       \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}
 %     \end{math}.
-%   \item \textcolor{red}{TODO: I think this should order W->R if there is no
+%   \item \todo{I think this should order W->R if there is no
 %       rf the other way}
 %   \end{itemize}  
 % \end{definition}
 % The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
 % \emph{Local Write Successor}.
 
-
-We emphasize that \ref{pom-rf-le} does not hold for $\frf{\semrr{}}$:
- $\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come
-from different sides of a sequential composition.  This means that $\rrfx$
-must be verified during pomset construction, rather than post-hoc.  The
-following lemma gives a post-hoc verification technique for $\rrfx$, using
-program order ($\rpox$).\footnote{It is obvious how to enhance the semantics
-  of most operators to define $\rpox$.  When combining pomsets using the
-  conditional, the obvious definition of $\rpox$ may result in cycles, since
-  $\rpox$-ordered events may coalesce.  In this case we include a separate
-  pomset for each way of breaking these $\rpox$ cycles.}
-% \begin{example}
-%   The obvious definition of $\rpox$ may be cyclic, due to the conditional. 
-% \end{example}
+We first show that \EC-validity is unchanged if we assume
+${\rcb}\supseteq{\rfr}$:
 \begin{lemma}
-  Any $\aPS$ in the image of $\frf{\semrr{}}$ is top-level iff
-  for every $\bEv\xrfx\aEv$ either
-  \begin{itemize}
-  \item external fulfillment: $\bEv\le\aEv$ and if $\labeling(\cEv)$ blocks
-    $\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
-  \item internal fulfillment: $\bEv\xpox\aEv$ and $(\not\exists\cEv)$
-    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv\xpox\cEv\xpox\aEv$.
-  \end{itemize}
+  \label{lemma:fr2}
+  Suppose $\aEG$ is \EC-valid via $({\rco}, {\rrfx}, {\rcb})$.  Then there a
+  permutation ${\rcbp}$ of ${\rcb}$ such that $\aEG$ is \EC-valid via
+  $({\rco}, {\rrfx}, {\rcbp})$ and ${\rcbp}\supseteq{\rfr}$, where ${\rfr}$
+  is defined in \ref{arm-local}.
+
+  \vspace{-.5\baselineskip}
+  \begin{proof}
+    Suppose $\aEv\xfr\cEv$. By definition of $\rfr$, %$(\exists\bEv)$
+    $\aEv\xrfxinv\bEv\xco\cEv$, for some $\bEv$.
+    %Since ${\rco}\subseteq{\rcb}$, we know that $\bEv\xcb\cEv$.
+    We show that either (1) ${\aEv\xcb\cEv}$, or (2) ${\cEv\xcb\aEv}$ and we
+    can reverse the order in ${\rcbp}$ to satisfy the requirements.
+
+    If \ref{arm-rfe} applies to $\bEv\xrfx\aEv$, then $\aEv\xcb\cEv$, since
+    it cannot be that $\cEv\xco\bEv$.
+
+    Suppose \ref{arm-rfi} applies to $\bEv\xrfx\aEv$ and $\cEv$ is from a
+    different thread than $\aEv$.  Because it is a different thread, we cannot have
+    $\aEv\xlob\cEv$, and therefore we can choose ${\cEv\xcb\aEv}$ in $\rcbp$.
+
+    Suppose \ref{arm-rfi} applies to $\bEv\xrfx\aEv$ and $\cEv$ is from the same thread as $\aEv$.
+    Applying \ref{arm-local} to $\aEv\xfr\cEv$, it cannot be that $\cEv\xpoloc\aEv$.
+    %Using \ref{arm-local} and $\bEv\xco\cEv$, it cannot be that $\cEv\xpoloc\bEv$.
+    Since $\rpoloc$ is a per-thread-and-per-location total order, it must be that $\aEv\xpoloc\cEv$.
+    Applying \ref{arm-lob-poloc}, we cannot have $\aEv\xlob\cEv$, and therefore we can choose ${\cEv\xcb\aEv}$ in $\rcbp$.
+  \end{proof}
 \end{lemma}
-% \begin{enumerate}
-% \item[(\textsc{m}7d)]
-%   if $\labeling(\cEv) \rblocks \labeling(\aEv)$
-%   then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
-%   %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then not $\bEv\le\cEv\xpox\aEv$.
-% \end{enumerate}
-
-
-
+Here is a contradictory non-example illustrating the last case of the proof:
+\begin{align*}
+  \PW{x}{2}
+  \SEMI
+  \PR{x}{r}
+  \PAR
+  \PW{x}{1}
+  &&
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{c}{{c}:\DW{x}{2}}{}
+      \event{d}{{d}:\DW{x}{1}}{below right=of c}
+      \event{e}{{e}:\DR{x}{1}}{above right=of d}
+      \co{d}[pos=.2,left]{c}
+      \rfx{d}[pos=.2,right]{e}
+      \poloc[out=15,in=165]{c}{e}
+      \fr{e}[above]{c}
+    \end{tikzinline}}
+\end{align*}
 
 % It follows from these that 
 % \begin{itemize}
@@ -522,39 +538,34 @@ program order ($\rpox$).\footnote{It is obvious how to enhance the semantics
   \end{proof}
 \end{theorem}
 
-The generality of \refthm{thm:ec} is not limited by the assumption that
-${\rcb_1}\supseteq{\rfr_1}$:
+
+We emphasize that \ref{pom-rf-le} does not hold for $\frf{\semrr{}}$:
+ $\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come
+from different sides of a sequential composition.  This means that $\rrfx$
+must be verified during pomset construction, rather than post-hoc.  The
+following lemma gives a post-hoc verification technique for $\rrfx$, using
+program order ($\rpox$) and phantom events ($\fmrg{}$).  The construction is
+discussed in \textsection\ref{sec:c11}.
 \begin{lemma}
-  \label{lemma:fr2}
-  Suppose $\aEG$ is \EC-valid via $({\rco}, {\rrfx}, {\rcb})$.  Then there a
-  permutation ${\rcbp}$ of ${\rcb}$ such that $\aEG$ is \EC-valid via
-  $({\rco}, {\rrfx}, {\rcbp})$ and ${\rcbp}\supseteq{\rfr}$, where ${\rfr}$
-  is defined in \ref{arm-local}.
-
-  \vspace{-.5\baselineskip}
-  \begin{proof}
-    We show that any ${\rcb}$ order that contradicts ${\rfr}$ is incidental.
-
-    By definition of $\rfr$, %$(\exists\bEv)$
-    $\aEv\xrfxinv\bEv\xco\cEv$, for some $\bEv$.
-    Since ${\rcb}\supseteq{\rco}$, we know that $\bEv\xco\cEv$.
-
-    If \ref{arm-rfe} applies to $\bEv\xrfx\aEv$, then $\aEv\xcb\cEv$, since
-    it cannot be that $\cEv\xco\bEv$.
-
-    Suppose \ref{arm-rfi} applies to $\bEv\xrfx\aEv$ and $\cEv$ is from a
-    different thread.  Because it is a different thread, we cannot have
-    $\aEv\xlob\cEv$, and thus the order in $\rcb$ is incidental.
-
-    Suppose \ref{arm-rfi} applies to $\bEv\xrfx\aEv$ and $\cEv$ is from the
-    same thread.  Since $\cEv\xco\bEv$, it cannot be that $\cEv\xpoloc\bEv$,
-    using \ref{arm-local}.  It also cannot be that
-    $\bEv\xpoloc\cEv\xpoloc\aEv$.  It must be that $\aEv\xpoloc\cEv$.  By
-    \ref{arm-lob-poloc}, we cannot have $\aEv\xlob\cEv$, and thus the order
-    in $\rcb$ is incidental.
-  \end{proof}
+  Any $\aPS$ in the image of $\frf{\semrr{}}$ is top-level iff
+  for every $\bEv\xrfx\aEv$ either
+  \begin{itemize}
+  \item external fulfillment:
+    $\bEv\le\aEv$ and if $\labeling(\cEv) \rblocks\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
+  \item internal fulfillment:
+    $(\exists\bEv'\mid\fmrg{\bEv'}=\bEv)$
+    $(\exists\aEv'\mid\fmrg{\aEv'}=\aEv)$
+\todo{The following is sketchy.}
+    $\bEv\xpox\aEv$ and $(\not\exists\cEv)$
+    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv\xpox\cEv\xpox\aEv$.
+  \end{itemize}
 \end{lemma}
-
+% \begin{enumerate}
+% \item[(\textsc{m}7d)]
+%   if $\labeling(\cEv) \rblocks \labeling(\aEv)$
+%   then $\bEv\xrfx\aEv$ implies $\cEv\le\bEv$.
+%   %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then not $\bEv\le\cEv\xpox\aEv$.
+% \end{enumerate}
 
 % Lemma: ${\rpoloc}\cup{\rpre}$ is acyclic.
 
