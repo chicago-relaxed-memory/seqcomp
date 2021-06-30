@@ -84,26 +84,31 @@ Restrict the syntax to top-level parallel composition.
     %   if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$,
     \item \label{pom-m-lambda} 
       $\labeling(\aEv)=\labeling(\fmrg{\aEv})$,
+    \item \label{pom-m-le}
+      if $\bEv\in\phEvs$ and $\bEv\le\aEv$ then $\aEv\in\phEvs$.
+      %Real events don't depend on phantom events %${\le}\subseteq(\reEvs\times\reEvs)$,
     \item \label{pom-m-kappa} 
       if $\aEv\in\dmEvs$ then 
       \makebox[0pt][l]{\begin{math}
           \smash{\labelingForm(\aEv)\rimplies
         \bigvee{}\!\!\!_{\{\cEv\in\phEvs\mid\fmrg{\cEv}=\aEv\}}\labelingForm(\cEv),}
       \end{math}}
-    \item \label{pom-m-tau} 
-      if $\aEv\in\phEvs$ then
-      \begin{math}
-        \aTr{\bEvs\cup\{\aEv\}}{\bForm}\rimplies \aTr{\bEvs}{\bForm},
-      \end{math}
-    \item \label{pom-m-le} 
-      ${\le}\subseteq(\reEvs\times\reEvs)$,
+    % \item \label{pom-m-tau} 
+    %   if $\aEv\in\phEvs$ then
+    %   \begin{math}
+    %     \aTr{\bEvs\cup\{\aEv\}}{\bForm}\rimplies \aTr{\bEvs}{\bForm},
+    %   \end{math}
     \end{enumerate}
     \end{multicols}
 
     \makecounter{Bpo}
   \item \label{pom-po} \makecounter{po}
     ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a partial order capturing
-    \emph{program order}.
+    \emph{program order}, such that
+    \begin{enumerate}
+    \item \label{pom-po-le}
+      if $\bEv,\aEv\in\phEvs$ and $\bEv\xpox\aEv$ then $\bEv\le\aEv$.
+    \end{enumerate}
     % , where 
     % $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$.
     % is the set of \emph{simple} %(rather than \emph{compound})
@@ -158,8 +163,8 @@ From \ref{pom-m-chain}, it follows that all phantom events are simple
 ($\dmEvs\subseteq\reEvs$).  In addition, all phantom events map to compound events
 (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 
-\ref{pom-m-tau} states that predicate transformers are insensitive to phantom
-events---the reverse implication holds from \refdef{def:family}.
+% \ref{pom-m-tau} states that predicate transformers are insensitive to phantom
+% events---the reverse implication holds from \refdef{def:family}.
 
 \begin{lemma}
   If $\aPS$ is a complete \PwTc{} and
@@ -223,10 +228,16 @@ sequentially into the bottom.
   \end{tikzcenter}
 \end{gather*}
 
+We have written \ref{seq-po-include} .
+
 \begin{definition}
   A \cXI{} \emph{pre-execution} is a projection of a \PwTc{}, taking all of
   the simple events whose preconditions are tautologies.
+
+  A \cXI{} {pre-execution} is an \emph{execution} if it satisfies the
+  appropriate axioms.
 \end{definition}
+
 
 %Let $\phEvs=\aEvs\setminus\reEvs$ and $\dmEvs=\aEvs\setminus\umEvs$.
 

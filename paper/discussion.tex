@@ -1181,13 +1181,34 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 \subsection{\PwTmcaTITLE{}: Encoding Delay in the Logic}
 \label{sec:delay}
 
-[Todo.]
-
-In order to validate
-\reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2} as
-equations, we could require that \ref{seq-le-delays} not impose order when
+\PwTmca{} satisfies one direction of
+\reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2}
+\begin{enumerate}
+\item[\eqref{lem:ifelse:if:if1}]
+  \begin{math} 
+    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+    \supseteq
+    \xSEMI{
+      \xIFTHEN{\aForm}{\aPSS_1}{}
+    }{
+      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+    }.
+  \end{math}
+  
+\item[\eqref{lem:ifelse:if:if2}]
+  \begin{math} 
+    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+    \supseteq
+    \xSEMI{
+      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+    }{
+      \xIFTHEN{\aForm}{\aPSS_1}{}
+    }.
+  \end{math}
+\end{enumerate}
+In order to validate the reverse inclusions, we could require that
+\ref{seq-le-delays} not impose order when
 $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is unsatisfiable.
-
 Thus, following on \textsection\ref{sec:false}, we would also like this:
 \begin{enumerate}
 \item[{\labeltext[\textsc{s}6b$'$]{(\textsc{s}6b$'$)}{seq-le-delays'}}] if
