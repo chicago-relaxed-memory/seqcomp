@@ -111,31 +111,35 @@ Restrict the syntax to top-level parallel composition.
   \end{enumerate}
 
 
-  % A \PwTc{} is \emph{complete} if 
-  % %\begin{multicols}{2}
-  %   \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+  A \PwTc{} is \emph{complete} if 
+  \begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
 
-  %     \setcounter{enumi}{\value{kappa}}
-  %   \item[]
-  %     \begin{enumerate}[leftmargin=0pt]
-  %     \item \label{top-kappa-real}
-  %       if $\aEv\in\reEvs$ then $\labelingForm(\aEv)$ is a tautology,
-  %     \item \label{top-kappa-phantom}
-  %       if $\aEv\in\dmEvs$ %(\aEvs\setminus\umEvs)$
-  %       then
-  %       $\labelingForm(\cEv)$
-  %       \makebox[0cm][l]{is a tautology,
-  %         for some $\cEv\in\phEvs$ %\aEvs\setminus\reEvs)$
-  %         such that $\fmrg{\cEv}=\aEv$,
-  %       }
-  %     \end{enumerate}
+      \setcounter{enumi}{\value{Bkappa}}
+    \item \label{top-kappa-c11}
+      if $\aEv\in\reEvs$ then $\labelingForm(\aEv)$ is a tautology,
 
-  %     %\columnbreak
-  %     \setcounter{enumi}{\value{Bterm}}
-  %   \item \label{top-term-c11}
-  %     $\aTerm$ is a tautology.
-  %   \end{enumerate}
-  %\end{multicols}
+    %   \setcounter{enumi}{\value{kappa}}
+    % \item[]
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{top-kappa-real}
+    %     if $\aEv\in\reEvs$ then $\labelingForm(\aEv)$ is a tautology,
+    %   \item \label{top-kappa-phantom}
+    %     if $\aEv\in\dmEvs$ %(\aEvs\setminus\umEvs)$
+    %     then
+    %     $\labelingForm(\cEv)$
+    %     \makebox[0cm][l]{is a tautology,
+    %       for some $\cEv\in\phEvs$ %\aEvs\setminus\reEvs)$
+    %       such that $\fmrg{\cEv}=\aEv$,
+    %     }
+    %   \end{enumerate}
+
+      %\columnbreak
+      \setcounter{enumi}{\value{Bterm}}
+    \item \label{top-term-c11}
+      $\aTerm$ is a tautology.
+    \end{enumerate}
+  \end{multicols}
 \end{definition}
 Note that
 \begin{math}
@@ -147,6 +151,15 @@ and
   \dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}.
   %\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}.
 \end{math}
+
+
+From \ref{pom-m-chain}, it follows that all phantom events are simple
+($\phEvs\subseteq\umEvs$) and all compound events are real
+($\dmEvs\subseteq\reEvs$).  In addition, all phantom events map to compound events
+(if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
+
+\ref{pom-m-tau} states that predicate transformers are insensitive to phantom
+events---the reverse implication holds from \refdef{def:family}.
 
 \begin{lemma}
   If $\aPS$ is a complete \PwTc{} and
@@ -160,14 +173,6 @@ and
     Immediate from \ref{pom-m-kappa}.
   \end{proof}
 \end{lemma}
-
-From \ref{pom-m-chain}, it follows that all phantom events are simple
-($\phEvs\subseteq\umEvs$) and all compound events are real
-($\dmEvs\subseteq\reEvs$).  In addition, all phantom events map to compound events
-(if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
-
-\ref{pom-m-tau} states that predicate transformers are insensitive to phantom
-events---the reverse implication holds from \refdef{def:family}.
 
 \input{fig-c11.tex}
 
