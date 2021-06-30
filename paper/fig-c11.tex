@@ -65,7 +65,8 @@
     \item[] \labeltext[\textsc{s}9]{}{seq-po}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-po-include}
-        ${\rpox}\supseteq {\rpox_1}\cup {\rpox_2}$,
+        %${\rpox}\supseteq ({\rpox_1}\cup {\rpox_2})\setminus((\aEvs_1\times\aEvs_2)\cup(\aEvs_2\times\aEvs_1))$,
+        ${\rpox}\supseteq \sigma_1({\rpox_1})\cup  \sigma_2({\rpox_2})$
       \item \label{seq-po-seq}
         if $\bEv\in\umEvs_1$ and $\aEv\in\umEvs_2$ then $\bEv\xpox\aEv$,
       \end{enumerate}
@@ -73,6 +74,10 @@
     where
     \begin{math}
       \umEvs_i= \phEvs_i \cup \{\aEv\in\aEvs_i\mid\forall\bEv.\;\fmrg[i]{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}
+    \end{math}
+    and
+    \begin{math}
+      \sigma_i=\{[\cEv_i/\aEv]\mid\cEv_i\in\phEvs_i\land \fmrg{\cEv_i}=\aEv\}
     \end{math}
     % \makebox[0cm][l]{\begin{math}
     %   \umEvs_1= \phEvs_1 \cup (\aEvs_1\setminus\aEvs_2)
@@ -102,7 +107,7 @@
       \eqref{seq-lambda-phantom1}\;
       \eqref{seq-lambda-phantom2}\;
       \eqref{seq-m}\;
-      %\eqref{seq-po-include}\;
+      \eqref{seq-po-include}\;
       as for $\sSEMI{}{}$,
 
     \item[\eqref{if-lambda}]
@@ -123,9 +128,9 @@
         if $\cEv\in \phEvs_2$ then $\labelingForm(\cEv) \riff \lnot\aForm\land\labelingForm_2(\aEv)$.
       \end{enumerate}      
 
-      \setcounter{enumi}{\value{Bpo}}
-    \item \label{if-po}
-        ${\rpox}= {\rpox_1}\cup {\rpox_2}$.
+    %   \setcounter{enumi}{\value{Bpo}}
+    % \item \label{if-po}
+    %     ${\rpox}= {\rpox_1}\cup {\rpox_2}$.
       
     \end{enumerate}
   \end{multicols}

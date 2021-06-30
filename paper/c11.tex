@@ -1,8 +1,6 @@
 \newpage
 \section{\PwTcTITLE: Pomsets with Predicate Transformers for C11}
 
-[Todo: \ref{seq-po-include} is not quite right.]
-
 Restrict the syntax to top-level parallel composition.
 
 % \begin{comment}
@@ -160,6 +158,7 @@ events---the reverse implication holds from \refdef{def:family}.
 
 \input{fig-c11.tex}
 
+
 The semantic rules are given in \reffig{fig:c11}.  As usual, we write
 $\existsone$ to mean ``there exists exactly one''.
 
@@ -169,6 +168,42 @@ newly compound event.
 \ref{seq-m-phantom-exists} states that every newly compound event must have two
 corresponding phantom events.
 
+Here is a diagram elucidating the $\rpox$ rules, where the top two are merged
+sequentially into the bottom.
+\begin{gather*}
+  \begin{tikzcenter}
+    \node (c1)  at (0, 0) {$\mathstrut c_1$};
+    \node (d1)  at (1, 0) {$\mathstrut d$};
+    \node (e1)  at (2, 0) {$\mathstrut e_1$};
+    \draw[->](c1)to(d1);
+    \draw[->](d1)to(e1);
+  \end{tikzcenter}
+  \qquad\qquad
+  \begin{tikzcenter}
+    \node (c2)  at (3, 0) {$\mathstrut c_2$};
+    \node (d2)  at (4, 0) {$\mathstrut d$};
+    \node (e2)  at (5, 0) {$\mathstrut e_2$};
+    \draw[->](c2)to(d2);
+    \draw[->](d2)to(e2);
+  \end{tikzcenter}
+  \\
+  \begin{tikzcenter}
+    \node (c1)  at (0, 0) {$\mathstrut c_1$};
+    \node (d1)  at (1, 0) {$\mathstrut d_1$};
+    \node (e1)  at (2, 0) {$\mathstrut e_1$};
+    \node (d)   at (2.5, .5) {$\mathstrut d$};
+    \node (c2)  at (3, 0) {$\mathstrut c_2$};
+    \node (d2)  at (4, 0) {$\mathstrut d_2$};
+    \node (e2)  at (5, 0) {$\mathstrut e_2$};
+    \draw[->](c1)to(d1);
+    \draw[->](d1)to(e1);
+    \draw[->](e1)to(c2);
+    \draw[->](c2)to(d2);
+    \draw[->](d2)to(e2);
+    \draw[->,dotted](d1)to(d);
+    \draw[->,dotted](d2)to(d);
+  \end{tikzcenter}
+\end{gather*}
 
 \begin{definition}
   A \cXI{} \emph{pre-execution} is a projection of a \PwTc{}, taking all of
