@@ -84,6 +84,11 @@ Restrict the syntax to top-level parallel composition.
     %   if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$,
     \item \label{pom-m-lambda} 
       $\labeling(\aEv)=\labeling(\fmrg{\aEv})$,
+    \item \label{pom-m-tau} 
+      if $\aEv\in\phEvs$ then
+      \begin{math}
+        \aTr{\bEvs\cup\{\aEv\}}{\bForm}\riff \aTr{\bEvs\cup\{\fmrg{\aEv}\}}{\bForm},
+      \end{math}
     \item \label{pom-m-le}
       if $\bEv\in\phEvs$ and $\bEv\le\aEv$ then $\aEv\in\phEvs$.
       %Real events don't depend on phantom events %${\le}\subseteq(\reEvs\times\reEvs)$,
@@ -93,11 +98,6 @@ Restrict the syntax to top-level parallel composition.
           \smash{\labelingForm(\aEv)\rimplies
         \bigvee{}\!\!\!_{\{\cEv\in\phEvs\mid\fmrg{\cEv}=\aEv\}}\labelingForm(\cEv),}
       \end{math}}
-    % \item \label{pom-m-tau} 
-    %   if $\aEv\in\phEvs$ then
-    %   \begin{math}
-    %     \aTr{\bEvs\cup\{\aEv\}}{\bForm}\rimplies \aTr{\bEvs}{\bForm},
-    %   \end{math}
     \end{enumerate}
     \end{multicols}
 
