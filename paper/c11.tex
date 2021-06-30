@@ -111,30 +111,30 @@ Restrict the syntax to top-level parallel composition.
   \end{enumerate}
 
 
-  A \PwTc{} is \emph{complete} if 
-  %\begin{multicols}{2}
-    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+  % A \PwTc{} is \emph{complete} if 
+  % %\begin{multicols}{2}
+  %   \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
 
-      \setcounter{enumi}{\value{kappa}}
-    \item[]
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{top-kappa-real}
-        if $\aEv\in\reEvs$ then $\labelingForm(\aEv)$ is a tautology,
-      \item \label{top-kappa-phantom}
-        if $\aEv\in\dmEvs$ %(\aEvs\setminus\umEvs)$
-        then
-        $\labelingForm(\cEv)$
-        \makebox[0cm][l]{is a tautology,
-          for some $\cEv\in\phEvs$ %\aEvs\setminus\reEvs)$
-          such that $\fmrg{\cEv}=\aEv$,
-        }
-      \end{enumerate}
+  %     \setcounter{enumi}{\value{kappa}}
+  %   \item[]
+  %     \begin{enumerate}[leftmargin=0pt]
+  %     \item \label{top-kappa-real}
+  %       if $\aEv\in\reEvs$ then $\labelingForm(\aEv)$ is a tautology,
+  %     \item \label{top-kappa-phantom}
+  %       if $\aEv\in\dmEvs$ %(\aEvs\setminus\umEvs)$
+  %       then
+  %       $\labelingForm(\cEv)$
+  %       \makebox[0cm][l]{is a tautology,
+  %         for some $\cEv\in\phEvs$ %\aEvs\setminus\reEvs)$
+  %         such that $\fmrg{\cEv}=\aEv$,
+  %       }
+  %     \end{enumerate}
 
-      %\columnbreak
-      \setcounter{enumi}{\value{Bterm}}
-    \item \label{top-term-c11}
-      $\aTerm$ is a tautology.
-    \end{enumerate}
+  %     %\columnbreak
+  %     \setcounter{enumi}{\value{Bterm}}
+  %   \item \label{top-term-c11}
+  %     $\aTerm$ is a tautology.
+  %   \end{enumerate}
   %\end{multicols}
 \end{definition}
 Note that
@@ -148,9 +148,22 @@ and
   %\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}.
 \end{math}
 
+\begin{lemma}
+  If $\aPS$ is a complete \PwTc{} and
+  $\aEv\in\dmEvs$ 
+  then
+  $(\exists \cEv\in\phEvs)$
+  $\fmrg{\cEv}=\aEv$
+  and
+  $\labelingForm(\cEv)$ is a tautology.
+  \begin{proof}
+    Immediate from \ref{pom-m-kappa}.
+  \end{proof}
+\end{lemma}
+
 From \ref{pom-m-chain}, it follows that all phantom events are simple
 ($\phEvs\subseteq\umEvs$) and all compound events are real
-($\dmEvs\subseteq\reEvs$).  Also all phantom events map to compound events
+($\dmEvs\subseteq\reEvs$).  In addition, all phantom events map to compound events
 (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 
 \ref{pom-m-tau} states that predicate transformers are insensitive to phantom
@@ -162,13 +175,13 @@ events---the reverse implication holds from \refdef{def:family}.
 The semantic rules are given in \reffig{fig:c11}.  As usual, we write
 $\existsone$ to mean ``there exists exactly one''.
 
-\ref{seq-m-exclude} states newly compound events must be real.
 \ref{seq-m-phantom-forall} states that new phantom events must merge into a
 newly compound event.
+\ref{seq-m-exclude} states that newly compound events must be real.
 \ref{seq-m-phantom-exists} states that every newly compound event must have two
 corresponding phantom events.
 
-Here is a diagram elucidating the $\rpox$ rules, where the top two are merged
+Here is a diagram elucidating \ref{seq-po-include}, where the top two are merged
 sequentially into the bottom.
 \begin{gather*}
   \begin{tikzcenter}

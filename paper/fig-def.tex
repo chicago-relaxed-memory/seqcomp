@@ -1,0 +1,73 @@
+\begin{definition}
+  \label{def:pomset}
+  A \emph{pomset with predicate transformers} (\PwT) %over $\Act$
+  is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\rrfx}, {\le})$ where
+  % \begin{multicols}{2}
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+    \makecounter{BE}
+  \item \label{pom-E} \makecounter{E}
+    $\aEvs\subseteq\AllEvents$ is a set of \emph{events},
+    \makecounter{Blambda}
+  \item \label{pom-lambda} \makecounter{lambda}
+    $\labeling: \aEvs \fun \Act$ defines a \emph{label} for each event,
+    \makecounter{Bkappa}
+  \item \label{pom-kappa} \makecounter{kappa}
+    $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
+    % such that
+    % \begin{enumerate}
+    % \item \label{pom-kappa-sat}
+    %   $\labelingForm(\aEv)$ is satisfiable,
+    % \end{enumerate}
+    \makecounter{Btau}
+  \item \label{pom-tau} \makecounter{tau}
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of predicate transformers} over $\aEvs$, 
+    \makecounter{Bterm}
+  \item \label{pom-term} \makecounter{term}
+    $\aTerm:\Formulae$ is a \emph{termination condition}, such that 
+    \begin{enumerate}
+    \item \label{pom-term-tau}
+      $\aTerm\rimplies\aTr{}{\TRUE}$,
+    \end{enumerate}
+    \makecounter{Ble}
+  \item \label{pom-le} \makecounter{le}
+    ${\le} \subseteq \aEvs\times\aEvs$, is a partial order capturing
+    \emph{causality},
+    % such that
+    % \begin{enumerate}
+    % \item \label{pom-le-match}
+    %   if $\bEv\xrfx\aEv$ then either $\bEv\le\aEv$ or $\aEv\le\bEv$,
+    % \item \label{pom-le-block}
+    %   if $\bEv\xrfx\aEv$ and $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$.
+    % \end{enumerate}
+    \makecounter{Brf}
+  \end{enumerate}
+  % \end{multicols}
+  
+  A \PwT{} is \emph{complete} if
+  \begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+      \setcounter{enumi}{\value{Bkappa}}
+    \item \label{top-kappa}
+      % $\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
+      $\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
+      \setcounter{enumi}{\value{Bterm}}
+    \item \label{top-term}
+      $\aTerm$ is a tautology.
+    \end{enumerate}
+  \end{multicols}
+  % \labeltext[\textsc{t}1]{(\textsc{t}1)}{top-term} $\aTerm$ is a tautology and \labeltext[\textsc{t}2]{(\textsc{t}2)}{top-ev} for every $\aEv\in\aEvs$,
+  % % $\labelingForm(\aEv)$ is a tautology and
+  % % if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  % % \begin{multicols}{2}
+  % \begin{enumerate}[label=(\textsc{t}\arabic*),ref=\textsc{t}\arabic*]
+  %   \setcounter{enumi}{2}
+  % \item[]
+  %   \begin{enumerate}[leftmargin=0pt]
+  %   \item \label{top-kappa}
+  %     $\labelingForm(\aEv)$ is a tautology,    
+  %   \item \label{top-rf}
+  %     if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+  %   \end{enumerate}
+  % \end{enumerate}
+  % % \end{multicols}
+\end{definition}

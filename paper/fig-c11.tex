@@ -13,8 +13,7 @@
     \item \label{seq-E-phantom}
       $\aEvs=(\aEvs_1\cup\aEvs_2)\uplus\phEvs_1 \uplus\phEvs_2$,
 
-    \item[\eqref{seq-lambda}]
-      \eqref{seq-kappa}\;
+    \item[\eqref{seq-kappa}]
       \eqref{seq-tau}\;
       \eqref{seq-term}\;
       \eqref{seq-le}\;
@@ -23,10 +22,12 @@
       \setcounter{enumi}{\value{lambda}}
     \item[] 
       \begin{enumerate}[leftmargin=0pt]
-      \item \label{seq-lambda-phantom1}
-        if $\cEv\in \phEvs_1$ then $\labeling(\cEv)=\labeling_1(\fmrg{\cEv})$,
-      \item \label{seq-lambda-phantom2}
-        if $\cEv\in \phEvs_2$ then $\labeling(\cEv)=\labeling_2(\fmrg{\cEv})$,
+      \item \label{seq-lambda-include}
+        ${\labeling}\supseteq\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+      \item \label{seq-lambda-phantom}
+        if $\cEv\in \phEvs_i$ then $\labeling(\cEv)=\labeling_i(\fmrg{\cEv})$,
+        %if $\cEv\in \phEvs_1$ then $\labeling(\cEv)=\labeling_1(\fmrg{\cEv})$,
+        %if $\cEv\in \phEvs_2$ then $\labeling(\cEv)=\labeling_2(\fmrg{\cEv})$,
       \end{enumerate}
 
       \setcounter{enumi}{\value{kappa}}
@@ -39,25 +40,26 @@
         if $\cEv\in \phEvs_2$ then $\labelingForm(\cEv)\riff\aTr[1]{}{\labelingForm_2(\fmrg{\cEv})}$,
       \end{enumerate}
 
-      %\columnbreak
       \setcounter{enumi}{\value{m}}
     \item[] \labeltext[\textsc{s}8]{}{seq-m}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-m-include}
         $\fmrg{}\supseteq\fmrg[1]{}\cup\fmrg[2]{}$,
+      \columnbreak
+      \item \label{seq-m-phantom-forall}
+        if $\cEv\in {\phEvs_1\cup\phEvs_2}$ then
+        $\fmrg{\cEv}\in {\aEvs_1\cap\aEvs_2}$,
       \item \label{seq-m-exclude}
-        if $\aEv\in (\aEvs_1\cap\aEvs_2)$
+        if $\aEv\in {\aEvs_1\cap\aEvs_2}$
         then $\fmrg[1]{\aEv}=\fmrg[2]{\aEv}=\aEv$,
       % \item \label{seq-m-real-cup}
       %   if $\aEv\in(\aEvs_1\cup\aEvs_2)$ then $\fmrg{\aEv}=\aEv$,
       % \item \label{seq-m-real-cap}
       %   if $\fmrg{\aEv}=\aEv$ then $\aEv\not\in(\aEvs_1\cap\aEvs_2)$,
-      \item \label{seq-m-phantom-forall}
-        if $\cEv\in (\phEvs_1\cup\phEvs_2)$ then
-        $\fmrg{\cEv}\in (\aEvs_1\cap\aEvs_2)$,
       \item \label{seq-m-phantom-exists}
-        if $\aEv\in (\aEvs_1\cap\aEvs_2)$ then
-        $(\existsone\cEv_1\in\phEvs_1)$ $(\existsone\cEv_2\in\phEvs_1)$
+        if $\aEv\in {\aEvs_1\cap\aEvs_2}$ then
+        $(\existsone\cEv_i\in\phEvs_i)$
+        %$(\existsone\cEv_2\in\phEvs_2)$
         $\fmrg{\cEv_1}=\fmrg{\cEv_2}=\aEv$,
       \end{enumerate}
 
@@ -104,14 +106,12 @@
     %   as for $\sSEMI{}{}$,
 
     \item[\eqref{seq-E-phantom}]
-      \eqref{seq-lambda-phantom1}\;
-      \eqref{seq-lambda-phantom2}\;
+      \eqref{seq-lambda}\;
       \eqref{seq-m}\;
       \eqref{seq-po-include}\;
       as for $\sSEMI{}{}$,
 
-    \item[\eqref{if-lambda}]
-      \eqref{if-kappa}\;
+    \item[\eqref{if-kappa}]
       \eqref{if-tau}\;
       \eqref{if-term}\; 
       \eqref{if-le}\;
