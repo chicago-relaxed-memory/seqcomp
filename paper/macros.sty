@@ -1,3 +1,5 @@
+\newcommand{\fextract}[1]{\mathsf{extract}\ifnotempty{#1}{(#1)}}
+\newcommand{\regForm}[1]{\cForm_{#1}}%\mathsf{REG}\ifnotempty{#1}{_{#1}}}
 \newcommand{\existsone}{\exists!}
 \renewcommand{\leq}{\leqslant}
 \renewcommand{\geq}{\geqslant}
@@ -5,6 +7,7 @@
 \newcommand{\PwP}{P\lowercase{w}P}
 \newcommand{\PwT}{P\lowercase{w}T}
 \newcommand{\PwTmca}[1]{\PwT-MCA\ifnotempty{#1}{$_{#1}$}}
+\newcommand{\PwTpo}{\PwT-PO}
 \newcommand{\PwTc}{\PwT-C11}
 \newcommand{\PwTTITLE}{P\lowercase{w}T}
 \newcommand{\PwTmcaTITLE}[1]{\PwT-MCA{#1}}
@@ -1226,6 +1229,7 @@
 %\NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{m}$}  (#4);}
 \NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to (#4);}
 \newcommand{\fmrg}[2][]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{\pi}}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}}%
+\newcommand{\fmrginv}[2][]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{\pi^{-1}}}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}}%
 \newcommand{\rmrg}{\ensuremath{\mathrel{\textcolor{\mrgcolor}{\mathsf{\pi}}}}}%
 \newcommand{\xmrg}{\xarrowtikz{mrg}{\pi}}%
 

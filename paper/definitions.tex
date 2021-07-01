@@ -1264,6 +1264,390 @@ which is
 which is a tautology.
 
 
+\subsection{Q}
+A more dramatic problem \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}.
+Version with control dependencies is \drf{}.
+
+\begin{align*}
+  \begin{gathered}    
+    \IF{r}\THEN
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    \\
+    \hbox{\begin{tikzinlinesmall}[node distance=1em]
+        \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
+        \event{a5}{r{\neq}0\land((1{=}s\lor x{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+      \end{tikzinlinesmall}}
+    \\
+    \hbox{\begin{tikzinlinesmall}[node distance=1em]
+        \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
+        \event{a5}{r{\neq}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinlinesmall}}
+  \end{gathered}
+  &&
+  \begin{gathered}    
+    \IF{\lnot r}\THEN
+      \PW{x}{0}
+      \SEMI
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    \\
+    % \hbox{\begin{tikzinlinesmall}[node distance=1em]
+    %     \event{a3}{r{=}0\mid\DW{x}{0}}{}
+    %     \event{a4}{r{=}0\mid\DR{x}{1}}{right=of a3}
+    %     \event{a5}{r{=}0\land((1{=}s\lor x{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+    %   \end{tikzinlinesmall}}
+    % \\
+    % \hbox{\begin{tikzinlinesmall}[node distance=1em]
+    %     \event{a3}{r{=}0\mid\DW{x}{0}}{}
+    %     \event{a4}{r{=}0\mid\DR{x}{1}}{right=of a3}
+    %     \event{a5}{r{=}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+    %     \po{a4}{a5}
+    %   \end{tikzinlinesmall}}
+    % \\
+    \hbox{\begin{tikzinlinesmall}[node distance=1em]
+        \event{a4}{r{=}0\mid\DR{x}{1}}{}
+        \event{a5}{r{=}0\land((1{=}s\lor 0{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+      \end{tikzinlinesmall}}
+    \\
+    \hbox{\begin{tikzinlinesmall}[node distance=1em]
+        \event{a4}{r{=}0\mid\DR{x}{1}}{}
+        \event{a5}{r{=}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinlinesmall}}
+  \end{gathered}
+\end{align*}
+\begin{align*}
+  \begin{gathered}    
+    \IF{r}\THEN
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
+        \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+      \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
+        \event{a5}{r{\neq}0\mid\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}    
+    \IF{\lnot r}\THEN
+      \PW{x}{0}
+      \SEMI
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{r{=}0\mid\DR{x}{1}}{}
+        \event{a5}{\FALSE\mid\DW{z}{1}}{right=of a4}
+      \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{r{=}0\mid\DR{x}{1}}{}
+        \event{a5}{r{=}0\mid\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinline}}
+  \end{gathered}
+\end{align*}
+\begin{align*}
+  \begin{gathered}    
+    \IF{r}\THEN
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \ELSE
+      \PW{x}{0}
+      \SEMI
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{\DR{x}{1}}{}
+        \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+      \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{\DR{x}{1}}{}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinline}}
+  \end{gathered}
+\end{align*}
+
+        % \event{a1}{\DW{x}{1}}{}
+        % \event{a2}{\DR{y}{1}}{right=of a1}
+        % \event{a3}{\DW{x}{0}}{right=of a2}
+        % \event{a4}{\DR{x}{1}}{right=of a2}
+        % \event{a5}{\DW{z}{1}}{right=of a4}
+        % %\wki[out=15,in=165]{a1}{a3}
+        % %\wki{a3}{a4}
+        % \po[out=15,in=165]{a2}{a5}
+
+\begin{gather*}
+    \PW{x}{1}
+    \SEMI
+    \PR{y}{r}
+    \SEMI
+    \IF{r}\THEN
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \ELSE
+      \PW{x}{0}
+      \SEMI
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    \PAR
+    \IF{z}\THEN
+      \PW{y}{1}
+    \FI
+    % \\
+    % \PW{x}{1}
+    % \SEMI
+    % \IF{y}\THEN
+    %   \IF{x}\THEN
+    %     \PW{z}{1}
+    %   \FI
+    % \ELSE
+    %   \PW{x}{0}
+    %   \SEMI
+    %   \IF{x}\THEN
+    %     \PW{z}{1}
+    %   \FI
+    % \FI
+    % \PAR
+    % \IF{z}\THEN
+    %   \PW{y}{1}
+    % \FI
+    % \\
+    % \PW{x}{1}
+    % \SEMI
+    % \IF{y}\THEN
+    %   \PW{z}{\PR{x}{}}
+    % \ELSE
+    %   \PW{x}{0}
+    %   \SEMI
+    %   \PW{z}{\PR{x}{}}
+    % \FI
+    % \PAR
+    % \PW{y}{\PR{z}{}}
+    \\
+    \tag{\cmark}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \event{a2}{\DR{y}{1}}{right=of a1}
+        %\event{a3}{\DW{x}{0}}{right=of a2}
+        \event{a4}{\DR{x}{1}}{right=of a2}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \event{b1}{\DR{z}{1}}{right=3em of a5}
+        \event{b2}{\DW{y}{1}}{right=of b1}
+        %\po{a2}{a3}
+        \po{b1}{b2}
+        %\wki[out=15,in=165]{a1}{a3}
+        %\wki{a3}{a4}
+        \rf{a5}{b1}
+        \rf[out=-170,in=-10]{b2}{a2}
+        \po[out=15,in=165]{a2}{a5}
+      \end{tikzinline}}
+    \\
+    \tag{\xmark}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \event{a2}{\DR{y}{1}}{right=of a1}
+        %\event{a3}{\DW{x}{0}}{right=of a2}
+        \event{a4}{\DR{x}{1}}{right=of a2}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \event{b1}{\DR{z}{1}}{right=3em of a5}
+        \event{b2}{\DW{y}{1}}{right=of b1}
+        %\po{a2}{a3}
+        \po{b1}{b2}
+        %\wki[out=15,in=165]{a1}{a3}
+        %\wki{a3}{a4}
+        \rf{a5}{b1}
+        \rf[out=-170,in=-10]{b2}{a2}
+        \po{a4}{a5}
+      \end{tikzinline}}
+    \\
+    \tag{\cmark}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \event{a2}{\DR{y}{0}}{right=of a1}
+        \event{a3}{\DW{x}{0}}{right=of a2}
+        \event{a4}{\DR{x}{1}}{right=of a3}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \event{b1}{\DR{z}{1}}{right=3em of a5}
+        \event{b2}{\DW{y}{1}}{right=of b1}
+        \po{a2}{a3}
+        \po{b1}{b2}
+        \wki[out=15,in=165]{a1}{a3}
+        \wki{a3}{a4}
+        \rf{a5}{b1}
+        %\rf[out=-170,in=-10]{b2}{a2}
+        \po[out=15,in=165]{a2}{a5}
+      \end{tikzinline}}
+    \\
+    \tag{\cmark}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DW{x}{1}}{}
+        \event{a2}{\DR{y}{0}}{right=of a1}
+        \event{a3}{\DW{x}{0}}{right=of a2}
+        \event{a4}{\DR{x}{1}}{right=of a3}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \event{b1}{\DR{z}{1}}{right=3em of a5}
+        \event{b2}{\DW{y}{1}}{right=of b1}
+        \po{a2}{a3}
+        \po{b1}{b2}
+        \wki[out=15,in=165]{a1}{a3}
+        \wki{a3}{a4}
+        \rf{a5}{b1}
+        %\rf[out=-170,in=-10]{b2}{a2}
+        \po{a4}{a5}
+      \end{tikzinline}}
+\end{gather*}
+
+With $\Q{x}$, we have:
+\begin{align*}
+  \begin{gathered}    
+    \IF{r}\THEN
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    % \\
+    % \hbox{\begin{tikzinline}[node distance=1em]
+    %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
+    %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+    %   \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
+        \event{a5}{r{\neq}0\mid\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}    
+    \IF{\lnot r}\THEN
+      \PW{x}{0}
+      \SEMI
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    % \\
+    % \hbox{\begin{tikzinline}[node distance=1em]
+    %     \event{a4}{\FALSE\mid\DR{x}{1}}{}
+    %     \event{a5}{\FALSE\mid\DW{z}{1}}{right=of a4}
+    %   \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{\FALSE\mid\DR{x}{1}}{}
+        \event{a5}{r{=}0\mid\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinline}}
+  \end{gathered}
+\end{align*}
+\begin{align*}
+  \begin{gathered}    
+    \IF{r}\THEN
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \ELSE
+      \PW{x}{0}
+      \SEMI
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    % \\
+    % \hbox{\begin{tikzinline}[node distance=1em]
+    %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
+    %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+    %   \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinline}}
+  \end{gathered}
+  \\
+  \begin{gathered}    
+    \PR{y}{r}
+    \SEMI
+    \IF{r}\THEN
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \ELSE
+      \PW{x}{0}
+      \SEMI
+      \PR{x}{s}
+      \SEMI
+      \IF{s}\THEN
+        \PW{z}{1}
+      \FI
+    \FI
+    % \\
+    % \hbox{\begin{tikzinline}[node distance=1em]
+    %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
+    %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+    %   \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a2}{\DR{y}{1}}{}
+        \event{a4}{1{=}r\limplies(r{\neq}0\land\Q{x})\mid\DR{x}{1}}{right=of a2}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \po{a4}{a5}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{align*}
+
 
 \subsection{Reordering Transformations}
 \label{sec:ex:valid}

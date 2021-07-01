@@ -1,8 +1,9 @@
-\newpage
 \section{\PwTcTITLE: Pomsets with Predicate Transformers for C11}
 \label{sec:c11}
 
-Restrict the syntax to top-level parallel composition.
+We first define pomsets with program order (\PwTpo{}).
+
+%Restrict the syntax to top-level parallel composition.
 
 % \begin{comment}
 %   \label{def:pomset}
@@ -57,7 +58,7 @@ Restrict the syntax to top-level parallel composition.
 % \end{comment}
 \begin{definition}
   \label{def:po}
-  A \PwTc{} is a \PwT{} (\refdef{def:pomset}) equipped
+  A \PwTpo{} is a \PwT{} (\refdef{def:pomset}) equipped
   with relations $\rmrg$ and
   $\rpox$ such that 
   \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
@@ -65,7 +66,7 @@ Restrict the syntax to top-level parallel composition.
     \makecounter{Bm}
   \item \label{pom-m} \makecounter{m}
     $\fmrg{} : (\aEvs\fun\aEvs)$
-    is a function capturing \emph{merging}, such that 
+    is an idempotent function capturing \emph{merging}, such that 
     \\
     let $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$ be \emph{real} events,
     let $\phEvs=(\aEvs\setminus\reEvs)$ be \emph{phantom} events,\\
@@ -78,30 +79,35 @@ Restrict the syntax to top-level parallel composition.
     % let $\umEvs=(\aEvs\setminus\dmEvs)$ be \emph{simple} events,
     \begin{multicols}{2}
     \begin{enumerate}%[leftmargin=0pt]
-    \item \label{pom-m-idempotent}
-      $\fmrg{}$ is idempotent:
-      \begin{math}
-        \fmrg{\fmrg{\aEv}} = \fmrg{\aEv},
-      \end{math}
+    % \item \label{pom-m-idempotent}
+    %   $\fmrg{}$ is idempotent:
+    %   \begin{math}
+    %     \fmrg{\fmrg{\aEv}} = \fmrg{\aEv},
+    %   \end{math}
       % $\fmrg{\aEv}\in\reEvs$,
       %where $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$,
     % \item \label{pom-m-phantom-compount}
     %   if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$,
     \item \label{pom-m-lambda} 
       $\labeling(\aEv)=\labeling(\fmrg{\aEv})$,
-    \item \label{pom-m-tau} 
-      if $\aEv\in\phEvs$ then
-      \begin{math}
-        \aTr{\bEvs\cup\{\aEv\}}{\bForm}\riff \aTr{\bEvs\cup\{\fmrg{\aEv}\}}{\bForm},
-      \end{math}
-    \item \label{pom-m-le}
-      if $\bEv\in\phEvs$ and $\bEv\le\aEv$ then $\aEv\in\phEvs$.
-      %Real events don't depend on phantom events %${\le}\subseteq(\reEvs\times\reEvs)$,
+    % \item \label{pom-m-tau} 
+    %   \begin{math}
+    %     \aTr{\bEvs}{\bForm}\riff
+    %     \aTr{\fmrg{\bEvs}}{\bForm},
+    %   \end{math}
+      % if $\aEv\in\phEvs$ then
+      % \begin{math}
+      %   \aTr{\bEvs\cup\{\aEv\}}{\bForm}\riff \aTr{\bEvs\cup\{\fmrg{\aEv}\}}{\bForm},
+      % \end{math}
+    % \item \label{pom-m-le}
+    %   if $\bEv\in\phEvs$ and $\bEv\le\aEv$ then $\aEv\in\phEvs$.
+    %   %Real events don't depend on phantom events %${\le}\subseteq(\reEvs\times\reEvs)$,
     \item \label{pom-m-kappa} 
       if $\aEv\in\dmEvs$ then 
       \makebox[0pt][l]{\begin{math}
           \smash{\labelingForm(\aEv)\rimplies
-        \bigvee{}\!\!\!_{\{\cEv\in\phEvs\mid\fmrg{\cEv}=\aEv\}}\labelingForm(\cEv),}
+            \bigvee{}\!\!\!_{\{\cEv\in\phEvs\mid\fmrg{\cEv}=\aEv\}}\labelingForm(\cEv)}
+          .
       \end{math}}
     \end{enumerate}
     \end{multicols}
@@ -109,11 +115,11 @@ Restrict the syntax to top-level parallel composition.
     \makecounter{Bpo}
   \item \label{pom-po} \makecounter{po}
     ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a partial order capturing
-    \emph{program order}, such that
-    \begin{enumerate}
-    \item \label{pom-po-le}
-      if $\bEv,\aEv\in\phEvs$ and $\bEv\xpox\aEv$ then $\bEv\le\aEv$.
-    \end{enumerate}
+    \emph{program order}. %, such that
+    % \begin{enumerate}
+    % \item \label{pom-po-le}
+    %   if $\bEv,\aEv\in\phEvs$ and $\bEv\xpox\aEv$ then $\bEv\le\aEv$.
+    % \end{enumerate}
     % , where 
     % $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$.
     % is the set of \emph{simple} %(rather than \emph{compound})
@@ -121,7 +127,7 @@ Restrict the syntax to top-level parallel composition.
   \end{enumerate}
 
 
-  A \PwTc{} is \emph{complete} if 
+  A \PwTpo{} is \emph{complete} if 
   \begin{multicols}{2}
     \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
 
@@ -151,92 +157,293 @@ Restrict the syntax to top-level parallel composition.
     \end{enumerate}
   \end{multicols}
 \end{definition}
-Note that
-\begin{math}
-  \phEvs=\{\aEv\mid\fmrg{\aEv}{\neq}\aEv\}
-  %\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}
-\end{math}
-and
-\begin{math}
-  \dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}.
-  %\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}.
-\end{math}
+Since $\fmrg{}$ is idempotent, we have $\fmrg{\fmrg{\aEv}} = \fmrg{\aEv}$.
+Equivalently, we could require $\fmrg{\aEv}\in\reEvs$.
 
-
-Equivalent to \ref{pom-m-idempotent}, we could require
-$\fmrg{\aEv}\in\reEvs$.  From \ref{pom-m-idempotent}, it follows that all
-phantom events are simple ($\phEvs\subseteq\umEvs$) and all compound events
-are real ($\dmEvs\subseteq\reEvs$).  In addition, all phantom events map to
-compound events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
+We use $\fmrg{}$ to partition events $\aEvs$ in two ways: we distinguish
+\emph{real} events $\reEvs$ from \emph{phantom} events $\phEvs$; we
+distinguish \emph{simple} events $\umEvs$ from \emph{compound} events
+$\dmEvs$.   From idempotency, it follows that all phantom events are simple
+($\phEvs\subseteq\umEvs$) and all compound events are real
+($\dmEvs\subseteq\reEvs$).  In addition, all phantom events map to compound
+events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
+% Note that the set of phantom events
+% \begin{math}
+%   \phEvs=\{\aEv\mid\fmrg{\aEv}{\neq}\aEv\}
+%   %\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}
+% \end{math}
+% and the set of compound events
+% \begin{math}
+%   \dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}.
+%   %\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}.
+% \end{math}
 
 % \ref{pom-m-tau} states that predicate transformers are insensitive to phantom
 % events---the reverse implication holds from \refdef{def:family}.
 
 \begin{lemma}
-  If $\aPS$ is a complete \PwTc{} and
-  $\aEv\in\dmEvs$ 
+  If $\aPS$ is a \PwT{} then there is a \PwTpo{} $\aPS''$ that conservatively
+  extends it.
+  \begin{proof}
+    The proof strategy is as follows: We extend the semantics of
+    \reffig{fig:seq} with $\rpox$.  The obvious definition gives us a
+    preorder rather than a partial order.  To get a partial order, we replay
+    the semantics with out merging to get an \emph{unmerged} pomset $\aPS'$;
+    the construction also produces the map $\fmrg{}$.  When then construct
+    $\aPS''$ by taking $\le''$ from $\aPS$ and $\rpox''$ from $\aPS'$.
+
+    We extend the semantics with $\rpox$ as follows.  For pomsets with at
+    most one event, ${\rpox}$ is the identity.  For sequential composition,
+    ${\rpox}={\rpox_1}\cup {\rpox_2}\cup{\aEvs_1\times\aEvs_2}$.  For the
+    conditional, ${\rpox}={\rpox_1}\cup {\rpox_2}$.  By construction, $\rpox$
+    is a pre-order, which may include cycles due to coalescing.  For example:
+    \begin{align*}
+      % \PR{y}{r}
+      % \SEQ
+      \IF{r}\THEN
+      \PW{x}{1}
+      \SEQ
+      \PW{y}{1}
+      \ELSE
+      \PW{y}{1}
+      \SEQ
+      \PW{x}{1}
+      \FI
+      &&
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{d}{\DW{x}{1}}{}
+          \event{e}{\DW{y}{1}}{right=of d}
+          \pox[out=-15,in=-165]{d}[below]{e}
+          \pox[out=165,in=15]{e}[above]{d}
+        \end{tikzinline}}    
+    \end{align*}
+
+    To find an acyclic $\rpox'$, we replay the construction of $\aPS$ to get
+    $\aPS'$.  When building $\aPS'$, we require disjoint union in \ref{seq-E}
+    and \ref{if-E}---$\aEvs' = \aEvs'_1\uplus\aEvs'_2$.  If and event is
+    unmerged in $\aPS$---$\aEv\in\aEvs_1\uplus\aEvs_2$---then we choose the
+    same event name for $\aEvs'$ in $\aPS'$.  If an event is merged in
+    $\aPS$---$\aEv\in\aEvs_1\cap\aEvs_2)$---then we choose fresh event
+    names---$\aEv'_1$ and $\aEv'_2$---and extend $\fmrg{}$
+    accordingly---$\fmrg{\aEv'_1}=\fmrg{\aEv'_2}=\aEv$.  In $\aPS'$, we take
+    ${\le'}={\rpox'}$.
+
+    To arrive at $\aPS''$, we take
+    \begin{enumerate*}
+    \item
+      $\aEvs''=\aEvs\cup\aEvs'$,
+    \item
+      $\labeling''=\labeling\cup\labeling'$,
+    \item[(3a)]
+      if $\aEv\in\aEvs$ then $\labelingForm''(\aEv)=\labelingForm(\aEv)$,
+    \item[(3b)]
+      if $\aEv\in\aEvs'\setminus\aEvs$ then $\labelingForm''(\aEv)=\labelingForm'(\aEv)$,
+      \stepcounter{enumi}
+    \item
+      $\aTr{\prime\prime\bEvs}{}=\aTr{(\fmrginv{\bEvs})}{}$,
+    \item
+      $\aTerm''=\aTerm$,
+    \item 
+      ${\le''}={\le}$,
+    \item 
+      ${\rpox''}={\rpox'}$, and
+    \item 
+      $\fmrg{}''$ is the constructed merge function. % $\fmrg{}$,
+    \end{enumerate*}
+  \end{proof}
+\end{lemma}
+
+\begin{lemma}
+  If $\aPS$ is a complete \PwTpo{} with compound event $\aEv$,
+  %$\aEv\in\dmEvs$ 
   then
-  $(\exists \cEv\in\phEvs)$
-  $\fmrg{\cEv}=\aEv$
-  and
+  %$(\exists \cEv\in\phEvs)$
+  %$\fmrg{\cEv}=\aEv$
+  there is a phantom event $\cEv\in\fmrginv{\aEv}$
+  such that
   $\labelingForm(\cEv)$ is a tautology.
   \begin{proof}
     Immediate from \ref{pom-m-kappa}.
   \end{proof}
 \end{lemma}
 
-\input{fig-c11.tex}
+\begin{definition}
+  % Let $\aPS$ be a \PwTpo{}.  We say that $\aPS$ is a \emph{candidate execution} if
+  % \begin{enumerate*}
+  % \item it is complete,
+  % \item all events in $\aEvs$ are simple (and therefore $\fmrg{}$ is the
+  %   identity function), and
+  % \item all preconditions in $\labelingForm{}$ are tautologies.
+  % \end{enumerate*}
+  % To extract a \cXI{} candidate execution, we use $\labeling$-consistency
+  % (\refdef{def:labeling:consistent}).
 
+  Let $\aPS_1$ be a \PwTpo{}. Then $\aPS\in\fextract{\aPS_1}$ if 
+  \begin{multicols}{2}
+    \begin{enumerate}
+    \item
+      $\aPS_1$ is complete (\refdef{def:po}),
+    \item 
+      \begin{math}
+        % \aEvs \subseteq \umEvs_1,
+        \aEvs = \{\aEv\in\umEvs_1\mid\allowbreak \labelingForm_1(\aEv)
+        \;\text{is a tautology} \}
+        % \;\text{is}\; \labeling_1 \;\text{consistent}\},
+      \end{math}
+    \item
+      if $\fmrg[1]{\bEv}\le_1 \fmrg[1]{\aEv}$
+      then $\bEv\le\aEv$,
+    \item $\rpox$, $\labeling$, $\labelingForm$, $\aTr{}{}$ and $\aTerm$ project $\aPS_1$ onto
+      $\aEvs$.
+    % \item
+    %   $\aTerm_1$ is a tautology and $\aTerm=\aTerm_1$.
+    \end{enumerate}
+  \end{multicols}
+\end{definition}
+A pomset in the image of $\fextract{}$ is a \emph{candidate execution}.
 
-The semantic rules are given in \reffig{fig:c11}.  As usual, we write
-$\existsone$ to mean ``there exists exactly one''.  For base cases, take
-$\fmrg{}$ to be the identity and $\rpox$ to be empty.
-
-\ref{seq-m-phantom-forall} states that new phantom events must merge into a
-newly compound event.
-\ref{seq-m-exclude} states that newly compound events must be real.
-\ref{seq-m-phantom-exists} states that every newly compound event must have two
-corresponding phantom events.
-
-Here is a diagram elucidating \ref{seq-po-include}, where the top two are merged
-sequentially into the bottom.
+As an example of a \PwTpo, consider:
 \begin{gather*}
-  \begin{tikzcenter}
-    \node (c1)  at (0, 0) {$\mathstrut c_1$};
-    \node (d1)  at (1, 0) {$\mathstrut d$};
-    \node (e1)  at (2, 0) {$\mathstrut e_1$};
-    \draw[->](c1)to(d1);
-    \draw[->](d1)to(e1);
-  \end{tikzcenter}
-  \qquad\qquad
-  \begin{tikzcenter}
-    \node (c2)  at (3, 0) {$\mathstrut c_2$};
-    \node (d2)  at (4, 0) {$\mathstrut d$};
-    \node (e2)  at (5, 0) {$\mathstrut e_2$};
-    \draw[->](c2)to(d2);
-    \draw[->](d2)to(e2);
-  \end{tikzcenter}
+  % \PR{y}{r}
+  % \SEQ
+  \IF{r}\THEN
+    \PW{x}{1}
+    \SEQ
+    \PW{x}{2}
+  \ELSE
+    \PW{x}{2}
+    \SEQ
+    \PW{x}{1}
+  \FI
+  % \IF{r}\THEN\PW{x}{2}\FI
+  % \SEQ
+  % \IF{r}\THEN\PW{x}{1}\FI
+  % \SEQ
+  % \IF{\BANG r}\THEN\PW{x}{2}\FI
+  % \SEQ
+  % \IF{\BANG r}\THEN\PW{x}{1}\FI
   \\
-  \begin{tikzcenter}
-    \node (c1)  at (0, 0) {$\mathstrut c_1$};
-    \node (d1)  at (1, 0) {$\mathstrut d_1$};
-    \node (e1)  at (2, 0) {$\mathstrut e_1$};
-    \node (d)   at (2.5, .5) {$\mathstrut d$};
-    \node (c2)  at (3, 0) {$\mathstrut c_2$};
-    \node (d2)  at (4, 0) {$\mathstrut d_2$};
-    \node (e2)  at (5, 0) {$\mathstrut e_2$};
-    \draw[->](c1)to(d1);
-    \draw[->](d1)to(e1);
-    \draw[->](e1)to(c2);
-    \draw[->](c2)to(d2);
-    \draw[->](d2)to(e2);
-    \draw[->,dotted](d1)to(d);
-    \draw[->,dotted](d2)to(d);
-  \end{tikzcenter}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}
+      \phevent{e1}{r{\neq}0\mid\DW{x}{2}}{right=of d1}
+      \phevent{e2}{r{=}0\mid\DW{x}{2}}{right=of e1}
+      \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e2}
+      \event{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above right=1.5em and -3em of d1}
+      \event{e}{r{\neq}0\lor r{=}0\mid\DW{x}{2}}{above right=1.5em and -3em of e2}
+      %\event{r}{\DR{y}{1}}{left=of d}
+      %\wki[out=5,in=175]{d}{e}
+      \pox[out=-15,in=-167]{d1}[below]{e1}
+      %\pox[out=-15,in=-167]{e1}[below]{e2}
+      \pox[out=-15,in=-167]{e2}[below]{d2}
+      \mrg{d1}[left]{d}
+      \mrg{d2}[pos=.15,right]{d}
+      \mrg{e1}[pos=.15,left]{e}
+      \mrg{e2}[right]{e}
+    \end{tikzinline}}    
+\end{gather*}
+Adding a read to complete the pomset, we can extract the following candidate executions.
+\begin{gather*}
+  \PR{y}{r}
+  \SEQ
+  \IF{r}\THEN
+    \PW{x}{1}
+    \SEQ
+    \PW{x}{2}
+  \ELSE
+    \PW{x}{2}
+    \SEQ
+    \PW{x}{1}
+  \FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{r}{\DR{y}{1}}{}
+      \event{d}{\DW{x}{1}}{right=of r}
+      \event{e}{\DW{x}{2}}{right=of d}
+      \pox[out=-15,in=-167]{d}[below]{e}
+    \end{tikzinline}}    
+  \qquad\qquad\qquad\qquad
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{r}{\DR{y}{0}}{}
+      \event{d}{\DW{x}{1}}{right=of r}
+      \event{e}{\DW{x}{2}}{right=of d}
+      \pox[in=-15,out=-167]{e}[below]{d}
+    \end{tikzinline}}    
 \end{gather*}
 
-We have written \ref{seq-po-include} .
 
+% \begin{comment}
+%   \input{fig-c11.tex}
+
+%   The semantic rules are given in \reffig{fig:c11}.  As usual, we write
+%   $\existsone$ to mean ``there exists exactly one''.  For base cases, take
+%   $\fmrg{}$ to be the identity and $\rpox$ to be empty.
+
+%   \ref{seq-m-phantom-forall} states that new phantom events must merge into a
+%   newly compound event.
+%   \ref{seq-m-exclude} states that newly compound events must be real.
+%   \ref{seq-m-phantom-exists} states that every newly compound event must have two
+%   corresponding phantom events.
+
+%   Here is a diagram elucidating \ref{seq-po-include}, where the top two are merged
+%   sequentially into the bottom.
+%   \begin{gather*}
+%     \begin{tikzcenter}
+%       \node (c1)  at (0, 0) {$\mathstrut c_1$};
+%       \node (d1)  at (1, 0) {$\mathstrut d$};
+%       \node (e1)  at (2, 0) {$\mathstrut e_1$};
+%       \draw[->](c1)to(d1);
+%       \draw[->](d1)to(e1);
+%     \end{tikzcenter}
+%     \qquad\qquad
+%     \begin{tikzcenter}
+%       \node (c2)  at (3, 0) {$\mathstrut c_2$};
+%       \node (d2)  at (4, 0) {$\mathstrut d$};
+%       \node (e2)  at (5, 0) {$\mathstrut e_2$};
+%       \draw[->](c2)to(d2);
+%       \draw[->](d2)to(e2);
+%     \end{tikzcenter}
+%     \\
+%     \begin{tikzcenter}
+%       \node (c1)  at (0, 0) {$\mathstrut c_1$};
+%       \node (d1)  at (1, 0) {$\mathstrut d_1$};
+%       \node (e1)  at (2, 0) {$\mathstrut e_1$};
+%       \node (d)   at (2.5, .5) {$\mathstrut d$};
+%       \node (c2)  at (3, 0) {$\mathstrut c_2$};
+%       \node (d2)  at (4, 0) {$\mathstrut d_2$};
+%       \node (e2)  at (5, 0) {$\mathstrut e_2$};
+%       \draw[->](c1)to(d1);
+%       \draw[->](d1)to(e1);
+%       \draw[->](e1)to(c2);
+%       \draw[->](c2)to(d2);
+%       \draw[->](d2)to(e2);
+%       \draw[->,dotted](d1)to(d);
+%       \draw[->,dotted](d2)to(d);
+%     \end{tikzcenter}
+%   \end{gather*}
+
+%   We have written \ref{seq-po-include} .
+% \end{comment}
+
+It is possible to project \PwTpo{}s directly to \cXI{} pre-executions.
+However, the dependency calculation thus produced is overly weak.  Consider
+the following example.
+\begin{align*}
+  \PR{y}{r}
+  \SEMI
+  \IF{r}\THEN
+  \PW{x}{1}\SEMI\PW{x}{2}
+  \ELSE
+  \PW{x}{2}\SEMI\PW{x}{1}
+  \FI
+  &&
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DR{y}{1}}{}
+      \event{b}{\DW{x}{1}}{right=of a}
+      \event{c}{\DW{x}{2}}{right=of b}
+    \end{tikzinline}}
+\end{align*}
+With augmentation, 
+Idea: merging reads can only make a difference is if there is a race.
 \begin{definition}
   A \cXI{} \emph{pre-execution} is a projection of a \PwTc{}, taking all of
   the simple events whose preconditions are tautologies.
@@ -394,522 +601,108 @@ For TC2, we have:
       \pox{p2}[below]{a3}
     \end{tikzinline}}
 \end{gather*}
-Idea: merging reads can only make a difference is if there is a race.
+% Idea: merging reads can only make a difference is if there is a race.
 
-\begin{align*}
-  \begin{gathered}[t]
-    % \PR{y}{r}
-    % \SEQ
-    \IF{r}\THEN
-      \PW{x}{1}
-      \SEQ
-      \PW{x}{2}
-    \ELSE
-      \PW{x}{1}
-      \SEQ
-      \PW{x}{2}
-    \FI
-    % \IF{r}\THEN\PW{x}{2}\FI
-    % \SEQ
-    % \IF{r}\THEN\PW{x}{1}\FI
-    % \SEQ
-    % \IF{\BANG r}\THEN\PW{x}{2}\FI
-    % \SEQ
-    % \IF{\BANG r}\THEN\PW{x}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        %\event{a1}{\DR{y}{1}}
-        \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}               %x{d_1}
-        \phevent{e1}{r{\neq}0\mid\DW{x}{2}}{right=of d1}    %x{e_1}
-        \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e1}    %x{d_2}
-        \phevent{e2}{r{=}0\mid\DW{x}{2}}{right=of d2}    %x{e_2}
-        \event{d}{\DW{x}{1}}{above=of d1}
-        \event{e}{\DW{x}{2}}{above=of e2}
-        \wki[out=5,in=175]{d}{e}
-        \pox[out=-15,in=-165]{d1}[below]{e1}
-        \pox[out=-15,in=-165]{e1}[below]{d2}
-        \pox[out=-15,in=-165]{d2}[below]{e2}
-        \mrg{d1}[left]{d}
-        \mrg[out=140,in=-10]{d2}[pos=.15,right]{d}
-        \mrg[out=40,in=-170]{e1}[pos=.15,left]{e}
-        \mrg{e2}[right]{e}
-      \end{tikzinline}}    
-  \end{gathered}
-\end{align*}
+% \begin{align*}
+%   \begin{gathered}[t]
+%     % \PR{y}{r}
+%     % \SEQ
+%     \IF{r}\THEN
+%       \PW{x}{1}
+%       \SEQ
+%       \PW{x}{2}
+%     \ELSE
+%       \PW{x}{1}
+%       \SEQ
+%       \PW{x}{2}
+%     \FI
+%     % \IF{r}\THEN\PW{x}{2}\FI
+%     % \SEQ
+%     % \IF{r}\THEN\PW{x}{1}\FI
+%     % \SEQ
+%     % \IF{\BANG r}\THEN\PW{x}{2}\FI
+%     % \SEQ
+%     % \IF{\BANG r}\THEN\PW{x}{1}\FI
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=1.5em]
+%         %\event{a1}{\DR{y}{1}}
+%         \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}               %x{d_1}
+%         \phevent{e1}{r{\neq}0\mid\DW{x}{2}}{right=of d1}    %x{e_1}
+%         \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e1}    %x{d_2}
+%         \phevent{e2}{r{=}0\mid\DW{x}{2}}{right=of d2}    %x{e_2}
+%         \event{d}{\DW{x}{1}}{above=of d1}
+%         \event{e}{\DW{x}{2}}{above=of e2}
+%         \wki[out=5,in=175]{d}{e}
+%         \pox[out=-15,in=-165]{d1}[below]{e1}
+%         \pox[out=-15,in=-165]{e1}[below]{d2}
+%         \pox[out=-15,in=-165]{d2}[below]{e2}
+%         \mrg{d1}[left]{d}
+%         \mrg[out=140,in=-10]{d2}[pos=.15,right]{d}
+%         \mrg[out=40,in=-170]{e1}[pos=.15,left]{e}
+%         \mrg{e2}[right]{e}
+%       \end{tikzinline}}    
+%   \end{gathered}
+% \end{align*}
 
-\begin{align*}
-  \begin{gathered}[t]
-    \PR{y}{r}
-    \SEQ
-    \IF{r}\THEN
-      \PW{x}{1}
-      \SEQ
-      \PW{x}{2}
-    \ELSE
-      \PW{x}{1}
-      \SEQ
-      \PW{x}{2}
-    \FI
-    % \IF{r}\THEN\PW{x}{2}\FI
-    % \SEQ
-    % \IF{r}\THEN\PW{x}{1}\FI
-    % \SEQ
-    % \IF{\BANG r}\THEN\PW{x}{2}\FI
-    % \SEQ
-    % \IF{\BANG r}\THEN\PW{x}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \phevent{d1}{1{\neq}0\mid\DW{x}{1}}{}               %x{d_1}
-        \phevent{e1}{1{\neq}0\mid\DW{x}{2}}{right=of d1}    %x{e_1}
-        \phevent{d2}{1{=}0\mid\DW{x}{1}}{right=of e1}    %x{d_2}
-        \phevent{e2}{1{=}0\mid\DW{x}{2}}{right=of d2}    %x{e_2}
-        \event{d}{\DW{x}{1}}{above=of d1}
-        \event{e}{\DW{x}{2}}{above=of e2}
-        \event{r}{\DR{y}{1}}{left=of d}
-        \wki[out=5,in=175]{d}{e}
-        \pox[out=-15,in=-167]{d1}[below]{e1}
-        \pox[out=-15,in=-167]{e1}[below]{d2}
-        \pox[out=-15,in=-167]{d2}[below]{e2}
-        \mrg{d1}[left]{d}
-        \mrg[out=140,in=-10]{d2}[pos=.15,right]{d}
-        \mrg[out=40,in=-170]{e1}[pos=.15,left]{e}
-        \mrg{e2}[right]{e}
-      \end{tikzinline}}    
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \phevent{d1}{\DW{x}{1}}{}               %x{d_1}
-        \phevent{e1}{\DW{x}{2}}{right=of d1}    %x{e_1}
-        \phnonevent{d2}{\DW{x}{1}}{right=of e1}    %x{d_2}
-        \phnonevent{e2}{\DW{x}{2}}{right=of d2}    %x{e_2}
-        \event{d}{\DW{x}{1}}{above=of d1}
-        \event{e}{\DW{x}{2}}{above=of e2}
-        \event{r}{\DR{y}{1}}{left=of d}
-        \wki[out=5,in=175]{d}{e}
-        \pox[out=-15,in=-170]{d1}[below]{e1}
-        \pox[out=-15,in=-170]{e1}[below]{d2}
-        \pox[out=-15,in=-170]{d2}[below]{e2}
-        \mrg{d1}[left]{d}
-        \mrg[out=140,in=-10]{d2}[pos=.15,right]{d}
-        \mrg[out=40,in=-170]{e1}[pos=.15,left]{e}
-        \mrg{e2}[right]{e}
-      \end{tikzinline}}    
-  \end{gathered}
-\end{align*}
+% \begin{align*}
+%   \begin{gathered}[t]
+%     \PR{y}{r}
+%     \SEQ
+%     \IF{r}\THEN
+%       \PW{x}{1}
+%       \SEQ
+%       \PW{x}{2}
+%     \ELSE
+%       \PW{x}{1}
+%       \SEQ
+%       \PW{x}{2}
+%     \FI
+%     % \IF{r}\THEN\PW{x}{2}\FI
+%     % \SEQ
+%     % \IF{r}\THEN\PW{x}{1}\FI
+%     % \SEQ
+%     % \IF{\BANG r}\THEN\PW{x}{2}\FI
+%     % \SEQ
+%     % \IF{\BANG r}\THEN\PW{x}{1}\FI
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=1.5em]
+%         \phevent{d1}{1{\neq}0\mid\DW{x}{1}}{}               %x{d_1}
+%         \phevent{e1}{1{\neq}0\mid\DW{x}{2}}{right=of d1}    %x{e_1}
+%         \phevent{d2}{1{=}0\mid\DW{x}{1}}{right=of e1}    %x{d_2}
+%         \phevent{e2}{1{=}0\mid\DW{x}{2}}{right=of d2}    %x{e_2}
+%         \event{d}{\DW{x}{1}}{above=of d1}
+%         \event{e}{\DW{x}{2}}{above=of e2}
+%         \event{r}{\DR{y}{1}}{left=of d}
+%         \wki[out=5,in=175]{d}{e}
+%         \pox[out=-15,in=-167]{d1}[below]{e1}
+%         \pox[out=-15,in=-167]{e1}[below]{d2}
+%         \pox[out=-15,in=-167]{d2}[below]{e2}
+%         \mrg{d1}[left]{d}
+%         \mrg[out=140,in=-10]{d2}[pos=.15,right]{d}
+%         \mrg[out=40,in=-170]{e1}[pos=.15,left]{e}
+%         \mrg{e2}[right]{e}
+%       \end{tikzinline}}    
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=1.5em]
+%         \phevent{d1}{\DW{x}{1}}{}               %x{d_1}
+%         \phevent{e1}{\DW{x}{2}}{right=of d1}    %x{e_1}
+%         \phnonevent{d2}{\DW{x}{1}}{right=of e1}    %x{d_2}
+%         \phnonevent{e2}{\DW{x}{2}}{right=of d2}    %x{e_2}
+%         \event{d}{\DW{x}{1}}{above=of d1}
+%         \event{e}{\DW{x}{2}}{above=of e2}
+%         \event{r}{\DR{y}{1}}{left=of d}
+%         \wki[out=5,in=175]{d}{e}
+%         \pox[out=-15,in=-170]{d1}[below]{e1}
+%         \pox[out=-15,in=-170]{e1}[below]{d2}
+%         \pox[out=-15,in=-170]{d2}[below]{e2}
+%         \mrg{d1}[left]{d}
+%         \mrg[out=140,in=-10]{d2}[pos=.15,right]{d}
+%         \mrg[out=40,in=-170]{e1}[pos=.15,left]{e}
+%         \mrg{e2}[right]{e}
+%       \end{tikzinline}}    
+%   \end{gathered}
+% \end{align*}
 
-Redundant read after read elimination example from \cite[\textsection6.4]{DBLP:conf/esop/PaviottiCPWOB20} to work out with merge.
-\cite[Fig.~5]{DBLP:conf/ecoop/SevcikA08}.  Take $r=s$.
-\begin{gather*}
-  \begin{gathered}    
-    \PR{y}{r}
-    \SEMI
-    \IF{r{=}1}\THEN
-      \PR{y}{s}
-      \SEMI
-      \PW{x}{s}
-    \ELSE
-      \PW{x}{1}
-    \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \phevent{d1}{\DR{y}{1}}{}               %x{d_1}
-        \phevent{d2}{1{=}r\limplies r{=}1\mid\DR{y}{1}}{right=of d1}    %x{e_1}
-        \phevent{e1}{1{=}r\limplies 1{=}s\limplies (r{=}1\land s{=}1)\mid\DW{x}{1}}{right=of d2}    %x{d_2}
-        \phevent{e2}{1{=}r\limplies r{\neq}1\mid\DW{x}{1}}{right=of e1}    %x{e_2}
-        \event{d}{\DR{y}{1}}{above=of d1}
-        \event{e}{\DW{x}{1}}{above=of e2}
-        \pox{d1}[above]{d2}
-        \pox{d2}[above]{e1}
-        \pox[out=-10,in=-170]{d1}[below]{e2}
-        \mrg{d1}[left]{d}
-        \mrg{d2}[pos=.15,right]{d}
-        \mrg{e1}[pos=.15,left]{e}
-        \mrg{e2}[right]{e}
-      \end{tikzinline}}
-  \end{gathered}  
-\end{gather*}
-
-A more dramatic problem \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}.
-Version with control dependencies is \drf{}.
-
-\begin{align*}
-  \begin{gathered}    
-    \IF{r}\THEN
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    \\
-    \hbox{\begin{tikzinlinesmall}[node distance=1em]
-        \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
-        \event{a5}{r{\neq}0\land((1{=}s\lor x{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
-      \end{tikzinlinesmall}}
-    \\
-    \hbox{\begin{tikzinlinesmall}[node distance=1em]
-        \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
-        \event{a5}{r{\neq}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinlinesmall}}
-  \end{gathered}
-  &&
-  \begin{gathered}    
-    \IF{\lnot r}\THEN
-      \PW{x}{0}
-      \SEMI
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    \\
-    % \hbox{\begin{tikzinlinesmall}[node distance=1em]
-    %     \event{a3}{r{=}0\mid\DW{x}{0}}{}
-    %     \event{a4}{r{=}0\mid\DR{x}{1}}{right=of a3}
-    %     \event{a5}{r{=}0\land((1{=}s\lor x{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
-    %   \end{tikzinlinesmall}}
-    % \\
-    % \hbox{\begin{tikzinlinesmall}[node distance=1em]
-    %     \event{a3}{r{=}0\mid\DW{x}{0}}{}
-    %     \event{a4}{r{=}0\mid\DR{x}{1}}{right=of a3}
-    %     \event{a5}{r{=}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
-    %     \po{a4}{a5}
-    %   \end{tikzinlinesmall}}
-    % \\
-    \hbox{\begin{tikzinlinesmall}[node distance=1em]
-        \event{a4}{r{=}0\mid\DR{x}{1}}{}
-        \event{a5}{r{=}0\land((1{=}s\lor 0{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
-      \end{tikzinlinesmall}}
-    \\
-    \hbox{\begin{tikzinlinesmall}[node distance=1em]
-        \event{a4}{r{=}0\mid\DR{x}{1}}{}
-        \event{a5}{r{=}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinlinesmall}}
-  \end{gathered}
-\end{align*}
-\begin{align*}
-  \begin{gathered}    
-    \IF{r}\THEN
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
-        \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
-      \end{tikzinline}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
-        \event{a5}{r{\neq}0\mid\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}    
-    \IF{\lnot r}\THEN
-      \PW{x}{0}
-      \SEMI
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{r{=}0\mid\DR{x}{1}}{}
-        \event{a5}{\FALSE\mid\DW{z}{1}}{right=of a4}
-      \end{tikzinline}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{r{=}0\mid\DR{x}{1}}{}
-        \event{a5}{r{=}0\mid\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-\begin{align*}
-  \begin{gathered}    
-    \IF{r}\THEN
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \ELSE
-      \PW{x}{0}
-      \SEMI
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{\DR{x}{1}}{}
-        \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
-      \end{tikzinline}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{\DR{x}{1}}{}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-
-        % \event{a1}{\DW{x}{1}}{}
-        % \event{a2}{\DR{y}{1}}{right=of a1}
-        % \event{a3}{\DW{x}{0}}{right=of a2}
-        % \event{a4}{\DR{x}{1}}{right=of a2}
-        % \event{a5}{\DW{z}{1}}{right=of a4}
-        % %\wki[out=15,in=165]{a1}{a3}
-        % %\wki{a3}{a4}
-        % \po[out=15,in=165]{a2}{a5}
-
-\begin{gather*}
-    \PW{x}{1}
-    \SEMI
-    \PR{y}{r}
-    \SEMI
-    \IF{r}\THEN
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \ELSE
-      \PW{x}{0}
-      \SEMI
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    \PAR
-    \IF{z}\THEN
-      \PW{y}{1}
-    \FI
-    % \\
-    % \PW{x}{1}
-    % \SEMI
-    % \IF{y}\THEN
-    %   \IF{x}\THEN
-    %     \PW{z}{1}
-    %   \FI
-    % \ELSE
-    %   \PW{x}{0}
-    %   \SEMI
-    %   \IF{x}\THEN
-    %     \PW{z}{1}
-    %   \FI
-    % \FI
-    % \PAR
-    % \IF{z}\THEN
-    %   \PW{y}{1}
-    % \FI
-    % \\
-    % \PW{x}{1}
-    % \SEMI
-    % \IF{y}\THEN
-    %   \PW{z}{\PR{x}{}}
-    % \ELSE
-    %   \PW{x}{0}
-    %   \SEMI
-    %   \PW{z}{\PR{x}{}}
-    % \FI
-    % \PAR
-    % \PW{y}{\PR{z}{}}
-    \\
-    \tag{\cmark}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DW{x}{1}}{}
-        \event{a2}{\DR{y}{1}}{right=of a1}
-        %\event{a3}{\DW{x}{0}}{right=of a2}
-        \event{a4}{\DR{x}{1}}{right=of a2}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=3em of a5}
-        \event{b2}{\DW{y}{1}}{right=of b1}
-        %\po{a2}{a3}
-        \po{b1}{b2}
-        %\wki[out=15,in=165]{a1}{a3}
-        %\wki{a3}{a4}
-        \rf{a5}{b1}
-        \rf[out=-170,in=-10]{b2}{a2}
-        \po[out=15,in=165]{a2}{a5}
-      \end{tikzinline}}
-    \\
-    \tag{\xmark}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DW{x}{1}}{}
-        \event{a2}{\DR{y}{1}}{right=of a1}
-        %\event{a3}{\DW{x}{0}}{right=of a2}
-        \event{a4}{\DR{x}{1}}{right=of a2}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=3em of a5}
-        \event{b2}{\DW{y}{1}}{right=of b1}
-        %\po{a2}{a3}
-        \po{b1}{b2}
-        %\wki[out=15,in=165]{a1}{a3}
-        %\wki{a3}{a4}
-        \rf{a5}{b1}
-        \rf[out=-170,in=-10]{b2}{a2}
-        \po{a4}{a5}
-      \end{tikzinline}}
-    \\
-    \tag{\cmark}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DW{x}{1}}{}
-        \event{a2}{\DR{y}{0}}{right=of a1}
-        \event{a3}{\DW{x}{0}}{right=of a2}
-        \event{a4}{\DR{x}{1}}{right=of a3}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=3em of a5}
-        \event{b2}{\DW{y}{1}}{right=of b1}
-        \po{a2}{a3}
-        \po{b1}{b2}
-        \wki[out=15,in=165]{a1}{a3}
-        \wki{a3}{a4}
-        \rf{a5}{b1}
-        %\rf[out=-170,in=-10]{b2}{a2}
-        \po[out=15,in=165]{a2}{a5}
-      \end{tikzinline}}
-    \\
-    \tag{\cmark}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DW{x}{1}}{}
-        \event{a2}{\DR{y}{0}}{right=of a1}
-        \event{a3}{\DW{x}{0}}{right=of a2}
-        \event{a4}{\DR{x}{1}}{right=of a3}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=3em of a5}
-        \event{b2}{\DW{y}{1}}{right=of b1}
-        \po{a2}{a3}
-        \po{b1}{b2}
-        \wki[out=15,in=165]{a1}{a3}
-        \wki{a3}{a4}
-        \rf{a5}{b1}
-        %\rf[out=-170,in=-10]{b2}{a2}
-        \po{a4}{a5}
-      \end{tikzinline}}
-\end{gather*}
-
-With $\Q{x}$, we have:
-\begin{align*}
-  \begin{gathered}    
-    \IF{r}\THEN
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    % \\
-    % \hbox{\begin{tikzinline}[node distance=1em]
-    %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-    %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
-    %   \end{tikzinline}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-        \event{a5}{r{\neq}0\mid\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}    
-    \IF{\lnot r}\THEN
-      \PW{x}{0}
-      \SEMI
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    % \\
-    % \hbox{\begin{tikzinline}[node distance=1em]
-    %     \event{a4}{\FALSE\mid\DR{x}{1}}{}
-    %     \event{a5}{\FALSE\mid\DW{z}{1}}{right=of a4}
-    %   \end{tikzinline}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{\FALSE\mid\DR{x}{1}}{}
-        \event{a5}{r{=}0\mid\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-\begin{align*}
-  \begin{gathered}    
-    \IF{r}\THEN
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \ELSE
-      \PW{x}{0}
-      \SEMI
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    % \\
-    % \hbox{\begin{tikzinline}[node distance=1em]
-    %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-    %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
-    %   \end{tikzinline}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinline}}
-  \end{gathered}
-  \\
-  \begin{gathered}    
-    \PR{y}{r}
-    \SEMI
-    \IF{r}\THEN
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \ELSE
-      \PW{x}{0}
-      \SEMI
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
-    % \\
-    % \hbox{\begin{tikzinline}[node distance=1em]
-    %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-    %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
-    %   \end{tikzinline}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a2}{\DR{y}{1}}{}
-        \event{a4}{1{=}r\limplies(r{\neq}0\land\Q{x})\mid\DR{x}{1}}{right=of a2}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \po{a4}{a5}
-      \end{tikzinline}}
-  \end{gathered}  
-\end{align*}
 
 
 

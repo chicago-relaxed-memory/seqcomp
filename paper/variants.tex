@@ -155,6 +155,84 @@ elimination is sound:
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
 \end{displaymath}
 
+As a further example, consider \cite[Fig.~5]{DBLP:conf/ecoop/SevcikA08},
+referenced in \cite[\textsection6.4]{DBLP:conf/esop/PaviottiCPWOB20}:
+\begin{gather*}
+  \begin{gathered}    
+    \PR{y}{r}
+    \SEMI
+    \IF{r{=}1}\THEN
+      \PR{y}{s}
+      \SEMI
+      \PW{x}{s}
+    \ELSE
+      \PW{x}{1}
+    \FI
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=1.5em]
+  %       \phevent{d1}{\DR{y}{1}}{}               %x{d_1}
+  %       \phevent{d2}{1{=}r\limplies r{=}1\mid\DR{y}{1}}{right=of d1}    %x{e_1}
+  %       \phevent{e1}{1{=}r\limplies 1{=}s\limplies (r{=}1\land s{=}1)\mid\DW{x}{1}}{right=of d2}    %x{d_2}
+  %       \phevent{e2}{1{=}r\limplies r{\neq}1\mid\DW{x}{1}}{right=of e1}    %x{e_2}
+  %       \event{d}{\DR{y}{1}}{above=of d1}
+  %       \event{e}{\DW{x}{1}}{above=of e2}
+  %       \pox{d1}[above]{d2}
+  %       \pox{d2}[above]{e1}
+  %       \pox[out=-10,in=-170]{d1}[below]{e2}
+  %       \mrg{d1}[left]{d}
+  %       \mrg{d2}[pos=.15,right]{d}
+  %       \mrg{e1}[pos=.15,left]{e}
+  %       \mrg{e2}[right]{e}
+  %     \end{tikzinline}}
+  \end{gathered}  
+\end{gather*}
+In order to independent of both reads, we take precondition of 
+$\DW{x}{1}$ to be:
+\begin{displaymath}
+  \PBR{
+    1{=}r\lor y{=}r
+  }
+  \limplies
+  \SBR{
+    r{=}1
+    \land
+    \PBRbig{
+      \PBR{
+        1{=}s\lor y{=}s
+      }
+      \limplies
+      s{=}1
+    }
+  }
+  \lor
+  \SBR{
+    r{\neq}1
+  }
+\end{displaymath}
+Suppose that the initial value of $y$ in this thread is $2$.
+Then collapsing $r$ and $s$ and substituting $[2/y]$, we have a tautology:
+\begin{displaymath}
+  \PBR{
+    1{=}r\lor 2{=}r
+  }
+  \limplies
+  \SBR{
+    r{=}1
+    \land
+    \PBRbig{
+      \PBR{
+        1{=}r\lor 2{=}r
+      }
+      \limplies
+      r{=}1
+    }
+  }
+  \lor
+  \SBR{
+    r{\neq}1
+  }
+\end{displaymath}
+
 
 \subsection{Register Consistency}
 \label{sec:false}
@@ -197,16 +275,19 @@ In this subsection, we refine these requirements into ones that do hold.
 %   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
 % \end{gather*}
 %
-First we define $\cForm_\labeling$, which captures the register state of a pomset:
-\begin{displaymath}
-  \cForm_\labeling=
-  \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
-  \textwhere \aEvs=\fdom(\labeling)
-\end{displaymath}
-We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\cForm_\labeling$ is satisfiable.
-We say that it is \emph{$\labeling$-inconsistent} otherwise.
-
-
+We define $\regForm{\labeling}$ to capture the register state of a pomset.
+\begin{definition}  
+  \label{def:labeling:consistent}
+  Let 
+  \begin{math}
+    \regForm{\labeling}=
+    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
+    \textwhere \aEvs=\fdom(\labeling)
+  \end{math}.
+  
+  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
+  We say that it is \emph{$\labeling$-inconsistent} otherwise.
+\end{definition}
 
 
 %tau maps (things incompatible with chi) to (things incompatible with chi)
