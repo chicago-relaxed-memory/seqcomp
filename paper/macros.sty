@@ -1,3 +1,19 @@
+\usepackage[rightbars]{changebar}
+% \usepackage[framemethod=tikz]{mdframed}
+% \newmdenv[
+%   skipabove = \partopsep,
+%   linecolor = lightgray,
+%   rightmargin = 0pt,
+%   innerrightmargin = 1em,
+%   innertopmargin = 0pt,
+%   innerbottommargin = 0pt,
+%   innerleftmargin = 0pt,
+%   leftmargin = 0pt,
+%   linewidth = 3pt,
+%   topline = false,
+%   leftline = false,
+%   bottomline = false
+%   ]{rightbar}
 \newcommand{\fextract}[1]{\mathsf{extract}\ifnotempty{#1}{(#1)}}
 \newcommand{\regForm}[1]{\cForm_{#1}}%\mathsf{REG}\ifnotempty{#1}{_{#1}}}
 \newcommand{\existsone}{\exists!}
@@ -61,6 +77,7 @@
 \newcommand{\rimpliesdef}{\mathrel{\vDash}}%{\LABEL@COLOR@REL{\emph{implies}}}
 \newcommand{\rextendsdef}[2]{\LABEL@REL{\emph{respects}}\ifnotempty{#1#2}{{#1}\ifnotempty{#2}{\;\allowbreak\textnormal{\emph{and}}\;\allowbreak{#2}}}}
 
+\newcommand{\roverlap}{\LABEL@COLOR@REL{{overlap}}}
 \newcommand{\roverlaps}{\LABEL@COLOR@REL{{overlaps}}}
 \newcommand{\rmatches}{\LABEL@COLOR@REL{{matches}}}
 \newcommand{\rblocks}{\LABEL@COLOR@REL{{blocks}}}
@@ -220,6 +237,7 @@
 \usepackage{verbatim}
 \usepackage{stmaryrd}
 \usepackage{soul}
+\sethlcolor{lightgray}
 \newcommand{\hlfancy}[2]{\sethlcolor{#1}\hl{#2}}
 \usepackage{alltt}
 \usepackage{float}

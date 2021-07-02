@@ -61,12 +61,12 @@ We first define pomsets with program order (\PwTpo{}).
 
     \makecounter{Bpo}
   \item \label{pom-po} \makecounter{po}
-    ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a partial order capturing
-    \emph{program order}. %, such that
-    % \begin{enumerate}
-    % \item \label{pom-po-le}
-    %   if $\bEv,\aEv\in\phEvs$ and $\bEv\xpox\aEv$ then $\bEv\le\aEv$.
-    % \end{enumerate}
+    ${\rpox} \subseteq (\aEvs\times\aEvs)$ is a pre-order capturing
+    \emph{program order}, such that
+    \begin{enumerate}
+    \item \label{pom-po-le}
+      $\rpox$ is a partial order when restricted to simple events $(\umEvs\times\umEvs)$.
+    \end{enumerate}
     % , where 
     % $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$.
     % is the set of \emph{simple} %(rather than \emph{compound})
@@ -138,7 +138,8 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
     preorder rather than a partial order.  To get a partial order, we replay
     the semantics with out merging to get an \emph{unmerged} pomset $\aPS'$;
     the construction also produces the map $\fmrg{}$.  When then construct
-    $\aPS''$ by taking $\le''$ from $\aPS$ and $\rpox''$ from $\aPS'$.
+    $\aPS''$ as the union of $\aPS$ and $\aPS'$, using the dependency
+    relation from $\aPS$.
 
     We extend the semantics with $\rpox$ as follows.  For pomsets with at
     most one event, ${\rpox}$ is the identity.  For sequential composition,
@@ -191,17 +192,61 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
       $\aTr{\prime\prime\bEvs}{}=\aTr{(\fmrginv{\bEvs})}{}$,
     \item
       $\aTerm''=\aTerm$,
-    \item 
-      ${\le''}={\le}$,
-    \item 
-      ${\rpox''}={\rpox'}$, and
+    \item \label{le-item}
+      ${\le''}=\fmrginv{\le}$,
+    \item \label{pox-item}
+      ${\rpox''}={\rpox}\cup{\rpox'}$, and
     \item 
       $\fmrg{}''$ is the constructed merge function. % $\fmrg{}$,
     \end{enumerate*}
   \end{proof}
 \end{lemma}
-We write $\sempo{}$ for the semantic function defined by applying the
-construction of \reflem{lem:po} to the base semantics of \ref{fig:seq}.  
+\begin{definition}
+  For a \PwTpo{}, let $\fextract{\aPS}$ be the projection
+  of $\aPS$ onto the set
+  \begin{math}
+    \{\aEv\in\umEvs_1\mid\allowbreak \labelingForm_1(\aEv) \;\text{is a tautology} \}.
+  \end{math}
+  % % Let $\aPS$ be a \PwTpo{}.  We say that $\aPS$ is a \emph{candidate execution} if
+  % % \begin{enumerate*}
+  % % \item it is complete,
+  % % \item all events in $\aEvs$ are simple (and therefore $\fmrg{}$ is the
+  % %   identity function), and
+  % % \item all preconditions in $\labelingForm{}$ are tautologies.
+  % % \end{enumerate*}
+  % % To extract a \cXI{} candidate execution, we use $\labeling$-consistency
+  % % (\refdef{def:labeling:consistent}).
+  % Let $\aPS_1$ be a \PwTpo{}. Then $\aPS\in\fextract{\aPS_1}$ if 
+  % \begin{multicols}{2}
+  %   \begin{enumerate}
+  %   \item
+  %     $\aPS_1$ is complete (\refdef{def:po}),
+  %   \item 
+  %     \begin{math}
+  %       % \aEvs \subseteq \umEvs_1,
+  %       \aEvs = \{\aEv\in\umEvs_1\mid\allowbreak \labelingForm_1(\aEv)
+  %       \;\text{is a tautology} \}
+  %       % \;\text{is}\; \labeling_1 \;\text{consistent}\},
+  %     \end{math}
+  %   \item
+  %     if $\fmrg[1]{\bEv}\le_1 \fmrg[1]{\aEv}$
+  %     then $\bEv\le\aEv$,
+  %   \item $\rpox$, $\labeling$, $\labelingForm$, $\aTr{}{}$ and $\aTerm$ project $\aPS_1$ onto
+  %     $\aEvs$.
+  %   % \item
+  %   %   $\aTerm_1$ is a tautology and $\aTerm=\aTerm_1$.
+  %   \end{enumerate}
+  % \end{multicols}
+\end{definition}
+By definition, $\fextract{\aPS}$ includes the simple events of $\aPS$ whose
+preconditions are tautologies.  These are already in program order, as per
+item \ref{pox-item} of the proof.  The dependency order is derived from the
+real events using $\fmrg{}$, as per item \ref{le-item}, which says that
+${\bEv}\le'' {\aEv}$ exactly when $\fmrg{\bEv}\le\fmrg{\aEv}$.
+
+The following lemma shows that if $\aPS$ is \emph{complete}, then
+$\fextract{\aPS}$ includes at least one simple event for every compound event
+in $\aPS$.
 
 \begin{lemma}
   If $\aPS$ is a complete \PwTpo{} with compound event $\aEv$,
@@ -217,39 +262,6 @@ construction of \reflem{lem:po} to the base semantics of \ref{fig:seq}.
   \end{proof}
 \end{lemma}
 
-\begin{definition}
-  % Let $\aPS$ be a \PwTpo{}.  We say that $\aPS$ is a \emph{candidate execution} if
-  % \begin{enumerate*}
-  % \item it is complete,
-  % \item all events in $\aEvs$ are simple (and therefore $\fmrg{}$ is the
-  %   identity function), and
-  % \item all preconditions in $\labelingForm{}$ are tautologies.
-  % \end{enumerate*}
-  % To extract a \cXI{} candidate execution, we use $\labeling$-consistency
-  % (\refdef{def:labeling:consistent}).
-
-  Let $\aPS_1$ be a \PwTpo{}. Then $\aPS\in\fextract{\aPS_1}$ if 
-  \begin{multicols}{2}
-    \begin{enumerate}
-    \item
-      $\aPS_1$ is complete (\refdef{def:po}),
-    \item 
-      \begin{math}
-        % \aEvs \subseteq \umEvs_1,
-        \aEvs = \{\aEv\in\umEvs_1\mid\allowbreak \labelingForm_1(\aEv)
-        \;\text{is a tautology} \}
-        % \;\text{is}\; \labeling_1 \;\text{consistent}\},
-      \end{math}
-    \item
-      if $\fmrg[1]{\bEv}\le_1 \fmrg[1]{\aEv}$
-      then $\bEv\le\aEv$,
-    \item $\rpox$, $\labeling$, $\labelingForm$, $\aTr{}{}$ and $\aTerm$ project $\aPS_1$ onto
-      $\aEvs$.
-    % \item
-    %   $\aTerm_1$ is a tautology and $\aTerm=\aTerm_1$.
-    \end{enumerate}
-  \end{multicols}
-\end{definition}
 A pomset in the image of $\fextract{}$ is a \emph{candidate execution}.
 
 As an example, consider Java Causality Test Case 6.  Taking $w=0$ and $v=1$,
@@ -277,6 +289,7 @@ the \PwTpo{} on the left below produces the candidate execution on the right.
         \mrg{e2}{e}
         \event{i}{\DW{y}{w}}{left=of r}
         \pox[out=-15,in=-167]{i}[below]{r}
+        \pox{r}{e}
       \end{tikzinlinesmall}}    
   \end{gathered}
   &&
@@ -328,6 +341,9 @@ the \PwTpo{} on the left below produces the candidate execution on the right.
   % \end{gathered}
 \end{align*}
 
+We write $\sempo{}$ for the semantic function defined by applying the
+construction of \reflem{lem:po} to the base semantics of \ref{fig:seq}.  
+
 The dependency calculation of $\sempo{}$ is sufficient for \cXI; however, it
 ignores synchronization and coherence completely.
 \begin{align*}
@@ -343,9 +359,11 @@ ignores synchronization and coherence completely.
         \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}
         \eventrr{e}{e}{s{\neq}0\mid\DW{x}{2}}{right=of d1}
         \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e}
-        \eventr{d}{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above=.5em of e}
+        \eventr{d}{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above=1em of e}
         \pox[out=-15,in=-167]{d1}[below]{e}
         \pox[out=-15,in=-167]{e}[below]{d2}
+        \pox[bend right]{e}[right]{d}
+        \pox[bend right]{d}[left]{e}
         \mrg{d1}{d}
         \mrg{d2}{d}
       \end{tikzinline}}    
