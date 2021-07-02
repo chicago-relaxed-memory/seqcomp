@@ -13,12 +13,11 @@ We adapt \citeauthor{Dolan:2018:BDR:3192366.3192421}'s
 The result requires that locations are properly initialized.  We assume a
 sufficient condition: that programs have the form
 ``$\aLoc_1\GETS\aVal_1\SEMI \cdots \aLoc_n\GETS\aVal_n\SEMI\aCmd$'' where
-every location mentioned in $\aCmd$ is some $\aLoc_i$.
-
-We make two further restrictions to simplify the exposition.  To simplify the
-definition of \emph{happens-before}, we ban fences and \RMWs.  To simplify
-the proof, we assume there are no local declarations of the form
-$(\VAR\aLoc\SEMI \aCmd)$.
+every location mentioned in $\aCmd$ is some $\aLoc_i$.  To simplify the
+definition of \emph{happens-before}, we ban fences and \RMWs.
+% To simplify
+% the proof, we assume there are no local declarations of the form
+% $(\VAR\aLoc\SEMI \aCmd)$.
 
 To state the theorem, we require several technical definitions.  The reader
 unfamiliar with \citep{Dolan:2018:BDR:3192366.3192421} may prefer to skip to

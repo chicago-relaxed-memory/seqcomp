@@ -383,49 +383,6 @@ Empty set is used for code that does not run in any given execution.  To get
 a complete pomset for $\sem{\IF{\FALSE}\THEN\PW{x}{1}\FI}$ you need to take
 the empty set for $\sem{\PW{x}{1}}$.
 
-Idea behind $\Q{\aLoc}$:
-\begin{itemize}
-\item most recent prior write to $\aLoc$ must be in the pomset in order to read $\aLoc$...
-\item similar to release/termination: all prior writes must be in the pomset
-  in order to release...
-\item terminology: ``prior'' means sequentially before, different from $\le$,
-  which is ``ordered before''.
-\item \eqref{top-kappa} requires tautologies, which means that all variables
-  are initialized sequentially in order to get rid of $\Q{\aLoc}$.
-\end{itemize}
-Sanity check:
-\begin{align*}
-  \begin{gathered}    
-    \PR{y}{r}
-    \SEMI
-    \IF{r}\THEN
-      \PW{x}{1}
-    \FI
-    \SEMI
-    \PR{x}{s}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a1}{\DR{y}{1}}{}
-        \event{a2}{1{=}r\limplies r{\neq}0\mid\DW{x}{1}}{right=of a1}
-        \event{a3}{1{=}r\limplies (r{\neq}0\land\Q{x})\mid\DR{x}{2}}{right=of a2}
-        \po{a1}{a2}
-        \wki{a2}{a3}
-      \end{tikzinline}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a1}{\DR{y}{0}}{}
-        \event{a3}{0{=}r\limplies \aTr{}{\Q{x}}\mid\DR{x}{2}}{right=of a1}
-      \end{tikzinline}}
-  \end{gathered}  
-\end{align*}
-where
-\begin{math}
-  \aTr{}{\bForm}=
-  (r{\neq}0 \land \bForm[1/x][\FALSE/\Q{x}])
-  \lor
-  (r{=}0 \land \bForm)
-\end{math}
-
 We give the semantics of programs $\sembase{}$ in \reffig{fig:seq}.
 
 Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
@@ -1295,7 +1252,19 @@ which is a tautology.
 
 
 \subsection{Q}
-A more dramatic problem \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}.
+
+Idea behind $\Q{\aLoc}$:
+\begin{itemize}
+\item most recent prior write to $\aLoc$ must be in the pomset in order to read $\aLoc$...
+\item similar to release/termination: all prior writes must be in the pomset
+  in order to release...
+\item terminology: ``prior'' means sequentially before, different from $\le$,
+  which is ``ordered before''.
+\item \eqref{top-kappa} requires tautologies, which means that all variables
+  are initialized sequentially in order to get rid of $\Q{\aLoc}$.
+\end{itemize}
+
+A problem \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}.
 Version with control dependencies is \drf{}.
 
 \begin{align*}
@@ -1677,6 +1646,39 @@ With $\Q{x}$, we have:
       \end{tikzinline}}
   \end{gathered}  
 \end{align*}
+
+Sanity check:
+\begin{align*}
+  \begin{gathered}    
+    \PR{y}{r}
+    \SEMI
+    \IF{r}\THEN
+      \PW{x}{1}
+    \FI
+    \SEMI
+    \PR{x}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a1}{\DR{y}{1}}{}
+        \event{a2}{1{=}r\limplies r{\neq}0\mid\DW{x}{1}}{right=of a1}
+        \event{a3}{1{=}r\limplies (r{\neq}0\land\Q{x})\mid\DR{x}{2}}{right=of a2}
+        \po{a1}{a2}
+        \wki{a2}{a3}
+      \end{tikzinline}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a1}{\DR{y}{0}}{}
+        \event{a3}{0{=}r\limplies \aTr{}{\Q{x}}\mid\DR{x}{2}}{right=of a1}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{align*}
+where
+\begin{math}
+  \aTr{}{\bForm}=
+  (r{\neq}0 \land \bForm[1/x][\FALSE/\Q{x}])
+  \lor
+  (r{=}0 \land \bForm)
+\end{math}
 
 
 \subsection{Reordering Transformations}

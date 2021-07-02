@@ -3,59 +3,6 @@
 
 We first define pomsets with program order (\PwTpo{}).
 
-%Restrict the syntax to top-level parallel composition.
-
-% \begin{comment}
-%   \label{def:pomset}
-%   A \emph{pomset with program order} is a tuple $(\aPS,\rmrg,\rpox)$,
-%   where $\aPS$ is a pomset with predicate transformers
-%   $(\aEvs, \labeling, \labelingForm, \aTr{}{}, {\aTerm}, {\le})$ %, {\ledep}, {\lesync}, {\leloc}, {\rrmw})$ 
-%   and
-%   \begin{enumerate}[,label=(\textsc{o}\arabic*),ref=\textsc{o}\arabic*]
-%     %\setcounter{enumi}{9}
-
-%   %   \makecounter{Bum}
-%   % \item \label{pom-B} \makecounter{um}
-%   %   $\umEvs \subseteq\aEvs$ is a set of \emph{unmerged events}, such that
-%   %   \begin{enumerate}
-%   %   \item ${\ledep}, {\lesync}, {\leloc}, {\rrmw}: ((\aEvs\setminus\umEvs)\times(\aEvs\setminus\umEvs))$,
-%   %     % where $\pmEvs=(\aEvs\setminus\umEvs)$ is the set of \emph{potentially merged} events,
-%   %   \end{enumerate}
-
-%   %   \makecounter{Bdm}
-%   % \item \label{pom-lambda} \makecounter{dm}
-%   %   $\dmEvs\subseteq(\aEvs\setminus\umEvs)$ is a set of \emph{merged events}, 
-
-%     \makecounter{Bmerge1}
-%   \item \label{pom-lambda} \makecounter{merge1}
-%     ${\rmrg} \subseteq (\phEvs\times\dmEvs)$
-%     is a relation capturing \emph{merging},
-%     where
-%     \begin{enumerate}
-%     \item $\phEvs\subseteq\aEvs$ represents \emph{phantom unmerged} events,
-%       let $\reEvs$ be $\aEvs\setminus\phEvs$, %representing \emph{real} events,
-%       % \item $\dmEvs$ and $\phEvs$ are disjoint, %$\phEvs\subseteq\umEvs$, and therefore 
-%     \item $\dmEvs\subseteq\reEvs$ represents \emph{merged} events,
-%       let $\umEvs$ be $\aEvs\setminus\dmEvs$, %, representing \emph{unmerged} events,
-%     \item %${\ledep}$, ${\lesync}$, ${\leloc}$, ${\rrmw}
-%       ${\le}\subseteq(\reEvs\times\reEvs)$,
-%     \end{enumerate}
-    
-%     \makecounter{Bpo1}
-%   \item \label{pom-lambda} \makecounter{po1}
-%     ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a partial order capturing
-%     \emph{program order}.
-%     % , such that 
-%     % \begin{enumerate}
-%     % \item ${\rpox}$ is total on events (in $\umEvs$) of the same thread:
-%     %   \begin{itemize}
-%     %   \item if $\labelingThrd(\bEv)=\labelingThrd(\aEv)$ then either
-%     %     $\bEv\xpox\aEv$ or $\aEv\xpox\bEv$,
-%     %   \item if $\bEv\xpox\aEv$ then $\labelingThrd(\bEv)=\labelingThrd(\aEv)$.
-%     %   \end{itemize}
-%     % \end{enumerate}
-%   \end{enumerate}
-% \end{comment}
 \begin{definition}
   \label{def:po}
   A \PwTpo{} is a \PwT{} (\refdef{def:pomset}) equipped
@@ -200,14 +147,14 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
     is a pre-order, which may include cycles due to coalescing.  For example:
     \begin{align*}
       % \PR{y}{r}
-      % \SEQ
+      % \SEMI
       \IF{r}\THEN
       \PW{x}{1}
-      \SEQ
+      \SEMI
       \PW{y}{1}
       \ELSE
       \PW{y}{1}
-      \SEQ
+      \SEMI
       \PW{x}{1}
       \FI
       &&
@@ -320,10 +267,10 @@ the \PwTpo{} on the left below produces the candidate execution on the right.
     $}
     \\
     \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
-        \event{e}{(v{=}r\lor w{=}r)\limplies (r{=}0\lor r{=}1)\mid\DW{x}{2}}{}
+        \event{e}{(v{=}r\lor w{=}r)\limplies (r{=}0\lor r{=}1)\mid\DW{x}{1}}{}
         \event{r}{\DR{y}{v}}{left=of e}
-        \phevent{e1}{v{=}r\limplies r{=}0\mid\DW{x}{2}}{below left=1em and -7em of e}
-        \phevent{e2}{v{=}r\limplies r{=}1\mid\DW{x}{2}}{below right=1em and -7em of e}
+        \phevent{e1}{v{=}r\limplies r{=}0\mid\DW{x}{1}}{below left=1em and -7em of e}
+        \phevent{e2}{v{=}r\limplies r{=}1\mid\DW{x}{1}}{below right=1em and -7em of e}
         \pox{r}[pos=0,below]{e1}
         \pox[out=-15,in=-167]{e1}[below]{e2}
         \mrg{e1}{e}
@@ -345,7 +292,7 @@ the \PwTpo{} on the left below produces the candidate execution on the right.
     $}
     \\
     \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
-        \event{e}{\DW{x}{2}}{}
+        \event{e}{\DW{x}{1}}{}
         \event{r}{\DR{y}{1}}{left=of e}
         \event{i}{\DW{y}{0}}{left=of r}
         \pox[out=-15,in=-167]{i}[below]{r}
@@ -381,6 +328,244 @@ the \PwTpo{} on the left below produces the candidate execution on the right.
   % \end{gathered}
 \end{align*}
 
+The dependency calculation of $\sempo{}$ is sufficient for \cXI; however, it
+ignores synchronization and coherence completely.
+\begin{align*}
+  \tag{$\ddagger$}\label{eq5}
+  \begin{gathered}
+    \IF{r}\THEN\PW{x}{1}\FI
+    \SEMI
+    \IF{s}\THEN\PW{x}{2}\FI
+    \SEMI
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}
+        \eventrr{e}{e}{s{\neq}0\mid\DW{x}{2}}{right=of d1}
+        \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e}
+        \eventr{d}{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above=.5em of e}
+        \pox[out=-15,in=-167]{d1}[below]{e}
+        \pox[out=-15,in=-167]{e}[below]{d2}
+        \mrg{d1}{d}
+        \mrg{d2}{d}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+Adding a pair of reads to complete the pomset, we can extract the following candidate execution.
+\begin{gather*}
+  \PR{y}{r}
+  \SEMI
+  \PR{z}{s}
+  \SEMI
+  \IF{r}\THEN\PW{x}{1}\FI
+  \SEMI
+  \IF{s}\THEN\PW{x}{2}\FI
+  \SEMI
+  \IF{\BANG r}\THEN\PW{x}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{r}{\DR{y}{1}}{}
+      \event{s}{\DR{z}{1}}{right=of r}
+      \event{d}{\DW{x}{1}}{right=of s}
+      \event{e}{\DW{x}{2}}{right=of d}
+      \pox[out=-15,in=-167]{r}[below]{s}
+      \pox[out=-15,in=-167]{s}[below]{d}
+      \pox[out=-15,in=-167]{d}[below]{e}
+    \end{tikzinline}}    
+  \qquad\qquad\qquad
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{r}{\DR{y}{0}}{}
+      \event{s}{\DR{z}{1}}{right=of r}
+      \event{d}{\DW{x}{2}}{right=of s}
+      \event{e}{\DW{x}{1}}{right=of d}
+      \pox[out=-15,in=-167]{r}[below]{s}
+      \pox[out=-15,in=-167]{s}[below]{d}
+      \pox[out=-15,in=-167]{d}[below]{e}
+    \end{tikzinline}}    
+\end{gather*}
+It is somewhat surprising that the writes are independent of both reads!
+
+In \PwTmca{}, delay stops the merge in \eqref{eq5}.
+\begin{align*}
+  \begin{gathered}
+    \IF{r}\THEN\PW{x}{1}\FI
+    \SEMI
+    \IF{s}\THEN\PW{x}{2}\FI
+    \SEMI
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{d1}{r{\neq}0\mid\DW{x}{1}}{}
+        \event{e}{s{\neq}0\mid\DW{x}{2}}{right=of d1}
+        \event{d2}{r{=}0\mid\DW{x}{1}}{right=of e}
+        \po{d1}{e}
+        \po{e}{d2}
+        \pox[out=-15,in=-167]{d1}[below]{e}
+        \pox[out=-15,in=-167]{e}[below]{d2}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+In order to mimic this in \cXI{}, we need to prevent the merge without
+introducing a dependency.  This can be achieved post-hoc using the relation
+$\ledelay$, defined as follows:
+\begin{displaymath}
+  \fmrg{\bEv}\ledelay\fmrg{\aEv} \textif \bEv\xpox\aEv \textand \labeling(\bEv)\rdelays \labeling(\aEv).
+\end{displaymath}
+In \eqref{eq5}, we have both $d\ledelay e$ and $e \ledelay d$.  To rule out
+this execution, it suffices to require that $\ledelay$ is a partial order.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\endinput
+
+
+Old example:
+\begin{gather*}
+  %\tag{$\ddagger$}\label{eq5}
+  % \PR{y}{r}
+  % \SEMI
+  \IF{r}\THEN
+    \PW{x}{1}
+    \SEMI
+    \PW{x}{2}
+  \ELSE
+    \PW{x}{2}
+    \SEMI
+    \PW{x}{1}
+  \FI
+  % \IF{r}\THEN\PW{x}{2}\FI
+  % \SEMI
+  % \IF{r}\THEN\PW{x}{1}\FI
+  % \SEMI
+  % \IF{\BANG r}\THEN\PW{x}{2}\FI
+  % \SEMI
+  % \IF{\BANG r}\THEN\PW{x}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}
+      \phevent{e1}{r{\neq}0\mid\DW{x}{2}}{right=of d1}
+      \phevent{e2}{r{=}0\mid\DW{x}{2}}{right=of e1}
+      \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e2}
+      \event{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above right=1.5em and -3em of d1}
+      \event{e}{r{\neq}0\lor r{=}0\mid\DW{x}{2}}{above right=1.5em and -3em of e2}
+      %\event{r}{\DR{y}{1}}{left=of d}
+      %\wki[out=5,in=175]{d}{e}
+      \pox[out=-15,in=-167]{d1}[below]{e1}
+      %\pox[out=-15,in=-167]{e1}[below]{e2}
+      \pox[out=-15,in=-167]{e2}[below]{d2}
+      \mrg{d1}[left]{d}
+      \mrg{d2}[pos=.15,right]{d}
+      \mrg{e1}[pos=.15,left]{e}
+      \mrg{e2}[right]{e}
+    \end{tikzinline}}    
+\end{gather*}
+Adding a read to complete the pomset, we can extract the following candidate executions.
+\begin{gather*}
+  \PR{y}{r}
+  \SEMI
+  \IF{r}\THEN
+    \PW{x}{1}
+    \SEMI
+    \PW{x}{2}
+  \ELSE
+    \PW{x}{2}
+    \SEMI
+    \PW{x}{1}
+  \FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{r}{\DR{y}{1}}{}
+      \event{d}{\DW{x}{1}}{right=of r}
+      \event{e}{\DW{x}{2}}{right=of d}
+      \pox[out=-15,in=-167]{r}[below]{d}
+      \pox[out=-15,in=-167]{d}[below]{e}
+    \end{tikzinline}}    
+  \qquad\qquad\qquad\qquad
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{r}{\DR{y}{0}}{}
+      \event{e}{\DW{x}{2}}{right=of r}
+      \event{d}{\DW{x}{1}}{right=of e}
+      \pox[out=-15,in=-167]{r}[below]{e}
+      \pox[out=-15,in=-167]{e}[below]{d}
+    \end{tikzinline}}    
+\end{gather*}
+
+OLD def:
+%Restrict the syntax to top-level parallel composition.
+
+% \begin{comment}
+%   \label{def:pomset}
+%   A \emph{pomset with program order} is a tuple $(\aPS,\rmrg,\rpox)$,
+%   where $\aPS$ is a pomset with predicate transformers
+%   $(\aEvs, \labeling, \labelingForm, \aTr{}{}, {\aTerm}, {\le})$ %, {\ledep}, {\lesync}, {\leloc}, {\rrmw})$ 
+%   and
+%   \begin{enumerate}[,label=(\textsc{o}\arabic*),ref=\textsc{o}\arabic*]
+%     %\setcounter{enumi}{9}
+
+%   %   \makecounter{Bum}
+%   % \item \label{pom-B} \makecounter{um}
+%   %   $\umEvs \subseteq\aEvs$ is a set of \emph{unmerged events}, such that
+%   %   \begin{enumerate}
+%   %   \item ${\ledep}, {\lesync}, {\leloc}, {\rrmw}: ((\aEvs\setminus\umEvs)\times(\aEvs\setminus\umEvs))$,
+%   %     % where $\pmEvs=(\aEvs\setminus\umEvs)$ is the set of \emph{potentially merged} events,
+%   %   \end{enumerate}
+
+%   %   \makecounter{Bdm}
+%   % \item \label{pom-lambda} \makecounter{dm}
+%   %   $\dmEvs\subseteq(\aEvs\setminus\umEvs)$ is a set of \emph{merged events}, 
+
+%     \makecounter{Bmerge1}
+%   \item \label{pom-lambda} \makecounter{merge1}
+%     ${\rmrg} \subseteq (\phEvs\times\dmEvs)$
+%     is a relation capturing \emph{merging},
+%     where
+%     \begin{enumerate}
+%     \item $\phEvs\subseteq\aEvs$ represents \emph{phantom unmerged} events,
+%       let $\reEvs$ be $\aEvs\setminus\phEvs$, %representing \emph{real} events,
+%       % \item $\dmEvs$ and $\phEvs$ are disjoint, %$\phEvs\subseteq\umEvs$, and therefore 
+%     \item $\dmEvs\subseteq\reEvs$ represents \emph{merged} events,
+%       let $\umEvs$ be $\aEvs\setminus\dmEvs$, %, representing \emph{unmerged} events,
+%     \item %${\ledep}$, ${\lesync}$, ${\leloc}$, ${\rrmw}
+%       ${\le}\subseteq(\reEvs\times\reEvs)$,
+%     \end{enumerate}
+    
+%     \makecounter{Bpo1}
+%   \item \label{pom-lambda} \makecounter{po1}
+%     ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a partial order capturing
+%     \emph{program order}.
+%     % , such that 
+%     % \begin{enumerate}
+%     % \item ${\rpox}$ is total on events (in $\umEvs$) of the same thread:
+%     %   \begin{itemize}
+%     %   \item if $\labelingThrd(\bEv)=\labelingThrd(\aEv)$ then either
+%     %     $\bEv\xpox\aEv$ or $\aEv\xpox\bEv$,
+%     %   \item if $\bEv\xpox\aEv$ then $\labelingThrd(\bEv)=\labelingThrd(\aEv)$.
+%     %   \end{itemize}
+%     % \end{enumerate}
+%   \end{enumerate}
+% \end{comment}
+
+
+OLD text:
 % \begin{comment}
 %   \input{fig-c11.tex}
 
@@ -434,121 +619,7 @@ the \PwTpo{} on the left below produces the candidate execution on the right.
 %   We have written \ref{seq-po-include} .
 % \end{comment}
 
-The dependency calculation of $\sempo{}$ is sufficient for \cXI; however, it
-ignores synchronization and coherence completely.
-\begin{gather*}
-  %\tag{$\ddagger$}\label{eq5}
-  % \PR{y}{r}
-  % \SEQ
-  \IF{r}\THEN
-    \PW{x}{1}
-    \SEQ
-    \PW{x}{2}
-  \ELSE
-    \PW{x}{2}
-    \SEQ
-    \PW{x}{1}
-  \FI
-  % \IF{r}\THEN\PW{x}{2}\FI
-  % \SEQ
-  % \IF{r}\THEN\PW{x}{1}\FI
-  % \SEQ
-  % \IF{\BANG r}\THEN\PW{x}{2}\FI
-  % \SEQ
-  % \IF{\BANG r}\THEN\PW{x}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}
-      \phevent{e1}{r{\neq}0\mid\DW{x}{2}}{right=of d1}
-      \phevent{e2}{r{=}0\mid\DW{x}{2}}{right=of e1}
-      \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e2}
-      \event{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above right=1.5em and -3em of d1}
-      \event{e}{r{\neq}0\lor r{=}0\mid\DW{x}{2}}{above right=1.5em and -3em of e2}
-      %\event{r}{\DR{y}{1}}{left=of d}
-      %\wki[out=5,in=175]{d}{e}
-      \pox[out=-15,in=-167]{d1}[below]{e1}
-      %\pox[out=-15,in=-167]{e1}[below]{e2}
-      \pox[out=-15,in=-167]{e2}[below]{d2}
-      \mrg{d1}[left]{d}
-      \mrg{d2}[pos=.15,right]{d}
-      \mrg{e1}[pos=.15,left]{e}
-      \mrg{e2}[right]{e}
-    \end{tikzinline}}    
-\end{gather*}
-Adding a read to complete the pomset, we can extract the following candidate executions.
-\begin{gather*}
-  \PR{y}{r}
-  \SEQ
-  \IF{r}\THEN
-    \PW{x}{1}
-    \SEQ
-    \PW{x}{2}
-  \ELSE
-    \PW{x}{2}
-    \SEQ
-    \PW{x}{1}
-  \FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{r}{\DR{y}{1}}{}
-      \event{d}{\DW{x}{1}}{right=of r}
-      \event{e}{\DW{x}{2}}{right=of d}
-      \pox[out=-15,in=-167]{r}[below]{d}
-      \pox[out=-15,in=-167]{d}[below]{e}
-    \end{tikzinline}}    
-  \qquad\qquad\qquad\qquad
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{r}{\DR{y}{0}}{}
-      \event{e}{\DW{x}{2}}{right=of r}
-      \event{d}{\DW{x}{1}}{right=of e}
-      \pox[out=-15,in=-167]{r}[below]{e}
-      \pox[out=-15,in=-167]{e}[below]{d}
-    \end{tikzinline}}    
-\end{gather*}
-It is somewhat surprising that the writes are independent of the read!
 
-To understand what has happened, let $\ledelay$ be defined as follows:
-\begin{displaymath}
-  \fmrg{\bEv}\ledelay\fmrg{\aEv} \textif \bEv\xpox\aEv \textand \labeling(\bEv)\rdelays \labeling(\aEv).
-\end{displaymath}
-In the example above, $\ledelay$ is a preorder, but not a partial order.
-It is possible to rule out such examples by requiring that $\ledelay$ be a
-partial order.  This would provide a more precise notion of dependency for
-\cXI{}, which is similar to the dependency calculated for \PwTmca{}s.
-
-\todo{Perhaps use a better example:
-  \begin{math}
-    \IF{r}\THEN\PW{x}{1}\FI
-    \SEMI
-    \IF{s}\THEN\FENCE{\fSC}\FI    
-    \SEMI
-    \IF{\BANG r}\THEN\PW{x}{1}\FI    
-  \end{math}}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\endinput
 
 %Let $\phEvs=\aEvs\setminus\reEvs$ and $\dmEvs=\aEvs\setminus\umEvs$.
 
@@ -703,22 +774,22 @@ For TC2, we have:
 % \begin{align*}
 %   \begin{gathered}[t]
 %     % \PR{y}{r}
-%     % \SEQ
+%     % \SEMI
 %     \IF{r}\THEN
 %       \PW{x}{1}
-%       \SEQ
+%       \SEMI
 %       \PW{x}{2}
 %     \ELSE
 %       \PW{x}{1}
-%       \SEQ
+%       \SEMI
 %       \PW{x}{2}
 %     \FI
 %     % \IF{r}\THEN\PW{x}{2}\FI
-%     % \SEQ
+%     % \SEMI
 %     % \IF{r}\THEN\PW{x}{1}\FI
-%     % \SEQ
+%     % \SEMI
 %     % \IF{\BANG r}\THEN\PW{x}{2}\FI
-%     % \SEQ
+%     % \SEMI
 %     % \IF{\BANG r}\THEN\PW{x}{1}\FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -744,22 +815,22 @@ For TC2, we have:
 % \begin{align*}
 %   \begin{gathered}[t]
 %     \PR{y}{r}
-%     \SEQ
+%     \SEMI
 %     \IF{r}\THEN
 %       \PW{x}{1}
-%       \SEQ
+%       \SEMI
 %       \PW{x}{2}
 %     \ELSE
 %       \PW{x}{1}
-%       \SEQ
+%       \SEMI
 %       \PW{x}{2}
 %     \FI
 %     % \IF{r}\THEN\PW{x}{2}\FI
-%     % \SEQ
+%     % \SEMI
 %     % \IF{r}\THEN\PW{x}{1}\FI
-%     % \SEQ
+%     % \SEMI
 %     % \IF{\BANG r}\THEN\PW{x}{2}\FI
-%     % \SEQ
+%     % \SEMI
 %     % \IF{\BANG r}\THEN\PW{x}{1}\FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1.5em]
