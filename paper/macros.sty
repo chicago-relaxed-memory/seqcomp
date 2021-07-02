@@ -269,6 +269,9 @@
 \NewDocumentCommand\PWField{O{} m m O{} m}{{#2.#3}^{#1}_{#4} \GETS #5}
 
 \newcommand{\sem}[2][]{\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket\ifshowSCOPE_{#1}\fi}
+\newcommand{\semmca}[2]{\mathsf{mca}_{#1}\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket}
+\newcommand{\sempomca}[2]{\mathsf{po}\text{-}\mathsf{mca}_{#1}\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket}
+\newcommand{\sempo}[1]{\mathsf{po}\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}
 \newcommand{\sembase}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_1}
 \newcommand{\semrr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_2}
 \newcommand{\semreg}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_3}
@@ -835,6 +838,7 @@
 %\Newcommand{\gtNsp}{\mathrel{\,\mid\!\!\!>}}
 % \newcommand{\ltNsp}{\mathrel{\,\mid\!\!\!<}}
 % \newcommand{\geN}{<}
+\newcommand{\ledelay}{\mathrel{\LABEL@COLOR{\sqsubseteq}}}
 \newcommand{\lesync}{\SYNC@COLOR{\LATEX@le}}
 \newcommand{\lesyncpo}{\SYNC@COLOR{\LATEX@le_{\mathsf{po}}}}
 \newcommand{\ltsync}{\SYNC@COLOR{<}}
@@ -902,7 +906,7 @@
 \newcommand{\semdown}[1]{\nabla\llbracket#1\rrbracket}
 \newcommand{\semsc}[1]{\llbracket#1\rrbracket_{\SC}}
 %\newcommand{\semsc}[1]{\textit{SC}\llbracket#1\rrbracket}
-\newcommand{\FENCE}{\texttt{F}}
+\newcommand{\FENCE}[1]{\texttt{F}\ifnotempty{#1}{^{#1}}}
 \newcommand{\INC}{\texttt{INC}}
 \newcommand{\FADD}{\texttt{FADD}}
 \newcommand{\CAS}{\texttt{CAS}}

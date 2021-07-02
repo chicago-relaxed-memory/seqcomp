@@ -80,7 +80,7 @@ moved early.''
 This execution is not allowed by the semantics $\sembase{}$ of \reffig{fig:seq}: the precondition of
 $\aEv$ in the independent case is
 \begin{displaymath}
-  \tag{$*$}\label{pre1}
+  \tag{$*$}\label{eq3}
   (1{=}r \lor x{=}r)\limplies (1{=}s \lor r{=}s)\limplies (r{=}s),
 \end{displaymath}
 which is equivalent to
@@ -95,13 +95,13 @@ event names to register names.  By using this renaming, coalesced events must
 choose the same register name.  In the above example, the precondition of
 $\aEv$ in the independent case becomes
 \begin{displaymath}
-  \tag{$**$}\label{pre2}
+  \tag{$**$}\label{eq4}
   (1{=}\uReg{\aEv} \lor x{=}\uReg{\aEv})\limplies (1{=}\uReg{\aEv} \lor \uReg{\aEv}{=}\uReg{\aEv})\limplies (\uReg{\aEv}{=}\uReg{\aEv}),
 \end{displaymath}
-which is a tautology.  In \eqref{pre2}, the first read resolves the
+which is a tautology.  In \eqref{eq4}, the first read resolves the
 nondeterminism in both the first and the second read.  Given the choice of
 event names, the outcome of the second read is predetermined!  In
-\eqref{pre1}, the second read remains nondeterministic, even in the case that
+\eqref{eq3}, the second read remains nondeterministic, even in the case that
 the events are destined to coalesce.  
 
 \begin{definition}

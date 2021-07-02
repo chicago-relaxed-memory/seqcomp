@@ -174,8 +174,8 @@ We require that
 \item $\rimpliesdef$ has the expected semantics for $=$, $\lnot$,
   $\land$, $\lor$, $\limplies$ and substitutions $[\aExp/\aReg]$,
   $[\aExp/\aLoc]$, $[\aForm/\Q{\aLoc}]$,
-\item there are three binary relations over $\Act\times\Act$:
-  $\roverlapsdef$, $\rmatchesdef$, and $\rblocksdef$,
+\item there are four binary relations over $\Act\times\Act$:
+  $\roverlapsdef$, $\rmatchesdef$, $\rblocksdef$, and $\rdelays$,
 \item there are two subsets of $\Act$, distinguishing
   $\sreaddef$ and $\sreleasedef$ actions.
 \end{itemize}
@@ -290,6 +290,36 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 
   % Let two actions \emph{overlap} if they access the same location.
   % We say $\aAct \roverlapsdef \bAct$ if they access the same location.
+  Let ${\eqreorderco}$ capture write-write, read-write coherence:
+  \begin{math}
+    {\eqreorderco}
+    =
+    \{(\DW{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DR{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DW{\aLoc}{}\Cb \DR{\aLoc}{})\}
+  \end{math}.
+
+  Let ${\reorderra}$ capture conflict due to synchronization:
+  \begin{math}
+    {\reorderra}
+    =
+    \{(\aAct\Cb             \DW[\gemode\mREL]{}{}     )\Cc
+    (\aAct\Cb               \DF{\gemode\fREL}        )\Cc
+    (\DR{}{}\Cb             \DF{\gemode\fACQ}        )\Cc
+    % (\DR{\aLoc}{}\Cb        \DR[\gemode\mACQ]{\aLoc}{})\Cc
+    (\DR[\gemode\mACQ]{}{}\Cb\aAct                    )\Cc
+    (\DF{\gemode\fACQ}\Cb   \aAct                    )\Cc
+    (\DF{\gemode\fREL}\Cb   \DW{}{}                  )\Cc
+    (\DW[\gemode\mREL]{\aLoc}{}\Cb\DW{\aLoc}{})\}
+  \end{math}.
+
+  Let ${\eqreordersc}$ capture conflict due to $\mSC$ access:
+  \begin{math}
+    {\eqreordersc}
+    =
+    % \{(\DX[\mSC]{}{}\Cb\DX[\mSC]{}{})\}
+    \{(\DW[\mSC]{}{}\Cb \DW[\mSC]{}{})\Cc(\DR[\mSC]{}{}\Cb \DW[\mSC]{}{}) \Cc(\DW[\mSC]{}{}\Cb \DR[\mSC]{}{})\Cc(\DR[\mSC]{}{}\Cb \DR[\mSC]{}{})\}
+  \end{math}.
+
+  We say $\aAct \rdelaysdef \bAct$ if $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or $\aAct\eqreordersc\bAct$.
 \end{definition}
 
 \subsection{\PwTTITLE: Pomsets with Predicate Transformers}
@@ -915,7 +945,7 @@ $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$.  If $\aPS$ is complete, it must have
 two events. Then $\sSEMI{}{}$ requires that there are %$\aVal,\bVal\in\Val$ and
 $\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
 \begin{align*}
-  \tag{$\ddagger$}\label{eq2}
+  \tag{$\dagger\dagger$}\label{eq2}
   \begin{gathered}
     \PR{x}{r} 
     \\

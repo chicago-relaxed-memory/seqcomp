@@ -182,6 +182,7 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 % events---the reverse implication holds from \refdef{def:family}.
 
 \begin{lemma}
+  \label{lem:po}
   If $\aPS$ is a \PwT{} then there is a \PwTpo{} $\aPS''$ that conservatively
   extends it.
   \begin{proof}
@@ -252,6 +253,8 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
     \end{enumerate*}
   \end{proof}
 \end{lemma}
+We write $\sempo{}$ for the semantic function defined by applying the
+construction of \reflem{lem:po} to the base semantics of \ref{fig:seq}.  
 
 \begin{lemma}
   If $\aPS$ is a complete \PwTpo{} with compound event $\aEv$,
@@ -302,8 +305,139 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 \end{definition}
 A pomset in the image of $\fextract{}$ is a \emph{candidate execution}.
 
-As an example of a \PwTpo, consider:
+As an example, consider Java Causality Test Case 6.  Taking $w=0$ and $v=1$,
+the \PwTpo{} on the left below produces the candidate execution on the right.
+\begin{align*}
+  \begin{gathered}[t]
+    \makebox{\small$
+      \PW{y}{w}
+      \SEMI
+      \PR{y}{r}
+      \SEMI
+      \IF{r{=}0}\THEN \PW{x}{1} \FI
+      \SEMI
+      \IF{r{=}1}\THEN \PW{x}{1} \FI
+    $}
+    \\
+    \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+        \event{e}{(v{=}r\lor w{=}r)\limplies (r{=}0\lor r{=}1)\mid\DW{x}{2}}{}
+        \event{r}{\DR{y}{v}}{left=of e}
+        \phevent{e1}{v{=}r\limplies r{=}0\mid\DW{x}{2}}{below left=1em and -7em of e}
+        \phevent{e2}{v{=}r\limplies r{=}1\mid\DW{x}{2}}{below right=1em and -7em of e}
+        \pox{r}[pos=0,below]{e1}
+        \pox[out=-15,in=-167]{e1}[below]{e2}
+        \mrg{e1}{e}
+        \mrg{e2}{e}
+        \event{i}{\DW{y}{w}}{left=of r}
+        \pox[out=-15,in=-167]{i}[below]{r}
+      \end{tikzinlinesmall}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \makebox{\small$
+      \PW{y}{0}
+      \SEMI
+      \PR{y}{r}
+      \SEMI
+      \IF{r{=}0}\THEN \PW{x}{1} \FI
+      \SEMI
+      \IF{r{=}1}\THEN \PW{x}{1} \FI
+    $}
+    \\
+    \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+        \event{e}{\DW{x}{2}}{}
+        \event{r}{\DR{y}{1}}{left=of e}
+        \event{i}{\DW{y}{0}}{left=of r}
+        \pox[out=-15,in=-167]{i}[below]{r}
+        \pox[out=-15,in=-167]{r}[below]{e}
+      \end{tikzinlinesmall}}    
+  \end{gathered}
+  % &&
+  % \begin{gathered}
+  %   \PW{y}{0}
+  %   \SEMI
+  %   \PR{y}{r}
+  %   \SEMI
+  %   \IF{r{=}0}\THEN
+  %   \PW{x}{1}
+  %   \FI
+  %   \SEMI
+  %   \IF{r{=}1}\THEN
+  %   \PW{x}{1}
+  %   \FI
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=1.5em]
+  %       \event{e}{(1{=}r\lor 0{=}r)\limplies (r{=}0\lor r{=}1)\mid\DW{x}{2}}{}
+  %       \event{r}{\DR{y}{1}}{left=of e}
+  %       \phevent{e1}{1{=}r\limplies r{=}0\mid\DW{x}{2}}{below left=1em and -7em of e}
+  %       \phevent{e2}{1{=}r\limplies r{=}1\mid\DW{x}{2}}{below right=1em and -7em of e}
+  %       \pox{r}[pos=0,below]{e1}
+  %       \pox[out=-15,in=-167]{e1}[below]{e2}
+  %       \mrg{e1}{e}
+  %       \mrg{e2}{e}
+  %       \event{i}{\DW{y}{0}}{left=of r}
+  %       \pox[out=-15,in=-167]{i}[below]{r}
+  %     \end{tikzinline}}    
+  % \end{gathered}
+\end{align*}
+
+% \begin{comment}
+%   \input{fig-c11.tex}
+
+%   The semantic rules are given in \reffig{fig:c11}.  As usual, we write
+%   $\existsone$ to mean ``there exists exactly one''.  For base cases, take
+%   $\fmrg{}$ to be the identity and $\rpox$ to be empty.
+
+%   \ref{seq-m-phantom-forall} states that new phantom events must merge into a
+%   newly compound event.
+%   \ref{seq-m-exclude} states that newly compound events must be real.
+%   \ref{seq-m-phantom-exists} states that every newly compound event must have two
+%   corresponding phantom events.
+
+%   Here is a diagram elucidating \ref{seq-po-include}, where the top two are merged
+%   sequentially into the bottom.
+%   \begin{gather*}
+%     \begin{tikzcenter}
+%       \node (c1)  at (0, 0) {$\mathstrut c_1$};
+%       \node (d1)  at (1, 0) {$\mathstrut d$};
+%       \node (e1)  at (2, 0) {$\mathstrut e_1$};
+%       \draw[->](c1)to(d1);
+%       \draw[->](d1)to(e1);
+%     \end{tikzcenter}
+%     \qquad\qquad
+%     \begin{tikzcenter}
+%       \node (c2)  at (3, 0) {$\mathstrut c_2$};
+%       \node (d2)  at (4, 0) {$\mathstrut d$};
+%       \node (e2)  at (5, 0) {$\mathstrut e_2$};
+%       \draw[->](c2)to(d2);
+%       \draw[->](d2)to(e2);
+%     \end{tikzcenter}
+%     \\
+%     \begin{tikzcenter}
+%       \node (c1)  at (0, 0) {$\mathstrut c_1$};
+%       \node (d1)  at (1, 0) {$\mathstrut d_1$};
+%       \node (e1)  at (2, 0) {$\mathstrut e_1$};
+%       \node (d)   at (2.5, .5) {$\mathstrut d$};
+%       \node (c2)  at (3, 0) {$\mathstrut c_2$};
+%       \node (d2)  at (4, 0) {$\mathstrut d_2$};
+%       \node (e2)  at (5, 0) {$\mathstrut e_2$};
+%       \draw[->](c1)to(d1);
+%       \draw[->](d1)to(e1);
+%       \draw[->](e1)to(c2);
+%       \draw[->](c2)to(d2);
+%       \draw[->](d2)to(e2);
+%       \draw[->,dotted](d1)to(d);
+%       \draw[->,dotted](d2)to(d);
+%     \end{tikzcenter}
+%   \end{gather*}
+
+%   We have written \ref{seq-po-include} .
+% \end{comment}
+
+The dependency calculation of $\sempo{}$ is sufficient for \cXI; however, it
+ignores synchronization and coherence completely.
 \begin{gather*}
+  %\tag{$\ddagger$}\label{eq5}
   % \PR{y}{r}
   % \SEQ
   \IF{r}\THEN
@@ -359,99 +493,62 @@ Adding a read to complete the pomset, we can extract the following candidate exe
       \event{r}{\DR{y}{1}}{}
       \event{d}{\DW{x}{1}}{right=of r}
       \event{e}{\DW{x}{2}}{right=of d}
+      \pox[out=-15,in=-167]{r}[below]{d}
       \pox[out=-15,in=-167]{d}[below]{e}
     \end{tikzinline}}    
   \qquad\qquad\qquad\qquad
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{r}{\DR{y}{0}}{}
-      \event{d}{\DW{x}{1}}{right=of r}
-      \event{e}{\DW{x}{2}}{right=of d}
-      \pox[in=-15,out=-167]{e}[below]{d}
+      \event{e}{\DW{x}{2}}{right=of r}
+      \event{d}{\DW{x}{1}}{right=of e}
+      \pox[out=-15,in=-167]{r}[below]{e}
+      \pox[out=-15,in=-167]{e}[below]{d}
     \end{tikzinline}}    
 \end{gather*}
+It is somewhat surprising that the writes are independent of the read!
+
+To understand what has happened, let $\ledelay$ be defined as follows:
+\begin{displaymath}
+  \fmrg{\bEv}\ledelay\fmrg{\aEv} \textif \bEv\xpox\aEv \textand \labeling(\bEv)\rdelays \labeling(\aEv).
+\end{displaymath}
+In the example above, $\ledelay$ is a preorder, but not a partial order.
+It is possible to rule out such examples by requiring that $\ledelay$ be a
+partial order.  This would provide a more precise notion of dependency for
+\cXI{}, which is similar to the dependency calculated for \PwTmca{}s.
+
+\todo{Perhaps use a better example:
+  \begin{math}
+    \IF{r}\THEN\PW{x}{1}\FI
+    \SEMI
+    \IF{s}\THEN\FENCE{\fSC}\FI    
+    \SEMI
+    \IF{\BANG r}\THEN\PW{x}{1}\FI    
+  \end{math}}
 
 
-% \begin{comment}
-%   \input{fig-c11.tex}
 
-%   The semantic rules are given in \reffig{fig:c11}.  As usual, we write
-%   $\existsone$ to mean ``there exists exactly one''.  For base cases, take
-%   $\fmrg{}$ to be the identity and $\rpox$ to be empty.
 
-%   \ref{seq-m-phantom-forall} states that new phantom events must merge into a
-%   newly compound event.
-%   \ref{seq-m-exclude} states that newly compound events must be real.
-%   \ref{seq-m-phantom-exists} states that every newly compound event must have two
-%   corresponding phantom events.
 
-%   Here is a diagram elucidating \ref{seq-po-include}, where the top two are merged
-%   sequentially into the bottom.
-%   \begin{gather*}
-%     \begin{tikzcenter}
-%       \node (c1)  at (0, 0) {$\mathstrut c_1$};
-%       \node (d1)  at (1, 0) {$\mathstrut d$};
-%       \node (e1)  at (2, 0) {$\mathstrut e_1$};
-%       \draw[->](c1)to(d1);
-%       \draw[->](d1)to(e1);
-%     \end{tikzcenter}
-%     \qquad\qquad
-%     \begin{tikzcenter}
-%       \node (c2)  at (3, 0) {$\mathstrut c_2$};
-%       \node (d2)  at (4, 0) {$\mathstrut d$};
-%       \node (e2)  at (5, 0) {$\mathstrut e_2$};
-%       \draw[->](c2)to(d2);
-%       \draw[->](d2)to(e2);
-%     \end{tikzcenter}
-%     \\
-%     \begin{tikzcenter}
-%       \node (c1)  at (0, 0) {$\mathstrut c_1$};
-%       \node (d1)  at (1, 0) {$\mathstrut d_1$};
-%       \node (e1)  at (2, 0) {$\mathstrut e_1$};
-%       \node (d)   at (2.5, .5) {$\mathstrut d$};
-%       \node (c2)  at (3, 0) {$\mathstrut c_2$};
-%       \node (d2)  at (4, 0) {$\mathstrut d_2$};
-%       \node (e2)  at (5, 0) {$\mathstrut e_2$};
-%       \draw[->](c1)to(d1);
-%       \draw[->](d1)to(e1);
-%       \draw[->](e1)to(c2);
-%       \draw[->](c2)to(d2);
-%       \draw[->](d2)to(e2);
-%       \draw[->,dotted](d1)to(d);
-%       \draw[->,dotted](d2)to(d);
-%     \end{tikzcenter}
-%   \end{gather*}
 
-%   We have written \ref{seq-po-include} .
-% \end{comment}
 
-It is possible to project \PwTpo{}s directly to \cXI{} pre-executions.
-However, the dependency calculation thus produced is overly weak.  Consider
-the following example.
-\begin{align*}
-  \PR{y}{r}
-  \SEMI
-  \IF{r}\THEN
-  \PW{x}{1}\SEMI\PW{x}{2}
-  \ELSE
-  \PW{x}{2}\SEMI\PW{x}{1}
-  \FI
-  &&
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DR{y}{1}}{}
-      \event{b}{\DW{x}{1}}{right=of a}
-      \event{c}{\DW{x}{2}}{right=of b}
-    \end{tikzinline}}
-\end{align*}
-With augmentation, 
-Idea: merging reads can only make a difference is if there is a race.
-\begin{definition}
-  A \cXI{} \emph{pre-execution} is a projection of a \PwTc{}, taking all of
-  the simple events whose preconditions are tautologies.
 
-  A \cXI{} {pre-execution} is an \emph{execution} if it satisfies the
-  appropriate axioms.
-\end{definition}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\endinput
 
 %Let $\phEvs=\aEvs\setminus\reEvs$ and $\dmEvs=\aEvs\setminus\umEvs$.
 

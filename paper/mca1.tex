@@ -1,0 +1,66 @@
+\section{\PwTmcaTITLE{1}: Pomsets with Predicate Transformers for MCA (Part 1)}
+\label{sec:mca1}
+We define two models for \mca{} architectures: \PwTmca{1} and \PwTmca{2}.
+We drop the subscript when referring to both models.
+
+\begin{definition}
+  \label{def:pwt:mca1}
+  A \PwTmca{1} is a \PwT{} (\refdef{def:pomset}) equipped
+  with a relation $\rrfx$ such that 
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+    \setcounter{enumi}{\value{Brf}}
+  \item \label{pom-rf} \makecounter{rf} ${\rrfx} \subseteq \aEvs\times\aEvs$
+    is an injective relation capturing \emph{reads-from}, such that
+    % \end{enumerate}
+    % A pomset is a \emph{candidate} if there is an injective relation
+    % ${\rrfx} : \aEvs\times\aEvs$, capturing \emph{reads-from}, such that
+    \begin{enumerate}
+      % \begin{enumerate}[,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
+      % \item \label{rf-injective}
+      %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is,
+      %   ${\rrfx}$ is injective,
+    \item \label{pom-rf-match} if $\bEv\xrfx\aEv$ then
+      $\labeling(\bEv) \rmatches \labeling(\aEv)$,
+    \item \label{pom-rf-block} if $\bEv\xrfx\aEv$ and
+      $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or
+      $\aEv\le\cEv$,
+    \item \label{pom-rf-le} if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
+    \end{enumerate}
+  \end{enumerate}
+
+  A \PwTmca{} is \emph{complete} if %it is a complete \PwT{} (\refdef{def:pomset}) and
+  \begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+    \item[\eqref{top-kappa}]
+      \eqref{top-term}\;
+      as in \refdef{def:pomset},
+      \setcounter{enumi}{\value{Brf}}
+    \item \label{top-rf}
+      if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+    \end{enumerate}
+  \end{multicols}
+\end{definition}
+
+% To include \RMW{}s, also add
+% \begin{enumerate}
+% \item[(\textsc{p}10)]\;
+%   ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
+% \end{enumerate}
+
+\input{fig-mca1.tex}
+\input{fig-mca2.tex}
+
+The semantic rules are given in \reffig{fig:mca1}.
+We write $\semmca{1}{}$ for the semantic function.
+Let
+\begin{math}
+  \semmca{1}{\aCmd_1 \LPAR[\bThrd] \aCmd_2} = \sLPAR{\semmca{1}{\aCmd_1}}{\semmca{1}{\aCmd_2}}.
+\end{math}
+
+% From the data model, we require an additional binary relation 
+% ${\rdelays}\subseteq(\Act\times\Act)$.  For the actions in this paper, we
+% define this as follows.
+
+% \begin{scope}
+% \end{scope}
+

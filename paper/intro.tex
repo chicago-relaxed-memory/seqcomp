@@ -641,11 +641,16 @@ all of the messiness of relaxed memory.
 
 There are few prior studies of relaxed memory that include sequential
 composition and/or precise calculation of semantic dependencies.
+\citet{DBLP:journals/pacmpl/JagadeesanJR20} give a denotational semantics,
+using prefixing rather than sequential compositions.
 \citet{DBLP:conf/esop/PaviottiCPWOB20} give a denotational semantics,
 calculating dependencies using event structures rather than logic.  They give
 the semantics of sequential composition in continuation passing style,
-whereas we give it in direct style.
-%
+whereas we give it in direct style.  This paper provides a general technique
+for computing sequential dependencies and applies it to these two approaches.
+We provide a detailed comparison with
+\cite{DBLP:journals/pacmpl/JagadeesanJR20} in \textsection\ref{sec:diff}.
+
 \citet{DBLP:journals/corr/abs-1804-04214} define a semantics
 using pomsets without preconditions. Instead, their model uses syntactic
 dependencies, thus invalidating many compiler optimizations.  They also
@@ -671,20 +676,8 @@ Many of the most prominent models are operational, whole-program models based
 on speculative execution \cite{Manson:2005:JMM:1047659.1040336,
   DBLP:conf/esop/JagadeesanPR10,
   DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}.
+We provide a detailed comparison with these approaches in \textsection\ref{sec:promising}.
 
-\citet{DBLP:journals/pacmpl/JagadeesanJR20} note that the speculative models
-listed above all, including \cite{DBLP:conf/popl/KangHLVD17}, fail to
-validate compositional reasoning of temporal properties---see their examples
-OOTA4, OOTA5, and \citep[Fig.~8]{DBLP:journals/toplas/Lochbihler13}).  The
-difference with our model can be understood in terms of the valid program
-transformations.  The speculative models allow reads to be introduced, with
-subsequent case analysis on the value read---effectively, this can turn one
-read into two, with different conditional branches taken for the two copies
-of the read.  Our model invalidates this transformation.  In return, our
-model enjoys compositionality for temporal safety properties.
-
-We provide a detailed comparison with
-\cite{DBLP:journals/pacmpl/JagadeesanJR20} in \textsection\ref{sec:diff}.
 
 \subsection{Contributions}
 

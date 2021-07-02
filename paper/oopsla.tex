@@ -1,6 +1,17 @@
 \subsection{Comparison to ``A Promising Semantics 2.1'' [POPL 2017]}
 \label{sec:promising}
 
+\citet{DBLP:journals/pacmpl/JagadeesanJR20} note that the speculative models
+listed above all, including \cite{DBLP:conf/popl/KangHLVD17}, fail to
+validate compositional reasoning of temporal properties---see their examples
+OOTA4, OOTA5, and \citep[Fig.~8]{DBLP:journals/toplas/Lochbihler13}).  The
+difference with our model can be understood in terms of the valid program
+transformations.  The speculative models allow reads to be introduced, with
+subsequent case analysis on the value read---effectively, this can turn one
+read into two, with different conditional branches taken for the two copies
+of the read.  Our model invalidates this transformation.  In return, our
+model enjoys compositionality for temporal safety properties.
+
 \todo{Write this.}
 
 Case analysis gives very weak results when combined with thread inlining.
