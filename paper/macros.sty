@@ -1,4 +1,6 @@
 \usepackage[rightbars]{changebar}
+\newcommand{\textchanged}[1]{\cbstart#1\cbend}
+\newenvironment{changed}{\cbstart\ignorespaces}{\cbend\ignorespacesafterend}
 % \usepackage[framemethod=tikz]{mdframed}
 % \newmdenv[
 %   skipabove = \partopsep,
@@ -287,9 +289,9 @@
 \NewDocumentCommand\PWField{O{} m m O{} m}{{#2.#3}^{#1}_{#4} \GETS #5}
 
 \newcommand{\sem}[2][]{\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket\ifshowSCOPE_{#1}\fi}
-\newcommand{\semmca}[2]{\mathsf{mca}_{#1}\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket}
-\newcommand{\sempomca}[2]{\mathsf{po}\text{-}\mathsf{mca}_{#1}\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket}
-\newcommand{\sempo}[1]{\mathsf{po}\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}
+\newcommand{\semmca}[2]{\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket_{\mathsf{mca}{#1}}}
+\newcommand{\sempomca}[2]{\llbracket\ifemptyelse{#2}{\cdot}{#2}\rrbracket_{\mathsf{mca}{#1}}^{\mathsf{po}}}
+\newcommand{\sempo}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket^{\mathsf{po}}}
 \newcommand{\sembase}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_1}
 \newcommand{\semrr}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_2}
 \newcommand{\semreg}[1]{\llbracket\ifemptyelse{#1}{\cdot}{#1}\rrbracket}%_3}
@@ -907,7 +909,7 @@
 \newcommand{\prefixsimp}{\mathbin{{\xRightarrow{{\mathsf{triv}}}}}}
 \newcommand{\sequence}{\mathbin;}
 \newcommand{\guard}{\mathbin\rhd}
-\newcommand{\downclose}[2][]{{\downarrow}_{#1}(#2)}
+\newcommand{\downclose}[2][]{{\nabla}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}
 \newcommand{\relfilt}[2][\amode]{\mathsf{cover}\ifnotempty{#1}{^{#1}}\ifnotempty{#2}{_{#2}}}
 \newcommand{\DOT}{\mathbin.}
 
@@ -920,7 +922,8 @@
 
 \newcommand{\Term}{\mathsf{Term}}
 \newcommand{\SC}{\mathsf{SC}}
-\newcommand{\semmin}[1]{\textsf{gen}\llbracket#1\rrbracket}
+\newcommand{\semcand}[1]{\textsf{cand}\ifnotempty{#1}{\llbracket#1\rrbracket}}
+\newcommand{\semmin}[1]{\textsf{gen}\ifnotempty{#1}{\llbracket#1\rrbracket}}
 \newcommand{\semdown}[1]{\nabla\llbracket#1\rrbracket}
 \newcommand{\semsc}[1]{\llbracket#1\rrbracket_{\SC}}
 %\newcommand{\semsc}[1]{\textit{SC}\llbracket#1\rrbracket}
@@ -1235,7 +1238,7 @@
 \newcommand{\syncsccolor}{blue!90!black}
 \newcommand{\rfcolor}{green!50!black}
 \newcommand{\wkicolor}{orange!80!black}
-\newcommand{\wkcolor}{cyan!70!black}
+\newcommand{\wkcolor}{blue!70!black}
 \newcommand{\hbcolor}{blue!70!black}
 \newcommand{\pocolor}{cyan!50!black}
 \newcommand{\mrgcolor}{orange!50!black}
@@ -1249,16 +1252,18 @@
 % \newcommand{\close}[3][]{\draw[close,#1](#2)to(#3);}
 % \newcommand{\xclose}{\xarrowtikz{close}{\;\;}}%
 
-\tikzstyle{mrg} = [-stealth,thick,dotted,color=\mrgcolor,]
+\tikzstyle{mrg} = [-latex,double,color=\mrgcolor,]
 %\NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{m}$}  (#4);}
 \NewDocumentCommand \mrg {O{} m O{} m} {\draw[mrg,#1](#2) to (#4);}
 \newcommand{\fmrg}[2][]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{\pi}}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}}%
 \newcommand{\fmrginv}[2][]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{\pi^{-1}}}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}}%
+\newcommand{\fmrginvp}[2][]{\ensuremath{\textcolor{\mrgcolor}{\mathsf{\pi^{\prime-1}}}\ifnotempty{#1}{_{#1}}\ifnotempty{#2}{(#2)}}}%
 \newcommand{\rmrg}{\ensuremath{\mathrel{\textcolor{\mrgcolor}{\mathsf{\pi}}}}}%
 \newcommand{\xmrg}{\xarrowtikz{mrg}{\pi}}%
 
 \tikzstyle{pox} = [-stealth,thick,dotted,color=\pocolor,]
-\NewDocumentCommand \pox {O{} m O{} m} {\draw[pox,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{po}$}  (#4);}
+%\NewDocumentCommand \pox {O{} m O{} m} {\draw[pox,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{po}$}  (#4);}
+\NewDocumentCommand \pox {O{} m O{} m} {\draw[pox,#1](#2) to (#4);}
 \newcommand{\rpox}{\ensuremath{\mathrel{\textcolor{\pocolor}{\mathsf{po}}}}}%
 \newcommand{\xpox}{\xarrowtikz{pox}{po}}%
 
@@ -1334,7 +1339,7 @@
 \newcommand{\rrfi}{\ensuremath{\mathrel{\textcolor{\rfcolor}{\mathsf{rfi}}}}}%
 \newcommand{\xrfi}{\xarrowtikz{rfint}{rfi}}%
 
-\tikzstyle{wki} = [-latex,dashed,thick,color=\wkicolor,]
+\tikzstyle{wki} = [-latex,thick,color=\wkicolor,]%dashed,
 \newcommand{\wki}[3][]{\draw[wki,#1](#2)to(#3);}
 \newcommand{\xwki}{\xarrowtikz{wki}{\;\;}}%
 \NewDocumentCommand \coi {O{} m O{} m} {\draw[wki,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{coi}$}  (#4);}
@@ -1347,7 +1352,7 @@
 \newcommand{\rpoloc}{\ensuremath{\mathrel{\textcolor{\wkicolor}{\mathsf{poloc}}}}}%
 \newcommand{\xpoloc}{\xarrowtikz{wki}{poloc}}%
 
-\tikzstyle{wk} = [->,dashed,thick,color=\wkcolor,]
+\tikzstyle{wk} = [->,thick,color=\wkcolor,]%dashed,
 \newcommand{\wk}[3][]{\draw[wk,#1](#2)to(#3);}
 \newcommand{\xwk}{\xarrowtikz{wk}{\;\;}}%
 \tikzstyle{wkx} = [->,dashed,thick,color=\wkcolor,]
@@ -1381,6 +1386,9 @@
 \NewDocumentCommand \ca {O{} m O{} m} {\draw[wk,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{ca}$}  (#4);}
 \newcommand{\rca}{\ensuremath{\mathrel{\textcolor{\wkcolor}{\mathsf{ca}}}}}%
 \newcommand{\xca}{\xarrowtikz{wk}{ca}}%
+\NewDocumentCommand \cae {O{} m O{} m} {\draw[wk,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{cae}$}  (#4);}
+\newcommand{\rcae}{\ensuremath{\mathrel{\textcolor{\wkcolor}{\mathsf{cae}}}}}%
+\newcommand{\xcae}{\xarrowtikz{wk}{cae}}%
 \NewDocumentCommand \xw {O{} m O{} m} {\draw[wk,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{xw}$}  (#4);}
 \newcommand{\rxw}{\ensuremath{\mathrel{\textcolor{\wkcolor}{\mathsf{xw}}}}}%
 \newcommand{\xxw}{\xarrowtikz{wk}{xw}}%

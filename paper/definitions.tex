@@ -549,18 +549,19 @@ preconditions to weaken.
 \end{lemma}
 \begin{definition}
   \label{def:augment}
-  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
-  \begin{multicols}{4}
-    \begin{enumerate}
-    \item $\aEvs_2=\aEvs_1$,
-    \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-    \item $\labelingForm_2(\aEv) \riff \labelingForm_1(\aEv)$,
-    \item $\aTr[2]{\bEvs}{\bForm}\riff \aTr[1]{\bEvs}{\bForm}$,
-    \item $\aTerm[2] \riff \aTerm[1]$,
-    \item ${\le_2}\supseteq{\le_1}$,
-    \item ${\rrfx_2}\supseteq{\rrfx_1}$.
-    \end{enumerate}
-  \end{multicols}
+  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if all fields are equal except,
+  perhaps, the order, where we require ${\le_2}\supseteq{\le_1}$.
+  % \begin{multicols}{4}
+  %   \begin{enumerate}
+  %   \item $\aEvs_2=\aEvs_1$,
+  %   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+  %   \item $\labelingForm_2(\aEv) \riff \labelingForm_1(\aEv)$,
+  %   \item $\aTr[2]{\bEvs}{\bForm}\riff \aTr[1]{\bEvs}{\bForm}$,
+  %   \item $\aTerm[2] \riff \aTerm[1]$,
+  %   \item ${\le_2}\supseteq{\le_1}$,
+  %   \item ${\rrfx_2}={\rrfx_1}$.
+  %   \end{enumerate}
+  % \end{multicols}
 \end{definition}
 \begin{lemma}
   % Suppose $\aPS_1\in\sembase{\aCmd}$.
@@ -633,87 +634,6 @@ Sequential composition is similar, with two changes: \ref{seq-E} does not
 require disjointness (see \textsection\ref{sec:ex:term}), and
 \ref{seq-le-delays} may require order (see example \ref{pub}, below).
 
-Note that reads-from implies order by \eqref{pom-rf-le}.
-% \begin{lemma}
-%   \label{lem:rf:implies:le}
-%   For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
-%   $\bEv\le\aEv$.
-
-%   \vspace{-.5\baselineskip}
-%   \begin{proof}
-%     Induction on the definition of $\sembase{}$, using \ref{par-rf-le1}, \ref{par-rf-le2}, and \ref{pom-rf-le}.
-%   \end{proof}
-% \end{lemma}
-In top-level pomsets, every read must have a matching write in $\rrfx$
-\eqref{top-rf}.  Together with \ref{pom-rf-match} and \ref{pom-rf-block}, the lemma
-guarantees that reads are \emph{fulfilled} at top-level, as in
-\cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.\footnote{The
-  basic model would be the same if we move $\rrfx$ from the model itself to
-  be existentially quantified in the definition of top-level pomset, along
-  with \ref{pom-rf-match} and \ref{pom-rf-block}.  This was the approach of
-  \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
-  explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
-  variant semantics $\frf{\semrr{}}$ where \ref{pom-rf-le} is not required.}
-
-From \refdef{def:actions}, recall that $\aAct \rdelaysdef \bAct$ if
-$\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or
-$\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
-order is enforced between conflicting accesses of the same location
-($\eqreorderco$), into a release and out of an acquire ($\reorderra$), and
-between SC accesses ($\eqreordersc$).  Combined with the fulfillment
-requirements (\ref{pom-rf-match}, \ref{pom-rf-block} and \ref{pom-rf-le}),
-these ensure coherence, publication, subscription and other idioms.  For
-example, consider the following:\footnote{We use different colors for arrows representing order:
-  \begin{itemize}  
-  \item \makebox{$\bEv\xpo\aEv$} arises from control/data/address \emph{dependency} (\ref{seq-kappa}, definition of $\labelingForm'_2(\bEv)$),
-  \item \makebox{$\bEv\xsync\aEv$} arises from $\reorderra$ or $\eqreordersc$ \eqref{seq-le-delays},
-  \item \makebox{$\bEv\xwki\aEv$} arises from $\eqreorderco$ \eqref{seq-le-delays},
-  \item \makebox{$\bEv\xrf\aEv$} arises from \emph{reads-from} \eqref{pom-rf-match},
-  %\item \makebox{$\bEv\xsyncsc\aEv$} arises from \emph{strong fencing} \eqref{cand-lesync-sc},
-  \item \makebox{$\bEv\xwk\aEv$} arises from \emph{blocking} \eqref{pom-rf-block}.
-  \end{itemize}
-  In \textsection\ref{sec:arm2}, it is possible for $\rrf$ to contradict
-  $\le$.  In this case, we use a dotted arrow for $\rrf$: $\bEv\xrfint\aEv$
-  indicates that $\aEv\le\bEv$.}
-\begin{gather*}
-  \taglabel{pub}
-  \begin{gathered}    
-    \PW{x}{0}\SEMI 
-    \PW{x}{1}\SEMI \PW[\mREL]{y}{1} \PAR \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
-    \\[-.4ex]
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wx0}{\DW{x}{0}}{}
-        \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \event{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
-        \event{ry1}{\DR[\mACQ]{y}{1}}{right=2.5em of wy1}
-        \event{rx0}{\DR{x}{0}}{right=of ry1}
-        \sync{wx1}{wy1}
-        \sync{ry1}{rx0}
-        \rf{wy1}{ry1}
-        \wk[out=170,in=10]{rx0}{wx1}
-        \wki{wx0}{wx1}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-The execution is disallowed due to the cycle.  All of the order shown is
-required at top-level: The intra-thread order comes from \ref{seq-le-delays}:
-$\DWP{x}{0}\xwki \DWP{x}{1}$ is required by $\eqreorderco$.
-$\DWP{x}{1}\xsync \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xsync \DRP{x}{0}$ are
-required by $\reorderra$.  The cross-thread order is required by fulfillment:
-\ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
-\ref{pom-rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
-\ref{pom-rf-le} subsequently ensures that
-$\DWP[\mREL]{y}{1}\le \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
-$\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{pom-rf-block}.  (Alternatively,
-we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
-
-The semantics gives the expected results for store buffering and load buffering,
-as well as litmus tests involving fences and SC access.  The model of
-coherence is weaker than C11, in order to support common subexpression
-elimination, and stronger than Java, in order to support local reasoning
-about data races.  See
-\cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20} for a discussion.
 
 In the structural rules $\sSEMI{}{}$ and $\sIF{}$, we say that
 $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ \emph{coalesce} if $\bEv=\aEv$.
@@ -1119,10 +1039,6 @@ to be lifted out of a conditional, validating the transformation
   \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} \supseteq
   \sem{\aCmd}.
 \end{math}
-%
-The use of $\rextendsdef{}{}$ in \ref{if-rf-extends}
-ensures that no $\rrfx$ is introduced between events in
-$\aEvs_1\cap\aEvs_2$ when coalescing; see \textsection\ref{sec:arm2}.
 
 
 
@@ -1206,7 +1122,7 @@ Reasoning as we did for \eqref{eq2} in \textsection\ref{sec:ex:data}, there are 
   \end{gathered}
 \end{align*}
 
-As another example, consider JMM causality test case 1 \cite{PughWebsite}:
+As another example, consider \jmm{} causality test case 1 \cite{PughWebsite}:
 \begin{gather*}
   \begin{gathered}
     \PW{x}{0} \SEMI

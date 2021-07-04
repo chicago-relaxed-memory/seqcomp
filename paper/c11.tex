@@ -61,16 +61,14 @@ We first define pomsets with program order (\PwTpo{}).
 
     \makecounter{Bpo}
   \item \label{pom-po} \makecounter{po}
-    ${\rpox} \subseteq (\aEvs\times\aEvs)$ is a pre-order capturing
-    \emph{program order}, such that
-    \begin{enumerate}
-    \item \label{pom-po-le}
-      $\rpox$ is a partial order when restricted to simple events $(\umEvs\times\umEvs)$.
-    \end{enumerate}
-    % , where 
-    % $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$.
-    % is the set of \emph{simple} %(rather than \emph{compound})
-    % events.
+    ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a partial-order capturing
+    \emph{program order}.
+    % ${\rpox} \subseteq (\aEvs\times\aEvs)$ is a pre-order capturing
+    % \emph{program order}, such that
+    % \begin{enumerate}
+    % \item \label{pom-po-le}
+    %   $\rpox$ is a partial order when restricted to simple events $(\umEvs\times\umEvs)$.
+    % \end{enumerate}
   \end{enumerate}
 
 
@@ -193,9 +191,11 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
     \item
       $\aTerm''=\aTerm$,
     \item \label{le-item}
-      ${\le''}=\fmrginv{\le}$,
+      ${\bEv}\le'' {\aEv}$ exactly when $\fmrg{\bEv}\le\fmrg{\aEv}$,
+      %${\le''}=\fmrginv{\le}$,
     \item \label{pox-item}
-      ${\rpox''}={\rpox}\cup{\rpox'}$, and
+      %${\rpox''}={\rpox}\cup{\rpox'}$, and
+      ${\rpox''}={\rpox'}$, and
     \item 
       $\fmrg{}''$ is the constructed merge function. % $\fmrg{}$,
     \end{enumerate*}
@@ -205,7 +205,7 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
   For a \PwTpo{}, let $\fextract{\aPS}$ be the projection
   of $\aPS$ onto the set
   \begin{math}
-    \{\aEv\in\umEvs_1\mid\allowbreak \labelingForm_1(\aEv) \;\text{is a tautology} \}.
+    \{\aEv\in\aEvs_1\mid\allowbreak \aEv \;\text{is simple and}\; \labelingForm_1(\aEv) \;\text{is a tautology} \}.
   \end{math}
   % % Let $\aPS$ be a \PwTpo{}.  We say that $\aPS$ is a \emph{candidate execution} if
   % % \begin{enumerate*}
@@ -241,14 +241,15 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 By definition, $\fextract{\aPS}$ includes the simple events of $\aPS$ whose
 preconditions are tautologies.  These are already in program order, as per
 item \ref{pox-item} of the proof.  The dependency order is derived from the
-real events using $\fmrg{}$, as per item \ref{le-item}, which says that
-${\bEv}\le'' {\aEv}$ exactly when $\fmrg{\bEv}\le\fmrg{\aEv}$.
+real events using $\fmrg{}$, as per item \ref{le-item}.
+% , which says that ${\bEv}\le'' {\aEv}$ exactly when $\fmrg{\bEv}\le\fmrg{\aEv}$.
 
 The following lemma shows that if $\aPS$ is \emph{complete}, then
 $\fextract{\aPS}$ includes at least one simple event for every compound event
 in $\aPS$.
 
 \begin{lemma}
+  \label{lem:compound:phantom:exists}
   If $\aPS$ is a complete \PwTpo{} with compound event $\aEv$,
   %$\aEv\in\dmEvs$ 
   then
@@ -266,6 +267,27 @@ A pomset in the image of $\fextract{}$ is a \emph{candidate execution}.
 
 As an example, consider Java Causality Test Case 6.  Taking $w=0$ and $v=1$,
 the \PwTpo{} on the left below produces the candidate execution on the right.
+In diagrams, we visualize $\rpox$ using a dotted arrow
+\begin{math}
+  \mkern-12mu
+  \begin{tikzpicture}
+    \node (a)  at (0, 0) {};
+    \node (b)  at (.7, 0) {};
+    \draw[pox](a)to(b);
+  \end{tikzpicture}
+  \mkern-12mu,
+\end{math}
+and
+$\fmrg{}$ using a double arrow 
+\begin{math}
+  \mkern-12mu
+  \begin{tikzpicture}
+    \node (a)  at (0, 0) {};
+    \node (b)  at (.7, 0) {};
+    \draw[mrg](a)to(b);
+  \end{tikzpicture}
+  \mkern-12mu
+\end{math}.
 \begin{align*}
   \begin{gathered}[t]
     \makebox{\small$
@@ -289,7 +311,7 @@ the \PwTpo{} on the left below produces the candidate execution on the right.
         \mrg{e2}{e}
         \event{i}{\DW{y}{w}}{left=of r}
         \pox[out=-15,in=-167]{i}[below]{r}
-        \pox{r}{e}
+        %\pox{r}{e}
       \end{tikzinlinesmall}}    
   \end{gathered}
   &&
@@ -362,8 +384,8 @@ ignores synchronization and coherence completely.
         \eventr{d}{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above=1em of e}
         \pox[out=-15,in=-167]{d1}[below]{e}
         \pox[out=-15,in=-167]{e}[below]{d2}
-        \pox[bend right]{e}[right]{d}
-        \pox[bend right]{d}[left]{e}
+        % \pox[bend right]{e}[right]{d}
+        % \pox[bend right]{d}[left]{e}
         \mrg{d1}{d}
         \mrg{d2}{d}
       \end{tikzinline}}    
@@ -423,8 +445,8 @@ In \PwTmca{}, delay stops the merge in \eqref{eq5}.
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-In order to mimic this in \cXI{}, we need to prevent the merge without
-introducing a dependency.  This can be achieved post-hoc using the relation
+It is possible to mimic this in \cXI{}, without introducing extra
+dependencies: one can filter executions post-hoc using the relation
 $\ledelay$, defined as follows:
 \begin{displaymath}
   \fmrg{\bEv}\ledelay\fmrg{\aEv} \textif \bEv\xpox\aEv \textand \labeling(\bEv)\rdelays \labeling(\aEv).

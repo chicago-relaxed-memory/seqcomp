@@ -3,6 +3,89 @@
 We define two models for \mca{} architectures: \PwTmca{1} and \PwTmca{2}.
 We drop the subscript when referring to both models.
 
+Note that reads-from implies order by \eqref{pom-rf-le}.
+% \begin{lemma}
+%   \label{lem:rf:implies:le}
+%   For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
+%   $\bEv\le\aEv$.
+
+%   \vspace{-.5\baselineskip}
+%   \begin{proof}
+%     Induction on the definition of $\sembase{}$, using \ref{par-rf-le1}, \ref{par-rf-le2}, and \ref{pom-rf-le}.
+%   \end{proof}
+% \end{lemma}
+In top-level pomsets, every read must have a matching write in $\rrfx$
+\eqref{top-rf}.  Together with \ref{pom-rf-match} and \ref{pom-rf-block}, the lemma
+guarantees that reads are \emph{fulfilled} at top-level, as in
+\cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.\footnote{The
+  basic model would be the same if we move $\rrfx$ from the model itself to
+  be existentially quantified in the definition of top-level pomset, along
+  with \ref{pom-rf-match} and \ref{pom-rf-block}.  This was the approach of
+  \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
+  explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
+  variant semantics $\frf{\semrr{}}$ where \ref{pom-rf-le} is not required.}
+
+From \refdef{def:actions}, recall that $\aAct \rdelaysdef \bAct$ if
+$\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or
+$\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
+order is enforced between conflicting accesses of the same location
+($\eqreorderco$), into a release and out of an acquire ($\reorderra$), and
+between SC accesses ($\eqreordersc$).  Combined with the fulfillment
+requirements (\ref{pom-rf-match}, \ref{pom-rf-block} and \ref{pom-rf-le}),
+these ensure coherence, publication, subscription and other idioms.  For
+example, consider the following:\footnote{We use different colors for arrows representing order:
+  \begin{itemize}  
+  \item \makebox{$\bEv\xpo\aEv$} arises from control/data/address \emph{dependency} (\ref{seq-kappa}, definition of $\labelingForm'_2(\bEv)$),
+  \item \makebox{$\bEv\xsync\aEv$} arises from $\reorderra$ or $\eqreordersc$ \eqref{seq-le-delays},
+  \item \makebox{$\bEv\xwki\aEv$} arises from $\eqreorderco$ \eqref{seq-le-delays},
+  \item \makebox{$\bEv\xrf\aEv$} arises from \emph{reads-from} \eqref{pom-rf-match},
+  %\item \makebox{$\bEv\xsyncsc\aEv$} arises from \emph{strong fencing} \eqref{cand-lesync-sc},
+  \item \makebox{$\bEv\xwk\aEv$} arises from \emph{blocking} \eqref{pom-rf-block}.
+  \end{itemize}
+  In \textsection\ref{sec:arm2}, it is possible for $\rrf$ to contradict
+  $\le$.  In this case, we use a dotted arrow for $\rrf$: $\bEv\xrfint\aEv$
+  indicates that $\aEv\le\bEv$.}
+\begin{gather*}
+  \taglabel{pub}
+  \begin{gathered}    
+    \PW{x}{0}\SEMI 
+    \PW{x}{1}\SEMI \PW[\mREL]{y}{1} \PAR \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
+    \\[-.4ex]
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \event{wy1}{\DW[\mREL]{y}{1}}{right=of wx1}
+        \event{ry1}{\DR[\mACQ]{y}{1}}{right=2.5em of wy1}
+        \event{rx0}{\DR{x}{0}}{right=of ry1}
+        \sync{wx1}{wy1}
+        \sync{ry1}{rx0}
+        \rf{wy1}{ry1}
+        \wk[out=170,in=10]{rx0}{wx1}
+        \wki{wx0}{wx1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+The execution is disallowed due to the cycle.  All of the order shown is
+required at top-level: The intra-thread order comes from \ref{seq-le-delays}:
+$\DWP{x}{0}\xwki \DWP{x}{1}$ is required by $\eqreorderco$.
+$\DWP{x}{1}\xsync \DWP[\mREL]{y}{1}$ and $\DRP[\mACQ]{y}{1}\xsync \DRP{x}{0}$ are
+required by $\reorderra$.  The cross-thread order is required by fulfillment:
+\ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
+\ref{pom-rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
+\ref{pom-rf-le} subsequently ensures that
+$\DWP[\mREL]{y}{1}\le \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
+$\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{pom-rf-block}.  (Alternatively,
+we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
+
+The semantics gives the expected results for store buffering and load buffering,
+as well as litmus tests involving fences and SC access.  The model of
+coherence is weaker than C11, in order to support common subexpression
+elimination, and stronger than Java, in order to support local reasoning
+about data races.  See
+\cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20} for a discussion.
+
+
 \begin{definition}
   \label{def:pwt:mca1}
   A \PwTmca{1} is a \PwT{} (\refdef{def:pomset}) equipped
@@ -28,6 +111,7 @@ We drop the subscript when referring to both models.
     \end{enumerate}
   \end{enumerate}
 
+  \label{def:pwt:mca:complete}
   A \PwTmca{} is \emph{complete} if %it is a complete \PwT{} (\refdef{def:pomset}) and
   \begin{multicols}{2}
     \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
