@@ -1323,6 +1323,9 @@
 \NewDocumentCommand \rfx {O{} m O{} m} {\draw[rf,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rf}$}  (#4);}
 \newcommand{\rrfx}{\ensuremath{\mathrel{\textcolor{\rfcolor}{\mathsf{rf}}}}}%
 \newcommand{\xrfx}{\xarrowtikz{rf}{rf}}%
+\newcommand{\xrfxp}{\xarrowtikz{rf}{rf'}}%
+\newcommand{\xrfxpp}{\xarrowtikz{rf}{rf''}}%
+\newcommand{\xrfxppp}{\xarrowtikz{rf}{rf'''}}%
 \newcommand{\xrfxinv}{\xarrowtikzrev{rf}{rf}}%
 \NewDocumentCommand \rfe {O{} m O{} m} {\draw[rf,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfe}$}  (#4);}
 \newcommand{\rrfe}{\ensuremath{\mathrel{\textcolor{\rfcolor}{\mathsf{rfe}}}}}%

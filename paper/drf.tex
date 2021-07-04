@@ -11,13 +11,13 @@
   [\citeyear{Dolan:2018:BDR:3192366.3192421}] notion of \emph{Local Data Race
     Freedom (LDRF)}.
 
-  We do not address \PwTc{}.  The existing \drfsc{} result for \cXI{}
+  We do not address \PwTc{}.  The internal \drfsc{} result for \cXI{}
   \cite{DBLP:phd/ethos/Batty15} does not rely on dependencies and thus
-  applies to \PwTc{}.  However, \citeauthor{DBLP:phd/ethos/Batty15}'s result
-  is \emph{internal}, where data-races are defined using the semantics of
-  \cXI{} itself.  Using the notion of dependency defined here, it should be
-  possible to prove an stronger external result for \cXI{}---we leave this as
-  future work.
+  applies to \PwTc{}.  In internal \drfsc{}, data-races are defined using the
+  semantics of the language itself.  Using the notion of dependency defined
+  here, it should be possible to prove an stronger external result for
+  \cXI{}, similar to that of \cite{DBLP:conf/pldi/LahavVKHD17}---we leave
+  this as future work.
 
   \citet{DBLP:journals/pacmpl/JagadeesanJR20} prove \ldrfsc{} for Pomsets
   with Preconditions (\PwP{}).  \PwTmca{} generalizes \PwP{} to account for
@@ -165,10 +165,10 @@ $\lnot(\bEv\xpox\aEv)$.
 
 Let ${\rhb}=({\rpox}\cup{\rsw})^+$ be the \emph{happens-before} relation.
 
-\begin{changed}
-  Note that ${\rhb}$ is a preorder in general. It is a partial order on
-  \emph{simple} events (\refdef{def:po}).
-\end{changed}
+% \begin{changed}
+%   Note that ${\rhb}$ is a preorder in general. It is a partial order on
+%   \emph{simple} events (\refdef{def:po}).
+% \end{changed}
 
 Let $L\subseteq\Loc$ be a set of locations.  We say that $\bEv$ \emph{has an
   $L$-race with} $\aEv$ (notation $\bEv\lrace{L}\aEv$) when
@@ -205,17 +205,18 @@ $\aPS\neq\aPS'\in\semmin{\aCmd}$ and $\aPS$ is a downset of $\aPS'$.
 We say that \emph{$\aPS'$ is $\aEv$-similar to $\aPS$} if they differ at most
 in
 \begin{enumerate*}
-\item pomset order adjacent to $\aEv$, and
-\item the value associated with event $\aEv$, if it is a read.
+\item pomset order adjacent to $\aEv$, 
+\item the value associated with event $\aEv$, if it is a read, and
+\item the addition and removal of read events $\rpox$-after $\aEv$.
 \end{enumerate*}
 % We say they are \emph{similar} if they are $\aEv$-similar for some $\aEv$.
-Formally: $\Event'=\Event$, $\labelingForm'=\labelingForm$,
-$\restrict {\le'}{\Event\setminus\{\aEv\}}=\restrict {\le}{\Event\setminus\{\aEv\}}$,
-if $\aEv$ is not a read then $\labelingAct'=\labelingAct$, and if $\aEv$ is a
-read then
-$\restrict{\labelingAct'}{\Event\setminus\{\aEv\}}=\restrict{\labelingAct}{\Event\setminus\{\aEv\}}$
-and $\labelingAct'(\aEv) = \labelingAct(\aEv)[\aVal'/\aVal]$, for some
-$\aVal'$, $\aVal$.
+% Formally: $\Event'=\Event$, $\labelingForm'=\labelingForm$,
+% $\restrict {\le'}{\Event\setminus\{\aEv\}}=\restrict {\le}{\Event\setminus\{\aEv\}}$,
+% if $\aEv$ is not a read then $\labelingAct'=\labelingAct$, and if $\aEv$ is a
+% read then
+% $\restrict{\labelingAct'}{\Event\setminus\{\aEv\}}=\restrict{\labelingAct}{\Event\setminus\{\aEv\}}$
+% and $\labelingAct'(\aEv) = \labelingAct(\aEv)[\aVal'/\aVal]$, for some
+% $\aVal'$, $\aVal$.
 
 \paragraph{Stability}
 We say that $\aPS$ is \emph{$L$-stable in $\aCmd$} if
@@ -336,12 +337,16 @@ includes a race involving $\aEv$.
 
   Using this decomposition, we can show the following.
   \begin{lemma}
-    Suppose $\aPS''\in\semmin{\aCmd}$ has a read $\aEv$ that is maximal in
-    $({\rppo}\cup{\rrfe})$ and such that every $\rpox$-following read is
-    also $\le$-following ($\aEv\xpox\bEv$ implies $\aEv\le\bEv$, for every
-    read $\bEv$).  Further, suppose there is an $\aEv$-similar $\aPS'''$
-    that satisfies the requirements of fulfillment.  Then
-    $\aPS'''\in\semmin{\aCmd}$.
+    Suppose $\aPS''\in\semmin{\aCmd}$ has an external read $\bEv\xrfxpp\aEv$ that is
+    maximal in $({\rppo}\cup{\rrfe})$.  Further suppose that there another
+    write $\bEv'$ that could fulfill $\aEv$.
+    Then there exists an $\aEv$-similar $\aPS'''$ with $\bEv'\xrfxppp\aEv$
+    such that $\aPS'''\in\semmin{\aCmd}$.
+    % and such that every $\rpox$-following read is also $\le$-following
+    % ($\aEv\xpox\bEv$ implies $\aEv\le\bEv$, for every read $\bEv$).
+    % Further, suppose there is an $\aEv$-similar $\aPS'''$
+    % that satisfies the requirements of fulfillment.  Then
+    % $\aPS'''\in\semmin{\aCmd}$.
   \end{lemma}
   The proof of the lemma follows an inductive construction of
   $\semmin{\aCmd}$, starting from a large set with little order, and
@@ -432,11 +437,12 @@ includes a race involving $\aEv$.
     and \PwTmca{1} as it does for \PwTmca{1}.
   \end{changed}
   
-  If there is no $({\rpox}\cup{\rrfe})$-maximal access, then all
-  cross-thread order must be from $\rrfe$.  In this case, we select a
+  If there is no $({\rpox}\cup{\rrfe})$-maximal access, then all cross-thread
+  order must be from $\rrfe$.  In this case, we select a
   $({\rppo}\cup{\rrfe})$-maximal read, switching its fulfilling write to an
-  ``older'' one.  As an example, consider the following; once again,
-  $\aEv$ is the read of $x$, which races with $(\DW{x}{1})$.
+  ``older'' one.  If there are several of these, we choose one that is
+  $\rpox$-minimal.  As an example, consider the following; once again, $\aEv$
+  is the read of $x$, which races with $(\DW{x}{1})$.
   \begin{gather*}
     x\GETS 0 \SEMI y\GETS 0 \SEMI (\aReg \GETS x  \SEMI y \GETS 1
     \PAR
