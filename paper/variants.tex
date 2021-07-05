@@ -120,14 +120,14 @@ the events are destined to coalesce.
   \item[] \labeltext[\textsc{r}4]{}{read-tau-reg}
     \begin{enumerate}[leftmargin=0pt]
     \item \label{read-tau-dep-reg}
-      if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+      if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff
         \aVal{=}\uReg{\aEv}
         \limplies \bForm[\uReg{\aEv}/\aReg]
       \end{math},    
     \item \label{read-tau-ind-reg}
-      if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
+      if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff
         \PBR{\aVal{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}} \limplies
@@ -216,105 +216,6 @@ Then collapsing $r$ and $s$ and substituting the initial value of $y$ (say $0$),
 \end{displaymath}
 
 
-\subsection{Register Consistency}
-\label{sec:false}
-
-We would like:
-\begin{enumerate}
-\item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
-  $\labelingForm(\aEv)$ is satisfiable.
-\end{enumerate}
-For associativity, \eqref{pom-kappa-sat'} in turn requires
-\begin{enumerate}
-\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
-  $\aTr{}{\FALSE}\riff\FALSE$.
-\end{enumerate}
-But that does not quite hold in our setting.
-In this subsection, we refine these requirements into ones that do hold.
-%
-% \eqref{tr-false'} is too strong.
-% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
-% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
-% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
-% for some $\aVal$.
-% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
-% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
-% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
-%
-% We require the following:
-% \begin{enumerate}
-% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
-%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
-% \end{enumerate}
-%
-% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
-% for both reads):
-% \begin{gather*}
-%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
-%   \\
-%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
-%   \lor  
-%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
-% \end{gather*}
-%
-We define $\regForm{\labeling}$ to capture the register state of a pomset.
-\begin{definition}  
-  \label{def:labeling:consistent}
-  Let 
-  \begin{math}
-    \regForm{\labeling}=
-    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
-    \textwhere \aEvs=\fdom(\labeling)
-  \end{math}.
-  
-  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
-  We say that it is \emph{$\labeling$-inconsistent} otherwise.
-\end{definition}
-
-
-%tau maps (things incompatible with chi) to (things incompatible with chi)
-
-\begin{definition}
-  \label{def:trans'}
-  A \emph{$\labeling$-predicate transformer} is a %monotone
-  function
-  $\aTr{}{}:\Formulae\fun\Formulae$ such that
-  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
-  % \item \label{tr-implies'}
-  %   \labeltextXX{2}{x}{tr-and'}
-  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
-  \item[\eqref{tr-implies}]
-    \eqref{tr-and}\;
-    \eqref{tr-or}\; as in \refdef{def:trans},
-  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
-    % \item[\eqref{tr-false}]
-    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-  \end{enumerate}
-
-  \label{def:family'}
-  A \emph{family of $\labeling$-predicate transformers} over consists of a
-  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
-  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
-  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
-
-  
-  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
-  \setcounter{enumi}{\value{Btau}}
-  \item \label{pom-tau'}
-    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
-  \end{enumerate}
-\end{definition}
-
-We add this:
-\begin{enumerate}
-% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
-%   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-\item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
-  $\labelingForm(\aEv)$ is $\labeling$-consistent.
-\end{enumerate}
-
-
-
 \subsection{Address Calculation}
 \label{sec:addr}
 
@@ -330,7 +231,7 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
     \item \label{write-E-addr}
-      if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+      if $\fcard{\aEvs}\leq1$,
     \item \label{write-lambda-addr}
       $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal}[\aThrd]$,
     \item \label{write-kappa-addr}
@@ -381,7 +282,7 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
   $(\exists\aVal\in\Val)$
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
   \item \label{read-E-addr}
-    if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    if $\fcard{\aEvs}\leq1$,
   \item \label{read-lambda-addr}
     $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal}[\aThrd]$
   \item \label{read-kappa-addr}
@@ -393,18 +294,20 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
   \item[] \labeltext[\textsc{r}4]{}{read-tau-addr}
     \begin{enumerate}[leftmargin=0pt]
     \item \label{read-tau-dep-addr}
-      \begin{math}
-        (\forall\aEv\in\aEvs\cap\bEvs)
-      \end{math}
+      if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
+      % \begin{math}
+      %   (\forall\aEv\in\aEvs\cap\bEvs)
+      % \end{math}
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff
         (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
         \limplies \bForm[\uReg{\aEv}/\aReg]
       \end{math},      
     \item \label{read-tau-ind-addr}
-      \begin{math}
-        (\forall\aEv\in\aEvs\setminus\bEvs)
-      \end{math}
+      if $\aEv\in\aEvs$ and $\aEv\not\in\bEvs$ then
+      % \begin{math}
+      %   (\forall\aEv\in\aEvs\setminus\bEvs)
+      % \end{math}
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff
         \PBR{(\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv}) \lor (\cExp{=}\cVal\limplies\REF{\cVal}{=}\uReg{\aEv})}
@@ -412,10 +315,10 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
         \bForm[\uReg{\aEv}/\aReg]
       \end{math},      
     \item \label{read-tau-empty-addr}
+      if $\aEvs=\emptyset$ then 
       \begin{math}
         (\forall\bReg)
       \end{math}
-      if $\aEvs=\emptyset$ then 
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff 
         \bForm[\bReg/\aReg],
@@ -1155,44 +1058,68 @@ first thread from the read of $y$ to one of the writes to $x$.
       \cForm_\aEv
     \end{math},
     \stepcounter{enumi}
-  \item[] \labeltext[\textsc{r}4]{}{read-tau-ca}
-    \begin{enumerate}[leftmargin=0pt]
-    \item \label{read-tau-dependent-ca}
-      \begin{math}
-        (\forall\aEv\in\aEvs\cap\bEvs)
-      \end{math}
-      \begin{math}
+  \item[] \label{read-tau-ca}
+    \begin{math}
+      \begin{aligned}[t]
+        (\forall\bReg)
         \aTr{\bEvs}{\bForm} \riff
+        &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
         \cForm_\aEv
         \limplies \aVal_\aEv{=}\uReg{\aEv}
         \limplies \bForm[\uReg{\aEv}/\aReg]
-      \end{math},
-      
-    \item \label{read-tau-independent-ca}
-      \begin{math}
-        (\forall\aEv\in\aEvs\setminus\bEvs)
-      \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff
+        \\[-.5ex]
+        \land
+        &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
         \cForm_\aEv 
         \limplies
         \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
         \limplies
         \bForm[\uReg{\aEv}/\aReg]
-      \end{math},
-      
-    \item \label{read-tau-empty-ca}
-      \begin{math}
-        (\forall\bReg)
-      \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff 
-        % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-        (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        \\[-.5ex]
+        \land
+        &\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
-        \bForm[\bReg/\aReg],
-      \end{math}  
-    \end{enumerate}  
+        \bForm[\bReg/\aReg]
+      \end{aligned}
+    \end{math}
+  % \item[] \labeltext[\textsc{r}4]{}{read-tau-ca}
+  %   \begin{enumerate}[leftmargin=0pt]
+  %   \item \label{read-tau-dependent-ca}
+  %     \begin{math}
+  %       (\forall\aEv\in\aEvs\cap\bEvs)
+  %     \end{math}
+  %     \begin{math}
+  %       \aTr{\bEvs}{\bForm} \riff
+  %       \cForm_\aEv
+  %       \limplies \aVal_\aEv{=}\uReg{\aEv}
+  %       \limplies \bForm[\uReg{\aEv}/\aReg]
+  %     \end{math},
+      
+  %   \item \label{read-tau-independent-ca}
+  %     \begin{math}
+  %       (\forall\aEv\in\aEvs\setminus\bEvs)
+  %     \end{math}
+  %     \begin{math}
+  %       \aTr{\bEvs}{\bForm} \riff
+  %       \cForm_\aEv 
+  %       \limplies
+  %       \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+  %       \limplies
+  %       \bForm[\uReg{\aEv}/\aReg]
+  %     \end{math},
+      
+  %   \item \label{read-tau-empty-ca}
+  %     \begin{math}
+  %       (\forall\bReg)
+  %     \end{math}
+  %     \begin{math}
+  %       \aTr{\bEvs}{\bForm} \riff 
+  %       % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+  %       (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+  %       \limplies 
+  %       \bForm[\bReg/\aReg],
+  %     \end{math}  
+  %   \end{enumerate}  
   \item \label{read-term-ca}
     if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}
@@ -1238,6 +1165,105 @@ first thread from the read of $y$ to one of the writes to $x$.
   % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
   % $\sLOAD{}{}$.
 \end{definition}
+
+\subsection{Register Consistency}
+\label{sec:false}
+
+We would like:
+\begin{enumerate}
+\item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
+  $\labelingForm(\aEv)$ is satisfiable.
+\end{enumerate}
+For associativity, \eqref{pom-kappa-sat'} in turn requires
+\begin{enumerate}
+\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
+  $\aTr{}{\FALSE}\riff\FALSE$.
+\end{enumerate}
+But that does not quite hold in our setting.
+In this subsection, we refine these requirements into ones that do hold.
+%
+% \eqref{tr-false'} is too strong.
+% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
+% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
+% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
+% for some $\aVal$.
+% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
+% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
+% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
+%
+% We require the following:
+% \begin{enumerate}
+% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
+%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
+% \end{enumerate}
+%
+% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
+% for both reads):
+% \begin{gather*}
+%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
+%   \\
+%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
+%   \lor  
+%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
+% \end{gather*}
+%
+We define $\regForm{\labeling}$ to capture the register state of a pomset.
+\begin{definition}  
+  \label{def:labeling:consistent}
+  Let 
+  \begin{math}
+    \regForm{\labeling}=
+    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
+    \textwhere \aEvs=\fdom(\labeling)
+  \end{math}.
+  
+  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
+  We say that it is \emph{$\labeling$-inconsistent} otherwise.
+\end{definition}
+
+
+%tau maps (things incompatible with chi) to (things incompatible with chi)
+
+\begin{definition}
+  \label{def:trans'}
+  A \emph{$\labeling$-predicate transformer} is a %monotone
+  function
+  $\aTr{}{}:\Formulae\fun\Formulae$ such that
+  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
+  % \item \label{tr-implies'}
+  %   \labeltextXX{2}{x}{tr-and'}
+  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
+  \item[\eqref{tr-implies}]
+    \eqref{tr-and}\;
+    \eqref{tr-or}\; as in \refdef{def:trans},
+  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
+    % \item[\eqref{tr-false}]
+    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+  \end{enumerate}
+
+  \label{def:family'}
+  A \emph{family of $\labeling$-predicate transformers} over consists of a
+  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
+  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
+  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
+
+  
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \setcounter{enumi}{\value{Btau}}
+  \item \label{pom-tau'}
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
+  \end{enumerate}
+\end{definition}
+
+We add this:
+\begin{enumerate}
+% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
+%   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+\item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
+  $\labelingForm(\aEv)$ is $\labeling$-consistent.
+\end{enumerate}
+
+
 
 
 

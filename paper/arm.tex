@@ -547,7 +547,7 @@ following lemma gives a post-hoc verification technique for $\rrfx$, using
 program order ($\rpox$) and phantom events ($\fmrg{}$).  The construction is
 discussed in \textsection\ref{sec:c11}.
 \begin{lemma}
-  Any $\aPS$ in the image of $\frf{\semrr{}}$ is top-level iff
+  Any $\aPS$ in the image of $\frf{\semrr{}}$ is complete iff
   for every $\bEv\xrfx\aEv$ either
   \begin{itemize}
   \item external fulfillment:
@@ -555,9 +555,9 @@ discussed in \textsection\ref{sec:c11}.
   \item internal fulfillment:
     $(\exists\bEv'\mid\fmrg{\bEv'}=\bEv)$
     $(\exists\aEv'\mid\fmrg{\aEv'}=\aEv)$
-\todo{The following is sketchy.}
-    $\bEv\xpox\aEv$ and $(\not\exists\cEv)$
-    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv\xpox\cEv\xpox\aEv$.
+    $\bEv'\xpox\aEv'$ and $(\not\exists\cEv')$
+    $\labelingForm(\cEv)$ is a tautology and
+    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv'\xpox\cEv\xpox\aEv'$.
   \end{itemize}
 \end{lemma}
 % \begin{enumerate}

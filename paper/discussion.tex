@@ -1093,7 +1093,6 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         \begin{math}
           (\forall\dVal)
         \end{math}
-        \\
         \begin{math}
           \aTr{\bEvs}{\bForm} \riff 
           % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
@@ -1133,41 +1132,65 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
       \land \cExp{=}\cVal_\aEv
     \end{math},
     \stepcounter{enumi}
-  \item[] \labeltext[\textsc{r}4]{}{read-tau-ca-addr}
-    \begin{enumerate}[leftmargin=0pt]
-    \item \label{read-tau-dependent-ca-addr}
-      \begin{math}
-        (\forall\aEv\in\aEvs\cap\bEvs)
-      \end{math}
-      \begin{math}
+  \item \label{read-tau-ca-addr}
+    \begin{math}
+      \begin{aligned}[t]
+        (\forall\bReg)
         \aTr{\bEvs}{\bForm} \riff
+        &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
         \cForm_\aEv
         \limplies (\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv})
         \limplies \bForm[\uReg{\aEv}/\aReg]
-      \end{math},      
-    \item \label{read-tau-independent-ca-addr}
-      \begin{math}
-        (\forall\aEv\in\aEvs\setminus\bEvs)
-      \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff
+        \\[-.5ex]
+        \land
+        &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
         \cForm_\aEv 
         \limplies
         \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}{=}\uReg{\aEv})}
         \limplies
         \bForm[\uReg{\aEv}/\aReg]
-      \end{math},      
-    \item \label{read-tau-empty-ca-addr}
-      \begin{math}
-        (\forall\bReg)
-      \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff 
-        (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        \\[-.5ex]
+        \land
+        &\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
         \bForm[\bReg/\aReg],
-      \end{math}  
-    \end{enumerate}  
+      \end{aligned}
+    \end{math}
+  % \item[] \labeltext[\textsc{r}4]{}{read-tau-ca-addr}
+  %   \begin{enumerate}[leftmargin=0pt]
+  %   \item \label{read-tau-dependent-ca-addr}
+  %     \begin{math}
+  %       (\forall\aEv\in\aEvs\cap\bEvs)
+  %     \end{math}
+  %     \begin{math}
+  %       \aTr{\bEvs}{\bForm} \riff
+  %       \cForm_\aEv
+  %       \limplies (\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv})
+  %       \limplies \bForm[\uReg{\aEv}/\aReg]
+  %     \end{math},      
+  %   \item \label{read-tau-independent-ca-addr}
+  %     \begin{math}
+  %       (\forall\aEv\in\aEvs\setminus\bEvs)
+  %     \end{math}
+  %     \begin{math}
+  %       \aTr{\bEvs}{\bForm} \riff
+  %       \cForm_\aEv 
+  %       \limplies
+  %       \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}{=}\uReg{\aEv})}
+  %       \limplies
+  %       \bForm[\uReg{\aEv}/\aReg]
+  %     \end{math},      
+  %   \item \label{read-tau-empty-ca-addr}
+  %     \begin{math}
+  %       (\forall\bReg)
+  %     \end{math}
+  %     \begin{math}
+  %       \aTr{\bEvs}{\bForm} \riff 
+  %       (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+  %       \limplies 
+  %       \bForm[\bReg/\aReg],
+  %     \end{math}  
+  %   \end{enumerate}  
   \item \label{read-term-ca-addr}
     if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}

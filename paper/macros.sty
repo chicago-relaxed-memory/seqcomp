@@ -1,6 +1,9 @@
 \usepackage[rightbars]{changebar}
-\newcommand{\textchanged}[1]{\cbstart#1\cbend}
-\newenvironment{changed}{\cbstart\ignorespaces}{\cbend\ignorespacesafterend}
+\newcommand{\textchanged}[1]{#1}
+\newenvironment{changed}{\ignorespaces}{\ignorespacesafterend}
+% \renewcommand{\textchanged}[1]{\cbstart#1\cbend}
+% \renewenvironment{changed}{\cbstart\ignorespaces}{\cbend\ignorespacesafterend}
+
 % \usepackage[framemethod=tikz]{mdframed}
 % \newmdenv[
 %   skipabove = \partopsep,
