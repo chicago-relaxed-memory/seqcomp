@@ -1078,31 +1078,50 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         \land \cExp{=}\cVal_\aEv
         \land \aExp{=}\aVal_\aEv
       \end{math},      
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{w}4]{}{write-tau-ca-addr}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{write-tau-dep-ca-addr}
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff 
-          \cForm_\aEv
-          \limplies (\cExp{=}\cVal)
-          \limplies 
-          \bForm[\aExp/\REF{\cVal}]
-        \end{math},
-      \item \label{write-tau-empty-ca-addr}
-        \begin{math}
-          (\forall\dVal)
-        \end{math}
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff 
-          % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
-          (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
-          \limplies (\cExp{=}\dVal)
-          \limplies 
-          \bForm
-          [\aExp/\REF{\dVal}]
-        \end{math}  
-      \end{enumerate}  
+    \item
+    \begin{math}
+      (\forall\dVal)
+      \begin{aligned}[t]
+        \aTr{\bEvs}{\bForm} \riff
+        &\textstyle\bigwedge_{\aEv\in\aEvs}
+        \cForm_\aEv
+        \limplies (\cExp{=}\cVal)
+        \limplies 
+        \bForm[\aExp/\aLoc][\aExp{=}\aVal_\aEv/\Q{\aLoc}]
+        \\[-.5ex]
+        \land
+        &\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        \limplies (\cExp{=}\dVal)
+        \limplies 
+        \bForm[\aExp/\aLoc][\FALSE/\Q{\aLoc}]
+      \end{aligned}
+    \end{math}
+    \columnbreak
+    % \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{w}4]{}{write-tau-ca-addr}
+      % \begin{enumerate}[leftmargin=0pt]
+      % \item \label{write-tau-dep-ca-addr}
+      %   \begin{math}
+      %     \aTr{\bEvs}{\bForm} \riff 
+      %     \cForm_\aEv
+      %     \limplies (\cExp{=}\cVal)
+      %     \limplies 
+      %     \bForm[\aExp/\REF{\cVal}]
+      %   \end{math},
+      % \item \label{write-tau-empty-ca-addr}
+      %   \begin{math}
+      %     (\forall\dVal)
+      %   \end{math}
+      %   \begin{math}
+      %     \aTr{\bEvs}{\bForm} \riff 
+      %     % (\!\not\exists\aEv\in\aEvs \suchthat \cForm_\aEv)
+      %     (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+      %     \limplies (\cExp{=}\dVal)
+      %     \limplies 
+      %     \bForm
+      %     [\aExp/\REF{\dVal}]
+      %   \end{math}  
+      % \end{enumerate}  
       \stepcounter{enumi}
     \item[] \labeltext[\textsc{w}5]{}{write-term-ca-addr}
       \begin{enumerate}[leftmargin=0pt]
@@ -1120,6 +1139,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$ 
+  \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
   \item \label{read-E-ca-addr}
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
@@ -1130,6 +1150,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
       \labelingForm(\aEv) \riff
       \cForm_\aEv
       \land \cExp{=}\cVal_\aEv
+      \land \Q{\REF{\cVal}}
     \end{math},
     \stepcounter{enumi}
   \item \label{read-tau-ca-addr}
@@ -1191,9 +1212,11 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   %       \bForm[\bReg/\aReg],
   %     \end{math}  
   %   \end{enumerate}  
+    \columnbreak
   \item \label{read-term-ca-addr}
     if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}
+  \end{multicols}
   % \medskip Similarly, let $\frf{\semaddr{}}$ be defined as for $\frf{\semrr{}}$
   % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
   % $\sLOAD{}{}$.

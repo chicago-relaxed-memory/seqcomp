@@ -1,8 +1,12 @@
-\section{\PwTmcaTITLE{1}: Pomsets with Predicate Transformers for MCA (Part 1)}
+\section{\PwTmcaTITLE{}: Pomsets with Predicate Transformers for MCA}
 \label{sec:mca}
-\label{sec:mca1}
 We define two models for \mca{} architectures: \PwTmca{1} and \PwTmca{2}.
-We drop the subscript when referring to both models.
+The first has a nicer semantics; the second has a more efficient lowering for
+acquiring reads on \armeight{}.  Both variants have optimal lowering for
+relaxed access.  We drop the subscript when referring to both models.
+
+\subsection{\PwTmcaTITLE{1}}
+\label{sec:mca1}
 
 Note that reads-from implies order by \eqref{pom-rf-le}.
 % \begin{lemma}

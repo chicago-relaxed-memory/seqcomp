@@ -245,15 +245,15 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
       \begin{enumerate}[leftmargin=0pt]
       \item \label{write-tau-dep-addr}
         if $\aEvs\neq\emptyset$ then 
-        \begin{math}
+        \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff 
           (\cExp{=}\cVal)
           \limplies 
-          \bForm[\aExp/\REF{\cVal}]
-        \end{math},
+          \bForm[\aExp/\REF{\cVal}][\aExp{=}\aVal/\Q{\REF{\cVal}}]
+        \end{math},}
       \item \label{write-tau-empty-addr}
-        if $\aEvs=\emptyset$ then \\
-        \begin{math}
+        if $\aEvs=\emptyset$ then
+        \makebox[0pt][l]{\begin{math}
           (\forall\dVal)
         \end{math}        
         \begin{math}
@@ -261,9 +261,10 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
           (\cExp{=}\dVal)
           \limplies 
           \bForm
-          [\aExp/\REF{\dVal}]
-        \end{math}  
-      \end{enumerate}  
+          [\aExp/\REF{\dVal}][\FALSE/\Q{\REF{\dVal}}],
+        \end{math}}
+      \end{enumerate}
+      \columnbreak
       \stepcounter{enumi}
     \item[] \labeltext[\textsc{w}5]{}{write-term-addr}
       \begin{enumerate}[leftmargin=0pt]
@@ -280,53 +281,66 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\cExp}[\aThrd]$ then
   $(\exists\cVal\in\Val)$
   $(\exists\aVal\in\Val)$
-  \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-  \item \label{read-E-addr}
-    if $\fcard{\aEvs}\leq1$,
-  \item \label{read-lambda-addr}
-    $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal}[\aThrd]$
-  \item \label{read-kappa-addr}
-    \begin{math}
-      \labelingForm(\aEv) 
-      \land \cExp{=}\cVal
-    \end{math},
-    \stepcounter{enumi}
-  \item[] \labeltext[\textsc{r}4]{}{read-tau-addr}
-    \begin{enumerate}[leftmargin=0pt]
-    \item \label{read-tau-dep-addr}
-      if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
-      % \begin{math}
-      %   (\forall\aEv\in\aEvs\cap\bEvs)
-      % \end{math}
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+    \item \label{read-E-addr}
+      if $\fcard{\aEvs}\leq1$,
+    \item \label{read-lambda-addr}
+      $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal}[\aThrd]$
+    \item \label{read-kappa-addr}
       \begin{math}
-        \aTr{\bEvs}{\bForm} \riff
-        (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
-        \limplies \bForm[\uReg{\aEv}/\aReg]
-      \end{math},      
-    \item \label{read-tau-ind-addr}
-      if $\aEv\in\aEvs$ and $\aEv\not\in\bEvs$ then
-      % \begin{math}
-      %   (\forall\aEv\in\aEvs\setminus\bEvs)
-      % \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff
-        \PBR{(\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv}) \lor (\cExp{=}\cVal\limplies\REF{\cVal}{=}\uReg{\aEv})}
-        \limplies
-        \bForm[\uReg{\aEv}/\aReg]
-      \end{math},      
-    \item \label{read-tau-empty-addr}
-      if $\aEvs=\emptyset$ then 
-      \begin{math}
-        (\forall\bReg)
-      \end{math}
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff 
-        \bForm[\bReg/\aReg],
-      \end{math}  
-    \end{enumerate}  
-  \item \label{read-term-addr}
-    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
-  \end{enumerate}
+        \labelingForm(\aEv) 
+        \riff
+        \cExp{=}\cVal
+        \land \Q{\REF{\cVal}}
+      \end{math},
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{r}4]{}{read-tau-addr}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-tau-dep-addr}
+        if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
+        % \begin{math}
+        %   (\forall\aEv\in\aEvs\cap\bEvs)
+        % \end{math}
+        \makebox[0pt][l]{\begin{math}
+            \aTr{\bEvs}{\bForm} \riff
+            (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
+            \limplies \bForm[\uReg{\aEv}/\aReg]
+          \end{math},}
+      \item \label{read-tau-ind-addr}
+        if $\aEv\in\aEvs$ and $\aEv\not\in\bEvs$ then
+        % \begin{math}
+        %   (\forall\aEv\in\aEvs\setminus\bEvs)
+        % \end{math}
+        \makebox[0pt][l]{\begin{math}
+            \aTr{\bEvs}{\bForm} \riff
+            \PBR{(\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv}) \lor (\cExp{=}\cVal\limplies\REF{\cVal}{=}\uReg{\aEv})}
+            \limplies
+            \bForm[\uReg{\aEv}/\aReg]
+          \end{math},}
+        \columnbreak
+      \item \label{read-tau-empty-addr}
+        if $\aEvs=\emptyset$ then 
+        \begin{math}
+          (\forall\bReg)
+        \end{math}
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \riff 
+          \bForm[\bReg/\aReg],
+        \end{math}  
+      \end{enumerate}  
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{r}5]{}{read-term-addr}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-term-nonempty-addr}
+        if $\aEvs\neq\emptyset$ or $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$. 
+      \item \label{read-term-empty-addr}
+        if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 
+      \end{enumerate}      
+    % \item \label{read-term-addr}
+    %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+    \end{enumerate}
+  \end{multicols}
 \end{definition}
 
 The combination of read-read independency (\refdef{def:semrr}) and address
@@ -978,7 +992,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
-  % \begin{multicols}{2}
+  \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
   \item \label{write-E-ca}
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
@@ -997,12 +1011,26 @@ first thread from the read of $y$ to one of the writes to $x$.
     %   %   (\forall\aEv\in\aEvs\cap\bEvs)
     %   (\forall\aEv\in\aEvs)
     % \end{math}
+    % \begin{math}
+    %   \aTr{\bEvs}{\bForm} \riff 
+    %   \cForm_\aEv
+    %   \limplies 
+    %   \bForm[\aExp/\aLoc]
+    % \end{math},
     \begin{math}
-      \aTr{\bEvs}{\bForm} \riff 
-      \cForm_\aEv
-      \limplies 
-      \bForm[\aExp/\aLoc]
-    \end{math},
+      \begin{aligned}[t]
+        \aTr{\bEvs}{\bForm} \riff
+        &\textstyle\bigwedge_{\aEv\in\aEvs}
+        \cForm_\aEv
+        \limplies 
+        \bForm[\aExp/\aLoc][\aExp{=}\aVal_\aEv/\Q{\aLoc}]
+        \\[-.5ex]
+        \land
+        &\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        \limplies 
+        \bForm[\aExp/\aLoc][\FALSE/\Q{\aLoc}]
+      \end{aligned}
+    \end{math}
     % \item
     %   \begin{math}    
     %     (\forall\aEv\in\aEvs\setminus\bEvs)
@@ -1029,7 +1057,12 @@ first thread from the read of $y$ to one of the writes to $x$.
     %   }
     %   \end{math}.
   \item \label{write-term-ca}
-    $\aTerm \riff \cForm_\aEv \limplies \aExp{=}\aVal_\aEv$,
+    \begin{math}
+      \aTerm \riff
+      \PBR{\bigvee_{\aEv\in\aEvs}\cForm_\aEv}
+      \land
+      \PBR{\bigwedge_{\aEv\in\aEvs}\cForm_\aEv \limplies \aExp{=}\aVal_\aEv},
+    \end{math}
     % \stepcounter{enumi}
     % \item[] \labeltext[\textsc{w}5]{}{write-term-ca}
     %   \begin{enumerate}[leftmargin=0pt]
@@ -1039,14 +1072,14 @@ first thread from the read of $y$ to one of the writes to $x$.
     %     $\aTerm \riff \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
     %   \end{enumerate}
   \end{enumerate}
-  % \end{multicols}
+  \end{multicols}
 
   \medskip
   \noindent
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$ 
-  % \begin{multicols}{2}
+  \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
   \item \label{read-E-ca}
     if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
@@ -1054,11 +1087,11 @@ first thread from the read of $y$ to one of the writes to $x$.
     $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
   \item \label{read-kappa-ca}
     \begin{math}
-      \labelingForm(\aEv) \riff
+      \labelingForm(\aEv) \riff      
       \cForm_\aEv
+      \land\Q{\aLoc}
     \end{math},
-    \stepcounter{enumi}
-  \item[] \label{read-tau-ca}
+  \item \label{read-tau-ca}
     \begin{math}
       \begin{aligned}[t]
         (\forall\bReg)
@@ -1082,6 +1115,7 @@ first thread from the read of $y$ to one of the writes to $x$.
         \bForm[\bReg/\aReg]
       \end{aligned}
     \end{math}
+    \columnbreak
   % \item[] \labeltext[\textsc{r}4]{}{read-tau-ca}
   %   \begin{enumerate}[leftmargin=0pt]
   %   \item \label{read-tau-dependent-ca}
@@ -1120,8 +1154,16 @@ first thread from the read of $y$ to one of the writes to $x$.
   %       \bForm[\bReg/\aReg],
   %     \end{math}  
   %   \end{enumerate}  
-  \item \label{read-term-ca}
-    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{r}5]{}{read-term-ca}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-term-nonempty-ca}
+        if $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$. 
+      \item \label{read-term-empty-ca}
+        if $\amode\gemode\mACQ$ then $\aTerm \riff \bigvee_{\aEv\in\aEvs}\cForm_\aEv$. 
+      \end{enumerate}      
+  % \item \label{read-term-ca}
+  %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}
   % \begin{multicols}{2}
   %   \noindent
@@ -1147,7 +1189,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   %       \cForm_\aEv\land \aLoc{=}\aVal_\aEv
   %     \end{math},
   %   \end{enumerate}
-  % \end{multicols}
+  \end{multicols}
   % \medskip
   % Could make \textsc{d}4b:
   % \begin{math}

@@ -134,18 +134,19 @@
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-tau-dep}
         if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
-        \begin{math}
+        \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
           \aVal{=}\aReg
-          \limplies \bForm
-        \end{math},    
+          \limplies \bForm,
+        \end{math}}
       \item \label{read-tau-ind}
         if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
-        \begin{math}
+        \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
           \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}
           \limplies \bForm,
-        \end{math}
+        \end{math}}
+        \columnbreak
       \item \label{read-tau-empty}
         if $\aEvs=\emptyset$ then
         \begin{math}
@@ -210,6 +211,7 @@
           [\aExp/\aLoc][\FALSE/\Q{\aLoc}],
         \end{math}
       \end{enumerate}
+      \columnbreak
       \stepcounter{enumi}      
     \item[] \labeltext[\textsc{w}5]{}{write-term}
       \begin{enumerate}[leftmargin=0pt]

@@ -29,10 +29,11 @@ recently, existing approaches either
 \item computed dependencies using non-compositional operational models over
   alternate worlds \cite{Manson:2005:JMM:1047659.1040336,
     DBLP:conf/esop/JagadeesanPR10,
-    DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}---as
-  discussed in \textsection\ref{sec:promising}, these models fail to validate
-  temporal safety properties.
-  %JMM, promising semantics, weakestMO, etc
+    DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}---these
+  models validate many compiler optimizations, but also
+  %allow some dubious executions 
+  fail to validate temporal safety properties
+  (see \textsection\ref{sec:promising}).
 \end{itemize}
 
 Recently, two denotational models have been proposed that compute sequential
@@ -48,28 +49,25 @@ adding one event at a time on the left.  In both cases, the approaches
 require perfect knowledge of the future.
 
 In this paper, we show that \PwP{} can be extended with \emph{families of
-  predicate transformers} to calculate sequential dependencies in a way that
+  predicate transformers (\PwT{})} to calculate sequential dependencies in a way that
 is \emph{compositional} and \emph{direct}: \emph{compositional} in that the
 denotation of $(\aCmd_1\SEMI \aCmd_2)$ can be computed from the denotation of
 $\aCmd_1$ and the denotation of $\aCmd_2$, and \emph{direct} in that these
-can be calculated independently.
+can be calculated independently.  The definition is associative: the
+denotation of $((\aCmd_1\SEMI \aCmd_2)\SEMI \aCmd_3)$ is the same as the
+denotation of $(\aCmd_1\SEMI (\aCmd_2\SEMI \aCmd_3))$.  It also validates
+expected laws concerning the interaction of sequencing and conditional
+execution.
 
-One of the main difficulties is to find a definition that is associative:
-the denotation of $((\aCmd_1\SEMI \aCmd_2)\SEMI \aCmd_3)$ should be the same as 
-the denotation of $(\aCmd_1\SEMI (\aCmd_2\SEMI \aCmd_3))$.
-
-We have layered the definitions, both to manage complexity and to make clear
-that the main contribution of this paper is broadly applicable.  After an
-overview, we define sequential dependencies in \textsection\ref{sec:model}.
-The next two sections add concurrency.  In \textsection\ref{sec:mca}, we
-define \PwTmca{}, which models Java for \mca{} hardware, similar to that of
+To manage complexity, we have layered the definitions.  After an overview, we
+define sequential dependencies in \textsection\ref{sec:model}.  The next two
+sections add concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
+which models Java for \mca{} hardware, similar to that of
 \citet{DBLP:journals/pacmpl/JagadeesanJR20}.  In \textsection\ref{sec:c11},
 we define \PwTc{}, which models \cXI, adapting the approach of
-\citet{DBLP:conf/esop/PaviottiCPWOB20}.
-
-We describe two variants of \PwTmca{}.  The first has a nicer semantics; the
-second has a more efficient lowering for acquiring reads on \armeight{}.
-Both variants have optimal lowering for relaxed access.
+\citet{DBLP:conf/esop/PaviottiCPWOB20}.  In \textsection\ref{sec:additional},
+we extend the semantics to include additional features, such as address calculation.
+In \textsection{sec:results}, we summarize the results.
 
 \todo{flesh this out}
 \begin{itemize}
