@@ -1,0 +1,81 @@
+%\subsection{\PwTmcaTITLE{2}: Pomsets with Predicate Transformers for MCA (Part 2)}
+\subsection{\PwTmcaTITLE{2}}
+\label{sec:mca2}
+
+%
+The use of $\rextendsdef{}{}$ in \ref{if-rf-extends}
+ensures that no $\rrfx$ is introduced between events in
+$\aEvs_1\cap\aEvs_2$ when coalescing.
+
+In the second semantics, we weaken the relationship between $\rrfx$
+and $\le$ in \ref{pom-rf-le}.  Rather than ensuring that there is no
+\emph{global} blocker for a sequentially fulfilled read \eqref{pom-rf-le}, we
+require only that there is no \emph{thread-local} blocker
+\eqref{seq-rf-le-rf}.
+% This change both allows and requires us to weaken the definition of
+% \emph{delays} to drop write-to-read order from $\eqreorderco$.
+
+With the weakening of \ref{seq-rf-le-rf}, we must be careful not to allow
+spurious pairs to be added to the $\rrfx$ relation.  Thus we add
+\ref{par-rf-extends},
+\ref{seq-rf-extends}, and
+\ref{if-rf-extends}.
+For example, \ref{if-rf-extends} ensure that
+\begin{math}
+  \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
+\end{math}
+does not include 
+\begin{math}
+  \smash{\hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \rfint[out=165,in=15]{b}{a}
+        \wki{a}{b}
+      \end{tikzinlinesmall}}}
+\end{math}, taking $\rrfx$ from the left and $\le$ from the right.
+
+\begin{definition}
+  \label{def:pwt:mca2}
+  A \PwTmca{2} is a \PwT{} (\refdef{def:pomset}) equipped with an injective
+  relation $\rrfx$ that satisfies requirements \ref{pom-rf-match} and
+  \ref{pom-rf-block} of \refdef{def:pwt:mca1}.
+
+  A A \PwTmca{2} is \emph{complete} if it satisfies
+  \ref{top-kappa}, \ref{top-term}, and \ref{top-rf}.
+  % \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  %   \setcounter{enumi}{\value{Brf}}
+  % \item \label{pom-rf'} ${\rrfx} \subseteq \aEvs\times\aEvs$
+  %   is an injective relation capturing \emph{reads-from}, such that
+  %   % \end{enumerate}
+  %   % A pomset is a \emph{candidate} if there is an injective relation
+  %   % ${\rrfx} : \aEvs\times\aEvs$, capturing \emph{reads-from}, such that
+  %   \begin{multicols}{2}    
+  %     \begin{enumerate}
+  %       % \begin{enumerate}[,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
+  %       % \item \label{rf-injective}
+  %       %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is,
+  %       %   ${\rrfx}$ is injective,
+  %     \item[\eqref{pom-rf-match}]
+  %       \eqref{pom-rf-block}\;
+  %       as in \refdef{def:pwt:mca1},
+  %       \setcounter{enumii}{2}
+  %     \item \label{pom-rf-le'} 
+  %       if $\bEv\xrfx\aEv$ then either $\bEv\le\aEv$ or $\aEv\le\bEv$.
+  %     \end{enumerate}
+  %   \end{multicols}
+  % \end{enumerate}
+\end{definition}
+A \PwTmca{2} need not satisfy requirement \ref{pom-rf-le}, and thus we may
+have $\bEv\xrfx\aEv$ and $\aEv\le\bEv$.
+
+% Derive $\rdelayspdef$ from $\rdelaysdef$ by replacing $\eqreorderco$ with
+% \begin{math}
+%   {\reorderlws}
+%   =
+%   \{(\DW{\aLoc}{}, \DW{\aLoc}{}),\;(\DR{\aLoc}{}, \DW{\aLoc}{})\}.
+% \end{math}
+% The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
+% \emph{Local Write Successor}.
+
+The semantic rules are given in \reffig{fig:mca2}.
+We write $\semmca{2}{}$ for the semantic function.

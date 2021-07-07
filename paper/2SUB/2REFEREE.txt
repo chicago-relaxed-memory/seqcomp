@@ -195,6 +195,20 @@ Questions for authors’ response
   a disjunction.)
 
 
+Reviewer's Comments after Authors' Response
+-------------------------------------------
+> > You don't explicitly state whether your model is intended to capture C11,
+> > Java, both, or neither. It looks pretty similar to C11 but not quite the
+> > same. Could you clarify?
+>
+> You could think of our model as a variant of C11 that allows more
+> optimizations on relaxed atomics. (C11 fails to validate
+> common-subexpression-elimination on relaxed atomics without alias analysis.)
+> Java fails time-wise LDRF (races from the past can pollute the future). 
+
+Very good. I think it would be good to clarify this when revising the paper,
+as readers will want to know whether you're aiming for fidelity to existing
+models or you're being more "idealistic".
 
 Review #220B
 ===========================================================================
@@ -266,13 +280,33 @@ while the abstract mentions these results.  Is it because of lack of space or
 are they straightforward?
 
 
+Reviewer's Comments after Authors' Response
+-------------------------------------------
+Thank you for your detailed response and for bringing up the multiple items
+of work in progress.
+
+In light of your response, what was not very clear from the paper was whether
+your contribution was one model that satisfies a bunch of criteria *or* a
+general method for making weak memory models that track dependencies
+compositional.
+
+I was assuming only the former and was a bit put off by the fragmented
+presentation, and that a number of items were still work in progress.  I now
+understand that you consider both to be contributions of the paper.  I would
+therefore recommend that you update the presentation accordingly.
+
+In addition, the paper would be much stronger once the claimed
+work-in-progress items (especially, the Agda mechanization) are complete. It
+may make sense to delay re-submitting this paper until these results are
+complete.
+
 
 Review #220C
 ===========================================================================
 
 Overall merit
 -------------
-3. Weak accept
+3. Weak accept [changed to 2 after response]
 
 Review confidence
 -----------------
@@ -315,3 +349,11 @@ with ARM architects; if so they should be clearer about this.
 I liked the technical ploy of first using single-use registers and
 then generalizing. As almost-noted in the paper, this mirrors actual
 register-renaming in processors as well as SSA compilation.
+
+Reviewer's Comments after Authors' Response
+-------------------------------------------
+I agree that the ideas of using predicate transformers are a potentially
+significant contribution. But I worry that these cannot have the impact they
+deserve until the development and presentation are more complete -- filling
+in or finalizing enough of the details mentioned in the paper and response to
+convince skeptical readers.

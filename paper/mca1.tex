@@ -5,8 +5,26 @@ The first has a nicer semantics; the second has a more efficient lowering for
 acquiring reads on \armeight{}.  Both variants have optimal lowering for
 relaxed access.  We drop the subscript when referring to both models.
 
+
+Concerning \reflem{lem:if}:
+For \PwTmca{}, \eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2} are
+inclusions rather than equations.  In \textsection\ref{sec:delay}, we refine
+the semantics to validate the reverse inclusions.
+
+
 \subsection{\PwTmcaTITLE{1}}
 \label{sec:mca1}
+
+Parallel composition is disjoint union.  Any $\rrfx$ edges added between the
+two sides must also be added to the order (\ref{par-rf-le1} and
+\ref{par-rf-le2}).
+
+Sequential composition is similar, with two changes: \ref{seq-E} does not
+require disjointness (see \textsection\ref{sec:ex:term}), and
+\ref{seq-le-delays} may require order (see example \ref{pub}, below).
+
+We include the \emph{reads-from} relation explicitly in the model
+\eqref{pom-rf}.
 
 Note that reads-from implies order by \eqref{pom-rf-le}.
 % \begin{lemma}

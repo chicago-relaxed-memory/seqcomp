@@ -12,10 +12,12 @@
   let
   %$\labelingForm'_2(\aEv)=\aTr[1]{}{\labelingForm_2(\aEv})$ if $\labeling(\aEv)$ is a $\sread$---otherwise
   $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$, where
-  $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$,\\
-  and
-  $\aTerm[1](\aEv) = \aTerm[1]$ if $\labeling(\aEv)$ is a $\srelease$---otherwise
-  $\aTerm[1](\aEv) = \TRUE$.
+  $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$,
+  % RELEASE:
+  % \\ and
+  % $\aTerm[1](\aEv) = \aTerm[1]$ if $\labeling(\aEv)$ is a $\srelease$---otherwise
+  % $\aTerm[1](\aEv) = \TRUE$.
+  %
   % let $\aTerm[1](\aEv) = \aTerm[1]$ if $\labeling_2(\aEv)$ is a $\srelease$
   % and $\aTerm[1](\aEv) = \TRUE$ otherwise,\\
   % let $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,
@@ -50,11 +52,11 @@
       \item \label{seq-kappa1}
         if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$,
       \item \label{seq-kappa2}
-        if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm'_2(\aEv) \land \aTerm[1](\aEv)$,
+        if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm'_2(\aEv)$, % \land \aTerm[1](\aEv)$,
       \item \label{seq-kappa12}
         % if $\aEv{\in}\aEvs_1{\cap}\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv){\lor}\labelingForm'_2(\aEv)$,\\
         \makebox[0pt][l]{%
-          if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv) \riff (\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)) \land \aTerm[1](\aEv)$,
+          if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv) \riff {\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)}$,% \land \aTerm[1](\aEv)$,
         }
         % where
         % $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,
@@ -69,7 +71,7 @@
     \item \label{seq-term}
       $\aTerm \riff \aTerm[1]\land\aTr[1]{}{\aTerm[2]}$,
     \item \label{seq-le}
-      ${\le}\supseteq{\le_1}\cup{\le_2}$,
+      ${\le}\supseteq{\le_1}\cup{\le_2}$.
     \end{enumerate}
   \end{multicols}
   \medskip
@@ -104,9 +106,9 @@
       $\aTr{\bEvs}{\bForm} \riff (\aForm\land\aTr[1]{\bEvs}{\bForm})\lor(\neg\aForm\land\aTr[2]{\bEvs}{\bForm})$,
     \item \label{if-term}
       % $\aTerm \riff (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
-      $\aTerm \riff (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$.
+      $\aTerm \riff (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$,
     \item \label{if-le}
-      ${\le}\supseteq{\le_1}\cup{\le_2}$,
+      ${\le}\supseteq{\le_1}\cup{\le_2}$.
     \end{enumerate}
   \end{multicols}
   \medskip
@@ -114,59 +116,6 @@
   \noindent
   If $\aPS\in\sLET{\aReg}{\aExp}$ then $\aEvs = \emptyset$ and
   $\aTr{\bEvs}{\bForm} \riff \bForm[\aExp/\aReg]$.
-  \medskip
-
-  \noindent
-  If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
-  $(\exists\aVal\in\Val)$
-  \begin{multicols}{2}
-    \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-    \item \label{read-E}
-      $\fcard{\aEvs}\leq1$,
-      %if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-    \item \label{read-lambda}
-      $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
-    \item \label{read-kappa}
-      %$\labelingForm(\aEv) \riff \TRUE$,
-      $\labelingForm(\aEv) \riff \Q{\aLoc}$,
-     \stepcounter{enumi}
-    \item[] \labeltext[\textsc{r}4]{}{read-tau}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{read-tau-dep}
-        if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
-        \makebox[0pt][l]{\begin{math}
-          \aTr{\bEvs}{\bForm} \riff
-          \aVal{=}\aReg
-          \limplies \bForm,
-        \end{math}}
-      \item \label{read-tau-ind}
-        if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
-        \makebox[0pt][l]{\begin{math}
-          \aTr{\bEvs}{\bForm} \riff
-          \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}
-          \limplies \bForm,
-        \end{math}}
-        \columnbreak
-      \item \label{read-tau-empty}
-        if $\aEvs=\emptyset$ then
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff
-          % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
-          \bForm,
-        \end{math}
-      \end{enumerate}
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{r}5]{}{read-term}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{read-term-nonempty}
-        if $\aEvs\neq\emptyset$ or $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$. 
-      \item \label{read-term-empty}
-        if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 
-      \end{enumerate}      
-    % \item \label{read-term}
-    %   if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 
-    \end{enumerate}
-  \end{multicols}
   \medskip
 
   \noindent
@@ -220,6 +169,59 @@
       \item \label{write-term-empty}
         if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
       \end{enumerate}
+    \end{enumerate}
+  \end{multicols}
+  \medskip
+
+  \noindent
+  If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
+  $(\exists\aVal\in\Val)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+    \item \label{read-E}
+      $\fcard{\aEvs}\leq1$,
+      %if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    \item \label{read-lambda}
+      $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
+    \item \label{read-kappa}
+      %$\labelingForm(\aEv) \riff \TRUE$,
+      $\labelingForm(\aEv) \riff \Q{\aLoc}$,
+     \stepcounter{enumi}
+    \item[] \labeltext[\textsc{r}4]{}{read-tau}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-tau-dep}
+        if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
+        \makebox[0pt][l]{\begin{math}
+          \aTr{\bEvs}{\bForm} \riff
+          \aVal{=}\aReg
+          \limplies \bForm,
+        \end{math}}
+      \item \label{read-tau-ind}
+        if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
+        \makebox[0pt][l]{\begin{math}
+          \aTr{\bEvs}{\bForm} \riff
+          \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}
+          \limplies \bForm,
+        \end{math}}
+        \columnbreak
+      \item \label{read-tau-empty}
+        if $\aEvs=\emptyset$ then
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \riff
+          % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+          \bForm,
+        \end{math}
+      \end{enumerate}
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{r}5]{}{read-term}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-term-nonempty}
+        if $\aEvs\neq\emptyset$ or $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+      \item \label{read-term-empty}
+        if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 
+      \end{enumerate}      
+    % \item \label{read-term}
+    %   if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 
     \end{enumerate}
   \end{multicols}
   \medskip

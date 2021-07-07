@@ -1232,9 +1232,9 @@
 \tikzstyle{xo} = [-stealth,dotted,thick,color=gray!20!black,]
 \tikzstyle{xright} = [out=-0,in=0,looseness=1.5,]
 \tikzstyle{xleft} = [out=-180,in=180,looseness=1.5,]
+\newcommand{\xos}[3][]{\draw[xo,xright,#1](#2)to(#3);}
 \newcommand{\xo}[3][]{\draw[xo,#1](#2)to(#3);}
 \newcommand{\xxo}{\xarrowtikz{xo}{\;\;}}%
-%\newcommand{\xos}[3][]{\draw[xo,#1](#2)to(#3);}
 
 \newcommand{\depcolor}{magenta}
 \newcommand{\synccolor}{red!65!black}

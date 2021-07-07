@@ -1,2 +1,64 @@
 \section{Results}
 \label{sec:results}
+
+% \subsection{Reordering Transformations}
+% \label{sec:ex:valid}
+
+% When $\sem{\aCmd} \supseteq \sem{\aCmd'}$, we say that $\aCmd'$ is a
+% \emph{valid transformation} of $\aCmd$.
+% In this subsection, we show the
+% validity of specific optimizations.  
+
+The semantics validates many peephole optimizations.  Most apply only to
+relaxed access.
+\begin{align*}
+  %\taglabel{RR}
+  \sembase{\PR{\aLoc}{\aReg} \SEMI \PR{\bLoc}{\bReg}} &=
+  \sembase{\PR{\bLoc}{\bReg}\SEMI \PR{\aLoc}{\aReg}} &&\text{if } \aReg\neq\bReg
+  \\
+  %\taglabel{WW}
+  \sembase{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
+  \sembase{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} &&\text{if } \aLoc\neq\bLoc
+  \\
+  %\taglabel{RW}
+  \sembase{\aLoc \GETS \aExp  \SEMI \PR{\bLoc}{\bReg}} &=
+  \sembase{\PR{\bLoc}{\bReg} \SEMI\aLoc \GETS \aExp} &&\text{if }
+  \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
+\end{align*}
+% \ref{WW}, \ref{RW} and \ref{RR} require that two sides of the semicolon
+% have disjoint ids; for example, \ref{RW} requires $\disjoint{{\free(\aReg
+% \GETS \aLoc)}}{{\free(\bLoc \GETS \bExp)}}$. 
+% \ref{RR} requires either $\aReg\neq\bReg$ or
+% $\aLoc=\bLoc$.  \ref{WW} and \ref{RW} require that two sides of the
+% semicolon have disjoint ids; for example, \ref{RW} requires
+% $\disjoint{{\free(\PR{\aLoc}{\aReg})}}{{\free(\bLoc \GETS \bExp)}}$.
+%\ref{5} imposes no order between events in \ref{RR}--\ref{RW}.  %Note that \ref{RR} allows aliasing.
+Here $\free(\aCmd)$ is the set of locations and registers that occur in $\aCmd$.
+Using augmentation closure, the semantics also validates roach-motel reorderings \cite{SevcikThesis}.  For
+example, on read/write pairs:
+  \begin{align*}
+    %\tag{\textsc{roach1}}\label{AcqW}
+    \sembase{x^\amode \GETS \aExp \SEMI\PR{y}{\bReg}} &\supseteq
+    \sembase{\PR{y}{\bReg}  \SEMI x^\amode\GETS \aExp} 
+    &&\text{if }
+    \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
+    \\
+    %\tag{\textsc{roach2}}\label{RelW}
+    \sembase{x \GETS \aExp \SEMI\PR[\amode]{y}{\bReg}} &\supseteq
+    \sembase{\PR[\amode]{y}{\bReg}  \SEMI x\GETS \aExp} 
+    &&\text{if }
+    \aLoc\neq\bLoc \textand \bReg\not\in\free(\aExp)%\disjoint{{\free(\aLoc \GETS \aExp)}}{{\free(\PR{\bLoc}{\bReg})}}
+  \end{align*}
+
+
+% As expected, %sequential and
+% parallel composition commutes with conditionals and declarations, and
+% conditionals and declarations commute with each other.  For example,
+% we have \emph{scope extrusion}~\cite{Milner:1999:CMS:329902}:
+% \begin{align*}
+%   \taglabel{SE}
+%   \sem{\aCmd\PAR \VAR\aLoc\SEMI\bCmd} &=
+%   \sem{\VAR\aLoc\SEMI(\aCmd\PAR\bCmd)}
+%   &&\text{if } \aLoc\not\in\free(\aCmd)
+% \end{align*}
+
