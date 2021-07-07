@@ -646,23 +646,24 @@ but dependent on $(\DR y0)$, which is the transformer
 which maps $\bForm$ to $(0{=}s) \limplies \bForm$.
 \begin{gather*}
   \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
-  \\[-2ex]
+  \\
   \nonumber
-  \hbox{\begin{tikzinline}[node distance=1ex and 1.2em]
-      \xform{rx0d}{(0{=}r) \limplies \bForm}{}
-      \event{rx0}{\DR{x}{0}}{right=of rx0d}
-      \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{right=of rx0}
-      \event{ry0}{\DR{y}{0}}{right=of rx0ry0d}
-      \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
-      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0d}
-      \xform{wz0i}{\bForm}{left=of rx0d}
-      \po[out=20,in=170]{ry0}{wz0}
+  \hbox{\begin{tikzinline}[node distance=2ex and 1.2em]
+      \xform{wz0i}{\bForm}{}
+      \xform{rx0d}{(0{=}r) \limplies \bForm}{right=of wz0i}
+      \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{right=of rx0d}
+      \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of rx0ry0d}
+      \event{rx0}{\DR{x}{0}}{above left=of rx0ry0d}
+      \event{ry0}{\DR{y}{0}}{above right=of rx0ry0d}
+      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+      \po{ry0}{wz0}
       \xo{rx0}{rx0d}
       \xo{ry0}{ry0d}
       \xo{rx0}{rx0ry0d}
       \xo{ry0}{rx0ry0d}
     \end{tikzinline}}
 \end{gather*}
+In the diagram, the dotted lines indicate set inclusion into the index of the transformer-family.
 As a sanity check, we can see that sequential composition is
 associative in this case, since it does not matter whether we
 associate to the left, with intermediate step:
@@ -670,7 +671,7 @@ associate to the left, with intermediate step:
   \PR{x}{r}\SEMI \PR{y}{s}
   \\
   \nonumber
-  \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+  \hbox{\begin{tikzinline}[node distance=2ex and 1.5em]
       \xform{rx0d}{(0{=}r) \limplies \bForm}{}
       \event{rx0}{\DR{x}{0}}{right=of rx0d}
       \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{right=of rx0}

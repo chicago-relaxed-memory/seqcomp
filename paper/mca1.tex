@@ -79,16 +79,15 @@ In complete pomsets, $\rrfx$ must pair every read with a matching write
 \cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.
 
 The semantic rules are mostly straightforward: Parallel composition is disjoint
-union, and all constructs respect reads-from.  Only \ref{seq-le-delays}
-requires explanation.
+union, and all constructs respect reads-from.  The monoid laws
+(\reflem{lem:monoid}) extend to parallel composition, with $\SKIP$ as right
+unit only due to the asymmetry of \ref{par-tau}.
 
-
-
+Only \ref{seq-le-delays} requires explanation.
 % \begin{lemma}
 %   \label{lem:rf:implies:le}
 %   For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
 %   $\bEv\le\aEv$.
-
 %   \vspace{-.5\baselineskip}
 %   \begin{proof}
 %     Induction on the definition of $\sembase{}$, using \ref{par-rf-le1}, \ref{par-rf-le2}, and \ref{pom-rf-le}.
@@ -101,7 +100,6 @@ requires explanation.
 %   \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
 %   explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
 %   variant semantics $\frf{\semrr{}}$ where \ref{pom-rf-le} is not required.}
-
 From \refdef{def:actions}, recall that $\aAct \rdelaysdef \bAct$ if
 $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or
 $\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
