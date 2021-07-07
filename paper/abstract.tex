@@ -26,8 +26,9 @@ reorder programs even more dramatically.  All of this reordering is meant to
 be unobservable in single-threaded code, but is observable in multi-threaded code.
 A formal attempt to understand the resulting mess is known
 as a ``relaxed memory model.''  The relaxed memory models that have been
-proposed to date either fail to address sequential composition directly, or overly
-restrict processors and compilers.
+proposed to date either fail to address sequential composition directly, overly
+restrict processors and compilers, or permit nonsense thin-air behaviors which are
+unobservable in practice.
 
 To support sequential composition while targeting modern hardware, we propose
 using preconditions and families of predicate transformers.  When composing
