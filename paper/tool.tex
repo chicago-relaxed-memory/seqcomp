@@ -1,9 +1,9 @@
 \section{\PwTerTITLE: automatic litmus test evaluator}
 \label{sec:tool}
 
-\PwTer{} automatically and exhaustively calculates the allowed outcomes of litmus tests for the PwT, PwT-po and PwT-C11 models. It is built in OCaml, and uses Z3~\cite{Z3Solver} to judge the truth of predicates constructed by the models. \PwTer{} obviates the need for error-prone hand evaluation.
+\PwTer{} automatically and exhaustively calculates the allowed outcomes of litmus tests for the \PwT, \PwTpo, and \PwTc{} models. It is built in OCaml, and uses Z3~\cite{Z3Solver} to judge the truth of predicates constructed by the models. \PwTer{} obviates the need for error-prone hand evaluation.
 
-\PwTer{} allows several modes of evaluation: it can evaluate the rules of Fig.~\ref{fig:seq}, implementing PwT; it can generate program order according to Section~\ref{sec:c11}, implementing PwwT-po; and similar to \MRD~\cite{DBLP:conf/esop/PaviottiCPWOB20}, it can construct C11-style pre-executions and filter them according to the rules of C11.
+\PwTer{} allows several modes of evaluation: it can evaluate the rules of Fig.~\ref{fig:seq}, implementing \PwT; it can generate program order according to Section~\ref{sec:c11}, implementing \PwTpo; and similar to \MRD~\cite{DBLP:conf/esop/PaviottiCPWOB20}, it can construct C11-style pre-executions and filter them according to the rules of C11.
 Our choice of C11 rules is careful: we take the rules of RC11~\cite{DBLP:conf/pldi/LahavVKHD17}, but we replace the overly strong No-Thin-Air restriction $\text{acyclic}(\rrf\cup\rpox)$ with $\text{acyclic}(\rrf\cup\lt)$. 
 This is a more precise categorisation of thin-air behavior, and it allows aggressive compiler optimizations which would be erroneously forbidden by RC11's original No-Thin-Air axiom.
 We show \PwTer{} in action in Fig.~\ref{fig:tool}.

@@ -144,8 +144,8 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
     The proof strategy is as follows: We extend the semantics of
     \reffig{fig:seq} with $\rpox$.  The obvious definition gives us a
     preorder rather than a partial order.  To get a partial order, we replay
-    the semantics with out merging to get an \emph{unmerged} pomset $\aPS'$;
-    the construction also produces the map $\fmrg{}$.  When then construct
+    the semantics without merging to get an \emph{unmerged} pomset $\aPS'$;
+    the construction also produces the map $\fmrg{}$.  We then construct
     $\aPS''$ as the union of $\aPS$ and $\aPS'$, using the dependency
     relation from $\aPS$.
 
@@ -177,12 +177,12 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 
     To find an acyclic $\rpox'$, we replay the construction of $\aPS$ to get
     $\aPS'$.  When building $\aPS'$, we require disjoint union in \ref{seq-E}
-    and \ref{if-E}---$\aEvs' = \aEvs'_1\uplus\aEvs'_2$.  If and event is
-    unmerged in $\aPS$---$\aEv\in\aEvs_1\uplus\aEvs_2$---then we choose the
+    and \ref{if-E}: $\aEvs' = \aEvs'_1\uplus\aEvs'_2$.  If and event is
+    unmerged in $\aPS$ (\emph{i.e.} $\aEv\in\aEvs_1\uplus\aEvs_2$) then we choose the
     same event name for $\aEvs'$ in $\aPS'$.  If an event is merged in
-    $\aPS$---$\aEv\in\aEvs_1\cap\aEvs_2)$---then we choose fresh event
+    $\aPS$ (\emph{i.e.} $\aEv\in\aEvs_1\cap\aEvs_2$) then we choose fresh event
     names---$\aEv'_1$ and $\aEv'_2$---and extend $\fmrg{}$
-    accordingly---$\fmrg{\aEv'_1}=\fmrg{\aEv'_2}=\aEv$.  In $\aPS'$, we take
+    accordingly: $\fmrg{\aEv'_1}=\fmrg{\aEv'_2}=\aEv$.  In $\aPS'$, we take
     ${\le'}={\rpox'}$.
 
     To arrive at $\aPS''$, we take
