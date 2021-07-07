@@ -6,8 +6,8 @@ executions of \cXI, while preserving optimal lowering for relaxed access.  We
 follow the approach of \citet{DBLP:conf/esop/PaviottiCPWOB20}, using our
 semantics to generate \cXI{} candidate executions with a dependency relation,
 then applying the rules of \rcXI{} \cite{DBLP:conf/pldi/LahavVKHD17}.  The
-\rcXI{} no-thin-air axiom requires that ${\rpox}\cup{\le}$ be acyclic.
-Instead, we require that ${\rrfx}\cup{\le}$ is acyclic.
+\rcXI{} no-thin-air axiom requires that ${\rrfx}\cup{\rpox}$ be acyclic.
+Instead, we require that ${\rrfx}\cup{\lt}$ is acyclic.
 
 The chief difficulty is instrumenting our semantics to generate program
 order, for use in the various axioms of \cXI{}.
