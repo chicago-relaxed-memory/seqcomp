@@ -25,14 +25,14 @@
 \renewcommand{\leq}{\leqslant}
 \renewcommand{\geq}{\geqslant}
 \newcommand{\MRD}{{\sc mrd-c11}}
-\newcommand{\PwP}{P\lowercase{w}P}
-\newcommand{\PwT}{P\lowercase{w}T}
-\newcommand{\PwTmca}[1]{\PwT-MCA\ifnotempty{#1}{$_{#1}$}}
-\newcommand{\PwTpo}{\PwT-PO}
-\newcommand{\PwTc}{\PwT-C11}
+\newcommand{\PwP}{{\sc PwP}}
+\newcommand{\PwT}{{\sc PwT}}
+\newcommand{\PwTmca}[1]{{\sc \PwT-mca}\ifnotempty{#1}{$_{#1}$}}
+\newcommand{\PwTpo}{{\sc \PwT-po}}
+\newcommand{\PwTc}{{\sc \PwT-c11}}
 \newcommand{\PwTTITLE}{P\lowercase{w}T}
-\newcommand{\PwTmcaTITLE}[1]{\PwT-MCA{#1}}
-\newcommand{\PwTcTITLE}{\PwT-C11}
+\newcommand{\PwTmcaTITLE}[1]{\PwTTITLE-MCA{#1}}
+\newcommand{\PwTcTITLE}{\PwTTITLE-C11}
 \newcommand{\DEP@COLOR}[1]{\mathrel{{\color{purple}#1}}}
 \newcommand{\LOC@COLOR}[1]{\mathrel{{\color{red}#1}}}
 \newcommand{\SYNC@COLOR}[1]{\mathrel{{\color{magenta}#1}}}
@@ -133,7 +133,7 @@
 \newcommand{\reflem}[1]{Lemma~\ref{#1}}
 \newcommand{\refthm}[1]{Theorem~\ref{#1}}
 \newcommand{\reffig}[1]{Fig.~\ref{#1}}
-\newcommand{\refdef}[1]{Definition~\ref{#1}}
+\newcommand{\refdef}[1]{Def.~\ref{#1}}
 \newcommand{\refex}[1]{Example~\ref{#1}}
 \newcommand{\refexs}[2]{Examples~\ref{#1}/\ref{#2}}
 \newcommand{\suchthat}{\mid}

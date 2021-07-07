@@ -19,36 +19,6 @@ We state the extensions with respect to the base semantics of
 \reffig{fig:seq}, but they apply equally to the variants described in
 \textsection\ref{sec:arm}.
 
-\subsection{Read-Read Independencies}
-\label{sec:read-read}
-
-To avoid stalling the \CPU{} pipeline unnecessarily, hardware does not
-enforce control dependencies between reads.  To support if-closure
-(\textsection\ref{sec:semca}), software models must not distinguish control
-dependencies from other dependencies.  Thus, we are forced to drop all
-dependencies between reads.  To achieve this, we modify the definition of
-$\labelingForm'_2$ in \reffig{fig:seq}.
-\begin{definition}
-  \label{def:semrr}
-  Let $\semrr{}$ be defined as in \reffig{fig:seq}, replacing the definition
-  of $\labelingForm'_2$ with:
-  \begin{displaymath}
-    \labelingForm'_2(\aEv)=
-    \begin{cases}
-      \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a}\; \sread
-      \\
-      \aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv)} & \text{otherwise, where}\; \Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}
-    \end{cases}
-    % $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
-    % \Cdown{\aEv}=
-    % \begin{cases}
-    %   \{ \cEv \mid \cEv \lt \aEv \} & \textif \labeling(\aEv) \;\text{is a write}
-    %   \\
-    %   \aEvs_1 & \textotherwise
-    % \end{cases}
-  \end{displaymath}
-\end{definition}
-
 \subsection{Register Recycling and Redundant Read Elimination}
 \label{sec:semreg}
 
@@ -343,7 +313,7 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
   \end{multicols}
 \end{definition}
 
-The combination of read-read independency (\refdef{def:semrr}) and address
+The combination of read-read independency (\textsection\ref{sec:read-read}) and address
 calculation is somewhat delicate.  
 % , in
 % \ref{read-tau-dep-addr}.  The subsection of \textsection\ref{sec:diff} on
@@ -476,8 +446,9 @@ ordered before $\DWP{x}{1}$.
 % \end{gather*}
 % All the preconditions are now tautologies.
 
-\subsection{Fence Operations}
+\subsection{Fences and Read-Modify-Write Operations}
 \label{sec:fences}
+\label{sec:rmw}
 
 The semantics of fences is straightforward.
 Let
@@ -512,9 +483,10 @@ if $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
     %   if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
   \end{enumerate}
 \end{multicols}
+This semantics is identical to that of
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}; see there for examples.
 
-\subsection{Read-Modify-Write Operations}
-\label{sec:rmw}
+% \subsection{}
 
 %We give the semantics of \RMW{}s without address calculation or if-closure.
 
@@ -522,7 +494,7 @@ if $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
 % $\Act\times\Act$: $\roverlapsdef$.  For the actions in this paper, we say
 % $\aAct \roverlapsdef \bAct$ if they access the same location.
 
-\RMW{} operations are formalized by adding a relation
+\RMW{} operations are more complex.  To support \RMW{}s, we add a relation
 ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
 \RMW{} to the succeeding write.
 % Let two actions \emph{overlap} if they access the same location.
@@ -1211,6 +1183,7 @@ first thread from the read of $y$ to one of the writes to $x$.
 \subsection{Register Consistency}
 \label{sec:false}
 
+\todo{flesh out}
 We would like:
 \begin{enumerate}
 \item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]

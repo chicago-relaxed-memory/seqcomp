@@ -174,10 +174,12 @@ We require that
 \item $\rimpliesdef$ has the expected semantics for $=$, $\lnot$,
   $\land$, $\lor$, $\limplies$ and substitutions $[\aExp/\aReg]$,
   $[\aExp/\aLoc]$, $[\aForm/\Q{\aLoc}]$,
+\item there is a subset of $\Act$, distinguishing
+  $\sreaddef$ actions,
+% \item there are two subsets of $\Act$, distinguishing
+%   $\sreaddef$ and $\sreleasedef$ actions,
 \item there are four binary relations over $\Act\times\Act$:
-  $\roverlapsdef$, $\rmatchesdef$, $\rblocksdef$, and $\rdelays$,
-\item there are two subsets of $\Act$, distinguishing
-  $\sreaddef$ and $\sreleasedef$ actions.
+  $\roverlapsdef$, $\rmatchesdef$, $\rblocksdef$, and $\rdelays$.
 \end{itemize}
 
 Logical formulae include equations over registers and memory references, such as
@@ -275,8 +277,8 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 \begin{definition}
   \label{def:actions}
   Actions $\DRP{}{}$ are $\sreaddef$ actions.
-  Actions $\DWP[\gemode\mREL]{}{}$ and $\DFP{\gemode\fREL}$ are
-  $\sreleasedef$ actions.
+  % Actions $\DWP[\gemode\mREL]{}{}$ and $\DFP{\gemode\fREL}$ are
+  % $\sreleasedef$ actions.
 
   We say $\aAct \roverlapsdef \bAct$ if they access the same location.
   
@@ -373,10 +375,15 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.  % We
   We write $\aTr{}{\bForm}$ as an abbreviation of $\aTr{\aEvs}{\bForm}$.
 \end{definition}
 In a family of predicate transformers, the transformer of a smaller set must
-entail the transformer of a larger set.  In sequential composition, adding
-more order can only increase the size of ${\Cdown{\aEv}}{}$; thus, larger
-dependent-sets will always satisfy more preconditions.
-(Note that the definition is written to be insensitive to events outside $\aEvs$.)
+entail the transformer of a larger set.  Thus bigger sets are \emph{better}
+and $\aTr{}{\bForm}$---the transformer of the biggest set---is the
+\emph{best}.  (Note that the definition is written to be insensitive to
+events outside $\aEvs$.)
+
+In sequential composition, adding more order can only increase the size of
+${\Cdown{\aEv}}{}$.  Following \refdef{def:family}, the larger
+${\Cdown{\aEv}}{}$ is, the better, at least in terms of satisfying
+preconditions.  Thus more order means weaker preconditions.
 
 \input{fig-def.tex}
 We give the semantics of programs $\sembase{}$ in \reffig{fig:seq}.
@@ -439,7 +446,6 @@ preconditions to weaken.
     Straightforward calculation.
     \eqref{monoid:unit} requires \ref{pom-term-tau} for
     the termination condition in $\xSEMIP{\aPSS}{\sSKIP}$.
-
     \eqref{monoid:seq} requires both
     conjunction closure (\ref{tr-and}, for the termination condition) and disjunction
     closure (\ref{tr-or}, for the predicate transformers themselves).
@@ -529,14 +535,13 @@ preconditions to weaken.
   \vspace{-.5\baselineskip}
   \begin{proof}
     Straightforward calculation.
-    In \textsection\ref{sec:semca}, we refine the semantics to validate the
-    reverse inclusions for \eqref{lem:if:seq}, \eqref{lem:seq:if}, and
-    \eqref{lem:if:elim}.
-
-    In \textsection\ref{sec:false}, we refine the semantics to validate the
-    reverse inclusion for \eqref{lem:if:dead}.
   \end{proof}
 \end{lemma}
+In \textsection\ref{sec:semca}, we refine the semantics to validate the
+reverse inclusions for \eqref{lem:if:seq}, \eqref{lem:seq:if}, and
+\eqref{lem:if:elim}.
+In \textsection\ref{sec:false}, we refine the semantics to validate the
+reverse inclusion for \eqref{lem:if:dead}.
 \begin{definition}
   \label{def:augment}
   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if all fields are equal except,
@@ -1120,10 +1125,47 @@ Reasoning as we did for \eqref{eq2} in \textsection\ref{sec:ex:data}, there are 
   \end{gathered}
 \end{align*}
 
+\subsection{A Refinement: No Dependencies into Reads}
+\label{sec:read-read}
+
+To avoid stalling the \CPU{} pipeline unnecessarily, hardware does not
+enforce control dependencies between reads.  To support if-closure
+(\textsection\ref{sec:semca}), software models must not distinguish control
+dependencies from other dependencies.  Thus, we are forced to drop all
+dependencies into reads.  To achieve this, we modify the definition of
+$\labelingForm'_2$ in \reffig{fig:seq}.
+% \begin{definition}
+%   \label{def:semrr}
+%   Let $\semrr{}$ be defined as in \reffig{fig:seq}, replacing the definition
+%   of $\labelingForm'_2$ with:
+\begin{displaymath}
+  \labelingForm'_2(\aEv)=
+  \begin{cases}
+    \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a}\sread
+    \\
+    \aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv)} & \text{otherwise, where}\; \Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}
+  \end{cases}
+  % $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$ is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise
+  % \Cdown{\aEv}=
+  % \begin{cases}
+  %   \{ \cEv \mid \cEv \lt \aEv \} & \textif \labeling(\aEv) \;\text{is a write}
+  %   \\
+  %   \aEvs_1 & \textotherwise
+  % \end{cases}
+\end{displaymath}
+  % \end{definition}
+Thus reads always use the ``best'' transformer, $\aTr[1]{}{}$.  In order for
+non-reads to get a good transformer, they need to add order.
+  
+Throughout the remainder of the paper, we use this definition.  (The lack of
+dependencies into reads is one of the factors complicating downset closure;
+see \textsection\ref{sec:downset} for a discussion.)
+
 \subsection{Subtleties}
 \label{sec:q}
 
-There are two aspects of \reffig{fig:seq} that are necessary to cover corner cases.
+There are two aspects of \reffig{fig:seq} that are fairly obscure: local
+invariant reasoning and $\Q{x}$.  
 
 First, consider local invariant reasoning, as in \jmm{} causality test case 1
 \cite{PughWebsite}:
@@ -1234,8 +1276,8 @@ are using the subsequent read.
 
 With $\Q{x}$, the precondition $\aForm$ is
 $(1{=}r\limplies (r{\neq}0 \land \Q{x}))[\FALSE/\Q{x}]$, which is
-unsatisfiable.  Intuitively, $\Q{x}$ requires that the most recent
-prior write to $\aLoc$ must be in the pomset in order to read $\aLoc$.
+unsatisfiable.  Intuitively, $\Q{x}$ requires that the most recent prior
+write to $\aLoc$ must be in the pomset in order to read $\aLoc$.
 
 $\Q{x}$ also guarantees initialization in complete pomsets: \eqref{top-kappa}
 requires tautologies, which means that all variables must be initialized
@@ -1282,7 +1324,8 @@ and
   (r{=}0 \land \bForm)
 \end{math}
 are the predicate transformers for the conditional writes, using
-\ref{write-tau-nonempty} and \ref{write-tau-empty} respectively.
+\ref{write-tau-nonempty} and \ref{write-tau-empty} respectively.  The
+executions are complete since all preconditions are tautologies.
 
 % A problem \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}.
 % Version with control dependencies is \drf{}.
@@ -1674,9 +1717,9 @@ are the predicate transformers for the conditional writes, using
 
 The predicate transformers we have chosen for \ref{read-tau-dep} and
 \ref{read-tau-ind} are different from the ones used traditionally, which are
-written using substitution \cite{DBLP:journals/pacmpl/JagadeesanJR20}.
+written using substitution.
 Attempting to write \ref{read-tau-dep} and \ref{read-tau-ind} in
-this style we would have:
+this style we would have (as in \cite{DBLP:journals/pacmpl/JagadeesanJR20}):
 \begin{enumerate}[topsep=0pt]
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-p}}]
   if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then

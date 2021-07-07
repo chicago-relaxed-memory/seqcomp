@@ -1,437 +1,6 @@
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{Substitutions}
-\label{sec:substitutions}
-
-In $\sLOAD{}{}$, it is also possible to collapse $\aLoc$ and $\aReg$ via substitution:
-\begin{enumerate}
-\item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-sub}}]
-  if $(\aEvs\cap\bEvs)\neq\emptyset$ then
-  \begin{math}
-    \aTr{\bEvs}{\bForm} \riff
-    \aVal{=}\aReg
-    \limplies \bForm[\aReg/\aLoc]
-  \end{math},    
-\item[{\labeltext[\textsc{r}4b$'$]{(\textsc{r}4b$'$)}{read-tau-ind-sub}}]
-  if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
-  \begin{math}
-    \aTr{\bEvs}{\bForm} \riff
-    \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
-    \bForm[\aReg/\aLoc],
-  \end{math}
-\item[{\labeltext[\textsc{r}4c$'$]{(\textsc{r}4c$'$)}{read-tau-empty-sub}}]
-  if $\aEvs=\emptyset$ then
-  \begin{math}
-    \aTr{\bEvs}{\bForm} \riff
-    % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
-    \bForm[\aReg/\aLoc],
-  \end{math}
-\end{enumerate}
-Perhaps surprisingly, this semantics is incomparable with that of
-\reffig{fig:seq}.  Consider the following:
-\begin{gather*}
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a3}{r\land s\;\mathsf{even}\mid\DW{y}{1}}{}
-      \event{a4}{r\land s\mid\DW{z}{1}}{right=of a3}
-    \end{tikzinline}}
-\end{gather*}
-Prepending $\PRP{x}{s}$, we get the same result regardless of whether we
-substitute $[s/x]$, since $x$ does not occur in either precondition.  Here
-we show the independent case:
-\begin{gather*}
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a2}{\DR{x}{2}}{}
-      \event{a3}{(2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{(2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
-    \end{tikzinline}}
-\end{gather*}
-Since the preconditions mention $x$, prepending $\PRP{x}{r}$, we now get
-different results depending on whether we perform the substitution.  Without
-any substitution, we have:
-\begin{gather*}
-  \PR{x}{r}\SEMI
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\[-2ex]
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
-      \po[out=12,in=168]{a1}{a3}
-      \po[out=10,in=170]{a1}{a4}
-    \end{tikzinline}}
-\end{gather*}
-Prepending $\PWP{x}{0}$, which substitutes $[0/x]$, the precondition of
-$\DWP{y}{1}$ becomes
-$(1{=}r\limplies (2{=}s\lor0{=}s)\limplies (r\land s\;\mathsf{even}))$, which
-is a tautology, whereas the precondition of $\DW{z}{1}$ becomes
-$(1{=}r\limplies(2{=}s\lor0{=}s)\limplies (r\land s))$, which is not.  In
-order to be top-level, $\DWP{z}{1}$ must be dependency ordered after
-$\DRP{x}{2}$; in this case the precondition becomes
-$(1{=}r\limplies2{=}s\limplies (r\land s))$, which is a tautology.
-\begin{gather*}
-  % \PW{x}{0}\SEMI
-  % \PR{x}{r}\SEMI
-  % \PR{x}{s}\SEMI
-  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  % \IF{r\land s}\THEN \PW{z}{1}\FI
-  % \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a0}{\DW{x}{0}}{}
-      \event{a1}{\DR{x}{1}}{right=of a0}
-      \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      \event{a4}{\DW{z}{1}}{right=of a3}
-      % \wk{a0}{a1}
-      % \wk[out=-20,in=-160]{a0}{a2}
-      \po[out=20,in=160]{a1}{a3}
-      \po[out=20,in=160]{a1}{a4}
-      \po[out=-20,in=-160]{a2}{a4}
-    \end{tikzinline}}
-\end{gather*}
-The situation reverses with the substitution $[r/x]$:
-\begin{gather*}
-  \PR{x}{r}\SEMI
-  \PR{x}{s}\SEMI
-  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  \IF{r\land s}\THEN \PW{z}{1}\FI
-  \\[-2ex]
-  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
-      \po[out=12,in=168]{a1}{a3}
-      \po[out=10,in=170]{a1}{a4}
-    \end{tikzinline}}
-\end{gather*}
-Prepending $\PWP{x}{0}$:
-%\vspace{-.5\baselineskip}
-\begin{gather*}
-  % \PW{x}{0}\SEMI
-  % \PR{x}{r}\SEMI
-  % \PR{x}{s}\SEMI
-  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
-  % \IF{r\land s}\THEN \PW{z}{1}\FI
-  % \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a0}{\DW{x}{0}}{}
-      \event{a1}{\DR{x}{1}}{right=of a0}
-      \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{\DW{y}{1}}{right=of a2}
-      \event{a4}{\DW{z}{1}}{right=of a3}
-      % \wk{a0}{a1}
-      % \wk[out=-20,in=-160]{a0}{a2}
-      \po[out=20,in=160]{a1}{a3}
-      \po[out=20,in=160]{a1}{a4}
-      \po{a2}{a3}
-    \end{tikzinline}}
-\end{gather*}
-The dependency has changed from $\DRP{x}{2}\xpo\DWP{z}{1}$ to
-$\DRP{x}{2}\xpo\DWP{y}{1}$.  The resulting sets of pomsets are
-incomparable.
-
-
-Thinking in terms of hardware, the difference is whether reads update the
-cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
-cache, whereas without the substitution, they do not.  Since most caches work
-this way, the model with $[r/x]$ is likely preferred for modeling hardware.
-However, this substitution only makes sense in a model with read-read
-coherence and read-read dependencies, which we will see is not the case for Arm.  By
-leaving out the substitution, we also ensure that downgraded reads are
-fulfilled by preceding writes, not reads.
-
-
-
-
-
-% \begin{figure*}[t]
-%   \showRAtrue
-%   \begin{center}
-%     \begin{minipage}{.91\textwidth}
-%       \input{fig-no-q-or-addr.tex}
-%     \end{minipage}
-%   \end{center}
-%   \caption{Simplified Quiescence Semantics w/o Address Calculation
-%     (See %\refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
-%     \refdef{def:dlx} for $\DLX{\aLoc}{\amode}{\bmode}$, $\DS{\aLoc}{\amode}$)
-%   } 
-%   \label{fig:no-q-or-addr}
-% \end{figure*}    
-% \begin{figure*}
-%   \begin{center}
-%     \begin{minipage}{.91\textwidth}
-%       \input{fig-full.tex}
-%       % \input{fig-full-where.tex}
-%       % \input{fig-full-noco.tex}
-%     \end{minipage}
-%   \end{center}
-%   \caption{Full Semantics with Address Calculation
-%     (See \refdef{def:QS} for $\QS{\aLoc}{\amode}$, $\QL{\aLoc}{\amode}$
-%     and \refdef{def:DS} for $\DL{\aLoc}{\amode}$, $\DS{\aLoc}{\amode}$)
-%   }
-%   \label{fig:full}
-% \end{figure*}    
-
-%\section{Discussion}
-\subsection{Downset Closure}
-\label{sec:downset}
-
-% We would like the semantics to be closed with respect to \emph{augments} and
-% \emph{downsets}.
-
-% Augments include more order and stronger formulae; in examples, we typically
-% consider pomsets that are augment-minimal.  One intuitive reading of augment
-% closure is that adding order can only cause preconditions to weaken.
-% \begin{definition}
-%   \label{def:augment}
-%   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
-%   \begin{enumerate}
-%   \item $\aEvs_2=\aEvs_1$,
-%   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-%   \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
-%   \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
-%   \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
-%   \end{enumerate}
-% \end{definition}
-
-% \begin{proposition}
-%   %   Suppose $\aPS_1\in\sem{\aCmd}$.
-%   If $\aPS_1\in\sem{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
-%   % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
-%   % \end{enumerate}
-% \end{proposition}
-
-We would like the semantics to be closed with respect to \emph{downsets}.
-Downsets include a subset of initial events, similar to \emph{prefixes} for
-strings.
-\begin{definition}
-  \label{def:downset}
-  $\aPS_2$ is an \emph{downset} of $\aPS_1$ if
-  \begin{multicols}{2}
-    \begin{enumerate}
-    \item $\aEvs_2\subseteq\aEvs_1$,
-    \item $(\forall \aEv\in\aEvs_2)$ $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-    \item $(\forall \aEv\in\aEvs_2)$ $\labelingForm_2(\aEv)\riff\labelingForm_1(\aEv)$,
-    \item $(\forall \aEv\in\aEvs_2)$ $\aTr[2]{\bEvs}{\aEv}\riff\aTr[1]{\bEvs}{\aEv}$,
-    \item $\aTerm[2] \rimplies \aTerm[1]$,
-      \stepcounter{enumi}
-    \item[] 
-      \begin{enumerate}[leftmargin=0pt]
-      \item $(\forall \bEv\in\aEvs_2)$ $(\forall \aEv\in\aEvs_2)$ $\bEv\le_2\aEv$ iff $\bEv\le_1\aEv$,
-      \item $(\forall \bEv\in\aEvs_1)$ $(\forall \aEv\in\aEvs_2)$ if
-        $\bEv\le_1\aEv$ then $\bEv\in\aEvs_2$,
-      \end{enumerate}
-    \item $(\forall \bEv\in\aEvs_2)$ $(\forall \aEv\in\aEvs_2)$ $\bEv\rrfx_2\aEv$ iff $\bEv\rrfx_1\aEv$.
-    \end{enumerate}
-  \end{multicols}
-\end{definition}
-
-Downset closure fails due to for two reasons.  The key property is that the
-empty set transformer should behave the same as the independent transformer.
-
-First, downset closure fails for \refdef{def:semrr}, because it does not
-enforce read-read dependencies.
-  % For \xRRD{}, \refdef{def:pomsets-rr} states:
-  % \begin{enumerate}
-  % \item[\ref{L4})]
-  %   $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
-  % \item[\ref{L5})]
-  %   $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\RW)\limplies\bForm$,
-  % \item[\ref{L6})] 
-  %   $\aTr{\dEvs}{\bForm} \rimplies \bForm$, when $\aEvs=\emptyset$.
-  % \end{enumerate}
-  % This semantics is not downset closed due to the lack of read-read dependencies.
-  % In both cases, for subsequent writes, \ref{L5} is the same as \ref{L6}.  For
-  % subsequent reads, \ref{L5} is the same as \ref{L4}.
-Consider
-\begin{gather*}
-  \begin{gathered}[t]
-    \PR{x}{r}\SEMI\IF{\BANG r}\THEN\PR{y}{s}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a}{\DR{x}{0}}{}
-        \event{b}{\DR{y}{0}}{right=of a}
-      \end{tikzinline}}
-  \end{gathered}    
-\end{gather*}
-The semantics of this program includes the singleton pomset $\DRP{x}{0}$,
-but not the singleton pomset $\DRP{y}{0}$.
-To get $\DRP{x}{0}$, we combine:
-\begin{align*}
-  \begin{gathered}[t]
-    \PR{x}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a}{\DR{x}{0}}{}
-      \end{tikzinline}}
-  \end{gathered}    
-  &&
-  \begin{gathered}[t]
-    \IF{\BANG r}\THEN\PR{y}{s}\FI
-    \\
-    \emptyset
-  \end{gathered}    
-\end{align*}
-Attempting to get $\DRP{y}{0}$, we instead get:
-\begin{align*}
-  \begin{gathered}[t]
-    \PR{x}{r}
-    \\
-    \emptyset
-  \end{gathered}    
-  &&
-  \begin{gathered}[t]
-    \IF{\BANG r}\THEN\PR{y}{s}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{b}{r\EQ0\mid\DR{y}{0}}{}
-      \end{tikzinline}}
-  \end{gathered}    
-\end{align*}
-Since $r$ appears only once in the program, this pomset cannot contribute
-to a top-level pomset.
-
-
-Second, the semantics is not downset closed because the independency reasoning of
-\ref{read-tau-ind} is only applicable for pomsets where the ignored read is present!
-Revisiting \jmm{} causality test case 1 from the end of \textsection\ref{sec:ex:control}:
-\begin{align*}
-  \begin{gathered}[t]
-    \PW{x}{0} 
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a0}{\DW{x}{0}}{}
-        \xform{xi}{\bForm[0/x]}{below=of a0}
-      \end{tikzinline}}    
-  \end{gathered}
-  &&
-  \begin{gathered}[t]
-    \PR{x}{r} 
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{\DR{x}{1}}{}
-        \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm}{below=of a1}
-      \end{tikzinline}}    
-  \end{gathered}
-  &&
-  \begin{gathered}[t]
-    \IF{r{\geq}0}\THEN \PW{y}{1} \FI
-    \SEMI
-    \PW{z}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a2}{r{\geq}0\mid\DW{y}{1}}{}      
-        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}      
-      \end{tikzinline}}    
-  \end{gathered}
-\end{align*}
-% Composing:
-\begin{align*}
-  \begin{gathered}[t]
-    \PW{x}{0} 
-    \SEMI\PR{x}{r} 
-    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
-    \SEMI
-    \PW{z}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a0}{\DW{x}{0}}{}
-        \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}      
-        \event{a3}{1{=}r\limplies r{=}1\mid\DW{z}{1}}{right=of a2}
-        \po[out=-15,in=-165]{a1}{a3}
-        \wki{a0}{a1}
-      \end{tikzinline}}    
-  \end{gathered}
-\end{align*}
-The precondition of $\DWP{y}{1}$ is a tautology.
-
-Taking the empty set for the read, however,
-the precondition of $\DWP{y}{1}$ is not a tautology:
-\begin{align*}
-  \begin{gathered}[t]
-    \PW{x}{0} 
-    \SEMI\PR{x}{r} 
-    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
-    \SEMI
-    \PW{z}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a0}{\DW{x}{0}}{}
-        % \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{r{\geq}0\mid\DW{y}{1}}{right=6em of a0}      
-        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}
-        % \wk{a0}{a1}
-      \end{tikzinline}}    
-  \end{gathered}
-\end{align*}
-One way to deal with the second issue would be to allow general access
-elimination to merge $\DWP{x}{0}$ and $\DRP{x}{0}$:
-\begin{align*}
-  \begin{gathered}[t]
-    \PW{x}{0} 
-    \SEMI\PR{x}{r} 
-    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
-    \SEMI
-    \PW{z}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a0}{\DW{x}{0}}{}
-        %\event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{(0{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=6em of a0}      
-        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}
-        %\po[out=-15,in=-165]{a1}{a3}
-        %\wki{a0}{a1}
-      \end{tikzinline}}    
-  \end{gathered}
-\end{align*}
-We leave the elaboration of this idea to future work.
-
-\begin{comment}
-  if in L6 we said [x/r], that says we know read the local version...  ignoring
-  the value read...  Perhaps there is some intervening stuff that stops you
-  from seeing the local state, such as release-acquire
-
-  We could potentially get rid of [x/r] If you do two reads, your not allowed
-  to be independent of the second based on the value that was read in the first
-  read.
-
-  x=0; r=x; if (r=1) { s=x; if (s=?) {y=1}}
-  read 1 then 2.
-
-
-  In order for the write to be independent of second read what does its
-  precondition have to be.
-  [r/x] then s==1
-  no sub then s==0
-
-  (s=? | Wy1)
-
-  if (phi) z=1
-  phi = s is even
-  phi = s < 2
-
-  With substitution you are saying you know that the ``local copy'' of x is the
-  same as r.  Sitting in the local cache.  Read might have gone to main
-  memory, but if it did it has updated the cache line so that the local copy is
-  what I just read.
-
-  If second read is a cache hit, then I know that I am seeing the same value.
-
-  If we take substitution out then 
-\end{comment}
-
 \subsection{Combining Address Calculation and If-Closure}
 
 \refdef{def:semaddr} is naive with respect to merging events.  Consider the
@@ -698,7 +267,437 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   % $\sLOAD{}{}$.
 \end{definition}
 
+\input{oopsla.tex}
 
+\subsection{Substitutions}
+\label{sec:substitutions}
+
+In $\sLOAD{}{}$, it is also possible to collapse $\aLoc$ and $\aReg$ via substitution:
+\begin{enumerate}
+\item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-sub}}]
+  if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \riff
+    \aVal{=}\aReg
+    \limplies \bForm[\aReg/\aLoc]
+  \end{math},    
+\item[{\labeltext[\textsc{r}4b$'$]{(\textsc{r}4b$'$)}{read-tau-ind-sub}}]
+  if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \riff
+    \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+    \bForm[\aReg/\aLoc],
+  \end{math}
+\item[{\labeltext[\textsc{r}4c$'$]{(\textsc{r}4c$'$)}{read-tau-empty-sub}}]
+  if $\aEvs=\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \riff
+    % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+    \bForm[\aReg/\aLoc],
+  \end{math}
+\end{enumerate}
+Perhaps surprisingly, this semantics is incomparable with that of
+\reffig{fig:seq}.  Consider the following:
+\begin{gather*}
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a3}{r\land s\;\mathsf{even}\mid\DW{y}{1}}{}
+      \event{a4}{r\land s\mid\DW{z}{1}}{right=of a3}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PRP{x}{s}$, we get the same result regardless of whether we
+substitute $[s/x]$, since $x$ does not occur in either precondition.  Here
+we show the independent case:
+\begin{gather*}
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a2}{\DR{x}{2}}{}
+      \event{a3}{(2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
+      \event{a4}{(2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+    \end{tikzinline}}
+\end{gather*}
+Since the preconditions mention $x$, prepending $\PRP{x}{r}$, we now get
+different results depending on whether we perform the substitution.  Without
+any substitution, we have:
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\[-2ex]
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
+      \event{a4}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+      \po[out=12,in=168]{a1}{a3}
+      \po[out=10,in=170]{a1}{a4}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PWP{x}{0}$, which substitutes $[0/x]$, the precondition of
+$\DWP{y}{1}$ becomes
+$(1{=}r\limplies (2{=}s\lor0{=}s)\limplies (r\land s\;\mathsf{even}))$, which
+is a tautology, whereas the precondition of $\DW{z}{1}$ becomes
+$(1{=}r\limplies(2{=}s\lor0{=}s)\limplies (r\land s))$, which is not.  In
+order to be top-level, $\DWP{z}{1}$ must be dependency ordered after
+$\DRP{x}{2}$; in this case the precondition becomes
+$(1{=}r\limplies2{=}s\limplies (r\land s))$, which is a tautology.
+\begin{gather*}
+  % \PW{x}{0}\SEMI
+  % \PR{x}{r}\SEMI
+  % \PR{x}{s}\SEMI
+  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  % \IF{r\land s}\THEN \PW{z}{1}\FI
+  % \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a0}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=of a0}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \wk{a0}{a1}
+      % \wk[out=-20,in=-160]{a0}{a2}
+      \po[out=20,in=160]{a1}{a3}
+      \po[out=20,in=160]{a1}{a4}
+      \po[out=-20,in=-160]{a2}{a4}
+    \end{tikzinline}}
+\end{gather*}
+The situation reverses with the substitution $[r/x]$:
+\begin{gather*}
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  \IF{r\land s}\THEN \PW{z}{1}\FI
+  \\[-2ex]
+  \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
+      \event{a4}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+      \po[out=12,in=168]{a1}{a3}
+      \po[out=10,in=170]{a1}{a4}
+    \end{tikzinline}}
+\end{gather*}
+Prepending $\PWP{x}{0}$:
+%\vspace{-.5\baselineskip}
+\begin{gather*}
+  % \PW{x}{0}\SEMI
+  % \PR{x}{r}\SEMI
+  % \PR{x}{s}\SEMI
+  % \IF{r\land s\;\mathsf{even}}\THEN \PW{y}{1}\FI\SEMI
+  % \IF{r\land s}\THEN \PW{z}{1}\FI
+  % \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a0}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=of a0}
+      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \wk{a0}{a1}
+      % \wk[out=-20,in=-160]{a0}{a2}
+      \po[out=20,in=160]{a1}{a3}
+      \po[out=20,in=160]{a1}{a4}
+      \po{a2}{a3}
+    \end{tikzinline}}
+\end{gather*}
+The dependency has changed from $\DRP{x}{2}\xpo\DWP{z}{1}$ to
+$\DRP{x}{2}\xpo\DWP{y}{1}$.  The resulting sets of pomsets are
+incomparable.
+
+
+Thinking in terms of hardware, the difference is whether reads update the
+cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
+cache, whereas without the substitution, they do not.  Since most caches work
+this way, the model with $[r/x]$ is likely preferred for modeling hardware.
+However, this substitution only makes sense in a model with read-read
+coherence and read-read dependencies, which we will see is not the case for Arm.  By
+leaving out the substitution, we also ensure that downgraded reads are
+fulfilled by preceding writes, not reads.
+
+
+
+
+
+% \begin{figure*}[t]
+%   \showRAtrue
+%   \begin{center}
+%     \begin{minipage}{.91\textwidth}
+%       \input{fig-no-q-or-addr.tex}
+%     \end{minipage}
+%   \end{center}
+%   \caption{Simplified Quiescence Semantics w/o Address Calculation
+%     (See %\refdef{def:QSx} for $\QS{}{\amode}$, $\QL{}{\amode}$, and
+%     \refdef{def:dlx} for $\DLX{\aLoc}{\amode}{\bmode}$, $\DS{\aLoc}{\amode}$)
+%   } 
+%   \label{fig:no-q-or-addr}
+% \end{figure*}    
+% \begin{figure*}
+%   \begin{center}
+%     \begin{minipage}{.91\textwidth}
+%       \input{fig-full.tex}
+%       % \input{fig-full-where.tex}
+%       % \input{fig-full-noco.tex}
+%     \end{minipage}
+%   \end{center}
+%   \caption{Full Semantics with Address Calculation
+%     (See \refdef{def:QS} for $\QS{\aLoc}{\amode}$, $\QL{\aLoc}{\amode}$
+%     and \refdef{def:DS} for $\DL{\aLoc}{\amode}$, $\DS{\aLoc}{\amode}$)
+%   }
+%   \label{fig:full}
+% \end{figure*}    
+
+%\section{Discussion}
+\subsection{Downset Closure}
+\label{sec:downset}
+
+% We would like the semantics to be closed with respect to \emph{augments} and
+% \emph{downsets}.
+
+% Augments include more order and stronger formulae; in examples, we typically
+% consider pomsets that are augment-minimal.  One intuitive reading of augment
+% closure is that adding order can only cause preconditions to weaken.
+% \begin{definition}
+%   \label{def:augment}
+%   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if
+%   \begin{enumerate}
+%   \item $\aEvs_2=\aEvs_1$,
+%   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+%   \item $\labelingForm_2(\aEv) \rimplies \labelingForm_1(\aEv)$,
+%   \item $\aTr[2]{\bEvs}{\aEv} \rimplies \aTr[1]{\bEvs}{\aEv}$,
+%   \item if $\bEv\le_2\aEv$ then $\bEv\le_1\aEv$.
+%   \end{enumerate}
+% \end{definition}
+
+% \begin{proposition}
+%   %   Suppose $\aPS_1\in\sem{\aCmd}$.
+%   If $\aPS_1\in\sem{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+%   % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sem{\aCmd}$.
+%   % \end{enumerate}
+% \end{proposition}
+
+We would like the semantics to be closed with respect to \emph{downsets}.
+Downsets include a subset of initial events, similar to \emph{prefixes} for
+strings.
+\begin{definition}
+  \label{def:downset}
+  $\aPS_2$ is an \emph{downset} of $\aPS_1$ if
+  \begin{multicols}{2}
+    \begin{enumerate}
+    \item $\aEvs_2\subseteq\aEvs_1$,
+    \item $(\forall \aEv\in\aEvs_2)$ $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+    \item $(\forall \aEv\in\aEvs_2)$ $\labelingForm_2(\aEv)\riff\labelingForm_1(\aEv)$,
+    \item $(\forall \aEv\in\aEvs_2)$ $\aTr[2]{\bEvs}{\aEv}\riff\aTr[1]{\bEvs}{\aEv}$,
+    \item $\aTerm[2] \rimplies \aTerm[1]$,
+      \stepcounter{enumi}
+    \item[] 
+      \begin{enumerate}[leftmargin=0pt]
+      \item $(\forall \bEv\in\aEvs_2)$ $(\forall \aEv\in\aEvs_2)$ $\bEv\le_2\aEv$ iff $\bEv\le_1\aEv$,
+      \item $(\forall \bEv\in\aEvs_1)$ $(\forall \aEv\in\aEvs_2)$ if
+        $\bEv\le_1\aEv$ then $\bEv\in\aEvs_2$,
+      \end{enumerate}
+    \item $(\forall \bEv\in\aEvs_2)$ $(\forall \aEv\in\aEvs_2)$ $\bEv\rrfx_2\aEv$ iff $\bEv\rrfx_1\aEv$.
+    \end{enumerate}
+  \end{multicols}
+\end{definition}
+
+Downset closure fails due to for two reasons.  The key property is that the
+empty set transformer should behave the same as the independent transformer.
+
+First, downset closure fails for read-read independency \textsection\ref{sec:read-read}.
+  % For \xRRD{}, \refdef{def:pomsets-rr} states:
+  % \begin{enumerate}
+  % \item[\ref{L4})]
+  %   $\aTr{\bEvs}{\bForm} \rimplies \aVal{=}\aReg\limplies\bForm$, 
+  % \item[\ref{L5})]
+  %   $\aTr{\cEvs}{\bForm} \rimplies (\aVal{=}\aReg\lor\RW)\limplies\bForm$,
+  % \item[\ref{L6})] 
+  %   $\aTr{\dEvs}{\bForm} \rimplies \bForm$, when $\aEvs=\emptyset$.
+  % \end{enumerate}
+  % This semantics is not downset closed due to the lack of read-read dependencies.
+  % In both cases, for subsequent writes, \ref{L5} is the same as \ref{L6}.  For
+  % subsequent reads, \ref{L5} is the same as \ref{L4}.
+Consider
+\begin{gather*}
+  \begin{gathered}[t]
+    \PR{x}{r}\SEMI\IF{\BANG r}\THEN\PR{y}{s}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a}{\DR{x}{0}}{}
+        \event{b}{\DR{y}{0}}{right=of a}
+      \end{tikzinline}}
+  \end{gathered}    
+\end{gather*}
+The semantics of this program includes the singleton pomset $\DRP{x}{0}$,
+but not the singleton pomset $\DRP{y}{0}$.
+To get $\DRP{x}{0}$, we combine:
+\begin{align*}
+  \begin{gathered}[t]
+    \PR{x}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a}{\DR{x}{0}}{}
+      \end{tikzinline}}
+  \end{gathered}    
+  &&
+  \begin{gathered}[t]
+    \IF{\BANG r}\THEN\PR{y}{s}\FI
+    \\
+    \emptyset
+  \end{gathered}    
+\end{align*}
+Attempting to get $\DRP{y}{0}$, we instead get:
+\begin{align*}
+  \begin{gathered}[t]
+    \PR{x}{r}
+    \\
+    \emptyset
+  \end{gathered}    
+  &&
+  \begin{gathered}[t]
+    \IF{\BANG r}\THEN\PR{y}{s}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{b}{r\EQ0\mid\DR{y}{0}}{}
+      \end{tikzinline}}
+  \end{gathered}    
+\end{align*}
+Since $r$ appears only once in the program, this pomset cannot contribute
+to a top-level pomset.
+
+
+Second, the semantics is not downset closed because the independency reasoning of
+\ref{read-tau-ind} is only applicable for pomsets where the ignored read is present!
+Revisiting \jmm{} causality test case 1 from the end of \textsection\ref{sec:ex:control}:
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{x}{0} 
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        \xform{xi}{\bForm[0/x]}{below=of a0}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \PR{x}{r} 
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{\DR{x}{1}}{}
+        \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm}{below=of a1}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \SEMI
+    \PW{z}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a2}{r{\geq}0\mid\DW{y}{1}}{}      
+        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}      
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+% Composing:
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{x}{0} 
+    \SEMI\PR{x}{r} 
+    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \SEMI
+    \PW{z}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        \event{a1}{\DR{x}{1}}{right=of a0}
+        \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}      
+        \event{a3}{1{=}r\limplies r{=}1\mid\DW{z}{1}}{right=of a2}
+        \po[out=-15,in=-165]{a1}{a3}
+        \wki{a0}{a1}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+The precondition of $\DWP{y}{1}$ is a tautology.
+
+Taking the empty set for the read, however,
+the precondition of $\DWP{y}{1}$ is not a tautology:
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{x}{0} 
+    \SEMI\PR{x}{r} 
+    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \SEMI
+    \PW{z}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        % \event{a1}{\DR{x}{1}}{right=of a0}
+        \event{a2}{r{\geq}0\mid\DW{y}{1}}{right=6em of a0}      
+        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}
+        % \wk{a0}{a1}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+One way to deal with the second issue would be to allow general access
+elimination to merge $\DWP{x}{0}$ and $\DRP{x}{0}$:
+\begin{align*}
+  \begin{gathered}[t]
+    \PW{x}{0} 
+    \SEMI\PR{x}{r} 
+    \SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
+    \SEMI
+    \PW{z}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a0}{\DW{x}{0}}{}
+        %\event{a1}{\DR{x}{1}}{right=of a0}
+        \event{a2}{(0{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=6em of a0}      
+        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}
+        %\po[out=-15,in=-165]{a1}{a3}
+        %\wki{a0}{a1}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+We leave the elaboration of this idea to future work.
+
+\begin{comment}
+  if in L6 we said [x/r], that says we know read the local version...  ignoring
+  the value read...  Perhaps there is some intervening stuff that stops you
+  from seeing the local state, such as release-acquire
+
+  We could potentially get rid of [x/r] If you do two reads, your not allowed
+  to be independent of the second based on the value that was read in the first
+  read.
+
+  x=0; r=x; if (r=1) { s=x; if (s=?) {y=1}}
+  read 1 then 2.
+
+
+  In order for the write to be independent of second read what does its
+  precondition have to be.
+  [r/x] then s==1
+  no sub then s==0
+
+  (s=? | Wy1)
+
+  if (phi) z=1
+  phi = s is even
+  phi = s < 2
+
+  With substitution you are saying you know that the ``local copy'' of x is the
+  same as r.  Sitting in the local cache.  Read might have gone to main
+  memory, but if it did it has updated the cache line so that the local copy is
+  what I just read.
+
+  If second read is a cache hit, then I know that I am seeing the same value.
+
+  If we take substitution out then 
+\end{comment}
 
 \subsection{Logical Encoding of Delay for \PwTmcaTITLE{}}
 \label{sec:delay}
@@ -862,7 +861,7 @@ quiescence symbol:
     \item \label{top-kappa-q}
       $\labelingForm(\aEv)[\TRUE/\Q{}]$ is a tautology,
       \setcounter{enumi}{\value{Bterm}}
-    \item \label{top-term-q} $\aTerm [\TRUE/\Q{}]$ is a tautology.
+    \item \label{top-term-q} $\aTerm{}[\TRUE/\Q{}]$ is a tautology.
     \end{enumerate}
   \end{multicols}
 \end{definition}
@@ -1287,16 +1286,20 @@ As shown by the following single-threaded code, allowing this outcome would viol
 \end{align*}
 
 It is for this reason that we use \emph{weakest} preconditions, rather than
-preconditions.  Note that as a result, we fail to validate the following
-refinement:
-\begin{math}
-  \aPSS_1
-  \not\supseteq
-  \xIFTHEN{\aForm}{\aPSS_1}{}.
-\end{math}
+preconditions.
+% Note that as a result, we fail to validate the following
+% refinement:
+% \begin{math}
+%   \aPSS_1
+%   \not\supseteq
+%   \xIFTHEN{\aForm}{\aPSS_1}{}.
+% \end{math}
 \end{example}
 
 
 
 
+
+% \subsection{Post-Hoc Verification of Fulfillment for \PwTmcaTITLE{2}}
+% \label{sec:post-hoc}
 

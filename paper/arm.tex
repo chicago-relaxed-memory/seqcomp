@@ -9,6 +9,8 @@ For simplicity, we restrict to top-level parallel composition.
 % JWR: I didn't know that!  It's better with them...
 
 \subsection{Arm executions}
+Our description of \armeight{} follows \citet{armed}, adapting the
+notation to our setting.
 \begin{definition}
   An \emph{\armeight{} execution graph}, $\aEG$, is tuple
   $(\aEvs, \labeling, {\rpoloc}, {\rlob})$ such that
@@ -538,28 +540,6 @@ Here is a contradictory non-example illustrating the last case of the proof:
   \end{proof}
 \end{theorem}
 
-
-We emphasize that \ref{pom-rf-le} does not hold for $\frf{\semrr{}}$:
- $\bEv\xrfx\aEv$ may not imply $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come
-from different sides of a sequential composition.  This means that $\rrfx$
-must be verified during pomset construction, rather than post-hoc.  The
-following lemma gives a post-hoc verification technique for $\rrfx$, using
-program order ($\rpox$) and phantom events ($\fmrg{}$).  The construction is
-discussed in \textsection\ref{sec:c11}.
-\begin{lemma}
-  Any $\aPS$ in the image of $\frf{\semrr{}}$ is complete iff
-  for every $\bEv\xrfx\aEv$ either
-  \begin{itemize}
-  \item external fulfillment:
-    $\bEv\le\aEv$ and if $\labeling(\cEv) \rblocks\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
-  \item internal fulfillment:
-    $(\exists\bEv'\mid\fmrg{\bEv'}=\bEv)$
-    $(\exists\aEv'\mid\fmrg{\aEv'}=\aEv)$
-    $\bEv'\xpox\aEv'$ and $(\not\exists\cEv')$
-    $\labelingForm(\cEv)$ is a tautology and
-    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv'\xpox\cEv\xpox\aEv'$.
-  \end{itemize}
-\end{lemma}
 % \begin{enumerate}
 % \item[(\textsc{m}7d)]
 %   if $\labeling(\cEv) \rblocks \labeling(\aEv)$

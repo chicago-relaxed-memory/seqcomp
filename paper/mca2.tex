@@ -2,16 +2,68 @@
 \subsection{\PwTmcaTITLE{2}}
 \label{sec:mca2}
 
-%
-The use of $\rextendsdef{}{}$ in \ref{if-rf-extends}
-ensures that no $\rrfx$ is introduced between events in
-$\aEvs_1\cap\aEvs_2$ when coalescing.
+Lowering \PwTmcaTITLE{1} to \armeight{} requires a full fence after every
+acquiring read.  To see why, consider the following attempted
+execution, where the final values of both $x$ and $y$ are $2$.
+\begin{gather*}
+  \PW{x}{2}\SEMI 
+  \PR[\mACQ]{x}{r}\SEMI
+  \PW{y}{r{-}1} \PAR
+  \PW{y}{2}\SEMI
+  \PW[\mREL]{x}{1}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{2}}{}
+      \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
+      \event{c}{\DW{y}{1}}{right=of b}
+      \event{d}{\DW{y}{2}}{right=2.5em of c}
+      \raevent{e}{\DW[\mREL]{x}{1}}{right=of d}
+      \rfint{a}{b}
+      \sync{b}{c}
+      \wk{c}{d}
+      \sync{d}{e}
+      \wk[out=-165,in=-15]{e}{a}
+    \end{tikzinline}}
+\end{gather*}
+The execution is  allowed by \armeight, but disallowed by \PwTmca{1}, due to
+the cycle.
 
-In the second semantics, we weaken the relationship between $\rrfx$
-and $\le$ in \ref{pom-rf-le}.  Rather than ensuring that there is no
+\armeight{} allows the execution because the read of $x$ is internal to the
+thread.  This aspect of \armeight{} semantics is difficult to model locally.
+To capture this, we found it necessary to drop \ref{pom-rf-le} and relax
+\ref{seq-le-delays}, %from
+% \refdef{def:pwt:mca1},
+adding local constraints on $\rrfx$ to $\sLPAR{}{}$, $\sSEMI{}{}$ and
+$\sIF{}{}{}$.
+Rather than ensuring that there is no
 \emph{global} blocker for a sequentially fulfilled read \eqref{pom-rf-le}, we
 require only that there is no \emph{thread-local} blocker
 \eqref{seq-rf-le-rf}.
+For \PwTmca{2}, internal reads don't necessarily contribute to order, and
+thus the above execution is allowed.
+
+\begin{definition}
+  \label{def:pwt:mca2}
+  A \PwTmca{2} is a \PwT{} (\refdef{def:pomset}) equipped with an injective
+  relation $\rrfx$ that satisfies requirements \ref{pom-rf-match} and
+  \ref{pom-rf-block} of \refdef{def:pwt:mca1}.
+
+  A A \PwTmca{2} is \emph{complete} if it satisfies
+  \ref{top-kappa}, \ref{top-term}, and \ref{top-rf}.
+
+  \input{fig-mca2.tex}
+\end{definition}
+% We write $\semmca{2}{}$ for the semantic function.
+A \PwTmca{2} need not satisfy requirement \ref{pom-rf-le}, and thus we may
+have $\bEv\xrfx\aEv$ and $\aEv\le\bEv$.
+
+% 
+% The use of $\rextendsdef{}{}$ in \ref{if-rf-extends}
+% ensures that no $\rrfx$ is introduced between events in
+% $\aEvs_1\cap\aEvs_2$ when coalescing.
+
+% In the second semantics, we weaken the relationship between $\rrfx$
+% and $\le$ in \ref{pom-rf-le}.  
 % This change both allows and requires us to weaken the definition of
 % \emph{delays} to drop write-to-read order from $\eqreorderco$.
 
@@ -34,15 +86,31 @@ does not include
       \end{tikzinlinesmall}}}
 \end{math}, taking $\rrfx$ from the left and $\le$ from the right.
 
-\begin{definition}
-  \label{def:pwt:mca2}
-  A \PwTmca{2} is a \PwT{} (\refdef{def:pomset}) equipped with an injective
-  relation $\rrfx$ that satisfies requirements \ref{pom-rf-match} and
-  \ref{pom-rf-block} of \refdef{def:pwt:mca1}.
+\PwTmca{2} does not enforce \ref{pom-rf-le}: $\bEv\xrfx\aEv$ may not imply
+$\bEv\le\aEv$ when $\bEv$ and $\aEv$ come from different sides of a
+sequential composition.  This means that $\rrfx$ must be verified during
+pomset construction, rather than post-hoc.  In \textsection\ref{sec:c11}, we
+show how to construct program order ($\rpox$) for complete pomsets using
+phantom events ($\fmrg{}$).  Using this construction, the following lemma
+gives a post-hoc verification technique for $\rrfx$.
+\begin{lemma}
+  If $\aPS\in\frf{\semmca{2}{\aCmd}}$ is complete, then
+  for every $\bEv\xrfx\aEv$ either
+  \begin{itemize}
+  \item external fulfillment:
+    $\bEv\le\aEv$ and if $\labeling(\cEv) \rblocks\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
+  \item internal fulfillment:
+    $(\exists\bEv'\in\fmrginv{\bEv})$
+    $(\exists\aEv'\in\fmrginv{\aEv})$
+    $\bEv'\xpox\aEv'$ and $(\not\exists\cEv')$
+    $\labelingForm(\cEv)$ is a tautology and
+    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv'\xpox\cEv\xpox\aEv'$.
+  \end{itemize}
+\end{lemma}
+These mimic the \emph{external consistency} requirements of \armeight{}
+\cite{armed}.
 
-  A A \PwTmca{2} is \emph{complete} if it satisfies
-  \ref{top-kappa}, \ref{top-term}, and \ref{top-rf}.
-  % \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+% \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
   %   \setcounter{enumi}{\value{Brf}}
   % \item \label{pom-rf'} ${\rrfx} \subseteq \aEvs\times\aEvs$
   %   is an injective relation capturing \emph{reads-from}, such that
@@ -64,9 +132,6 @@ does not include
   %     \end{enumerate}
   %   \end{multicols}
   % \end{enumerate}
-\end{definition}
-A \PwTmca{2} need not satisfy requirement \ref{pom-rf-le}, and thus we may
-have $\bEv\xrfx\aEv$ and $\aEv\le\bEv$.
 
 % Derive $\rdelayspdef$ from $\rdelaysdef$ by replacing $\eqreorderco$ with
 % \begin{math}
@@ -77,5 +142,4 @@ have $\bEv\xrfx\aEv$ and $\aEv\le\bEv$.
 % The acronym $\textsf{lws}$ is adopted from \armeight.  It stands for
 % \emph{Local Write Successor}.
 
-The semantic rules are given in \reffig{fig:mca2}.
-We write $\semmca{2}{}$ for the semantic function.
+%The semantic rules are given in \reffig{fig:mca2}.

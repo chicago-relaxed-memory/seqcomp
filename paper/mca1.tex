@@ -1,32 +1,88 @@
 \section{\PwTmcaTITLE{}: Pomsets with Predicate Transformers for MCA}
 \label{sec:mca}
-We define two models for \mca{} architectures: \PwTmca{1} and \PwTmca{2}.
-The first has a nicer semantics; the second has a more efficient lowering for
-acquiring reads on \armeight{}.  Both variants have optimal lowering for
-relaxed access.  We drop the subscript when referring to both models.
 
+We derive a model of concurrent computation by adding \emph{parallel
+  composition} and \emph{reads-from} to \reffig{fig:seq}.  To model coherence
+and synchronization, we add \emph{delay} to the rule for sequential
+composition.  For \mca{} architectures, it is sufficient to encode delay in
+the pomset order.  The resulting model, \PwTmca{1}, supports optimal lowering
+for relaxed access on \armeight{}, but requires extra synchronization for
+acquiring reads.
 
-Concerning \reflem{lem:if}:
-For \PwTmca{}, \eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2} are
-inclusions rather than equations.  In \textsection\ref{sec:delay}, we refine
-the semantics to validate the reverse inclusions.
+A variant, \PwTmca{2}, supports optimal lowering for all access modes on
+\armeight{}.  To achieve this, \PwTmca{2} drops the global requirement that
+\emph{reads-from} implies pomset order \eqref{pom-rf-le}.
 
+The lowering proofs can be found in \textsection\ref{sec:arm}.  The proofs
+use recent alternative characterizations of \armeight{} \cite{armed}.
 
 \subsection{\PwTmcaTITLE{1}}
 \label{sec:mca1}
 
-Parallel composition is disjoint union.  Any $\rrfx$ edges added between the
-two sides must also be added to the order (\ref{par-rf-le1} and
-\ref{par-rf-le2}).
+We define \PwTmca{1} by extending \refdef{def:pomset} and \reffig{fig:seq}.
+The definition uses several relations over actions---$\rmatches$, $\rblocks$
+and $\rdelays$---as well a distinguished set of $\sread$ actions; see
+\textsection\ref{sec:actions}.
+\begin{definition}
+  \label{def:pwt:mca1}
+  A \PwTmca{1} is a \PwT{} (\refdef{def:pomset}) equipped
+  with a relation $\rrfx$ such that 
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+    \setcounter{enumi}{\value{Brf}}
+  \item \label{pom-rf} \makecounter{rf} ${\rrfx} \subseteq \aEvs\times\aEvs$
+    is an injective relation capturing \emph{reads-from}, such that
+    % \end{enumerate}
+    % A pomset is a \emph{candidate} if there is an injective relation
+    % ${\rrfx} : \aEvs\times\aEvs$, capturing \emph{reads-from}, such that
+    \begin{enumerate}
+      % \begin{enumerate}[,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
+      % \item \label{rf-injective}
+      %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is,
+      %   ${\rrfx}$ is injective,
+    \item \label{pom-rf-match} if $\bEv\xrfx\aEv$ then
+      $\labeling(\bEv) \rmatches \labeling(\aEv)$,
+    \item \label{pom-rf-block} if $\bEv\xrfx\aEv$ and
+      $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or
+      $\aEv\le\cEv$,
+    \item \label{pom-rf-le} if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
+    \end{enumerate}
+  \end{enumerate}
 
-Sequential composition is similar, with two changes: \ref{seq-E} does not
-require disjointness (see \textsection\ref{sec:ex:term}), and
-\ref{seq-le-delays} may require order (see example \ref{pub}, below).
+  \noindent
+  \label{def:pwt:mca:complete}
+  A \PwTmca{} is \emph{complete} if %it is a complete \PwT{} (\refdef{def:pomset}) and
+  \begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+    \item[\eqref{top-kappa}]
+      \eqref{top-term}\;
+      as in \refdef{def:pomset},
+      \setcounter{enumi}{\value{Brf}}
+    \item \label{top-rf}
+      if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+    \end{enumerate}
+  \end{multicols}
+  \smallskip
+  
+  %The semantic rules are as follows:
+  \input{fig-mca1.tex}
+\end{definition}
+Let
+\begin{math}
+  \sem{\aCmd_1 \LPAR[\bThrd] \aCmd_2} = \sLPAR{\sem{\aCmd_1}}{\sem{\aCmd_2}}.
+\end{math}
+We write $\semmca{1}{}$ for the semantic function when it is unclear from context.
 
-We include the \emph{reads-from} relation explicitly in the model
-\eqref{pom-rf}.
+In complete pomsets, $\rrfx$ must pair every read with a matching write
+\eqref{top-rf}.  The requirements \ref{pom-rf-match}, \ref{pom-rf-block}, and
+\ref{pom-rf-le} guarantee that reads are \emph{fulfilled}, as in
+\cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.
 
-Note that reads-from implies order by \eqref{pom-rf-le}.
+The semantic rules are mostly straightforward: Parallel composition is disjoint
+union, and all constructs respect reads-from.  Only \ref{seq-le-delays}
+requires explanation.
+
+
+
 % \begin{lemma}
 %   \label{lem:rf:implies:le}
 %   For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
@@ -37,16 +93,13 @@ Note that reads-from implies order by \eqref{pom-rf-le}.
 %     Induction on the definition of $\sembase{}$, using \ref{par-rf-le1}, \ref{par-rf-le2}, and \ref{pom-rf-le}.
 %   \end{proof}
 % \end{lemma}
-In top-level pomsets, every read must have a matching write in $\rrfx$
-\eqref{top-rf}.  Together with \ref{pom-rf-match} and \ref{pom-rf-block}, the lemma
-guarantees that reads are \emph{fulfilled} at top-level, as in
-\cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.\footnote{The
-  basic model would be the same if we move $\rrfx$ from the model itself to
-  be existentially quantified in the definition of top-level pomset, along
-  with \ref{pom-rf-match} and \ref{pom-rf-block}.  This was the approach of
-  \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
-  explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
-  variant semantics $\frf{\semrr{}}$ where \ref{pom-rf-le} is not required.}
+% \footnote{The
+%   basic model would be the same if we move $\rrfx$ from the model itself to
+%   be existentially quantified in the definition of top-level pomset, along
+%   with \ref{pom-rf-match} and \ref{pom-rf-block}.  This was the approach of
+%   \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} We include $\rrfx$
+%   explicitly for use in \textsection\ref{sec:arm2}, where we introduce a
+%   variant semantics $\frf{\semrr{}}$ where \ref{pom-rf-le} is not required.}
 
 From \refdef{def:actions}, recall that $\aAct \rdelaysdef \bAct$ if
 $\aAct\eqreorderco\bAct$ or $\aAct\reorderra\bAct$ or
@@ -57,15 +110,17 @@ between SC accesses ($\eqreordersc$).  Combined with the fulfillment
 requirements (\ref{pom-rf-match}, \ref{pom-rf-block} and \ref{pom-rf-le}),
 these ensure coherence, publication, subscription and other idioms.  For
 example, consider the following:\footnote{We use different colors for arrows representing order:
-  \begin{itemize}  
-  \item \makebox{$\bEv\xpo\aEv$} arises from control/data/address \emph{dependency} (\ref{seq-kappa}, definition of $\labelingForm'_2(\bEv)$),
-  \item \makebox{$\bEv\xsync\aEv$} arises from $\reorderra$ or $\eqreordersc$ \eqref{seq-le-delays},
-  \item \makebox{$\bEv\xwki\aEv$} arises from $\eqreorderco$ \eqref{seq-le-delays},
-  \item \makebox{$\bEv\xrf\aEv$} arises from \emph{reads-from} \eqref{pom-rf-match},
-  %\item \makebox{$\bEv\xsyncsc\aEv$} arises from \emph{strong fencing} \eqref{cand-lesync-sc},
-  \item \makebox{$\bEv\xwk\aEv$} arises from \emph{blocking} \eqref{pom-rf-block}.
-  \end{itemize}
-  In \textsection\ref{sec:arm2}, it is possible for $\rrf$ to contradict
+  \begin{multicols}{2}
+    \begin{itemize}  
+    \item \makebox{$\bEv\xwki\aEv$} arises from $\eqreorderco$ \eqref{seq-le-delays},
+    \item \makebox{$\bEv\xsync\aEv$} arises from $\reorderra$ or $\eqreordersc$ \eqref{seq-le-delays},
+    \item \makebox{$\bEv\xpo\aEv$} arises from \makebox[0pt][l]{control/data/address \emph{dependency} (\ref{seq-kappa}, definition of $\labelingForm'_2(\bEv)$),}
+    \item \makebox{$\bEv\xrf\aEv$} arises from \emph{reads-from} \eqref{pom-rf-match},
+      % \item \makebox{$\bEv\xsyncsc\aEv$} arises from \emph{strong fencing} \eqref{cand-lesync-sc},
+    \item \makebox{$\bEv\xwk\aEv$} arises from \emph{blocking} \eqref{pom-rf-block}.
+    \end{itemize}    
+  \end{multicols}
+  In \PwTmca{2}, it is possible for $\rrf$ to contradict
   $\le$.  In this case, we use a dotted arrow for $\rrf$: $\bEv\xrfint\aEv$
   indicates that $\aEv\le\bEv$.}
 \begin{gather*}
@@ -105,48 +160,47 @@ The semantics gives the expected results for store buffering and load buffering,
 as well as litmus tests involving fences and SC access.  The model of
 coherence is weaker than C11, in order to support common subexpression
 elimination, and stronger than Java, in order to support local reasoning
-about data races.  See
-\cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20} for a discussion.
+about data races.  For further examples, see \textsection\ref{sec:extras} and
+\cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20}.
 
+Lemmas \ref{lem:monoid} and \ref{lem:if} mostly hold for \PwTmca{1}.  The
+exceptions are items \eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2},
+which become inclusions.  For example, \eqref{lem:ifelse:if:if1} becomes:
+\begin{displaymath} 
+  \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+  \supseteq
+  \xSEMI{
+    \xIFTHEN{\aForm}{\aPSS_1}{}
+  }{
+    \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+  }
+\end{displaymath}
+The culprit is $\rdelay$, which introduces order regardless whether
+preconditions are disjoint.  As an example, 
+\begin{math}
+  \sem{\IF{r}
+  \THEN \PW{x}{1}
+  \ELSE \PW{x}{2}
+  \FI}
+\end{math}
+has an execution with
+\begin{math}
+  (r{=}0\mid\DW{x}{2})
+  \xwki
+  (r{\neq}0\mid\DW{x}{1}),
+\end{math}
+(using augmentation), whereas
+\begin{math}
+  \sem{
+    \IF{r} \THEN \PW{x}{1}\FI
+    \SEMI
+    \IF{\BANG r} \THEN \PW{x}{2}\FI
+  \FI}
+\end{math}
+has no such execution.
 
-\begin{definition}
-  \label{def:pwt:mca1}
-  A \PwTmca{1} is a \PwT{} (\refdef{def:pomset}) equipped
-  with a relation $\rrfx$ such that 
-  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
-    \setcounter{enumi}{\value{Brf}}
-  \item \label{pom-rf} \makecounter{rf} ${\rrfx} \subseteq \aEvs\times\aEvs$
-    is an injective relation capturing \emph{reads-from}, such that
-    % \end{enumerate}
-    % A pomset is a \emph{candidate} if there is an injective relation
-    % ${\rrfx} : \aEvs\times\aEvs$, capturing \emph{reads-from}, such that
-    \begin{enumerate}
-      % \begin{enumerate}[,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
-      % \item \label{rf-injective}
-      %   if $\bEv\xrfx\aEv$ and $\cEv\xrfx\aEv$ then $\bEv=\cEv$, that is,
-      %   ${\rrfx}$ is injective,
-    \item \label{pom-rf-match} if $\bEv\xrfx\aEv$ then
-      $\labeling(\bEv) \rmatches \labeling(\aEv)$,
-    \item \label{pom-rf-block} if $\bEv\xrfx\aEv$ and
-      $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or
-      $\aEv\le\cEv$,
-    \item \label{pom-rf-le} if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
-    \end{enumerate}
-  \end{enumerate}
+For further discussion, see \textsection\ref{sec:delay}.
 
-  \label{def:pwt:mca:complete}
-  A \PwTmca{} is \emph{complete} if %it is a complete \PwT{} (\refdef{def:pomset}) and
-  \begin{multicols}{2}
-    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
-    \item[\eqref{top-kappa}]
-      \eqref{top-term}\;
-      as in \refdef{def:pomset},
-      \setcounter{enumi}{\value{Brf}}
-    \item \label{top-rf}
-      if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
-    \end{enumerate}
-  \end{multicols}
-\end{definition}
 
 % To include \RMW{}s, also add
 % \begin{enumerate}
@@ -154,15 +208,8 @@ about data races.  See
 %   ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
 % \end{enumerate}
 
-\input{fig-mca1.tex}
-\input{fig-mca2.tex}
 
-The semantic rules are given in \reffig{fig:mca1}.
-We write $\semmca{1}{}$ for the semantic function.
-Let
-\begin{math}
-  \semmca{1}{\aCmd_1 \LPAR[\bThrd] \aCmd_2} = \sLPAR{\semmca{1}{\aCmd_1}}{\semmca{1}{\aCmd_2}}.
-\end{math}
+%The semantic rules are given in \reffig{fig:mca1}.
 
 % From the data model, we require an additional binary relation 
 % ${\rdelays}\subseteq(\Act\times\Act)$.  For the actions in this paper, we
