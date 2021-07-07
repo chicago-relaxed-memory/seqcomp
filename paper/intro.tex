@@ -20,12 +20,11 @@ one of the most basic elements of computing: the humble semicolon.  Until
 recently, existing approaches either
 \begin{itemize}
 \item did not bother tracking dependencies, allowing ``thin air'' executions
-  \cite{Batty:2011:MCC:1926385.1926394},
+  --- as in C and C++~\cite{DBLP:conf/esop/BattyMNPS15},
 \item tracked dependencies conservatively, using syntax, requiring inefficient
   implementation of relaxed access
-  \cite{DBLP:conf/pldi/LahavVKHD17,Boehm:2014:OGA:2618128.2618134,DBLP:conf/oopsla/VafeiadisN13,DBLP:journals/corr/abs-1804-04214}---while
-  this may be fine for C, it's a non-started for safe languages like Java,
-  which lack C's ``plain'' access,
+  \cite{DBLP:conf/pldi/LahavVKHD17,Boehm:2014:OGA:2618128.2618134,DBLP:conf/oopsla/VafeiadisN13,DBLP:journals/corr/abs-1804-04214}--- a non-starter for safe languages like Java,
+  and an unacceptable cost for low-level languages like C,
 \item computed dependencies using non-compositional operational models over
   alternate worlds \cite{Manson:2005:JMM:1047659.1040336,
     DBLP:conf/esop/JagadeesanPR10,
@@ -65,7 +64,8 @@ sections add concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
 which provides a Java-like model for \mca{} hardware, similar to that of
 \citet{DBLP:journals/pacmpl/JagadeesanJR20}.  In \textsection\ref{sec:c11},
 we define \PwTc{}, which models \cXI, adapting the approach of
-\citet{DBLP:conf/esop/PaviottiCPWOB20}.  In \textsection\ref{sec:additional},
+\citet{DBLP:conf/esop/PaviottiCPWOB20}.  In \textsection\ref{sec:tool} we 
+provide a tool for automatic evaluation of litmus tests.  In \textsection\ref{sec:additional},
 we extend the semantics to include additional features, such as address
 calculation.  In \textsection\ref{sec:results}, we summarize our results.
 
@@ -746,5 +746,6 @@ on speculative execution \cite{Manson:2005:JMM:1047659.1040336,
   DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}.
 We provide a detailed comparison with these approaches in \textsection\ref{sec:promising}.
 
-
-
+Other work in relaxed memory has shown that tooling is especially useful to researchers, architects, and language specifiers, enabling them to build intuitions experimentally~\cite{DBLP:conf/esop/PaviottiCPWOB20,PrideMM,alglave,Batty:2011:MCC:1926385.1926394}.
+Unfortunately, it is not obvious that tools can be built for all thin-air free models, the calculation of \citet{Pichon-Pharabod:2016:CSR:2837614.2837616} does not have a termination proof for an arbitrary input, and the enormous state space for the operational models of \citet{DBLP:conf/popl/KangHLVD17} and \citet{DBLP:journals/pacmpl/ChakrabortyV19} is a daunting prospect for a tool builder -- and as yet no tool exists for automatically evaluating these models.
+We describe a tool, \PwTer, for automatically evaluating \PwT{} in \textsection\ref{sec:tool}.
