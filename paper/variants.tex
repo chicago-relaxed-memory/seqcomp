@@ -10,14 +10,22 @@ $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$.  By assumption
 $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.  The resulting semantics satisfies
 redundant read elimination.
 
-In the rest of this section we consider several orthogonal features: address
-calculation, if-closure, read-modify-write operations, and access
-elimination.
+In this section we consider several mostly-orthogonal features: address
+calculation, if-closure, fences, and read-modify-write operations.  Address
+calculation and if-closure do have some interaction, and we spell out the
+combined semantics in \textsection\ref{sec:semcaaddr}.
 
-These extensions preserve all of the valid transformations discussed thus far.
-We state the extensions with respect to the base semantics of
-\reffig{fig:seq}, but they apply equally to the variants described in
-\textsection\ref{sec:arm}.
+It is worth pointing out that address calculation and if-closure only affect
+the semantics of read and write.  Fences introduce new trivial actions.
+\RMW{}s require more infrastructure in order to ensure atomicity while
+compiling to \armeight{}.
+
+These extensions preserve all of the program transformation discussed thus
+far, and apply equally to the various semantics we have discussed: \PwT{},
+\PwTmca{1}, \PwTmca{2}, and \PwTc{}.  The results discussed in
+\textsection\ref{sec:results} also apply equally, with the exception of
+\RMW{}s: we have not proven \drfsc{} or \armeight lowering for \RMW{}s.
+
 
 \subsection{Register Recycling and Redundant Read Elimination}
 \label{sec:semreg}
@@ -47,7 +55,7 @@ moved early.''
       \rf[out=169,in=11]{b2}{a1}
     \end{tikzinline}}
 \end{gather*}
-This execution is not allowed by the semantics $\sembase{}$ of \reffig{fig:seq}: the precondition of
+This execution is not allowed by the semantics \reffig{fig:seq}: the precondition of
 $\aEv$ in the independent case is
 \begin{displaymath}
   \tag{$*$}\label{eq3}
@@ -57,8 +65,8 @@ which is equivalent to
 \begin{math}
   (x{=}r)\limplies (1{=}s)\limplies (r{=}s),
 \end{math}
-which is not a tautology, and thus $\sembase{}$ requires order from
-$\bEv$  to $\aEv$.
+which is not a tautology, and thus \reffig{fig:seq} requires order from
+$\bEv$  to $\aEv$ in order to complete the pomset.
 
 This execution is allowed, however, if we rename registers using a map from
 event names to register names.  By using this renaming, coalesced events must
@@ -806,7 +814,7 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 In order to model sequential composition, we must allow inconsistent
 predicates in a single pomset, unlike \PwP{}
 \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  For example, if
-$\aCmd=(\PW{x}{1})$, then $\sembase{}$ does \emph{not} allow:
+$\aCmd=(\PW{x}{1})$, then the semantics \reffig{fig:seq} does \emph{not} allow:
 \begin{gather*}
   \IF{\aExp}\THEN\PW{x}{1}\FI
   \SEMI
@@ -887,7 +895,7 @@ Coalescing events gives the desired result.
 
 
 This is not simply a theoretical question; it is observable.  For example,
-$\sembase{}$ does not allow the following, since it must add order in the
+the semantics of \reffig{fig:seq} does not allow the following, since it must add order in the
 first thread from the read of $y$ to one of the writes to $x$.
 \begin{gather*}
   \begin{gathered}
@@ -1179,107 +1187,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
   % $\sLOAD{}{}$.
 \end{definition}
-
-\subsection{Register Consistency}
-\label{sec:false}
-
-\todo{flesh out}
-We would like:
-\begin{enumerate}
-\item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
-  $\labelingForm(\aEv)$ is satisfiable.
-\end{enumerate}
-For associativity, \eqref{pom-kappa-sat'} in turn requires
-\begin{enumerate}
-\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
-  $\aTr{}{\FALSE}\riff\FALSE$.
-\end{enumerate}
-But that does not quite hold in our setting.
-In this subsection, we refine these requirements into ones that do hold.
-%
-% \eqref{tr-false'} is too strong.
-% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
-% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
-% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
-% for some $\aVal$.
-% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
-% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
-% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
-%
-% We require the following:
-% \begin{enumerate}
-% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
-%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
-% \end{enumerate}
-%
-% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
-% for both reads):
-% \begin{gather*}
-%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
-%   \\
-%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
-%   \lor  
-%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
-% \end{gather*}
-%
-We define $\regForm{\labeling}$ to capture the register state of a pomset.
-\begin{definition}  
-  \label{def:labeling:consistent}
-  Let 
-  \begin{math}
-    \regForm{\labeling}=
-    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
-    \textwhere \aEvs=\fdom(\labeling)
-  \end{math}.
-  
-  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
-  We say that it is \emph{$\labeling$-inconsistent} otherwise.
-\end{definition}
-
-
-%tau maps (things incompatible with chi) to (things incompatible with chi)
-
-\begin{definition}
-  \label{def:trans'}
-  A \emph{$\labeling$-predicate transformer} is a %monotone
-  function
-  $\aTr{}{}:\Formulae\fun\Formulae$ such that
-  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
-  % \item \label{tr-implies'}
-  %   \labeltextXX{2}{x}{tr-and'}
-  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
-  \item[\eqref{tr-implies}]
-    \eqref{tr-and}\;
-    \eqref{tr-or}\; as in \refdef{def:trans},
-  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
-    % \item[\eqref{tr-false}]
-    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-  \end{enumerate}
-
-  \label{def:family'}
-  A \emph{family of $\labeling$-predicate transformers} over consists of a
-  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
-  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
-  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
-
-  
-  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
-  \setcounter{enumi}{\value{Btau}}
-  \item \label{pom-tau'}
-    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
-  \end{enumerate}
-\end{definition}
-
-We add this:
-\begin{enumerate}
-% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
-%   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-\item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
-  $\labelingForm(\aEv)$ is $\labeling$-consistent.
-\end{enumerate}
-
-
-
+We show how to combine address calculation and if-closure in \textsection\ref{sec:semcaaddr}.
 
 
 \endinput

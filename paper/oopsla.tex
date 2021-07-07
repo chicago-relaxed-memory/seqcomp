@@ -1,40 +1,98 @@
-\subsection{Comparison to ``A Promising Semantics 2.1'' [POPL 2017]}
+\subsection{Comparison to ``Promising Semantics'' [POPL 2017]}
 \label{sec:promising}
 
-\citet{DBLP:journals/pacmpl/JagadeesanJR20} note that the speculative models
-listed above all, including \cite{DBLP:conf/popl/KangHLVD17}, fail to
-validate compositional reasoning of temporal properties---see their examples
-OOTA4, OOTA5, and \citep[Fig.~8]{DBLP:journals/toplas/Lochbihler13}).  The
-difference with our model can be understood in terms of the valid program
-transformations.  The speculative models allow reads to be introduced, with
-subsequent case analysis on the value read---effectively, this can turn one
-read into two, with different conditional branches taken for the two copies
-of the read.  Our model invalidates this transformation.  In return, our
-model enjoys compositionality for temporal safety properties.
+\citet{DBLP:journals/pacmpl/JagadeesanJR20} note that the promising semantics
+(\PS{}) \cite{DBLP:conf/popl/KangHLVD17} and related models
+\citep{DBLP:conf/esop/JagadeesanPR10,DBLP:journals/pacmpl/ChakrabortyV19,Manson:2005:JMM:1047659.1040336},
+fail to validate compositional reasoning of temporal properties.  Consider
+their example \ref{oota4}:
+\begin{align}
+  \taglabel{oota4}
+  \begin{gathered}
+    \PW{y}{x}
+    \PAR
+    \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
+    \PAR
+    \PW{b}{1}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx}{\DR{x}{1}}{}
+        \event{wy}{\DW{y}{1}}{right=of rx}
+        \po{rx}{wy}
+        \event{ry}{\DR{y}{1}}{right=3em of wy} 
+        \event{wx}{\DW{x}{1}}{right=of ry}
+        \event{wz}{\DW{z}{1}}{right=of wx}
+        \event{rb}{\DR{b}{1}}{right=of wz}
+        \event{wb1}{\DW{b}{1}}{right=3em of rb}
+        \po{ry}{wx}
+        \rf{wb1}{rb}
+        \rf{wy}{ry}
+        \rf[out=-170,in=-10]{wx}{rx}
+        \po{rb}{wz}
+        \po[out=15,in=165]{ry}{wz}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{align}
+Under \PS{}, this outcome is allowed by \emph{baiting} with the \texttt{else}
+branch, then \emph{switching} to the \texttt{then} branch, based on a coin
+flip $(\IF{b})$.\footnote{Call the threads \texttt{s}, \texttt{t}, and
+  \texttt{u}.  To get the result in the promising semantics, first execute
+  \texttt{u} to get message \texttt{<b:1@1>}.  Then \texttt{t} promises
+  \texttt{<x:1@1>}, which it can fulfill by reading \texttt{b}$=$\texttt{0}.
+  Then execute \texttt{s} to get message \texttt{<y:1@1>}.  Then execute
+  \texttt{t}, reading \texttt{b}$=$\texttt{1} and \texttt{y}$=$\texttt{1} and
+  fulfill the promise by writing \texttt{<x:1@1>}. The execution is exactly
+  the same in our speculative semantics \cite{DBLP:conf/esop/JagadeesanPR10},
+  removing timestamps and replacing the word \emph{promise} by
+  \emph{speculation}.}
 
-\todo{Write this.}
+Under all variants of \PwT{}, this outcome is disallowed, due to a cycle in
+${\rrfx}\cup{\lt}$. (Note that all reads cross threads in the example, so
+there is no difference between \PwTmca{1} and \PwTmca{2}.)
 
-Case analysis gives very weak results when combined with thread inlining.
-See \cite[\textsection B.1]{DBLP:journals/pacmpl/ChakrabortyV19appendix}.
-These happen by performing transformations that: 
-(1) introduce conditionals,
-(2) inline two threads on both sides of the introduced conditional,
-(3) choose different orders for the two threads for the two sides of the conditional.
+\citet[Fig.~8]{DBLP:journals/toplas/Lochbihler13} notes that such violations
+of temporal reasoning could result in violations of the Java security
+architecture.
 
-Case analysis gives very weak results when combined with read introduction.
-See \cite{promising-ldrf}.
-These happen by performing transformations that: 
-(1) introduce reads,
-(2) introduce conditionals,
-(3) choose different values for the reads on the two sides of the conditional.
+The difference between \PS{} and \PwT{} can be understood in terms of the
+valid program transformations.  \PS{} allows reads to be introduced, with
+subsequent case analysis (aka, if-closure) on the value read---effectively,
+this can turn one read into two, with different conditional branches taken
+for the two copies of the read.  For detailed examples, see
+\cite{promising-ldrf}.
+
+\PwT{} invalidates read introduction.  In return, \PwT{} enjoys
+compositionality for temporal safety properties, as discussed in
+\textsection\ref{sec:results} and
+\cite[\textsection6]{DBLP:journals/pacmpl/JagadeesanJR20}.
+
+This difference highlights the subtle tensions in relaxed memory models.
+It is not possible to have everything one wants, thus, one is forced
+to choose which optimizations and reasoning principles are most important.
+
+% \todo{Write this.}
+
+% Case analysis gives very weak results when combined with thread inlining.
+% See \cite[\textsection B.1]{DBLP:journals/pacmpl/ChakrabortyV19appendix}.
+% These happen by performing transformations that: 
+% (1) introduce conditionals,
+% (2) inline two threads on both sides of the introduced conditional,
+% (3) choose different orders for the two threads for the two sides of the conditional.
+
+% Case analysis gives very weak results when combined with read introduction.
+% See \cite{promising-ldrf}.
+% These happen by performing transformations that: 
+% (1) introduce reads,
+% (2) introduce conditionals,
+% (3) choose different values for the reads on the two sides of the conditional.
 
 
-The fact that the semantics is not verifiable a posteriori is something it
-shares with \weakestmo{}, where the justification relation must be built
-inductively.
+% The fact that the semantics is not verifiable a posteriori is something it
+% shares with \weakestmo{}, where the justification relation must be built
+% inductively.
 
-\weakestmo{} admits FADD, but \PS{} does not.
-\PS{} admits CohCYC, but \weakestmo{} does not.
+% \weakestmo{} admits FADD, but \PS{} does not.
+% \PS{} admits CohCYC, but \weakestmo{} does not.
 
 
 

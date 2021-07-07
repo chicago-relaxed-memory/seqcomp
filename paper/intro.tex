@@ -62,12 +62,13 @@ To manage complexity, we have layered the definitions.  After an overview, we
 define sequential dependencies in \textsection\ref{sec:model}.  The next two
 sections add concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
 which provides a Java-like model for \mca{} hardware, similar to that of
-\citet{DBLP:journals/pacmpl/JagadeesanJR20}.  In \textsection\ref{sec:c11},
+\citet{DBLP:journals/pacmpl/JagadeesanJR20}.  In
+\textsection\ref{sec:results}, we summarize the results for this model. In \textsection\ref{sec:c11},
 we define \PwTc{}, which models \cXI, adapting the approach of
 \citet{DBLP:conf/esop/PaviottiCPWOB20}.  In \textsection\ref{sec:tool} we 
 provide a tool for automatic evaluation of litmus tests.  In \textsection\ref{sec:additional},
 we extend the semantics to include additional features, such as address
-calculation.  In \textsection\ref{sec:results}, we summarize our results.
+calculation.  
 
 % \todo{flesh this out}
 % \begin{itemize}
@@ -698,7 +699,7 @@ or to the right, with intermediate step:
 \end{gather*}
 This is an instance of the general result that sequential composition forms a monoid.
 
-\subsection{Related Work}
+\section{Related Work}
 
 \citet{DBLP:conf/snapl/MarinoMMNS15} argue that the ``silently shifting
 semicolon'' is sufficiently problematic for programmers that concurrent

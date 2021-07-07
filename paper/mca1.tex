@@ -11,7 +11,8 @@ acquiring reads.
 
 A variant, \PwTmca{2}, supports optimal lowering for all access modes on
 \armeight{}.  To achieve this, \PwTmca{2} drops the global requirement that
-\emph{reads-from} implies pomset order \eqref{pom-rf-le}.
+\emph{reads-from} implies pomset order \eqref{pom-rf-le}.  The models are the
+same, except for \emph{internal reads}, where a thread reads its own write.
 
 The lowering proofs can be found in \textsection\ref{sec:arm}.  The proofs
 use recent alternative characterizations of \armeight{} \cite{armed}.

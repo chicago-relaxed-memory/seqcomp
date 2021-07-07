@@ -338,10 +338,9 @@ semantics permits \ref{RP}:
 
 
 
-These following examples are from ``Modular Data-Race-Freedom Guarantees in
-the Promising Semantics'' to appear in PLDI21.
+These following examples are from \cite{promising-ldrf}.
 
-\ref{CDRF} shows that our semantics is not too permissive for $\mRA$-\RMW{}s.
+\ref{CDRF} shows that \PwT{} semantics is not too permissive for $\mRA$-\RMW{}s.
 But what about $\mRLX$-\RMW{}s.  The following execution is allowed by \armeight,
 and \PS{2.0}, but disallowed by \PS{2.1}.
 \begin{gather*}
@@ -410,7 +409,7 @@ If this $\ldrfra{z}$?
   \end{gathered}
 \end{gather*}
 
-Our semantics already disallows \ref{LDRF-Fail-PS}, which is similar to \ref{OOTA4}.
+\PwT{} disallows \ref{LDRF-Fail-PS}, which is similar to \ref{OOTA4}.
 \begin{gather*}  
   \taglabel{LDRF-Fail-PS}
   \begin{gathered}
