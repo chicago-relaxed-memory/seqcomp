@@ -1606,31 +1606,37 @@ where
 \subsection{Associativity and Skolemization}
 \label{sec:ex:assoc}
 
-\todo{Fix this}
-
 The predicate transformers we have chosen for \ref{read-tau-dep} and
 \ref{read-tau-ind} are different from the ones used traditionally, which are
-written using substitution \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  Attempting to write \ref{read-tau-dep} in
+written using substitution \cite{DBLP:journals/pacmpl/JagadeesanJR20}.
+Attempting to write \ref{read-tau-dep} and \ref{read-tau-ind} in
 this style we would have:
 \begin{enumerate}[topsep=0pt]
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-p}}]
-  if $(\aEvs\cap\bEvs)\neq\emptyset$ then
+  if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
   \begin{math}
     \aTr{\bEvs}{\bForm} \riff    
     \bForm[\aVal/\aReg]
   \end{math},    
+\item[{\labeltext[\textsc{r}4b$'$]{(\textsc{r}4b$'$)}{read-tau-ind-p}}]
+  if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \riff    
+    \bForm[\aVal/\aReg]
+    \land
+    \bForm[\aLoc/\aReg]
+  \end{math}.
 \end{enumerate}
-Recall that \ref{read-tau-empty} says that $\bForm$ must be independent of
-$\aReg$ in order to appear in a top-level pomset: if $\aEvs=\emptyset$ then
-\begin{math}
-  \aTr{\bEvs}{\bForm} \riff
-  % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
-  \bForm.
-\end{math}
-This choice for \ref{read-tau-empty} is forced by \refdef{def:family}, which
-states that the predicate transformer for a small subset of $\aEvs$ must
-imply the transformer for a larger subset.
-
+% Recall that \ref{read-tau-empty} says that $\bForm$ must be independent of
+% $\aReg$ in order to appear in a top-level pomset: if $\aEvs=\emptyset$ then
+% \begin{math}
+%   \aTr{\bEvs}{\bForm} \riff
+%   % \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies
+%   \bForm.
+% \end{math}
+% This choice for \ref{read-tau-empty} is forced by \refdef{def:family}, which
+% states that the predicate transformer for a small subset of $\aEvs$ must
+% imply the transformer for a larger subset.
 Sadly, this definition fails associativity.
 
 Consider the following, eliding transformers for the writes (``$\BANG$''
@@ -1641,8 +1647,8 @@ represents logical negation):
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \xform{xd}{1{=}r\limplies\bForm}{right=of a}
-        \xform{xi}{(y{=}r\lor1{=}r)\limplies\bForm}{left=.5em of a}
+        \xform{xd}{\bForm[1/r]}{right=of a}
+        \xform{xi}{\bForm[1/r]\land\bForm[y/r]}{left=.5em of a}
         \xo{a1}{xd}
       \end{tikzinline}}    
   \end{gathered}
@@ -1662,14 +1668,14 @@ represents logical negation):
         \event{b}{r{\neq}0\mid\DW{x}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
-  &&
-  \begin{gathered}[t]
-    \PW{x}{0} 
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{b}{\DW{x}{0}}{}
-      \end{tikzinline}}    
-  \end{gathered}
+  % &&
+  % \begin{gathered}[t]
+  %   \PW{x}{0} 
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+  %       \event{b}{\DW{x}{0}}{}
+  %     \end{tikzinline}}    
+  % \end{gathered}
 \end{align*}
 Coalescing the writes and associating to the right,
 we have the following, since $(r{=}0 \lor r{\neq}0)\riff\TRUE$:
@@ -1685,12 +1691,12 @@ we have the following, since $(r{=}0 \lor r{\neq}0)\riff\TRUE$:
   \begin{gathered}[t]
     \PW{x}{\BANG r} 
     \SEMI \PW{x}{\BANG\BANG r} 
-    \SEMI \PW{x}{0} 
+    %\SEMI \PW{x}{0} 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{b}{\DW{x}{1}}{}
-        \event{c}{\DW{x}{0}}{right=of b}
-        \wki{b}{c}
+        %\event{c}{\DW{x}{0}}{right=of b}
+        %\wki{b}{c}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -1700,14 +1706,14 @@ we have the following, since $(r{=}0 \lor r{\neq}0)\riff\TRUE$:
   \begin{gathered}[t]
     \PR{y}{r}
     \SEMI (\PW{x}{\BANG r} 
-    \SEMI \PW{x}{\BANG\BANG r} 
-    \SEMI \PW{x}{0} )
+    \SEMI \PW{x}{\BANG\BANG r} )
+    %\SEMI \PW{x}{0} )
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
         \event{b}{\DW{x}{1}}{right=of a}
-        \event{c}{\DW{x}{0}}{right=of b}
-        \wki{b}{c}
+        %\event{c}{\DW{x}{0}}{right=of b}
+        %\wki{b}{c}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1720,18 +1726,18 @@ Associating to the left and the coalescing, instead:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \event{b}{(y{=}r\lor1{=}r)\limplies r{=}0\mid\DW{x}{1}}{right=of a}
+        \event{b}{1{=}0\land y{=}0\mid\DW{x}{1}}{right=of a}
       \end{tikzinline}}    
   \end{gathered}
   &&
   \begin{gathered}[t]
     \PW{x}{\BANG\BANG r} 
-    \SEMI \PW{x}{0} 
+    %\SEMI \PW{x}{0} 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{b}{r{\neq}0\mid\DW{x}{1}}{}
-        \event{c}{\DW{x}{0}}{right=of b}
-        \wki{b}{c}
+        %\event{c}{\DW{x}{0}}{right=of b}
+        %\wki{b}{c}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -1741,25 +1747,31 @@ Associating to the left and the coalescing, instead:
   \begin{gathered}[t]
     (\PR{y}{r}
     \SEMI \PW{x}{\BANG r} )
-    \SEMI (\PW{x}{\BANG\BANG r} 
-    \SEMI \PW{x}{0} )
+    \SEMI \PW{x}{\BANG\BANG r} 
+    %\SEMI \PW{x}{0} )
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
         \event{b}{\aForm\mid\DW{x}{1}}{right=of a}
-        \event{c}{\DW{x}{0}}{right=of b}
-        \wki{b}{c}
+        % \event{c}{\DW{x}{0}}{right=of b}
+        % \wki{b}{c}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-where $\aForm=((y{=}r\lor1{=}r)\limplies r{=}0)\lor (r{\neq}0)$.  The
-precondition $\aForm$ is not a tautology.  In a top-level pomset, this forces
-dependency order from $\DRP{y}{1}$ to $\DWP{x}{1}$.
+The precondition $\aForm=(1{=}0\land y{=}0)\lor (1{\neq}0 \land y{\neq}0)$,
+which is equivalent to $y{\neq}0$, 
+which is not a tautology.  This pomset can never be complete due to the bogus
+write of $(\PW{x}{\BANG r})$, which will show up in the termination condition $(1{=}0)$.
+Nevertheless, this is a problem, since associativity must reckon with
+incomplete pomsets.
 
-Our solution is to Skolemize, replacing 
-uses of $\bForm[\aVal/\aReg]$
-by $(\aReg{=}\aVal)\limplies\bForm$,
-for uniquely chosen $\aReg$.
+Our solution is to Skolemize, replacing substitution by implication, for 
+% uses of $\bForm[\aVal/\aReg]$
+% by $(\aReg{=}\aVal)\limplies\bForm$,
+uniquely chosen registers.  Using \reffig{fig:seq}, we compute
+$\aForm=((y{=}r\lor1{=}r)\limplies r{=}0)\lor (r{\neq}0)$ in the example
+above, which is a tautology.
+
 %  We have proven associativity of
 %  \refdef{def:pomsets-trans} in Agda.
 The proof of associativity requires that predicate
