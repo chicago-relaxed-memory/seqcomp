@@ -19,7 +19,7 @@ available, however, we are left with an enormous gap in our understanding of
 one of the most basic elements of computing: the humble semicolon.  Until
 recently, existing approaches either
 \begin{itemize}
-\item didn't bother tracking dependencies, allowing ``thin air'' executions
+\item did not bother tracking dependencies, allowing ``thin air'' executions
   \cite{Batty:2011:MCC:1926385.1926394},
 \item tracked dependencies conservatively, using syntax, requiring inefficient
   implementation of relaxed access
@@ -62,48 +62,48 @@ execution.
 To manage complexity, we have layered the definitions.  After an overview, we
 define sequential dependencies in \textsection\ref{sec:model}.  The next two
 sections add concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
-which models Java for \mca{} hardware, similar to that of
+which provides a Java-like model for \mca{} hardware, similar to that of
 \citet{DBLP:journals/pacmpl/JagadeesanJR20}.  In \textsection\ref{sec:c11},
 we define \PwTc{}, which models \cXI, adapting the approach of
 \citet{DBLP:conf/esop/PaviottiCPWOB20}.  In \textsection\ref{sec:additional},
-we extend the semantics to include additional features, such as address calculation.
-In \textsection\ref{sec:results}, we summarize the results.
+we extend the semantics to include additional features, such as address
+calculation.  In \textsection\ref{sec:results}, we summarize our results.
 
-\todo{flesh this out}
-\begin{itemize}
-\item We provide a tool to execute litmus tests for both models.
-\item \textsection\ref{sec:sc} We prove \drfsc{} for \PwTmca{}; \MRD{} inherits the result from \rcXI.
-\item \textsection\ref{sec:arm} We prove a lowering result for \PwTmca{}.
-\item \textsection\ref{sec:additional} We extend the model to include many features.
-\end{itemize}
+% \todo{flesh this out}
+% \begin{itemize}
+% \item We provide a tool to execute litmus tests for both models.
+% \item \textsection\ref{sec:sc} We prove \drfsc{} for \PwTmca{}; \MRD{} inherits the result from \rcXI.
+% \item \textsection\ref{sec:arm} We prove a lowering result for \PwTmca{}.
+% \item \textsection\ref{sec:additional} We extend the model to include many features.
+% \end{itemize}
 
-% \subsection{Contributions}
+% % \subsection{Contributions}
 
-% \todo{}
-% We show how predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75} can
-% be added to pomsets with
-% preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} to create a
-% compositional semantics for sequential composition.
-\begin{itemize}
-\item \S\ref{sec:model} presents the basic model, which satisfies many
-  desiderata, but not all.
-\item \S\ref{sec:arm} shows two approaches for efficient implementation on
-  Arm.  The first uses a suboptimal lowering for acquiring reads.  The second
-  uses an optimal lowering, but requires a nontrivial change to the
-  definition of sequential composition.
-\item \S\ref{sec:additional} generalizes the basic semantics of read and write
-  to validate compiler optimizations.
-\end{itemize}
-% Acknowledgements go here, once we're not double-blinded.
-% The definitions in this paper have been formalized in Agda.
-Because it is closely related, we expect that the memory-model results of
-\cite{DBLP:journals/pacmpl/JagadeesanJR20} apply to our model, including
-compositional reasoning for temporal safety properties and {local} \drfsc{}
-as in \cite{Dolan:2018:BDR:3192366.3192421,DBLP:conf/ppopp/DongolJR19,promising-ldrf}.
-% In \textsection\ref{sec:arm}, we provide an alternative proof strategy for
-% efficient compilation to \armeight{}, which improves upon that of
-% \cite{DBLP:journals/pacmpl/JagadeesanJR20} by using a recent alternative
-% characterization of \armeight{}.
+% % \todo{}
+% % We show how predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75} can
+% % be added to pomsets with
+% % preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} to create a
+% % compositional semantics for sequential composition.
+% \begin{itemize}
+% \item \S\ref{sec:model} presents the basic model, which satisfies many
+%   desiderata, but not all.
+% \item \S\ref{sec:arm} shows two approaches for efficient implementation on
+%   Arm.  The first uses a suboptimal lowering for acquiring reads.  The second
+%   uses an optimal lowering, but requires a nontrivial change to the
+%   definition of sequential composition.
+% \item \S\ref{sec:additional} generalizes the basic semantics of read and write
+%   to validate compiler optimizations.
+% \end{itemize}
+% % Acknowledgements go here, once we're not double-blinded.
+% % The definitions in this paper have been formalized in Agda.
+% Because it is closely related, we expect that the memory-model results of
+% \cite{DBLP:journals/pacmpl/JagadeesanJR20} apply to our model, including
+% compositional reasoning for temporal safety properties and {local} \drfsc{}
+% as in \cite{Dolan:2018:BDR:3192366.3192421,DBLP:conf/ppopp/DongolJR19,promising-ldrf}.
+% % In \textsection\ref{sec:arm}, we provide an alternative proof strategy for
+% % efficient compilation to \armeight{}, which improves upon that of
+% % \cite{DBLP:journals/pacmpl/JagadeesanJR20} by using a recent alternative
+% % characterization of \armeight{}.
 
 \section{Overview}
 \label{sec:overview}
