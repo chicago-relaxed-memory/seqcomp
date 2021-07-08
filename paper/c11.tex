@@ -6,9 +6,11 @@ executions of \cXI, while preserving optimal lowering for relaxed access.  We
 follow the approach of \citet{DBLP:conf/esop/PaviottiCPWOB20}, using our
 semantics to generate \cXI{} candidate executions with a dependency relation,
 then applying the rules of \rcXI{} \cite{DBLP:conf/pldi/LahavVKHD17}.  The
-no-thin-air axiom of \rcXI{} is overly restrictive, requiring that
+No-Thin-Air axiom of \rcXI{} is overly restrictive, requiring that
 ${\rrfx}\cup{\rpox}$ be acyclic.  Instead, we require that ${\rrfx}\cup{\lt}$
-is acyclic.
+is acyclic.  This is a more precise categorisation of thin-air behavior, and 
+it allows aggressive compiler optimizations that would be erroneously forbidden
+by \rcXI's original No-Thin-Air axiom.
 
 The chief difficulty is instrumenting our semantics to generate program
 order, for use in the various axioms of \cXI{}.
@@ -464,6 +466,14 @@ $\ledelay$, defined as follows:
 In \eqref{eq5}, we have both $d\ledelay e$ and $e \ledelay d$.  To rule out
 this execution, it suffices to require that $\ledelay$ is a partial order.
 
+Program \eqref{eq5} shows that the definition of semantic dependency is up for debate in \cXI, and
+the International Standard Organisation's C++ concurrency subgroup acknowledges that semantic
+dependency ($\rsdepx$) would address the Out-of-Thin-Air problem: \emph{Prohibiting executions that
+have cycles in $\rrfx \cup \rsdepx$ can therefore be expected to prohibit Out-of-Thin-Air behaviors}
+~\cite{mckenny:sdep}.
+\PwTc{} resolves program structure into a dependency relation---not a complex state---that is
+precise and easily adjusted. As refinements are made to \cXI, \PwTc{} can accommodate these and
+test them automatically.
 
 
 
