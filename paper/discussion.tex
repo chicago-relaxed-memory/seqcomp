@@ -1,6 +1,3 @@
-\section{Discussion}
-\label{sec:discussion}
-
 \subsection{Comparison with Sequential Predicate Transformers}
 
 We compare traditional transformers to the dependent-case transformers of
@@ -613,8 +610,6 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   % $\sLOAD{}{}$.
 \end{definition}
 
-\input{oopsla.tex}
-
 \subsection{Substitutions}
 \label{sec:substitutions}
 
@@ -1048,7 +1043,12 @@ We leave the elaboration of this idea to future work.
 \subsection{Logical Encoding of Delay for \PwTmcaTITLE{}}
 \label{sec:delay}
 
-\PwTmca{} satisfies one direction of
+In this subsection, we develop a logical encoding of $\rdelay$, which can
+replace \ref{seq-le-delays} in \PwTmca{1}.  It is not obvious how to repeat
+this trick for \PwTmca{2}, due to thread-local reads-from
+and thread-local blockers (\ref{seq-le-delays-rf} and \ref{seq-rf-le-rf} in \refdef{def:pwt:mca2}).
+
+As motivation, note that \PwTmca{} satisfies only one direction of
 \reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2}
 \begin{enumerate}
 \item[\eqref{lem:ifelse:if:if1}]
@@ -1198,7 +1198,7 @@ and $\Qw{\aLoc}$.  We refer to these collectively as \emph{quiescence
   symbols}.
 
 We update the \refdef{def:pomset} of complete pomset to substitute true for every
-quiescence symbol:
+quiescence symbol (notation $[\TRUE/\Q{}]$):
 \begin{definition}
   A \PwT{} is \emph{complete} if
   \begin{multicols}{2}
@@ -1274,7 +1274,7 @@ Update the following rules from \reffig{fig:seq}.
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff 
         \bForm
-        [\aExp/\aLoc][\aExp{=}\aVal/\QS{\aLoc}{\amode}],
+        [\aExp/\aLoc][(\aExp{=}\aVal\land\QS{\aLoc}{\amode})/\QS{\aLoc}{\amode}],
       \end{math}}
   \item \label{write-tau-empty-q}
     if $\aEvs=\emptyset$ then 
@@ -1353,7 +1353,6 @@ $\FALSE$ for $\QL{\aLoc}{\mACQ}$ in the independent case for an acquiring
 write; this ensures that all subsequent accesses follow the acquiring read in
 top-level pomsets.
 
-\todo{Fix these examples}
 \begin{example}
   \label{ex:q1}
   The following pomsets show the effect of quiescence for each access mode.
@@ -1363,132 +1362,135 @@ top-level pomsets.
 \begin{example}
   The definition enforces publication.  Consider:
   \begin{align*}
-    \begin{gathered}
+    \begin{gathered}[t]
       \PW{x}{1}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a1}{1{=}1\land\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
-          \xform{x1d}{1{=}1\land\bForm}{below=of a1}
-          \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of x1d}
-          \xos{a1}{x1d}
-        \end{tikzinline}}
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \event{a}{1{=}v\land\Qr{x}\land\Qw{x}\mid\DW{x}{v}}{}
+          \xform{xi}{\bForm[1/\aLoc][\FALSE/\Qw{\aLoc}]}{above=of a}
+          \xform{xd}{\bForm[1/\aLoc]}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
     \end{gathered}
     &&
-    \begin{gathered}
-      \PW[\mREL]{y}{1}
+    \begin{gathered}[t]
+      \PW[\mREL]{x}{1}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \raevent{a2}{1{=}1\land\QS{\bLoc}{\mREL}\mid\DW{y}{2}}{}
-          \xform{x2d}{1{=}1\land\bForm}{below=of a2}
-          \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mREL}]}{below=of x2d}
-          \xos{a2}{x2d}
-        \end{tikzinline}}
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \raevent{a}{1{=}v\land\Qr{*}\land\Qw{*}\mid\DW[\mREL]{x}{v}}{}
+          \xform{xi}{\bForm[1/\bLoc][\FALSE/\Qw{x}]}{above=of a}
+          \xform{xd}{\bForm[1/\bLoc]}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
     \end{gathered}
   \end{align*}
-  Since $\QS{\bLoc}{\mREL}[\FALSE/\QS{\aLoc}{\mRLX}]$ is $\FALSE$,
-  composing these without order simplifies to:
-  \begin{gather*}
-    \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm}{below right=of a1}
-          \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mREL}]}{below=of a1}
-          \xo{a1}{x1d}
-          \raevent{a2}{\FALSE\mid\DW{\bLoc}{1}}{above right=of x1d}
-          %\xform{x2d}{\bForm}{below left=of a2}
-          \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
-          \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mREL}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
-          \xo{a2}{x1d}
-          \xos[xleft]{a1}{x2i}
-          \xos{a2}{x1i}
-        \end{tikzinline}}
-  \end{gather*}
-  In order to get a satisfiable precondition for $\DWP{y}{1}$, we must
-  introduce order:
-  \begin{gather*}
-    % \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
-    % \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
-          \xform{x1d}{\bForm}{below right=of a1}
-          \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mREL}]}{below=of a1}
-          \xo{a1}{x1d}
-          \raevent{a2}{\QS{\bLoc}{\mREL}\mid\DW{\bLoc}{1}}{above right=of x1d}
-          %\xform{x2d}{\bForm}{below left=of a2}
-          \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
-          \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mREL}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
-          \xo{a2}{x1d}
-          \xos[xleft]{a1}{x2i}
-          \xos{a2}{x1i}
-          \sync{a1}{a2}
-        \end{tikzinline}}
-  \end{gather*}
+  Since $\Qw{*}[\FALSE/\Qw{\aLoc}]$ is $\FALSE$, we must
+  introduce order to get a satisfiable precondition for $\DWP{y}{1}$.
+  % composing these without order simplifies to:
+  % \begin{gather*}
+  %   \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %         \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
+  %         \xform{x1d}{\bForm}{below right=of a1}
+  %         \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mREL}]}{below=of a1}
+  %         \xo{a1}{x1d}
+  %         \raevent{a2}{\FALSE\mid\DW{\bLoc}{1}}{above right=of x1d}
+  %         %\xform{x2d}{\bForm}{below left=of a2}
+  %         \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
+  %         \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mREL}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
+  %         \xo{a2}{x1d}
+  %         \xos[xleft]{a1}{x2i}
+  %         \xos{a2}{x1i}
+  %       \end{tikzinline}}
+  % \end{gather*}
+  % In order to get a satisfiable precondition for $\DWP{y}{1}$, we must
+  % introduce order:
+  % \begin{gather*}
+  %   % \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
+  %   % \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %         \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
+  %         \xform{x1d}{\bForm}{below right=of a1}
+  %         \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mREL}]}{below=of a1}
+  %         \xo{a1}{x1d}
+  %         \raevent{a2}{\QS{\bLoc}{\mREL}\mid\DW{\bLoc}{1}}{above right=of x1d}
+  %         %\xform{x2d}{\bForm}{below left=of a2}
+  %         \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
+  %         \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mREL}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
+  %         \xo{a2}{x1d}
+  %         \xos[xleft]{a1}{x2i}
+  %         \xos{a2}{x1i}
+  %         \sync{a1}{a2}
+  %       \end{tikzinline}}
+  % \end{gather*}
 \end{example}
 
 \begin{example}
   \label{ex:subscription}
   The definition enforces subscription.  Consider:
   \begin{align*}
-    \begin{gathered}
+    \begin{gathered}[t]
       \PR[\mACQ]{y}{r}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and .5em]
-          \raevent{a1}{\QL{\bLoc}{\mACQ}\mid\DR{y}{1}}{}
-          \xform{x1d}{r{=}1\limplies\bForm}{below=of a1}
-          \xform{x1i}{\bForm[\FALSE/\QL{\bLoc}{\mACQ}]}{right=of x1d}
-          \xos[xleft]{a1}{x1d}
-        \end{tikzinline}}
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \raevent{a}{\Qw{y}\mid\DR[\mACQ]{y}{v}}{}
+          \xform{xi}{\PBR{1{=}\aReg \lor y{=}\aReg} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
+          \xform{xd}{v{=}r\limplies\bForm}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
     \end{gathered}
     &&
-    \begin{gathered}
-      \PR{x}{s}
+    \begin{gathered}[t]
+      \PR{x}{r}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and .5em]
-          \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{}
-          \xform{x2d}{s{=}1\limplies\bForm}{below=of a2}
-          \xform{x2i}{\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{right=of x2d}
-          \xos[xleft]{a2}{x2d}
-        \end{tikzinline}}
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \event{a}{\Qw{x}\mid\DR{x}{v}}{}
+          \xform{xi}{\PBR{1{=}\aReg \lor x{=}\aReg} \limplies \bForm[\FALSE/\Qr{x}]}{above=of a}
+          \xform{xd}{v{=}r\limplies\bForm}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
     \end{gathered}
   \end{align*}
-  Since $\QL{\aLoc}{\mRLX}[\FALSE/\QL{\bLoc}{\mACQ}]$ is $\FALSE$,
-  composing these without order simplifies to:
-  \begin{gather*}
-    \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \raevent{a1}{\QL{\bLoc}{\mACQ}\mid\DR{y}{1}}{}
-          \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
-          \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
-          \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mACQ}][\FALSE/\QL{\aLoc}{\mRLX}]}{above=of xdd}
-          \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mACQ}]}{right=of xdd}
-          \event{a2}{\FALSE\mid\DR{x}{1}}{above=of x2d}
-          \xos[xleft]{a1}{x1d}
-          \xos{a2}{x2d}
-          \xo{a1}{xdd}
-          \xo{a2}{xdd}
-        \end{tikzinline}}
-  \end{gather*}
-  In order to get a satisfiable precondition for $\DRP{x}{1}$, we must
-  introduce order:
-  \begin{gather*}
-    % \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
-    % \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \raevent{a1}{\QL{\bLoc}{\mACQ}\mid\DR{y}{1}}{}
-          \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
-          \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
-          \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mACQ}][\FALSE/\QL{\aLoc}{\mRLX}]}{above=of xdd}
-          \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mACQ}]}{right=of xdd}
-          \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{above=of x2d}
-          \xos[xleft]{a1}{x1d}
-          \xos{a2}{x2d}
-          \xo{a1}{xdd}
-          \xo{a2}{xdd}
-          \sync[out=15,in=165]{a1}{a2}
-        \end{tikzinline}}
-  \end{gather*}
+  Since $\Qw{x}[\FALSE/\Qw{*}]$ is $\FALSE$, we must
+  introduce order to get a satisfiable precondition for $\DWP{y}{1}$.
+  % Since $\QL{\aLoc}{\mRLX}[\FALSE/\QL{\bLoc}{\mACQ}]$ is $\FALSE$,
+  % composing these without order simplifies to:
+  % \begin{gather*}
+  %   \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
+  %   \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %         \raevent{a1}{\QL{\bLoc}{\mACQ}\mid\DR{y}{1}}{}
+  %         \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
+  %         \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
+  %         \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mACQ}][\FALSE/\QL{\aLoc}{\mRLX}]}{above=of xdd}
+  %         \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mACQ}]}{right=of xdd}
+  %         \event{a2}{\FALSE\mid\DR{x}{1}}{above=of x2d}
+  %         \xos[xleft]{a1}{x1d}
+  %         \xos{a2}{x2d}
+  %         \xo{a1}{xdd}
+  %         \xo{a2}{xdd}
+  %       \end{tikzinline}}
+  % \end{gather*}
+  % In order to get a satisfiable precondition for $\DRP{x}{1}$, we must
+  % introduce order:
+  % \begin{gather*}
+  %   % \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
+  %   % \\
+  %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+  %         \raevent{a1}{\QL{\bLoc}{\mACQ}\mid\DR{y}{1}}{}
+  %         \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
+  %         \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
+  %         \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mACQ}][\FALSE/\QL{\aLoc}{\mRLX}]}{above=of xdd}
+  %         \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mACQ}]}{right=of xdd}
+  %         \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{above=of x2d}
+  %         \xos[xleft]{a1}{x1d}
+  %         \xos{a2}{x2d}
+  %         \xo{a1}{xdd}
+  %         \xo{a2}{xdd}
+  %         \sync[out=15,in=165]{a1}{a2}
+  %       \end{tikzinline}}
+  % \end{gather*}
 \end{example}
 
 \begin{example}
@@ -1631,7 +1633,7 @@ As shown by the following single-threaded code, allowing this outcome would viol
   \end{gathered}
 \end{align*}
 
-It is for this reason that we use \emph{weakest} preconditions, rather than
+This is one reason that we use \emph{weakest} preconditions, rather than
 preconditions.
 % Note that as a result, we fail to validate the following
 % refinement:

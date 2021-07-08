@@ -1,109 +1,107 @@
-\begingroup
-\allowdisplaybreaks
 \begin{align*}
   \begin{gathered}
     \begin{gathered}[t]
-      \PW{x}{\aExp}
+      \mathstrut\PW{x}{\aExp}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
           \event{a}{\aExp{=}v\land\Qr{x}\land\Qw{x}\mid\DW{x}{v}}{}
           \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{\aLoc}]}{above=of a}
-          \xform{xd}{\bForm[\aExp/\aLoc][\aExp{=}\aVal/\Qw{\aLoc}]}{below=of a}
+          \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{\aLoc}]}{below=of a}
           \xos{a}{xd}
-        \end{tikzinline}}
+        \end{tikzinlinesmall}}
     \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
       \PW[\mREL]{x}{\aExp}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
           \raevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\mid\DW[\mREL]{x}{v}}{}
-          \xform{xi}{\bForm[\FALSE/\Qw{x}]}{above=of a}
-          \xform{xd}{\bForm\land \aExp{=}\aVal}{below=of a}
+          \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{x}]}{above=of a}
+          \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{x}]}{below=of a}
           \xos{a}{xd}
-        \end{tikzinline}}
+        \end{tikzinlinesmall}}
     \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
       \PW[\mSC]{x}{\aExp}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
           \scevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\land\Qsc \mid\DW[\mSC]{x}{v}}{}
-          \xform{xi}{\bForm[\FALSE/\Qw{x}][\FALSE/\Qsc]}{above=of a}
-          \xform{xd}{\bForm\land \aExp{=}\aVal}{below=of a}
+          \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{x}][\FALSE/\Qsc]}{above=of a}
+          \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{x}][(\aExp{=}\aVal\land \Qsc)/\Qsc]}{below=of a}
           \xos{a}{xd}
-        \end{tikzinline}}
+        \end{tikzinlinesmall}}
     \end{gathered}
   \end{gathered}
   &&
+  \mkern-60mu
   \begin{gathered}
     \begin{gathered}[t]
-      \PR{x}{r}
+      \mathstrut\PR{x}{r}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
           \event{a}{\Qw{x}\mid\DR{x}{v}}{}
-          \xform{xi}{\bForm[\FALSE/\Qr{x}]}{above=of a}
+          \xform{xi}{\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies \bForm[\FALSE/\Qr{x}]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xos{a}{xd}
-        \end{tikzinline}}
+        \end{tikzinlinesmall}}
     \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
       \PR[\mACQ]{x}{r}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
           \raevent{a}{\Qw{x}\mid\DR[\mACQ]{x}{v}}{}
-          \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
+          \xform{xi}{\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xos{a}{xd}
-        \end{tikzinline}}
+        \end{tikzinlinesmall}}
     \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
       \PR[\mSC]{x}{r}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
           \scevent{a}{\Qw{x}\land\Qsc\mid\DR[\mSC]{x}{v}}{}
-          \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
+          \xform{xi}{\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xos{a}{xd}
-        \end{tikzinline}}
+        \end{tikzinlinesmall}}
     \end{gathered}
   \end{gathered}
   &&
   \begin{gathered}
       \begin{gathered}[t]
-        \PF{\fREL}
+        \mathstrut\smash{\PF{\fREL}}
         \\
-        \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
             \raevent{a}{\Qr{*}\land\Qw{*}\mid\DF{\fREL}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xos[xright]{a}{xd}
-          \end{tikzinline}}
+          \end{tikzinlinesmall}}
       \end{gathered}      
     \\[1ex]
       \begin{gathered}[t]
-        \PR[\fACQ]{x}{r}
+        \PF{\fACQ}
         \\
-        \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qw{x}\land\Qr{*}\mid\DR[\fACQ]{x}{v}}{}
+        \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+            \raevent{a}{\Qr{*}\mid\DR[\fACQ]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xos[xright]{a}{xd}
-          \end{tikzinline}}
+          \end{tikzinlinesmall}}
       \end{gathered}
     \\[1ex]
     \begin{gathered}[t]
       \PF{\fSC}
       \\
-      \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
           \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DF{\mSC}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm}{below=of a}
           \xos[xright]{a}{xd}
-        \end{tikzinline}}
+        \end{tikzinlinesmall}}
     \end{gathered}
   \end{gathered}
 \end{align*}
-\endgroup

@@ -338,148 +338,6 @@ semantics permits \ref{RP}:
 
 
 
-These following examples are from \cite{promising-ldrf}.
-
-\ref{CDRF} shows that \PwT{} semantics is not too permissive for $\mRA$-\RMW{}s.
-But what about $\mRLX$-\RMW{}s.  The following execution is allowed by \armeight,
-and \PS{2.0}, but disallowed by \PS{2.1}.
-\begin{gather*}
-  \taglabel{RMW-W}
-  \begin{gathered}
-    \PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \PW{y}{1}
-    \PAR
-    \PR{y}{r}\SEMI \PFADD[\mRLX][\mRLX]{x}{s}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=2em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a1b}{\DW{x}{2}}{below=1em of a1}
-        \event{a2}{\DW{y}{1}}{right=of a1}
-        \event{b1}{\DR{y}{1}}{right=3em of a2}
-        \event{b2}{\DR{x}{0}}{right=of b1}
-        \event{b2b}{\DW{x}{1}}{below=1em of b2}
-        \rmw{a1}{a1b}
-        \rmw{b2}{b2b}
-        \rf{a2}{b1}
-        \po{b1}{b2b}
-        \rf[out=-175,in=-20]{b2b}{a1}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-
-If this $\ldrfra{z}$?
-\begin{gather*}
-  \taglabel{Naive-LDRF-RA-Fail}
-  \begin{gathered}
-    \IF{y}\THEN \PW{x}{z} \ELSE \PW{x}{1} \FI
-    \PAR
-    \PR{x}{r}\SEMI \PW{z}{1}\SEMI \PW{y}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=2em]
-        \event{a1}{\DR{y}{1}}{}
-        \event{a2}{\DR{z}{1}}{right=of a1}
-        \event{a3}{\DW{x}{1}}{right=of a2}
-        \event{b1}{\DR{x}{1}}{right=3em of a3}
-        \event{b2}{\DW{z}{1}}{right=of b1}
-        \event{b3}{\DW{y}{1}}{right=of b2}
-        \po{a2}{a3}
-        \po[in=165,out=15]{b1}{b3}
-        \rf[out=-165,in=-15]{b2}{a2}
-        \rf[out=-165,in=-15]{b3}{a1}
-        \rf{a3}{b1}
-      \end{tikzinline}}
-  \end{gathered}
-\intertext{Interpreting $\{z\}$ as $\mRA$:}
-    \\
-  \begin{gathered}
-    \hbox{\begin{tikzinline}[node distance=2em]
-        \event{a1}{\DR{y}{1}}{}
-        \event{a2}{\DR[\mACQ]{z}{1}}{right=of a1}
-        \event{a3}{\DW{x}{1}}{right=of a2}
-        \event{b1}{\DR{x}{1}}{right=3em of a3}
-        \event{b2}{\DW[\mREL]{z}{1}}{right=of b1}
-        \event{b3}{\DW{y}{1}}{right=of b2}
-        \po{a2}{a3}
-        \po[in=165,out=15]{b1}{b3}
-        \rf[out=-165,in=-15]{b2}{a2}
-        \rf[out=-165,in=-15]{b3}{a1}
-        \rf{a3}{b1}
-        \sync{a1}{a2}
-        \sync{b2}{b3}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-
-\PwT{} disallows \ref{LDRF-Fail-PS}, which is similar to \ref{OOTA4}.
-\begin{gather*}  
-  \taglabel{LDRF-Fail-PS}
-  \begin{gathered}
-  \IF{x}\THEN
-    \PFADD{w}{}{1}\SEMI
-    \PW{y}{1}\SEMI
-    \PW{z}{1}
-  \FI
-  \PAR
-  \IF{\BANG z}\THEN
-    \PW{x}{1}
-  \ELSE
-    \IF{\BANG \PFADD{w}{}{1}}\THEN
-      \PW{x}{\PR{y}{}}
-    \FI
-  \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=2em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a2}{\DR{w}{1}}{right=of a1}
-        \event{a3}{\DW{w}{2}}{right=of a2}
-        \event{a4}{\DW{y}{1}}{right=of a3}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=5em of a5}
-        \event{b2}{\DR{w}{0}}{right=of b1}
-        \event{b3}{\DW{w}{1}}{right=of b2}
-        \event{b4}{\DR{y}{1}}{right=of b3}
-        \event{b5}{\DW{x}{1}}{right=of b4}
-        \rmw{a2}{a3}
-        \po[out=15,in=165]{a1}{a3}
-        \po[out=15,in=165]{a1}{a4}
-        \po[out=15,in=165]{a1}{a5}        
-        \rmw{b2}{b3}
-        \po{b4}{b5}
-        \po[out=15,in=165]{b2}{b5}        
-        \po[out=15,in=165]{b1}{b3}
-        \rf{a5}{b1}
-        \rf[out=15,in=165]{a4}{b4}
-        \rf[out=-165,in=-15]{b3}{a2}
-        \rf[out=-165,in=-15]{b5}{a1}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-\begin{gather}
-  \taglabel{OOTA4}
-  \begin{gathered}
-    \PW{y}{x}
-    \PAR
-    \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
-    \PAR
-    \PW{b}{1}
-    \\[-1ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx}{\DR{x}{1}}{}
-        \event{wy}{\DW{y}{1}}{right=of rx}
-        \po{rx}{wy}
-        \event{ry}{\DR{y}{1}}{right=3em of wy} 
-        \event{wx}{\DW{x}{1}}{right=of ry}
-        \event{wz}{\DW{z}{1}}{right=of wx}
-        \event{rb}{\DR{b}{1}}{right=of wz}
-        \event{wb1}{\DW{b}{1}}{right=3em of rb}
-        \po{ry}{wx}
-        \rf{wb1}{rb}
-        \rf{wy}{ry}
-        \rf[out=-170,in=-10]{wx}{rx}
-        \po{rb}{wz}
-        \po[out=15,in=165]{ry}{wz}
-      \end{tikzinline}}
-  \end{gathered}  
-\end{gather}
 \begin{example}
   This definition ensures atomicity, disallowing executions such as
   \cite[Ex.~3.2]{DBLP:journals/pacmpl/PodkopaevLV19}:
@@ -726,6 +584,151 @@ This is allowed by \weakestmo{}, but not \PS{}.
 These candidate executions are invalid, due to cycles.
 
 \endinput
+
+These following examples are from \cite{promising-ldrf}.
+
+\ref{CDRF} shows that \PwT{} semantics is not too permissive for $\mRA$-\RMW{}s.
+But what about $\mRLX$-\RMW{}s.  The following execution is allowed by \armeight,
+and \PS{2.0}, but disallowed by \PS{2.1}.
+\begin{gather*}
+  \taglabel{RMW-W}
+  \begin{gathered}
+    \PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \PW{y}{1}
+    \PAR
+    \PR{y}{r}\SEMI \PFADD[\mRLX][\mRLX]{x}{s}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a1b}{\DW{x}{2}}{below=1em of a1}
+        \event{a2}{\DW{y}{1}}{right=of a1}
+        \event{b1}{\DR{y}{1}}{right=3em of a2}
+        \event{b2}{\DR{x}{0}}{right=of b1}
+        \event{b2b}{\DW{x}{1}}{below=1em of b2}
+        \rmw{a1}{a1b}
+        \rmw{b2}{b2b}
+        \rf{a2}{b1}
+        \po{b1}{b2b}
+        \rf[out=-175,in=-20]{b2b}{a1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+If this $\ldrfra{z}$?
+\begin{gather*}
+  \taglabel{Naive-LDRF-RA-Fail}
+  \begin{gathered}
+    \IF{y}\THEN \PW{x}{z} \ELSE \PW{x}{1} \FI
+    \PAR
+    \PR{x}{r}\SEMI \PW{z}{1}\SEMI \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DR{y}{1}}{}
+        \event{a2}{\DR{z}{1}}{right=of a1}
+        \event{a3}{\DW{x}{1}}{right=of a2}
+        \event{b1}{\DR{x}{1}}{right=3em of a3}
+        \event{b2}{\DW{z}{1}}{right=of b1}
+        \event{b3}{\DW{y}{1}}{right=of b2}
+        \po{a2}{a3}
+        \po[in=165,out=15]{b1}{b3}
+        \rf[out=-165,in=-15]{b2}{a2}
+        \rf[out=-165,in=-15]{b3}{a1}
+        \rf{a3}{b1}
+      \end{tikzinline}}
+  \end{gathered}
+\intertext{Interpreting $\{z\}$ as $\mRA$:}
+    \\
+  \begin{gathered}
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DR{y}{1}}{}
+        \event{a2}{\DR[\mACQ]{z}{1}}{right=of a1}
+        \event{a3}{\DW{x}{1}}{right=of a2}
+        \event{b1}{\DR{x}{1}}{right=3em of a3}
+        \event{b2}{\DW[\mREL]{z}{1}}{right=of b1}
+        \event{b3}{\DW{y}{1}}{right=of b2}
+        \po{a2}{a3}
+        \po[in=165,out=15]{b1}{b3}
+        \rf[out=-165,in=-15]{b2}{a2}
+        \rf[out=-165,in=-15]{b3}{a1}
+        \rf{a3}{b1}
+        \sync{a1}{a2}
+        \sync{b2}{b3}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+\PwT{} disallows \ref{LDRF-Fail-PS}, which is similar to \ref{OOTA4}.
+\begin{gather*}  
+  \taglabel{LDRF-Fail-PS}
+  \begin{gathered}
+  \IF{x}\THEN
+    \PFADD{w}{}{1}\SEMI
+    \PW{y}{1}\SEMI
+    \PW{z}{1}
+  \FI
+  \PAR
+  \IF{\BANG z}\THEN
+    \PW{x}{1}
+  \ELSE
+    \IF{\BANG \PFADD{w}{}{1}}\THEN
+      \PW{x}{\PR{y}{}}
+    \FI
+  \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{w}{1}}{right=of a1}
+        \event{a3}{\DW{w}{2}}{right=of a2}
+        \event{a4}{\DW{y}{1}}{right=of a3}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \event{b1}{\DR{z}{1}}{right=5em of a5}
+        \event{b2}{\DR{w}{0}}{right=of b1}
+        \event{b3}{\DW{w}{1}}{right=of b2}
+        \event{b4}{\DR{y}{1}}{right=of b3}
+        \event{b5}{\DW{x}{1}}{right=of b4}
+        \rmw{a2}{a3}
+        \po[out=15,in=165]{a1}{a3}
+        \po[out=15,in=165]{a1}{a4}
+        \po[out=15,in=165]{a1}{a5}        
+        \rmw{b2}{b3}
+        \po{b4}{b5}
+        \po[out=15,in=165]{b2}{b5}        
+        \po[out=15,in=165]{b1}{b3}
+        \rf{a5}{b1}
+        \rf[out=15,in=165]{a4}{b4}
+        \rf[out=-165,in=-15]{b3}{a2}
+        \rf[out=-165,in=-15]{b5}{a1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+\begin{gather}
+  \taglabel{OOTA4}
+  \begin{gathered}
+    \PW{y}{x}
+    \PAR
+    \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
+    \PAR
+    \PW{b}{1}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx}{\DR{x}{1}}{}
+        \event{wy}{\DW{y}{1}}{right=of rx}
+        \po{rx}{wy}
+        \event{ry}{\DR{y}{1}}{right=3em of wy} 
+        \event{wx}{\DW{x}{1}}{right=of ry}
+        \event{wz}{\DW{z}{1}}{right=of wx}
+        \event{rb}{\DR{b}{1}}{right=of wz}
+        \event{wb1}{\DW{b}{1}}{right=3em of rb}
+        \po{ry}{wx}
+        \rf{wb1}{rb}
+        \rf{wy}{ry}
+        \rf[out=-170,in=-10]{wx}{rx}
+        \po{rb}{wz}
+        \po[out=15,in=165]{ry}{wz}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{gather}
+
+
 \subsection{IRIW}
 Status of IRIW is unclear in our model, since we allow everything allowed by
 power...

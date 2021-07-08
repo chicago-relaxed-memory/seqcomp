@@ -1,8 +1,18 @@
+\section{Discussion}
+\label{sec:discussion}
+
 \subsection{Comparison to ``Promising Semantics'' [POPL 2017]}
 \label{sec:promising}
 
-\citet{DBLP:journals/pacmpl/JagadeesanJR20} note that the promising semantics
-(\PS{}) \cite{DBLP:conf/popl/KangHLVD17} and related models
+Recently, \citet{promising-ldrf} showed that certain combinations of compiler
+optimizations are inconsistent with local \drf{} guarantees.  All of the
+examples that prove inconsistency have the same shape: they combine read
+introduction and case analysis (aka, if-closure).  Effectively, this turns
+one read into two, where different conditional branches can be taken for the
+two copies of the read.  This is reminiscent of the type of \emph{bait and
+  switch} behavior noted by \citet{DBLP:journals/pacmpl/JagadeesanJR20}: the
+promising semantics (\PS{}) \cite{DBLP:conf/popl/KangHLVD17} and related
+models
 \citep{DBLP:conf/esop/JagadeesanPR10,DBLP:journals/pacmpl/ChakrabortyV19,Manson:2005:JMM:1047659.1040336},
 fail to validate compositional reasoning of temporal properties.  Consider
 their example \ref{oota4}:
@@ -11,7 +21,7 @@ their example \ref{oota4}:
   \begin{gathered}
     \PW{y}{x}
     \PAR
-    \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
+    \PR{y}{r} \SEMI \PR{b}{s} \SEMI\IF{s}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
     \PAR
     \PW{b}{1}
     \\[-1ex]
@@ -35,40 +45,99 @@ their example \ref{oota4}:
 \end{align}
 Under \PS{}, this outcome is allowed by \emph{baiting} with the \texttt{else}
 branch, then \emph{switching} to the \texttt{then} branch, based on a coin
-flip $(\IF{b})$.\footnote{Call the threads \texttt{s}, \texttt{t}, and
-  \texttt{u}.  To get the result in the promising semantics, first execute
-  \texttt{u} to get message \texttt{<b:1@1>}.  Then \texttt{t} promises
-  \texttt{<x:1@1>}, which it can fulfill by reading \texttt{b}$=$\texttt{0}.
-  Then execute \texttt{s} to get message \texttt{<y:1@1>}.  Then execute
-  \texttt{t}, reading \texttt{b}$=$\texttt{1} and \texttt{y}$=$\texttt{1} and
-  fulfill the promise by writing \texttt{<x:1@1>}. The execution is exactly
-  the same in our speculative semantics \cite{DBLP:conf/esop/JagadeesanPR10},
-  removing timestamps and replacing the word \emph{promise} by
-  \emph{speculation}.}
+flip $(\IF{b})$.
+% Using a combination of read introduction and case analysis,
+% the middle thread can be rewritten to:
+% \begin{displaymath}
+%   \begin{array}{l}
+%     \PR{y}{r} \SEMI \IF{b}\THEN\\
+%     \quad \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI\\
+%     \ELSE\\
+%     \quad \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI\\
+%     \FI
+%   \end{array}
+% \end{displaymath}
+% \footnote{Call the threads \texttt{s}, \texttt{t}, and
+%   \texttt{u}.  To get the result in the promising semantics, first execute
+%   \texttt{u} to get message \texttt{<b:1@1>}.  Then \texttt{t} promises
+%   \texttt{<x:1@1>}, which it can fulfill by reading \texttt{b}$=$\texttt{0}.
+%   Then execute \texttt{s} to get message \texttt{<y:1@1>}.  Then execute
+%   \texttt{t}, reading \texttt{b}$=$\texttt{1} and \texttt{y}$=$\texttt{1} and
+%   fulfill the promise by writing \texttt{<x:1@1>}. The execution is exactly
+%   the same in our speculative semantics \cite{DBLP:conf/esop/JagadeesanPR10},
+%   removing timestamps and replacing the word \emph{promise} by
+%   \emph{speculation}.}
+% \citet[Fig.~8]{DBLP:journals/toplas/Lochbihler13} notes that such violations
+% of temporal reasoning could result in violations of the Java security
+% architecture.
 
 Under all variants of \PwT{}, this outcome is disallowed, due to a cycle in
 ${\rrfx}\cup{\lt}$. (Note that all reads cross threads in the example, so
 there is no difference between \PwTmca{1} and \PwTmca{2}.)
 
-\citet[Fig.~8]{DBLP:journals/toplas/Lochbihler13} notes that such violations
-of temporal reasoning could result in violations of the Java security
-architecture.
+The examples in \cite{promising-ldrf} are more complex.  Here is one, dubbed
+\textsc{ldrf-fail-ps}:
+\begin{gather*}  
+  %\taglabel{LDRF-Fail-PS}
+  \begin{gathered}
+  \IF{x}\THEN
+    \PFADD{w}{}{1}\SEMI
+    \PW{y}{1}\SEMI
+    \PW{z}{1}
+  \FI
+  \PAR
+  \IF{\BANG z}\THEN
+    \PW{x}{1}
+  \ELSE
+    \IF{\BANG \PFADD{w}{}{1}}\THEN
+      \PW{x}{\PR{y}{}}
+    \FI
+  \FI
+    \\
+    \hbox{\begin{tikzinlinesmall}[node distance=2em]
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{w}{1}}{right=of a1}
+        \event{a3}{\DW{w}{2}}{right=of a2}
+        \event{a4}{\DW{y}{1}}{right=of a3}
+        \event{a5}{\DW{z}{1}}{right=of a4}
+        \event{b1}{\DR{z}{1}}{right=5em of a5}
+        \event{b2}{\DR{w}{0}}{right=of b1}
+        \event{b3}{\DW{w}{1}}{right=of b2}
+        \event{b4}{\DR{y}{1}}{right=of b3}
+        \event{b5}{\DW{x}{1}}{right=of b4}
+        \rmw{a2}{a3}
+        \po[out=15,in=165]{a1}{a3}
+        \po[out=15,in=165]{a1}{a4}
+        \po[out=15,in=165]{a1}{a5}        
+        \rmw{b2}{b3}
+        \po{b4}{b5}
+        \po[out=15,in=165]{b2}{b5}        
+        \po[out=15,in=165]{b1}{b3}
+        \rf{a5}{b1}
+        \rf[out=15,in=165]{a4}{b4}
+        \rf[out=-165,in=-15]{b3}{a2}
+        \rf[out=-165,in=-15]{b5}{a1}
+      \end{tikzinlinesmall}}
+  \end{gathered}
+\end{gather*}
+This execution is allowed by \PS{} and disallowed by \PwTmca{}.
+
 
 The difference between \PS{} and \PwT{} can be understood in terms of the
 valid program transformations.  \PS{} allows reads to be introduced, with
-subsequent case analysis (aka, if-closure) on the value read---effectively,
-this can turn one read into two, with different conditional branches taken
-for the two copies of the read.  For detailed examples, see
-\cite{promising-ldrf}.
+subsequent case analysis on the value read.  \PwT{} validates case analysis,
+but invalidates read introduction.  In return, \PwT{} enjoys compositionality
+for temporal safety properties, as discussed in \textsection\ref{sec:results}
+and \cite[\textsection6]{DBLP:journals/pacmpl/JagadeesanJR20}.
 
-\PwT{} invalidates read introduction.  In return, \PwT{} enjoys
-compositionality for temporal safety properties, as discussed in
-\textsection\ref{sec:results} and
-\cite[\textsection6]{DBLP:journals/pacmpl/JagadeesanJR20}.
+\citet{promising-ldrf} show that by restricting \RMW{}-store reorderings, one
+can establish local \drf{} for \PS{}.  We believe that no such restriction is
+required for \PwT{}.
 
-This difference highlights the subtle tensions in relaxed memory models.
-It is not possible to have everything one wants, thus, one is forced
-to choose which optimizations and reasoning principles are most important.
+These differences highlight the subtle tensions between compiler optimizations
+and program logics that are revealed by relaxed memory models.  It is not
+possible to have everything one wants, thus, one is forced to choose which
+optimizations and reasoning principles are most important.
 
 % \todo{Write this.}
 
@@ -183,8 +252,8 @@ disjunction, even assuming that the prime operations do:\footnote{%
 See also \textsection\ref{sec:ex:assoc}.
 
 The substitutions collapse $\aLoc$ and $\aReg$, allowing local invariant
-reasoning (\xLIR{}), as required by \jmm{} causality test case 1, discussed at the end of
-\textsection\ref{sec:ex:control}.  Without Skolemizing it is necessary to
+reasoning (\xLIR{}), as required by \jmm{} causality test case 1, discussed in
+\textsection\ref{sec:q}.  Without Skolemizing it is necessary to
 substitute $[\aLoc/\aReg]$, since the reverse substitution $[\aReg/\aLoc]$ is
 useless when $\aReg$ is bound---compare with
 \textsection\ref{sec:substitutions}.  As discussed below (\ref{p:downset}),
@@ -278,18 +347,6 @@ is $[0/r][0/x]$, resulting in:
 \end{align*}
 
 
-\myparagraph{Augmentation of Preconditions}
-\jjr{} allows augmentation of preconditions.
-As discussed in \textsection\ref{sec:delay}, this causes associativity to fail
-for $\rdelay$, at least when attempting to validate \reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2}
-Thus, we use \emph{weakest} preconditions, rather than general preconditions.
-As a result, we fail to validate the following
-refinement:
-\begin{math}
-  \aPSS_1
-  \not\supseteq
-  \xIFTHEN{\aForm}{\aPSS_1}{}.
-\end{math}
 
 \myparagraph{Consistency}
 \jjr{} imposes \emph{consistency}, which requires that for every pomset
@@ -608,7 +665,7 @@ the final value of $y$ is $2$.  This execution is allowed by \armeight{} and
       % \coe[out=-165,in=-15]{e}{a}
     \end{tikzinline}}
 \end{gather*}
-We discussed two approaches to this problem in \textsection\ref{sec:arm}.
+We discuss two approaches to this problem in \textsection\ref{sec:arm}.
 % The solution we have adopted is to allow an acquiring read to be downgraded
 % to a relaxed read when it is preceded (sequentially) by a relaxed write that
 % could fulfill it.  This solution allows executions that are not allowed under
@@ -624,8 +681,8 @@ We discussed two approaches to this problem in \textsection\ref{sec:arm}.
 \myparagraph{Redundant Read Elimination}
 
 Contrary to the claim, redundant read elimination fails for \jjr{}.
-We discussed redundant read elimination in \textsection\ref{sec:semreg}.
-Consider JMM Causality Test Case 2, which we discussed there.
+We discuss redundant read elimination in \textsection\ref{sec:semreg}.
+Consider JMM Causality Test Case 2, which we describe there.
 \begin{gather*}
   \PR{x}{r}\SEMI
   \PR{x}{s}\SEMI
@@ -701,6 +758,18 @@ case of the theorem clarifies the discussion of the \textsc{past} example
 in \jjr{};
 
 
+\myparagraph{Augmentation of Preconditions}
+\jjr{} allows augmentation of preconditions.
+As discussed in \textsection\ref{sec:delay}, this causes associativity to fail
+for $\rdelay$, at least when attempting to validate \reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2}
+Thus, we use \emph{weakest} preconditions, rather than general preconditions.
+As a result, we fail to validate the following
+refinement:
+\begin{math}
+  \aPSS_1
+  \not\supseteq
+  \xIFTHEN{\aForm}{\aPSS_1}{}.
+\end{math}
 
 
 

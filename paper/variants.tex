@@ -10,7 +10,10 @@ $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$.  By assumption
 $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.  The resulting semantics satisfies
 redundant read elimination.
 
-In this section we consider several mostly-orthogonal features: address
+Our approach to register recycling allows us to define a criterion for
+eliminating certain types of useless pomsets (\textsection\ref{sec:false}).
+
+In the remainder of this section we consider several mostly-orthogonal features: address
 calculation, if-closure, fences, and read-modify-write operations.  Address
 calculation and if-closure do have some interaction, and we spell out the
 combined semantics in \textsection\ref{sec:semcaaddr}.
@@ -18,7 +21,7 @@ combined semantics in \textsection\ref{sec:semcaaddr}.
 It is worth pointing out that address calculation and if-closure only affect
 the semantics of read and write.  Fences introduce new trivial actions.
 \RMW{}s require more infrastructure in order to ensure atomicity while
-compiling to \armeight{}.
+compiling to \armeight{} using load-exclusive and store-exclusive.
 
 These extensions preserve all of the program transformation discussed thus
 far, and apply equally to the various semantics we have discussed: \PwT{},
@@ -192,6 +195,121 @@ Then collapsing $r$ and $s$ and substituting the initial value of $y$ (say $0$),
     r{\neq}1
   }
 \end{displaymath}
+
+
+\subsection{Register Consistency}
+\label{sec:false}
+
+If a precondition is false, you can be pretty sure it's useless.  In this
+subsection, we develop a criterion for eliminating such useless pomsets.
+
+To achieve this, we would like to bolt a requirement into the definition of
+pomsets in order to weed out the useless ones.  Something like this:
+\begin{enumerate}
+\item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
+  $\labelingForm(\aEv)$ is satisfiable.
+\end{enumerate}
+For associativity, \eqref{pom-kappa-sat'} would in turn require
+\begin{enumerate}
+\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
+  $\aTr{}{\FALSE}\riff\FALSE$.
+\end{enumerate}
+\citet{DBLP:journals/cacm/Dijkstra75} requires exactly \ref{tr-false'}.
+Problem solved!  Unfortunately, our transformer for read actions
+\eqref{read-tau-dep} does not obey \ref{tr-false'}, since $\FALSE$ is not
+equivalent to $v{=}r\limplies\FALSE$.
+
+In this subsection, we refine these requirements into ones that do hold.  The
+main insight is to pull values for registers from the labels of pomset itself.
+%
+% \eqref{tr-false'} is too strong.
+% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
+% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
+% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
+% for some $\aVal$.
+% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
+% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
+% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
+%
+% We require the following:
+% \begin{enumerate}
+% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
+%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
+% \end{enumerate}
+%
+% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
+% for both reads):
+% \begin{gather*}
+%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
+%   \\
+%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
+%   \lor  
+%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
+% \end{gather*}
+%
+Thus, we define $\regForm{\labeling}$ to capture the \emph{register state} of a pomset.
+\begin{definition}  
+  \label{def:labeling:consistent}
+  Let 
+  \begin{math}
+    \regForm{\labeling}=
+    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
+    \textwhere \aEvs=\fdom(\labeling)
+  \end{math}.
+  
+  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
+  We say that it is \emph{$\labeling$-inconsistent} otherwise.
+\end{definition}
+
+
+%tau maps (things incompatible with chi) to (things incompatible with chi)
+Using this, we define the constraint on predicate transformers that we want.
+We also need to update the definition of predicate transformer families to
+carry the labeling.
+\begin{definition}
+  \label{def:trans'}
+  A \emph{$\labeling$-predicate transformer} is a %monotone
+  function
+  $\aTr{}{}:\Formulae\fun\Formulae$ such that
+  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
+  % \item \label{tr-implies'}
+  %   \labeltextXX{2}{x}{tr-and'}
+  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
+  \item[\eqref{tr-implies}]
+    \eqref{tr-and}\;
+    \eqref{tr-or}\; as in \refdef{def:trans},
+  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
+    % \item[\eqref{tr-false}]
+    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+  \end{enumerate}
+
+  \label{def:family'}
+  A \emph{family of $\labeling$-predicate transformers} over consists of a
+  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
+  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
+  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
+
+  
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \setcounter{enumi}{\value{Btau}}
+  \item \label{pom-tau'}
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
+  \end{enumerate}
+\end{definition}
+
+Given these definitions, we can add the following requirement to the model,
+which enables us to prune pomsets that include $\labeling$-inconsistent
+preconditions.
+\begin{enumerate}
+% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
+%   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+\item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
+  $\labelingForm(\aEv)$ is $\labeling$-consistent.
+\end{enumerate}
+
+
+
+
 
 
 \subsection{Address Calculation}
@@ -543,9 +661,9 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
     \end{enumerate}
   \end{enumerate}
 
-  Extend the definition of $\sSEMI{}{}$ and $\sIF{}{}{}$ to include:
+  Extend the definition of $\sSEMI{}{}$, $\sIF{}{}{}$ and $\sLPAR{}{}$ to include:
   \begin{enumerate}
-  \item[(\textsc{s}10)] (\textsc{i}10)\; % (\textsc{p}10)\; 
+  \item[(\textsc{s}10)] (\textsc{i}10)\; (\textsc{p}10)\; 
     ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
   \end{enumerate}
 \end{definition}
