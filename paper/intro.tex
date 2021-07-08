@@ -44,11 +44,11 @@ calculate dependencies for a Java-like language on multicopy-atomic (\mca{}) har
 \armeight{} \cite{DBLP:journals/pacmpl/PulteFDFSS18}.  However, neither paper
 treated sequential composition as a first-class citizen.  \MRD{} encoded
 sequential composition using continuation-passing, and \PwP{} used prefixing,
-adding one event at a time on the left.  In both cases, the approaches
-require perfect knowledge of the future.
+adding one event at a time on the left.  In both cases, adding an event
+requires perfect knowledge of the future.
 
 In this paper, we show that \PwP{} can be extended with \emph{families of
-  predicate transformers (\PwT{})} to calculate sequential dependencies in a way that
+  predicate transformers} (\PwT{}) to calculate sequential dependencies in a way that
 is \emph{compositional} and \emph{direct}: \emph{compositional} in that the
 denotation of $(\aCmd_1\SEMI \aCmd_2)$ can be computed from the denotation of
 $\aCmd_1$ and the denotation of $\aCmd_2$, and \emph{direct} in that these
@@ -58,15 +58,16 @@ denotation of $(\aCmd_1\SEMI (\aCmd_2\SEMI \aCmd_3))$.  It also validates
 expected laws concerning the interaction of sequencing and conditional
 execution.
 
-To manage complexity, we have layered the definitions.  After an overview, we
-define sequential dependencies in \textsection\ref{sec:model}.  The next two
-sections add concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
+To manage complexity, we have layered the definitions.  After an overview and
+discussion of related work, we
+define sequential dependencies in \textsection\ref{sec:model}.  We then add
+concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
 which provides a Java-like model for \mca{} hardware, similar to that of
-\citet{DBLP:journals/pacmpl/JagadeesanJR20}.  In
-\textsection\ref{sec:results}, we summarize the results for this model. In \textsection\ref{sec:c11},
+\citet{DBLP:journals/pacmpl/JagadeesanJR20};
+\textsection\ref{sec:results} summarizes the results for this model. In \textsection\ref{sec:c11},
 we define \PwTc{}, which models \cXI, adapting the approach of
-\citet{DBLP:conf/esop/PaviottiCPWOB20}.  In \textsection\ref{sec:tool} we 
-provide a tool for automatic evaluation of litmus tests.  In \textsection\ref{sec:additional},
+\citet{DBLP:conf/esop/PaviottiCPWOB20};  \textsection\ref{sec:tool} 
+describes a tool for automatic evaluation of litmus tests.  In \textsection\ref{sec:additional},
 we extend the semantics to include additional features, such as address
 calculation.  
 
@@ -186,12 +187,12 @@ context. Note that \ref{wp-let} is sound because a read from a thread-local
 register must be fulfilled by a preceding write in the same thread.
 In a concurrent context, with shared variables
 ($\aLoc$--$\cLoc$), the obvious generalization
-\begin{multicols}{2}
+%\begin{multicols}{2}
 \begin{itemize}
-\item[{\labeltext[\textsc{d}2b]{(\textsc{d}2b)}{wp-write}}] $\fwp{\LET{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
-\item[{\labeltext[\textsc{d}2c]{(\textsc{d}2c)}{wp-read}}] $\fwp{\LET{\aReg}{\aLoc}}{\bForm} = \bForm[\aLoc/\aReg]$
+\item[{\labeltext[\textsc{d}2a]{(\textsc{d}2a)}{wp-write}}] $\fwp{\LET{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
+\item[{\labeltext[\textsc{d}2b]{(\textsc{d}2b)}{wp-read}}] $\fwp{\LET{\aReg}{\aLoc}}{\bForm} = \bForm[\aLoc/\aReg]$
 \end{itemize}
-\end{multicols}
+%\end{multicols}
 \noindent
 is unsound!  In particular, a read from a shared memory location may be fulfilled by a write
 in another thread, invalidating \ref{wp-read}.  (We assume that expressions

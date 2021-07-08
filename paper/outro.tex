@@ -10,7 +10,7 @@ approach of showing continuity for all the semantic operations with respect
 to set inclusion would go through. \citet{DBLP:conf/esop/PaviottiCPWOB20} use
 step-indexing to account for loops; a similar approach could be applied here.
 
-We've also not handled access elimination: store-forwarding and
+\PwTmca{} does not validate access elimination: store-forwarding and
 dead-write-removal are unsound.  We expect that these can be validated by
 allowing events with different labels to merge in some instances.
 
