@@ -756,9 +756,7 @@ cache, thus clobbering preceding writes.  With $[r/x]$, reads clobber the
 cache, whereas without the substitution, they do not.  Since most caches work
 this way, the model with $[r/x]$ is likely preferred for modeling hardware.
 However, this substitution only makes sense in a model with read-read
-coherence and read-read dependencies, which we will see is not the case for Arm.  By
-leaving out the substitution, we also ensure that downgraded reads are
-fulfilled by preceding writes, not reads.
+coherence and read-read dependencies, which is not the case for \armeight{}.  
 
 
 

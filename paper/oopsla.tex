@@ -15,7 +15,7 @@ promising semantics (\PS{}) \cite{DBLP:conf/popl/KangHLVD17} and related
 models
 \citep{DBLP:conf/esop/JagadeesanPR10,DBLP:journals/pacmpl/ChakrabortyV19,Manson:2005:JMM:1047659.1040336},
 fail to validate compositional reasoning of temporal properties.  Consider
-their example \ref{oota4}:
+example \ref{oota4} from \cite{DBLP:journals/pacmpl/JagadeesanJR20}:
 \begin{align}
   \taglabel{oota4}
   \begin{gathered}
@@ -127,8 +127,7 @@ The difference between \PS{} and \PwT{} can be understood in terms of the
 valid program transformations.  \PS{} allows reads to be introduced, with
 subsequent case analysis on the value read.  \PwT{} validates case analysis,
 but invalidates read introduction.  In return, \PwT{} enjoys compositionality
-for temporal safety properties, as discussed in \textsection\ref{sec:results}
-and \cite[\textsection6]{DBLP:journals/pacmpl/JagadeesanJR20}.
+for temporal safety properties, as discussed in \textsection\ref{sec:results}.
 
 \citet{promising-ldrf} show that by restricting \RMW{}-store reorderings, one
 can establish local \drf{} for \PS{}.  We believe that no such restriction is
@@ -136,7 +135,7 @@ required for \PwT{}.
 
 These differences highlight the subtle tensions between compiler optimizations
 and program logics that are revealed by relaxed memory models.  It is not
-possible to have everything one wants, thus, one is forced to choose which
+possible to have everything one wants. Thus, one is forced to choose which
 optimizations and reasoning principles are most important.
 
 % \todo{Write this.}
