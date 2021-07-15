@@ -115,6 +115,8 @@ $\mREL$,
 $\mACQ$,
 %$\mRA$,
 $\mSC$.
+In examples, the default mode for reads and writes is $\mRLX$---we
+systematically drop the annotation. 
 
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs. Following
@@ -168,7 +170,7 @@ We require that
 \begin{itemize}
 \item formulae include $\TRUE$, $\FALSE$, $\Q{\aLoc}$, and the equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
 \item formulae are closed under $\lnot$, $\land$, $\lor$, $\limplies$, and
-  substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$, $[\aForm/\Q{\aLoc}]$
+  substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$, $[\aForm/\Q{\aLoc}]$,
 \item there is a relation $\rimpliesdef$ between
   formulae, capturing entailment, %\subseteq(\Formulae\times\Formulae)$ %
 \item $\rimpliesdef$ has the expected semantics for $=$, $\lnot$,
@@ -179,8 +181,10 @@ We require that
 % \item there are two subsets of $\Act$, distinguishing
 %   $\sreaddef$ and $\sreleasedef$ actions,
 \item there are four binary relations over $\Act\times\Act$:
-  $\roverlapsdef$, $\rmatchesdef$, $\rblocksdef$, and $\rdelays$.
+  %$\rdelaysdef$, $\rmatchesdef$, $\rblocksdef$, $\roverlapsdef$, and.
+  $\rdelaysdef$ and ${\rmatchesdef}\subseteq{\rblocksdef}\subseteq{\roverlapsdef}$.
 \end{itemize}
+%We require that $\rmatches\subseteq\rblocks\subseteq\roverlaps$.
 
 Logical formulae include equations over registers and memory references, such as
 $(\aReg{=}\bReg{+}1)$ and $(\aLoc{=}1)$.
@@ -280,8 +284,6 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
   % Actions $\DWP[\gemode\mREL]{}{}$ and $\DFP{\gemode\fREL}$ are
   % $\sreleasedef$ actions.
 
-  We say $\aAct \roverlapsdef \bAct$ if they access the same location.
-  
   We say $\aAct \rmatchesdef \bAct$ if $\aAct=\DWP{\aLoc}{\aVal}$ and $\bAct=\DRP{\aLoc}{\aVal}$.
   % We say $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
   % Action $\DWP{\aLoc}{\aVal} \rmatchesdef \DRP{\aLoc}{\bVal}$ when $\aVal=\bVal$.
@@ -290,6 +292,8 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
   % We say $\DWP{\aLoc}{\aVal} \rblocksdef \DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
   % Action $\DWP{\aLoc}{\aVal} \rblocksdef \DRP{\aLoc}{\bVal}$, for any $\aVal$, $\bVal$.
 
+  We say $\aAct \roverlapsdef \bAct$ if they access the same location, regardless of whether they read or write.
+  
   % Let two actions \emph{overlap} if they access the same location.
   % We say $\aAct \roverlapsdef \bAct$ if they access the same location.
   Let ${\eqreorderco}$ capture write-write, read-write coherence:
@@ -389,14 +393,14 @@ preconditions.  Thus more order means weaker preconditions.
 Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
 We give the semantics of programs $\sembase{}$ in \reffig{fig:seq}.
 % Let $\Pom$ be the set of all pomsets.
-
+%
 The model has $6$ components, which can be daunting at first glance.  To aid
 the reader, we use consistent numbering throughout. For example, item $6$
 always refers to the order relation.
 
 The core of the model is a pomset, which includes a set of events
 \eqref{pom-E}, a labeling \eqref{pom-lambda}, and an order \eqref{pom-le}.
-
+%
 On top of this basic structure, \ref{pom-kappa}--\ref{pom-term} add a layer
 of logic.  For each pomset, \ref{pom-term} provides a termination condition.
 For each event in a pomset, \ref{pom-kappa} provides a precondition.  For
@@ -735,7 +739,7 @@ Thus
 contains a complete pomset with exactly one event: $\DWP{x}{1}$.  To
 construct this pomset, we take the singleton from the left and the empty set
 from the right.  This is a general principle: for code that contributes no
-event at top-level, use the empty set.
+events at top-level, use the empty set.
 
 \subsection{Preconditions, Predicate Transformers, and Data Dependencies}
 \label{sec:ex:data}
@@ -748,7 +752,7 @@ requires that every precondition $\labelingForm(\aEv)$ is a tautology.  Using
 \begin{math}
   \sembase{\PW{x}{2}}
 \end{math}
-cannot include a pomset with event $\DWP{x}{3}$, since $2{=}3$ is not a
+cannot include a complete pomset with event $\DWP{x}{3}$, since $2{=}3$ is not a
 tautology.  The symbols $\Q{\aLoc}$ that occur in \ref{read-kappa} and
 \ref{write-tau} serve similar purpose.  We defer discussion of these until
 \textsection\ref{sec:q}.
@@ -814,10 +818,10 @@ discuss address dependencies in \textsection\ref{sec:addr}.)
 The rules track dependencies.  We discuss data dependencies \eqref{write-kappa}
 here and control dependencies \eqref{if-kappa} in
 \textsection\ref{sec:ex:control}.  Unless otherwise noted, we assume pomsets
-are \emph{complete} and \emph{augment-minimal}.  We do not discuss
-\ref{seq-kappa} further.  It simply ensures that all writes are
-present before a release, even for incomplete pomsets (see
-\textsection\ref{sec:ex:term}).
+are \emph{complete} and \emph{augment-minimal}.  % We do not discuss
+% \ref{seq-kappa} further.  It simply ensures that all writes are
+% present before a release, even for incomplete pomsets (see
+% \textsection\ref{sec:ex:term}).
 
 A simple example of a data dependency is a pomset
 $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$.  If $\aPS$ is complete, it must have
@@ -905,7 +909,7 @@ be a tautology at top-level.  There are two possibilities.
 \item If $\bEv\not\le\aEv$ then we apply the independent transformer and
   $\aForm=((x{=}r\lor1{=}r)\limplies r{=}1)$.  Under the assumption that $r$
   is bound, this is logically equivalent to $(x{=}1)$. (We make this more
-  precise in \textsection\ref{sec:semreg}.)
+  precise in \textsection\ref{sec:false}.)
 \end{itemize}
 Eliding transformers, the two outcomes are:
 \begin{align*}
@@ -958,7 +962,7 @@ resulting in the tautology $(1{=}1)$.
 
 
 Now suppose that $\aVal\neq\bVal$ in \eqref{eq2}.  Again there are two
-possibilities, where we take $\aVal=0$ and $\bVal=1$:
+possibilities. Taking $\aVal{=}0$ and $\bVal{=}1$:
 \begin{align*}
   \begin{gathered}
     \PR{x}{r}\SEMI \PW{y}{r}
@@ -1095,21 +1099,33 @@ For example:
     \IF{r{=}1}\THEN\PW{y}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{r{=}1\limplies\bForm[1/y]}{}
+        \xform{xd}{\aTr[2]{\{\aEv\}}{\bForm}}{}
         \eventr{\aEv}{a2}{r{=}1\mid\DW{y}{\bVal}}{left=of xd}      
-        \xform{xi}{r{=}1\limplies\bForm[1/y]}{left=.5em of a2}
+        \xform{xi}{\aTr[2]{\emptyset}{\bForm}}{left=.5em of a2}
         \xo{a2}{xd}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-Reasoning as we did for \eqref{eq2} in \textsection\ref{sec:ex:data}, there are two possibilities:
+where
+\begin{math}
+  \aTr[2]{\emptyset}{\bForm}
+  \riff
+  \aTr[2]{\{\aEv\}}{\bForm}
+  \riff
+  (r{=}1\land\bForm[1/y])
+  \lor
+  (r{\neq}1\land\bForm).
+\end{math}
+As for \eqref{eq2}, there
+%Reasoning as we did for \eqref{eq2} in \textsection\ref{sec:ex:data}, there
+are two possibilities:
 \begin{align*}
   \begin{gathered}
     \PR{x}{r}\SEMI \IF{r{=}1}\THEN\PW{y}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{1}}{}
-        \eventr{\aEv}{a2}{\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
         \po{a1}{a2}
       \end{tikzinline}}    
   \end{gathered}
@@ -1119,7 +1135,7 @@ Reasoning as we did for \eqref{eq2} in \textsection\ref{sec:ex:data}, there are 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{1}}{}
-        \eventr{\aEv}{a2}{x{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{(x{=}r\lor1{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1216,6 +1232,9 @@ tautological under both $[v/r]$ and $[x/r]$.  Here $v$ is the value read, and
 $x$ tracks the ``local state'' of the variable.  This idea is borrowed from
 \cite{DBLP:journals/pacmpl/JagadeesanJR20}, which includes further examples.
 (See \textsection\ref{sec:ex:assoc} for a discussion of Skolemization.)
+\todo{Local invariant reasoning requires that we track the state of variables
+  in the logic, not just registers.  This is one reason we use predicate
+  transformers rather than simple postconditions.}
 
 Second, consider $\Q{x}$, which we motivate using the following example 
 \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}:
@@ -1249,8 +1268,8 @@ Second, consider $\Q{x}$, which we motivate using the following example
         \event{a1}{\DW{x}{1}}{}
         \event{a2}{\DR{y}{1}}{right=of a1}
         %\event{a3}{\DW{x}{0}}{right=of a2}
-        \event{a4}{\DR{x}{1}}{right=of a2}
-        \event{a5}{\aForm\mid\DW{z}{1}}{right=of a4}
+        \event{a4}{\aForm\mid\DR{x}{1}}{right=of a2}
+        \event{a5}{\DW{z}{1}}{right=of a4}
         \event{b1}{\DR{z}{1}}{right=3em of a5}
         \event{b2}{\DW{y}{1}}{right=of b1}
         %\po{a2}{a3}
@@ -1265,7 +1284,7 @@ Second, consider $\Q{x}$, which we motivate using the following example
 \end{align*}
 Note that the two branches of the conditional are the same after the first
 assignment in the else branch.  Without $\Q{x}$, the precondition $\aForm$ is
-$(1{=}r\limplies r{\neq}0)$, which is a tautology, and the execution is
+$\TRUE$, which is a tautology, and the execution is
 allowed, resulting in a violation of \drfsc.  To construct this pomset, we
 have chosen the empty pomset for $\sembase{\PW{x}{0}}$.  The constraints on
 complete pomsets do not filter out this pomset, since $\PW{x}{0}$ is in the
@@ -1273,9 +1292,9 @@ false-branch of the conditional.  The problem here is that we have forgotten
 the local state of $x$ in the false-branch of the execution.  Nonetheless, we
 are using the subsequent read.
 
-With $\Q{x}$, the precondition $\aForm$ is
-$(1{=}r\limplies (r{\neq}0 \land \Q{x}))[\FALSE/\Q{x}]$, which is
-unsatisfiable.  Intuitively, $\Q{x}$ requires that the most recent prior
+With $\Q{x}$, the precondition of $\aForm$ is $\FALSE$.
+%$\Q{x}[\FALSE/\Q{x}]$, which is unsatisfiable.
+Intuitively, $\Q{x}$ requires that the most recent prior
 write to $\aLoc$ must be in the pomset in order to read $\aLoc$.
 
 $\Q{x}$ also guarantees initialization in complete pomsets: \eqref{top-kappa}

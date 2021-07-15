@@ -38,7 +38,7 @@ $\sIF{}{}{}$.
 Rather than ensuring that there is no
 \emph{global} blocker for a sequentially fulfilled read \eqref{pom-rf-le}, we
 require only that there is no \emph{thread-local} blocker
-\eqref{seq-rf-le-rf}.
+\eqref{seq-le-rf-rf}.
 For \PwTmca{2}, internal reads don't necessarily contribute to order, and
 thus the above execution is allowed.
 
@@ -48,8 +48,9 @@ thus the above execution is allowed.
   relation $\rrfx$ that satisfies requirements \ref{pom-rf-match} and
   \ref{pom-rf-block} of \refdef{def:pwt:mca1}.
 
-  A A \PwTmca{2} is \emph{complete} if it satisfies
-  \ref{top-kappa}, \ref{top-term}, and \ref{top-rf}.
+  A \PwTmca{2} is \emph{complete} if it satisfies
+  \ref{top-kappa}, \ref{top-term}, and \ref{top-rf}---this is the same as for
+  \PwTmca{1}. 
 
   \input{fig-mca2.tex}
 \end{definition}
@@ -67,7 +68,10 @@ have $\bEv\xrfx\aEv$ and $\aEv\le\bEv$.
 % This change both allows and requires us to weaken the definition of
 % \emph{delays} to drop write-to-read order from $\eqreorderco$.
 
-With the weakening of \ref{seq-rf-le-rf}, we must be careful not to allow
+\todo{Example using \ref{seq-le-delays-rf} and \ref{seq-le-rf-rf}. To make
+  space, \reflem{lem:mca2} could move to appendix.}
+
+With the weakening of \ref{seq-le-delays}, we must be careful not to allow
 spurious pairs to be added to the $\rrfx$ relation.  Thus we add
 \ref{par-rf-extends},
 \ref{seq-rf-extends}, and
@@ -86,14 +90,16 @@ does not include
       \end{tikzinlinesmall}}}
 \end{math}, taking $\rrfx$ from the left and $\le$ from the right.
 
-\PwTmca{2} does not enforce \ref{pom-rf-le}: $\bEv\xrfx\aEv$ may not imply
-$\bEv\le\aEv$ when $\bEv$ and $\aEv$ come from different sides of a
-sequential composition.  This means that $\rrfx$ must be verified during
+% \PwTmca{2} does not enforce \ref{pom-rf-le}: $\bEv\xrfx\aEv$ may not imply
+% $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come from different sides of a
+% sequential composition.  This means that
+As a consequence of dropping \ref{pom-rf-le}, sequential $\rrfx$ must be validated during
 pomset construction, rather than post-hoc.  In \textsection\ref{sec:c11}, we
 show how to construct program order ($\rpox$) for complete pomsets using
 phantom events ($\fmrg{}$).  Using this construction, the following lemma
 gives a post-hoc verification technique for $\rrfx$.
 \begin{lemma}
+  \label{lem:mca2}
   If $\aPS\in\frf{\semmca{2}{\aCmd}}$ is complete, then
   for every $\bEv\xrfx\aEv$ either
   \begin{itemize}

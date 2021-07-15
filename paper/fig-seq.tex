@@ -142,7 +142,7 @@
     %     % \land\aExp{=}\aVal
     %   \end{math},
       \stepcounter{enumi}      
-    \item[] \labeltext[\textsc{w}5]{}{write-tau}
+    \item[] \labeltext[\textsc{w}4]{}{write-tau}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{write-tau-nonempty}
         if $\aEvs\neq\emptyset$ then 
@@ -190,14 +190,16 @@
     \item[] \labeltext[\textsc{r}4]{}{read-tau}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-tau-dep}
-        if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
+        if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
+        %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
           \aVal{=}\aReg
           \limplies \bForm,
         \end{math}}
       \item \label{read-tau-ind}
-        if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
+        if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
+        %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
           \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}

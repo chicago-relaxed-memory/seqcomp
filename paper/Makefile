@@ -18,7 +18,7 @@ paper:
 	latexmk -xelatex --pvc --pdf --halt-on-error paper.tex
 	killall Skim
 diff:
-	git latexdiff --main paper.tex fef2c4cd --
+	git latexdiff --main paper.tex 89c1d7b06 --
 z:
 	rm  -f z.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error z.tex

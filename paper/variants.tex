@@ -306,6 +306,14 @@ preconditions.
 \item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
   $\labelingForm(\aEv)$ is $\labeling$-consistent.
 \end{enumerate}
+With this modification, dead-code elimination
+(\reflem{lem:if}\ref{lem:if:dead}) is an equation rather than an inclusion:
+\begin{displaymath}
+  \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+  =
+  \aPSS_1
+  \;\text{if $\aForm$ is a tautology.}
+\end{displaymath}
 
 
 
@@ -318,7 +326,7 @@ preconditions.
 Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and $\sLOAD{}{}$.
 \begin{definition}
   \label{def:semaddr}
-  Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
+  %Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
 
   \noindent
   If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
@@ -1083,17 +1091,32 @@ first thread from the read of $y$ to one of the writes to $x$.
 
 \begin{definition}
   \label{def:semca}
-  Let $\semca{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
+  \label{def:partition}
+  Let $\aEvs\subseteq\AllEvents$ and $\cForm:\aEvs\fun\Formulae$ and
+  $\emptyForm\in\Formulae$.  We say that $\cForm$ \emph{partitions}
+  $\emptyForm$ if
+  %\begin{multicols}{2}
+    \begin{enumerate*}
+    % \item $\cForm_\aEv$ is satisfiable,
+    \item if $\cForm_\aEv\land\cForm_\bEv$ is satisfiable then $\aEv=\bEv$,
+    % \item $\cForm_\aEv\rimplies\emptyForm$,
+    % \item $\lnot\emptyForm\lor\bigvee_{\aEv\in\aEvs}\cForm_\aEv$ is a tautology.
+    \item $\emptyForm\riff\bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
+    \end{enumerate*}
+  %\end{multicols}
+  %Let $\semca{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
 
   
   \noindent
   If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
+  $(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
   \item \label{write-E-ca}
-    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+    $\cForm$ partitions $\emptyForm$,
+    %if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
   \item \label{write-lambda-ca}
     $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
   \item \label{write-kappa-ca}
@@ -1124,7 +1147,9 @@ first thread from the read of $y$ to one of the writes to $x$.
         \bForm[\aExp/\aLoc][\aExp{=}\aVal_\aEv/\Q{\aLoc}]
         \\[-.5ex]
         \land
-        &\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        &
+        \lnot \emptyForm
+        % \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
         \bForm[\aExp/\aLoc][\FALSE/\Q{\aLoc}]
       \end{aligned}
@@ -1157,9 +1182,10 @@ first thread from the read of $y$ to one of the writes to $x$.
   \item \label{write-term-ca}
     \begin{math}
       \aTerm \riff
-      \PBR{\bigvee_{\aEv\in\aEvs}\cForm_\aEv}
+      \emptyForm
+      %\PBR{\bigvee_{\aEv\in\aEvs}\cForm_\aEv}
       \land
-      \PBR{\bigwedge_{\aEv\in\aEvs}\cForm_\aEv \limplies \aExp{=}\aVal_\aEv},
+      \PBR{\bigwedge_{\aEv\in\aEvs}\cForm_\aEv \limplies \aExp{=}\aVal_\aEv}.
     \end{math}
     % \stepcounter{enumi}
     % \item[] \labeltext[\textsc{w}5]{}{write-term-ca}
@@ -1178,10 +1204,12 @@ first thread from the read of $y$ to one of the writes to $x$.
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$ 
+  $(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
   \item \label{read-E-ca}
-    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+    $\cForm$ partitions $\emptyForm$,
+    %if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
   \item \label{read-lambda-ca}
     $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
   \item \label{read-kappa-ca}
@@ -1209,7 +1237,9 @@ first thread from the read of $y$ to one of the writes to $x$.
         \bForm[\uReg{\aEv}/\aReg]
         \\[-.5ex]
         \land
-        &\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        &
+        \lnot\emptyForm
+        % \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
         \bForm[\bReg/\aReg]
       \end{aligned}
@@ -1257,9 +1287,14 @@ first thread from the read of $y$ to one of the writes to $x$.
     \item[] \labeltext[\textsc{r}5]{}{read-term-ca}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-term-nonempty-ca}
-        if $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$. 
+        if $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
       \item \label{read-term-empty-ca}
-        if $\amode\gemode\mACQ$ then $\aTerm \riff \bigvee_{\aEv\in\aEvs}\cForm_\aEv$. 
+        if $\amode\gemode\mACQ$ then
+        \begin{math}
+          \aTerm \riff
+          \emptyForm.
+          %\bigvee_{\aEv\in\aEvs}\cForm_\aEv.
+        \end{math}
       \end{enumerate}      
   % \item \label{read-term-ca}
   %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
@@ -1310,6 +1345,10 @@ first thread from the read of $y$ to one of the writes to $x$.
 The definition allows multiple events to represent a single action, each with
 a disjoint precondition.  The predicate transformers are derived from those
 defined for the conditional.
+
+This modification validates
+%\reflem{lem:if}\ref{lem:if:seq}--\ref{lem:if:elim} as equations.
+\reflem{lem:if}\ref{lem:if:seq}, \ref{lem:seq:if}, and \ref{lem:if:elim} as equations.
 
 We show how to combine address calculation and if-closure in
 \textsection\ref{sec:semcaaddr}.

@@ -445,18 +445,19 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 
 \begin{definition}
   \label{def:semcaaddr}
-  Let $\semcaaddr{}$ be defined as in \reffig{fig:seq}, changing
-  $\sSTORE{}{}$ and $\sLOAD{}{}$:
+  %Let $\semcaaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
 
   \noindent
   If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
+  $(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
     \item \label{write-E-ca-addr}
-      if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+      $\cForm$ partitions $\emptyForm$,
+      %if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
     \item \label{write-lambda-ca-addr}
       $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$,
     \item \label{write-kappa-ca-addr}
@@ -478,7 +479,9 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         \bForm[\aExp/\aLoc][\aExp{=}\aVal_\aEv/\Q{\aLoc}]
         \\[-.5ex]
         \land
-        &\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        &
+        \lnot\emptyForm
+        %\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies (\cExp{=}\dVal)
         \limplies 
         \bForm[\aExp/\aLoc][\FALSE/\Q{\aLoc}]
@@ -510,27 +513,42 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
       %     [\aExp/\REF{\dVal}]
       %   \end{math}  
       % \end{enumerate}  
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{w}5]{}{write-term-ca-addr}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{write-term-nonempty-ca-addr}
-        $\aTerm \riff \cForm_\aEv \limplies \cExp{=}\cVal_\aEv \land \aExp{=}\aVal_\aEv$,
-      \item \label{write-term-empty-ca-addr}
-        $\aTerm \riff \bigvee_{\aEv\in\aEvs}\cForm_\aEv$.
-      \end{enumerate}
+    \item \label {write-term-ca-addr}
+      \begin{math}
+        \aTerm \riff
+        \emptyForm
+        % \PBR{\bigvee_{\aEv\in\aEvs}\cForm_\aEv}
+        \land
+        \PBR{\bigwedge_{\aEv\in\aEvs}\cForm_\aEv \limplies \cExp{=}\cVal_\aEv \land\aExp{=}\aVal_\aEv}.
+      \end{math}
+    % \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{w}5]{}{write-term-ca-addr}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{write-term-nonempty-ca-addr}
+    %     $\aTerm \riff \cForm_\aEv \limplies \cExp{=}\cVal_\aEv \land \aExp{=}\aVal_\aEv$,
+    %   \item \label{write-term-empty-ca-addr}
+    %     \begin{math}
+    %       \aTerm \riff
+    %       \emptyForm.
+    %       %\bigvee_{\aEv\in\aEvs}\cForm_\aEv.
+    %     \end{math}
+    %   \end{enumerate}
     \end{enumerate}
   \end{multicols}
 
   \medskip
   \noindent
+  \begin{minipage}{1.0\linewidth}
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\cExp}[\aThrd]$ then
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$ 
+  $(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
   \item \label{read-E-ca-addr}
-    if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+    $\cForm$ partitions $\emptyForm$,
+    %if $\cForm_\bEv\land\cForm_\aEv$ is satisfiable then $\bEv=\aEv$,
   \item \label{read-lambda-ca-addr}
     $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$
   \item \label{read-kappa-ca-addr}
@@ -540,7 +558,6 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
       \land \cExp{=}\cVal_\aEv
       \land \Q{\REF{\cVal}}
     \end{math},
-    \stepcounter{enumi}
   \item \label{read-tau-ca-addr}
     \begin{math}
       \begin{aligned}[t]
@@ -560,11 +577,14 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         \bForm[\uReg{\aEv}/\aReg]
         \\[-.5ex]
         \land
-        &\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
+        &
+        \lnot\emptyForm
+        %\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies 
         \bForm[\bReg/\aReg],
       \end{aligned}
     \end{math}
+  % \stepcounter{enumi}
   % \item[] \labeltext[\textsc{r}4]{}{read-tau-ca-addr}
   %   \begin{enumerate}[leftmargin=0pt]
   %   \item \label{read-tau-dependent-ca-addr}
@@ -601,10 +621,24 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   %     \end{math}  
   %   \end{enumerate}  
     \columnbreak
-  \item \label{read-term-ca-addr}
-    if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{r}5]{}{read-term-ca-addr}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-term-nonempty-ca-addr}
+        if $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+      \item \label{read-term-empty-ca-addr}
+        if $\amode\gemode\mACQ$ then
+        \begin{math}
+          \aTerm \riff
+          \emptyForm.
+          %\bigvee_{\aEv\in\aEvs}\cForm_\aEv.
+        \end{math}
+      \end{enumerate}      
+  % \item \label{read-term-ca-addr}
+  %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}
   \end{multicols}
+  \end{minipage}
   % \medskip Similarly, let $\frf{\semaddr{}}$ be defined as for $\frf{\semrr{}}$
   % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
   % $\sLOAD{}{}$.
@@ -1044,7 +1078,7 @@ We leave the elaboration of this idea to future work.
 In this subsection, we develop a logical encoding of $\rdelay$, which can
 replace \ref{seq-le-delays} in \PwTmca{1}.  It is not obvious how to repeat
 this trick for \PwTmca{2}, due to thread-local reads-from
-and thread-local blockers (\ref{seq-le-delays-rf} and \ref{seq-rf-le-rf} in \refdef{def:pwt:mca2}).
+and thread-local blockers (\ref{seq-le-delays-rf} and \ref{seq-le-rf-rf} in \refdef{def:pwt:mca2}).
 
 As motivation, note that \PwTmca{} satisfies only one direction of
 \reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2}

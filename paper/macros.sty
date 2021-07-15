@@ -1,9 +1,10 @@
-\usepackage[rightbars]{changebar}
-% \newcommand{\textchanged}[1]{#1}
-% \newenvironment{changed}{\ignorespaces}{\ignorespacesafterend}
-\newcommand{\textchanged}[1]{\cbstart#1\cbend}
-\newenvironment{changed}{\cbstart\ignorespaces}{\cbend\ignorespacesafterend}
+\newcommand{\UNDEFINED}{\mathbf{undef}}
 
+\usepackage[rightbars]{changebar}
+\newcommand{\textchanged}[1]{#1}
+\newenvironment{changed}{\ignorespaces}{\ignorespacesafterend}
+%\newcommand{\textchanged}[1]{\cbstart#1\cbend}
+%\newenvironment{changed}{\cbstart\ignorespaces}{\cbend\ignorespacesafterend}
 % \usepackage[framemethod=tikz]{mdframed}
 % \newmdenv[
 %   skipabove = \partopsep,
@@ -973,6 +974,8 @@
 \newcommand{\brELSE}{\texttt{\}}\\\texttt{else}\,\texttt{\{}}
 \newcommand{\brELIF}[1]{\texttt{\}}\\\texttt{else}\,\IF{#1}}
 \newcommand{\FI}{\texttt{\}}}
+\newcommand{\LOCK}{\texttt{lock()}}
+\newcommand{\TERNARY}[3]{#1\texttt{?}#2\texttt{:}#3}
 \newcommand{\VAR}{\texttt{var}\,}
 \newcommand{\TOUCHED}{\texttt{touched}\,}
 \newcommand{\REF}[1]{\mkern-2mu\texttt{[}\mkern-2mu#1 \mkern-2mu\texttt{]}\mkern-2mu}
