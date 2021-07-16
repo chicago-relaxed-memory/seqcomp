@@ -1,3 +1,6 @@
+% \subsection{Post-Hoc Verification of Fulfillment for \PwTmcaTITLE{2}}
+% \label{sec:post-hoc}
+
 \subsection{Comparison with Sequential Predicate Transformers}
 
 We compare traditional transformers to the dependent-case transformers of
@@ -1327,14 +1330,18 @@ Update the following rules from \reffig{fig:seq}.
 \item[] \labeltext[\textsc{r}4]{}{read-tau-q}
   \begin{enumerate}[leftmargin=0pt]
   \item \label{read-tau-dep-q}
-    if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
+    if $\aEv\in\aEvs\cap\bEvs$ then
+    %if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
+    %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
     \makebox[0pt][l]{\begin{math}
         \aTr{\bEvs}{\bForm} \riff
         \aVal{=}\aReg
         \limplies \bForm,
       \end{math}}
   \item \label{read-tau-ind-q}
-    if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
+    if $\aEv\in\aEvs\setminus\bEvs$ then
+    %if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
+    %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
     \makebox[0pt][l]{\begin{math}
         \aTr{\bEvs}{\bForm} \riff
         \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}
@@ -1385,11 +1392,12 @@ $\FALSE$ for $\QL{\aLoc}{\mACQ}$ in the independent case for an acquiring
 write; this ensures that all subsequent accesses follow the acquiring read in
 top-level pomsets.
 
-\begin{example}
-  \label{ex:q1}
-  The following pomsets show the effect of quiescence for each access mode.
+\reffig{fig:q1} shows  the effect of quiescence for each access mode.
+\begin{figure}
   \input{fig-q1.tex}
-\end{example}
+  \caption{The Effect of Quiescence for Each Access Mode}
+  \label{fig:q1}
+\end{figure}
 
 \begin{example}
   The definition enforces publication.  Consider:
@@ -1565,11 +1573,11 @@ in \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  Consider the following.
 % \begin{align*}
 %   \begin{gathered}[t]
 %     \IF{r}\THEN\PW{x}{2}\FI
-%     \SEQ
+%     \SEMI
 %     \PW{x}{1}
-%     \SEQ
+%     \SEMI
 %     \PW{x}{2}
-%     \SEQ
+%     \SEMI
 %     \IF{\BANG r}\THEN\PW{x}{1}\FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
@@ -1580,6 +1588,7 @@ in \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  Consider the following.
 %       \end{tikzinline}}    
 %   \end{gathered}
 % \end{align*}
+If $r{=}0$ then $x$ is $1,2,1$.  If $r{\neq}0$ then $x$ is $2,1,2$.
 Augmenting the middle preconditions and then using sequential composition, we have:
 \begin{align*}
   \begin{gathered}[t]
@@ -1592,7 +1601,7 @@ Augmenting the middle preconditions and then using sequential composition, we ha
   &&
   \begin{gathered}[t]
     \PW{x}{1}
-    \SEQ
+    \SEMI
     \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
@@ -1625,11 +1634,11 @@ Merging left and right, we have:
 \begin{align*}
   \begin{gathered}[t]
     \IF{r}\THEN\PW{x}{2}\FI
-    \SEQ
+    \SEMI
     \PW{x}{1}
-    \SEQ
+    \SEMI
     \PW{x}{2}
-    \SEQ
+    \SEMI
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
@@ -1643,15 +1652,15 @@ As shown by the following single-threaded code, allowing this outcome would viol
 \begin{align*}
   \begin{gathered}[t]
     \PW{y}{1}
-    \SEQ
+    \SEMI
     \PR{y}{r}
-    \SEQ
+    \SEMI
     \IF{r}\THEN\PW{x}{2}\FI
-    \SEQ
+    \SEMI
     \PW{x}{1}
-    \SEQ
+    \SEMI
     \PW{x}{2}
-    \SEQ
+    \SEMI
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
@@ -1664,22 +1673,114 @@ As shown by the following single-threaded code, allowing this outcome would viol
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-
 This is one reason that we use \emph{weakest} preconditions, rather than
 preconditions.
-% Note that as a result, we fail to validate the following
-% refinement:
-% \begin{math}
-%   \aPSS_1
-%   \not\supseteq
-%   \xIFTHEN{\aForm}{\aPSS_1}{}.
-% \end{math}
+
+The same problem does not occur due to if-closure:
+\begin{align*}
+  \begin{gathered}[t]
+    \IF{r}\THEN\PW{x}{2}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \PW{x}{1}
+    \SEMI
+    \PW{x}{2}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a2}{r{\neq}0\mid\DW{x}{1}}{}
+        \event{a2p}{r{=}0\mid\DW{x}{1}}{below=of a2}
+        \event{a3}{r{=}0\mid\DW{x}{2}}{right=of a1}
+        \event{a3p}{r{\neq}0\mid\DW{x}{2}}{below=of a3}
+        \wki{a2}{a3p}
+        \wki{a2p}{a3}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a4}{r{=}0\mid\DW{x}{1}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+Merging left and right, we have
+\begin{align*}
+  \begin{gathered}[t]
+    \IF{r}\THEN\PW{x}{2}\FI
+    \SEMI
+    \PW{x}{1}
+    \SEMI
+    \PW{x}{2}
+    \SEMI
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+        \event{a1a3}{\DW{x}{2}}{}
+        \event{a2p}{r{=}0\mid\DW{x}{1}}{right=of a1a3}
+        \event{a3p}{r{\neq}0\mid\DW{x}{2}}{right=of a2p}
+        \event{a2a4}{\DW{x}{1}}{right=of a3p}
+        \wki[out=165,in=10]{a2a4}{a3p}
+        \wki[out=170,in=15]{a2p}{a1a3}
+        \wki{a3p}{a2a4}
+        \wki{a1a3}{a2p} 
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
 \end{example}
 
 
+\subsection{Is Coherence/Delay Compatible with If-closure and Dead-Write-Removal?}
 
+This paper has a ``High-level abstraction for efficient computation''
 
-
-% \subsection{Post-Hoc Verification of Fulfillment for \PwTmcaTITLE{2}}
-% \label{sec:post-hoc}
-
+With if-closure, the following equation should hold:
+\begin{align*}
+  &\sem{
+    \IF{r}\THEN\PW{x}{2}\FI
+    \SEMI
+    \PW{x}{1}
+    \SEMI
+    \PW{x}{2}
+    \SEMI
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \SEMI
+    \PW{x}{3}
+  }
+  \\=
+  &\sem{
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \SEMI
+    \PW{x}{2}
+    \SEMI
+    \PW{x}{1}
+    \SEMI
+    \IF{r}\THEN\PW{x}{2}\FI
+    \SEMI
+    \PW{x}{3}
+  }
+\end{align*}
+Using dead write removal, these can be refined, respectively, to:
+\begin{align*}
+  &\sem{
+    \PW{x}{1}
+    \SEMI
+    \PW{x}{2}
+    \SEMI
+    \PW{x}{3}
+  }
+  \\\neq
+  &\sem{
+    \PW{x}{2}
+    \SEMI
+    \PW{x}{1}
+    \SEMI
+    \PW{x}{3}
+  }
+\end{align*}
+What has become of coherence?

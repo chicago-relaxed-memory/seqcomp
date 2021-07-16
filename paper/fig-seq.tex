@@ -85,7 +85,7 @@
       $\aEvs = (\aEvs_1\cup\aEvs_2)$,
     \item \label{if-lambda}
       ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
-      % \item[(\ref{par-E}--\ref{par-le})] as for $\sLPAR{}{}$,
+      % \item[(\ref{par-E}--\ref{par-le})] as for $\sPAR{}{}$,
       \stepcounter{enumi}
     \item[] \labeltext[\textsc{i}3]{}{if-kappa}
       \begin{enumerate}[leftmargin=0pt]
@@ -190,7 +190,8 @@
     \item[] \labeltext[\textsc{r}4]{}{read-tau}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-tau-dep}
-        if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
+        if $\aEv\in\aEvs\cap\bEvs$ then
+        %if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
         %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
@@ -198,7 +199,8 @@
           \limplies \bForm,
         \end{math}}
       \item \label{read-tau-ind}
-        if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
+        if $\aEv\in\aEvs\setminus\bEvs$ then
+        %if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
         %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff

@@ -312,8 +312,8 @@ which we define using an asymmetric operator for parallel composition, as in
 \cite{DBLP:conf/icfp/FerreiraHJ96}.
 
 We remove thread groups as a separate category in the syntax and semantics.
-The transformer for the \emph{left composition} $\aCmd_1\LPAR\aCmd_2$ takes
-the register state from the left, but quiescence from both sides.
+The transformer for the \emph{right composition} $\aCmd_1\RPAR\aCmd_2$ takes
+the register state from the right, but quiescence from both sides.
 \begin{align*}
   \aCmd
   \BNFDEF& \ABORT
@@ -325,19 +325,19 @@ the register state from the left, but quiescence from both sides.
   \BNFSEP \PWREF[\amode]{\cExp}{\aExp}
   % \BNFSEP \PA{\aLoc}{\aExp} 
   \\[-.5ex]
-  \BNFSEP& \aCmd_1 \LPAR \aCmd_2
+  \BNFSEP& \aCmd_1 \RPAR \aCmd_2
   \BNFSEP \aCmd_1 \SEMI \aCmd_2
   \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI  
 \end{align*}
 
 \begin{definition}
-  If $\aPS \in (\aPSS_1\sLPAR\aPSS_2)$ then
+  If $\aPS \in (\aPSS_1\sPAR\aPSS_2)$ then
   $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
   % there are $\aPS_1\in\aPSS_1$ and $\aPS_2\in\aPSS_2$ such that
   \begin{enumerate}
     % \setcounter{enumi}{\value{pomsetPreParCount}}
   \item[\ref{par-E}--\ref{par-kappa2})]
-    as for $\sLPAR{}{}$ in \refdef{def:pomsets-pre},
+    as for $\sPAR{}{}$ in \refdef{def:pomsets-pre},
   \item \label{par-tau1}
     $\aTr{\bEvs}{\bForm} \rimplies \aTr[1]{\bEvs}{\bForm}$,
   \item \label{par-tau2}
@@ -423,7 +423,7 @@ with preconditions \emph{and termination}.
 
 % Extend the definition of $\sNIL$ so that $\TICK$ is true.
 
-% Extend the definition of $\sLPAR{}{}$ to handle for $\TICK$ by adding the
+% Extend the definition of $\sPAR{}{}$ to handle for $\TICK$ by adding the
 % following.
 % \begin{enumerate}
 %   \setcounter{enumi}{\value{pomsetPreParCount}}
@@ -461,11 +461,11 @@ with preconditions \emph{and termination}.
   \end{enumerate}
 
   \noindent
-  If $\aPS \in \sLPAR{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$
+  If $\aPS \in \sPAR{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$
   $(\exists\aPS_2\in\aPSS_2)$
   \begin{enumerate}
     % \setcounter{enumi}{\value{pomsetPreParCount}}
-  \item[\ref{par-E}--\ref{par-kappa2})] as for $\sLPAR{}{}$ in
+  \item[\ref{par-E}--\ref{par-kappa2})] as for $\sPAR{}{}$ in
     \refdef{def:pomsets-pre},
   \item \label{par-tick} $\TICK \rimplies \TICK_1\land\TICK_2$.
   \end{enumerate}

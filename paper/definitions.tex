@@ -72,7 +72,7 @@ We model the following language.
   \BNFSEP \SKIP
   \BNFSEP \aCmd_1 \SEMI \aCmd_2
   \BNFSEP \IF{\aExp} \THEN \aCmd_1 \ELSE \aCmd_2 \FI
-  \BNFSEP \aCmd_1 \LPAR[\bThrd] \aCmd_2
+  \BNFSEP \aCmd_1 \RPAR[\bThrd] \aCmd_2
   % \\[-.5ex]
   % \BNFSEP& \PCAS[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
   % \BNFSEP \PFADD[\amode_1][\amode_2]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
@@ -120,8 +120,8 @@ systematically drop the annotation.
 
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs. Following
-\cite{DBLP:conf/icfp/FerreiraHJ96}, $\LPAR$ denotes parallel composition,
-preserving thread state on the left after a join.  In examples and
+\cite{DBLP:conf/icfp/FerreiraHJ96}, $\RPAR$ denotes parallel composition,
+preserving thread state on the right after a join.  In examples and
 sublanguages without join, we use the symmetric $\PAR$ operator.
 
 We use common syntax sugar, such as \emph{extended expressions}, $\aEExp$,
@@ -422,7 +422,7 @@ preconditions to weaken.
     \begin{math}
       \aPSS
       % =
-      % \xLPARP{\aPSS}{\sSKIP}
+      % \xPARP{\aPSS}{\sSKIP}
       =
       \xSEMIP{\aPSS}{\sSKIP}
       =
@@ -431,9 +431,9 @@ preconditions to weaken.
 
   % \\\item \label{monoid:par}
   %   \begin{math}
-  %     \xLPAR{\xLPARP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
+  %     \xPAR{\xPARP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
   %     =
-  %     \xLPAR{\aPSS_1}{\xLPARP{\aPSS_2}{\aPSS_3}}.
+  %     \xPAR{\aPSS_1}{\xPARP{\aPSS_2}{\aPSS_3}}.
   %   \end{math}
 
   \\\item \label{monoid:seq}
@@ -545,6 +545,10 @@ reverse inclusions for \eqref{lem:if:seq}, \eqref{lem:seq:if}, and
 \eqref{lem:if:elim}.
 In \textsection\ref{sec:false}, we refine the semantics to validate the
 reverse inclusion for \eqref{lem:if:dead}.
+As discussed in \textsection\ref{sec:mca1}, for \PwTmca{},
+\eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2} are 
+inclusions, rather than equations; we show how to restore them to equations
+in \textsection\ref{sec:delay}
 \begin{definition}
   \label{def:augment}
   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if all fields are equal except,
@@ -905,9 +909,9 @@ $\aEv$ to participate in a top-level pomset, the precondition $\aForm$ must
 be a tautology at top-level.  There are two possibilities.
 \begin{itemize}
 \item If $\bEv\le\aEv$ then we apply the dependent transformer and
-  $\aForm=(1{=}r\limplies r{=}1)$, a tautology.
+  $\aForm\riff(1{=}r\limplies r{=}1)$, a tautology.
 \item If $\bEv\not\le\aEv$ then we apply the independent transformer and
-  $\aForm=((x{=}r\lor1{=}r)\limplies r{=}1)$.  Under the assumption that $r$
+  $\aForm\riff((x{=}r\lor1{=}r)\limplies r{=}1)$.  Under the assumption that $r$
   is bound, this is logically equivalent to $(x{=}1)$. (We make this more
   precise in \textsection\ref{sec:false}.)
 \end{itemize}
@@ -1885,7 +1889,7 @@ Associating to the left and the coalescing, instead:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-The precondition $\aForm=(1{=}0\land y{=}0)\lor (1{\neq}0 \land y{\neq}0)$,
+The precondition $\aForm\riff(1{=}0\land y{=}0)\lor (1{\neq}0 \land y{\neq}0)$,
 which is equivalent to $y{\neq}0$, which is not a tautology.  This pomset can
 never be complete due to the bogus write of $(\PW{x}{\BANG r})$, which will
 show up in the termination condition $(1{=}0)$.  Nevertheless, this is a
@@ -1895,7 +1899,7 @@ Our solution is to Skolemize, replacing substitution by implication, with
 % uses of $\bForm[\aVal/\aReg]$
 % by $(\aReg{=}\aVal)\limplies\bForm$,
 uniquely chosen registers.  Using \reffig{fig:seq}, we compute a tautology in
-the example above: $\aForm=((y{=}r\lor1{=}r)\limplies r{=}0)\lor (r{\neq}0)$.
+the example above: $\aForm\riff((y{=}r\lor1{=}r)\limplies r{=}0)\lor (r{\neq}0)$.
 
 %  We have proven associativity of
 %  \refdef{def:pomsets-trans} in Agda.

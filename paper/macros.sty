@@ -346,8 +346,9 @@
 
 % \NewDocumentCommand\PAR{O{} O{}}{\mathrel{\ifnotempty{#1}{{}_{#1}}\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\ifnotempty{#2}{_{#2}}}}
 %\newcommand{\LPAR}{\,\mathbin{\rrceil}\,}
-\NewDocumentCommand\LPAR{O{}}{\mathrel{\rrceil\ifnotempty{#1}{\ifshowSCOPE_{#1}\fi}}}
-%\NewDocumentCommand\LPAR{O{}}{\mathrel{\mkern3mu\makebox[0pt][l]{$\PAR$}\mkern-10mu\leftarrow\ifnotempty{#1}{\mkern-8mu{}_{#1}}}}
+%\NewDocumentCommand\LPAR{O{}}{\mathrel{\rrceil\ifnotempty{#1}{\ifshowSCOPE_{#1}\fi}}}
+%\NewDocumentCommand\RPAR{O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\!\fi}\llceil}}
+\NewDocumentCommand\LPAR{O{}}{\mathrel{\mkern3mu\makebox[0pt][l]{$\PAR$}\mkern-10mu\leftarrow\ifnotempty{#1}{\ifshowSCOPE\mkern-8mu{}_{#1}\fi}}}
 \NewDocumentCommand\RPAR{O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\fi}\makebox[0pt][l]{$\PAR$}\mkern-9mu\rightarrow}}
 \NewDocumentCommand\PAR{O{} O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\fi}\parallel\ifnotempty{#2}{_{#2}}}}
 %\NewDocumentCommand\sRPAR{O{} O{}}{\mathrel{\ifnotempty{#1}{{}_{#1}}\makebox[0pt][l]{$\sPAR$}\mkern-9mu\rightarrow\ifnotempty{#2}{_{#2}}}}
@@ -621,6 +622,8 @@
 \newcommand{\cXI}{{\sc c11}}
 \newcommand{\mca}{{\sc mca}}
 \newcommand{\iriw}{{\sc iriw}}
+\newcommand{\llvm}{{\sc llvm}}
+\newcommand{\ub}{{\sc ub}}
 
 
 
@@ -962,11 +965,12 @@
 \newcommand{\AND}{\mathbin{\texttt{\&\!\&}}}%\land}
 \newcommand{\BANG}{\texttt{\!!}}%\lnot}%\texttt{!!}\mkern-1mu}
 \newcommand{\GETS}{\mkern1mu\texttt{:}\mkern-1mu\texttt{=}\,}
-\newcommand{\SEQ}{\texttt{;}\,\allowbreak}
+%\newcommand{\SEQ}{\texttt{;}\,\allowbreak}
 \newcommand{\SEMI}{\texttt{;}\,\allowbreak}
 \newcommand{\PASS}{\texttt{pass}}
-\newcommand{\WHILE}{\texttt{while}\,}
-\newcommand{\DO}[1]{\texttt{do}\texttt{\{}#1\texttt{\}}}
+\newcommand{\WHILE}[1]{\texttt{while}\,\allowbreak\!\texttt{(}#1\texttt{)}}
+\newcommand{\DO}{\texttt{\{}}
+\newcommand{\OD}{\texttt{\}}}
 \newcommand{\IF}[1]{\texttt{if}\,\allowbreak\!\texttt{(}#1\texttt{)}}
 \newcommand{\THEN}{\allowbreak\texttt{\{}}
 \newcommand{\ELSE}{\texttt{\}}\,\allowbreak\texttt{else}\,\allowbreak\texttt{\{}}
@@ -1013,9 +1017,13 @@
 \NewDocumentCommand\IFTHEN{m m m}{\IF{#1}\THEN#2\ifnotempty{#3}{\ELSE#3}\FI}
 %\NewDocumentCommand\sPAR{m m}{#1\PAR#2}
 % \NewDocumentCommand\sRPAR{m O{} m}{#1\RPAR[#2]#3}
-\NewDocumentCommand\sLPAR{m O{} m}{\textnormal{\textit{PAR}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak\ifnotempty{#2}{#2,\,\allowbreak}#3)}}
+\NewDocumentCommand\sPAR{m m}{\textnormal{\textit{PAR}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)}}
 \NewDocumentCommand\xLPAR{m O{} m}{#1\LPAR[#2]#3}
 \NewDocumentCommand\xLPARP{m O{} m}{(#1\LPAR[#2]#3)}
+\NewDocumentCommand\xRPAR{m O{} m}{#1\RPAR[#2]#3}
+\NewDocumentCommand\xRPARP{m O{} m}{(#1\RPAR[#2]#3)}
+\NewDocumentCommand\xPAR{m m}{#1\LPAR#2}
+\NewDocumentCommand\xPARP{m m}{(#1\LPAR#2)}
 \NewDocumentCommand\sSEMI{m m}{\textnormal{\textit{SEQ}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)}}
 \NewDocumentCommand\xSEMI{m m}{{#1}\SEMI{#2}}
 \NewDocumentCommand\xSEMIP{m m}{({#1}\SEMI{#2})}

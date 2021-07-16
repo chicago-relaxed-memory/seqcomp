@@ -72,6 +72,42 @@ This appendix includes additional examples.  They all apply equally to
 
 \subsection{Coherence}
 
+TC16  Not allowed by us or by \cite{Dolan:2018:BDR:3192366.3192421}.
+\begin{gather*}
+  \PR{x}{r}\SEMI \PW{x}{1}
+  \PAR
+  \PR{x}{s}\SEMI \PW{x}{2}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DR{x}{2}}{}
+      \event{a2}{\DW{x}{1}}{right=of a1}
+      \wki{a1}{a2}
+      \event{b1}{\DR{x}{1}}{right=of a1}
+      \event{b2}{\DW{x}{2}}{right=of b1}
+      \wki{b1}{b2}
+      \rf[out=-165,in=-15]{b2}{a1}
+      \rf{a2}{b1}
+   \end{tikzinline}}
+\end{gather*}
+But we allow the following, which \cite{Dolan:2018:BDR:3192366.3192421}
+disallows (do to lack of read-to-write reordering).
+\begin{gather*}
+  \PR{y}{r}\SEMI \PW{x}{1}
+  \PAR
+  \PR{x}{s}\SEMI \PW{y}{2}
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DR{y}{2}}{}
+      \event{a2}{\DW{x}{1}}{right=of a1}
+      %\wk{a1}{a2}
+      \event{b1}{\DR{x}{1}}{right=of a1}
+      \event{b2}{\DW{y}{2}}{right=of b1}
+      %\wk{b1}{b2}
+      \rf[out=-165,in=-15]{b2}{a1}
+      \rf{a2}{b1}
+   \end{tikzinline}}
+\end{gather*}
+
 The following execution is disallowed by fulfillment (\ref{pom-rf-match} and
 \ref{pom-rf-block}).
 \begin{gather*}
@@ -128,9 +164,9 @@ We also forbid the following, which Java allows:
 \begin{gather*}
   \taglabel{Co3}
   \begin{gathered}
-    \PW{x}{1}\SEMI \PW[\mRA]{y}{1}
+    \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
     \PAR
-    \PW{x}{2}\SEMI \PW[\mRA]{z}{1}
+    \PW{x}{2}\SEMI \PW[\mREL]{z}{1}
     \PAR
     \PR[\mRA]{z}{r} \SEMI 
     \PR[\mRA]{y}{r} \SEMI 
@@ -167,12 +203,12 @@ to the cycle:
 \begin{gather*}
   \tag{\textsc{coh-cyc}}
   \begin{gathered}
-    x\GETS 2\SEMI
-    \IF{x\NOTEQ2}\THEN y\GETS 1 \FI
+    \PW{x}{2}\SEMI
+    \IF{x\NOTEQ2}\THEN \PW{y}{1} \FI
     \PAR
-    x\GETS 1\SEMI
-    r\GETS x\SEMI
-    \IF{y}\THEN x\GETS 3 \FI
+    \PW{x}{1}\SEMI
+    \PR{x}{r}\SEMI
+    \IF{y}\THEN \PW{x}{3} \FI
     \\\nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx2}{\DW{x}{2}}{}
@@ -227,6 +263,70 @@ This behavior is allowed by Java in order to validate CSE without requiring
 aliasing analysis.
 
 \subsection{RMWs}
+If \RMW{}s simply use the same semantics as read and write, then we allow
+\ref{LDRF-PF-Fail}, which is used to show failure of $\ldrfsc{}$ for the
+promising semantics in \cite{promising-ldrf}.
+\begin{gather*}  
+  \taglabel{LDRF-PF-Fail}
+  \begin{gathered}
+    \PW{y}{0}\SEMI
+    \IF{y}\THEN
+      \IF{\BANG\PCAS{x}{}{0}{1}}\THEN
+        \IF{z}\THEN
+          \PW{x}{2}
+    \FI\FI\FI
+    \PAR
+    \PW{y}{1}\SEMI
+    \IF{1{\neq}\PCAS{x}{}{0}{3}}\THEN
+      \PW{z}{1}
+    \FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=2em]
+        \event{a1}{\DW{y}{0}}{}
+        \event{a2}{\DR{y}{1}}{right=of a1}
+        \event{a3}{\DR{x}{0}}{right=of a2}
+        \event{a4}{\DW{x}{1}}{right=of a3}
+        \event{a5}{\DR{z}{1}}{right=of a4}
+        \event{a6}{\DW{x}{2}}{right=of a5}
+        \event{b1}{\DW{y}{1}}{right=5em of a6}
+        \event{b2}{\DR{x}{2}}{right=of b1}
+        \event{b3}{\DW{z}{1}}{right=of b2}
+        \wk{a1}{a2}
+        \rmw{a3}{a4}
+        \po[out=10,in=170]{a2}{a6}
+        %\po[out=15,in=165]{a3}{a6}
+        \po{a5}{a6}
+        \wk[out=-20,in=-160]{a4}{a6}
+        %\po{b2}{b3}
+        \rf[out=15,in=165]{a6}{b2}
+        \rf[out=-170,in=-10]{b3}{a5}
+        \rf[out=-170,in=-10]{b1}{a2}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+To disallow this, we need to retain the dependency
+\begin{math}
+  \DRP{x}{2}\xpo \DWP{z}{1}.
+\end{math}
+For this, we need to avoid the substitution for $x$.  This is why we use
+$\sLOADP{}{}$ instead of $\sLOAD{}{}$ in the independent case for \RMW{}s.
+
+\begin{comment}
+  \centering  
+\begin{verbatim}
+Y := 0                   Y := 1                 
+a := Y                   d := CAS(X,0,1) /37?   
+if a != 0 then           if d != 42 then        
+  b := CAS(X,0,42)         L := 1               
+  if b = 0 then
+    c := L
+    if c = 1 then
+      Xsrlx := 37
+\end{verbatim}
+\includegraphics[width=.8\textwidth]{LDRF-PF-Fail.png}
+\caption{LDRF-PF-Fail}
+\end{comment}
+
 It is not possible for two \RMW{}s to see the same write.
 \begin{gather*}
   \begin{gathered}
@@ -608,65 +708,73 @@ These candidate executions are invalid, due to cycles.
 \section{Not for publication}
 
 
-\subsection{TC18}
+\subsection{TC17-20}
 
-\begin{verbatim}
-Initially,  x = y = 0
-Thread 1:         Thread 2: 
-r3 = x            r2 = y    
-if (r3 == 0)      x = r2    
-  x = 1
-r1 = x
-y = r1
-Behavior in question: r1 == r2 == r3 == 1
-\end{verbatim}
-Decision: Allowed. A compiler could determine that the only legal values for
-$x$ are $0$ and $1$. From that, the compiler could deduce that $r3 \neq 0$
-implies $r3 = 1$.  A compiler could then determine that at $r1 = x$ in thread
-1, is must be legal for to read $x$ and see the value $1$. Changing $r1 = x$
-to $r1 = 1$ would allow $y = r1$ to be transformed to $y = 1$ and performed
-earlier, resulting in the behavior in question.
+% \begin{verbatim}
+% Initially,  x = y = 0
+% Thread 1:         Thread 2: 
+% r3 = x            r2 = y    
+% if (r3 == 0)      x = r2    
+%   x = 1
+% r1 = x
+% y = r1
+% Behavior in question: r1 == r2 == r3 == 1
+% \end{verbatim}
+% Decision: Allowed. A compiler could determine that the only legal values for
+% $x$ are $0$ and $1$. From that, the compiler could deduce that $r3 \neq 0$
+% implies $r3 = 1$.  A compiler could then determine that at $r1 = x$ in thread
+% 1, is must be legal for to read $x$ and see the value $1$. Changing $r1 = x$
+% to $r1 = 1$ would allow $y = r1$ to be transformed to $y = 1$ and performed
+% earlier, resulting in the behavior in question.
+
 \begin{displaymath}
   \begin{gathered}
-    \PR{x}{r}
+    \PW{x}{0}
     \SEMI
-    \IF{r{=}0}\THEN \PW{x}{1}\FI
-    \SEMI
-    \PR{x}{s}
-    \SEMI
-    \PW{y}{s}
-    \PAR
-    \PW{x}{\PR{y}{}}
+    \PBR{
+      \PW{x}{\PR{y}{}}
+      \PAR
+      \PR{x}{r}
+      \SEMI
+      \IF{r{=}0}\THEN \PW{x}{1}\FI
+      \SEMI
+      \PR{x}{s}
+      \SEMI
+      \PW{y}{s}
+    }
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a}{\DR{x}{1}}{}
+        \event{i}{\DW{x}{0}}{}
+        \event{e}{\DR{y}{1}}{right=3em of i}
+        \event{f}{\DW{x}{1}}{right=of e}
+        \event{a}{\DR{x}{1}}{right=3em of f}
         %\event{b}{\DW{x}{1}}{right=of a}
         \event{c}{\DR{x}{1}}{right=of a}
         \event{d}{\aForm\mid\DW{y}{1}}{right=of c}
-        \event{e}{\DR{y}{1}}{right=3em of d}
-        \event{f}{\DW{x}{1}}{right=of e}
         \po{e}{f}
-        \rf{d}{e}
-        \rf[out=-165,in=-15]{f}{a}
-        \rf[out=-165,in=-15]{f}{c}
+        \rf[out=-165,in=-15]{d}{e}
+        \rf{f}{a}
+        \rf[out=15,in=165]{f}{c}
+        \wki[out=-15,in=-165]{i}{f}
       \end{tikzinline}}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a}{\DR{x}{1}}{}
+        \event{i}{\DW{x}{0}}{}
+        \event{e}{\DR{y}{1}}{right=3em of i}
+        \event{f}{\DW{x}{1}}{right=of e}
+        \event{a}{\DR{x}{1}}{right=3em of f}
         %\event{b}{\DW{x}{1}}{right=of a}
         %\event{c}{\DR{x}{1}}{right=of a}
         \event{d}{\aForm\mid\DW{y}{1}}{right=of a}
-        \event{e}{\DR{y}{1}}{right=3em of d}
-        \event{f}{\DW{x}{1}}{right=of e}
         \po{e}{f}
-        \rf{d}{e}
-        \rf[out=-165,in=-15]{f}{a}
-        %\rf[out=-165,in=-15]{f}{c}
+        \rf[out=-165,in=-15]{d}{e}
+        \rf{f}{a}
+        \wki[out=-15,in=-165]{i}{f}
       \end{tikzinline}}
   \end{gathered}
 \end{displaymath}
 \begin{displaymath}
-  \aForm=
+  \aForm\riff
   (1{=}r \lor x{=}r)
   \limplies
   \PBR{
@@ -675,126 +783,118 @@ earlier, resulting in the behavior in question.
     \SBR{r{\neq}0\land\PBR{(1{=}s \lor x{=}s) \limplies s{=}1}}
   }
 \end{displaymath}
-If we coalesce $s$ and $r$ and prefix $\PW{x}{0}$
+Simplifying:
 \begin{displaymath}
-  \aForm=
+  \aForm\riff
+  (1{=}r \lor x{=}r)
+  \limplies
+  \PBR{
+    r{=}0
+    \lor
+    \SBR{r{\neq}0\land\PBR{(1{=}s \lor x{=}s) \limplies s{=}1}}
+  }
+\end{displaymath}
+Prefixing $\PW{x}{0}$:
+\begin{displaymath}
+  \aForm\riff
   (1{=}r \lor 0{=}r)
   \limplies
   \PBR{
     r{=}0
     \lor
-    \SBR{r{\neq}0\land\PBR{(1{=}r \lor 0{=}r) \limplies r{=}1}}
+    \SBR{r{\neq}0\land\PBR{(1{=}s \lor 0{=}s) \limplies s{=}1}}
   }
 \end{displaymath}
-which is
+Drilling into the interesting part:
 \begin{displaymath}
-  \aForm=
+  \aForm\riff
+  1{=}r
+  \limplies
+  \PBR{(1{=}s \lor 0{=}s) \limplies s{=}1}
+\end{displaymath}
+This is not a tautology.  But we get one by coalescing $s$ and $r$:
+% \begin{displaymath}
+%   \aForm\riff
+%   (1{=}r \lor 0{=}r)
+%   \limplies
+%   \PBR{
+%     r{=}0
+%     \lor
+%     \SBR{r{\neq}0\land\PBR{(1{=}r \lor 0{=}r) \limplies r{=}1}}
+%   }
+% \end{displaymath}
+% which is:
+\begin{displaymath}
+  \aForm\riff
   1{=}r
   \limplies
   \PBR{(1{=}r \lor 0{=}r) \limplies r{=}1}
 \end{displaymath}
-which is a tautology.
 
-\subsection{Load hoisting in LLVM}
-Load-hoisting followed by case analysis is unsound in LLVM, without freeze.
-Introducing a read may cause a race, resulting in read value $\UNDEFINED$.
-Branch on $\UNDEFINED$ is UB.  Freeze was added to get around this...
-
-Examples from \cite{promising-ldrf} show that freeze is bullshit.  Compcert
-does not validate loop switching
-\cite[\textsection9]{DBLP:conf/pldi/LeeKSHDMRL17}.
-
-\cite[\textsection3.3]{DBLP:conf/pldi/LeeKSHDMRL17} Global Value Numbering
-(GVN) and Loop Unswitching require different semantics for branch on
-$\UNDEFINED$. \url{https://llvm.org/docs/LangRef.html#freeze-instruction}
-
-\href{https://lists.llvm.org/pipermail/llvm-dev/2016-October/106182.html}{Purpose of Freeze}
-\begin{quotation}
-  Poison is propagated aggressively throughout. However, there are cases
-  where this breaks certain optimizations, and therefore freeze is used to
-  selectively stop poison from being propagated.
-
-  A use of freeze is to enable speculative execution.  For example, loop
-  switching does the following transformation:
-\begin{verbatim}
-while (C) {        if (C2) {     
-  if (C2) {           while (C)  
-   A                     A       
-  } else {   ==>   } else {      
-   B                   while (C) 
-  }                       B      
-}                  }             
-\end{verbatim}
-  Here we are evaluating C2 before C.  If the original loop never executed
-  then we had never evaluated C2, while now we do.  So we need to make sure
-  there's no UB for branching on C2.  Freeze ensures that so we would
-  actually have 'if (freeze(C2))' instead.  Note that
-  \emph{having branch on poison not trigger UB has its own problems.}
-  We believe this is a good tradeoff.
-\end{quotation}
-
-
-\cite[\textsection6.3]{DBLP:conf/cgo/ChakrabortyV17}:
-\begin{quotation}
-  LLVM frequently performs such load introductions in the “simplify CFG”
-  pass; e.g., when hoisting loads outside of conditionals.
-\end{quotation}
-
-case analysis happens in ``function specialization'' also known as
-``procedure cloning''
-
-\subsection{Hoisting and CSE}
-Example from Viktor's talk: ``Weak Memory Concurrency in C/C++11 and LLVM''
-
-Load Hoisting:
+Test case 17 is similar by replaces the condition $r{=}0$ by $r{\neq}1$:
 \begin{displaymath}
-  \IF{c}\THEN \PR{x}{a}\FI
-  \rightsquigarrow
-  \PR{x}{t}\SEMI
-  \LET{a}{\TERNARY{c}{t}{a}}
+  \aForm\riff
+  (1{=}r \lor x{=}r)
+  \limplies
+  \PBR{
+    \SBR{r{\neq}1\land\PBR{(1{=}s \lor 1{=}s) \limplies s{=}1}}
+    \lor
+    \SBR{r{=}1\land\PBR{(1{=}s \lor x{=}s) \limplies s{=}1}}
+  }
 \end{displaymath}
-
-CSE over acquiring lock:
+Simplifying and prefixing $\PW{x}{0}$:
 \begin{displaymath}
-  \PR{x}{a}\SEMI
-  \LOCK\SEMI
-  \PR{x}{b}
-  \rightsquigarrow
-  \PR{x}{a}\SEMI
-  \LOCK\SEMI
-  \LET{b}{a}
+  \aForm\riff
+  (1{=}r \lor 0{=}r)
+  \limplies
+  \PBR{
+    r{\neq}1
+    \lor
+    \SBR{r{=}1\land\PBR{(1{=}s \lor 0{=}s) \limplies s{=}1}}
+  }
 \end{displaymath}
-
-Having both is clearly wrong:
+Again, we have:
 \begin{displaymath}
-  \begin{array}{l}
-    \IF{c}\THEN\\
-    \quad\PR{x}{a}\FI\SEMI\\
-    \LOCK\SEMI\\
-    \PR{x}{b}    
-  \end{array}
-  \rightsquigarrow
-  \begin{array}{l}
-    \PR{x}{t}\SEMI\\
-    \LET{a}{\TERNARY{c}{t}{a}}\SEMI\\
-    \LOCK\SEMI\\
-    \PR{x}{b}    
-  \end{array}
-  \rightsquigarrow
-  \begin{array}{l}
-    \PR{x}{t}\SEMI\\
-    \LET{a}{\TERNARY{c}{t}{a}}\SEMI\\
-    \LOCK\SEMI\\
-    \LET{b}{a}    
-  \end{array}
+  \aForm\riff
+  1{=}r
+  \limplies
+  \PBR{(1{=}s \lor 0{=}s) \limplies s{=}1}
 \end{displaymath}
-When c is false, x is moved out of the critical region!
+which is not a tautology.  But we get one by coalescing $s$ and $r$.
 
-So we have to forbid one transformation.
-\begin{itemize}
-\item C11 forbids load hoisting, allows CSE over lock().
-\item LLVM allows load hoisting, forbids CSE over lock().
-\end{itemize}
+TC20 splits the first thread of TC18:
+\begin{gather*}  
+  \begin{gathered}
+    \PW{x}{0}
+    \SEMI
+    \PBR{
+      \PW{x}{y}
+      \RPAR
+      \PR{x}{r}\SEMI\IF{r{=}0}\THEN \PW{x}{1} \FI 
+    }
+    \SEMI \PR{x}{s}\SEMI \PW{y}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{i}{\DW{x}{0}}{}
+        \event{e}{\DR{y}{1}}{right=3em of i}
+        \event{f}{\DW{x}{1}}{right=of e}
+        \event{a}{\DR{x}{1}}{right=3em of f}
+        % \event{b}{\DW{x}{1}}{right=of a}
+        % \event{c}{\DR{x}{1}}{right=of a}
+        \event{d}{\aForm\mid\DW{y}{1}}{right=of a}
+        \po{e}{f}
+        \rf[out=-165,in=-15]{d}{e}
+        \rf{f}{a}
+        \wki[out=-15,in=-165]{i}{f}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+Because we take register state from the right, the example is the same as for
+TC18 above.
+
+TC19 does the same split for TC17, and follows for the same reason.
+
+
 \subsection{More RMW}
 These following examples are from \cite{promising-ldrf}.
 
@@ -867,94 +967,6 @@ If this $\ldrfra{z}$?
   \end{gathered}
 \end{gather*}
 
-\PwT{} disallows \ref{LDRF-Fail-PS}, which is similar to \ref{OOTA4}.
-\begin{gather*}  
-  \taglabel{LDRF-Fail-PS}
-  \begin{gathered}
-  \IF{x}\THEN
-    \PFADD{w}{}{1}\SEMI
-    \PW{y}{1}\SEMI
-    \PW{z}{1}
-  \FI
-  \PAR
-  \IF{\BANG z}\THEN
-    \PW{x}{1}
-  \ELSE
-    \IF{\BANG \PFADD{w}{}{1}}\THEN
-      \PW{x}{\PR{y}{}}
-    \FI
-  \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=2em]
-        \event{a1}{\DR{x}{1}}{}
-        \event{a2}{\DR{w}{1}}{right=of a1}
-        \event{a3}{\DW{w}{2}}{right=of a2}
-        \event{a4}{\DW{y}{1}}{right=of a3}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=5em of a5}
-        \event{b2}{\DR{w}{0}}{right=of b1}
-        \event{b3}{\DW{w}{1}}{right=of b2}
-        \event{b4}{\DR{y}{1}}{right=of b3}
-        \event{b5}{\DW{x}{1}}{right=of b4}
-        \rmw{a2}{a3}
-        \po[out=15,in=165]{a1}{a3}
-        \po[out=15,in=165]{a1}{a4}
-        \po[out=15,in=165]{a1}{a5}        
-        \rmw{b2}{b3}
-        \po{b4}{b5}
-        \po[out=15,in=165]{b2}{b5}        
-        \po[out=15,in=165]{b1}{b3}
-        \rf{a5}{b1}
-        \rf[out=10,in=170]{a4}{b4}
-        \rf[out=-170,in=-10]{b3}{a2}
-        \rf[out=-170,in=-10]{b5}{a1}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-\begin{gather}
-  \taglabel{OOTA4}
-  \begin{gathered}
-    \PW{y}{x}
-    \PAR
-    \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
-    \PAR
-    \PW{b}{1}
-    % \\[-1ex]
-    % \hbox{\begin{tikzinline}[node distance=1.5em]
-    %     \event{rx}{\DR{x}{1}}{}
-    %     \event{wy}{\DW{y}{1}}{right=of rx}
-    %     \po{rx}{wy}
-    %     \event{ry}{\DR{y}{1}}{right=3em of wy} 
-    %     \event{wx}{\DW{x}{1}}{right=of ry}
-    %     \event{wz}{\DW{z}{1}}{right=of wx}
-    %     \event{rb}{\DR{b}{1}}{right=of wz}
-    %     \event{wb1}{\DW{b}{1}}{right=3em of rb}
-    %     \po{ry}{wx}
-    %     \rf{wb1}{rb}
-    %     \rf{wy}{ry}
-    %     \rf[out=-170,in=-10]{wx}{rx}
-    %     \po{rb}{wz}
-    %     \po[out=15,in=165]{ry}{wz}
-    %   \end{tikzinline}}
-    \\[-1ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx}{\DR{x}{1}}{}
-        \event{wy}{\DW{y}{1}}{right=of rx}
-        \po{rx}{wy}
-        \event{rb}{\DR{b}{1}}{right=3em of wy}
-        \event{ry}{\DR{y}{1}}{right=of rb} 
-        \event{wx}{\DW{x}{1}}{right=of ry}
-        \event{wz}{\DW{z}{1}}{right=of wx}
-        \event{wb1}{\DW{b}{1}}{right=3em of wz}
-        \po{ry}{wx}
-        \rf[out=-170,in=-10]{wb1}{rb}
-        \rf[out=15,in=165]{wy}{ry}
-        \rf[out=-170,in=-10]{wx}{rx}
-        \po[out=15,in=165]{rb}{wz}
-        \po[out=15,in=165]{ry}{wz}
-      \end{tikzinline}}
-  \end{gathered}  
-\end{gather}
 
 % \begin{comment}
 %   \centering  
@@ -973,68 +985,6 @@ If this $\ldrfra{z}$?
 % \end{comment}
 
 
-If \RMW{}s simply use the same semantics as read and write, then we allow
-\ref{LDRF-PF-Fail}, which is used to show failure of $\ldrfsc{}$.
-\begin{gather*}  
-  \taglabel{LDRF-PF-Fail}
-  \begin{gathered}
-    \PW{y}{0}\SEMI
-    \IF{y}\THEN
-      \IF{\BANG\PCAS{x}{}{0}{1}}\THEN
-        \IF{z}\THEN
-          \PW{x}{2}
-    \FI\FI\FI
-    \PAR
-    \PW{y}{1}\SEMI
-    \IF{1{\neq}\PCAS{x}{}{0}{3}}\THEN
-      \PW{z}{1}
-    \FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=2em]
-        \event{a1}{\DW{y}{0}}{}
-        \event{a2}{\DR{y}{1}}{right=of a1}
-        \event{a3}{\DR{x}{0}}{right=of a2}
-        \event{a4}{\DW{x}{1}}{right=of a3}
-        \event{a5}{\DR{z}{1}}{right=of a4}
-        \event{a6}{\DW{x}{2}}{right=of a5}
-        \event{b1}{\DW{y}{1}}{right=5em of a6}
-        \event{b2}{\DR{x}{2}}{right=of b1}
-        \event{b3}{\DW{z}{1}}{right=of b2}
-        \wk{a1}{a2}
-        \rmw{a3}{a4}
-        \po[out=10,in=170]{a2}{a6}
-        %\po[out=15,in=165]{a3}{a6}
-        \po{a5}{a6}
-        \wk[out=-20,in=-160]{a4}{a6}
-        %\po{b2}{b3}
-        \rf[out=15,in=165]{a6}{b2}
-        \rf[out=-170,in=-10]{b3}{a5}
-        \rf[out=-170,in=-10]{b1}{a2}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-To disallow this, we need to retain the dependency
-\begin{math}
-  \DRP{x}{2}\xpo \DWP{z}{1}.
-\end{math}
-For this, we need to avoid the substitution for $x$.  This is why we use
-$\sLOADP{}{}$ instead of $\sLOAD{}{}$ in the independent case for \RMW{}s.
-
-\begin{comment}
-  \centering  
-\begin{verbatim}
-Y := 0                   Y := 1                 
-a := Y                   d := CAS(X,0,1) /37?   
-if a != 0 then           if d != 42 then        
-  b := CAS(X,0,42)         L := 1               
-  if b = 0 then
-    c := L
-    if c = 1 then
-      Xsrlx := 37
-\end{verbatim}
-\includegraphics[width=.8\textwidth]{LDRF-PF-Fail.png}
-\caption{LDRF-PF-Fail}
-\end{comment}
 
 \subsection{A Note on Mixed-Mode Data Races}
 
@@ -1159,190 +1109,37 @@ is a downset of \eqref{mix1}.
 
 
 \section{Old Notes}
+\subsection{Read-Read Dependencies}
+Alan is somewhat obsessed by the worry that lack of read-read dependency is a
+problem.
+Most recently, he thought it might break external DRF-SC.  But no one can
+construct an example.  Non-problem:
+\begin{gather*}
+  \PW{z}{1}\SEMI\PW[\mREL]{y}{1}
+  \PAR
+  \PR[\mACQ]{y}{r}\SEMI\PW[\mREL]{x}{1}
+  \PAR
+  \IF{\PR{x}{}}\THEN\PR{z}{s}\FI  
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{z}{1}}{}
+      \event{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR[\mACQ]{y}{1}}{right=3em of b}
+      \event{d}{\DW[\mREL]{x}{1}}{right=of c}
+      \event{e}{\DR{x}{1}}{right=3em of d}
+      \event{f}{\DR{z}{0}}{right=of e}
+      \sync{a}{b}
+      \rf{b}{c}
+      \sync{c}{d}
+      \rf{d}{e}
+      \ctrl{e}{f}
+      \wk[out=-170,in=-10]{f}{a}
+    \end{tikzinline}}
+\end{gather*}
+
+
 \subsection{JMM examples}
 
-TC17: Should be possible to read 1 everywhere
-\begin{gather*}
-  x\GETS y
-  \PAR
-  r\GETS x\SEMI\IF{r{\neq}1}\THEN x\GETS 1 \SEMI y\GETS x\ELSE y\GETS x\FI
-  \\
-  \begin{gathered}
-    \IF{r{\neq}1}\THEN x\GETS 1 \SEMI y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{r{\neq}1 \mid \DW{x}{1}}{}
-        \event{a2}{r{\neq}1 \mid \DR{x}{1}}{right=of a1}
-        \event{a3}{r{\neq}1 \land 1{=}1\mid \DW{y}{1}}{right=of a2}
-        \wk{a1}{a2}
-      \end{tikzinline}}
-  \end{gathered}
-  \\
-  \begin{gathered}
-    \IF{r{=}1}\THEN y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a4}{r{=}1 \mid \DR{x}{1}}{}
-        \event{a5}{r{=}1 \land x{=}1\mid \DW{y}{1}}{right=of a4}
-      \end{tikzinline}}
-  \end{gathered}  
-  \\
-  \begin{gathered}
-    \IF{r{\neq}1}\THEN x\GETS 1 \SEMI y\GETS x\ELSE y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{r{\neq}1 \mid \DW{x}{1}}{}
-        \event{a2}{\DR{x}{1}}{right=of a1}
-        \event{a3}{r{\neq}1\lor x{=}1\mid \DW{y}{1}}{right=of a2}
-        \wk{a1}{a2}
-      \end{tikzinline}}
-  \end{gathered}    
-  \\
-  \begin{gathered}
-    r\GETS x\SEMI\IF{r{\neq}1}\THEN x\GETS 1 \SEMI y\GETS x\ELSE y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{x{\neq}1 \mid \DW{x}{1}}{}
-        \event{a2}{\DR{x}{1}}{right=of a1}
-        \event{a3}{x{\neq}1\lor x{=}1\mid \DW{y}{1}}{right=of a2}
-        \event{a0}{\DR{x}{1}}{left=of a1}
-        \wk{a1}{a2}
-        \wk{a0}{a1}
-      \end{tikzinline}}
-  \end{gathered}    
-  \\
-  \begin{gathered}
-    x\GETS0\SEMI r\GETS x\SEMI\IF{r{\neq}1}\THEN x\GETS 1 \SEMI y\GETS x\ELSE y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{0{\neq}1 \mid \DW{x}{1}}{}
-        \event{a2}{\DR{x}{1}}{right=of a1}
-        \event{a3}{\DW{y}{1}}{right=of a2}
-        \event{a0}{\DR{x}{1}}{left=of a1}
-        \event{a-1}{\DW{x}{0}}{left=of a0}
-        \wk{a1}{a2}
-        \wk{a0}{a1}
-        \wk{a-1}{a0}
-      \end{tikzinline}}
-  \end{gathered}    
-\end{gather*}
-
-TC18
-\begin{gather*}
-  x\GETS y
-  \PAR
-  r\GETS x\SEMI\IF{r{=}0}\THEN x\GETS 1 \SEMI y\GETS x\ELSE y\GETS x\FI
-  \\
-  \begin{gathered}
-    \IF{r{=}0}\THEN x\GETS 1 \SEMI y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{r{=}0 \mid \DW{x}{1}}{}
-        \event{a2}{r{=}0 \mid \DR{x}{1}}{right=of a1}
-        \event{a3}{r{=}0 \land 1{\neq}0\mid \DW{y}{1}}{right=of a2}
-        \wk{a1}{a2}
-      \end{tikzinline}}
-  \end{gathered}
-  \\
-  \begin{gathered}
-    \IF{r{\neq}0}\THEN y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a4}{r{\neq}0 \mid \DR{x}{1}}{}
-        \event{a5}{r{\neq}0 \land x{\neq}0\mid \DW{y}{1}}{right=of a4}
-      \end{tikzinline}}
-  \end{gathered}  
-  \\
-  \begin{gathered}
-    \IF{r{=}0}\THEN x\GETS 1 \SEMI y\GETS x\ELSE y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{r{=}0 \mid \DW{x}{1}}{}
-        \event{a2}{\DR{x}{1}}{right=of a1}
-        \event{a3}{r{=}0\lor x{\neq}0\mid \DW{y}{1}}{right=of a2}
-        \wk{a1}{a2}
-      \end{tikzinline}}
-  \end{gathered}    
-  \\
-  \begin{gathered}
-    r\GETS x\SEMI\IF{r{=}0}\THEN x\GETS 1 \SEMI y\GETS x\ELSE y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{x{=}0 \mid \DW{x}{1}}{}
-        \event{a2}{\DR{x}{1}}{right=of a1}
-        \event{a3}{x{=}0\lor x{\neq}0\mid \DW{y}{1}}{right=of a2}
-        \event{a0}{\DR{x}{1}}{left=of a1}
-        \wk{a1}{a2}
-        \wk{a0}{a1}
-      \end{tikzinline}}
-  \end{gathered}    
-  \\
-  \begin{gathered}
-    x\GETS0\SEMI r\GETS x\SEMI\IF{r{=}0}\THEN x\GETS 1 \SEMI y\GETS x\ELSE y\GETS x\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{0{=}0 \mid \DW{x}{1}}{}
-        \event{a2}{\DR{x}{1}}{right=of a1}
-        \event{a3}{\DW{y}{1}}{right=of a2}
-        \event{a0}{\DR{x}{1}}{left=of a1}
-        \event{a-1}{\DW{x}{0}}{left=of a0}        
-        \wk{a1}{a2}
-        \wk{a0}{a1}
-        \wk{a-1}{a0}
-      \end{tikzinline}}
-  \end{gathered}    
-\end{gather*}
-
-TC19 --- where join keeps the right hand side.
-\begin{gather*}
-  (x\GETS y
-  \RPAR
-  r\GETS x\SEMI\IF{r{\neq}1}\THEN x\GETS 1 \FI )
-  \SEMI y\GETS x
-\end{gather*}
-
-TC20
-\begin{gather*}
-  (x\GETS y
-  \RPAR
-  r\GETS x\SEMI\IF{r{=}0}\THEN x\GETS 1 \FI )
-  \SEMI y\GETS x
-\end{gather*}
-
-TC16  Not allowed by us or by \cite{Dolan:2018:BDR:3192366.3192421}.
-\begin{gather*}
-  r\GETS x\SEMI x\GETS 1
-  \PAR
-  s\GETS x\SEMI x\GETS 2
-  \\
-  \hbox{\begin{tikzinline}[node distance=1em]
-      \event{a1}{\DR{x}{2}}{}
-      \event{a2}{\DW{x}{1}}{right=of a1}
-      \wk{a1}{a2}
-      \event{b1}{\DR{x}{1}}{below=of a1}
-      \event{b2}{\DW{x}{2}}{right=of b1}
-      \wk{b1}{b2}
-      \rf{b2}{a1}
-      \rf{a2}{b1}
-   \end{tikzinline}}
-\end{gather*}
-But we allow the following, which \cite{Dolan:2018:BDR:3192366.3192421} disallows.
-\begin{gather*}
-  r\GETS y\SEMI x\GETS 1
-  \PAR
-  s\GETS x\SEMI y\GETS 2
-  \\
-  \hbox{\begin{tikzinline}[node distance=1em]
-      \event{a1}{\DR{y}{2}}{}
-      \event{a2}{\DW{x}{1}}{right=of a1}
-      %\wk{a1}{a2}
-      \event{b1}{\DR{x}{1}}{below=of a1}
-      \event{b2}{\DW{y}{2}}{right=of b1}
-      %\wk{b1}{b2}
-      \rf{b2}{a1}
-      \rf{a2}{b1}
-   \end{tikzinline}}
-\end{gather*}
 
 \subsection{Sevcik examples}
 
@@ -1350,9 +1147,9 @@ But we allow the following, which \cite{Dolan:2018:BDR:3192366.3192421} disallow
 incorrectly credit \citet{DBLP:conf/ecoop/SevcikA08}.)
 
 \begin{gather*}
-  \IF{x\land y}\THEN z\GETS 1\FI
+  \IF{x\land y}\THEN \PW{z}{1}\FI
   \PAR
-  \IF{z}\THEN x\GETS1\SEMI y\GETS1 \ELSE y\GETS1\SEMI x\GETS1 \FI
+  \IF{z}\THEN \PW{x}{1}\SEMI \PW{y}{1} \ELSE \PW{y}{1}\SEMI \PW{x}{1} \FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DR{x}{1}}{}
@@ -1392,7 +1189,7 @@ $r_3=1$. With read rule, we have $y=1$.  In read prefixing, we don't weaken.
 Instead we weaken with the read into r2.
 \begin{gather*}
   \begin{gathered}
-    \IF{r_2{=}1}\THEN r_3\GETS y\SEMI x\GETS r_3\FI
+    \IF{r_2{=}1}\THEN \PR{y}{r_3}\SEMI \PW{x}{r_3}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a1}{r_2{=}1 \mid \DR{y}{1}}{}
@@ -1401,21 +1198,21 @@ Instead we weaken with the read into r2.
   \end{gathered}
   \qquad
   \begin{gathered}
-    \IF{r_2{\neq}1}\THEN x\GETS 1\FI
+    \IF{r_2{\neq}1}\THEN \PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a2}{r_2{\neq}1 \mid \DW{x}{1}}{}
       \end{tikzinline}}
   \end{gathered}
   \\
-  \IF{r_2{=}1}\THEN r_3\GETS y\SEMI x\GETS r_3 \ELSE x\GETS 1\FI
+  \IF{r_2{=}1}\THEN \PR{y}{r_3}\SEMI \PW{x}{r_3} \ELSE \PW{x}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{r_2{=}1 \mid \DR{y}{1}}{}
       \event{a2}{(r_2{=}1 \land y{=}1) \lor (r_2{\neq}1) \mid \DW{x}{1}}{right=of a1}
    \end{tikzinline}}
   \\
-  r_2\GETS y \SEMI\IF{r_2{=}1}\THEN r_3\GETS y\SEMI x\GETS r_3 \ELSE x\GETS 1\FI
+  \PR{y}{r_2} \SEMI\IF{r_2{=}1}\THEN \PR{y}{r_3}\SEMI \PW{x}{r_3} \ELSE \PW{x}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DR{y}{1}}{}
@@ -1450,7 +1247,7 @@ In any execution, we must have 1 before 2, or 2 before 1.
 \item If thread sees 1, then read x is 1.
   \begin{gather*}
     \begin{gathered}
-      \IF{r_1{=}2}\THEN y\GETS 1 \ELSE y\GETS r_2\FI
+      \IF{r_1{=}2}\THEN \PW{y}{1} \ELSE \PW{y}{r_2}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{r_1{=}2\lor (r_1{\neq}2 \land r_2{=}1)\mid \DW{y}{1}}{}
@@ -1458,9 +1255,9 @@ In any execution, we must have 1 before 2, or 2 before 1.
     \end{gathered}
     \\
     \begin{gathered}
-      r_1\GETS x\SEMI
-      r_2\GETS z\SEMI
-      \IF{r_1{=}2}\THEN y\GETS 1 \ELSE y\GETS r_2\FI
+      \PR{x}{r_1}\SEMI
+      \PR{z}{r_2}\SEMI
+      \IF{r_1{=}2}\THEN \PW{y}{1} \ELSE \PW{y}{r_2}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{\DW{y}{1}}{}
@@ -1482,7 +1279,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
 
 \begin{gather*}
     \begin{gathered}
-      \IF{\BANG r}\THEN \IF{x}\THEN y\GETS 1\FI\FI
+      \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{r{=}0\mid\DW{y}{1}}{}
@@ -1492,7 +1289,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \end{gathered}      
     \qquad
     \begin{gathered}
-      \IF{r}\THEN s\GETS x\SEMI y\GETS r\FI
+      \IF{r}\THEN \PR{x}{s}\SEMI \PW{y}{r}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{r{=}1\mid\DW{y}{1}}{}
@@ -1501,7 +1298,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \end{gathered}      
     \\
     \begin{gathered}
-      \IF{\BANG r}\THEN \IF{x}\THEN y\GETS 1\FI\ELSE y\GETS r\FI
+      \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\ELSE \PW{y}{r}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{r{=}0\lor r{=}1\mid\DW{y}{1}}{}
@@ -1511,7 +1308,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \end{gathered}          
     \\
     \begin{gathered}
-      z\GETS 0\SEMI r\GETS z\SEMI \IF{\BANG r}\THEN \IF{x}\THEN y\GETS 1\FI\ELSE y\GETS r\FI
+      \PW{z}{0}\SEMI \PR{z}{r}\SEMI \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\ELSE \PW{y}{r}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{0{=}0\lor 0{=}1\mid\DW{y}{1}}{}
@@ -1525,7 +1322,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
   \end{gather*}
 \begin{gather*}
     \begin{gathered}
-      \IF{\BANG r}\THEN \IF{x}\THEN y\GETS 1\FI\FI
+      \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{r{=}0\mid\DW{y}{1}}{}
@@ -1535,7 +1332,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \end{gathered}      
     \qquad
     \begin{gathered}
-      \IF{r}\THEN y\GETS r\FI
+      \IF{r}\THEN \PW{y}{r}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{r{=}1\mid\DW{y}{1}}{}
@@ -1543,7 +1340,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \end{gathered}      
     \\
     \begin{gathered}
-      \IF{\BANG r}\THEN \IF{x}\THEN y\GETS 1\FI\ELSE y\GETS r\FI
+      \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\ELSE \PW{y}{r}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{r{=}0\lor r{=}1\mid\DW{y}{1}}{}
@@ -1553,7 +1350,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \end{gathered}          
     \\
     \begin{gathered}
-      z\GETS 0\SEMI r\GETS z\SEMI \IF{\BANG r}\THEN \IF{x}\THEN y\GETS 1\FI\ELSE y\GETS r\FI
+      \PW{z}{0}\SEMI \PR{z}{r}\SEMI \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\ELSE \PW{y}{r}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{0{=}0\lor 0{=}1\mid\DW{y}{1}}{}
@@ -1616,7 +1413,7 @@ be used to get rid of them.
 
 Value for $r$ in $(r\EQ1\mid\DW{z}{1})$ from $(\DW{x}{1})$:
 \begin{gather*}
-  x\GETS 1 \PAR x\GETS 1\SEMI r\GETS x \SEMI y\GETS r\SEMI z\GETS r
+  \PW{x}{1} \PAR \PW{x}{1}\SEMI \PR{x}{r} \SEMI \PW{y}{r}\SEMI \PW{z}{r}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DW{x}{1}}{}
@@ -1631,7 +1428,7 @@ Value for $r$ in $(r\EQ1\mid\DW{z}{1})$ from $(\DW{x}{1})$:
 \end{gather*}          
 Value for $r$ in $(r\EQ1\mid\DW{z}{1})$ from $(\DW{x}{1})$:
 \begin{gather*}
-  x\GETS 2 \PAR x\GETS 1\SEMI r\GETS x \SEMI \IF{r{>}0}\THEN y\GETS 1\FI \SEMI \IF{r{>}0}\THEN z\GETS 1\FI
+  \PW{x}{2} \PAR \PW{x}{1}\SEMI \PR{x}{r} \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI \SEMI \IF{r{>}0}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DW{x}{1}}{}
@@ -1647,7 +1444,7 @@ Value for $r$ in $(r\EQ1\mid\DW{z}{1})$ from $(\DW{x}{1})$:
 Note that this also contains pomset where value for $r$ in
 $(r\EQ1\mid\DW{y}{1})$ also comes from $(\DW{x}{1})$:
 \begin{gather*}
-  x\GETS 2 \PAR x\GETS 1\SEMI r\GETS x \SEMI \IF{r{>}0}\THEN y\GETS 1\FI \SEMI \IF{r{>}0}\THEN z\GETS 1\FI
+  \PW{x}{2} \PAR \PW{x}{1}\SEMI \PR{x}{r} \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI \SEMI \IF{r{>}0}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DW{x}{1}}{}
@@ -1664,7 +1461,7 @@ So our semantics will calculate the least ordered version.  Then rely on
 augmentation to get the others.
 \begin{gather*}
   \begin{gathered}
-    x\GETS 1
+    \PW{x}{1}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DW{x}{1}}{}
@@ -1673,7 +1470,7 @@ augmentation to get the others.
   \end{gathered}
   \qquad
   \begin{gathered}
-    r\GETS x
+    \PR{x}{r}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{b}{\DRreg{r}{x}{2}}{}
@@ -1682,7 +1479,7 @@ augmentation to get the others.
   \end{gathered}
   \qquad
   \begin{gathered}
-    \IF{r{>}0}\THEN y\GETS 1\FI
+    \IF{r{>}0}\THEN \PW{y}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{c}{r{>}0 \mid \DW{y}{1}}{}
@@ -1691,7 +1488,7 @@ augmentation to get the others.
   \end{gathered}
   \qquad
   \begin{gathered}
-    \IF{r{>}0}\THEN z\GETS 1\FI
+    \IF{r{>}0}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{d}{r{>}0 \mid \DW{z}{1}}{}
@@ -1700,9 +1497,9 @@ augmentation to get the others.
   \end{gathered}
   \\
   \begin{gathered}
-    x\GETS 1
+    \PW{x}{1}
     \SEMI
-    r\GETS x    
+    \PR{x}{r}    
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DW{x}{1}}{}
@@ -1712,9 +1509,9 @@ augmentation to get the others.
   \end{gathered}
   \qquad
   \begin{gathered}
-    \IF{r{>}0}\THEN y\GETS 1\FI
+    \IF{r{>}0}\THEN \PW{y}{1}\FI
     \SEMI
-    \IF{r{>}0}\THEN z\GETS 1\FI
+    \IF{r{>}0}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{c}{r{>}0 \mid \DW{y}{1}}{}
@@ -1725,7 +1522,7 @@ augmentation to get the others.
 \end{gather*}
 It is also possible that the read is necessary to give a value for $r$:
 \begin{gather*}
-  x\GETS 2 \PAR x\GETS 0\SEMI r\GETS x \SEMI \IF{r{>}0}\THEN y\GETS 1\FI \SEMI \IF{r{>}0}\THEN z\GETS 1\FI
+  \PW{x}{2} \PAR \PW{x}{0}\SEMI \PR{x}{r} \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI \SEMI \IF{r{>}0}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DW{x}{0}}{}
@@ -1740,9 +1537,9 @@ It is also possible that the read is necessary to give a value for $r$:
 \end{gather*}
 \begin{gather*}
   \begin{gathered}
-    x\GETS 0
+    \PW{x}{0}
     \SEMI
-    r\GETS x    
+    \PR{x}{r}    
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DW{x}{0}}{}
@@ -1752,9 +1549,9 @@ It is also possible that the read is necessary to give a value for $r$:
   \end{gathered}
   \qquad
   \begin{gathered}
-    \IF{r{>}0}\THEN y\GETS 1\FI
+    \IF{r{>}0}\THEN \PW{y}{1}\FI
     \SEMI
-    \IF{r{>}0}\THEN z\GETS 1\FI
+    \IF{r{>}0}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{c}{r{>}0 \mid \DW{y}{1}}{}
@@ -1765,7 +1562,7 @@ It is also possible that the read is necessary to give a value for $r$:
 \end{gather*}
 Dependency on two reads:
 \begin{gather*}
-  r\GETS x \SEMI s\GETS y\SEMI \IF{r{<}s}\THEN z\GETS 1\FI
+  \PR{x}{r} \SEMI \PR{y}{s}\SEMI \IF{r{<}s}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DRreg{r}{x}{1}}{}
@@ -1777,7 +1574,7 @@ Dependency on two reads:
 \end{gather*}          
 \begin{gather*}
   \begin{gathered}
-    r\GETS x\SEMI s\GETS y
+    \PR{x}{r}\SEMI \PR{y}{s}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -1787,7 +1584,7 @@ Dependency on two reads:
   \end{gathered}
   \qquad
   \begin{gathered}
-    \IF{r{<}s}\THEN z\GETS 1\FI
+    \IF{r{<}s}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{c}{r{<}s \mid \DW{z}{1}}{}
@@ -1796,7 +1593,7 @@ Dependency on two reads:
   \end{gathered}
   \\
   \begin{gathered}
-    r\GETS x\SEMI s\GETS y \SEMI \IF{r{<}s}\THEN z\GETS 1\FI
+    \PR{x}{r}\SEMI \PR{y}{s} \SEMI \IF{r{<}s}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -1809,7 +1606,7 @@ Dependency on two reads:
 \end{gather*}
 Don't need to worry about confusing reads:
 \begin{gather*}
-  r\GETS x \SEMI s\GETS x\SEMI \IF{s{<}0}\THEN z\GETS 1\FI
+  \PR{x}{r} \SEMI \PR{x}{s}\SEMI \IF{s{<}0}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DRreg{r}{x}{1}}{}
@@ -1820,7 +1617,7 @@ Don't need to worry about confusing reads:
 \end{gather*}          
 \begin{gather*}
   \begin{gathered}
-    r\GETS x\SEMI s\GETS x
+    \PR{x}{r}\SEMI \PR{x}{s}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -1830,7 +1627,7 @@ Don't need to worry about confusing reads:
   \end{gathered}
   \qquad
   \begin{gathered}
-    z\GETS s
+    \PW{z}{s}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{c}{s{<}0 \mid \DW{z}{1}}{}
@@ -1840,7 +1637,7 @@ Don't need to worry about confusing reads:
 \end{gather*}
 But we also have
 \begin{gather*}
-  r\GETS x \SEMI s\GETS x\SEMI \IF{s{<}0}\THEN z\GETS 1\FI
+  \PR{x}{r} \SEMI \PR{x}{s}\SEMI \IF{s{<}0}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DRreg{r}{x}{1}}{}
@@ -1851,7 +1648,7 @@ But we also have
 \end{gather*}          
 \begin{gather*}
   \begin{gathered}
-    r\GETS x
+    \PR{x}{r}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -1860,7 +1657,7 @@ But we also have
   \end{gathered}
   \qquad
   \begin{gathered}
-    s\GETS x \SEMI \IF{s{<}0}\THEN z\GETS 1\FI
+    \PR{x}{s} \SEMI \IF{s{<}0}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{b}{\DRreg{s}{x}{2}}{}
@@ -1871,7 +1668,7 @@ But we also have
 \end{gather*}
 Dependency on two reads (No dependency here):
 \begin{gather*}
-  r\GETS x \SEMI s\GETS x\SEMI \IF{r{=}s}\THEN z\GETS 1\FI
+  \PR{x}{r} \SEMI \PR{x}{s}\SEMI \IF{r{=}s}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DRreg{r}{x}{1}}{}
@@ -1883,7 +1680,7 @@ Dependency on two reads (No dependency here):
 \end{gather*}          
 \begin{gather*}
   \begin{gathered}
-    r\GETS x
+    \PR{x}{r}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -1892,7 +1689,7 @@ Dependency on two reads (No dependency here):
   \end{gathered}
   \qquad
   \begin{gathered}
-    s\GETS x \SEMI \IF{r{=}s}\THEN z\GETS 1\FI
+    \PR{x}{s} \SEMI \IF{r{=}s}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{b}{\DRreg{s}{x}{2}}{}
@@ -1903,7 +1700,7 @@ Dependency on two reads (No dependency here):
 \end{gather*}
 Another example:
 \begin{gather*}
-  r\GETS x \SEMI s\GETS x\SEMI  z\GETS s
+  \PR{x}{r} \SEMI \PR{x}{s}\SEMI  \PW{z}{s}
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DRreg{r}{x}{1}}{}
@@ -1915,7 +1712,7 @@ Another example:
 \end{gather*}          
 \begin{gather*}
   \begin{gathered}
-    r\GETS x
+    \PR{x}{r}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -1924,7 +1721,7 @@ Another example:
   \end{gathered}
   \qquad
   \begin{gathered}
-    s\GETS x \SEMI z \GETS s
+    \PR{x}{s} \SEMI \PW{z}{s}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{b}{\DRreg{s}{x}{1}}{}
@@ -1936,7 +1733,7 @@ Another example:
 
 Value for $r$ in $(r{<}s\mid\DW{z}{1})$ from $(\DW{x}{0})$:
 \begin{gather*}
-  x\GETS 0\SEMI r\GETS x \SEMI s\GETS y\SEMI \IF{r{<}s}\THEN z\GETS 1\FI
+  \PW{x}{0}\SEMI \PR{x}{r} \SEMI \PR{y}{s}\SEMI \IF{r{<}s}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DRreg{r}{x}{1}}{}
@@ -1952,7 +1749,7 @@ Value for $r$ in $(r{<}s\mid\DW{z}{1})$ from $(\DW{x}{0})$:
 Contrary to submission, reverse subsumption not okay.
 \begin{gather*}
   \begin{gathered}
-    x\GETS 1
+    \PW{x}{1}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -1961,7 +1758,7 @@ Contrary to submission, reverse subsumption not okay.
   \end{gathered}
   \qquad
   \begin{gathered}
-    x\GETS 2
+    \PW{x}{2}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{b}{\DRreg{s}{x}{2}}{}
@@ -1974,16 +1771,15 @@ Contrary to submission, reverse subsumption not okay.
 
 RA example.  This is impossible, since $\DR{x}{1}$ unfulfilled.
 \begin{gather*}
-  x\GETS1 \SEMI
-  a^\mRA\GETS1 \SEMI
-  %y \GETS b^\mRA + x
-  r \GETS b^\mRA\SEMI
-  s \GETS x\SEMI
-  y \GETS r+s
+  \PW{x}{1} \SEMI
+  \PW[\mREL]{a}{1} \SEMI
+  \PR[\mACQ]{b}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \PW{y}{r{+}s}
   \PAR
-  r\GETS a^\mRA\SEMI
-  x\GETS 2\SEMI
-  b^\mRA\GETS10
+  \PR[\mACQ]{a}{r}\SEMI
+  \PW{x}{2}\SEMI
+  \PW[\mREL]{b}{10}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
   \event{a1}{\DW{x}{1}}{}
@@ -2007,16 +1803,13 @@ RA example.  This is impossible, since $\DR{x}{1}$ unfulfilled.
 If you swap the release and acquire, then it is impossible for the second
 thread to get in the middle.
 \begin{gather*}
-  x\GETS1 \SEMI
-  %y \GETS b^\mRA + x
-  r \GETS b^\mRA\SEMI
-  a^\mRA\GETS1 \SEMI
-  % s \GETS x\SEMI
-  % y \GETS r+s
+  \PW{x}{1} \SEMI
+  \PR[\mACQ]{b}{r}\SEMI
+  \PW[\mREL]{a}{1} \SEMI
   \PAR
-  r\GETS a^\mRA\SEMI
-  x\GETS 2\SEMI
-  b^\mRA\GETS10
+  \PR[\mACQ]{a}{r}\SEMI
+  \PW{x}{2}\SEMI
+  \PW[\mREL]{b}{10}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
   \event{a1}{\DW{x}{1}}{}
@@ -2040,16 +1833,15 @@ thread to get in the middle.
 \end{gather*}
 In this case, the following execution is possible:
 \begin{gather*}
-  x\GETS1 \SEMI
-  r \GETS b^\mRA\SEMI
-  a^\mRA\GETS1 \SEMI
-  %y \GETS b^\mRA + x
-  s \GETS x\SEMI
-  y \GETS r+s
+  \PW{x}{1} \SEMI
+  \PR[\mACQ]{b}{r}\SEMI
+  \PW[\mREL]{a}{1} \SEMI
+  \PR{x}{s}\SEMI
+  \PW{y}{r{+}s}
   \PAR
-  r\GETS a^\mRA\SEMI
-  x\GETS 2\SEMI
-  b^\mRA\GETS10
+  \PR[\mACQ]{a}{r}\SEMI
+  \PW{x}{2}\SEMI
+  \PW[\mREL]{b}{10}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
   \event{a1}{\DW{x}{1}}{}
@@ -2073,16 +1865,15 @@ In this case, the following execution is possible:
 \end{gather*}
 But not:
 \begin{gather*}
-  x\GETS1 \SEMI
-  r \GETS b^\mRA\SEMI
-  a^\mRA\GETS1 \SEMI
-  %y \GETS b^\mRA + x
-  s \GETS x\SEMI
-  y \GETS r+s
+  \PW{x}{1} \SEMI
+  \PR[\mACQ]{b}{r}\SEMI
+  \PW[\mREL]{a}{1} \SEMI
+  \PR{x}{s}\SEMI
+  \PW{y}{r{+}s}
   \PAR
-  r\GETS a^\mRA\SEMI
-  x\GETS 2\SEMI
-  b^\mRA\GETS10
+  \PR[\mACQ]{a}{r}\SEMI
+  \PW{x}{2}\SEMI
+  \PW[\mREL]{b}{10}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
   \event{a1}{\DW{x}{1}}{}
@@ -2110,11 +1901,11 @@ But not:
  Our model of coherence is as weak as that of
 \cite{Dolan:2018:BDR:3192366.3192421}:
 \begin{gather*}
-  x\GETS1\SEMI x\GETS 2
+  \PW{x}{1}\SEMI \PW{x}{2}
   \PAR
-  r_1\GETS x \SEMI
-  r_2\GETS x \SEMI
-  r_3\GETS x \SEMI
+  \PR{x}{r_1} \SEMI
+  \PR{x}{r_2} \SEMI
+  \PR{x}{r_3} \SEMI
   \\
   \hbox{\begin{tikzinline}[node distance=.8em]
     \event{a1}{\DW{x}{1}}{}
@@ -2135,7 +1926,7 @@ But not:
 \subsection{Write rule}
 Alan example of why substitute M/x rather than v/x in the write rule:
 \begin{gather*}
-  r\GETS y\SEMI x\GETS r\SEMI s\GETS  x\SEMI z\GETS s
+  \PR{y}{r}\SEMI \PW{x}{r}\SEMI \PR{x}{s} \SEMI \PW{z}{s}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a1}{\DR{y}{1}}{}
@@ -2148,7 +1939,7 @@ Alan example of why substitute M/x rather than v/x in the write rule:
 \end{gather*}
 We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
 \begin{gather*}
-   s\GETS  x\SEMI z\GETS s
+   \PR{x}{s}\SEMI \PW{z}{s}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a3}{\DR{x}{1}}{}
@@ -2156,7 +1947,7 @@ We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
     \end{tikzinline}}
 \end{gather*}
 \begin{gather*}
-  x\GETS r \SEMI s\GETS  x\SEMI z\GETS s
+  \PW{x}{r} \SEMI \PR{x}{s}\SEMI \PW{z}{s}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a2}{\DW{x}{1}}{}
@@ -2175,9 +1966,9 @@ We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
 \subsection{CSE example}
 Pugh example for alias analysis and CSE:
 \begin{gather*}
-  r_1\GETS x \SEMI
-  r_2\GETS x \SEMI  
-  r_3\GETS x \SEMI
+  \PR{x}{r_1} \SEMI
+  \PR{x}{r_2} \SEMI  
+  \PR{x}{r_3} \SEMI
   \IF{r_3{\leq}1}\THEN y=r_2\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
@@ -2190,9 +1981,9 @@ Pugh example for alias analysis and CSE:
     \end{tikzinline}}
 \end{gather*}
 \begin{gather*}
-  r_1\GETS x \SEMI
-  r_2\GETS x \SEMI  
-  r_3\GETS r_1 \SEMI
+  \PR{x}{r_1} \SEMI
+  \PR{x}{r_2} \SEMI  
+  \LET{r_3}{r_1} \SEMI
   \IF{r_3{\leq}1}\THEN y=r_2\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
@@ -2213,15 +2004,15 @@ rather than all of it.
 
 Another
 \begin{gather*}
-  r\GETS x
-  \SEMI s\GETS x
-  \SEMI \IF{r{>}0}\THEN y\GETS 1\FI
-  \SEMI \IF{s{>}0}\THEN z\GETS 1\FI
+  \PR{x}{r}
+  \SEMI \PR{x}{s}
+  \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI
+  \SEMI \IF{s{>}0}\THEN \PW{z}{1}\FI
   \\
-  r\GETS x
-  \SEMI \IF{r{>}0}\THEN y\GETS 1\FI
-  \SEMI s\GETS x
-  \SEMI \IF{s{>}0}\THEN z\GETS 1\FI
+  \PR{x}{r}
+  \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI
+  \SEMI \PR{x}{s}
+  \SEMI \IF{s{>}0}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=1em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -2242,15 +2033,15 @@ Another
     \end{tikzinline}}
 \end{gather*}          
 \begin{gather*}
-  s\GETS x
-  \SEMI r\GETS x
-  \SEMI \IF{r{>}0}\THEN y\GETS 1\FI
-  \SEMI \IF{s{>}0}\THEN z\GETS 1\FI
+  \PR{x}{s}
+  \SEMI \PR{x}{r}
+  \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI
+  \SEMI \IF{s{>}0}\THEN \PW{z}{1}\FI
   \\
-  s\GETS x
-  \SEMI \IF{s{>}0}\THEN z\GETS 1\FI
-  \SEMI r\GETS x
-  \SEMI \IF{r{>}0}\THEN y\GETS 1\FI
+  \PR{x}{s}
+  \SEMI \IF{s{>}0}\THEN \PW{z}{1}\FI
+  \SEMI \PR{x}{r}
+  \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=1em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -2271,9 +2062,9 @@ Another
     \end{tikzinline}}
 \end{gather*}          
 \begin{gather*}
-  s\GETS x
-  \SEMI \IF{r{>}0}\THEN y\GETS 1\FI
-  \SEMI \IF{s{>}0}\THEN z\GETS 1\FI
+  \PR{x}{s}
+  \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI
+  \SEMI \IF{s{>}0}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=1em]
       \event{b}{\DRreg{s}{x}{2}}{}
@@ -2285,9 +2076,9 @@ Another
 \end{gather*}          
 % For the desired result, it is sufficient if
 % \begin{gather*}
-%   s\GETS x
-%   \SEMI \IF{r{>}0}\THEN y\GETS 1\FI
-%   \SEMI \IF{s{>}0}\THEN z\GETS 1\FI
+%   \PR{x}{s}
+%   \SEMI \IF{r{>}0}\THEN \PW{y}{1}\FI
+%   \SEMI \IF{s{>}0}\THEN \PW{z}{1}\FI
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=1em]
 %       \event{b}{\DRreg{s}{x}{2}}{}
@@ -2300,8 +2091,8 @@ Another
 
 \begin{gather*}
   \begin{gathered}
-  r\GETS x
-  \SEMI s\GETS x
+  \PR{x}{r}
+  \SEMI \PR{x}{s}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{a}{\DRreg{r}{x}{1}}{}
@@ -2311,8 +2102,8 @@ Another
   \end{gathered}
   \qquad
   \begin{gathered}
-    \IF{r{>}0}\THEN y\GETS 1\FI
-    \SEMI \IF{s{>}0}\THEN z\GETS 1\FI
+    \IF{r{>}0}\THEN \PW{y}{1}\FI
+    \SEMI \IF{s{>}0}\THEN \PW{z}{1}\FI
 \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
       \event{c}{r{>}0 \mid \DW{y}{1}}{}
@@ -2335,10 +2126,10 @@ validate read reordering on same variable, due to consistency.
 
 Without 4b, we still do not allow:
 \begin{gather*}
-  r\GETS x\SEMI
-  s\GETS x\SEMI
-  y\GETS r\SEMI
-  z\GETS r
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \PW{y}{r}\SEMI
+  \PW{z}{r}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2352,8 +2143,8 @@ Without 4b, we still do not allow:
 \end{gather*}
 The following is not a pomset (consistency):
 \begin{gather*}
-  y\GETS r\SEMI
-  z\GETS r
+  \PW{y}{r}\SEMI
+  \PW{z}{r}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2364,11 +2155,11 @@ The following is not a pomset (consistency):
 
 Without 4b, we still do not allow:
 \begin{gather*}
-  r\GETS x\SEMI
-  s\GETS x\SEMI
-  y\GETS r\SEMI
-  z\GETS s\SEMI
-  \IF{r{=}s}\THEN a\GETS 1\FI\SEMI
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \PW{y}{r}\SEMI
+  \PW{z}{s}\SEMI
+  \IF{r{=}s}\THEN \PW{a}{1}\FI\SEMI
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2383,9 +2174,9 @@ Without 4b, we still do not allow:
 \end{gather*}
 The following is not a pomset (consistency):
 \begin{gather*}
-  y\GETS r\SEMI
-  z\GETS s\SEMI
-  \IF{r{=}s}\THEN a\GETS 1\FI\SEMI
+  \PW{y}{r}\SEMI
+  \PW{z}{s}\SEMI
+  \IF{r{=}s}\THEN \PW{a}{1}\FI\SEMI
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2397,9 +2188,9 @@ The following is not a pomset (consistency):
 
 We do allow:
 \begin{gather*}
-  r\GETS x\SEMI
-  s\GETS x\SEMI
-  \IF{r{=}s}\THEN a\GETS 1\FI\SEMI
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \IF{r{=}s}\THEN \PW{a}{1}\FI\SEMI
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2409,8 +2200,8 @@ We do allow:
     \end{tikzinline}}
 \end{gather*}
 % \begin{gather*}
-%   s\GETS x\SEMI
-%   \IF{r{=}s}\THEN a\GETS 1\FI\SEMI
+%   \PR{x}{s}\SEMI
+%   \IF{r{=}s}\THEN \PW{a}{1}\FI\SEMI
 %   \\[-1ex]
 %   \nonumber
 %   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2420,10 +2211,10 @@ We do allow:
 % \end{gather*}
 And also
 \begin{gather*}
-  r_1\GETS x\SEMI
-  r_2\GETS x\SEMI
-  r_3\GETS x\SEMI
-  \IF{r_3{\leq}1}\THEN y\GETS 1\FI\SEMI
+  \PR{x}{r_1}\SEMI
+  \PR{x}{r_2}\SEMI
+  \PR{x}{r_3}\SEMI
+  \IF{r_3{\leq}1}\THEN \PW{y}{1}\FI\SEMI
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2438,10 +2229,10 @@ And also
 But we cannot wait forever to satisfy a precondition.
 This is not a pomset:
 \begin{gather*}
-  r\GETS x\SEMI
-  s\GETS x\SEMI
-  y\GETS r\SEMI
-  z\GETS s
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \PW{y}{r}\SEMI
+  \PW{z}{s}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2455,10 +2246,10 @@ Note that reads that we delay must all be consistent.
 
 Also note that we cannot have:
 \begin{gather*}
-  r\GETS x\SEMI a\GETS r\SEMI
-  s\GETS x\SEMI b\GETS s\SEMI
-  y\GETS r\SEMI
-  z\GETS s
+  \PR{x}{r}\SEMI \PW{a}{r}\SEMI
+  \PR{x}{s}\SEMI \PW{b}{s}\SEMI
+  \PW{y}{r}\SEMI
+  \PW{z}{s}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2474,9 +2265,9 @@ Also note that we cannot have:
 \end{gather*}
 Because the following is not a pomset:
 \begin{gather*}
-  b\GETS s\SEMI
-  y\GETS r\SEMI
-  z\GETS s
+  \PW{b}{s}\SEMI
+  \PW{y}{r}\SEMI
+  \PW{z}{s}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2487,12 +2278,12 @@ Because the following is not a pomset:
 \end{gather*}
 But we can have the following, since there is no order the reads:
 \begin{gather*}
-  r_1\GETS x\SEMI
-  s_1\GETS x\SEMI  
-  r_2\GETS x\SEMI
-  s_2\GETS x\SEMI
-  y\GETS r_2\SEMI
-  z\GETS s_2
+  \PR{x}{r_1}\SEMI
+  \PR{x}{s_1}\SEMI  
+  \PR{x}{r_2}\SEMI
+  \PR{x}{s_2}\SEMI
+  \PW{y}{r_2}\SEMI
+  \PW{z}{s_2}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2508,12 +2299,12 @@ But we can have the following, since there is no order the reads:
 \end{gather*}
 Because this is indistinguishable from:
 \begin{gather*}
-  r_1\GETS x\SEMI
-  s_1\GETS x\SEMI  
-  r_2\GETS x\SEMI
-  s_2\GETS x\SEMI
-  y\GETS r_2\SEMI
-  z\GETS s_2
+  \PR{x}{r_1}\SEMI
+  \PR{x}{s_1}\SEMI  
+  \PR{x}{r_2}\SEMI
+  \PR{x}{s_2}\SEMI
+  \PW{y}{r_2}\SEMI
+  \PW{z}{s_2}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2529,12 +2320,12 @@ Because this is indistinguishable from:
 \end{gather*}
 which is the same as:
 \begin{gather*}
-  r_1\GETS x\SEMI
-  r_2\GETS x\SEMI
-  y\GETS r_2\SEMI
-  s_1\GETS x\SEMI  
-  s_2\GETS x\SEMI
-  z\GETS s_2
+  \PR{x}{r_1}\SEMI
+  \PR{x}{r_2}\SEMI
+  \PW{y}{r_2}\SEMI
+  \PR{x}{s_1}\SEMI  
+  \PR{x}{s_2}\SEMI
+  \PW{z}{s_2}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
@@ -2551,11 +2342,11 @@ which is the same as:
 
 But we can have:
 \begin{gather*}
-  p\GETS x\SEMI
-  r\GETS x\SEMI
-  s\GETS x\SEMI
-  y\GETS r\SEMI
-  z\GETS s
+  \PR{x}{p}\SEMI
+  \PR{x}{r}\SEMI
+  \PR{x}{s}\SEMI
+  \PW{y}{r}\SEMI
+  \PW{z}{s}
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]

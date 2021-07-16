@@ -101,14 +101,16 @@ the events are destined to coalesce.
   \item[] \labeltext[\textsc{r}4]{}{read-tau-reg}
     \begin{enumerate}[leftmargin=0pt]
     \item \label{read-tau-dep-reg}
-      if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
+      if $\aEv\in\aEvs\cap\bEvs$ then
+      %if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff
         \aVal{=}\uReg{\aEv}
         \limplies \bForm[\uReg{\aEv}/\aReg]
       \end{math},    
     \item \label{read-tau-ind-reg}
-      if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
+      if $\aEv\in\aEvs\setminus\bEvs$ then
+      %if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff
         \PBR{\aVal{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}} \limplies
@@ -307,7 +309,7 @@ preconditions.
   $\labelingForm(\aEv)$ is $\labeling$-consistent.
 \end{enumerate}
 With this modification, dead-code elimination
-(\reflem{lem:if}\ref{lem:if:dead}) is an equation rather than an inclusion:
+(\reflem{lem:if}\ref{lem:if:dead}) can be changed from an inclusion to an equation:
 \begin{displaymath}
   \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
   =
@@ -402,7 +404,8 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
     \item[] \labeltext[\textsc{r}4]{}{read-tau-addr}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-tau-dep-addr}
-        if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
+        if $\aEv\in\aEvs\cap\bEvs$ then
+        %if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
         % \begin{math}
         %   (\forall\aEv\in\aEvs\cap\bEvs)
         % \end{math}
@@ -412,7 +415,8 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
             \limplies \bForm[\uReg{\aEv}/\aReg]
           \end{math},}
       \item \label{read-tau-ind-addr}
-        if $\aEv\in\aEvs$ and $\aEv\not\in\bEvs$ then
+        if $\aEv\in\aEvs\setminus\bEvs$ then
+        %if $\aEv\in\aEvs$ and $\aEv\not\in\bEvs$ then
         % \begin{math}
         %   (\forall\aEv\in\aEvs\setminus\bEvs)
         % \end{math}
@@ -669,7 +673,7 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
     \end{enumerate}
   \end{enumerate}
 
-  Extend the definition of $\sSEMI{}{}$, $\sIF{}{}{}$ and $\sLPAR{}{}$ to include:
+  Extend the definition of $\sSEMI{}{}$, $\sIF{}{}{}$ and $\sPAR{}{}$ to include:
   \begin{enumerate}
   \item[(\textsc{s}10)] (\textsc{i}10)\; (\textsc{p}10)\; 
     ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,

@@ -16,36 +16,56 @@ models
 \citep{DBLP:conf/esop/JagadeesanPR10,DBLP:journals/pacmpl/ChakrabortyV19,Manson:2005:JMM:1047659.1040336},
 fail to validate compositional reasoning of temporal properties.  Consider
 example \ref{oota4} from \cite{DBLP:journals/pacmpl/JagadeesanJR20}:
-\begin{align}
+\begin{gather*}
   \taglabel{oota4}
   \begin{gathered}
     \PW{y}{x}
     \PAR
-    \PR{y}{r} \SEMI \PR{b}{s} \SEMI\IF{s}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
+    \PR{y}{r} \SEMI\IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
     \PAR
     \PW{b}{1}
+    % \\[-1ex]
+    % \hbox{\begin{tikzinline}[node distance=1.5em]
+    %     \event{rx}{\DR{x}{1}}{}
+    %     \event{wy}{\DW{y}{1}}{right=of rx}
+    %     \po{rx}{wy}
+    %     \event{ry}{\DR{y}{1}}{right=3em of wy} 
+    %     \event{wx}{\DW{x}{1}}{right=of ry}
+    %     \event{wz}{\DW{z}{1}}{right=of wx}
+    %     \event{rb}{\DR{b}{1}}{right=of wz}
+    %     \event{wb1}{\DW{b}{1}}{right=3em of rb}
+    %     \po{ry}{wx}
+    %     \rf{wb1}{rb}
+    %     \rf{wy}{ry}
+    %     \rf[out=-170,in=-10]{wx}{rx}
+    %     \po{rb}{wz}
+    %     \po[out=15,in=165]{ry}{wz}
+    %   \end{tikzinline}}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{rx}{\DR{x}{1}}{}
         \event{wy}{\DW{y}{1}}{right=of rx}
         \po{rx}{wy}
-        \event{ry}{\DR{y}{1}}{right=3em of wy} 
+        \event{rb}{\DR{b}{1}}{right=3em of wy}
+        \event{ry}{\DR{y}{1}}{right=of rb} 
         \event{wx}{\DW{x}{1}}{right=of ry}
         \event{wz}{\DW{z}{1}}{right=of wx}
-        \event{rb}{\DR{b}{1}}{right=of wz}
-        \event{wb1}{\DW{b}{1}}{right=3em of rb}
+        \event{wb1}{\DW{b}{1}}{right=3em of wz}
         \po{ry}{wx}
-        \rf{wb1}{rb}
-        \rf{wy}{ry}
+        \rf[out=-170,in=-10]{wb1}{rb}
+        \rf[out=15,in=165]{wy}{ry}
         \rf[out=-170,in=-10]{wx}{rx}
-        \po{rb}{wz}
+        \po[out=15,in=165]{rb}{wz}
         \po[out=15,in=165]{ry}{wz}
       \end{tikzinline}}
-  \end{gathered}  
-\end{align}
-Under \PS{}, this outcome is allowed by \emph{baiting} with the \texttt{else}
-branch, then \emph{switching} to the \texttt{then} branch, based on a coin
-flip $(\IF{b})$.
+  \end{gathered}
+\end{gather*}
+Under all variants of \PwT{}, this outcome is disallowed, due to the cycle
+involving $x$ and $y$.\footnote{All of the reads in \ref{oota4} are
+  cross-thread, so there is no difference between \PwTmca{1} and \PwTmca{2}.
+  For \PwTc, there is a cycle in ${\rrfx}\cup{\lt}$.}  Under \PS{}, this
+outcome is allowed by {baiting} with the \texttt{else} branch, then
+{switching} to the \texttt{then} branch, based on a coin flip (${b}$).
 % Using a combination of read introduction and case analysis,
 % the middle thread can be rewritten to:
 % \begin{displaymath}
@@ -71,12 +91,12 @@ flip $(\IF{b})$.
 % of temporal reasoning could result in violations of the Java security
 % architecture.
 
-Under all variants of \PwT{}, this outcome is disallowed, due to a cycle in
-${\rrfx}\cup{\lt}$. (Note that all reads cross threads in the example, so
-there is no difference between \PwTmca{1} and \PwTmca{2}.)
-
-The examples in \cite{promising-ldrf} are more complex.  Here is one, dubbed
-\textsc{ldrf-fail-ps}:
+\citet{promising-ldrf} introduce more complex examples to show that the
+promising semantics fails \ldrfsc{}.\footnote{\citet{promising-ldrf} show
+  that by restricting \RMW{}-store reorderings, one can establish \ldrfsc{}
+  for \PS{}.  We speculate that no such restriction is required for \PwT{}.
+  (We did not treat \RMW{}s in our proof of \ldrfsc{}.)}  Here is one, dubbed
+\labeltext{\textsc{ldrf-fail-ps}}{LDRF-Fail-PS}.
 \begin{gather*}  
   %\taglabel{LDRF-Fail-PS}
   \begin{gathered}
@@ -86,57 +106,113 @@ The examples in \cite{promising-ldrf} are more complex.  Here is one, dubbed
     \PW{z}{1}
   \FI
   \PAR
-  \IF{\BANG z}\THEN
-    \PW{x}{1}
-  \ELSE
+  \IF{z}\THEN
     \IF{\BANG \PFADD{w}{}{1}}\THEN
       \PW{x}{\PR{y}{}}
     \FI
+  \ELSE
+    \PW{x}{1}
   \FI
     \\
-    \hbox{\begin{tikzinlinesmall}[node distance=2em]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DR{x}{1}}{}
         \event{a2}{\DR{w}{1}}{right=of a1}
         \event{a3}{\DW{w}{2}}{right=of a2}
         \event{a4}{\DW{y}{1}}{right=of a3}
         \event{a5}{\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=5em of a5}
+        \event{b1}{\DR{z}{1}}{right=4em of a5}
         \event{b2}{\DR{w}{0}}{right=of b1}
         \event{b3}{\DW{w}{1}}{right=of b2}
         \event{b4}{\DR{y}{1}}{right=of b3}
         \event{b5}{\DW{x}{1}}{right=of b4}
-        \rmw{a2}{a3}
         \po[out=15,in=165]{a1}{a3}
         \po[out=15,in=165]{a1}{a4}
         \po[out=15,in=165]{a1}{a5}        
-        \rmw{b2}{b3}
         \po{b4}{b5}
         \po[out=15,in=165]{b2}{b5}        
         \po[out=15,in=165]{b1}{b3}
         \rf{a5}{b1}
-        \rf[out=15,in=165]{a4}{b4}
-        \rf[out=-165,in=-15]{b3}{a2}
-        \rf[out=-165,in=-15]{b5}{a1}
-      \end{tikzinlinesmall}}
+        \rf[out=10,in=170]{a4}{b4}
+        \rf[out=-170,in=-10]{b3}{a2}
+        \rf[out=-170,in=-10]{b5}{a1}
+        \rmw{a2}{a3}
+        \rmw{b2}{b3}
+      \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-This execution is allowed by \PS{} and disallowed by \PwTmca{}.
+Again, all variants of \PwT{} disallow the outcome due to the cycle involving
+$x$ and $y$.  It is allowed by \PS{} by baiting the second thread with
+$\PW{x}{1}$ in the \texttt{else} branch, then switching to the \texttt{then}
+branch.  This shows some some structural resemblance to \ref{oota4}, with $z$
+replacing $b$.
 
 
-The difference between \PS{} and \PwT{} can be understood in terms of the
-valid program transformations.  \PS{} allows reads to be introduced, with
+\citeauthor{promising-ldrf} argue that the outcome of \ref{LDRF-Fail-PS} is
+inevitable due to compiler optimizations.  The examples crucially involve the
+following sequence of operations:
+\begin{itemize}
+\item read introduction,
+\item if introduction, branching on the read just introduced.
+\end{itemize}
+We believe this combination of optimizations is unsound.  This is obviously
+the case in \cXI: read introduction may cause undefined behavior (\ub), due to
+the possible introduction of a data race.
+
+The situation is more delicate in \llvm.  The short version of the story is
+that load-hoisting followed by case analysis is unsound in \llvm, without freeze. 
+This happens because:
+\begin{itemize}
+\item read introduction may result in the undefined value $\UNDEFINED$, due
+  to the possible introduction of a data race \cite{DBLP:conf/cgo/ChakrabortyV17}, and
+\item branching on an undefined value in \llvm{} results in \ub. 
+\end{itemize}
+\llvm{} delays \ub{} using the undefined value.  This allows \llvm{} to
+perform optimizations such as load hoisting, where
+\begin{math}
+  \IF{C}\THEN \PR{x}{r}\FI
+\end{math}
+is rewritten to 
+\begin{math}
+  \PR{x}{s}\SEMI
+  \LET{r}{\TERNARY{C}{s}{r}}.
+\end{math}
+Despite this, other optimizations regularly performed by \llvm{} are
+unsound \cite{DBLP:conf/pldi/LeeKSHDMRL17}.  An example is loop switching,
+where
+\begin{math}
+  \WHILE{C_1}\DO \IF{C_2}\THEN \aCmd_1 \ELSE \aCmd_2 \FI \OD
+\end{math}
+is rewritten to 
+\begin{math}
+  \IF{C_2}\THEN \WHILE{C_1}\DO \aCmd_1 \OD \ELSE \WHILE{C_1}\DO \aCmd_2 \FI \OD.
+\end{math}
+Freeze was introduced in \llvm{} in order to make such optimizations sound by
+allowing branch on frozen $\UNDEFINED$ to give nondeterministic choice rather
+than \ub{}.  In the RFC for freeze, \citet{nuno} says: \emph{``Note that
+  having branch on poison not trigger \ub{} has its own problems.  We believe
+  this is a good tradeoff.''}  \ref{LDRF-Fail-PS} demonstrates a concrete
+problem with this tradeoff.  Other compilers, such as Compcert, are more
+conservative \cite[\textsection9]{DBLP:conf/pldi/LeeKSHDMRL17}.
+
+Thus, the difference between \PS{} and \PwT{} can be understood in terms of
+the valid program transformations.  \PS{} allows reads to be introduced, with
 subsequent case analysis on the value read.  \PwT{} validates case analysis,
-but invalidates read introduction.  In return, \PwT{} enjoys compositionality
-for temporal safety properties, as discussed in \textsection\ref{sec:results}.
+but invalidates read introduction.
 
-\citet{promising-ldrf} show that by restricting \RMW{}-store reorderings, one
-can establish local \drf{} for \PS{}.  We believe that no such restriction is
-required for \PwT{}.
+Allowing executions such as \ref{oota4} and \ref{LDRF-Fail-PS} also
+invalidates compositional reasoning for temporal safety properties (see
+\textsection\ref{sec:results}).
 
-These differences highlight the subtle tensions between compiler optimizations
-and program logics that are revealed by relaxed memory models.  It is not
-possible to have everything one wants. Thus, one is forced to choose which
-optimizations and reasoning principles are most important.
+These differences highlight the subtle tensions between compiler
+optimizations and program logics that are revealed by relaxed memory models.
+It is not possible to have everything one wants. Thus, one is forced to
+choose which optimizations and reasoning principles are most
+important.\footnote{Another example is the tension between load
+  hoisting---forbidden in \cXI{} but allowed by \llvm{}---and common
+  subexpression elimination over an acquiring lock---allowed by \cXI{} but
+  forbidden by \llvm{} \cite{DBLP:conf/cgo/ChakrabortyV17}.}
+
+Finally, we note that it is possible that \PS{} is properly weaker than \PwT{}.  
 
 % \todo{Write this.}
 
@@ -145,7 +221,7 @@ optimizations and reasoning principles are most important.
 % These happen by performing transformations that: 
 % (1) introduce conditionals,
 % (2) inline two threads on both sides of the introduced conditional,
-% (3) choose different orders for the two threads for the two sides of the conditional.
+% (3) choose different orders for the two threads for the two sides of the ( conditional.
 
 % Case analysis gives very weak results when combined with read introduction.
 % See \cite{promising-ldrf}.
@@ -161,6 +237,108 @@ optimizations and reasoning principles are most important.
 
 % \weakestmo{} admits FADD, but \PS{} does not.
 % \PS{} admits CohCYC, but \weakestmo{} does not.
+
+% \subsubsection{Load hoisting in LLVM}
+% Load-hoisting followed by case analysis is unsound in LLVM, without freeze.
+% Introducing a read may cause a race, resulting in read value $\UNDEFINED$.
+% Branch on $\UNDEFINED$ is UB.  Freeze was added to get around this...
+
+% Examples from \cite{promising-ldrf} show that freeze is bullshit.  Compcert
+% does not validate loop switching
+% \cite[\textsection9]{DBLP:conf/pldi/LeeKSHDMRL17}.
+
+% \cite[\textsection3.3]{DBLP:conf/pldi/LeeKSHDMRL17} Global Value Numbering
+% (GVN) and Loop Unswitching require different semantics for branch on
+% $\UNDEFINED$. \url{https://llvm.org/docs/LangRef.html#freeze-instruction}
+
+% \href{https://lists.llvm.org/pipermail/llvm-dev/2016-October/106182.html}{Purpose of Freeze}
+% \begin{quotation}
+%   Poison is propagated aggressively throughout. However, there are cases
+%   where this breaks certain optimizations, and therefore freeze is used to
+%   selectively stop poison from being propagated.
+
+%   A use of freeze is to enable speculative execution.  For example, loop
+%   switching does the following transformation:
+% \begin{verbatim}
+% \end{verbatim}
+% \begin{verbatim}
+% while (C) {        if (C2) {     
+%   if (C2) {           while (C)  
+%    A                     A       
+%   } else {   ==>   } else {      
+%    B                   while (C) 
+%   }                       B      
+% }                  }             
+% \end{verbatim}
+%   Here we are evaluating C2 before C.  If the original loop never executed
+%   then we had never evaluated C2, while now we do.  So we need to make sure
+%   there's no UB for branching on C2.  Freeze ensures that so we would
+%   actually have 'if (freeze(C2))' instead.  Note that
+%   \emph{having branch on poison not trigger UB has its own problems.}
+%   We believe this is a good tradeoff.
+% \end{quotation}
+
+
+% \begin{quotation}
+%   LLVM frequently performs such load introductions in the “simplify CFG”
+%   pass; e.g., when hoisting loads outside of conditionals.
+% \end{quotation}
+
+% case analysis happens in ``function specialization'' also known as
+% ``procedure cloning''
+
+% \subsubsection{Hoisting and CSE}
+% Example from Viktor's talk: ``Weak Memory Concurrency in C/C++11 and LLVM''
+
+% Load Hoisting:
+% \begin{displaymath}
+%   \IF{c}\THEN \PR{x}{a}\FI
+%   \rightsquigarrow
+%   \PR{x}{t}\SEMI
+%   \LET{a}{\TERNARY{c}{t}{a}}
+% \end{displaymath}
+
+% CSE over acquiring lock:
+% \begin{displaymath}
+%   \PR{x}{a}\SEMI
+%   \LOCK\SEMI
+%   \PR{x}{b}
+%   \rightsquigarrow
+%   \PR{x}{a}\SEMI
+%   \LOCK\SEMI
+%   \LET{b}{a}
+% \end{displaymath}
+
+% Having both is clearly wrong:
+% \begin{displaymath}
+%   \begin{array}{l}
+%     \IF{c}\THEN\\
+%     \quad\PR{x}{a}\FI\SEMI\\
+%     \LOCK\SEMI\\
+%     \PR{x}{b}    
+%   \end{array}
+%   \rightsquigarrow
+%   \begin{array}{l}
+%     \PR{x}{t}\SEMI\\
+%     \LET{a}{\TERNARY{c}{t}{a}}\SEMI\\
+%     \LOCK\SEMI\\
+%     \PR{x}{b}    
+%   \end{array}
+%   \rightsquigarrow
+%   \begin{array}{l}
+%     \PR{x}{t}\SEMI\\
+%     \LET{a}{\TERNARY{c}{t}{a}}\SEMI\\
+%     \LOCK\SEMI\\
+%     \LET{b}{a}    
+%   \end{array}
+% \end{displaymath}
+% When c is false, x is moved out of the critical region!
+
+% So we have to forbid one transformation.
+% \begin{itemize}
+% \item C11 forbids load hoisting, allows CSE over lock().
+% \item LLVM allows load hoisting, forbids CSE over lock().
+% \end{itemize}
 
 
 
