@@ -1115,7 +1115,8 @@ first thread from the read of $y$ to one of the writes to $x$.
   If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
-  $(\exists\emptyForm\in\Formulae)$
+  $(\exists\emptyForm\in\{\TRUE,\FALSE\})$
+  %$(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
   \item \label{write-E-ca}
@@ -1146,9 +1147,11 @@ first thread from the read of $y$ to one of the writes to $x$.
       \begin{aligned}[t]
         \aTr{\bEvs}{\bForm} \riff
         &\textstyle\bigwedge_{\aEv\in\aEvs}
-        \cForm_\aEv
-        \limplies 
-        \bForm[\aExp/\aLoc][\aExp{=}\aVal_\aEv/\Q{\aLoc}]
+        \PBR{
+          \cForm_\aEv
+          \limplies 
+          \bForm[\aExp/\aLoc][\aExp{=}\aVal_\aEv/\Q{\aLoc}]
+        }
         \\[-.5ex]
         \land
         &
@@ -1189,7 +1192,7 @@ first thread from the read of $y$ to one of the writes to $x$.
       \emptyForm
       %\PBR{\bigvee_{\aEv\in\aEvs}\cForm_\aEv}
       \land
-      \PBR{\bigwedge_{\aEv\in\aEvs}\cForm_\aEv \limplies \aExp{=}\aVal_\aEv}.
+      \bigwedge_{\aEv\in\aEvs}\PBR{\cForm_\aEv \limplies \aExp{=}\aVal_\aEv}.
     \end{math}
     % \stepcounter{enumi}
     % \item[] \labeltext[\textsc{w}5]{}{write-term-ca}
@@ -1208,7 +1211,8 @@ first thread from the read of $y$ to one of the writes to $x$.
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$ 
-  $(\exists\emptyForm\in\Formulae)$
+  $(\exists\emptyForm\in\{\TRUE,\FALSE\})$
+  %$(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
   \item \label{read-E-ca}
@@ -1228,17 +1232,21 @@ first thread from the read of $y$ to one of the writes to $x$.
         (\forall\bReg)
         \aTr{\bEvs}{\bForm} \riff
         &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
-        \cForm_\aEv
-        \limplies \aVal_\aEv{=}\uReg{\aEv}
-        \limplies \bForm[\uReg{\aEv}/\aReg]
+        \PBR{
+          \cForm_\aEv
+          \limplies \aVal_\aEv{=}\uReg{\aEv}
+          \limplies \bForm[\uReg{\aEv}/\aReg]
+        }
         \\[-.5ex]
         \land
         &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
-        \cForm_\aEv 
-        \limplies
-        \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
-        \limplies
-        \bForm[\uReg{\aEv}/\aReg]
+        \PBR{
+          \cForm_\aEv 
+          \limplies
+          \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+          \limplies
+          \bForm[\uReg{\aEv}/\aReg]
+        }
         \\[-.5ex]
         \land
         &
