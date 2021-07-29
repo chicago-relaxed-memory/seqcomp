@@ -652,7 +652,8 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
   Extend the definition of a pomset as follows. % where two actions \emph{overlap} if they access the same location:
   \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
     \setcounter{enumi}{9}
-  \item \label{pom-rmw}
+    \makecounter{Brmw}    
+  \item \label{pom-rmw} \makecounter{rmw}    
     ${\rrmw} : \aEvs\fun\aEvs$ is a partial function capturing
     read-modify-write \emph{atomicity}, such that
     \begin{enumerate}
@@ -691,35 +692,65 @@ To define specific operations, we extend the syntax:
 We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic functions are as follows.
 \begin{definition}
   Let $\sLOADP{}{}$ be defined as for $\sLOAD{}{}$, adding the constraint:
-  \begin{itemize}
-  \item[{\labeltext[\textsc{r}4d]{(\textsc{r}4d)}{read-tau-rmw}}]
+  \begin{enumerate}
+  \item[{\labeltextXX{4d}{r}{read-tau-rmw}}]
     if $(\aEvs\cap\bEvs)=\emptyset$ then
     \begin{math}
-      \aTr{\bEvs}{\bForm} \rimplies
+      \aTr{\bEvs}{\bForm} \riff
       \bForm.
     \end{math}
-  \end{itemize}
-  If $\aPS\in\mathit{FADD}(\aReg,\cExp,\aExp,\amode,\bmode)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sSTORE[\bmode]{\cExp}{\aReg{+}\aExp}})$
-  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
+  \end{enumerate}
+  If $\aPS\in\sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]$ then
+  \begin{math}
+    %\sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]\subseteq\sSEMI{
+    \aPS\in\sSEMI{
+      \sLOADP[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
+    }{
+      \sSTORE[\bmode]{\aLoc}[\ascope]{\aReg{+}\aExp}[\aThrd]
+    }
+  \end{math}
+  and %s.t.
+  \\
+  If $\aPS\in\sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]$ then
+  \begin{math}
+    %\sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]\subseteq\sSEMI{
+    \aPS\in\sSEMI{    
+      \sLOADP[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
+    }{
+      \sSTORE[\bmode]{\aLoc}[\ascope]{\aExp}[\aThrd]
+    }
+  \end{math}
+  and %s.t.
+  \\
+  If $\aPS\in\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]$ then\\\quad
+  \begin{math}
+    %\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]\subseteq\sSEMI{
+    \aPS\in\sSEMI{
+      \sLOADP[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
+    }{
+      \sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\bmode]{\aLoc}[\ascope]{\bExp}[\aThrd]\sELSE\sSKIP\sFI
+    }
+  \end{math}
+  and %s.t.
+  \begin{enumerate}[label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
+    \setcounter{enumi}{\value{Brmw}}
+  \item if $\labeling(\aEv)$ is a write then there is a read $\labeling(\bEv)$ such that 
     $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
     $\bEv\xrmw\aEv$.
   \end{enumerate}
-  If $\aPS\in\mathit{EXCHG}(\aReg,\cExp,\aExp,\amode,\bmode)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sSTORE[\bmode]{\cExp}{\aExp}})$
-  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
-    $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
-    $\bEv\xrmw\aEv$.
-  \end{enumerate}
-  If $\aPS\in\mathit{CAS}(\aReg,\cExp,\aExp,\bExp,\amode,\bmode)$ then
-  $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode]{\aReg}{\cExp}}{\sIF{\aReg{=}\aExp}\sTHEN\sSTORE[\bmode]{\cExp}{\bExp}\sELSE\sSKIP\sFI})$
-  \begin{enumerate}[topsep=0pt,label=(\textsc{u}\arabic*),ref=\textsc{u}\arabic*]
-  \item if $\labeling_1(\aEv)$ is a write then there is a read $\labeling_1(\bEv)$ such that 
-    $\labelingForm(\aEv)\rimplies\labelingForm(\bEv)$ and
-    $\bEv\xrmw\aEv$.
-  \end{enumerate}
+  \begin{align*}
+    \sem[\aThrd]{\PCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}}
+    &=
+    \sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]
+    \\
+    \sem[\aThrd]{\PFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}}
+    &=
+    \sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]
+    \\
+    \sem[\aThrd]{\PEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}}
+    &=
+    \sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]
+  \end{align*}
 \end{definition}
   % If $\aPS\in\mathit{FADD}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
   % $(\exists \aPS_1\in\sSEMI{\sLOADP[\amode_1]{\aReg}{\aLoc}}{\sSTORE[\amode_2]{\aLoc}{\aReg{+}\aExp}})$
@@ -782,14 +813,19 @@ $\sLOAD{}{}$.  Thus, for \RMW{} operations, the independent case for a read
 is the same as the empty case.  To see why this should be, consider the
 relaxed variant of the \textsc{cdrf} example from
 \cite{DBLP:conf/pldi/LeeCPCHLV20}, using $\sLOAD{}{}$ rather than $\sLOADP{}{}$.
+\begin{scope}
+  \small
 \begin{gather*}
   \begin{gathered}
     \PW{x}{0}\SEMI
-    \begin{aligned}[t]
-      (&\PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI \;\;\PAR
-      \\&
+      (\PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI \;\;\PAR
       \PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \PW{y}{1} \FI)
-    \end{aligned}
+    % \PW{x}{0}\SEMI
+    % \begin{aligned}[t]
+    %   (&\PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \IF{y}\THEN \PW{x}{0} \FI \FI \;\;\PAR
+    %   \\&
+    %   \PFADD[\mRLX][\mRLX]{x}{r}{1}\SEMI \IF{\BANG r}\THEN \PW{y}{1} \FI)
+    % \end{aligned}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{i}{\DW{x}{0}}{}
@@ -812,6 +848,7 @@ relaxed variant of the \textsc{cdrf} example from
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
+\end{scope}
 A write should only be visible to one $\PFADD{}{}{}$ instruction, but here
 the write of $0$ is visible to two.  This is allowed because no order is
 required from $\DRP{x}{0}$ to $\DWP{y}{1}$ in the last thread.  To see why,

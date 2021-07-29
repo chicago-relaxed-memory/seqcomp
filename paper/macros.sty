@@ -412,7 +412,7 @@
   \csname phantomsection\endcsname% in case hyperref is used
   \def\@currentlabel{\textsc{#2}#1}{\label{#3}}%
   \@esphack%
-  (\textsc{#2}#1)
+  (\textsc{#2}#1)%
 }
 %\newcommand{\imm}{\restrict{\mathrm{imm}}}
 % \renewcommand{\@fnsymbol}[1]{\ensuremath{\ifcase#1\or
@@ -1038,6 +1038,9 @@
 \NewDocumentCommand{\sLOADP}{O{} m O{} m O{}}{\textnormal{\textit{READ}}'\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#4\ifnotempty{#1}{,\,\allowbreak#1}\ifnotempty{#3}{\ifshowSCOPE,\,\allowbreak#3\fi})\ifshowSCOPE_{#5}\fi}}
 \NewDocumentCommand{\sSTORE}{O{} m O{} m O{}}{\textnormal{\textit{WRITE}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#4\ifnotempty{#1}{,\,\allowbreak#1}\ifnotempty{#3}{\ifshowSCOPE,\,\allowbreak#3\fi})\ifshowSCOPE_{#5}\fi}}
 \NewDocumentCommand{\sFENCE}{O{} m O{}}{\textnormal{\textit{FENCE}}\ifnotempty{#2}{\allowbreak(#2\ifnotempty{#1}{\ifshowSCOPE,\,\allowbreak#1\fi})\ifshowSCOPE_{#3}\fi}}
+\NewDocumentCommand\sCAS{O{} O{} m O{} m m m O{}}{\textnormal{\textit{CAS}}(#5,\,#3,\,#6,\,#7,\,#1,\,#2\ifshowSCOPE,\,\allowbreak#4\fi)\ifshowSCOPE_#8\fi}
+\NewDocumentCommand\sFADD{O{} O{} m O{} m m O{}}{\textnormal{\textit{FADD}}(#5,\,#3,\,#6,\,#1,\,#2\ifshowSCOPE,\,\allowbreak#4\fi)\ifshowSCOPE_#7\fi}
+\NewDocumentCommand\sEXCHG{O{} O{} m O{} m m O{}}{\textnormal{\textit{EXCHG}}(#5,\,#3,\,#6,\,#1,\,#2\ifshowSCOPE,\,\allowbreak#4\fi)\ifshowSCOPE_#7\fi}
 \newcommand{\sSTOREtight}[3][]{\textnormal{\textit{WRITE}}\ifnotempty{#2}{\allowbreak(#2,#3\ifnotempty{#1}{,#1})}}
 \newcommand{\sLOADPRE}[4][]{\textnormal{\textit{RD}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}
 \newcommand{\sSTOREPRE}[4][]{\textnormal{\textit{WR}}\ifnotempty{#2}{\allowbreak(#2,\,\allowbreak#3\ifnotempty{#1}{,\,\allowbreak#1},\,\allowbreak#4)}}

@@ -303,18 +303,23 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
     \{(\DW{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DR{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DW{\aLoc}{}\Cb \DR{\aLoc}{})\}
   \end{math}.
 
-  Let ${\reorderra}$ capture conflict due to synchronization:
+  Let ${\reorderra}$ capture conflict due to
+  synchronization:\footnote{Symmetry would suggest that we include
+  \begin{math}
+    (\DR{\aLoc}{}, \DR[\gemode\mACQ]{\aLoc}{}),
+  \end{math}
+  but this is not sound for \armeight{}.}
   \begin{math}
     {\reorderra}
-    =
-    \{(\aAct\Cb             \DW[\gemode\mREL]{}{}     )\Cc
-    (\aAct\Cb               \DF{\gemode\fREL}        )\Cc
-    (\DR{}{}\Cb             \DF{\gemode\fACQ}        )\Cc
-    % (\DR{\aLoc}{}\Cb        \DR[\gemode\mACQ]{\aLoc}{})\Cc
-    (\DR[\gemode\mACQ]{}{}\Cb\aAct                    )\Cc
-    (\DF{\gemode\fACQ}\Cb   \aAct                    )\Cc
-    (\DF{\gemode\fREL}\Cb   \DW{}{}                  )\Cc
-    (\DW[\gemode\mREL]{\aLoc}{}\Cb\DW{\aLoc}{})\}
+    =\{
+    ( \aAct                     \Cb\DW[\gemode\mREL]{}{}      )\Cc
+    ( \aAct                     \Cb\DF{\gemode\fREL}          )\Cc
+    ( \DR{}{}                   \Cb\DF{\gemode\fACQ}          )\Cc 
+    %( \DR{\aLoc}{}              \Cb\DR[\gemode\mACQ]{\aLoc}{} )\Cc
+    ( \DR[\gemode\mACQ]{}{}     \Cb\bAct                      )\Cc 
+    ( \DF{\gemode\fACQ}         \Cb\bAct                      )\Cc
+    ( \DF{\gemode\fREL}         \Cb\DW{}{}                    )\Cc
+    ( \DW[\gemode\mREL]{\aLoc}{}\Cb\DW{\aLoc}{}               )\}
   \end{math}.
 
   Let ${\eqreordersc}$ capture conflict due to $\mSC$ access:
@@ -342,13 +347,13 @@ The definition comes from \citet{DBLP:journals/cacm/Dijkstra75}:
   $\aTr{}{}:\Formulae\fun\Formulae$ such that
   \begin{multicols}{2}
     \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
-    \item \label{tr-implies}
-      if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies
-      \aTr{}{\bForm}$,
     \item \label{tr-and}
       $\aTr{}{\bForm_1\land\bForm_2}\riff\aTr{}{\bForm_1}\land\aTr{}{\bForm_2}$,    
     \item \label{tr-or}
-      $\aTr{}{\bForm_1\lor\bForm_2}\riff\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$.
+      $\aTr{}{\bForm_1\lor\bForm_2}\riff\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$,
+    \item \label{tr-implies}
+      if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies
+      \aTr{}{\bForm}$.
     % \item \label{tr-false}
     %   $\aTr{}{\FALSE}$ is $\FALSE$,    
     \end{enumerate}
