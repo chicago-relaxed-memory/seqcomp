@@ -225,7 +225,7 @@ execution, where the final values of both $x$ and $y$ are $2$.
       \gcbz[out=-165,in=-15]{e}{a}
     \end{tikzinline}}
   \\
-  \tag{$\le$}
+  \tag{$\lt$}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a}{\DW{x}{2}}{}
       \raevent{b}{\DR[\mACQ]{x}{2}}{right=of a}
@@ -404,7 +404,7 @@ Arm.  The proof uses the characterization of Arm using \EGC{}.
 We can achieve optimal lowering for Arm by weakening the semantics of
 sequential composition slightly.  In particular, we must lose
 \ref{pom-rf-le}, which states that $\bEv\xrfx\aEv$ implies
-$\bEv\le\aEv$.  Revisiting the example in the last subsection, we essentially
+$\bEv\lt\aEv$.  Revisiting the example in the last subsection, we essentially
 mimic the \EC{} characterization:
 \begin{gather*}
   \PW{x}{2}\SEMI 

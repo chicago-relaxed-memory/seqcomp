@@ -405,6 +405,7 @@ always refers to the order relation.
 
 The core of the model is a pomset, which includes a set of events
 \eqref{pom-E}, a labeling \eqref{pom-lambda}, and an order \eqref{pom-le}.
+As usual, we write $\bEv\le\aEv$ to mean $\bEv\lt\aEv$ or $\bEv=\aEv$.
 %
 On top of this basic structure, \ref{pom-kappa}--\ref{pom-term} add a layer
 of logic.  For each pomset, \ref{pom-term} provides a termination condition.
@@ -557,7 +558,7 @@ in \textsection\ref{sec:delay}
 \begin{definition}
   \label{def:augment}
   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if all fields are equal except,
-  perhaps, the order, where we require ${\le_2}\supseteq{\le_1}$.
+  perhaps, the order, where we require ${\lt_2}\supseteq{\lt_1}$.
   % \begin{multicols}{4}
   %   \begin{enumerate}
   %   \item $\aEvs_2=\aEvs_1$,
@@ -913,9 +914,9 @@ Turning to the precondition $\aForm$ on the write, recall that in order for
 $\aEv$ to participate in a top-level pomset, the precondition $\aForm$ must
 be a tautology at top-level.  There are two possibilities.
 \begin{itemize}
-\item If $\bEv\le\aEv$ then we apply the dependent transformer and
+\item If $\bEv\lt\aEv$ then we apply the dependent transformer and
   $\aForm\riff(1{=}r\limplies r{=}1)$, a tautology.
-\item If $\bEv\not\le\aEv$ then we apply the independent transformer and
+\item If $\bEv\not\lt\aEv$ then we apply the independent transformer and
   $\aForm\riff((x{=}r\lor1{=}r)\limplies r{=}1)$.  Under the assumption that $r$
   is bound, this is logically equivalent to $(x{=}1)$. (We make this more
   precise in \textsection\ref{sec:false}.)
@@ -1185,15 +1186,18 @@ Throughout the remainder of the paper, we use this definition.  (The lack of
 dependencies into reads is one of the factors complicating downset closure;
 see \textsection\ref{sec:downset} for a discussion.)
 
-\subsection{Subtleties}
+\subsection{A Subtlety: Local Invariant Reasoning}
+\label{sec:lir}
 \label{sec:q}
 
-There are two aspects of \reffig{fig:seq} that are fairly obscure: local
-invariant reasoning and $\Q{x}$.  
-
-First, consider local invariant reasoning, as in \jmm{} causality test case 1
-\cite{PughWebsite}:
+Two aspects of \reffig{fig:seq} that are fairly obscure: First,
+\ref{read-tau-ind} introduces locations into formula, in order to track the
+local state of memory.  This is necessary to support local invariant
+reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}.
+Second, \ref{read-kappa} introduces symbols $\Q{x}$ to ensure that local
+state is tracked accurately.  Consider \ref{TC1}:
 \begin{gather*}
+  \taglabel{TC1}
   \begin{gathered}
     \PW{x}{0} \SEMI
     (\PR{x}{r}\SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
@@ -1245,7 +1249,8 @@ $x$ tracks the ``local state'' of the variable.  This idea is borrowed from
   in the logic, not just registers.  This is one reason we use predicate
   transformers rather than simple postconditions.}
 
-Second, consider $\Q{x}$, which we motivate using the following example 
+To see that $\Q{x}$ is necessary to constrain this use of local state,
+consider the following example from
 \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}:
 \begin{align*}
   \begin{gathered}    

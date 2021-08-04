@@ -38,25 +38,28 @@ execution should be allowed ``since redundant read elimination could result
 in simplification of $\aReg{=}\bReg$ to true, allowing $\PW{y}{1}$ to be
 moved early.''
 \begin{gather*}
-  \PR{x}{r}\SEMI
-  \PR{x}{s}\SEMI
-  \IF{r{=}s}\THEN \PW{y}{1}\FI
-  \PAR
-  \PW{x}{y}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \eventl{\bEv}{a1}{\DR{x}{1}}{}
-      % \event{a2}{\DR{x}{1}}{right=of a1}
-      \eventr{\aEv}{a3}{\DW{y}{1}}{right=of a1}
-      % \po{a1}{a3}
-      % \po[out=-20,in=-160]{a1}{a3}
-      \event{b1}{\DR{y}{1}}{right=3em of a3}
-      \event{b2}{\DW{x}{1}}{right=of b1}
-      \rf{a3}{b1}
-      \po{b1}{b2}
-      % \rf[out=169,in=11]{b2}{a2}
-      \rf[out=169,in=11]{b2}{a1}
-    \end{tikzinline}}
+  \taglabel{TC2}
+  \begin{gathered}
+    \PR{x}{r}\SEMI
+    \PR{x}{s}\SEMI
+    \IF{r{=}s}\THEN \PW{y}{1}\FI
+    \PAR
+    \PW{x}{y}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \eventl{\bEv}{a1}{\DR{x}{1}}{}
+        % \event{a2}{\DR{x}{1}}{right=of a1}
+        \eventr{\aEv}{a3}{\DW{y}{1}}{right=of a1}
+        % \po{a1}{a3}
+        % \po[out=-20,in=-160]{a1}{a3}
+        \event{b1}{\DR{y}{1}}{right=3em of a3}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \rf{a3}{b1}
+        \po{b1}{b2}
+        % \rf[out=169,in=11]{b2}{a2}
+        \rf[out=169,in=11]{b2}{a1}
+      \end{tikzinline}}
+  \end{gathered}
 \end{gather*}
 Under the semantics of \reffig{fig:seq}, the precondition of
 $\aEv$ in the independent case is
@@ -451,6 +454,53 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
   \end{multicols}
 \end{definition}
 
+\todo{Perhaps move this to \textsection\ref{sec:extras} and put
+  \href{http://www.cs.umd.edu/~pugh/java/memoryModel/unifiedProposal/testcases.html}{TC12}
+  here.}
+\begin{comment}
+Initially, x = y = 0; a[0] = 1, a[1] = 2
+
+Thread 1
+r1 = x
+a[r1] = 0
+r2 = a[0]
+y = r2
+
+Thread 2
+r3 = y
+x = r3
+
+Behavior in question: r1 = r2 = r3 = 1
+
+Decision: Disallowed. Since no other thread accesses the array a,
+the code for thread 1 should be equivalent to:
+
+   r1 = x
+   a[r1] = 0
+   if (r1 == 0)
+     r2 = 0
+   else
+     r2 = 1
+   y = r2
+
+
+With this code, it is clear that this is the same situation as test 4:
+
+Initially, x = y = 0
+
+Thread 1:
+r1 = x
+y = r1
+
+Thread 2:
+r2 = y
+x = r2
+
+Behavior in question: r1 == r2 == 1
+
+Decision: Forbidden: values are not allowed to come out of thin air
+\end{comment}
+
 The combination of read-read independency (\textsection\ref{sec:read-read}) and address
 calculation is somewhat delicate.  
 % , in
@@ -660,17 +710,15 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
     \item \label{pom-rmw-block}
       if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$,
     \item \label{pom-rmw-le}
-      if $\bEv\xrmw\aEv$ then $\bEv \le \aEv$,    
+      if $\bEv\xrmw\aEv$ then $\bEv \lt \aEv$,    
     \item \label{pom-rmw-atomic}
-      if $\labeling(\cEv) \roverlaps \labeling(\bEv)$ then
-      \begin{enumerate}        
-      \item \label{pom-rmw-atomic1}
-        if $\bEv \xrmw \aEv$ then
-        $\cEv\le \aEv$ implies $\cEv\le \bEv$,
-      \item \label{pom-rmw-atomic2}
-        if $\bEv \xrmw \aEv$ then
-        $\bEv\le \cEv$ implies $\aEv\le \cEv$.
-      \end{enumerate}
+      if $\labeling(\cEv) \roverlaps \labeling(\bEv)$ and $\bEv \xrmw \aEv$ then
+      % \begin{enumerate*}        
+      % \item \label{pom-rmw-atomic1}
+        $\cEv\lt \aEv$ implies $\cEv\le \bEv$ and
+      %\item \label{pom-rmw-atomic2}
+        $\bEv\lt \cEv$ implies $\aEv\le \cEv$.
+      %\end{enumerate*}
     \end{enumerate}
   \end{enumerate}
 
@@ -722,7 +770,8 @@ We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic f
   \end{math}
   and %s.t.
   \\
-  If $\aPS\in\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]$ then\\\quad
+  If $\aPS\in\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]$ then\\
+  \hfill
   \begin{math}
     %\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]\subseteq\sSEMI{
     \aPS\in\sSEMI{
@@ -811,7 +860,7 @@ exclusive operations.  See \cite{DBLP:journals/pacmpl/JagadeesanJR20} for exampl
 One subtlety of the definition is that we use $\sLOADP{}{}$ rather than
 $\sLOAD{}{}$.  Thus, for \RMW{} operations, the independent case for a read
 is the same as the empty case.  To see why this should be, consider the
-relaxed variant of the \textsc{cdrf} example from
+\labeltext[\textsc{cdrf-rlx}]{relaxed variant of the \textsc{cdrf} example}{CDRF-RLX} from
 \cite{DBLP:conf/pldi/LeeCPCHLV20}, using $\sLOAD{}{}$ rather than $\sLOADP{}{}$.
 \begin{scope}
   \small

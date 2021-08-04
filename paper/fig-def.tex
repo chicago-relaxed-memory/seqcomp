@@ -1,7 +1,7 @@
 \begin{definition}
   \label{def:pomset}
   A \emph{pomset with predicate transformers} (\PwT) %over $\Act$
-  is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\le})$ where
+  is a tuple $(\aEvs, \labeling, \labelingForm, \aTr{}{}, \aTerm, {\lt})$ where
   % \begin{multicols}{2}
   \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
     \makecounter{BE}
@@ -30,7 +30,7 @@
     \end{enumerate}
     \makecounter{Ble}
   \item \label{pom-le} \makecounter{le}
-    ${\le} \subseteq \aEvs\times\aEvs$, is a partial order capturing
+    ${\lt} \subseteq \aEvs\times\aEvs$, is a strict partial order capturing
     \emph{causality},
     % such that
     % \begin{enumerate}

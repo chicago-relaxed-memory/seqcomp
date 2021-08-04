@@ -34,7 +34,7 @@
     \emph{consistency}, \emph{causal strengthening}, \emph{downset closure}
     (see \textsection\ref{sec:diff}).
   \item \PwP{} allows preconditions that are stronger than the weakest precondition.
-  \item \PwP{} imposes \ref{pom-rf-le} ($\rrfx$ implies $\le$) and thus is
+  \item \PwP{} imposes \ref{pom-rf-le} ($\rrfx$ implies $\lt$) and thus is
     similar to \PwTmca{1}.  \PwTmca{2} is a weaker model that is new to this
     paper.  %Hence we cannot use the \PwP{} result directly.
   \item \PwP{} did not provide an accurate account of program order for
@@ -155,7 +155,7 @@ For example, consider \jmm{} causality test case 2, with an added write to $z$:
 
 \paragraph{Data Race}
 Data races are defined using \emph{program} order $(\rpox)$, not
-\emph{pomset} order $(\le)$. %, and thus is stable with respect to augmentation.
+\emph{pomset} order $(\lt)$. %, and thus is stable with respect to augmentation.
 
 
 Because we ban fences and \RMWs, we can adopt the simplest definition of
@@ -325,11 +325,11 @@ includes a race involving $\aEv$.
 
   In order to develop a technique to find $\aPS'''$ from $\aPS''$, we analyze
   pomset order in generation-minimal top-level pomsets.  First, we note that
-  $\le_*$ (the transitive reduction $\le$) can be decomposed into three
-  disjoint relations.  Let ${\rppo}=({\le_*}\cap{\rpox})$ denote
+  $\lt_*$ (the transitive reduction $\lt$) can be decomposed into three
+  disjoint relations.  Let ${\rppo}=({\lt_*}\cap{\rpox})$ denote
   \emph{preserved} program order, as required by sequential composition and
   conditional.  The other two relations are cross-thread subsets of
-  $({\le_*}\setminus{\rpox})$: $\rrfe$ (reads-from-external) orders writes
+  $({\lt_*}\setminus{\rpox})$: $\rrfe$ (reads-from-external) orders writes
   before reads, satisfying \ref{par-rf-le}; $\rcae$
   (coherence-after-external) orders read and write accesses before writes,
   satisfying \ref{pom-rf-block}. (Within a thread, \ref{seq-le-mca2} induces

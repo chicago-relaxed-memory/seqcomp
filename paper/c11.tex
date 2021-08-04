@@ -73,7 +73,7 @@ order, for use in the various axioms of \cXI{}.
 
     \makecounter{Bpo}
   \item \label{pom-po} \makecounter{po}
-    ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a partial-order capturing
+    ${\rpox} \subseteq (\umEvs\times\umEvs)$ is a strict partial order capturing
     \emph{program order}.
     % ${\rpox} \subseteq (\aEvs\times\aEvs)$ is a pre-order capturing
     % \emph{program order}, such that
@@ -185,7 +185,7 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
     $\aPS$ (\emph{i.e.} $\aEv\in\aEvs_1\cap\aEvs_2$) then we choose fresh event
     names---$\aEv'_1$ and $\aEv'_2$---and extend $\fmrg{}$
     accordingly: $\fmrg{\aEv'_1}=\fmrg{\aEv'_2}=\aEv$.  In $\aPS'$, we take
-    ${\le'}={\rpox'}$.
+    ${\lt'}={\rpox'}$.
 
     To arrive at $\aPS''$, we take
     \begin{enumerate*}
@@ -203,7 +203,7 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
     \item
       $\aTerm''=\aTerm$,
     \item \label{le-item}
-      ${\bEv}\le'' {\aEv}$ exactly when $\fmrg{\bEv}\le\fmrg{\aEv}$,
+      ${\bEv}\lt'' {\aEv}$ exactly when $\fmrg{\bEv}\lt\fmrg{\aEv}$,
       %${\le''}=\fmrginv{\le}$,
     \item \label{pox-item}
       %${\rpox''}={\rpox}\cup{\rpox'}$, and

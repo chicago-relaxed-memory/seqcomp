@@ -1,18 +1,3 @@
-## This is useful for Mark and Simon, but perhaps not the canonical way to build the paper
-
-all:
-	pdflatex paper
-	bibtex paper
-	pdflatex paper
-	pdflatex paper
-
-clean:
-	rm -f *.log *.out *.aux *.dvi *.bbl *.blg *.fdb_latexmk *.fls *.synctex.gz
-	rm -f paper.pdf
-
-
-## James's makefile...
-
 paper:
 	rm  -f paper.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error paper.tex
@@ -44,3 +29,15 @@ zip:
 
 present:
 	presentation.py -p 0 -d 15 talk.pdf 2>/dev/null
+
+## From Mark and Simon:
+
+all:
+	pdflatex paper
+	bibtex paper
+	pdflatex paper
+	pdflatex paper
+
+clean:
+	rm -f *.log *.out *.aux *.dvi *.bbl *.blg *.fdb_latexmk *.fls *.synctex.gz
+	rm -f paper.pdf

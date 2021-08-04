@@ -45,7 +45,7 @@ and $\rdelays$---as well a distinguished set of $\sread$ actions; see
     \item \label{pom-rf-block} if $\bEv\xrfx\aEv$ and
       $\labeling(\cEv) \rblocks \labeling(\aEv)$ then either $\cEv\le\bEv$ or
       $\aEv\le\cEv$,
-    \item \label{pom-rf-le} if $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
+    \item \label{pom-rf-le} if $\bEv\xrfx\aEv$ then $\bEv\lt\aEv$.
     \end{enumerate}
   \end{enumerate}
 
@@ -120,8 +120,8 @@ example, consider the following:\footnote{We use different colors for arrows rep
     \end{itemize}    
   \end{multicols}
   In \PwTmca{2}, it is possible for $\rrf$ to contradict
-  $\le$.  In this case, we use a dotted arrow for $\rrf$: $\bEv\xrfint\aEv$
-  indicates that $\aEv\le\bEv$.}
+  $\lt$.  In this case, we use a dotted arrow for $\rrf$: $\bEv\xrfint\aEv$
+  indicates that $\aEv\lt\bEv$.}
 \begin{gather*}
   \taglabel{pub}
   \begin{gathered}    
@@ -151,7 +151,7 @@ required by $\reorderra$.  The cross-thread order is required by fulfillment:
 \ref{top-rf} requires that all top-level reads are in the image of $\xrfx$.
 \ref{pom-rf-match} ensures that $\DWP[\mREL]{y}{1}\xrfx \DRP[\mACQ]{y}{1}$, and
 \ref{pom-rf-le} subsequently ensures that
-$\DWP[\mREL]{y}{1}\le \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
+$\DWP[\mREL]{y}{1}\lt \DRP[\mACQ]{y}{1}$.  The \emph{antidependency}
 $\DRP{x}{0}\xwk \DWP{x}{1}$ is required by \ref{pom-rf-block}.  (Alternatively,
 we could have $\DWP{x}{1}\xwk \DWP{x}{0}$, again resulting in a cycle.)
 

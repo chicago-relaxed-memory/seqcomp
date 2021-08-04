@@ -348,9 +348,10 @@
 %\newcommand{\LPAR}{\,\mathbin{\rrceil}\,}
 %\NewDocumentCommand\LPAR{O{}}{\mathrel{\rrceil\ifnotempty{#1}{\ifshowSCOPE_{#1}\fi}}}
 %\NewDocumentCommand\RPAR{O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\!\fi}\llceil}}
-\NewDocumentCommand\LPAR{O{}}{\mathrel{\mkern3mu\makebox[0pt][l]{$\PAR$}\mkern-10mu\leftarrow\ifnotempty{#1}{\ifshowSCOPE\mkern-8mu{}_{#1}\fi}}}
+\NewDocumentCommand\LPAR{O{}}{\mathrel{\mkern5mu\makebox[0pt][l]{$\PAR$}\mkern-10mu\leftarrow\ifnotempty{#1}{\ifshowSCOPE\mkern-8mu{}_{#1}\fi}}}
 \NewDocumentCommand\RPAR{O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\fi}\makebox[0pt][l]{$\PAR$}\mkern-9mu\rightarrow}}
-\NewDocumentCommand\PAR{O{} O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\fi}\parallel\ifnotempty{#2}{_{#2}}}}
+%\NewDocumentCommand\PAR{O{} O{}}{\mathrel{\ifnotempty{#1}{\ifshowSCOPE{}_{#1}\fi}\mathord\parallel\ifshowSCOPE\ifnotempty{#2}{_{#2}}\fi}}
+\NewDocumentCommand\PAR{O{}}{\mathrel{\parallel}\ifshowSCOPE\ifnotempty{#1}{_{#1}}\fi}
 %\NewDocumentCommand\sRPAR{O{} O{}}{\mathrel{\ifnotempty{#1}{{}_{#1}}\makebox[0pt][l]{$\sPAR$}\mkern-9mu\rightarrow\ifnotempty{#2}{_{#2}}}}
 % \newcommand{\RPAR}{\,\mathbin{\texttt{\textbf{|}}\mkern-6mu\texttt{\textbf{|}}\mkern-5mu\raisebox{.7ex}{\texttt{\textbf{-}}}\mkern-3mu}\,}
 
@@ -530,6 +531,8 @@
 \newcommand{\xcta}{\mathrel{\smash{=_{\rcta}}}}
 \newcommand{\rgpu}{\mathrel{\sGPU}}
 \newcommand{\xgpu}{\mathrel{\smash{=_{\rgpu}}}}
+\newcommand{\rsys}{\mathrel{\sSYS}}
+\newcommand{\xsys}{\mathrel{\smash{=_{\rsys}}}}
 \newcommand{\topThrd}{\mathbf{0}}
 %\newcommand{\testThrd}{\mathbf{1}}
 % \newcommand{\fthrd}{\mathsf{thread}}
@@ -538,9 +541,9 @@
 \newcommand{\aThrd}{\alpha}
 \newcommand{\bThrd}{\gamma}
 \newcommand{\cThrd}{\delta}
-\newcommand{\aScp}{\aThrd}
-\newcommand{\bScp}{\bThrd}
-\newcommand{\cScp}{\cThrd}
+% \newcommand{\aScp}{\aThrd}
+% \newcommand{\bScp}{\bThrd}
+% \newcommand{\cScp}{\cThrd}
 
 \newcommand{\aSym}{\mathsf{s}}
 
@@ -597,7 +600,7 @@
 \newcommand{\UMA}{{\sc uma}}
 \newcommand{\GPU}{{\sc gpu}}
 \newcommand{\CPU}{{\sc cpu}}
-\newcommand{\ID}{{\sc id}}
+\newcommand{\ID}{id}
 \newcommand{\RMW}{{\sc rmw}}
 \newcommand{\RMWs}{{\sc rmw}s}
 \newcommand{\drf}{{\sc drf}}
@@ -867,6 +870,7 @@
 %\Newcommand{\gtNsp}{\mathrel{\,\mid\!\!\!>}}
 % \newcommand{\ltNsp}{\mathrel{\,\mid\!\!\!<}}
 % \newcommand{\geN}{<}
+\newcommand{\ltdelay}{\mathrel{\LABEL@COLOR{\sqsubset}}}
 \newcommand{\ledelay}{\mathrel{\LABEL@COLOR{\sqsubseteq}}}
 \newcommand{\lesync}{\SYNC@COLOR{\LATEX@le}}
 \newcommand{\lesyncpo}{\SYNC@COLOR{\LATEX@le_{\mathsf{po}}}}
@@ -878,9 +882,12 @@
 % \newcommand{\geloc}{\LOC@COLOR{\sqsupseteq}}
 % \newcommand{\gtloc}{\LOC@COLOR{\sqsupset}}
 \newcommand{\leexists}{\LOC@COLOR{\sqsubsetsim}}
-\newcommand{\lelocweak}{\LOC@COLOR{\sqsubseteq\mkern-6mu\makebox[0pt][r]{\raisebox{2pt}{\small$\scriptscriptstyle\mathsf{w}$}}\mkern2mu}}
-\newcommand{\lelocstrong}{\LOC@COLOR{\sqsubseteq\mkern-8mu\makebox[0pt][r]{\raisebox{2pt}{$\scriptscriptstyle\mathsf{s}$}}\mkern4mu}}
-\newcommand{\leloctwo}{\LOC@COLOR{\sqsubseteq\mkern-8mu\makebox[0pt][r]{\raisebox{2pt}{\small$\scriptscriptstyle\mathsf{2}$}}\mkern4mu}}
+\newcommand{\lelocweak}{\LOC@COLOR{\sqsubseteq\mkern-6mu\makebox[0pt][r]{\raisebox{1.5pt}{\small$\scriptscriptstyle\mathsf{w}$}}\mkern2mu}}
+\newcommand{\lelocstrong}{\LOC@COLOR{\sqsubseteq\mkern-8mu\makebox[0pt][r]{\raisebox{1pt}{$\scriptscriptstyle\mathsf{s}$}}\mkern4mu}}
+\newcommand{\leloctwo}{\LOC@COLOR{\sqsubseteq\mkern-8mu\makebox[0pt][r]{\raisebox{1.5pt}{\small$\scriptscriptstyle\mathsf{2}$}}\mkern4mu}}
+\newcommand{\ltlocweak}{\LOC@COLOR{\sqsubset\mkern-6mu\makebox[0pt][r]{\raisebox{1.5pt}{\small$\scriptscriptstyle\mathsf{w}$}}\mkern2mu}}
+\newcommand{\ltlocstrong}{\LOC@COLOR{\sqsubset\mkern-8mu\makebox[0pt][r]{\raisebox{1.5pt}{$\scriptscriptstyle\mathsf{s}$}}\mkern4mu}}
+\newcommand{\ltloctwo}{\LOC@COLOR{\sqsubset\mkern-8mu\makebox[0pt][r]{\raisebox{1pt}{\small$\scriptscriptstyle\mathsf{2}$}}\mkern4mu}}
 % \newcommand{\lelocweak}{\mathrel{\smash{\overset{\mathsf{w}}{\sqsubseteq}}}}
 % \newcommand{\lelocstrong}{\mathrel{\smash{\overset{\mathsf{s}}{\sqsubseteq}}}}
 % \newcommand{\leloctwo}{\mathrel{\smash{\overset{\mathsf{2}}{\sqsubseteq}}}}
@@ -1254,7 +1261,7 @@
 
 \newcommand{\depcolor}{magenta}
 \newcommand{\synccolor}{red!65!black}
-\newcommand{\syncsccolor}{blue!90!black}
+\newcommand{\syncsccolor}{cyan!90!black}
 \newcommand{\rfcolor}{green!50!black}
 \newcommand{\wkicolor}{orange!80!black}
 \newcommand{\wkcolor}{blue!70!black}

@@ -56,7 +56,7 @@ thus the above execution is allowed.
 \end{definition}
 % We write $\semmca{2}{}$ for the semantic function.
 A \PwTmca{2} need not satisfy requirement \ref{pom-rf-le}, and thus we may
-have $\bEv\xrfx\aEv$ and $\aEv\le\bEv$.
+have $\bEv\xrfx\aEv$ and $\aEv\lt\bEv$.
 
 % 
 % The use of $\rextendsdef{}{}$ in \ref{if-rf-extends}
@@ -88,7 +88,7 @@ does not include
         \rfint[out=165,in=15]{b}{a}
         \wki{a}{b}
       \end{tikzinlinesmall}}}
-\end{math}, taking $\rrfx$ from the left and $\le$ from the right.
+\end{math}, taking $\rrfx$ from the left and $\lt$ from the right.
 
 % \PwTmca{2} does not enforce \ref{pom-rf-le}: $\bEv\xrfx\aEv$ may not imply
 % $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come from different sides of a
@@ -104,7 +104,7 @@ gives a post-hoc verification technique for $\rrfx$.
   for every $\bEv\xrfx\aEv$ either
   \begin{itemize}
   \item external fulfillment:
-    $\bEv\le\aEv$ and if $\labeling(\cEv) \rblocks\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
+    $\bEv\lt\aEv$ and if $\labeling(\cEv) \rblocks\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
   \item internal fulfillment:
     $(\exists\bEv'\in\fmrginv{\bEv})$
     $(\exists\aEv'\in\fmrginv{\aEv})$
