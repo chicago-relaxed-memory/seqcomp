@@ -304,13 +304,17 @@ carry the labeling.
 
 Given these definitions, we can add the following requirement to the model,
 which enables us to prune pomsets that include $\labeling$-inconsistent
-preconditions.
-\begin{enumerate}
-% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
-%   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-\item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
-  $\labelingForm(\aEv)$ is $\labeling$-consistent.
-\end{enumerate}
+preconditions and termination conditions.
+\begin{multicols}{2}
+  \begin{enumerate}
+    % \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
+    %   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+  \item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
+    $\labelingForm(\aEv)$ is $\labeling$-consistent,
+  \item[{\labeltext[\textsc{m}5b]{(\textsc{m}5b)}{pom-term-sat}}]
+    $\aTerm$ is $\labeling$-consistent.
+  \end{enumerate}
+\end{multicols}
 With this modification, dead-code elimination
 (\reflem{lem:if}\ref{lem:if:dead}) can be changed from an inclusion to an equation:
 \begin{displaymath}

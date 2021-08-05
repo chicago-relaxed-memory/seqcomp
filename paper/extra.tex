@@ -118,6 +118,205 @@ Load buffering is allowed.
   \end{gathered}
 \end{align*}
 
+\subsection{Thin-Air}
+Thin air is disallowed.
+\cite[TC4]{PughWebsite}:
+\begin{gather*}
+  \taglabel{OOTA1}
+  \begin{gathered}
+    % \PW{y}{0}\SEMI 
+    \PW{y}{x}
+    \PAR
+    % \PW{x}{0}\SEMI
+    \PR{y}{r}\SEMI \PW{x}{r}  
+    \\[-.5ex]
+    \smash{\hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{rx}{\DR{x}{1}}{}
+          \event{wy}{\DW{y}{1}}{right=of rx}
+          \po{rx}{wy}
+          % \event{y0}{\DW{y}{0}}{left=of rx}
+          % \event{x0}{\DW{x}{0}}{right=2em of wy}
+          \event{ry}{\DR{y}{1}}{right=3em of wy}
+          \event{wx}{\DW{x}{1}}{right=of ry}
+          \po{ry}{wx}
+          \rf[out=10,in=170]{wy}{ry}
+          \rf[out=170,in=10]{wx}{rx}
+          % \wk[out=-15,in=-165]{y0}{wy}
+          % \wk[out=-15,in=-165]{x0}{wx}
+        \end{tikzinline}}}
+  \end{gathered}
+\end{gather*}
+Control variant:
+\begin{gather*}
+  \taglabel{OOTA2}
+  \begin{gathered}
+    \IF{x}\THEN \PW{y}{1} \FI
+    \PAR
+    \IF{y}\THEN \PW{x}{1} %\SEMI \PW{z}{1}
+    \FI
+    \\[-.5ex]
+    \smash{\hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{rx}{\DR{x}{1}}{}
+          \event{wy}{\DW{y}{1}}{right=of rx}
+          \po{rx}{wy}
+          % \event{y0}{\DW{y}{0}}{left=of rx}
+          % \event{x0}{\DW{x}{0}}{right=2em of wy}
+          \event{ry}{\DR{y}{1}}{right=3em of wy}
+          \event{wx}{\DW{x}{1}}{right=of ry}
+          \po{ry}{wx}
+          \rf[out=10,in=170]{wy}{ry}
+          \rf[out=170,in=10]{wx}{rx}
+          % \wk[out=-15,in=-165]{y0}{wy}
+          % \wk[out=-15,in=-165]{x0}{wx}
+        \end{tikzinline}}}
+  \end{gathered}
+\end{gather*}
+\cite[\textsection2]{DBLP:journals/pacmpl/JagadeesanJR20}
+\begin{gather}
+  \taglabel{OOTA3}
+  \begin{gathered}
+    % \PW{x}{0} \SEMI
+    % \PW{y}{0} \SEMI
+    % \PBR
+    {
+      \PW{y}{\PR{x}{}}
+      \PAR
+      \PR{y}{r}\SEMI
+      \IF{r}\THEN
+        \PW{x}{r}\SEMI
+        \PW{z}{r}
+      \ELSE
+        \PW{x}{2}
+      \FI
+    }
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        % \event{wy0}{\DW{y}{0}}{}
+        % \event{wx0}{\DW{x}{0}}{left=of wy0}
+        \event{rx1}{\DR{x}{1}}{right=3em of wy0}
+        \event{wy1}{\DW{y}{1}}{right=of rx1}
+        \event{ry1}{\DR{y}{1}}{right=3em of wy1}
+        \event{wx1}{\DW{x}{1}}{right=of ry1}
+        \event{wa1}{\DW{z}{1}}{right=of wx1}
+        %\event{stop}{\DSTOP}{right=of wa1}
+        \rf[out=-165,in=-15]{wx1}{rx1}
+        \rf{wy1}{ry1}
+        % \wk[out=12,in=168]{wx0}{wx1}
+        % \wk[out=19,in=161]{wy0}{wy1}
+        \po{rx1}{wy1}
+        \po[out=20,in=160]{ry1}{wa1}
+        % \sync[out=20,in=160]{wx1}{stop}
+        % \sync{wa1}{stop}
+        \po{ry1}{wx1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather}
+\cite[\textsection8]{DBLP:journals/lmcs/JeffreyR19} and \cite[\textsection6]{DBLP:journals/pacmpl/JagadeesanJR20}:
+\begin{gather*}
+  \taglabel{OOTA4}
+  \begin{gathered}
+    \PW{y}{x}
+    \PAR
+    \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
+    \PAR
+    \PW{b}{1}
+    \\[-.5ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx}{\DR{x}{1}}{}
+        \event{wy}{\DW{y}{1}}{right=of rx}
+        \po{rx}{wy}
+        \event{ry}{\DR{y}{1}}{right=3em of wy} 
+        \event{wx}{\DW{x}{1}}{right=of ry}
+        \event{wz}{\DW{z}{1}}{right=of wx}
+        \event{rb}{\DR{b}{1}}{right=of wz}
+        \event{wb1}{\DW{b}{1}}{right=3em of rb}
+        \po{ry}{wx}
+        \rf{wb1}{rb}
+        \rf{wy}{ry}
+        \rf[out=-170,in=-10]{wx}{rx}
+        \po{rb}{wz}
+        \po[out=15,in=165]{ry}{wz}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{gather*}
+\cite{DBLP:conf/esop/SvendsenPDLV18} is disallowed since there is no write
+to fulfill $(\DR{y}{1})$.
+\begin{gather*}
+  \taglabel{OOTA6}
+  \begin{gathered}
+    ( \PW{y}{\PR{x}{}{+}1}
+    \PAR
+    \PW{x}{\PR{y}{}} )
+    \\[-.5ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{rx}{\DR{x}{1}}{}
+        \event{wy}{\DW{y}{2}}{right=of rx}
+        \po{rx}{wy}
+        \event{ry}{\DR{y}{1}}{right=3em of wy}
+        \event{wx}{\DW{x}{1}}{right=of ry}
+        \po{ry}{wx}
+        \rf[out=170,in=10]{wx}{rx}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+\cite[Fig.~3]{DBLP:journals/pacmpl/ChakrabortyV19}:
+\begin{gather*}
+  \taglabel{OOTA7}
+  \begin{gathered}
+    \PW{x}{2}\SEMI
+    \IF{\PR{x}{}\NOTEQ2}\THEN \PW{y}{1} \FI
+    \PAR
+    \PW{x}{1}\SEMI
+    \PR{x}{r}\SEMI
+    \IF{\PR{y}{}}\THEN \PW{x}{3} \FI
+    \\[-.5ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx2}{\DW{x}{2}}{}
+        \event{rx3}{\DR{x}{3}}{right=of wx2}
+        \event{wy1}{\DW{y}{1}}{right=of rx3}
+        \po{rx3}{wy1}
+        \event{wx1}{\DW{x}{1}}{right=2em of wy1}
+        \event{rx2}{\DR{x}{2}}{right=of wx1}
+        \wk{wx1}{rx2}
+        \event{ry1}{\DR{y}{1}}{right=of rx2}
+        \event{wx3}{\DW{x}{3}}{right=of ry1}
+        \po{ry1}{wx3}
+        \wk[in=165,out=15]{rx2}{wx3}
+        \rf[in=-170,out=-10]{wy1}{ry1}
+        \rf[in=170,out=10]{wx2}{rx2}
+        \rf[out=-170,in=-10]{wx3}{rx3}
+        \wk[out=-170,in=-10]{wx1}{wx2}
+        \wk{wx2}{rx3}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+
+\cite[\textsection6]{DBLP:journals/pacmpl/JagadeesanJR20}:
+\begin{quote}
+  \citeauthor{BoehmOOTA}'s [\citeyear{BoehmOOTA}] \ref{RFUB} example presents
+  another potential form of \oota{} behavior.
+  Our analysis shows that there is no \oota{} behavior in
+  \ref{RFUB}, only a false dependency:
+  \begin{gather*}
+    \taglabel{RFUB}
+    \sem{\PR{y}{r}\SEMI \PW{x}{r}}
+    \not\supseteq
+    \sem{\PR{y}{r}\SEMI \IF{r \NOTEQ 1} \THEN \PW{z}{1}\SEMI \LET{r}{1}\FI \SEMI \PW{x}{r}}
+  \end{gather*}
+  The left command is half of \ref{OOTA3} (). %, from \textsection\ref{sec:logic}.
+  The right command is dubbed \rfub{}, for \emph{Register assignment From an
+    Unexecuted Branch}.  \citeauthor{BoehmOOTA} observes that in the context
+  $\PW{x}{y} \PAR \hole{}$, these programs have different behaviors.  Yet the
+  \oota{} example on the left never writes $1$.  Why should the unexecuted
+  branch change that?  Because of the conditional, the write to $x$ in
+  \ref{RFUB} is independent of the read from $y$.  It useful to considering the
+  Hoare logic formulas satisfied by the two threads above: we have
+  $\hoare{\TRUE}{\text{\ref{RFUB}}}{x=1}$ for the right thread of \ref{RFUB}, but not
+  $\hoare{\TRUE}{\text{\ref{OOTA3}}}{x=1}$ for the right thread of \ref{OOTA3}.  The
+  change in the thread from \ref{OOTA3} to \ref{RFUB} is not a valid refinement
+  under Hoare logic; thus, it is expected that \ref{RFUB} may have additional
+  behaviors.
+\end{quote}
 \subsection{Coherence}
 
 The following execution is disallowed by fulfillment (\ref{pom-rf-match} and
@@ -342,6 +541,62 @@ aliasing analysis.
 
 Here are a few litmus tests that distinguish \mca{} architectures from
 non-\mca{} architectures.  
+\ref{MCA1} is an example of \emph{write subsumption}
+\cite[\textsection 3]{DBLP:journals/pacmpl/PulteFDFSS18}:
+\begin{gather*}
+  \taglabel{MCA1}
+  \begin{gathered}
+    \IF{z}\THEN \PW{x}{0} \FI \SEMI \PW{x}{1}
+    \PAR
+    \IF{x}\THEN \PW{y}{0} \FI \SEMI \PW{y}{1}
+    \PAR
+    \IF{y}\THEN \PW{z}{0} \FI \SEMI \PW{z}{1}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{z}{1}}{}
+        \event{a2}{\DW{x}{0}}{right=of a1}
+        \po{a1}{a2}
+        \event{a3}{\DW{x}{1}}{right=of a2}
+        \wki{a2}{a3}
+        \event{b1}{\DR{x}{1}}{right=3em of a3}
+        \event{b2}{\DW{y}{0}}{right=of b1}
+        \po{b1}{b2}
+        \event{b3}{\DW{y}{1}}{right=of b2}
+        \wki{b2}{b3}
+        \event{c1}{\DR{y}{1}}{right=3em of b3}
+        \event{c2}{\DW{z}{0}}{right=of c1}
+        \po{c1}{c2}
+        \event{c3}{\DW{z}{1}}{right=of c2}
+        \wki{c2}{c3}
+        \rf{a3}{b1}
+        \rf{b3}{c1}
+        \rf[out=173,in=7]{c3}{a1}  
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+Two thread variant:
+\begin{gather*}
+  \IF{x}\THEN \PW{y}{0} \FI \SEMI \PW{y}{1}
+  \PAR
+  \IF{y}\THEN \PW{x}{0} \FI \SEMI \PW{x}{1}  
+  \\[-.5ex]
+  \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+  \event{a1}{\DR{x}{1}}{}
+  \event{a2}{\DW{y}{0}}{right=of a1}
+  \po{a1}{a2}
+  \event{a3}{\DW{y}{1}}{right=of a2}
+  \wki{a2}{a3}
+  \event{b1}{\DR{y}{1}}{right=3em of a3}
+  \event{b2}{\DW{x}{0}}{right=of b1}
+  \po{b1}{b2}
+  \event{b3}{\DW{x}{1}}{right=of b2}
+  \wki{b2}{b3}
+  \rf{a3}{b1}
+  \rf[out=173,in=7]{b3}{a1}  
+    \end{tikzinlinesmall}}
+\end{gather*}
+\ref{IRIW} is allowed if all accesses are relaxed, but not if the initial
+reads are acquiring:
 \begin{gather*}
   \taglabel{IRIW}
   \begin{gathered}
@@ -379,37 +634,7 @@ non-\mca{} architectures.
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-\begin{gather*}
-  \taglabel{MCA1}
-  \begin{gathered}
-    \IF{z}\THEN \PW{x}{0} \FI \SEMI \PW{x}{1}
-    {\PAR}
-    \IF{x}\THEN \PW{y}{0} \FI \SEMI \PW{y}{1}
-    {\PAR}
-    \IF{y}\THEN \PW{z}{0} \FI \SEMI \PW{z}{1}
-    \\[-1ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DR{z}{1}}{}
-        \event{a2}{\DW{x}{0}}{right=of a1}
-        \po{a1}{a2}
-        \event{a3}{\DW{x}{1}}{right=of a2}
-        \wki{a2}{a3}
-        \event{b1}{\DR{x}{1}}{right=3em of a3}
-        \event{b2}{\DW{y}{0}}{right=of b1}
-        \po{b1}{b2}
-        \event{b3}{\DW{y}{1}}{right=of b2}
-        \wki{b2}{b3}
-        \event{c1}{\DR{y}{1}}{right=3em of b3}
-        \event{c2}{\DW{z}{0}}{right=of c1}
-        \po{c1}{c2}
-        \event{c3}{\DW{z}{1}}{right=of c2}
-        \wki{c2}{c3}
-        \rf{a3}{b1}
-        \rf{b3}{c1}
-        \rf[out=173,in=7]{c3}{a1}  
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
+\ref{MCA2} is a simplified version of \ref{IRIW}
 \begin{gather*}
   \taglabel{MCA2}
   \begin{gathered}
@@ -435,13 +660,17 @@ non-\mca{} architectures.
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
+\cite{DBLP:conf/popl/FlurGPSSMDS16} and
+\cite[Fig.~4]{DBLP:conf/fm/LahavV16}:
 \begin{gather*}
+  \taglabel{MCA3}
   \begin{gathered}
-    r\GETS x\SEMI x\GETS 1
+    \PR{x}{r}\SEMI
+    \PW{x}{1}
     \PAR
-    y\GETS x 
+    \PW{y}{x}
     \PAR
-    x\GETS y 
+    \PW{x}{y}
     \\[-1.2ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a}{\DR{x}{1}}{}
@@ -458,14 +687,46 @@ non-\mca{} architectures.
         \rf[out=172,in=8]{f}{a}
       \end{tikzinline}}
   \end{gathered}
-  \taglabel{MCA3}
 \end{gather*}
 These candidate executions are invalid, due to cycles.  
 
-\subsection{Read-Read Coherence and CSE}
+\subsection{Detour}
 
-\todo{Add text.}
-Pugh example for alias analysis and CSE.  Suppose $z{=}x$:
+The following example \cite[Ex.~3.7]{DBLP:journals/pacmpl/PodkopaevLV19} is
+disallowed by \IMM{} by including a detour relation.  It is also disallowed
+by \PS{}.
+\begin{gather*}
+  \PW{x}{z{-}1}\SEMI
+  \PW{y}{x}
+  \PAR
+  \PW{x}{1}
+  \PAR
+  \PW{z}{y}
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+      \event{b1}{\DR{z}{1}}{}
+      \event{b2}{\DW{x}{0}}{right=of b1}
+      \po{b1}{b2}
+      \event{b3}{\DR{x}{1}}{right=of b2}
+      \event{b4}{\DW{y}{1}}{right=of b3}
+      \po{b3}{b4}
+      \event{c1}{\DR{y}{1}}{right=2em of b4}
+      \event{c2}{\DW{z}{1}}{right=of c1}
+      \po{c1}{c2}
+      \event{a1}{\DW{x}{1}}{below right=2ex and -2ex of b2}
+      \rf{b4}{c1}
+      \rf{a1}{b3}
+      \wk{b2}{a1} 
+      \rf[out=170,in=10]{c2}{b1}
+   \end{tikzinline}}
+\end{gather*}
+
+\subsection{Read-Read Coherence Versus CSE}
+
+\citeauthor{DBLP:conf/java/Pugh99} [\citeyear{DBLP:conf/java/Pugh99},
+\textsection2.3] presented the following example to show that Java's original
+memory model required alias analysis to validate common subexpression
+elimination (\CSE).
 \begin{gather*}
   \PR{x}{r_1} \SEMI
   \PR{z}{r_2} \SEMI  
@@ -474,13 +735,25 @@ Pugh example for alias analysis and CSE.  Suppose $z{=}x$:
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a1}{\DR{x}{1}}{}
-      \event{a2}{\DR{x}{2}}{right=of a1}
+      \event{a2}{\DR{z}{2}}{right=of a1}
       % \event{a3}{\DR{x}{1}}{right=of a2}
       \event{a4}{\DW{y}{2}}{right=of a2}
       \po{a2}{a4}
       \po[out=15,in=165]{a1}{a4}
     \end{tikzinline}}
 \end{gather*}
+Coalescing the two read of $x$ is obviously allowed if $z{\neq}x$.
+But if $z{=}x$, coalescing is only permitted because we do not include
+read-read pairs in $\eqreorderco$ (\textsection\ref{sec:actions}):
+\begin{displaymath}
+  {\eqreorderco}
+  =
+  \{(\DW{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DR{\aLoc}{}\Cb \DW{\aLoc}{})\Cc(\DW{\aLoc}{}\Cb \DR{\aLoc}{})\}
+\end{displaymath}
+\cXI{} has read-read coherence, and therefore \CSE{} is only valid up to
+alias analysis in \cXI{}.
+
+
 % \begin{gather*}
 %   \PR{x}{r_1} \SEMI
 %   \PR{x}{r_2} \SEMI  
@@ -500,7 +773,8 @@ Pugh example for alias analysis and CSE.  Suppose $z{=}x$:
 
 
 
-\subsection{Read-Read Dependencies}
+\subsection{Read-Read Dependencies and Java Final Field Semantics Versus If-Closure}
+
 One might worry that the lack of read-read dependencies could cause \drfsc{}
 to fail.  For example, the following execution has a control dependency
 between the reads of the last thread, but this order is not enforced, neither
@@ -552,13 +826,25 @@ follow.
       \wk[out=-170,in=-10]{f}{a}
     \end{tikzinline}}
 \end{gather*}
-Lack of read-read dependencies causes issues with Java final field semantics:
+
+\armeight{} enforces address dependencies between reads, but not control
+dependencies.  To support case-analysis (\AKA{} if-closure), we drop all
+dependencies between reads.  This, in turn, invalidates Java's final field
+semantics.
 \begin{gather*}
   \taglabel{addr2}
   \begin{gathered}
-    (r\GETS 1 \SEMI \REF{r}\GETS 0 \SEMI \REF{r}\GETS 1\SEMI  x^\mRA\GETS r)
+    \PBR{
+      \LET{r}{1} \SEMI
+      \PW{\REF{r}}{0} \SEMI
+      \PW{\REF{r}}{1} \SEMI
+      \PW[\mREL]{x}{r}
+    }
     \PAR
-    (r\GETS x^\mRA \SEMI s \GETS \REF{r})
+    \PBR{
+      \PR[\mACQ]{x}{r} \SEMI
+      \PR{\REF{r}}{s}
+    }
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DW{\REF{1}}{0}}{}
@@ -574,8 +860,15 @@ Lack of read-read dependencies causes issues with Java final field semantics:
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
+The acquire annotation is required to ensure publication.  If address
+dependencies were enforced between reads then the acquire annotation could be
+dropped.  However, the compiler would need to track address dependencies in
+order to ensure that case analysis did not convert them to control
+dependencies.
 
 \subsection{Local Invariant Reasoning and Value Range Analysis}
+\todo{Discuss.}
+
 We have already seen \ref{TC1} in \textsection\ref{sec:lir} and \ref{TC2} in \textsection\ref{sec:semreg}.
 Here are some additional examples.
 \begin{gather*}
@@ -850,6 +1143,7 @@ TC19 does the same split for TC17, and follows for the same reason.
 
 
 \subsection{Commuting release and acquire}
+\todo{Discuss.}
 
 RA example.  This is impossible, since $\DR{x}{1}$ unfulfilled.
 \begin{gather*}
@@ -980,6 +1274,8 @@ But not:
 \end{gather*}
 
 \subsection{Write rule}
+\todo{Discuss.}
+
 Alan example of why substitute M/x rather than v/x in the write rule:
 \begin{gather*}
   \PR{y}{r}\SEMI \PW{x}{r}\SEMI \PR{x}{s} \SEMI \PW{z}{s}
@@ -1020,8 +1316,8 @@ We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
 
 
 \subsection{Sevcik examples}
+\todo{Discuss.}
 
-\todo{Make presentable.}
 \citet[\textsection7]{DBLP:conf/esop/CenciarelliKS07} example. (I
 incorrectly credit \citet{DBLP:conf/ecoop/SevcikA08}.)
 
@@ -1245,137 +1541,8 @@ If z is initialized to 2, rather than 0, then the dependencies remain and
 both are disallowed.  This relies crucially on the fact that par takes
 order from both sides.
 
-\subsection{Thin-Air}
-\todo{Add text.}
-\cite[TC4]{PughWebsite}:
-\begin{gather*}
-  \taglabel{OOTA1}
-  \begin{gathered}
-    % \PW{y}{0}\SEMI 
-    \PW{y}{x}
-    \PAR
-    % \PW{x}{0}\SEMI
-    \PR{y}{r}\SEMI \PW{x}{r}  
-    \\[-.5ex]
-    \smash{\hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{rx}{\DR{x}{1}}{}
-          \event{wy}{\DW{y}{1}}{right=of rx}
-          \po{rx}{wy}
-          % \event{y0}{\DW{y}{0}}{left=of rx}
-          % \event{x0}{\DW{x}{0}}{right=2em of wy}
-          \event{ry}{\DR{y}{1}}{right=3em of wy}
-          \event{wx}{\DW{x}{1}}{right=of ry}
-          \po{ry}{wx}
-          \rf[out=10,in=170]{wy}{ry}
-          \rf[out=170,in=10]{wx}{rx}
-          % \wk[out=-15,in=-165]{y0}{wy}
-          % \wk[out=-15,in=-165]{x0}{wx}
-        \end{tikzinline}}}
-  \end{gathered}
-\end{gather*}
-Control variant:
-\begin{gather*}
-  \taglabel{OOTA2}
-  \begin{gathered}
-    \IF{x}\THEN \PW{y}{1} \FI
-    \PAR
-    \IF{y}\THEN \PW{x}{1} %\SEMI \PW{z}{1}
-    \FI
-    \\[-.5ex]
-    \smash{\hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{rx}{\DR{x}{1}}{}
-          \event{wy}{\DW{y}{1}}{right=of rx}
-          \po{rx}{wy}
-          % \event{y0}{\DW{y}{0}}{left=of rx}
-          % \event{x0}{\DW{x}{0}}{right=2em of wy}
-          \event{ry}{\DR{y}{1}}{right=3em of wy}
-          \event{wx}{\DW{x}{1}}{right=of ry}
-          \po{ry}{wx}
-          \rf[out=10,in=170]{wy}{ry}
-          \rf[out=170,in=10]{wx}{rx}
-          % \wk[out=-15,in=-165]{y0}{wy}
-          % \wk[out=-15,in=-165]{x0}{wx}
-        \end{tikzinline}}}
-  \end{gathered}
-\end{gather*}
-\cite[\textsection8]{DBLP:journals/lmcs/JeffreyR19} and \cite{DBLP:journals/pacmpl/JagadeesanJR20}:
-\begin{gather*}
-  \taglabel{OOTA4}
-  \begin{gathered}
-    \PW{y}{x}
-    \PAR
-    \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
-    \PAR
-    \PW{b}{1}
-    \\[-.5ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx}{\DR{x}{1}}{}
-        \event{wy}{\DW{y}{1}}{right=of rx}
-        \po{rx}{wy}
-        \event{ry}{\DR{y}{1}}{right=3em of wy} 
-        \event{wx}{\DW{x}{1}}{right=of ry}
-        \event{wz}{\DW{z}{1}}{right=of wx}
-        \event{rb}{\DR{b}{1}}{right=of wz}
-        \event{wb1}{\DW{b}{1}}{right=3em of rb}
-        \po{ry}{wx}
-        \rf{wb1}{rb}
-        \rf{wy}{ry}
-        \rf[out=-170,in=-10]{wx}{rx}
-        \po{rb}{wz}
-        \po[out=15,in=165]{ry}{wz}
-      \end{tikzinline}}
-  \end{gathered}  
-\end{gather*}
-\begin{gather*}
-  \taglabel{OOTA6}
-  \begin{gathered}
-    ( y\GETS x+1
-    \PAR
-    x\GETS y )
-    \\[-.5ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{rx}{\DR{x}{1}}{}
-        \event{wy}{\DW{y}{2}}{right=of rx}
-        \po{rx}{wy}
-        \event{ry}{\DR{y}{1}}{right=3em of wy}
-        \event{wx}{\DW{x}{1}}{right=of ry}
-        \po{ry}{wx}
-        \rf[out=170,in=10]{wx}{rx}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-\begin{gather*}
-  \taglabel{OOTA7}
-  \begin{gathered}
-    x\GETS 2\SEMI
-    \IF{x\NOTEQ2}\THEN y\GETS 1 \FI
-    \PAR
-    x\GETS 1\SEMI
-    r\GETS x\SEMI
-    \IF{y}\THEN x\GETS 3 \FI
-    \\[-.5ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wx2}{\DW{x}{2}}{}
-        \event{rx3}{\DR{x}{3}}{right=of wx2}
-        \event{wy1}{\DW{y}{1}}{right=of rx3}
-        \po{rx3}{wy1}
-        \event{wx1}{\DW{x}{1}}{right=2em of wy1}
-        \event{rx2}{\DR{x}{2}}{right=of wx1}
-        \wk{wx1}{rx2}
-        \event{ry1}{\DR{y}{1}}{right=of rx2}
-        \event{wx3}{\DW{x}{3}}{right=of ry1}
-        \po{ry1}{wx3}
-        \wk[in=165,out=15]{rx2}{wx3}
-        \rf[in=-170,out=-10]{wy1}{ry1}
-        \rf[in=170,out=10]{wx2}{rx2}
-        \rf[out=-170,in=-10]{wx3}{rx3}
-        \wk[out=-170,in=-10]{wx1}{wx2}
-        \wk{wx2}{rx3}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-
 \subsection{SC Access}
+\todo{Discuss.}
 
 \begin{gather*}
   \taglabel{SC1}
@@ -1398,6 +1565,7 @@ Control variant:
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
+\citet[\textsection3.1]{DBLP:conf/pldi/WattPPBDFPG20}:
 \begin{gather*}
   \taglabel{SC2}
   \begin{gathered}
@@ -1424,6 +1592,7 @@ Control variant:
 \end{gather*}
 
 \subsection{Fences}
+\todo{Discuss.}
 
 \begin{gather*}
   \taglabel{Pub2}
@@ -1518,7 +1687,102 @@ Control variant:
   \end{gathered}
 \end{gather*}
 
-\subsection{Another fencing example}
+Here are several examples mixing fencing with release/acquire:
+\begin{gather*}  
+  \PW{x}{1}\SEMI
+  %\FENCE{\mREL}\SEMI
+  \PW[\mRA]{y}{1}
+  \PAR
+  \PR[\mACQ]{y}{r}\SEMI
+  %\FENCE{\mACQ}\SEMI
+  \PR{x}{s}
+  \\[-1ex]
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \event{a1}{\DW{x}{1}}{}
+      % \event{a2}{\DFS{\mREL}}{right=of a1}
+      % \sync{a1}{a2}
+      \event{a3}{\DWRel{y}{1}}{right=of a1}
+      \sync{a1}{a3}
+      \event{b1}{\DRAcq{y}{1}}{right=3em of a3}
+      % \event{b2}{\DFS{\mACQ}}{right=of b1}
+      % \sync{b1}{b2}
+      \event{b3}{\DR{x}{0}}{right=of b1}
+      \sync{b1}{b3}
+      \rf{a3}{b1}
+      \wk[out=-170,in=-10]{b3}{a1}
+    \end{tikzinline}}
+\end{gather*}
+\begin{gather*}  
+  \PW{x}{1}\SEMI
+  \FENCE{\mREL}\SEMI
+  \PW{y}{1}
+  \PAR
+  \PR[\mACQ]{y}{r}\SEMI
+  %\FENCE{\mACQ}\SEMI
+  \PR{x}{s}
+  \\[-1ex]
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \event{a1}{\DW{x}{1}}{}
+      \event{a2}{\DFS{\mREL}}{right=of a1}
+      \sync{a1}{a2}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \sync{a2}{a3}
+      \event{b1}{\DR{y}{1}}{right=3em of a3}
+      % \event{b2}{\DFS{\mACQ}}{right=of b1}
+      % \sync{b1}{b2}
+      \event{b3}{\DR{x}{0}}{right=of b1}
+      \sync{b1}{b3}
+      \rf{a3}{b1}
+      \wk[out=-170,in=-10]{b3}{a1}
+    \end{tikzinline}}
+\end{gather*}
+\begin{gather*}  
+  \PW{x}{1}\SEMI
+  \PW[\mRA]{y}{1}
+  \PAR
+  \PR{y}{r}\SEMI
+  \FENCE{\mACQ}\SEMI
+  \PR{x}{s}
+  \\[-1ex]
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \event{a1}{\DW{x}{1}}{}
+      % \event{a2}{\DFS{\mREL}}{right=of a1}
+      % \sync{a1}{a2}
+      \event{a3}{\DWRel{y}{1}}{right=of a1}
+      \sync{a1}{a3}
+      \event{b1}{\DR{y}{1}}{right=3em of a3}
+      \event{b2}{\DFS{\mACQ}}{right=of b1}
+      \sync{b1}{b2}
+      \event{b3}{\DR{x}{0}}{right=of b2}
+      \sync{b2}{b3}
+      \rf{a3}{b1}
+      \wk[out=-170,in=-10]{b3}{a1}
+    \end{tikzinline}}
+\end{gather*}
+\begin{gather*}  
+  \PW{x}{1}\SEMI
+  \FENCE{\mREL}\SEMI
+  \PW{y}{1}
+  \PAR
+  \PR{y}{r}\SEMI
+  \FENCE{\mACQ}\SEMI
+  \PR{x}{s}
+  \\[-1ex]
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \event{a1}{\DW{x}{1}}{}
+      \event{a2}{\DFS{\mREL}}{right=of a1}
+      \sync{a1}{a2}
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \sync{a2}{a3}
+      \event{b1}{\DR{y}{1}}{right=3em of a3}
+      \event{b2}{\DFS{\mACQ}}{right=of b1}
+      \sync{b1}{b2}
+      \event{b3}{\DR{x}{0}}{right=of b2}
+      \sync{b2}{b3}
+      \rf{a3}{b1}
+      \wk[out=-170,in=-10]{b3}{a1}
+    \end{tikzinline}}
+\end{gather*}
 
 \cite[\textsection{}D]{DBLP:journals/pacmpl/PodkopaevLV19}:
 The following execution graph is not consistent in the promise-free
@@ -1552,7 +1816,7 @@ promising semantics allows this behavior.
       \event{c1}{\DR{y}{1}}{right=3em of b3}
       \event{c2}{\DW{z}{1}}{right=of c1}
       %\sync{c1}{c2}
-      \wkx{a3}{b1}
+      \wk{a3}{b1}
       \rf{b3}{c1}
       \rf[out=170,in=10]{c2}{a1}
       \sync[out=-10,in=-170]{a2}{b2}
@@ -1980,12 +2244,6 @@ This is allowed by \weakestmo{}, but not \PS{}.
   \end{gather*}
 \end{example}
 
-
-
-% \endinput
-\section{Not for publication}
-
-
 \subsection{More RMW}
 These following examples are from \cite{promising-ldrf}.
 
@@ -2075,6 +2333,154 @@ If this $\ldrfra{z}$?
 %   \caption{LDRF-Fail-PS}
 % \end{comment}
 
+
+
+\subsection{Fences and RMW}
+\todo{Discuss.}
+
+\cite[Remark 2, After example 3.1]{DBLP:journals/pacmpl/PodkopaevLV19}: Aim:
+allow the splitting of release writes and RMWs into release fences followed
+by relaxed operations.  In RC11 [Lahav et al. 2017], as well as in C/C++11
+[Batty et al. 2011], this rather intuitive transformation, as we found out,
+is actually unsound.
+\begin{gather*}
+  \PW{y}{1}\SEMI
+  \PW[\mRA]{x}{1}
+  \PAR
+  \PINC[\mRA][\mRA]{x}{}\SEMI
+  \PW{x}{3}
+  \PAR
+  \PR[\mACQ]{x}{r} \SEMI %3
+  \PR{y}{s} %0
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+      \event{a1}{\DW{y}{1}}{}
+      \event{a2}{\DWRel{x}{1}}{right=of a1}
+      \sync{a1}{a2}
+      \event{b1}{\DRAcq{x}{1}}{right=2em of a2}
+      \event{b2}{\DWRel{x}{2}}{right=1.5em of b1}
+      \rmw{b1}{b2}
+      \event{b3}{\DW{x}{3}}{right=of b2}
+      \wkx{b2}{b3}
+      \event{c1}{\DRAcq{x}{3}}{right=2em of b3}
+      \event{c2}{\DR{y}{0}}{right=of c1}
+      \sync{c1}{c2}
+      \rf{b3}{c1}
+      \rf{a2}{b1}
+      \wky[out=170,in=10]{c2}{a1}
+      \sync[out=-15,in=-165]{b1}{b3}
+   \end{tikzinline}}
+\end{gather*}
+(R)C11 disallows the annotated behavior, due in particular to the release sequence formed from the
+release exclusive write to x in the second thread to its subsequent relaxed write. However, if we
+split the increment to fencerel; a := FADDacq,rlx(x, 1) (which intuitively may seem stronger), the
+release sequence will no longer exist, and the annotated behavior will be allowed. IMM overcomes
+this problem by strengthening sw in a way that ensures a synchronization edge for the transformed
+program as well
+\begin{gather*}
+  \PW{y}{1}\SEMI
+  \PW[\mRA]{x}{1}
+  \PAR
+  \FENCE{\mREL}\SEMI
+  \PINC[\mRA][\mRLX]{x}{}\SEMI
+  \PW{x}{3}
+  \PAR
+  \PR[\mACQ]{x}{r} \SEMI %3
+  \PR{y}{s} %0
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+      \event{a1}{\DW{y}{1}}{}
+      \event{a2}{\DWRel{x}{1}}{right=of a1}
+      \sync{a1}{a2}
+      \event{b0}{\DFS{\mREL}}{right=2em of a2}
+      \event{b1}{\DRAcq{x}{1}}{right=of b0}
+      \event{b2}{\DW{x}{2}}{right=1.5em of b1}
+      \rmw{b1}{b2}
+      \event{b3}{\DW{x}{3}}{right=of b2}
+      \wkx{b2}{b3}
+      \event{c1}{\DRAcq{x}{3}}{right=2em of b3}
+      \event{c2}{\DR{y}{0}}{right=of c1}
+      \sync{c1}{c2}
+      \rf{b3}{c1}
+      \rf[out=15,in=165]{a2}{b1}
+      \sync[out=-15,in=-165]{b0}{b2}
+      \wky[out=170,in=10]{c2}{a1}
+      \sync[out=-15,in=-165]{b1}{b3}
+      \sync[out=-20,in=-160]{b0}{b3}
+   \end{tikzinline}}
+\end{gather*}
+
+We seem to disallow both of these out of the box.
+
+In the case of a relaxed read in the RMW, the outcome is allowed in both
+cases:
+\begin{gather*}
+  \PW{y}{1}\SEMI
+  \PW[\mRA]{x}{1}
+  \PAR
+  \PINC[\mRLX][\mRA]{x}{}\SEMI
+  \PW{x}{3}
+  \PAR
+  \PR[\mACQ]{x}{r} \SEMI %3
+  \PR{y}{s} %0
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+      \event{a1}{\DW{y}{1}}{}
+      \event{a2}{\DWRel{x}{1}}{right=of a1}
+      \sync{a1}{a2}
+      \event{b1}{\DR{x}{1}}{right=2em of a2}
+      \event{b2}{\DWRel{x}{2}}{right=1.5em of b1}
+      \rmw{b1}{b2}
+      \event{b3}{\DW{x}{3}}{right=of b2}
+      \wkx{b2}{b3}
+      \event{c1}{\DRAcq{x}{3}}{right=2em of b3}
+      \event{c2}{\DR{y}{0}}{right=of c1}
+      \sync{c1}{c2}
+      \rf{b3}{c1}
+      \rf{a2}{b1}
+      \wky[out=170,in=10]{c2}{a1}
+      %\sync[out=-15,in=-165]{b1}{b3}
+      %\wkx[out=-15,in=-165]{b1}{b3}
+   \end{tikzinline}}
+\end{gather*}
+\begin{gather*}
+  \PW{y}{1}\SEMI
+  \PW[\mRA]{x}{1}
+  \PAR
+  \FENCE{\mREL}\SEMI
+  \PINC[\mRLX][\mRLX]{x}{}\SEMI
+  \PW{x}{3}
+  \PAR
+  \PR[\mACQ]{x}{r} \SEMI %3
+  \PR{y}{s} %0
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+      \event{a1}{\DW{y}{1}}{}
+      \event{a2}{\DWRel{x}{1}}{right=of a1}
+      \sync{a1}{a2}
+      \event{b0}{\DFS{\mREL}}{right=2em of a2}
+      \event{b1}{\DR{x}{1}}{right=of b0}
+      \event{b2}{\DW{x}{2}}{right=1.5em of b1}
+      \rmw{b1}{b2}
+      \event{b3}{\DW{x}{3}}{right=of b2}
+      \wkx{b2}{b3}
+      \event{c1}{\DRAcq{x}{3}}{right=2em of b3}
+      \event{c2}{\DR{y}{0}}{right=of c1}
+      \sync{c1}{c2}
+      \rf{b3}{c1}
+      \rf[out=15,in=165]{a2}{b1}
+      \sync[out=-15,in=-165]{b0}{b2}
+      \wky[out=170,in=10]{c2}{a1}
+      %\sync[out=-15,in=-165]{b1}{b3}
+      \sync[out=-20,in=-160]{b0}{b3}
+      %\wkx[out=-15,in=-165]{b1}{b3}
+   \end{tikzinline}}
+\end{gather*}
+
+
+
+% \endinput
+\section{Not for publication}
 
 
 \subsection{A Note on Mixed-Mode Data Races}

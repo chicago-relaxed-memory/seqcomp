@@ -29,7 +29,7 @@ recently, existing approaches either
   alternate worlds \cite{Manson:2005:JMM:1047659.1040336,
     DBLP:conf/esop/JagadeesanPR10,
     DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}---these
-  models validate many compiler optimizations, but also
+  models validate many compiler optimizations, but
   %allow some dubious executions 
   fail to validate temporal safety properties
   (see \textsection\ref{sec:promising}).
@@ -38,9 +38,10 @@ recently, existing approaches either
 Recently, two denotational models have been proposed that compute sequential
 dependencies semantically. \citet{DBLP:conf/esop/PaviottiCPWOB20} defined
 Modular Relaxed Dependencies (\MRD), which use event structures to calculate
-dependencies for \cXI.  \citet{DBLP:journals/pacmpl/JagadeesanJR20} defined
+dependencies for \cXI, targeting the Intermediate Memory Model (\IMM)
+\cite{DBLP:journals/pacmpl/PodkopaevLV19}. \citet{DBLP:journals/pacmpl/JagadeesanJR20} defined
 Pomsets with Preconditions (\PwP), which use preconditions and logic to
-calculate dependencies for a Java-like language on multicopy-atomic (\mca{}) hardware, such as
+calculate dependencies for a Java-like language targeting multicopy-atomic (\mca{}) hardware, such as
 \armeight{} \cite{DBLP:journals/pacmpl/PulteFDFSS18}.  However, neither paper
 treated sequential composition as a first-class citizen.  \MRD{} encoded
 sequential composition using continuation-passing, and \PwP{} used prefixing,
