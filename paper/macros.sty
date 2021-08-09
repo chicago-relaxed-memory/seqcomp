@@ -158,6 +158,8 @@
 \newcommand{\Dmode}[1]{\Dx{#1}}
 \newcommand{\RW}{\mathsf{W}}
 \newcommand{\RO}{\lnot\mathsf{W}}
+\newcommand{\A}[1]{\mathsf{A}_{#1}}
+\newcommand{\Aother}{{\ast}}
 \newcommand{\Q}[1]{\mathsf{Q}_{#1}}
 \newcommand{\Qstar}{\mathsf{Q}^{*}}
 \newcommand{\D}{\Dx{\texttt{*}}}
@@ -991,7 +993,10 @@
 \newcommand{\TERNARY}[3]{#1\texttt{?}#2\texttt{:}#3}
 \newcommand{\VAR}{\texttt{var}\,}
 \newcommand{\TOUCHED}{\texttt{touched}\,}
-\newcommand{\REF}[1]{\mkern-2mu\texttt{[}\mkern-2mu#1 \mkern-2mu\texttt{]}\mkern-2mu}
+%\newcommand{\REFARRAY}[2]{#1\texttt{[}\mkern-2mu#2 \mkern-2mu\texttt{]}\mkern-0mu}
+\newcommand{\REFARRAY}[2]{\REF{#1{+}#2}}
+\newcommand{\ADDRARRAY}[2]{#1{+}#2}
+\newcommand{\REF}[1]{\mkern-0mu\texttt{[}\mkern-2mu#1 \mkern-2mu\texttt{]}\mkern-0mu}
 \newcommand{\REFAcq}[1]{\REF{#1}^{\texttt{acq}}}
 \newcommand{\REFRel}[1]{\REF{#1}^{\texttt{rel}}}
 
@@ -1001,8 +1006,8 @@
 \newcommand{\BARRIER}{\texttt{barrier}}
 
 \newcommand{\EQ}{{=}}%\,\texttt{=}\,}
-% \newcommand{\NOTEQ}{\,\texttt{!=}\,}
-\newcommand{\NOTEQ}{\ensuremath{{\neq}}}
+% \newcommand{\NEQ}{\,\texttt{!=}\,}
+\newcommand{\NEQ}{\ensuremath{{\neq}}}
 
 \newcommand{\GCC}{\ensuremath{\texttt{gcc}}}
 \newcommand{\CLANG}{\ensuremath{\texttt{clang}}}

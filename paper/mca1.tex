@@ -162,43 +162,9 @@ elimination, and stronger than Java, in order to support local reasoning
 about data races.  For further examples, see \textsection\ref{sec:extras} and
 \cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20}.
 
-Lemmas \ref{lem:monoid} and \ref{lem:if} mostly hold for \PwTmca{1}.  The
-exceptions are items \eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2},
-which become inclusions.  For example, \eqref{lem:ifelse:if:if1} becomes:
-\begin{displaymath} 
-  \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-  \supseteq
-  \xSEMI{
-    \xIFTHEN{\aForm}{\aPSS_1}{}
-  }{
-    \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
-  }
-\end{displaymath}
-The culprit is $\rdelay$, which introduces order regardless of whether
-preconditions are disjoint.  As an example, 
-\begin{math}
-  \sem{\IF{r}
-  \THEN \PW{x}{1}
-  \ELSE \PW{x}{2}
-  \FI}
-\end{math}
-has an execution with
-\begin{math}
-  (r{=}0\mid\DW{x}{2})
-  \xwki
-  (r{\neq}0\mid\DW{x}{1}),
-\end{math}
-(using augmentation), whereas
-\begin{math}
-  \sem{
-    \IF{r} \THEN \PW{x}{1}\FI
-    \SEMI
-    \IF{\BANG r} \THEN \PW{x}{2}\FI
-  \FI}
-\end{math}
-has no such execution.
-
-For further discussion, see \textsection\ref{sec:delay}.
+Lemmas \ref{lem:monoid} and \ref{lem:if} hold for \PwTmca{1}.  For further
+discussion of items \eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2},
+see \textsection\ref{sec:delay}.
 
 
 % To include \RMW{}s, also add

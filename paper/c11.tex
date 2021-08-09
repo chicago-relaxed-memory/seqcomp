@@ -27,14 +27,14 @@ order, for use in the various axioms of \cXI{}.
     $\fmrg{} : (\aEvs\fun\aEvs)$
     is an idempotent function capturing \emph{merging}, such that 
     \\
-    let $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$ be \emph{real} events,
+    let $\reEvs=\{\aEv\mid\fmrg{\aEv}\EQ\aEv\}$ be \emph{real} events,
     let $\phEvs=(\aEvs\setminus\reEvs)$ be \emph{phantom} events,\\
-    let $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}$ be \emph{simple} events,
+    let $\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}\EQ\aEv \limplies \bEv{=}\aEv\}$ be \emph{simple} events,
     let $\dmEvs=(\aEvs\setminus\umEvs)$ be \emph{compound} events,
     % % \\
     % let $\phEvs=\{\aEv\mid\fmrg{\aEv}{\neq}\aEv\}$ be \emph{phantom} events,
     % let $\reEvs=(\aEvs\setminus\phEvs)$ be \emph{real} events,\\
-    % let $\dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}$ be \emph{compound} events,
+    % let $\dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}\EQ\fmrg{\bEv}\EQ\aEv\}$ be \emph{compound} events,
     % let $\umEvs=(\aEvs\setminus\dmEvs)$ be \emph{simple} events,
     \begin{multicols}{2}
     \begin{enumerate}%[leftmargin=0pt]
@@ -44,7 +44,7 @@ order, for use in the various axioms of \cXI{}.
     %     \fmrg{\fmrg{\aEv}} = \fmrg{\aEv},
     %   \end{math}
       % $\fmrg{\aEv}\in\reEvs$,
-      %where $\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}$,
+      %where $\reEvs=\{\aEv\mid\fmrg{\aEv}\EQ\aEv\}$,
     % \item \label{pom-m-phantom-compount}
     %   if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$,
     \item \label{pom-m-lambda} 
@@ -127,12 +127,12 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 % Note that the set of phantom events
 % \begin{math}
 %   \phEvs=\{\aEv\mid\fmrg{\aEv}{\neq}\aEv\}
-%   %\reEvs=\{\aEv\mid\fmrg{\aEv}{=}\aEv\}
+%   %\reEvs=\{\aEv\mid\fmrg{\aEv}\EQ\aEv\}
 % \end{math}
 % and the set of compound events
 % \begin{math}
-%   \dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}{=}\fmrg{\bEv}{=}\aEv\}.
-%   %\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}{=}\aEv \limplies \bEv{=}\aEv\}.
+%   \dmEvs=\{\aEv\mid\exists\cEv{\neq}\bEv.\;\fmrg{\cEv}\EQ\fmrg{\bEv}\EQ\aEv\}.
+%   %\umEvs=\{\aEv\mid\forall\bEv.\;\fmrg{\bEv}\EQ\aEv \limplies \bEv{=}\aEv\}.
 % \end{math}
 
 % \ref{pom-m-tau} states that predicate transformers are insensitive to phantom
@@ -277,7 +277,7 @@ in $\aPS$.
 
 A pomset in the image of $\fextract{}$ is a \emph{candidate execution}.
 
-As an example, consider Java Causality Test Case 6.  Taking $w=0$ and $v=1$,
+As an example, consider \labeltext[\textsc{tc6}]{Java Causality Test Case 6}{JC-TC6}.  Taking $w=0$ and $v=1$,
 the \PwTpo{} on the left below produces the candidate execution on the right.
 In diagrams, we visualize $\rpox$ using a dotted arrow
 \begin{math}

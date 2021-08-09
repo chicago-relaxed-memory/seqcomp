@@ -73,7 +73,7 @@ This appendix includes additional examples.  They all apply equally to
 
 \subsection{Buffering}
 
-Store buffering is allowed.
+Store buffering is allowed, as required by \tso{}.
 \begin{align*}
   \taglabel{SB}
   \begin{gathered}
@@ -99,7 +99,7 @@ Store buffering is allowed.
   \end{gathered}
 \end{align*}
 
-Load buffering is allowed.
+Load buffering is allowed, as required by \armeight{}.
 \begin{align*}
   \taglabel{LB}
   \begin{gathered}
@@ -125,28 +125,28 @@ Thin air is disallowed.
   \taglabel{OOTA1}
   \begin{gathered}
     % \PW{y}{0}\SEMI 
-    \PW{y}{x}
+    \PW{y}{\PR{x}{}}
     \PAR
     % \PW{x}{0}\SEMI
     \PR{y}{r}\SEMI \PW{x}{r}  
     \\[-.5ex]
     \smash{\hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{rx}{\DR{x}{1}}{}
-          \event{wy}{\DW{y}{1}}{right=of rx}
-          \po{rx}{wy}
-          % \event{y0}{\DW{y}{0}}{left=of rx}
-          % \event{x0}{\DW{x}{0}}{right=2em of wy}
-          \event{ry}{\DR{y}{1}}{right=3em of wy}
-          \event{wx}{\DW{x}{1}}{right=of ry}
-          \po{ry}{wx}
-          \rf[out=10,in=170]{wy}{ry}
-          \rf[out=170,in=10]{wx}{rx}
-          % \wk[out=-15,in=-165]{y0}{wy}
-          % \wk[out=-15,in=-165]{x0}{wx}
+          \event{a1}{\DR{x}{1}}{}
+          \event{a2}{\DW{y}{1}}{right=of a1}
+          \po{a1}{a2}
+          % \event{iy}{\DW{y}{0}}{left=of a1}
+          % \event{ix}{\DW{x}{0}}{right=2em of a2}
+          \event{b1}{\DR{y}{1}}{right=3em of a2}
+          \event{b2}{\DW{x}{1}}{right=of b1}
+          \po{b1}{b2}
+          \rf{a2}{b1}
+          \rf[out=170,in=10]{b2}{a1}
+          % \wk[out=-15,in=-165]{iy}{a2}
+          % \wk[out=-15,in=-165]{ix}{b2}
         \end{tikzinline}}}
   \end{gathered}
 \end{gather*}
-Control variant:
+The control variant (\cite[TC13]{PughWebsite}) is also disallowed:
 \begin{gather*}
   \taglabel{OOTA2}
   \begin{gathered}
@@ -164,7 +164,7 @@ Control variant:
           \event{ry}{\DR{y}{1}}{right=3em of wy}
           \event{wx}{\DW{x}{1}}{right=of ry}
           \po{ry}{wx}
-          \rf[out=10,in=170]{wy}{ry}
+          \rf{wy}{ry}
           \rf[out=170,in=10]{wx}{rx}
           % \wk[out=-15,in=-165]{y0}{wy}
           % \wk[out=-15,in=-165]{x0}{wx}
@@ -193,7 +193,7 @@ Control variant:
     \hbox{\begin{tikzinline}[node distance=1.5em]
         % \event{wy0}{\DW{y}{0}}{}
         % \event{wx0}{\DW{x}{0}}{left=of wy0}
-        \event{rx1}{\DR{x}{1}}{right=3em of wy0}
+        \event{rx1}{\DR{x}{1}}{}
         \event{wy1}{\DW{y}{1}}{right=of rx1}
         \event{ry1}{\DR{y}{1}}{right=3em of wy1}
         \event{wx1}{\DW{x}{1}}{right=of ry1}
@@ -215,7 +215,7 @@ Control variant:
 \begin{gather*}
   \taglabel{OOTA4}
   \begin{gathered}
-    \PW{y}{x}
+    \PW{y}{\PR{x}{}}
     \PAR
     \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
     \PAR
@@ -239,8 +239,8 @@ Control variant:
       \end{tikzinline}}
   \end{gathered}  
 \end{gather*}
-\cite{DBLP:conf/esop/SvendsenPDLV18} is disallowed since there is no write
-to fulfill $(\DR{y}{1})$.
+\cite[\textsc{rng}]{DBLP:conf/esop/SvendsenPDLV18} is disallowed since there
+is no write to fulfill $(\DR{y}{1})$.
 \begin{gather*}
   \taglabel{OOTA6}
   \begin{gathered}
@@ -259,12 +259,13 @@ to fulfill $(\DR{y}{1})$.
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-\cite[Fig.~3]{DBLP:journals/pacmpl/ChakrabortyV19}:
+\ref{OOTA7} is allowed by \PS{}, but not
+\weakestmo{} \cite[Fig.~3]{DBLP:journals/pacmpl/ChakrabortyV19}:
 \begin{gather*}
   \taglabel{OOTA7}
   \begin{gathered}
     \PW{x}{2}\SEMI
-    \IF{\PR{x}{}\NOTEQ2}\THEN \PW{y}{1} \FI
+    \IF{\PR{x}{}\NEQ2}\THEN \PW{y}{1} \FI
     \PAR
     \PW{x}{1}\SEMI
     \PR{x}{r}\SEMI
@@ -291,6 +292,77 @@ to fulfill $(\DR{y}{1})$.
   \end{gathered}
 \end{gather*}
 
+\ref{oota4} is similar to \ref{TC5} \cite{PughWebsite}:
+\begin{comment}
+r1 = x //1
+y = r1
+
+r2 = y //1
+x = r2
+
+z = 1
+
+r3 = z //0
+x = r3
+\end{comment}
+\begin{gather*}
+  \taglabel{TC5}
+  \begin{gathered}
+    \PW{y}{\PR{x}{}}
+    \PAR
+    \PW{x}{\PR{y}{}}
+    \PAR
+    \PW{z}{0}\SEMI\PW{z}{1}
+    \PAR
+    \PW{x}{\PR{z}{}}
+    \\[-.5ex]
+    \smash{\hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{rx}{\DR{x}{1}}{}
+          \event{wy}{\DW{y}{1}}{right=of rx}
+          \po{rx}{wy}
+          \event{ry}{\DR{y}{1}}{right=3em of wy}
+          \event{wx}{\DW{x}{1}}{right=of ry}
+          \po{ry}{wx}
+          \event{z0}{\DW{z}{0}}{right=3em of wx}
+          \event{z1}{\DW{z}{1}}{right=of z0}
+          \wki{z0}{z1}
+          \event{rz}{\DR{z}{0}}{right=3em of z1}
+          \event{wx0}{\DW{x}{0}}{right=of rz}
+          \po{rz}{wx0}
+          \rf{wy}{ry}
+          \rf[out=170,in=10]{wx}{rx}
+          \rf[out=10,in=170]{z0}{rz}
+        \end{tikzinline}}}
+  \end{gathered}
+\end{gather*}
+The justification for forbidding this execution states:
+\begin{quote}
+  values are not allowed to come out of thin air, even if there are other
+  executions in which the thin-air value would have been written to that
+  variable by some not out-of-thin air means.
+\end{quote}
+\ref{oota4} is an interesting border case, since it is allowed by speculative
+models (\textsection\ref{sec:promising}).
+
+
+\todo{What's the point?}
+We presented two examples of thin-air behavior involving address calculation
+in \textsection\ref{sec:addr}.  The justification for \ref{TC12} states:
+\begin{quotation}
+  \renewcommand{\ADDRARRAY}[2]{#2}%
+  \renewcommand{\REFARRAY}[2]{\REF{#2}}%
+  Since no other thread accesses [either $\REFARRAY{a}{0}$ or
+  $\REFARRAY{a}{1}$], the code for [the second] thread should be equivalent
+  to:
+  \begin{displaymath}
+    \PR{y}{r}\SEMI
+    \PW{\REFARRAY{a}{r}}{0}\SEMI
+    \PBR{\LET{s}{\IF{r{=}0}\THEN 0 \ELSE 1\FI}}\SEMI
+    \PW{x}{s}\SEMI
+  \end{displaymath}
+  With this code, it is clear that this is the same situation as test 4.
+\end{quotation}
+
 \cite[\textsection6]{DBLP:journals/pacmpl/JagadeesanJR20}:
 \begin{quote}
   \citeauthor{BoehmOOTA}'s [\citeyear{BoehmOOTA}] \ref{RFUB} example presents
@@ -299,14 +371,24 @@ to fulfill $(\DR{y}{1})$.
   \ref{RFUB}, only a false dependency:
   \begin{gather*}
     \taglabel{RFUB}
-    \sem{\PR{y}{r}\SEMI \PW{x}{r}}
+    \sem{
+      \PR{y}{r}\SEMI
+      \PW{x}{r}
+    }
     \not\supseteq
-    \sem{\PR{y}{r}\SEMI \IF{r \NOTEQ 1} \THEN \PW{z}{1}\SEMI \LET{r}{1}\FI \SEMI \PW{x}{r}}
+    \sem{
+      \PR{y}{r}\SEMI
+      \IF{r \NEQ 1}\THEN
+        \PW{z}{1}\SEMI
+        \LET{r}{1}
+      \FI\SEMI
+      \PW{x}{r}
+    }
   \end{gather*}
-  The left command is half of \ref{OOTA3} (). %, from \textsection\ref{sec:logic}.
+  The left command is half of \ref{OOTA3} ($\PW{y}{\PR{x}{}}$). %, from \textsection\ref{sec:logic}.
   The right command is dubbed \rfub{}, for \emph{Register assignment From an
     Unexecuted Branch}.  \citeauthor{BoehmOOTA} observes that in the context
-  $\PW{x}{y} \PAR \hole{}$, these programs have different behaviors.  Yet the
+  $\PW{x}{\PR{y}{}} \PAR \hole{}$, these programs have different behaviors.  Yet the
   \oota{} example on the left never writes $1$.  Why should the unexecuted
   branch change that?  Because of the conditional, the write to $x$ in
   \ref{RFUB} is independent of the read from $y$.  It useful to considering the
@@ -317,10 +399,11 @@ to fulfill $(\DR{y}{1})$.
   under Hoare logic; thus, it is expected that \ref{RFUB} may have additional
   behaviors.
 \end{quote}
+
 \subsection{Coherence}
 
 The following execution is disallowed by fulfillment (\ref{pom-rf-match} and
-\ref{pom-rf-block}).
+\ref{pom-rf-block}).  It is also disallowed by \cXI{} and Java.
 \begin{gather*}
   \tag{\textsc{coh}}
   \begin{gathered}
@@ -350,52 +433,6 @@ write).  Suppose we pick $1$ before $2$, as shown.  This satisfies
 \ref{pom-rf-block} for $\DRP{x}{2}$.  But to satisfy the requirement for
 $\DRP{x}{1}$ we must have either $\DWP{x}{2}\lt\DWP{x}{1}$ or
 $\DRP{x}{1}\lt\DWP{x}{2}$.   Either way, we have a cycle.
-
-We allow the following execution, which is disallowed by C11:
-\begin{gather*}
-  \PW{x}{1}\SEMI \PW{x}{2}
-  \PAR
-  \PW{y}{x} \SEMI \PW{z}{x}
-  \\[-1ex]
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DW{x}{1}}{}
-      \event{b}{\DW{x}{2}}{right=of a}
-      \wkx{a}{b}
-      \event{c}{\DR{x}{2}}{right=3em of b}
-      \event{d}{\DW{y}{2}}{right=of c}
-      \po{c}{d}
-      \event{e}{\DR{x}{1}}{right=of d}
-      \event{f}{\DW{z}{1}}{right=of e}
-      \po{e}{f}
-      \rf{b}{c}
-      \rf[out=10,in=170]{a}{e}
-      \wk[out=-165,in=-15]{e}{b}
-    \end{tikzinline}}
-\end{gather*}
-As another example in this vein:
-\begin{gather*}
-  \PW{x}{1}\SEMI \PW{x}{2}
-  \PAR
-  \PR{x}{r_1} \SEMI
-  \PR{x}{r_2} \SEMI
-  \PR{x}{r_3} \SEMI
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \event{a2}{\DW{x}{2}}{right=of a1}
-      \wk{a1}{a2}
-      \event{b1}{\DR{x}{2}}{right=3em of a2}
-      \event{b2}{\DR{x}{1}}{right=of b1}
-      \event{b3}{\DR{x}{2}}{right=of b2}
-      % \po{b1}{b2}
-      % \po{b2}{b3}
-      \rf{a2}{b1}
-      \rf[out=15,in=165]{a1}{b2}
-      \rf[out=15,in=165]{a2}{b3}
-      \wk[out=-165,in=-15]{b2}{a2}
-    \end{tikzinline}}
-\end{gather*}
-
 
 Our model is more coherent than Java, which permits the following:
 \begin{gather*}
@@ -451,35 +488,15 @@ We also forbid the following, which Java allows:
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-\cite{Dolan:2018:BDR:3192366.3192421} disallows \ref{TC16}, as well as the
-one below (due to read-to-write ordering).  We allow this execution:
-\begin{gather*}
-  \PR{y}{r}\SEMI \PW{x}{1}
-  \PAR
-  \PR{x}{s}\SEMI \PW{y}{2}
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DR{y}{2}}{}
-      \event{a2}{\DW{x}{1}}{right=of a1}
-      % \wk{a1}{a2}
-      \event{b1}{\DR{x}{1}}{right=3em of a2}
-      \event{b2}{\DW{y}{2}}{right=of b1}
-      % \wk{b1}{b2}
-      \rf[out=-165,in=-15]{b2}{a1}
-      \rf{a2}{b1}
-    \end{tikzinline}}
-\end{gather*}
-
 
 The following outcome is allowed by the promising semantics
 \cite{DBLP:conf/popl/KangHLVD17}, but not in \weakestmo{}
-\cite[Fig.~3]{DBLP:journals/pacmpl/ChakrabortyV19} nor in our semantics, due
-to the cycle:
+\cite[Fig.~3]{DBLP:journals/pacmpl/ChakrabortyV19}.  We disallow it:
 \begin{gather*}
   \tag{\textsc{coh-cyc}}
   \begin{gathered}
     \PW{x}{2}\SEMI
-    \IF{x\NOTEQ2}\THEN \PW{y}{1} \FI
+    \IF{x\NEQ2}\THEN \PW{y}{1} \FI
     \PAR
     \PW{x}{1}\SEMI
     \PR{x}{r}\SEMI
@@ -506,15 +523,15 @@ to the cycle:
   \end{gathered}
 \end{gather*}
 
-Since reads are not ordered by intra-thread coherence,
-we {allow} the following unintuitive behavior. C11 includes read-read
-coherence between relaxed atomics in order to forbid this:
+\cXI{} includes read-read
+coherence between relaxed atomics in order to forbid the following.
+We do not order reads by intra-thread coherence, and this allow the following:
 \begin{gather*}
   \taglabel{Co2}
   \begin{gathered}
     \PW{x}{1}\SEMI \PW{x}{2}
     \PAR
-    \PW{y}{x} \SEMI \PW{z}{x}
+    \PW{y}{\PR{x}{}} \SEMI \PW{z}{\PR{x}{}}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a}{\DW{x}{1}}{}
@@ -534,194 +551,32 @@ coherence between relaxed atomics in order to forbid this:
 \end{gather*}
 Here, the reader sees $2$ then $1$, although they are written in the reverse
 order.
-This behavior is allowed by Java in order to validate CSE without requiring
-aliasing analysis.
+% This behavior is allowed by Java in order to validate CSE without requiring
+% aliasing analysis.
 
-\subsection{MCA}
-
-Here are a few litmus tests that distinguish \mca{} architectures from
-non-\mca{} architectures.  
-\ref{MCA1} is an example of \emph{write subsumption}
-\cite[\textsection 3]{DBLP:journals/pacmpl/PulteFDFSS18}:
+We also allow the following, similar execution:
 \begin{gather*}
-  \taglabel{MCA1}
-  \begin{gathered}
-    \IF{z}\THEN \PW{x}{0} \FI \SEMI \PW{x}{1}
-    \PAR
-    \IF{x}\THEN \PW{y}{0} \FI \SEMI \PW{y}{1}
-    \PAR
-    \IF{y}\THEN \PW{z}{0} \FI \SEMI \PW{z}{1}
-    \\[-1ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DR{z}{1}}{}
-        \event{a2}{\DW{x}{0}}{right=of a1}
-        \po{a1}{a2}
-        \event{a3}{\DW{x}{1}}{right=of a2}
-        \wki{a2}{a3}
-        \event{b1}{\DR{x}{1}}{right=3em of a3}
-        \event{b2}{\DW{y}{0}}{right=of b1}
-        \po{b1}{b2}
-        \event{b3}{\DW{y}{1}}{right=of b2}
-        \wki{b2}{b3}
-        \event{c1}{\DR{y}{1}}{right=3em of b3}
-        \event{c2}{\DW{z}{0}}{right=of c1}
-        \po{c1}{c2}
-        \event{c3}{\DW{z}{1}}{right=of c2}
-        \wki{c2}{c3}
-        \rf{a3}{b1}
-        \rf{b3}{c1}
-        \rf[out=173,in=7]{c3}{a1}  
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-Two thread variant:
-\begin{gather*}
-  \IF{x}\THEN \PW{y}{0} \FI \SEMI \PW{y}{1}
+  \PW{x}{1}\SEMI \PW{x}{2}
   \PAR
-  \IF{y}\THEN \PW{x}{0} \FI \SEMI \PW{x}{1}  
-  \\[-.5ex]
-  \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
-  \event{a1}{\DR{x}{1}}{}
-  \event{a2}{\DW{y}{0}}{right=of a1}
-  \po{a1}{a2}
-  \event{a3}{\DW{y}{1}}{right=of a2}
-  \wki{a2}{a3}
-  \event{b1}{\DR{y}{1}}{right=3em of a3}
-  \event{b2}{\DW{x}{0}}{right=of b1}
-  \po{b1}{b2}
-  \event{b3}{\DW{x}{1}}{right=of b2}
-  \wki{b2}{b3}
-  \rf{a3}{b1}
-  \rf[out=173,in=7]{b3}{a1}  
-    \end{tikzinlinesmall}}
-\end{gather*}
-\ref{IRIW} is allowed if all accesses are relaxed, but not if the initial
-reads are acquiring:
-\begin{gather*}
-  \taglabel{IRIW}
-  \begin{gathered}
-    % \PW{x}{0}\SEMI
-    \PW{x}{1}
-    \PAR
-    \PR[\mRA]{x}{r}\SEMI \PR{y}{s}
-    \PAR
-    % \PW{y}{0}\SEMI
-    \PW{y}{1}
-    \PAR
-    \PR[\mRA]{y}{s} \SEMI \PR{x}{r}
-    \\[-1ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        % \event{wx0}{\DW{x}{0}}{}
-        % \event{wx1}{\DW{x}{1}}{right=of wx0}
-        % \event{wy0}{\DW{y}{0}}{below=4ex of wx0}
-        % \event{wy1}{\DW{y}{1}}{right=of wy0}
-        \event{wx1}{\DW{x}{1}}{}
-        \event{rx1}{\DR[\mRA]{x}{1}}{right=3em of wx1}
-        \event{ry0}{\DR{y}{0}}{right=of rx1}
-        \event{wy1}{\DW{y}{1}}{right=3em of ry0}
-        \event{ry1}{\DR[\mRA]{y}{1}}{right=3em of wy1}
-        \event{rx0}{\DR{x}{0}}{right=of ry1}
-        % \wk{wx0}{wx1}
-        % \wk{wy0}{wy1}
-        % \rf[bend left]{wy0}{ry0}
-        % \rf[bend right]{wx0}{rx0}
-        \sync{rx1}{ry0}
-        \sync{ry1}{rx0}
-        \rf{wx1}{rx1}
-        \rf{wy1}{ry1}
-        \wk[out=170,in=10]{rx0}{wx1}
-        \wk{ry0}{wy1}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-\ref{MCA2} is a simplified version of \ref{IRIW}
-\begin{gather*}
-  \taglabel{MCA2}
-  \begin{gathered}
-    \PW{x}{0}\SEMI \PW{x}{1}
-    \PAR
-    \PW{y}{x}
-    \PAR
-    \PR[\mRA]{y}{r} \SEMI \PR{x}{s}
-    \\[-1ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{wx0}{\DW{x}{0}}{}
-        \event{wx1}{\DW{x}{1}}{right=of wx0}
-        \wki{wx0}{wx1}
-        \event{rx1}{\DR{x}{1}}{right=3em of wx1}
-        \event{wy1}{\DW{y}{1}}{right=of rx1}
-        \po{rx1}{wy1}
-        \event{ry1}{\DRAcq{y}{1}}{right=3em of wy1}
-        \event{rx0}{\DR{x}{0}}{right=of ry1}
-        \rf{wx1}{rx1}
-        \rf{wy1}{ry1}
-        \sync{ry1}{rx0}
-        \wk[out=170,in=10]{rx0}{wx1}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-\cite{DBLP:conf/popl/FlurGPSSMDS16} and
-\cite[Fig.~4]{DBLP:conf/fm/LahavV16}:
-\begin{gather*}
-  \taglabel{MCA3}
-  \begin{gathered}
-    \PR{x}{r}\SEMI
-    \PW{x}{1}
-    \PAR
-    \PW{y}{x}
-    \PAR
-    \PW{x}{y}
-    \\[-1.2ex]
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a}{\DR{x}{1}}{}
-        \event{b}{d:\DW{x}{1}}{right=of a}
-        \wk{a}{b}
-        \event{c}{\DR{x}{1}}{right=3em of b}
-        \event{d}{\DW{y}{1}}{right=of c}
-        \po{c}{d}
-        \event{e}{\DR{y}{1}}{right=3em of d}
-        \event{f}{e:\DW{x}{1}}{right=of e}
-        \po{e}{f}
-        \rf{b}{c}
-        \rf{d}{e}
-        \rf[out=172,in=8]{f}{a}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-These candidate executions are invalid, due to cycles.  
-
-\subsection{Detour}
-
-The following example \cite[Ex.~3.7]{DBLP:journals/pacmpl/PodkopaevLV19} is
-disallowed by \IMM{} by including a detour relation.  It is also disallowed
-by \PS{}.
-\begin{gather*}
-  \PW{x}{z{-}1}\SEMI
-  \PW{y}{x}
-  \PAR
-  \PW{x}{1}
-  \PAR
-  \PW{z}{y}
+  \PR{x}{r_1} \SEMI
+  \PR{x}{r_2} \SEMI
+  \PR{x}{r_3} \SEMI
   \\
-  \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-      \event{b1}{\DR{z}{1}}{}
-      \event{b2}{\DW{x}{0}}{right=of b1}
-      \po{b1}{b2}
-      \event{b3}{\DR{x}{1}}{right=of b2}
-      \event{b4}{\DW{y}{1}}{right=of b3}
-      \po{b3}{b4}
-      \event{c1}{\DR{y}{1}}{right=2em of b4}
-      \event{c2}{\DW{z}{1}}{right=of c1}
-      \po{c1}{c2}
-      \event{a1}{\DW{x}{1}}{below right=2ex and -2ex of b2}
-      \rf{b4}{c1}
-      \rf{a1}{b3}
-      \wk{b2}{a1} 
-      \rf[out=170,in=10]{c2}{b1}
-   \end{tikzinline}}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \event{a2}{\DW{x}{2}}{right=of a1}
+      \wk{a1}{a2}
+      \event{b1}{\DR{x}{2}}{right=3em of a2}
+      \event{b2}{\DR{x}{1}}{right=of b1}
+      \event{b3}{\DR{x}{2}}{right=of b2}
+      % \po{b1}{b2}
+      % \po{b2}{b3}
+      \rf{a2}{b1}
+      \rf[out=15,in=165]{a1}{b2}
+      \rf[out=15,in=165]{a2}{b3}
+      \wk[out=-165,in=-15]{b2}{a2}
+    \end{tikzinline}}
 \end{gather*}
-
-\subsection{Read-Read Coherence Versus CSE}
 
 \citeauthor{DBLP:conf/java/Pugh99} [\citeyear{DBLP:conf/java/Pugh99},
 \textsection2.3] presented the following example to show that Java's original
@@ -772,6 +627,190 @@ alias analysis in \cXI{}.
 % I don't see the problem with this for now.  Is this sound????
 
 
+\subsection{MCA}
+
+Here are a few litmus tests that distinguish \mca{} architectures from
+non-\mca{} architectures.  
+\ref{MCA1} is an example of \emph{write subsumption}
+\cite[\textsection 3]{DBLP:journals/pacmpl/PulteFDFSS18}:
+\begin{gather*}
+  \taglabel{MCA1}
+  \begin{gathered}
+    \IF{z}\THEN \PW{x}{0} \FI \SEMI \PW{x}{1}
+    \PAR
+    \IF{x}\THEN \PW{y}{0} \FI \SEMI \PW{y}{1}
+    \PAR
+    \IF{y}\THEN \PW{z}{0} \FI \SEMI \PW{z}{1}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DR{z}{1}}{}
+        \event{a2}{\DW{x}{0}}{right=of a1}
+        \po{a1}{a2}
+        \event{a3}{\DW{x}{1}}{right=of a2}
+        \wki{a2}{a3}
+        \event{b1}{\DR{x}{1}}{right=3em of a3}
+        \event{b2}{\DW{y}{0}}{right=of b1}
+        \po{b1}{b2}
+        \event{b3}{\DW{y}{1}}{right=of b2}
+        \wki{b2}{b3}
+        \event{c1}{\DR{y}{1}}{right=3em of b3}
+        \event{c2}{\DW{z}{0}}{right=of c1}
+        \po{c1}{c2}
+        \event{c3}{\DW{z}{1}}{right=of c2}
+        \wki{c2}{c3}
+        \rf{a3}{b1}
+        \rf{b3}{c1}
+        \rf[out=173,in=7]{c3}{a1}  
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+Two thread variant:
+\begin{gather*}
+  \IF{x}\THEN \PW{y}{0} \FI \SEMI \PW{y}{1}
+  \PAR
+  \IF{y}\THEN \PW{x}{0} \FI \SEMI \PW{x}{1}  
+  \\[-.5ex]
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+  \event{a1}{\DR{x}{1}}{}
+  \event{a2}{\DW{y}{0}}{right=of a1}
+  \po{a1}{a2}
+  \event{a3}{\DW{y}{1}}{right=of a2}
+  \wki{a2}{a3}
+  \event{b1}{\DR{y}{1}}{right=3em of a3}
+  \event{b2}{\DW{x}{0}}{right=of b1}
+  \po{b1}{b2}
+  \event{b3}{\DW{x}{1}}{right=of b2}
+  \wki{b2}{b3}
+  \rf{a3}{b1}
+  \rf[out=173,in=7]{b3}{a1}  
+    \end{tikzinline}}
+\end{gather*}
+\ref{IRIW} is allowed if all accesses are relaxed, but not if the initial
+reads are acquiring:
+\begin{gather*}
+  \taglabel{IRIW}
+  \begin{gathered}
+    % \PW{x}{0}\SEMI
+    \PW{x}{1}
+    \PAR
+    \PR[\mRA]{x}{r}\SEMI \PR{y}{s}
+    \PAR
+    % \PW{y}{0}\SEMI
+    \PW{y}{1}
+    \PAR
+    \PR[\mRA]{y}{s} \SEMI \PR{x}{r}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        % \event{wx0}{\DW{x}{0}}{}
+        % \event{wx1}{\DW{x}{1}}{right=of wx0}
+        % \event{wy0}{\DW{y}{0}}{below=4ex of wx0}
+        % \event{wy1}{\DW{y}{1}}{right=of wy0}
+        \event{wx1}{\DW{x}{1}}{}
+        \event{rx1}{\DR[\mRA]{x}{1}}{right=3em of wx1}
+        \event{ry0}{\DR{y}{0}}{right=of rx1}
+        \event{wy1}{\DW{y}{1}}{right=3em of ry0}
+        \event{ry1}{\DR[\mRA]{y}{1}}{right=3em of wy1}
+        \event{rx0}{\DR{x}{0}}{right=of ry1}
+        % \wk{wx0}{wx1}
+        % \wk{wy0}{wy1}
+        % \rf[bend left]{wy0}{ry0}
+        % \rf[bend right]{wx0}{rx0}
+        \sync{rx1}{ry0}
+        \sync{ry1}{rx0}
+        \rf{wx1}{rx1}
+        \rf{wy1}{ry1}
+        \wk[out=170,in=10]{rx0}{wx1}
+        \wk{ry0}{wy1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+\ref{MCA2} is a simplified version of \ref{IRIW}
+\begin{gather*}
+  \taglabel{MCA2}
+  \begin{gathered}
+    \PW{x}{0}\SEMI \PW{x}{1}
+    \PAR
+    \PW{y}{\PR{x}{}}
+    \PAR
+    \PR[\mRA]{y}{r} \SEMI \PR{x}{s}
+    \\[-1ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{wx0}{\DW{x}{0}}{}
+        \event{wx1}{\DW{x}{1}}{right=of wx0}
+        \wki{wx0}{wx1}
+        \event{rx1}{\DR{x}{1}}{right=3em of wx1}
+        \event{wy1}{\DW{y}{1}}{right=of rx1}
+        \po{rx1}{wy1}
+        \event{ry1}{\DRAcq{y}{1}}{right=3em of wy1}
+        \event{rx0}{\DR{x}{0}}{right=of ry1}
+        \rf{wx1}{rx1}
+        \rf{wy1}{ry1}
+        \sync{ry1}{rx0}
+        \wk[out=170,in=10]{rx0}{wx1}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+\cite{DBLP:conf/popl/FlurGPSSMDS16} and \cite[Fig.~4]{DBLP:conf/fm/LahavV16}
+discuss the following, which is not valid in \armeight{}, although it was
+valid under some earlier sketches of the model:
+\begin{gather*}
+  \taglabel{MCA3}
+  \begin{gathered}
+    \PR{x}{r}\SEMI
+    \PW{x}{1}
+    \PAR
+    \PW{y}{\PR{x}{}}
+    \PAR
+    \PW{x}{\PR{y}{}}
+    \\[-1.2ex]
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{d:\DW{x}{1}}{right=of a}
+        \wk{a}{b}
+        \event{c}{\DR{x}{1}}{right=3em of b}
+        \event{d}{\DW{y}{1}}{right=of c}
+        \po{c}{d}
+        \event{e}{\DR{y}{1}}{right=3em of d}
+        \event{f}{e:\DW{x}{1}}{right=of e}
+        \po{e}{f}
+        \rf{b}{c}
+        \rf{d}{e}
+        \rf[out=172,in=8]{f}{a}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+These candidate executions are invalid, due to cycles.  
+
+\subsection{Detour}
+
+The following example \cite[Ex.~3.7]{DBLP:journals/pacmpl/PodkopaevLV19} is
+disallowed by \IMM{} by including a detour relation.  It is also disallowed
+by \PS{}.
+\begin{gather*}
+  \PW{x}{\PR{z}{}{-}1}\SEMI
+  \PW{y}{\PR{x}{}}
+  \PAR
+  \PW{x}{1}
+  \PAR
+  \PW{z}{\PR{y}{}}
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+      \event{b1}{\DR{z}{1}}{}
+      \event{b2}{\DW{x}{0}}{right=of b1}
+      \po{b1}{b2}
+      \event{b3}{\DR{x}{1}}{right=of b2}
+      \event{b4}{\DW{y}{1}}{right=of b3}
+      \po{b3}{b4}
+      \event{c1}{\DR{y}{1}}{right=2em of b4}
+      \event{c2}{\DW{z}{1}}{right=of c1}
+      \po{c1}{c2}
+      \event{a1}{\DW{x}{1}}{below right=2ex and -2ex of b2}
+      \rf{b4}{c1}
+      \rf{a1}{b3}
+      \wk{b2}{a1} 
+      \rf[out=170,in=10]{c2}{b1}
+   \end{tikzinline}}
+\end{gather*}
 
 \subsection{Read-Read Dependencies and Java Final Field Semantics Versus If-Closure}
 
@@ -867,17 +906,76 @@ order to ensure that case analysis did not convert them to control
 dependencies.
 
 \subsection{Local Invariant Reasoning and Value Range Analysis}
+We have already seen \ref{TC1} in \textsection\ref{sec:lir}, \ref{TC2} in
+\textsection\ref{sec:semreg} and \ref{JC-TC6} in \textsection\ref{sec:c11}.
+Here is the complete program for \ref{TC6}:
+\begin{gather*}
+  \taglabel{TC6}
+  \begin{gathered}
+    \PW{y}{0}
+    \SEMI
+    \PBR{
+      \PR{y}{r}
+      \SEMI
+      \IF{r{=}0}\THEN \PW{x}{1} \FI
+      \SEMI
+      \IF{r{=}1}\THEN \PW{x}{1} \FI
+    } \PAR \PBR{
+      \IF{\PR{x}{}\EQ1}\THEN \PW{y}{1} \FI
+    }
+    \\
+    \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+        \event{i1}{\DW{y}{0}}{}
+        \event{a1}{\DR{y}{1}}{right=3em of i1}
+        \event{a2}{\aForm\mid\DW{x}{1}}{right=of a1}
+        \event{b1}{\DR{y}{1}}{right=3em of a2}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \po{b1}{b2}
+        \rf{a2}{b1}
+        \rf[out=-165,in=-15]{b2}{a1}
+      \end{tikzinlinesmall}}    
+  \end{gathered}
+  \\
+  \aForm = (1{=}r \lor 0{=}r) \limplies (r{=}0 \lor r{=}1)
+\end{gather*}
+
 \todo{Discuss.}
 
-We have already seen \ref{TC1} in \textsection\ref{sec:lir} and \ref{TC2} in \textsection\ref{sec:semreg}.
-Here are some additional examples.
+Here are some additional examples:
+\begin{gather*}
+  \taglabel{TC8}
+  \begin{gathered}
+    \PW{y}{0}
+    \SEMI
+    \PBR{
+      \PR{y}{r}
+      \SEMI
+      \PW{x}{1{+}r{*}r{-}r}
+    } \PAR \PBR{
+      \PW{y}{\PR{x}{}}
+    }
+    \\
+    \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
+        \event{i1}{\DW{y}{0}}{}
+        \event{a1}{\DR{y}{1}}{right=3em of i1}
+        \event{a2}{\aForm\mid\DW{x}{1}}{right=of a1}
+        \event{b1}{\DR{y}{1}}{right=3em of a2}
+        \event{b2}{\DW{x}{1}}{right=of b1}
+        \po{b1}{b2}
+        \rf{a2}{b1}
+        \rf[out=-165,in=-15]{b2}{a1}
+      \end{tikzinlinesmall}}    
+  \end{gathered}
+  \\
+  \aForm = (1{=}r \lor 0{=}r) \limplies 1{+}r{*}r{-}r=1
+\end{gather*}
 \begin{gather*}
   \taglabel{TC9}
   \begin{gathered}
     \PW{x}{0} \SEMI
     (\PR{x}{r}\SEMI\IF{r\geq0}\THEN \PW{y}{1} \FI
     \PAR
-    \PW{x}{y}
+    \PW{x}{\PR{y}{}}
     \PAR
     \PW{x}{-2})
     \\[-1ex]
@@ -902,7 +1000,7 @@ Here are some additional examples.
   \begin{gathered}
     \PW{x}{1} \SEMI
     \PW[\mRA]{a}{1} \SEMI
-    \IF{z^\mRA}\THEN  \PW{y}{x} \FI
+    \IF{z^\mRA}\THEN  \PW{y}{\PR{x}{}} \FI
     \PAR
     \IF{a^\mRA}\THEN  \PW{x}{2}\SEMI \PW[\mRA]{z}{1} \FI
     \\
@@ -934,7 +1032,7 @@ Here are some additional examples.
     \PR{y}{\bReg}\SEMI
     \PW{z}{\bReg}
     \PAR
-    \PW{x}{z}
+    \PW{x}{\PR{z}{}}
     \\[-1ex]
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -953,7 +1051,7 @@ Here are some additional examples.
   \end{gathered}
 \end{gather*}
 
-\subsection{TC17-20}
+% \subsection{TC17-20}
 
 % \begin{verbatim}
 % Initially,  x = y = 0
@@ -973,6 +1071,7 @@ Here are some additional examples.
 % earlier, resulting in the behavior in question.
 Java Causality Test Case 18 asks that we justify the following execution:
 \begin{displaymath}
+  \taglabel{TC18}
   \begin{gathered}
     \PW{x}{0}
     \SEMI
@@ -1078,7 +1177,38 @@ This is not a tautology.  But we get one by coalescing $s$ and $r$:
   \PBR{(1{=}r \lor 0{=}r) \limplies r{=}1}
 \end{displaymath}
 
-Test case 17 is similar by replaces the condition $r{=}0$ by $r{\neq}1$:
+\ref{TC20} splits the first thread of \ref{TC18}:
+\begin{gather*}  
+  \taglabel{TC20}
+  \begin{gathered}
+    \PW{x}{0}
+    \SEMI
+    \PBR{
+      \PW{x}{\PR{y}{}}
+      \RPAR
+      \PR{x}{r}\SEMI\IF{r{=}0}\THEN \PW{x}{1} \FI 
+    }
+    \SEMI \PR{x}{s}\SEMI \PW{y}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{i}{\DW{x}{0}}{}
+        \event{e}{\DR{y}{1}}{right=3em of i}
+        \event{f}{\DW{x}{1}}{right=of e}
+        \event{a}{\DR{x}{1}}{right=3em of f}
+        % \event{b}{\DW{x}{1}}{right=of a}
+        % \event{c}{\DR{x}{1}}{right=of a}
+        \event{d}{\aForm\mid\DW{y}{1}}{right=of a}
+        \po{e}{f}
+        \rf[out=-165,in=-15]{d}{e}
+        \rf{f}{a}
+        \wki[out=-15,in=-165]{i}{f}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+Because we take register state from the right, the example is the same as for
+\ref{TC18} above.
+
+TC17 replaces the condition $r{=}0$ by $r{\neq}1$ in \ref{TC18}:
 \begin{displaymath}
   \aForm\riff
   (1{=}r \lor x{=}r)
@@ -1109,37 +1239,7 @@ Again, we have:
 \end{displaymath}
 which is not a tautology.  But we get one by coalescing $s$ and $r$.
 
-TC20 splits the first thread of TC18:
-\begin{gather*}  
-  \begin{gathered}
-    \PW{x}{0}
-    \SEMI
-    \PBR{
-      \PW{x}{y}
-      \RPAR
-      \PR{x}{r}\SEMI\IF{r{=}0}\THEN \PW{x}{1} \FI 
-    }
-    \SEMI \PR{x}{s}\SEMI \PW{y}{s}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{i}{\DW{x}{0}}{}
-        \event{e}{\DR{y}{1}}{right=3em of i}
-        \event{f}{\DW{x}{1}}{right=of e}
-        \event{a}{\DR{x}{1}}{right=3em of f}
-        % \event{b}{\DW{x}{1}}{right=of a}
-        % \event{c}{\DR{x}{1}}{right=of a}
-        \event{d}{\aForm\mid\DW{y}{1}}{right=of a}
-        \po{e}{f}
-        \rf[out=-165,in=-15]{d}{e}
-        \rf{f}{a}
-        \wki[out=-15,in=-165]{i}{f}
-      \end{tikzinline}}
-  \end{gathered}
-\end{gather*}
-Because we take register state from the right, the example is the same as for
-TC18 above.
-
-TC19 does the same split for TC17, and follows for the same reason.
+TC19 makes the same change for TC20, and follows for the same reason.
 
 
 \subsection{Commuting release and acquire}
@@ -1544,6 +1644,7 @@ order from both sides.
 \subsection{SC Access}
 \todo{Discuss.}
 
+\cite[\textsection8.2]{Dolan:2018:BDR:3192366.3192421}:
 \begin{gather*}
   \taglabel{SC1}
   \begin{gathered}
@@ -1619,7 +1720,7 @@ order from both sides.
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-\cite[Fig.~5]{DBLP:conf/pldi/LahavVKHD17}
+\cite[Fig.~5]{DBLP:conf/pldi/LahavVKHD17}:
 \begin{gather*}
   \taglabel{SC3}
   \begin{gathered}
@@ -1997,7 +2098,7 @@ semantics permits \ref{GA+E}:
     \bigl(
     \PCAS[\mRLX][\mRLX]{x}{r}{0}{1}\SEMI \IF{r{<}10}\THEN \PW{y}{1} \FI
     \PAR
-    \PW{x}{42}\SEMI \PW{x}{y}
+    \PW{x}{42}\SEMI \PW{x}{\PR{y}{}}
     \bigr)
     \\
     \hbox{\begin{tikzinline}[node distance=2em]
@@ -2024,7 +2125,7 @@ semantics permits \ref{RP}:
     \PR{x}{r}\SEMI
     \PFADD[\mRLX][\mRLX]{z}{s}{r}\SEMI \PW{y}{s{+}1}
     \PAR
-    \PW{x}{y}
+    \PW{x}{\PR{y}{}}
     \\
     \hbox{\begin{tikzinline}[node distance=2em]
         \event{a0}{\DR{x}{1}}{}
@@ -2046,6 +2147,15 @@ semantics permits \ref{RP}:
 
 
 \begin{example}
+  Recall \ref{pom-rmw-atomic}:
+  if $\labeling(\cEv) \roverlaps \labeling(\bEv)$ and $\bEv \xrmw \aEv$ then
+  \begin{enumerate*}        
+  \item \label{pom-rmw-atomic1}
+    $\cEv\lt \aEv$ implies $\cEv\le \bEv$ and
+  \item \label{pom-rmw-atomic2}
+    $\bEv\lt \cEv$ implies $\aEv\le \cEv$.
+  \end{enumerate*}
+
   This definition ensures atomicity, disallowing executions such as
   \cite[Ex.~3.2]{DBLP:journals/pacmpl/PodkopaevLV19}:
   \begin{gather*}
@@ -2277,7 +2387,7 @@ If this $\ldrfra{z}$?
 \begin{gather*}
   \taglabel{Naive-LDRF-RA-Fail}
   \begin{gathered}
-    \IF{y}\THEN \PW{x}{z} \ELSE \PW{x}{1} \FI
+    \IF{y}\THEN \PW{x}{\PR{z}{}} \ELSE \PW{x}{1} \FI
     \PAR
     \PR{x}{r}\SEMI \PW{z}{1}\SEMI \PW{y}{r}
     \\
@@ -2477,7 +2587,174 @@ cases:
    \end{tikzinline}}
 \end{gather*}
 
+\section{Recent discussion on JMM/JDK-dev}
 
+\href{https://mail.openjdk.java.net/pipermail/jdk-dev/2021-August/005904.html}{Raffaello Giulietti}:
+``JEP 188: Java Memory Model Update'' \href{https://openjdk.java.net/jeps/188}{[1]}, the JMM wiki \href{https://wiki.openjdk.java.net/display/jmm/Main}{[2]} and the 
+jmm-dev mailing list \href{https://mail.openjdk.java.net/pipermail/jmm-dev/}{[3]} seem quite inactive. (The latter point explains 
+why I'm posting to this list instead.)
+
+The introduction of \texttt{j.l.i.VarHandle} \href{https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/invoke/VarHandle.html}{[4]} brought more access modes to 
+Java, but in a narrative and informal way. A paper by Bender \& Palsberg 
+\href{https://dl.acm.org/doi/10.1145/3360568}{[5]}, addressing the formalization of the concurrent access modes, has 
+been published in 2019 but I'm not sure if it caught the attention of 
+the OpenJDK community.
+
+So what is the current thinking for progressing the JMM spec?
+
+\bigskip
+
+\href{https://mail.openjdk.java.net/pipermail/jdk-dev/2021-August/005909.html}{Hans Boehm}:
+I think it's safe to say that it has been slow going, not just for Java,
+but for other languages as well.
+
+In my view, the core problem, shared by pretty much all of them, is that we
+don't have an established way to give well-defined semantics to potentially
+racing unordered accesses, like ordinary variable accesses in Java, or
+memory\_order\_relaxed accesses in C and C++. That's particularly essential
+with the traditional Java language-based-security model, since we can't
+just give up on racing accesses to ordinary variables.
+
+I'm aware of a number of proposed solutions. But I don't think we currently
+have enough confidence that they
+\begin{itemize}
+\item Are correct, and don't have issues similar to the older models,
+\item Don't have unintended consequences, particularly for compilation, and
+\item Are sufficiently comprehensible by programmers to actually be useful.
+\end{itemize}
+[Correctness] is hard because the models have gotten complex enough that reviewers
+are scarce. (A problem that I gather you're familiar with.) The authors are
+commonly experts at formally analyzing the models, but it's hard to analyze
+whether the model conflicts with some well-known, but perhaps not
+well-written-down compilation technique.
+
+Probably even more controversially, I think we've realized that existing
+compiler technology can compile such racing code in ways that some of us
+are not 100\% sure should really be allowed. Demonstrably unexecuted code
+can affect the semantics in ways that strike me as scary. (See
+\url{https://wg21.link/p1217} for a down-to-assembly C++ version; IIUC, Lochbihler and
+others earlier came up with some closely related observations for Java.)
+
+It might be possible to do what we've involuntarily done for C++: Punt the
+hard cases for now, and define what the model is for programs without
+racing ordinary accesses.
+
+[p1217 is \cite{BoehmOOTA}.]
+
+\bigskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000447.html}{Andrew Haley}:
+\begin{verbatim}
+> Probably even more controversially, I think we've realized that
+> existing compiler technology can compile such racing code in ways
+> that some of us are not 100\% sure should really be allowed.
+\end{verbatim}
+This implies, does it not, that the problem is not formalization as
+such, but that we don't really understand what the language is
+supposed to mean? That's always been my problem with OOTA: I'm unsure
+whether the problem is due to the inadequacy of formal models, in
+which case the formalists can fix their own problem, or something we
+all have to pay attention to.
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000450.html}{Hans Boehm}:
+In some sense, I'm not sure either. The p1217 examples bother me in that
+they seem to violate  some global programming rules ("if x is only ever null
+or refers to an object properly constructed by the same thread, then x
+should never appear to refer to an incompletely constructed object").
+And there seems to be disagreement about whether the currently allowed
+behavior is "correct".
+
+On the other hand, in practice the weirdness doesn't seem to break things.
+If you ask people advocating the current behavior, the answer will be
+that it doesn't matter because nobody writes code that way. If you ask
+people trying to analyzer or verify code, they'll probably be unhappy.
+And I haven't been able to convince myself that you cannot get yourself
+into these situations just by linking components together, each of which
+does something perfectly reasonable.
+
+And there are very common code
+patterns (like the standard implementation of reentrant locks used
+by all Java implementations) that break if you allow general OOTA
+behavior. Which at least means that you can't currently formally verify such
+code. The theorem you'd be trying to prove is false with respect to the
+part of the language spec we know how to formalize.
+
+It's a mess.
+
+
+\bigskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000447.html}{Andrew Haley}:
+\begin{verbatim}
+> Demonstrably unexecuted code can affect the semantics in ways that
+> strike me as scary. (See wg21.link/p1217 for a down-to-assembly C++
+> version; IIUC, Lochbihler and others earlier came up with some
+> closely related observations for Java.)
+\end{verbatim}
+Looking again at p1217, it seems to me that enforcing load-store
+ordering would have severe effects on compilers, at least without new
+optimization techniques. We hoist loads before loops and sink stores
+after them. When it all works out, there are no memory accesses in the
+loop. A load-store barrier in a loop would have the effect of forcing
+succeeding stores out to memory, and forcing preceding loads to reload
+from memory. It's not hard to imagine that this would cause an
+order-of-margnitude performance reduction in common cases.
+
+I suppose one could argue that such optimizations would continue to be
+valid, so only those stores which would have been emitted anyway would
+be affected. But that's not how compilers work, as far as I know. In
+our IR for C2, memory accesses are not pinned in any way, so the only
+way to make unrelated accesses execute in any particular order is to
+add a dependency between all loads and stores.
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000450.html}{Hans Boehm}:
+I think it would be a fairly pervasive change to optimizers. It has also
+become clear in WG21, the C++ committee, that there is not enough
+support for requiring this. In that case, Ou and Demsky have a paper
+saying that the overhead is likely to be on the order of 1% or less.
+For Java if it were applied everywhere, it would probably be
+appreciably higher.
+
+On the other hand, it's a bit harder than that to come up with examples
+where
+the generated x86 code has to be worse. Moving loads earlier in the
+code, or delaying stores, as you suggest, would still be fine. The only
+issue is with delaying loads past stores, which seems less common,
+though it can certainly be beneficial for reducing live ranges, probably
+some
+vectorization etc.
+
+But it seems unlikely that such a restriction will be applied even to
+C++ memory\_order\_relaxed, much less Java ordinary variables.
+
+\bigskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000449.html}{Doug
+  Lea}:
+My stance in the less formal account 
+(\url{http://gee.cs.oswego.edu/dl/html/j9mm.html}) as well as Shuyang Liu et 
+al's ongoing formalization (see links from 
+\url{http://compilers.cs.ucla.edu/people/}) is that the most you want to say 
+about racy Java programs is that they are typesafe. As in: you can't see 
+a String when expecting an int. Even this looser constraint is 
+challenging to specify, prove, and extend. But it is a path for Java 
+that might not apply to languages like C that are not guaranteed 
+typesafe anyway, and so enter Undefined Behavior territory (as opposed 
+to possibly-unexpected but still typesafe behavior).
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000451.html}{Han Boehm}:
+But this now breaks some common idioms, right? In particular, I think a
+bunch of
+code assumes that racing assignments of equivalent primitive values or
+immutable
+objects to the same field are OK.
+
+If, in 2004, our view of language-based security had been the same as it is
+now,
+then I completely agree that this would have been the right approach. But I
+think
+doing it now would require significant user code changes. Which might still
+be the best way forward ...
 
 % \endinput
 \section{Not for publication}

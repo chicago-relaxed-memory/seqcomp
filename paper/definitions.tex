@@ -522,7 +522,7 @@ preconditions to weaken.
   \\\item
     \begin{math} \label{lem:ifelse:if:if1}
       \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-      =
+      \supseteq
       \xSEMI{
         \xIFTHEN{\aForm}{\aPSS_1}{}
       }{
@@ -533,7 +533,7 @@ preconditions to weaken.
   \\\item
     \begin{math} \label{lem:ifelse:if:if2}
       \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-      =
+      \supseteq
       \xSEMI{
         \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
       }{
@@ -551,10 +551,11 @@ reverse inclusions for \eqref{lem:if:seq}, \eqref{lem:seq:if}, and
 \eqref{lem:if:elim}.
 In \textsection\ref{sec:false}, we refine the semantics to validate the
 reverse inclusion for \eqref{lem:if:dead}.
-As discussed in \textsection\ref{sec:mca1}, for \PwTmca{},
-\eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2} are 
-inclusions, rather than equations; we show how to restore them to equations
-in \textsection\ref{sec:delay}
+For \reffig{fig:seq}, 
+\eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2} can be strengthened
+to equations, rather than inclusions.  However, the reverse direction does
+not hold for \PwTmca{} (\textsection\ref{sec:mca1}) nor for \PwTpo{} (\textsection\ref{sec:c11}).
+For further discussion, see \textsection\ref{sec:delay}.
 \begin{definition}
   \label{def:augment}
   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if all fields are equal except,

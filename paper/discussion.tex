@@ -582,7 +582,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         \PBR{
           \cForm_\aEv 
           \limplies
-          \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}{=}\uReg{\aEv})}
+          \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}\EQ\uReg{\aEv})}
           \limplies
           \bForm[\uReg{\aEv}/\aReg]
         }
@@ -616,7 +616,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   %       \aTr{\bEvs}{\bForm} \riff
   %       \cForm_\aEv 
   %       \limplies
-  %       \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}{=}\uReg{\aEv})}
+  %       \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}\EQ\uReg{\aEv})}
   %       \limplies
   %       \bForm[\uReg{\aEv}/\aReg]
   %     \end{math},      
@@ -1091,8 +1091,8 @@ replace \ref{seq-le-delays} in \PwTmca{1}.  It is not obvious how to repeat
 this trick for \PwTmca{2}, due to thread-local reads-from
 and thread-local blockers (\ref{seq-le-delays-rf} and \ref{seq-le-rf-rf} in \refdef{def:pwt:mca2}).
 
-As motivation, note that \PwTmca{} satisfies only one direction of
-\reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2}
+As motivation, recall that we stated 
+\reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2} as inclusions:
 \begin{enumerate}
 \item[\eqref{lem:ifelse:if:if1}]
   \begin{math} 
@@ -1116,6 +1116,33 @@ As motivation, note that \PwTmca{} satisfies only one direction of
     }.
   \end{math}
 \end{enumerate}
+\PwTmca{} does not satisfy the reverse inclusion.
+The culprit is $\rdelay$, which introduces order regardless of whether
+preconditions are disjoint.  As an example, 
+\begin{math}
+  \sem{\IF{r}
+  \THEN \PW{x}{1}
+  \ELSE \PW{x}{2}
+  \FI}
+\end{math}
+has an execution with
+\begin{math}
+  (r{=}0\mid\DW{x}{2})
+  \xwki
+  (r{\neq}0\mid\DW{x}{1}),
+\end{math}
+(using augmentation), whereas
+\begin{math}
+  \sem{
+    \IF{r} \THEN \PW{x}{1}\FI
+    \SEMI
+    \IF{\BANG r} \THEN \PW{x}{2}\FI
+  \FI}
+\end{math}
+has no such execution.
+
+\todo{Put an example for \PwTpo{}.}
+
 In order to validate the reverse inclusions, we could require that
 \ref{seq-le-delays} not impose order when
 $\labelingForm_1(\bEv) \land \labelingForm_2(\aEv)$ is unsatisfiable.

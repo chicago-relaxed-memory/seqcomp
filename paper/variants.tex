@@ -80,7 +80,7 @@ choose the same register name.  In the above example, the precondition of
 $\aEv$ in the independent case becomes
 \begin{displaymath}
   \tag{$**$}\label{eq4}
-  (1{=}\uReg{\aEv} \lor x{=}\uReg{\aEv})\limplies (1{=}\uReg{\aEv} \lor \uReg{\aEv}{=}\uReg{\aEv})\limplies (\uReg{\aEv}{=}\uReg{\aEv}),
+  (1{=}\uReg{\aEv} \lor x{=}\uReg{\aEv})\limplies (1{=}\uReg{\aEv} \lor \uReg{\aEv}\EQ\uReg{\aEv})\limplies (\uReg{\aEv}\EQ\uReg{\aEv}),
 \end{displaymath}
 which is a tautology.  In \eqref{eq4}, the first read resolves the
 nondeterminism in both the first and the second read.  Given the choice of
@@ -258,7 +258,7 @@ Thus, we define $\regForm{\labeling}$ to capture the \emph{register state} of a 
   Let 
   \begin{math}
     \regForm{\labeling}=
-    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}{=}\aVal)
+    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}\EQ\aVal)
     \textwhere \aEvs=\fdom(\labeling)
   \end{math}.
   
@@ -332,7 +332,13 @@ With this modification, dead-code elimination
 \subsection{Address Calculation}
 \label{sec:addr}
 
-Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and $\sLOAD{}{}$.
+Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$
+and $\sLOAD{}{}$.
+%
+We assume a family of \emph{aliasing symbols} $\A{\aVal}$, indexed by value.
+Let $\aForm$ be a formula that may include the pseudo-value $\Aother$.  Then
+let $[\aForm/\A{\Aother\neq\cVal}]$ be the substitution that, for every
+$\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
 \begin{definition}
   \label{def:semaddr}
   %Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
@@ -362,7 +368,11 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
           \aTr{\bEvs}{\bForm} \riff 
           (\cExp{=}\cVal)
           \limplies 
-          \bForm[\aExp/\REF{\cVal}][\aExp{=}\aVal/\Q{\REF{\cVal}}]
+          \bForm
+          [\aExp/\REF{\cVal}]
+          [\aExp{=}\aVal/\Q{\REF{\cVal}}]
+          [\TRUE/\A{\cVal}]
+          [(\cExp{\neq}\Aother\land\A{\Aother})/\A{\Aother{\neq}\cVal}]
         \end{math},}
       \item \label{write-tau-empty-addr}
         if $\aEvs=\emptyset$ then
@@ -374,7 +384,9 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
           (\cExp{=}\dVal)
           \limplies 
           \bForm
-          [\aExp/\REF{\dVal}][\FALSE/\Q{\REF{\dVal}}],
+          [\aExp/\REF{\dVal}]
+          [\FALSE/\Q{\REF{\dVal}}]
+          [\FALSE/\A{\Aother}],
         \end{math}}
       \end{enumerate}
       \columnbreak
@@ -429,7 +441,11 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
         % \end{math}
         \makebox[0pt][l]{\begin{math}
             \aTr{\bEvs}{\bForm} \riff
-            \PBR{(\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv}) \lor (\cExp{=}\cVal\limplies\REF{\cVal}{=}\uReg{\aEv})}
+            \PBR{
+              (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
+              \lor
+              ((\cExp{=}\cVal\land\A{\cVal})\limplies\REF{\cVal}\EQ\uReg{\aEv})
+            }
             \limplies
             \bForm[\uReg{\aEv}/\aReg]
           \end{math},}
@@ -457,77 +473,29 @@ Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$ and
     \end{enumerate}
   \end{multicols}
 \end{definition}
-
-\todo{Perhaps move this to \textsection\ref{sec:extras} and put
-  \href{http://www.cs.umd.edu/~pugh/java/memoryModel/unifiedProposal/testcases.html}{TC12}
-  here.}
-\begin{comment}
-Initially, x = y = 0; a[0] = 1, a[1] = 2
-
-Thread 1
-r1 = x
-a[r1] = 0
-r2 = a[0]
-y = r2
-
-Thread 2
-r3 = y
-x = r3
-
-Behavior in question: r1 = r2 = r3 = 1
-
-Decision: Disallowed. Since no other thread accesses the array a,
-the code for thread 1 should be equivalent to:
-
-   r1 = x
-   a[r1] = 0
-   if (r1 == 0)
-     r2 = 0
-   else
-     r2 = 1
-   y = r2
-
-
-With this code, it is clear that this is the same situation as test 4:
-
-Initially, x = y = 0
-
-Thread 1:
-r1 = x
-y = r1
-
-Thread 2:
-r2 = y
-x = r2
-
-Behavior in question: r1 == r2 == 1
-
-Decision: Forbidden: values are not allowed to come out of thin air
-\end{comment}
-
 The combination of read-read independency (\textsection\ref{sec:read-read}) and address
 calculation is somewhat delicate.  
 % , in
 % \ref{read-tau-dep-addr}.  The subsection of \textsection\ref{sec:diff} on
 % \ref{xCausal} discusses this example using the semantics of \jjr{}.
-Consider the following program, from \cite[\textsection5]{DBLP:journals/pacmpl/JagadeesanJR20}, where initially $x=0$, $y=0$, $\REF{0}=0$,
-$\REF{1}=2$, and $\REF{2}=1$.  It should only be possible to read $0$,
+Consider the following program, from \cite[\textsection5]{DBLP:journals/pacmpl/JagadeesanJR20}, where initially $x\EQ0$, $y\EQ0$, $\REF{0}\EQ0$,
+$\REF{1}\EQ2$, and $\REF{2}\EQ1$.  It should only be possible to read $0$,
 disallowing the attempted execution below:
 \begin{gather*}
   \begin{gathered}
-    \PR{y}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{x}{s}
-    \PAR
     \PR{x}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{y}{s}
+    \PAR
+    \PR{y}{r}\SEMI \PR{\REF{r}}{s}\SEMI \PW{x}{s}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DR{y}{2}}{}
-        \event{a2}{\DR{\REF{2}}{1}}{right=of a1}
-        \event{a3}{\DW{x}{1}}{right=of a2}
+        \event{a1}{\DR{x}{1}}{}
+        \event{a2}{\DR{\REF{1}}{2}}{right=of a1}
+        \event{a3}{\DW{y}{2}}{right=of a2}
         \po{a2}{a3}
         \po[out=15,in=165]{a1}{a3}
-        \event{b1}{\DR{x}{1}}{right=3em of a3}
-        \event{b2}{\DR{\REF{1}}{2}}{right=of b1}
-        \event{b3}{\DW{y}{2}}{right=of b2}
+        \event{b1}{\DR{y}{2}}{right=3em of a3}
+        \event{b2}{\DR{\REF{2}}{1}}{right=of b1}
+        \event{b3}{\DW{x}{1}}{right=of b2}
         \po{b2}{b3}
         \po[out=15,in=165]{b1}{b3}
         \rf[out=-170,in=-10]{b3}{a1}
@@ -539,6 +507,82 @@ This execution would become possible, however, if we were to replace
 $(\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})$ by $(\aVal{=}\uReg{\aEv})$ in
 \ref{read-tau-dep-addr}.  In this case, $\DRP{y}{2}$ would not necessarily be dependency
 ordered before $\DWP{x}{1}$.
+
+
+\begin{scope}
+  \renewcommand{\ADDRARRAY}[2]{#2}%
+  \renewcommand{\REFARRAY}[2]{\REF{#2}}%
+  \ref{TC12} describes another potential \oota{} behavior.
+  % We write $\REFARRAY{\aExp}{\bExp}$ for $\REF{\aExp{+}\bExp}$.
+  Initially, $x \EQ y \EQ 0$,  $\REFARRAY{a}{0} \EQ 1$, and $\REFARRAY{a}{1} \EQ 2$:
+  \begin{gather*}
+    \taglabel{TC12}
+    \begin{gathered}
+      \PW{y}{\PR{x}{}}
+      \PAR
+      \PR{y}{r}\SEMI
+      \PW{\REFARRAY{a}{r}}{0}\SEMI
+      \PR{\REFARRAY{a}{0}}{s}\SEMI
+      \PW{x}{s}\SEMI
+      \\[-1ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{x}{1}}{}
+          \event{a2}{\DW{y}{1}}{right=of a1}
+          \po{a1}{a2}
+          % \event{iy}{\DW{y}{0}}{left=of a1}
+          % \event{ix}{\DW{x}{0}}{right=2em of a2}
+          \event{b1}{\DR{y}{1}}{right=3em of a2}
+          \event{b2}{\DW{\REFARRAY{a}{1}}{0}}{right=of b1}
+          \event{b3}{\DR{\REFARRAY{a}{0}}{1}}{right=of b2}
+          \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
+          \po{b1}{b2}
+          \po[out=15,in=165]{b1}{b4}
+          \rf{a2}{b1}
+          \rf[out=-170,in=-10]{b4}{a1}
+          % \wk[out=-15,in=-165]{iy}{a2}
+          % \wk[out=-15,in=-165]{ix}{b4}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  Building the precondition $\aForm$ from right to left (assuming that
+  $x,y\not\in\{\REFARRAY{a}{0}, \REFARRAY{a}{1}\}$ and $x{\neq}y$):
+  \begin{align*}
+    \tag{$\PW{x}{s}$}
+    \aForm_1 &=
+    s{=}1
+    \\
+    \tag{Prepending $\PR{\REFARRAY{a}{0}}{s}$}
+    \aForm_2 &=
+    % \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
+    \PBR{1{=}s \lor (\A{0}\limplies\REFARRAY{a}{0}\EQ s)}
+    % \PBR{(\ADDRARRAY{a}{0}\EQ0\limplies1{=}s) \lor ((\ADDRARRAY{a}{0}\EQ0\land \A{0})\limplies\REFARRAY{a}{0}\EQ s)}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PW{\REFARRAY{a}{r}}{0}$}
+    \aForm_3 &=
+    \PBR{1{=}s \lor ((\ADDRARRAY{a}{0}\NEQ r\land\A{0})\limplies\REFARRAY{a}{0}\EQ s)}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PR{y}{r}$}
+    \aForm_4 &=
+    \PBR{\ADDRARRAY{a}{r}\EQ1}
+    \limplies 
+    \PBR{1{=}s \lor ((\ADDRARRAY{a}{0}\NEQ r\land\A{0})\limplies\REFARRAY{a}{0}\EQ s)}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PW{\REFARRAY{a}{0}}{1}$}
+    \aForm_5 &=
+    \PBR{\ADDRARRAY{a}{r}\EQ1}
+    \limplies 
+    \PBR{1{=}s \lor ((\ADDRARRAY{a}{0}\NEQ r\land\TRUE)\limplies 1\EQ s)}
+    \limplies
+    s{=}1
+  \end{align*}
+\end{scope}
+
 % % 
 % In isolation, the precondition of $\DWP{x}{1}$ is $(s=1)$.  Using the erroneous
 % definition of \ref{read-tau-dep-addr}, the precondition becomes $(1{=}s)\limplies (s=1)$
