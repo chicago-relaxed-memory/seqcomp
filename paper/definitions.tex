@@ -846,7 +846,7 @@ $\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{\aVal{=}r\limplies\bForm}{}
         \eventr{\bEv}{a1}{\DR{x}{\aVal}}{left=of xd}
-        \xform{xi}{(x{=}r\lor\aVal{=}r)\limplies\bForm}{left=.5em of a1}
+        \xform{xi}{(\aVal{=}r\lor x{=}r)\limplies\bForm}{left=.5em of a1}
         \xo{a1}{xd}
       \end{tikzinline}}    
   \end{gathered}
@@ -868,7 +868,7 @@ First we consider the case that $\aVal=\bVal$.  For example if $\aVal=\bVal=1$, 
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{1{=}r\limplies\bForm}{}
         \eventr{\bEv}{a1}{\DR{x}{1}}{left=of xd}
-        \xform{xi}{(x{=}r\lor1{=}r)\limplies\bForm}{left=.5em of a1}
+        \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm}{left=.5em of a1}
         \xo{a1}{xd}
       \end{tikzinline}}    
   \end{gathered}
@@ -884,7 +884,7 @@ First we consider the case that $\aVal=\bVal$.  For example if $\aVal=\bVal=1$, 
 \end{align*}
 For the read, the dependent transformer $\smash{\aTr[1]{\{\bEv\}}{}}$ is
 $1{=}r\limplies\bForm$; the independent transformer $\aTr[1]{\emptyset}{}$ is
-$(x{=}r\lor1{=}r)\limplies\bForm$.  These are determined by
+$(1{=}r\lor x{=}r)\limplies\bForm$.  These are determined by
 \ref{read-tau-dep} and \ref{read-tau-ind}, respectively.  For the write, both
 % the dependent transformer
 $\smash{\aTr[2]{\{\aEv\}}{}}$ and
@@ -900,7 +900,7 @@ Combining these into a single pomset, we have:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{1{=}r\limplies\bForm[r/y]}{}
         \eventr{\bEv}{a1}{\DR{x}{1}}{left=of xd}
-        \xform{xi}{(x{=}r\lor1{=}r)\limplies\bForm[r/y]}{left=.5em of a1}
+        \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm[r/y]}{left=.5em of a1}
         \eventr{\aEv}{a2}{\aForm\mid\DW{y}{1}}{right=of xd}      
         \xo{a1}{xd}
       \end{tikzinline}}    
@@ -918,7 +918,7 @@ be a tautology at top-level.  There are two possibilities.
 \item If $\bEv\lt\aEv$ then we apply the dependent transformer and
   $\aForm\riff(1{=}r\limplies r{=}1)$, a tautology.
 \item If $\bEv\not\lt\aEv$ then we apply the independent transformer and
-  $\aForm\riff((x{=}r\lor1{=}r)\limplies r{=}1)$.  Under the assumption that $r$
+  $\aForm\riff((1{=}r\lor x{=}r)\limplies r{=}1)$.  Under the assumption that $r$
   is bound, this is logically equivalent to $(x{=}1)$. (We make this more
   precise in \textsection\ref{sec:false}.)
 \end{itemize}
@@ -990,7 +990,7 @@ possibilities. Taking $\aVal{=}0$ and $\bVal{=}1$:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{0}}{}
-        \eventr{\aEv}{a2}{(x{=}r\lor0{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{(0{=}r\lor x{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1005,8 +1005,8 @@ them.  For example, the precondition of $\aEv$ is a tautology in:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{0{=}r\limplies\bForm[r/y]}{}
         \eventr{\bEv}{a1}{\DR{x}{0}}{left=of xd}
-        \xform{xi}{(x{=}r\lor0{=}r)\limplies\bForm[r/y]}{left=.5em of a1}
-        \eventr {\aEv}{a2}{(x{=}r\lor0{=}r)\limplies 1{=}1\mid\DW{y}{1}}{right=of xd}      
+        \xform{xi}{(0{=}r\lor x{=}r)\limplies\bForm[r/y]}{left=.5em of a1}
+        \eventr {\aEv}{a2}{(0{=}r\lor x{=}r)\limplies 1{=}1\mid\DW{y}{1}}{right=of xd}      
         \xo{a1}{xd}
       \end{tikzinline}}    
   \end{gathered}
@@ -1101,7 +1101,7 @@ For example:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{\aVal{=}r\limplies\bForm}{}
         \eventr{\bEv}{a1}{\DR{x}{\aVal}}{left=of xd}
-        \xform{xi}{(x{=}r\lor\aVal{=}r)\limplies\bForm}{left=.5em of a1}
+        \xform{xi}{(\aVal{=}r\lor x{=}r)\limplies\bForm}{left=.5em of a1}
         \xo{a1}{xd}
       \end{tikzinline}}    
   \end{gathered}
@@ -1146,7 +1146,7 @@ are two possibilities:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{1}}{}
-        \eventr{\aEv}{a2}{(x{=}r\lor1{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{(1{=}r\lor x{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1910,7 +1910,7 @@ Our solution is to Skolemize, replacing substitution by implication, with
 % uses of $\bForm[\aVal/\aReg]$
 % by $(\aReg{=}\aVal)\limplies\bForm$,
 uniquely chosen registers.  Using \reffig{fig:seq}, we compute a tautology in
-the example above: $\aForm\riff((y{=}r\lor1{=}r)\limplies r{=}0)\lor (r{\neq}0)$.
+the example above: $\aForm\riff((1{=}r\lor y{=}r)\limplies r{=}0)\lor (r{\neq}0)$.
 
 %  We have proven associativity of
 %  \refdef{def:pomsets-trans} in Agda.

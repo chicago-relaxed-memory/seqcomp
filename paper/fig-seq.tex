@@ -3,6 +3,13 @@
   \raggedright
   
   \noindent
+  Suppose $\aRel_i$ is a relation in $\aEvs_i\times\aEvs_i$.
+  We say $\aRel \rextendsdef{\aRel_i}{}$ if
+  ${\aRel}\supseteq {\aRel_i}$ and
+  $\aRel\cap(\aEvs_i\times \aEvs_i) = \aRel_i$.
+  \medskip
+
+  \noindent
   If $\aPS\in\sSKIP$ then $\aEvs = \emptyset$
   and $\aTr{\bEvs}{\bForm} \riff \bForm$
   and $\aTerm\riff\TRUE$.
@@ -72,7 +79,16 @@
     \item \label{seq-term}
       $\aTerm \riff \aTerm[1]\land\aTr[1]{}{\aTerm[2]}$,
     \item \label{seq-le}
-      ${\lt}\supseteq{\lt_1}\cup{\lt_2}$.
+      ${\lt}\rextends{\lt_1}{\lt_2}$.
+      % ${\lt}\supseteq{\lt_1}\cup{\lt_2}$.
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{s}6]{}{seq-le}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{seq-le-subset}
+    %     ${\lt}\supseteq{\lt_1}\cup{\lt_2}$,
+    %   \item \label{seq-le-project}
+    %     ${\lt_i}={\lt}\cap(\aEvs_i\times \aEvs_i)$, for $i\in\{1,2\}$.        
+    %   \end{enumerate}
     \end{enumerate}
   \end{multicols}
   \medskip
@@ -109,7 +125,16 @@
       % $\aTerm \riff (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
       $\aTerm \riff (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$,
     \item \label{if-le}
-      ${\lt}\supseteq{\lt_1}\cup{\lt_2}$.
+      ${\lt}\rextends{\lt_1}{\lt_2}$.
+    %   ${\lt}\supseteq{\lt_1}\cup{\lt_2}$.
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{i}6]{}{if-le}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{if-le-subset}
+    %     ${\lt}\supseteq{\lt_1}\cup{\lt_2}$,
+    %   \item \label{if-le-project}
+    %     ${\lt_i}={\lt}\cap(\aEvs_i\times \aEvs_i)$, for $i\in\{1,2\}$.        
+    %   \end{enumerate}
     \end{enumerate}
   \end{multicols}
   \medskip

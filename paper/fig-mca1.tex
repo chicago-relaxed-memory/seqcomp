@@ -24,7 +24,16 @@
     \item \label{par-term}
       $\aTerm \riff \aTerm[1]\land\aTerm[2]$,
     \item \label{par-le}
-        ${\lt}\rsupset{\lt_1}{\lt_2}$,
+    %     ${\lt}\rsupset{\lt_1}{\lt_2}$,
+      ${\lt}\rextends{\lt_1}{\lt_2}$,
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{p}6]{}{par-le}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{par-le-subset}
+    %     ${\lt}\supseteq{\lt_1}\cup{\lt_2}$,
+    %   \item \label{par-le-project}
+    %     ${\lt_i}={\lt}\cap(\aEvs_i\times \aEvs_i)$, for $i\in\{1,2\}$.        
+    %   \end{enumerate}
     \item \label{par-rf}
         ${\rrfx}\rsupset{\rrfx_1}{\rrfx_2}$.
       \stepcounter{enumi}
@@ -111,7 +120,7 @@
         ${\rrfx}\rsupset{\rrfx_1}{\rrfx_2}$.
     % \item[] \labeltext[\textsc{s}7]{}{seq-rf}
     %   \begin{enumerate}[leftmargin=0pt]
-    %   \item \label{seq-rf-extends}
+    %   \item \label{seq-rf-project}
     %     ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
     %   \item \label{seq-rf-le}
     %     if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\le\aEv$.
@@ -174,7 +183,7 @@
         ${\rrfx}\rsupset{\rrfx_1}{\rrfx_2}$.
     % \item[] \labeltext[\textsc{i}7]{}{if-rf}
     %   \begin{enumerate}[leftmargin=0pt]
-    %   \item \label{if-rf-extends}
+    %   \item \label{if-rf-project}
     %     ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
     %   \item \label{if-rf-le}
     %     ${\rrfx}\rsubset{\rrfx_1}{\rrfx_2}$.

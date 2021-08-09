@@ -59,7 +59,7 @@ A \PwTmca{2} need not satisfy requirement \ref{pom-rf-le}, and thus we may
 have $\bEv\xrfx\aEv$ and $\aEv\lt\bEv$.
 
 % 
-% The use of $\rextendsdef{}{}$ in \ref{if-rf-extends}
+% The use of $\rextendsdef{}{}$ in \ref{if-rf-project}
 % ensures that no $\rrfx$ is introduced between events in
 % $\aEvs_1\cap\aEvs_2$ when coalescing.
 
@@ -73,10 +73,10 @@ have $\bEv\xrfx\aEv$ and $\aEv\lt\bEv$.
 
 With the weakening of \ref{seq-le-delays}, we must be careful not to allow
 spurious pairs to be added to the $\rrfx$ relation.  Thus we add
-\ref{par-rf-extends},
-\ref{seq-rf-extends}, and
-\ref{if-rf-extends}.
-For example, \ref{if-rf-extends} ensure that
+\ref{par-rf-project},
+\ref{seq-rf-project}, and
+\ref{if-rf-project}.
+For example, \ref{if-rf-project} ensures that
 \begin{math}
   \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
 \end{math}
