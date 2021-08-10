@@ -655,7 +655,123 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   % $\sLOAD{}{}$.
 \end{definition}
 
-\subsection{Substitutions}
+\subsection{The Need for Respect}
+In \reffig{fig:seq}, we choose the weakest precondition.  Because of this,
+associativity requires that \ref{seq-le} is ${\lt}\rextends{\lt_1}{\lt_2}$
+rather than ${\lt}\rsupset{\lt_1}{\lt_2}$.  Consider
+\begin{math}
+  \PBR{
+    \PR{x}{r}
+    \SEMI
+    \PW{y}{\aExp}
+    \SEMI
+    \SKIP
+  }.
+\end{math}
+Associating to the left, we might have:
+\begin{align*}
+  \aPS_{12}=
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \eventr{d}{d}{\DR{x}{}}{}
+      \eventr{e}{e}{\aForm\mid \DW{y}{}}{right=of d}
+    \end{tikzinline}}
+  &&
+  \aPS_{3}= \emptyset
+  &&
+  \aPS=
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \eventr{d}{d}{\DR{x}{}}{}
+      \eventr{e}{e}{\aForm\mid \DW{y}{}}{right=of d}
+      \po{d}{e}
+    \end{tikzinline}}
+\end{align*}
+When building $\aPS_{12}$, we would have had $\Cdown{e}=\emptyset$, and thus
+$\aForm$ must have been constructed using the independent transformer
+\ref{read-tau-ind}.  Attempting to repeat this, associating to the right:
+\begin{align*}
+  \aPS_{1}=
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \eventr{d}{d}{\DR{x}{}}{}
+    \end{tikzinline}}
+  &&
+  \aPS_{23}=
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \eventr{e}{e}{\aForm'\mid \DW{y}{}}{}
+    \end{tikzinline}}
+  &&
+  \aPS'=
+  \hbox{\begin{tikzinline}[node distance=1em]
+      \eventr{d}{d}{\DR{x}{}}{}
+      \eventr{e}{e}{\aForm'\mid \DW{y}{}}{right=of d}
+      \po{d}{e}
+    \end{tikzinline}}
+\end{align*}
+In $\aPS'$, however, $\Cdown{e}=\{d\}$, and thus $\aForm'$ must be
+constructed using the dependent transformer \ref{read-tau-dep}.
+Since
+\begin{math}
+  \PBR{
+    \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}
+    \limplies \bForm
+  }
+  \not\riff
+  \PBR{
+    \aVal{=}\aReg
+    \limplies \bForm
+  },
+\end{math}
+associativity fails.
+
+If we allow stronger preconditions, as in
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}, then we could use inclusion
+rather than $\rextendsdef{}{}$.  To arrive at this semantics, one would
+replace every occurrence of $\riff$ in \reffig{fig:seq} with $\rimplies$.
+Then $\PBR{{\lt}\rextends{\lt_1}{\lt_2}}$ can be replaced by
+$\PBR{{\lt}\rsupset{\lt_1}{\lt_2}}$.
+
+\subsection{Write Substitutions}
+\todo{Discuss.}
+
+Alan example of why substitute M/x rather than v/x in the write rule:
+\begin{gather*}
+  \PR{y}{r}\SEMI \PW{x}{r}\SEMI \PR{x}{s} \SEMI \PW{z}{s}
+  \\
+  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
+      \event{a1}{\DR{y}{1}}{}
+      \event{a2}{\DW{x}{1}}{right=of a1}
+      \event{a3}{\DR{x}{1}}{right=of a2}
+      \event{a4}{\DW{z}{1}}{right=of a3}
+      % \po[out=15,in=165]{a1}{a4}
+      \po{a1}{a2}
+    \end{tikzinline}}
+\end{gather*}
+We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
+\begin{gather*}
+  \PR{x}{s}\SEMI \PW{z}{s}
+  \\
+  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
+      \event{a3}{\DR{x}{1}}{}
+      \event{a4}{x\EQ1\mid\DW{z}{1}}{right=of a3}
+    \end{tikzinline}}
+\end{gather*}
+\begin{gather*}
+  \PW{x}{r} \SEMI \PR{x}{s}\SEMI \PW{z}{s}
+  \\
+  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
+      \event{a2}{\DW{x}{1}}{}
+      \event{a3}{\DR{x}{1}}{right=of a2}
+      \event{a4}{1\EQ1\mid\DW{z}{1}}{right=of a3}
+    \end{tikzinline}}
+  \\
+  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
+      \event{a2}{\DW{x}{1}}{}
+      \event{a3}{\DR{x}{1}}{right=of a2}
+      \event{a4}{r\EQ1\mid\DW{z}{1}}{right=of a3}
+    \end{tikzinline}}
+\end{gather*}
+
+
+\subsection{Read Substitutions}
 \label{sec:substitutions}
 
 In $\sLOAD{}{}$, it is also possible to collapse $\aLoc$ and $\aReg$ via substitution:

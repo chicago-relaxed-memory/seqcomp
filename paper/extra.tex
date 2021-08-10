@@ -1373,48 +1373,6 @@ But not:
     \end{tikzinline}}
 \end{gather*}
 
-\subsection{Write rule}
-\todo{Discuss.}
-
-Alan example of why substitute M/x rather than v/x in the write rule:
-\begin{gather*}
-  \PR{y}{r}\SEMI \PW{x}{r}\SEMI \PR{x}{s} \SEMI \PW{z}{s}
-  \\
-  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
-      \event{a1}{\DR{y}{1}}{}
-      \event{a2}{\DW{x}{1}}{right=of a1}
-      \event{a3}{\DR{x}{1}}{right=of a2}
-      \event{a4}{\DW{z}{1}}{right=of a3}
-      % \po[out=15,in=165]{a1}{a4}
-      \po{a1}{a2}
-    \end{tikzinline}}
-\end{gather*}
-We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
-\begin{gather*}
-  \PR{x}{s}\SEMI \PW{z}{s}
-  \\
-  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
-      \event{a3}{\DR{x}{1}}{}
-      \event{a4}{x\EQ1\mid\DW{z}{1}}{right=of a3}
-    \end{tikzinline}}
-\end{gather*}
-\begin{gather*}
-  \PW{x}{r} \SEMI \PR{x}{s}\SEMI \PW{z}{s}
-  \\
-  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
-      \event{a2}{\DW{x}{1}}{}
-      \event{a3}{\DR{x}{1}}{right=of a2}
-      \event{a4}{1\EQ1\mid\DW{z}{1}}{right=of a3}
-    \end{tikzinline}}
-  \\
-  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
-      \event{a2}{\DW{x}{1}}{}
-      \event{a3}{\DR{x}{1}}{right=of a2}
-      \event{a4}{r\EQ1\mid\DW{z}{1}}{right=of a3}
-    \end{tikzinline}}
-\end{gather*}
-
-
 \subsection{Sevcik examples}
 \todo{Discuss.}
 
@@ -2587,7 +2545,10 @@ cases:
    \end{tikzinline}}
 \end{gather*}
 
-\section{Recent discussion on JMM/JDK-dev}
+% \endinput
+\section{Not for publication}
+
+\subsection{Recent discussion on JMM/JDK-dev}
 
 \href{https://mail.openjdk.java.net/pipermail/jdk-dev/2021-August/005904.html}{Raffaello Giulietti}:
 ``JEP 188: Java Memory Model Update'' \href{https://openjdk.java.net/jeps/188}{[1]}, the JMM wiki \href{https://wiki.openjdk.java.net/display/jmm/Main}{[2]} and the 
@@ -2756,8 +2717,6 @@ think
 doing it now would require significant user code changes. Which might still
 be the best way forward ...
 
-% \endinput
-\section{Not for publication}
 
 
 \subsection{A Note on Mixed-Mode Data Races}
