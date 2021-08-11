@@ -332,6 +332,8 @@ With this modification, dead-code elimination
 \subsection{Address Calculation}
 \label{sec:addr}
 
+\todo{We develop a flat memory model, which does not deal with provenance \cite{DBLP:journals/pacmpl/LeeHJLRL18}.}
+
 Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$
 and $\sLOAD{}{}$.
 %
@@ -511,13 +513,80 @@ ordered before $\DWP{x}{1}$.
 
 
 \begin{scope}
-  \renewcommand{\ADDRARRAY}[2]{#2}%
-  \renewcommand{\REFARRAY}[2]{\REF{#2}}%
+  % \renewcommand{\ADDRARRAY}[2]{#2}%
+  % \renewcommand{\REFARRAY}[2]{\REF{#2}}%
   \ref{TC12} describes another potential \oota{} behavior.
   % We write $\REFARRAY{\aExp}{\bExp}$ for $\REF{\aExp{+}\bExp}$.
   Initially, $x \EQ y \EQ 0$,  $\REFARRAY{a}{0} \EQ 1$, and $\REFARRAY{a}{1} \EQ 2$:
   \begin{gather*}
     \taglabel{TC12}
+    \begin{gathered}
+      \PW{y}{\PR{x}{}}
+      \PAR
+      \PR{y}{r}\SEMI
+      \PW{\REFARRAY{a}{r}}{0}\SEMI
+      \PR{\REFARRAY{a}{0}}{s}\SEMI
+      \PW{x}{s}\SEMI
+      \\[-1ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{x}{1}}{}
+          \event{a2}{\DW{y}{1}}{right=of a1}
+          \po{a1}{a2}
+          % \event{iy}{\DW{y}{0}}{left=of a1}
+          % \event{ix}{\DW{x}{0}}{right=2em of a2}
+          \event{b1}{\DR{y}{1}}{right=3em of a2}
+          \event{b2}{\DW{\REFARRAY{a}{1}}{0}}{right=of b1}
+          \event{b3}{\DR{\REFARRAY{a}{0}}{1}}{right=of b2}
+          \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
+          \po{b1}{b2}
+          %\po[out=15,in=165]{b1}{b4}
+          \rf{a2}{b1}
+          \rf[out=-170,in=-10]{b4}{a1}
+          % \wk[out=-15,in=-165]{iy}{a2}
+          % \wk[out=-15,in=-165]{ix}{b4}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  Building the precondition $\aForm$ from right to left (without $\A{}$):
+  \begin{align*}
+    \tag{$\PW{x}{s}$}
+    \aForm_1 &=
+    s{=}1
+    \\
+    \tag{Prepending $\PR{\REFARRAY{a}{0}}{s}$}
+    \aForm_2 &=
+    \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PW{\REFARRAY{a}{r}}{0}$}
+    \aForm_3 &=
+    \PBR{
+      \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
+      \limplies
+      s{=}1
+    }[0/\REFARRAY{a}{1}]
+    \\
+    \tag{Prepending $\PR{y}{r}$}
+    \aForm_4 &=
+    \PBR{r\EQ1 \lor y\EQ1}
+    \limplies 
+    \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PW{\REFARRAY{a}{0}}{1}$}
+    \aForm_5 &=
+    \PBR{r\EQ1 \lor y\EQ1}
+    \limplies 
+    \PBR{1{=}s \lor 1\EQ s)}
+    \limplies
+    s{=}1
+  \end{align*}
+
+  Adding $\A{}$ fixes that:
+  \begin{gather*}
+    %\taglabel{TC12}
     \begin{gathered}
       \PW{y}{\PR{x}{}}
       \PAR
@@ -545,6 +614,17 @@ ordered before $\DWP{x}{1}$.
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
+  A compiler should be able to refine the second thread to:
+  \begin{displaymath}
+    \PR{y}{r}\SEMI
+    \IF{r\EQ0}\THEN
+      \PW{\REFARRAY{a}{0}}{0}\SEMI
+      \PW{x}{0}
+    \ELIF{r\EQ1}\THEN
+      \PW{\REFARRAY{a}{1}}{0}\SEMI
+      \PW{x}{1}
+    \FI
+  \end{displaymath}    
   Building the precondition $\aForm$ from right to left (assuming that
   $x,y\not\in\{\REFARRAY{a}{0}, \REFARRAY{a}{1}\}$ and $x{\neq}y$):
   \begin{align*}
@@ -555,30 +635,30 @@ ordered before $\DWP{x}{1}$.
     \tag{Prepending $\PR{\REFARRAY{a}{0}}{s}$}
     \aForm_2 &=
     % \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
-    \PBR{1{=}s \lor (\A{0}\limplies\REFARRAY{a}{0}\EQ s)}
+    \PBR{1{=}s \lor (\A{\ADDRARRAY{a}{0}}\limplies\REFARRAY{a}{0}\EQ s)}
     % \PBR{(\ADDRARRAY{a}{0}\EQ0\limplies1{=}s) \lor ((\ADDRARRAY{a}{0}\EQ0\land \A{0})\limplies\REFARRAY{a}{0}\EQ s)}
     \limplies
     s{=}1
     \\
     \tag{Prepending $\PW{\REFARRAY{a}{r}}{0}$}
     \aForm_3 &=
-    \PBR{1{=}s \lor ((\ADDRARRAY{a}{0}\NEQ r\land\A{0})\limplies\REFARRAY{a}{0}\EQ s)}
+    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{a}{0}})\limplies\REFARRAY{a}{0}\EQ s)}
     \limplies
     s{=}1
     \\
     \tag{Prepending $\PR{y}{r}$}
     \aForm_4 &=
-    \PBR{\ADDRARRAY{a}{r}\EQ1}
+    \PBR{r\EQ1}
     \limplies 
-    \PBR{1{=}s \lor ((\ADDRARRAY{a}{0}\NEQ r\land\A{0})\limplies\REFARRAY{a}{0}\EQ s)}
+    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{a}{0}})\limplies\REFARRAY{a}{0}\EQ s)}
     \limplies
     s{=}1
     \\
     \tag{Prepending $\PW{\REFARRAY{a}{0}}{1}$}
     \aForm_5 &=
-    \PBR{\ADDRARRAY{a}{r}\EQ1}
+    \PBR{r\EQ1}
     \limplies 
-    \PBR{1{=}s \lor ((\ADDRARRAY{a}{0}\NEQ r\land\TRUE)\limplies 1\EQ s)}
+    \PBR{1{=}s \lor (0\NEQ r\land\TRUE)\limplies 1\EQ s)}
     \limplies
     s{=}1
   \end{align*}
@@ -1250,7 +1330,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
-  $(\exists\emptyForm\in\{\TRUE,\FALSE\})$
+  $(\exists\emptyForm\in\Formulae)$
   %$(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
@@ -1346,7 +1426,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$ 
-  $(\exists\emptyForm\in\{\TRUE,\FALSE\})$
+  $(\exists\emptyForm\in\Formulae)$
   %$(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]

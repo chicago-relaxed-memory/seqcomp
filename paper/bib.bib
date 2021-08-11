@@ -1,5 +1,183 @@
 Quine: To be is, purely and simply, to be the value of a variable. 
 
+@MISC{BoehmOOTA,
+  author = {Boehm, Hans-J.},
+  title = {Out-of-thin-air, Revisited, Again (Revision 2)},
+  year = {2019},
+  month = jun,
+  howpublished = {\url{https://wg21.link/p1217}}
+}
+@MISC{C11-undefined,
+  author = {Boehm, Hans-J.},
+  title = {``Undefined behavior'' and the concurrency memory model},
+  year = {2020},
+  month = sep,
+  howpublished = {\url{http://wg21.link/p2215}}
+}
+@MISC{C11-oota,
+  author = {David Goldblatt},
+  title = {There might not be an elegant OOTA fix},
+  year = {2019},
+  month = oct,
+  howpublished = {\url{http://wg21.link/p1916}}
+}
+@MISC{mckenny:sdep,
+  author = {McKenney, Paul E. and Jeffrey, Alan and Sezgin, Ali and Tye, Tony},
+  title = {Out-of-Thin-Air Execution is vacuous},
+  institution = {ISO/IEC JTC1 SC22 WG21},
+  number  = {P0422 R0},
+  month = jul,
+  year = {2016},
+  howpublished = {\url{http://wg21.link/p0422}}
+}
+@MISC{undefined,
+  author = {Hans-J. Boehm},
+  title = {Memory Model Rationales},
+  month = mar,
+  year = {2007},
+  howpublished = {\url{http://wg21.link/n2176}}
+}
+@MISC{boehm-tar,
+  author = {Hans-J. Boehm},
+  title = {Specifying the Absence of ``Out Of Thin Air'' Results},
+  month = aug,
+  year = {2013},
+  howpublished = {\url{http://wg21.link/n3710}}
+}
+@MISC{boehm-c14,
+  author = {Hans-J. Boehm},
+  title = {Prohibiting ``Out Of Thin Air'' Results in C++14},
+  month = nov,
+  year = {2013},
+  howpublished = {\url{http://wg21.link/n3786}}
+}
+
+@Misc{ecma-262,
+  key = 	 {ecma-262},
+  author =	 {{ECMA TC39}},
+  title =	 {{ECMAScript} 2017 Language Specification},
+  year =	 {2017},
+  howpublished = {\url{https://www.ecma-international.org/ecma-262/8.0/}},
+}
+
+@MISC{goMM,
+  author = {Russ Cox},
+  title = {Go’s Memory Model},
+  month = feb,
+  year = {2016},
+  howpublished = {\url{http://nil.csail.mit.edu/6.824/2016/notes/gomem.pdf}}
+}
+
+@MISC{leaky,
+  author = {Joel Spolsky},
+  title = {The Law of Leaky Abstractions},
+  month = nov,
+  year = {2002},
+  howpublished = {\url{https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/}}
+}
+
+@MISC{nvidia-model,
+  author = {{NVIDIA}},
+  title = {Parallel Thread Execution ISA Version 7.1},
+  month = oct,
+  year = {2020},
+  howpublished = {\url{https://docs.nvidia.com/cuda/parallel-thread-execution/index.html\#memory-consistency-model}}
+}
+@MISC{nvidia-uma,
+  author = {{NVIDIA}},
+  title = {{CUDA} Toolkit v11.3.1 Documentation: {CUDA} {C++} Programming Guide},
+  month = may,
+  year = {2021},
+  howpublished = {\url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-unified-memory-programming-hd}}
+}
+
+@MISC{armed-cats,
+  author = {Jade Alglave and Will Deacon and Richard Grisenthwaite and
+    Antoine Hacquard and  Luc Maranget},
+  title = {Armed cats: Formal Concurrency Modelling at Arm},
+  year = 2020,
+  numpages = {49},
+  howpublished = {Draft}
+}
+
+@MISC{arm-reference-manual,
+  author = {{Arm Limited}},
+  title = {Arm Architecture Reference Manual: {Armv8}, for {Armv8-A} Architecture Profile (Issue {F.c})},
+  month = jul,
+  year = {2020},
+  howpublished = {\url{https://developer.arm.com/documentation/ddi0487/latest}}
+}
+
+
+@misc{blog,
+ author = {Jann Horn},
+ title = {Reading privileged memory with a side-channel},
+ year = {2018},
+ howpublished = {\url{https://googleprojectzero.blogspot.com/2018/01/reading-privileged-memory-with-side.html}}
+}
+ 
+@MISC{PughWebsite,
+  author = {William Pugh},
+  title = {Causality Test Cases},
+  year = 2004,
+  url = {https://perma.cc/PJT9-XS8Z},
+  XXurl = {http://www.cs.umd.edu/~pugh/java/memoryModel/CausalityTestCases.html}
+}
+@MISC{undefined2,
+  author = {Pascal Cuoq and John Regehr},
+  title = {Undefined Behavior in 2017},
+  booktitle = {Embedded in Academia Blog},
+  month = jul,
+  year = {2017},
+  howpublished = {\url{https://blog.regehr.org/archives/1520}}
+}
+@MISC{ecma2019,
+  author = {{ECMA International}},
+  title = {{ECMAScript} 2019 Language Specification},
+  year = {2019},
+  howpublished = {\url{https://www.ecma-international.org/ecma-262/10.0/}}
+}
+@MISC{alglave-git-alternate,
+  author = {Jade Alglave},
+  title = {This commit adds three alternative formulations of the Arm model, both for non-mixed and mixed size accesses},
+  month = jun,
+  year = {2020},
+  howpublished = {\url{https://github.com/herd/herdtools7/commit/685ee4}}
+}
+@MISC{nuno,
+  author = {Nuno Lopes},
+  title = {RFC: Killing undef and spreading poison},
+  month = oct,
+  year = {2016},
+  howpublished = {\url{https://lists.llvm.org/pipermail/llvm-dev/2016-October/106182.html}}
+}
+@MISC{alglave-git,
+  author = {Jade Alglave},
+  title = {This commit adds the Armv8 memory model for mixed-size accesses},
+  month = oct,
+  year = {2019},
+  howpublished = {\url{https://github.com/herd/herdtools7/commit/95785c}}
+}
+@MISC{deacon-git,
+  author = {Will Deacon},
+  title = {Formal memory model for Armv8.0 application level},
+  month = apr,
+  year = {2017},
+  howpublished = {\url{https://github.com/herd/herdtools7/commit/daa126}}
+}
+@MISC{brookes,
+  author = {Stephen Brookes},
+  title = {A denotational semantics for weak memory concurrency},
+  year = {2016},
+  note = {Midlands Graduate School in the Foundations of Computing Science},
+  howpublished = {\url{http://www.cs.bham.ac.uk/~pbl/mgs2016/brookesslides.pdf}}
+}
+@MISC{gordonHoare,
+  author = {Mike Gordon},
+  title = {Background reading on Hoare Logic},
+  year = {2012},
+  howpublished = {\url{https://www.cl.cam.ac.uk/archive/mjcg/HL/Notes/Notes.pdf}}
+}
 @inproceedings{DBLP:conf/pldi/LeeKSHDMRL17,
   author    = {Juneyoung Lee and
                Yoonseung Kim and
@@ -195,6 +373,25 @@ Quine: To be is, purely and simply, to be the value of a variable.
   biburl    = {https://dblp.org/rec/conf/cgo/ChakrabortyV17.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
+@article{DBLP:journals/pacmpl/LeeHJLRL18,
+  author    = {Juneyoung Lee and
+               Chung{-}Kil Hur and
+               Ralf Jung and
+               Zhengyang Liu and
+               John Regehr and
+               Nuno P. Lopes},
+  title     = {Reconciling high-level optimizations and low-level code in {LLVM}},
+  journal   = {Proc. {ACM} Program. Lang.},
+  volume    = {2},
+  number    = {{OOPSLA}},
+  pages     = {125:1--125:28},
+  year      = {2018},
+  url       = {https://doi.org/10.1145/3276495},
+  doi       = {10.1145/3276495},
+  timestamp = {Wed, 17 Feb 2021 08:54:05 +0100},
+  biburl    = {https://dblp.org/rec/journals/pacmpl/LeeHJLRL18.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
 
 @phdthesis{Kang19,
   author    = {Jeehoon Kang},
@@ -256,55 +453,6 @@ Quine: To be is, purely and simply, to be the value of a variable.
   biburl    = {https://dblp.org/rec/journals/pacmpl/BenderP19.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
-
-@MISC{goMM,
-  author = {Russ Cox},
-  title = {Go’s Memory Model},
-  month = feb,
-  year = {2016},
-  howpublished = {\url{http://nil.csail.mit.edu/6.824/2016/notes/gomem.pdf}}
-}
-
-@MISC{leaky,
-  author = {Joel Spolsky},
-  title = {The Law of Leaky Abstractions},
-  month = nov,
-  year = {2002},
-  howpublished = {\url{https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/}}
-}
-
-@MISC{nvidia-model,
-  author = {{NVIDIA}},
-  title = {Parallel Thread Execution ISA Version 7.1},
-  month = oct,
-  year = {2020},
-  howpublished = {\url{https://docs.nvidia.com/cuda/parallel-thread-execution/index.html\#memory-consistency-model}}
-}
-@MISC{nvidia-uma,
-  author = {{NVIDIA}},
-  title = {{CUDA} Toolkit v11.3.1 Documentation: {CUDA} {C++} Programming Guide},
-  month = may,
-  year = {2021},
-  howpublished = {\url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-unified-memory-programming-hd}}
-}
-
-@MISC{armed-cats,
-  author = {Jade Alglave and Will Deacon and Richard Grisenthwaite and
-    Antoine Hacquard and  Luc Maranget},
-  title = {Armed cats: Formal Concurrency Modelling at Arm},
-  year = 2020,
-  numpages = {49},
-  howpublished = {Draft}
-}
-
-@MISC{arm-reference-manual,
-  author = {{Arm Limited}},
-  title = {Arm Architecture Reference Manual: {Armv8}, for {Armv8-A} Architecture Profile (Issue {F.c})},
-  month = jul,
-  year = {2020},
-  howpublished = {\url{https://developer.arm.com/documentation/ddi0487/latest}}
-}
-
 
 @inproceedings{DBLP:conf/asplos/LustigSG19,
   author    = {Daniel Lustig and
@@ -453,71 +601,6 @@ Quine: To be is, purely and simply, to be the value of a variable.
   biburl    = {https://dblp.org/rec/conf/pldi/WattPPBDFPG20.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
-@MISC{undefined,
-  author = {Hans-J. Boehm},
-  title = {Memory Model Rationales},
-  month = mar,
-  year = {2007},
-  howpublished = {\url{http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2176}}
-}
-@MISC{boehm-tar,
-  author = {Hans-J. Boehm},
-  title = {Specifying the Absence of ``Out Of Thin Air'' Results},
-  month = aug,
-  year = {2013},
-  howpublished = {\url{http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3710}}
-}
-@MISC{boehm-c14,
-  author = {Hans-J. Boehm},
-  title = {Prohibiting ``Out Of Thin Air'' Results in C++14},
-  month = nov,
-  year = {2013},
-  howpublished = {\url{http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3786}}
-}
-@MISC{undefined2,
-  author = {Pascal Cuoq and John Regehr},
-  title = {Undefined Behavior in 2017},
-  booktitle = {Embedded in Academia Blog},
-  month = jul,
-  year = {2017},
-  howpublished = {\url{https://blog.regehr.org/archives/1520}}
-}
-@MISC{ecma2019,
-  author = {{ECMA International}},
-  title = {{ECMAScript} 2019 Language Specification},
-  year = {2019},
-  howpublished = {\url{https://www.ecma-international.org/ecma-262/10.0/}}
-}
-@MISC{alglave-git-alternate,
-  author = {Jade Alglave},
-  title = {This commit adds three alternative formulations of the Arm model, both for non-mixed and mixed size accesses},
-  month = jun,
-  year = {2020},
-  howpublished = {\url{https://github.com/herd/herdtools7/commit/685ee4}}
-}
-@MISC{nuno,
-  author = {Nuno Lopes},
-  title = {RFC: Killing undef and spreading poison},
-  month = oct,
-  year = {2016},
-  howpublished = {\url{https://lists.llvm.org/pipermail/llvm-dev/2016-October/106182.html}}
-}
-@MISC{alglave-git,
-  author = {Jade Alglave},
-  title = {This commit adds the Armv8 memory model for mixed-size accesses},
-  month = oct,
-  year = {2019},
-  howpublished = {\url{https://github.com/herd/herdtools7/commit/95785c}}
-}
-@MISC{deacon-git,
-  author = {Will Deacon},
-  title = {Formal memory model for Armv8.0 application level},
-  month = apr,
-  year = {2017},
-  howpublished = {\url{https://github.com/herd/herdtools7/commit/daa126}}
-}
-
-
 
 @inproceedings{10.1145/2694344.2694391,
 author = {Alglave, Jade and Batty, Mark and Donaldson, Alastair F. and Gopalakrishnan, Ganesh and Ketema, Jeroen and Poetzl, Daniel and Sorensen, Tyler and Wickerson, John},
@@ -833,45 +916,6 @@ series = {ASPLOS ’15}
   timestamp = {Mon, 20 Apr 2020 16:36:31 +0200},
   biburl    = {https://dblp.org/rec/conf/esop/PaviottiCPWOB20.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-
-@MISC{modular,
-  author = {Mark Batty and
-    Simon Cooksey and
-    Scott Owens and
-    Anouk Paradis and
-    Marco Paviotti and
-    Daniel Wright},
-  title = {Modular Relaxed Dependencies: A new approach to the Out-Of-Thin-Air Problem},
-  year = {2019},
-  month = jun,
-  howpublished = {\url{http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1780r0}}
-}
-
-@MISC{brookes,
-  author = {Stephen Brookes},
-  title = {A denotational semantics for weak memory concurrency},
-  year = {2016},
-  note = {Midlands Graduate School in the Foundations of Computing Science},
-  howpublished = {\url{http://www.cs.bham.ac.uk/~pbl/mgs2016/brookesslides.pdf}}
-}
-@MISC{gordonHoare,
-  author = {Mike Gordon},
-  title = {Background reading on Hoare Logic},
-  year = {2012},
-  howpublished = {\url{https://www.cl.cam.ac.uk/archive/mjcg/HL/Notes/Notes.pdf}}
-}
-
-
-@MISC{vacuous,
-  author = {McKenney, Paul E. and
-           Jeffrey, Alan and
-           Sezgin, Ali and
-           Tye, Tony},
-         title = {0422R0: Out-of-thin-air execution is vacuous},
-         month = jul,
-  year = {2016},
-  howpublished = {\url{http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0422r0}}
 }
 
 @inproceedings{DBLP:conf/fm/LahavV16,
@@ -1235,31 +1279,6 @@ series = {ASPLOS ’15}
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
-@MISC{BoehmOOTA,
-  author = {Boehm, Hans-J.},
-  title = {Out-of-thin-air, Revisited, Again (Revision 2)},
-  year = {2019},
-  month = jun,
-  howpublished = {\url{https://wg21.link/p1217}}
-}
-OLD VERSION: howpublished =
-\url{http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1217r2}
-\url{http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1217r0}
-
-@MISC{C11-undefined,
-  author = {Boehm, Hans-J.},
-  title = {``Undefined behavior'' and the concurrency memory model},
-  year = {2020},
-  month = sep,
-  howpublished = {\url{http://wg21.link/p2215}}
-}
-@MISC{C11-oota,
-  author = {David Goldblatt},
-  title = {There might not be an elegant OOTA fix},
-  year = {2019},
-  month = oct,
-  howpublished = {\url{http://wg21.link/p1916}}
-}
 
   
 
@@ -1892,13 +1911,6 @@ month={July},}
  address = {Washington, DC, USA},
  keywords = {Secure Multi-Execution, Information Flow, Noninterference},
 }
-@MISC{PughWebsite,
-  author = {William Pugh},
-  title = {Causality Test Cases},
-  year = 2004,
-  url = {https://perma.cc/PJT9-XS8Z},
-  XXurl = {http://www.cs.umd.edu/~pugh/java/memoryModel/CausalityTestCases.html}
-}
 @inproceedings{DBLP:conf/esop/BattyMNPS15,
   author    = {Mark Batty and
                Kayvan Memarian and
@@ -2183,13 +2195,6 @@ month={July},}
  howpublished = {Private correspondence}
 }
 
-@misc{blog,
- author = {Jann Horn},
- title = {Reading privileged memory with a side-channel},
- year = {2018},
- howpublished = {\url{https://googleprojectzero.blogspot.com/2018/01/reading-privileged-memory-with-side.html}}
-}
- 
 @PHDTHESIS{AlglaveThesis,
   AUTHOR =       {Alglave, Jade},
   TITLE =        {A shared memory poetics},
@@ -2757,14 +2762,6 @@ howpublished = {\url{https://blog.mozilla.org/security/2018/01/03/mitigations-la
   biburl    = {https://dblp.org/rec/books/ws/95/Mazurkiewicz95.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
-@Misc{ecma-262,
-  key = 	 {ecma-262},
-  author =	 {{ECMA TC39}},
-  title =	 {{ECMAScript} 2017 Language Specification},
-  year =	 {2017},
-  howpublished = {\url{https://www.ecma-international.org/ecma-262/8.0/}},
-}
-
 
 @inproceedings{DBLP:conf/hipc/HighamK00,
   author    = {Lisa Higham and
@@ -2808,15 +2805,6 @@ howpublished = {\url{https://blog.mozilla.org/security/2018/01/03/mitigations-la
   year="2019",
   publisher="Springer International Publishing",
   pages="507--525",
-}
-
-@techreport{mckenny:sdep,
-  author  = {McKenney, Paul E. and Jeffrey, Alan and Sezgin, Ali and Tye, Tony},
-  title   = {Out-of-Thin-Air Execution is Vacuous},
-  institution = {ISO/IEC JTC1 SC22 WG21},
-  volume  = {P0422},
-  number  = {R0},
-  year    = {2016}
 }
 
 % Local Variables:

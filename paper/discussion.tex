@@ -446,6 +446,7 @@ Sequencing and merging:
 \end{align*}
 The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 
+\todo{Add $\A{\aVal}$.}
 \begin{definition}
   \label{def:semcaaddr}
   %Let $\semcaaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
@@ -455,7 +456,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$
-  $(\exists\emptyForm\in\{\TRUE,\FALSE\})$
+  $(\exists\emptyForm\in\Formulae)$
   %$(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
@@ -479,9 +480,9 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         &\textstyle\bigwedge_{\aEv\in\aEvs}
         \PBR{
           \cForm_\aEv
-          \limplies (\cExp{=}\cVal)
+          \limplies (\cExp{=}\cVal_\aEv)
           \limplies 
-          \bForm[\aExp/\aLoc][\aExp{=}\aVal_\aEv/\Q{\aLoc}]
+          \bForm[\aExp/\REF{\cVal_\aEv}][\aExp{=}\aVal_\aEv/\Q{\REF{\cVal_\aEv}}]
         }
         \\[-.5ex]
         \land
@@ -490,7 +491,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
         %\textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\cForm_\aEv)
         \limplies (\cExp{=}\dVal)
         \limplies 
-        \bForm[\aExp/\aLoc][\FALSE/\Q{\aLoc}]
+        \bForm[\aExp/\REF{\dVal}][\FALSE/\Q{\REF{\dVal}}]
       \end{aligned}
     \end{math}
     \columnbreak
@@ -549,7 +550,7 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
   $(\exists\cForm:\aEvs\fun\Formulae)$ 
-  $(\exists\emptyForm\in\{\TRUE,\FALSE\})$
+  $(\exists\emptyForm\in\Formulae)$
   %$(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
@@ -657,8 +658,8 @@ The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 
 \subsection{The Need for Respect}
 In \reffig{fig:seq}, we choose the weakest precondition.  Because of this,
-associativity requires that \ref{seq-le} is ${\lt}\rextends{\lt_1}{\lt_2}$
-rather than ${\lt}\rsupset{\lt_1}{\lt_2}$.  Consider
+associativity requires that \ref{seq-le} is $\PBR{{\lt}\rextends{\lt_1}{\lt_2}}$
+rather than $\PBR{{\lt}\rsupset{\lt_1}{\lt_2}}$.  Consider
 \begin{math}
   \PBR{
     \PR{x}{r}
@@ -1440,8 +1441,14 @@ We define some helper notation:
     \end{align*}
   \end{scope}
 \end{definition}
-Update the following rules from \reffig{fig:seq}.
-(The change is similar for address calculation and if-closure.)
+Update the following rules from \reffig{fig:seq}.  (The change is similar for
+address calculation and if-closure.)
+
+\todo{This is buggy.  Need to enforce order for
+  coherence/synchronization/dependency into a write and
+  coherence/synchronization, but not dependency, into reads.  Lack of
+  read-read dependency is bad here.  Note that the write rules should mention
+  D---see the agda version of write.}
 \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
   \setcounter{enumi}{\value{Bkappa}}
 \item \label{write-kappa-q}
@@ -1827,7 +1834,9 @@ As shown by the following single-threaded code, allowing this outcome would viol
 This is one reason that we use \emph{weakest} preconditions, rather than
 preconditions.
 
-The same problem does not occur due to if-closure:
+The same problem does not occur due to if-closure (at least not for complete
+pomsets, where you need to have termination being a tautology, so you can't
+arbitrarily choose to partition $\emptyForm\neq\TRUE$:
 \begin{align*}
   \begin{gathered}[t]
     \IF{r}\THEN\PW{x}{2}\FI

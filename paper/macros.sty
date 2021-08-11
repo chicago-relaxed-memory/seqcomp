@@ -956,8 +956,12 @@
 \newcommand{\COMMIT}{\texttt{commit}}
 \newcommand{\RECOVERY}{\texttt{onabort}\texttt{\{}}
 \newcommand{\ENDREC}{\texttt{\}}}
-\newcommand{\NEW}{\texttt{new}\,}
+\newcommand{\NEW}[2]{\texttt{new}\,#1\texttt{(}#2\texttt{)}}
+\newcommand{\ClassC}{\textsf{C}}
+\newcommand{\MethodF}{\textsf{f}}
+\newcommand{\RANDOM}{\textsf{random}\texttt{()}}
 \newcommand{\NULL}{\texttt{null}}
+\newcommand{\INVOKE}[3]{#1\texttt{.}#2\texttt{(}#3\texttt{)}}
 \newcommand{\BEGINVAL}{\BEGIN\,\aVal}
 \newcommand{\COMMITVAL}{\COMMIT\,\aVal}
 \newcommand{\RECOVERYVAL}{\texttt{onabort}\,\aVal\texttt{\{}}
@@ -985,7 +989,7 @@
 \newcommand{\IF}[1]{\texttt{if}\,\allowbreak\!\texttt{(}#1\texttt{)}}
 \newcommand{\THEN}{\allowbreak\texttt{\{}}
 \newcommand{\ELSE}{\texttt{\}}\,\allowbreak\texttt{else}\,\allowbreak\texttt{\{}}
-\newcommand{\ELIF}[1]{\ELSE\IF{#1}}
+\newcommand{\ELIF}[1]{\texttt{\}}\,\allowbreak\texttt{else}\,\allowbreak\IF{#1}}
 \newcommand{\brELSE}{\texttt{\}}\\\texttt{else}\,\texttt{\{}}
 \newcommand{\brELIF}[1]{\texttt{\}}\\\texttt{else}\,\IF{#1}}
 \newcommand{\FI}{\texttt{\}}}

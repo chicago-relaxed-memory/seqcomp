@@ -400,6 +400,43 @@ in \textsection\ref{sec:addr}.  The justification for \ref{TC12} states:
   behaviors.
 \end{quote}
 
+\rfub{} New Constructor:
+\begin{gather*}
+  \taglabel{RFUB-NC}
+  \PW{y}{\PR{x}{}}
+  \PAR
+  \PR{y}{r}\SEMI
+  \IF{r \EQ \NULL}\THEN
+    \LET{r}{\NEW{\ClassC}{}}
+  \FI\SEMI
+  \PW{x}{r}\SEMI
+  \INVOKE{r}{\MethodF}{}
+\end{gather*}
+This is similar to:
+\begin{gather*}
+  \PW{y}{\PR{x}{}}
+  \PAR
+  \PR{y}{r}\SEMI
+  \IF{r \EQ 0}\THEN
+    \LET{r}{\RANDOM}
+  \FI\SEMI
+  \PW{x}{r}\SEMI
+  \IF{r}\THEN \PW{z}{1} \FI
+\end{gather*}
+And different from the following, which is similar to \ref{TC18}:
+\begin{gather*}
+  \PW{y}{\PR{x}{}}
+  \PAR
+  \PR{y}{r}\SEMI
+  \IF{r \EQ 0}\THEN
+    \LET{r}{1}
+  \FI\SEMI
+  \PW{x}{r}\SEMI
+  \IF{r}\THEN \PW{z}{1} \FI
+\end{gather*}
+
+
+
 \subsection{Coherence}
 
 The following execution is disallowed by fulfillment (\ref{pom-rf-match} and
@@ -2590,11 +2627,12 @@ whether the model conflicts with some well-known, but perhaps not
 well-written-down compilation technique.
 
 Probably even more controversially, I think we've realized that existing
-compiler technology can compile such racing code in ways that some of us
-are not 100\% sure should really be allowed. Demonstrably unexecuted code
-can affect the semantics in ways that strike me as scary. (See
-\url{https://wg21.link/p1217} for a down-to-assembly C++ version; IIUC, Lochbihler and
-others earlier came up with some closely related observations for Java.)
+compiler technology can compile such racing code in ways that some of us are
+not 100\% sure should really be allowed. Demonstrably unexecuted code can
+affect the semantics in ways that strike me as scary. (See
+\url{https://wg21.link/p1217} for a down-to-assembly C++ version; [if I
+understand correctly], Lochbihler and others earlier came up with some
+closely related observations for Java.)
 
 It might be possible to do what we've involuntarily done for C++: Punt the
 hard cases for now, and define what the model is for programs without
@@ -2617,13 +2655,15 @@ whether the problem is due to the inadequacy of formal models, in
 which case the formalists can fix their own problem, or something we
 all have to pay attention to.
 
+\smallskip
+
 \href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000450.html}{Hans Boehm}:
 In some sense, I'm not sure either. The p1217 examples bother me in that
-they seem to violate  some global programming rules ("if x is only ever null
-or refers to an object properly constructed by the same thread, then x
-should never appear to refer to an incompletely constructed object").
+they seem to violate  some global programming rules (``if \texttt{x} is only ever null
+or refers to an object properly constructed by the same thread, then \texttt{x}
+should never appear to refer to an incompletely constructed object'').
 And there seems to be disagreement about whether the currently allowed
-behavior is "correct".
+behavior is ``correct.''
 
 On the other hand, in practice the weirdness doesn't seem to break things.
 If you ask people advocating the current behavior, the answer will be
@@ -2647,10 +2687,9 @@ It's a mess.
 
 \href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000447.html}{Andrew Haley}:
 \begin{verbatim}
-> Demonstrably unexecuted code can affect the semantics in ways that
-> strike me as scary. (See wg21.link/p1217 for a down-to-assembly C++
-> version; IIUC, Lochbihler and others earlier came up with some
-> closely related observations for Java.)
+> Demonstrably unexecuted code can affect the semantics in ways that strike me 
+> as scary. (See wg21.link/p1217 for a down-to-assembly C++ version; IIUC, Lochbihler 
+> and others earlier came up with some closely related observations for Java.)
 \end{verbatim}
 Looking again at p1217, it seems to me that enforcing load-store
 ordering would have severe effects on compilers, at least without new
@@ -2668,11 +2707,13 @@ our IR for C2, memory accesses are not pinned in any way, so the only
 way to make unrelated accesses execute in any particular order is to
 add a dependency between all loads and stores.
 
+\smallskip
+
 \href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000450.html}{Hans Boehm}:
 I think it would be a fairly pervasive change to optimizers. It has also
 become clear in WG21, the C++ committee, that there is not enough
 support for requiring this. In that case, Ou and Demsky have a paper
-saying that the overhead is likely to be on the order of 1% or less.
+saying that the overhead is likely to be on the order of 1\% or less.
 For Java if it were applied everywhere, it would probably be
 appreciably higher.
 
@@ -2702,6 +2743,8 @@ challenging to specify, prove, and extend. But it is a path for Java
 that might not apply to languages like C that are not guaranteed 
 typesafe anyway, and so enter Undefined Behavior territory (as opposed 
 to possibly-unexpected but still typesafe behavior).
+
+\smallskip
 
 \href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000451.html}{Han Boehm}:
 But this now breaks some common idioms, right? In particular, I think a
