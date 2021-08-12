@@ -1252,8 +1252,12 @@ $x$ tracks the ``local state'' of the variable.  This idea is borrowed from
   in the logic, not just registers.  This is one reason we use predicate
   transformers rather than simple postconditions.}
 
-To see that $\Q{x}$ is necessary to constrain this use of local state,
-consider the following example from
+$\Q{x}$ only occurs positively in the preconditions of read actions.  Thus,
+per \textsection\ref{sec:read-read}, it does not add dependencies.  Instead,
+the purpose of $\Q{x}$ is to filter out pomsets with stale reads. Recall that
+all events in a pomset must have tautological preconditions in a complete
+pomset.  $\Q{x}$ strengthens the preconditions of reads.  Consider the
+following example from
 \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}:
 \begin{align*}
   \begin{gathered}    
