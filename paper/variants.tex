@@ -1,3 +1,5 @@
+% https://trac.webkit.org/browser/webkit/trunk/Source/WTF/wtf/Atomics.h?rev=+217722#L342
+
 \section{Refinements and Additional Features} %Case Analysis, Address Calculation, RMWs, Elimination}
 \label{sec:additional}
 
@@ -724,10 +726,10 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$
 and $\sLOAD{}{}$.
 %
-We assume a family of \emph{aliasing symbols} $\A{\aVal}$, indexed by value.
-Let $\aForm$ be a formula that may include the pseudo-value $\Aother$.  Then
-let $[\aForm/\A{\Aother\neq\cVal}]$ be the substitution that, for every
-$\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
+% We assume a family of \emph{aliasing symbols} $\A{\aVal}$, indexed by value.
+% Let $\aForm$ be a formula that may include the pseudo-value $\Aother$.  Then
+% let $[\aForm/\A{\Aother\neq\cVal}]$ be the substitution that, for every
+% $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
 \begin{definition}
   \label{def:semaddr}
   %Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
@@ -746,7 +748,8 @@ $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
       \begin{math}
         \labelingForm(\aEv) \riff
         \cExp{=}\cVal
-        \land \aExp{=}\aVal
+        \land
+        \aExp{=}\aVal
       \end{math},      
       \stepcounter{enumi}
     \item[] \labeltext[\textsc{w}4]{}{write-tau-addr}
@@ -755,27 +758,27 @@ $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
         if $\aEvs\neq\emptyset$ then 
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff 
-          (\cExp{=}\cVal)
-          \limplies 
-          \bForm
-          [\aExp/\REF{\cVal}]
-          [\aExp{=}\aVal/\Q{\REF{\cVal}}]
-          [\TRUE/\A{\cVal}]
-          [(\cExp{\neq}\Aother\land\A{\Aother})/\A{\Aother{\neq}\cVal}]
-        \end{math},}
-      \item \label{write-tau-empty-addr}
-        if $\aEvs=\emptyset$ then
-        \makebox[0pt][l]{\begin{math}
-          (\forall\dVal)
-        \end{math}        
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff 
+          \textstyle\bigwedge_{\dVal\in\Val}
           (\cExp{=}\dVal)
           \limplies 
           \bForm
           [\aExp/\REF{\dVal}]
-          [\FALSE/\Q{\REF{\dVal}}]
-          [\FALSE/\A{\Aother}],
+          [\aExp{=}\aVal/\Q{\REF{\dVal}}],
+          %[\TRUE/\A{\cVal}]
+          %[(\cExp{\neq}\Aother\land\A{\Aother})/\A{\Aother{\neq}\cVal}]
+        \end{math}}
+      \item \label{write-tau-empty-addr}
+        if $\aEvs=\emptyset$ then
+        \makebox[0pt][l]{
+        \begin{math}
+          \aTr{\bEvs}{\bForm} \riff 
+          \textstyle\bigwedge_{\dVal\in\Val}
+          (\cExp{=}\dVal)
+          \limplies 
+          \bForm
+          [\aExp/\REF{\dVal}]
+          [\FALSE/\Q{\REF{\dVal}}],
+          %[\FALSE/\A{\Aother}],
         \end{math}}
       \end{enumerate}
       \columnbreak
@@ -806,7 +809,8 @@ $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
         \labelingForm(\aEv) 
         \riff
         \cExp{=}\cVal
-        \land \Q{\REF{\cVal}}
+        \land 
+        \Q{\REF{\cVal}}
       \end{math},
       \stepcounter{enumi}
     \item[] \labeltext[\textsc{r}4]{}{read-tau-addr}
@@ -819,8 +823,15 @@ $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
         % \end{math}
         \makebox[0pt][l]{\begin{math}
             \aTr{\bEvs}{\bForm} \riff
-            (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
-            \limplies \bForm[\uReg{\aEv}/\aReg]
+            \PBR{
+              \cExp{=}\cVal
+              \land 
+              \Q{\REF{\cVal}}
+              \limplies
+              \aVal{=}\uReg{\aEv}
+            }
+            \limplies
+            \bForm[\uReg{\aEv}/\aReg]
           \end{math},}
       \item \label{read-tau-ind-addr}
         if $\aEv\in\aEvs\setminus\bEvs$ then
@@ -830,10 +841,18 @@ $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
         % \end{math}
         \makebox[0pt][l]{\begin{math}
             \aTr{\bEvs}{\bForm} \riff
+            % \PBR{
+            %   (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
+            %   \lor
+            %   %((\cExp{=}\cVal\land\A{\cVal})\limplies\REF{\cVal}\EQ\uReg{\aEv})
+            %   (\cExp{=}\cVal\limplies\REF{\cVal}\EQ\uReg{\aEv})
+            % }
             \PBR{
-              (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
-              \lor
-              ((\cExp{=}\cVal\land\A{\cVal})\limplies\REF{\cVal}\EQ\uReg{\aEv})
+              \cExp{=}\cVal
+              \land 
+              \Q{\REF{\cVal}}
+              \limplies
+              \aVal{=}\uReg{\aEv} \lor \REF{\cVal}\EQ\uReg{\aEv}
             }
             \limplies
             \bForm[\uReg{\aEv}/\aReg]

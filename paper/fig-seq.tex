@@ -213,7 +213,7 @@
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
     \item \label{read-kappa}
       %$\labelingForm(\aEv) \riff \TRUE$,
-      $\labelingForm(\aEv) \riff \Q{\aLoc}$,
+      % $\labelingForm(\aEv) \riff \Q{\aLoc}$,
      \stepcounter{enumi}
     \item[] \labeltext[\textsc{r}4]{}{read-tau}
       \begin{enumerate}[leftmargin=0pt]
@@ -223,7 +223,7 @@
         %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
-          \aVal{=}\aReg
+          (\Q{\aLoc}\limplies\aVal{=}\aReg)
           \limplies \bForm,
         \end{math}}
       \item \label{read-tau-ind}
@@ -232,7 +232,7 @@
         %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
-          \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}
+          \PBR{\Q{\aLoc}\limplies\aVal{=}\aReg \lor \aLoc{=}\aReg}
           \limplies \bForm,
         \end{math}}
         \columnbreak

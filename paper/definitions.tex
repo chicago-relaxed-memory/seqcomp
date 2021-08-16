@@ -766,9 +766,12 @@ requires that every precondition $\labelingForm(\aEv)$ is a tautology.  Using
   \sembase{\PW{x}{2}}
 \end{math}
 cannot include a complete pomset with event $\DWP{x}{3}$, since $2{=}3$ is not a
-tautology.  The symbols $\Q{\aLoc}$ that occur in \ref{read-kappa} and
-\ref{write-tau} serve similar purpose.  We defer discussion of these until
-\textsection\ref{sec:q}.
+tautology.
+
+We defer discussion of $\Q{\aLoc}$ to \textsection\ref{sec:q}. Here we assume
+we take $\Q{\aLoc}=\TRUE$, for all $\aLoc$.
+% that occur in \ref{write-tau} and \ref{read-tau} serve similar purpose.  We defer discussion of these until
+% \textsection\ref{sec:q}.
 % We first explain preconditions and predicate transformers using data
 % dependencies.  We ignore $\sIF{}$ and $\Q{\aLoc}$, deferring discussion of
 % these to \textsection\ref{sec:ex:control} and \textsection\ref{sec:q}.
@@ -1189,16 +1192,14 @@ Throughout the remainder of the paper, we use this definition.  (The lack of
 dependencies into reads is one of the factors complicating downset closure;
 see \textsection\ref{sec:downset} for a discussion.)
 
-\subsection{A Subtlety: Local Invariant Reasoning}
+\subsection{Subtleties: Local Invariant Reasoning and Local State}
 \label{sec:lir}
 \label{sec:q}
 
-Two aspects of \reffig{fig:seq} that are fairly obscure: First,
+%Two aspects of \reffig{fig:seq} are fairly obscure: First,
 \ref{read-tau-ind} introduces locations into formula, in order to track the
 local state of memory.  This is necessary to support local invariant
-reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}.
-Second, \ref{read-kappa} introduces symbols $\Q{x}$ to ensure that local
-state is tracked accurately.  Consider \ref{TC1}:
+reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}:
 \begin{gather*}
   \taglabel{TC1}
   \begin{gathered}
@@ -1246,41 +1247,46 @@ which is indeed a tautology.  Intuitively, \ref{read-tau-ind} says that, to
 be independent of the read action, subsequent preconditions must be
 tautological under both $[v/r]$ and $[x/r]$.  Here $v$ is the value read, and
 $x$ tracks the ``local state'' of the variable.  This idea is borrowed from
-\cite{DBLP:journals/pacmpl/JagadeesanJR20}, which includes further examples.
-(See \textsection\ref{sec:ex:assoc} for a discussion of Skolemization.)
-\todo{Local invariant reasoning requires that we track the state of variables
-  in the logic, not just registers.  This is one reason we use predicate
-  transformers rather than simple postconditions.}
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}. %, which includes further examples.
+%(See \textsection\ref{sec:ex:assoc} for a discussion of Skolemization.)
+Local invariant reasoning requires that we track the state of variables in
+the logic, not just registers.  This is one reason we use predicate
+transformers rather than simple postconditions.
 
-$\Q{x}$ only occurs positively in the preconditions of read actions.  Thus,
-per \textsection\ref{sec:read-read}, it does not add dependencies.  Instead,
-the purpose of $\Q{x}$ is to filter out pomsets with stale reads. Recall that
-all events in a pomset must have tautological preconditions in a complete
-pomset.  $\Q{x}$ strengthens the preconditions of reads.  Consider the
-following example from
+$\Q{x}$ ensures that the local state of $x$ is up-to-date when $x$ is read.
+\ref{read-kappa} and \ref{read-tau} add these ``quiescence'' constraints,
+which are simplified by \ref{write-tau}.
+% Reads have trivial preconditions; thus, we introduce $\Q{x}$ in $\aTr{}{}$ \eqref{read-tau}
+% not $\labelingForm$ \eqref{read-kappa}. 
+Consider the following example 
 \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}:
-\begin{align*}
+\begin{gather*}
   \begin{gathered}    
     \PW{x}{1}
     \SEMI
     \PR{y}{r}
     \SEMI
-    \IF{r}\THEN
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
+    \mkern-8mu
+    \begin{array}[t]{r}
+      \IF{r\EQ0}\THEN
+        \PW{x}{0}
+        \SEMI
+        \PR{x}{s}
+        \SEMI
+        \IF{s}\THEN
+          \PW{z}{1}
+        \FI
       \FI
-    \ELSE
-      \PW{x}{0}
-      \SEMI
-      \PR{x}{s}
-      \SEMI
-      \IF{s}\THEN
-        \PW{z}{1}
-      \FI
-    \FI
+      \\\ELSEnl
+        \PR{x}{s}
+        \SEMI
+        \IF{s}\THEN
+          \PW{z}{1}
+        \FI
+      \FI      
+    \end{array}
     \PAR
+    \mkern8mu
     \IF{z}\THEN
       \PW{y}{1}
     \FI
@@ -1289,9 +1295,9 @@ following example from
         \event{a1}{\DW{x}{1}}{}
         \event{a2}{\DR{y}{1}}{right=of a1}
         %\event{a3}{\DW{x}{0}}{right=of a2}
-        \event{a4}{\aForm\mid\DR{x}{1}}{right=of a2}
-        \event{a5}{\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=3em of a5}
+        \event{a4}{\DR{x}{1}}{right=of a2}
+        \event{a5}{\aForm\mid\DW{z}{1}}{right=of a4}
+        \event{b1}{\DR{z}{1}}{right=5em of a5}
         \event{b2}{\DW{y}{1}}{right=of b1}
         %\po{a2}{a3}
         \po{b1}{b2}
@@ -1302,9 +1308,21 @@ following example from
         \po{a4}{a5}
       \end{tikzinline}}
   \end{gathered}
-\end{align*}
-Note that the two branches of the conditional are the same after the first
-assignment in the else branch.  Without $\Q{x}$, the precondition $\aForm$ is
+  \\
+  \aForm \riff
+  (\Q{y}\limplies 1{=}r \lor y{=}r)\;
+  \begin{aligned}[t]
+    \limplies\;&
+    (r{=}0 \land ((\Q{x}[\FALSE/\Q{x}]\limplies 1{=}s)\limplies s{\neq}0))
+    \\[-1ex]
+    \land\;&
+    (r{\neq}0 \land ((\Q{x}[1{=}1/\Q{x}]\limplies 1{=}s)\limplies
+    s{\neq}0))
+  \end{aligned}
+\end{gather*}
+\todo{Fix the rest of this.}
+Note that the two branches of the conditional are the same except for the
+leading $\PWP{x}{0}$.  Without $\Q{x}$, the precondition $\aForm$ is
 $\TRUE$, which is a tautology, and the execution is
 allowed, resulting in a violation of \drfsc.  To construct this pomset, we
 have chosen the empty pomset for $\sembase{\PW{x}{0}}$.  The constraints on
@@ -1318,53 +1336,262 @@ With $\Q{x}$, the precondition of $\aForm$ is $\FALSE$.
 Intuitively, $\Q{x}$ requires that the most recent prior
 write to $\aLoc$ must be in the pomset in order to read $\aLoc$.
 
-$\Q{x}$ also guarantees initialization in complete pomsets: \eqref{top-kappa}
-requires tautologies, which means that all variables must be initialized
-sequentially in order to get rid of $\Q{\aLoc}$.
 
-The use of $\Q{x}$ is not too restrictive.  As a sanity check, consider the
-following pomsets,
-\begin{align*}
-  \begin{gathered}    
-    \PR{y}{r}
-    \SEMI
-    \IF{r}\THEN
-      \PW{x}{1}
-    \FI
-    \SEMI
-    \PR{x}{s}
+We include $\Q{x}$ in \ref{read-kappa} to reduce the number of useless
+pomsets---when $\Q{x}$ is false for $\PWP{x}{r}$, the read is useless and can
+be eliminated by taking $\aEvs=\emptyset$.  By including $\Q{x}$ in
+\ref{read-kappa}, we also guarantee initialization in complete pomsets:
+\eqref{top-kappa} requires tautologies, which means that all variables must
+be initialized sequentially in order to get rid of $\Q{\aLoc}$.
+
+Control variant of \ref{TC12}
+
+\begin{gather*}
+  \tag{\textsc{tc12}$'$}\label{TC12'}
+  \begin{gathered}
+    \PR{y}{r}\SEMI
+    \IF{r}\THEN \PW{\REFVAR{1}}{1} \ELSE \PW{\REFVAR{0}}{1} \FI \SEMI
+    \PR{\REFVAR{0}}{s}\SEMI
+    \PW{x}{\BANG s}
+    \PAR
+    \PW{y}{\PR{x}{}}
     \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a1}{\DR{y}{1}}{}
-        \event{a2}{1{=}r\limplies r{\neq}0\mid\DW{x}{1}}{right=of a1}
-        \event{a3}{1{=}r\limplies \aTr[1]{}{\Q{x}}\mid\DR{x}{2}}{right=of a2}
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        % \event{iy}{\DW{y}{0}}{left=of a1}
+        % \event{ix}{\DW{x}{0}}{right=2em of a2}
+        \event{b1}{\DR{y}{1}}{}
+        \event{b2}{\DW{\REFVAR{1}}{1}}{right=of b1}
+        \event{b3}{\DR{\REFVAR{0}}{0}}{right=of b2}
+        \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
+        \po{b1}{b2}
+        \po{b3}{b4}
+        \event{a1}{\DR{x}{1}}{right=3em of b4}
+        \event{a2}{\DW{y}{1}}{right=of a1}
         \po{a1}{a2}
-        %\wki{a2}{a3}
+        % \po[out=15,in=165]{b1}{b4}
+        \rf[out=-170,in=-10]{a2}{b1}
+        \rf{b4}{a1}
+        % \wk[out=-15,in=-165]{iy}{a2}
+        % \wk[out=-15,in=-165]{ix}{b4}
       \end{tikzinline}}
-    \qquad\qquad\qquad
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a1}{\DR{y}{0}}{}
-        \event{a3}{0{=}r\limplies \aTr[2]{}{\Q{x}}\mid\DR{x}{2}}{right=of a1}
-      \end{tikzinline}}
-  \end{gathered}  
+  \end{gathered}
+  % \\
+  % \aForm \riff
+  % (\Q{y}\limplies 1{=}r \lor y{=}r)\;
+  % \begin{aligned}[t]
+  %   \limplies\;&
+  %   (r{=}0 \land ((\Q{x}[\FALSE/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
+  %   \\[-1ex]
+  %   \land\;&
+  %   (r{\neq}0 \land ((\Q{x}[1{=}1/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
+  % \end{aligned}
+\end{gather*}
+
+Building the precondition $\aForm$ from right to left (without $\A{}$):
+\begin{align*}
+  \tag{$\PW{x}{s}$}
+  \aForm_1 &=
+  s{=}0
+  \\
+  \tag{Prepending $\PR{\REFVAR{0}}{s}$}
+  \aForm_2 &=
+  \PBR{\Q{\REFVAR{0}}\limplies 1{=}s}
+  \limplies
+  s{=}0
+  \\
+  \tag{Prepending $\IF{}$}
+  \aForm_3 &
+  \begin{aligned}[t]
+    =\;&\PBR{
+      r{\neq}0
+      \land
+      \PBR{
+        \Q{\REFVAR{0}}%[1{=}1/\Q{\REFVAR{1}}]
+        \limplies
+        1{=}s
+      }
+      \limplies
+      s{=}0
+    }
+    \\[-1ex]
+    \lor\;&\PBR{
+      r{=}0
+      \land
+      \PBR{
+        % \Q{\REFVAR{0}}[1{=}1/\Q{\REFVAR{0}}]
+        % \limplies
+        1{=}s
+      }
+      \limplies
+      s{=}0
+    }
+  \end{aligned}
+  \\
+  \tag{Prepending $\PR{y}{r}$}
+  \aForm_4 &=
+  \\
+  \tag{Prepending $\PW{\REFVAR{0}}{0}$}
+  \aForm_5 &=
 \end{align*}
-where 
-\begin{math}
-  \aTr[1]{}{\bForm}=
-  (r{\neq}0 \land \bForm[1/x][1{=}1/\Q{x}])
-  \lor
-  (r{=}0 \land \bForm)
-\end{math}
-and
-\begin{math}
-  \aTr[2]{}{\bForm}=
-  (r{\neq}0 \land \bForm[1/x][\FALSE/\Q{x}])
-  \lor
-  (r{=}0 \land \bForm)
-\end{math}
-are the predicate transformers for the conditional writes, using
-\ref{write-tau-nonempty} and \ref{write-tau-empty} respectively.  The
-executions are complete since all preconditions are tautologies.
+
+% As a sanity check, consider the
+% following pomsets,
+% \begin{align*}
+%   \begin{gathered}    
+%     \PR{y}{r}
+%     \SEMI
+%     \IF{r}\THEN
+%       \PW{x}{1}
+%     \FI
+%     \SEMI
+%     \PR{x}{s}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=1em]
+%         \event{a1}{\DR{y}{1}}{}
+%         \event{a2}{1{=}r\limplies r{\neq}0\mid\DW{x}{1}}{right=of a1}
+%         \event{a3}{1{=}r\limplies \aTr[1]{}{\Q{x}}\mid\DR{x}{2}}{right=of a2}
+%         \po{a1}{a2}
+%         %\wki{a2}{a3}
+%       \end{tikzinline}}
+%     \qquad\qquad\qquad
+%     \hbox{\begin{tikzinline}[node distance=1em]
+%         \event{a1}{\DR{y}{0}}{}
+%         \event{a3}{0{=}r\limplies \aTr[2]{}{\Q{x}}\mid\DR{x}{2}}{right=of a1}
+%       \end{tikzinline}}
+%   \end{gathered}  
+% \end{align*}
+% where 
+% \begin{math}
+%   \aTr[1]{}{\bForm}=
+%   (r{\neq}0 \land \bForm[1/x][1{=}1/\Q{x}])
+%   \lor
+%   (r{=}0 \land \bForm)
+% \end{math}
+% and
+% \begin{math}
+%   \aTr[2]{}{\bForm}=
+%   (r{\neq}0 \land \bForm[1/x][\FALSE/\Q{x}])
+%   \lor
+%   (r{=}0 \land \bForm)
+% \end{math}
+% are the predicate transformers for the conditional writes, using
+% \ref{write-tau-nonempty} and \ref{write-tau-empty} respectively.  The
+% executions are complete since all preconditions are tautologies.
+
+% Second, \ref{read-tau} introduces symbols $\Q{x}$ to ensure that local state
+% is tracked accurately.  $\Q{x}$ only occurs positively in the preconditions
+% of read actions.  Thus, per \textsection\ref{sec:read-read}, it does not add
+% dependencies.  Instead, the purpose of $\Q{x}$ is to filter out pomsets with
+% stale reads. Recall that all events in a pomset must have tautological
+% preconditions in a complete pomset.  $\Q{x}$ strengthens the preconditions of
+% reads.  Consider the following example from
+% \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}:
+% \begin{align*}
+%   \begin{gathered}    
+%     \PW{x}{1}
+%     \SEMI
+%     \PR{y}{r}
+%     \SEMI
+%     \IF{r}\THEN
+%       \PR{x}{s}
+%       \SEMI
+%       \IF{s}\THEN
+%         \PW{z}{1}
+%       \FI
+%     \ELSE
+%       \PW{x}{0}
+%       \SEMI
+%       \PR{x}{s}
+%       \SEMI
+%       \IF{s}\THEN
+%         \PW{z}{1}
+%       \FI
+%     \FI
+%     \PAR
+%     \IF{z}\THEN
+%       \PW{y}{1}
+%     \FI
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=1.5em]
+%         \event{a1}{\DW{x}{1}}{}
+%         \event{a2}{\DR{y}{1}}{right=of a1}
+%         %\event{a3}{\DW{x}{0}}{right=of a2}
+%         \event{a4}{\aForm\mid\DR{x}{1}}{right=of a2}
+%         \event{a5}{\DW{z}{1}}{right=of a4}
+%         \event{b1}{\DR{z}{1}}{right=3em of a5}
+%         \event{b2}{\DW{y}{1}}{right=of b1}
+%         %\po{a2}{a3}
+%         \po{b1}{b2}
+%         %\wki[out=15,in=165]{a1}{a3}
+%         %\wki{a3}{a4}
+%         \rf{a5}{b1}
+%         \rf[out=-170,in=-10]{b2}{a2}
+%         \po{a4}{a5}
+%       \end{tikzinline}}
+%   \end{gathered}
+% \end{align*}
+% Note that the two branches of the conditional are the same after the first
+% assignment in the else branch.  Without $\Q{x}$, the precondition $\aForm$ is
+% $\TRUE$, which is a tautology, and the execution is
+% allowed, resulting in a violation of \drfsc.  To construct this pomset, we
+% have chosen the empty pomset for $\sembase{\PW{x}{0}}$.  The constraints on
+% complete pomsets do not filter out this pomset, since $\PW{x}{0}$ is in the
+% false-branch of the conditional.  The problem here is that we have forgotten
+% the local state of $x$ in the false-branch of the execution.  Nonetheless, we
+% are using the subsequent read.
+
+% With $\Q{x}$, the precondition of $\aForm$ is $\FALSE$.
+% %$\Q{x}[\FALSE/\Q{x}]$, which is unsatisfiable.
+% Intuitively, $\Q{x}$ requires that the most recent prior
+% write to $\aLoc$ must be in the pomset in order to read $\aLoc$.
+
+% $\Q{x}$ also guarantees initialization in complete pomsets: \eqref{top-kappa}
+% requires tautologies, which means that all variables must be initialized
+% sequentially in order to get rid of $\Q{\aLoc}$.
+
+% The use of $\Q{x}$ is not too restrictive.  As a sanity check, consider the
+% following pomsets,
+% \begin{align*}
+%   \begin{gathered}    
+%     \PR{y}{r}
+%     \SEMI
+%     \IF{r}\THEN
+%       \PW{x}{1}
+%     \FI
+%     \SEMI
+%     \PR{x}{s}
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=1em]
+%         \event{a1}{\DR{y}{1}}{}
+%         \event{a2}{1{=}r\limplies r{\neq}0\mid\DW{x}{1}}{right=of a1}
+%         \event{a3}{1{=}r\limplies \aTr[1]{}{\Q{x}}\mid\DR{x}{2}}{right=of a2}
+%         \po{a1}{a2}
+%         %\wki{a2}{a3}
+%       \end{tikzinline}}
+%     \qquad\qquad\qquad
+%     \hbox{\begin{tikzinline}[node distance=1em]
+%         \event{a1}{\DR{y}{0}}{}
+%         \event{a3}{0{=}r\limplies \aTr[2]{}{\Q{x}}\mid\DR{x}{2}}{right=of a1}
+%       \end{tikzinline}}
+%   \end{gathered}  
+% \end{align*}
+% where 
+% \begin{math}
+%   \aTr[1]{}{\bForm}=
+%   (r{\neq}0 \land \bForm[1/x][1{=}1/\Q{x}])
+%   \lor
+%   (r{=}0 \land \bForm)
+% \end{math}
+% and
+% \begin{math}
+%   \aTr[2]{}{\bForm}=
+%   (r{\neq}0 \land \bForm[1/x][\FALSE/\Q{x}])
+%   \lor
+%   (r{=}0 \land \bForm)
+% \end{math}
+% are the predicate transformers for the conditional writes, using
+% \ref{write-tau-nonempty} and \ref{write-tau-empty} respectively.  The
+% executions are complete since all preconditions are tautologies.
 
 % A problem \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}.
 % Version with control dependencies is \drf{}.
@@ -1761,13 +1988,15 @@ Attempting to write \ref{read-tau-dep} and \ref{read-tau-ind} in
 this style we would have (as in \cite{DBLP:journals/pacmpl/JagadeesanJR20}):
 \begin{enumerate}[topsep=0pt]
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-p}}]
-  if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
+  if $\aEv\in\aEvs\cap\bEvs$ then
+  %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
   \begin{math}
     \aTr{\bEvs}{\bForm} \riff    
     \bForm[\aVal/\aReg]
   \end{math},    
 \item[{\labeltext[\textsc{r}4b$'$]{(\textsc{r}4b$'$)}{read-tau-ind-p}}]
-  if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
+  if $\aEv\in\aEvs\setminus\bEvs$ then
+  %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
   \begin{math}
     \aTr{\bEvs}{\bForm} \riff    
     \bForm[\aVal/\aReg]
@@ -1785,10 +2014,11 @@ this style we would have (as in \cite{DBLP:journals/pacmpl/JagadeesanJR20}):
 % This choice for \ref{read-tau-empty} is forced by \refdef{def:family}, which
 % states that the predicate transformer for a small subset of $\aEvs$ must
 % imply the transformer for a larger subset.
-Sadly, this definition fails associativity.
-
-Consider the following, eliding transformers for the writes (``$\BANG$''
-represents logical negation):
+Sadly, \ref{read-tau-ind-p} fails \ref{tr-or}, and therefore is not a
+predicate transformer.  This is not merely a theoretical inconvenience:
+adopting \ref{read-tau-ind-p} would also break associativity.  Consider the
+following example, where we elide transformers for the writes and ``$\BANG$''
+represents logical negation:
 \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
@@ -1847,7 +2077,7 @@ we have the following, since $(r{=}0 \lor r{\neq}0)\riff\TRUE$:
         %\wki{b}{c}
       \end{tikzinline}}    
   \end{gathered}
-  &&
+  && &&
 % \end{align*}  
 % The precondition of $\DWP{x}{1}$ is a tautology, thus we have:
 % \begin{align*}
@@ -1888,7 +2118,7 @@ Associating to the left and the coalescing, instead:
         %\wki{b}{c}
       \end{tikzinline}}    
   \end{gathered}
-  &&
+  && &&
 % \end{align*}  
 % Sequencing and merging:
 % \begin{align*}
@@ -1906,38 +2136,51 @@ Associating to the left and the coalescing, instead:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-The precondition $\aForm\riff(1{=}0\land y{=}0)\lor (1{\neq}0 \land y{\neq}0)$,
-which is equivalent to $y{\neq}0$, which is not a tautology.  This pomset can
-never be complete due to the bogus write of $(\PW{x}{\BANG r})$, which will
-show up in the termination condition $(1{=}0)$.  Nevertheless, this is a
-problem, since associativity must hold for incomplete pomsets.
-
+The precondition
+\begin{math}
+  \aForm\riff(1{=}0\land y{=}0)\lor (1{\neq}0 \land y{\neq}0)
+\end{math}
+is equivalent to $y{\neq}0$, which is not a tautology.
+% This pomset can
+% never be complete due to the bogus write of $(\PW{x}{\BANG r})$, which will
+% show up in the termination condition $(1{=}0)$.  Nevertheless, this is a
+% problem, since associativity must hold for incomplete pomsets.
+%
 Our solution is to Skolemize, replacing substitution by implication, with 
 % uses of $\bForm[\aVal/\aReg]$
 % by $(\aReg{=}\aVal)\limplies\bForm$,
-uniquely chosen registers.  Using \reffig{fig:seq}, we compute a tautology in
-the example above: $\aForm\riff((1{=}r\lor y{=}r)\limplies r{=}0)\lor (r{\neq}0)$.
+uniquely chosen registers.  Using \reffig{fig:seq}, we compute
+\begin{math}
+  \aForm\riff
+  ((1{=}r\lor y{=}r)\limplies r{=}0)
+  \lor
+  ((1{=}r\lor y{=}r)\limplies r{\neq}0), 
+\end{math}
+which is a tautology.
 
 %  We have proven associativity of
 %  \refdef{def:pomsets-trans} in Agda.
-The proof of associativity requires that predicate
-transformers distribute through disjunction (\refdef{def:trans}).  The
-attempt to define predicate transformers using substitution fails for
-\ref{read-tau-empty} because the predicate transformer
-$\aTr{}{\bForm}=(\forall\aReg)\bForm$ does not distribute through
-disjunction:
-\begin{math}
-  \aTr{}{\bForm_1\lor \bForm_2}=
-  (\forall r)(\bForm_1\lor \bForm_2)
-  \neq
-  ((\forall r)(\bForm_1)) \lor ((\forall r)(\bForm_2))
-  = \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
-\end{math}.  Since $\aTr{}\bForm=(\forall\aReg)\bForm$ does not distribute
-through disjunction, we use $\aTr{}\bForm=\bForm$ instead (which trivially
-distributes through disjunction).  This change means we cannot use
-substitution, since $\bForm$ does not imply $\bForm[\aVal/\aReg]$.
-Fortunately, Skolemizing solves this problem, since $\bForm$ implies
-$(\aReg{=}\aVal)\limplies\bForm$.
+% The proof of associativity requires that predicate transformers distribute
+% through disjunction (\refdef{def:trans}).  The attempt to define predicate
+% transformers using substitution fails because the transformer of
+% \ref{read-tau-ind-p} does not distribute through disjunction:
+% \begin{math}
+%   \aTr{}{\bForm_1\lor \bForm_2}
+%   % =
+%   % (\bForm_1\lor \bForm_2)[\aVal/\aReg] \land (\bForm_1\lor \bForm_2)[\aLoc/\aReg]
+%   %(\forall r)(\bForm_1\lor \bForm_2)
+%   \not\riff
+%   % (\bForm_1[\aVal/\aReg] \land \bForm_1[\aLoc/\aReg]) \lor (\bForm_2[\aVal/\aReg] \land \bForm_2[\aLoc/\aReg])
+%   %((\forall r)(\bForm_1)) \lor ((\forall r)(\bForm_2))
+%   % =
+%   \aTr{}{\bForm_1} \lor \aTr{}{\bForm_2}
+% \end{math}.
+% Since $\aTr{}\bForm=(\forall\aReg)\bForm$ does not distribute
+% through disjunction, we use $\aTr{}\bForm=\bForm$ instead (which trivially
+% distributes through disjunction).  This change means we cannot use
+% substitution, since $\bForm$ does not imply $\bForm[\aVal/\aReg]$.
+% Fortunately, Skolemizing solves this problem, since $\bForm$ implies
+% $(\aReg{=}\aVal)\limplies\bForm$.
 
 
 \label{sec:ex:last}

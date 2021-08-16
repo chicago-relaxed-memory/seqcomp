@@ -986,9 +986,10 @@
 \newcommand{\WHILE}[1]{\texttt{while}\,\allowbreak\!\texttt{(}#1\texttt{)}}
 \newcommand{\DO}{\texttt{\{}}
 \newcommand{\OD}{\texttt{\}}}
-\newcommand{\IF}[1]{\texttt{if}\,\allowbreak\!\texttt{(}#1\texttt{)}}
+\newcommand{\IF}[1]{\texttt{if}\ifnotempty{#1}{\,\allowbreak\!\texttt{(}#1\texttt{)}}}
 \newcommand{\THEN}{\allowbreak\texttt{\{}}
 \newcommand{\ELSE}{\texttt{\}}\,\allowbreak\texttt{else}\,\allowbreak\texttt{\{}}
+\newcommand{\ELSEnl}{\allowbreak\texttt{else}\,\allowbreak\texttt{\{}}
 \newcommand{\ELIF}[1]{\texttt{\}}\,\allowbreak\texttt{else}\,\allowbreak\IF{#1}}
 \newcommand{\brELSE}{\texttt{\}}\\\texttt{else}\,\texttt{\{}}
 \newcommand{\brELIF}[1]{\texttt{\}}\\\texttt{else}\,\IF{#1}}
@@ -998,6 +999,7 @@
 \newcommand{\VAR}{\texttt{var}\,}
 \newcommand{\TOUCHED}{\texttt{touched}\,}
 %\newcommand{\REFARRAY}[2]{#1\texttt{[}\mkern-2mu#2 \mkern-2mu\texttt{]}\mkern-0mu}
+\newcommand{\REFVAR}[1]{\ifx1#1{a}\else{b}\fi}
 \newcommand{\REFARRAY}[2]{\REF{#1{+}#2}}
 \newcommand{\ADDRARRAY}[2]{#1{+}#2}
 \newcommand{\REF}[1]{\mkern-0mu\texttt{[}\mkern-2mu#1 \mkern-2mu\texttt{]}\mkern-0mu}

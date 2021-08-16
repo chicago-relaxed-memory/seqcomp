@@ -1605,8 +1605,8 @@ With if-closure, the following equation should hold:
     \SEMI
     \PW{x}{3}
   }
-  \\=
-  &\sem{
+  \\ &=
+  \sem{
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \SEMI
     \PW{x}{2}
@@ -1627,8 +1627,8 @@ Using dead write removal, these can be refined, respectively, to:
     \SEMI
     \PW{x}{3}
   }
-  \\\neq
-  &\sem{
+  \\ &\neq
+  \sem{
     \PW{x}{2}
     \SEMI
     \PW{x}{1}
