@@ -1,0 +1,162 @@
+\noindent
+If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
+$(\exists\cVal\in\Val)$
+$(\exists\aVal\in\Val)$
+\begin{multicols}{2}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
+  \item \label{write-E-addr}
+    if $\fcard{\aEvs}\leq1$,
+  \item \label{write-lambda-addr}
+    $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal}[\aThrd]$,
+  \item \label{write-kappa-addr}
+    \begin{math}
+      \labelingForm(\aEv) \riff
+      \cExp{=}\cVal
+      \land
+      \aExp{=}\aVal
+    \end{math},      
+    % \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{w}4]{}{write-tau-addr}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{write-tau-dep-addr}
+    %     if $\aEvs\neq\emptyset$ then 
+    %     \makebox[0pt][l]{\begin{math}
+    %       \aTr{\bEvs}{\bForm} \riff 
+    %       \textstyle\bigwedge_{\dVal\in\Val}
+    %       \cExp{=}\dVal
+    %       \limplies
+    %       \bForm
+    %       [\aExp/\REF{\dVal}]
+    %       [\aExp{=}\aVal/\Q{\REF{\dVal}}],
+    %       %       [\TRUE/\A{\cVal}]
+    %       %       [(\cExp{\neq}\Aother\land\A{\Aother})/\A{\Aother{\neq}\cVal}]
+    %     \end{math}}
+    %   \item \label{write-tau-empty-addr}
+    %     if $\aEvs=\emptyset$ then
+    %     \makebox[0pt][l]{
+    %     \begin{math}
+    %       \aTr{\bEvs}{\bForm} \riff 
+    %       \textstyle\bigwedge_{\dVal\in\Val}
+    %       \cExp{=}\dVal
+    %       \limplies
+    %       \bForm
+    %       [\aExp/\REF{\dVal}]
+    %       [\FALSE/\Q{\REF{\dVal}}],
+    %       %       [\FALSE/\A{\Aother}],
+    %     \end{math}}
+    %   \end{enumerate}
+    %   \columnbreak
+  \item \label{write-tau-addr}
+    % \makebox[0pt][l]{%
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \riff 
+      \textstyle\bigwedge_{\dVal\in\Val}
+      \cExp{=}\dVal
+      \;\limplies
+    \end{math}
+    \\\makebox[\linewidth][r]{
+      \begin{math}
+        \bForm
+        [\aExp/\REF{\dVal}]
+        [\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\aExp{=}\aVal}/\Q{\REF{\dVal}}],
+        % [\TRUE/\A{\cVal}]
+        % [(\cExp{\neq}\Aother\land\A{\Aother})/\A{\Aother{\neq}\cVal}]
+      \end{math}}
+  \item \label{write-term-addr}
+    $\aTerm \riff {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\cExp{=}\cVal \land \aExp{=}\aVal}}$.
+    % \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{w}5]{}{write-term-addr}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{write-term-nonempty-addr}
+    %     if $\aEvs\neq\emptyset$ then $\aTerm \riff \cExp{=}\cVal \land \aExp{=}\aVal$,
+    %   \item \label{write-term-empty-addr}
+    %     if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+    %   \end{enumerate}
+  \end{enumerate}
+\end{multicols}
+
+% \medskip
+\noindent
+If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\cExp}[\aThrd]$ then
+$(\exists\cVal\in\Val)$
+$(\exists\aVal\in\Val)$
+\begin{multicols}{2}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+  \item \label{read-E-addr}
+    if $\fcard{\aEvs}\leq1$,
+  \item \label{read-lambda-addr}
+    $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal}[\aThrd]$
+  \item \label{read-kappa-addr}
+    \begin{math}
+      \labelingForm(\aEv) 
+      \riff
+      \cExp{=}\cVal
+      \land 
+      \Q{\REF{\cVal}}
+    \end{math},
+    \stepcounter{enumi}
+  \item[] \labeltext[\textsc{r}4]{}{read-tau-addr}
+    \begin{enumerate}[leftmargin=0pt]
+    \item \label{read-tau-dep-addr}
+      if $\aEv\in\aEvs\cap\bEvs$ then
+      % if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
+      % \begin{math}
+      %   (\forall\aEv\in\aEvs\cap\bEvs)
+      % \end{math}
+      \makebox[0pt][l]{\begin{math}
+          \aTr{\bEvs}{\bForm} \riff
+          \PBR{
+            \cExp{=}\cVal
+            \land 
+            \Q{\REF{\cVal}}
+            \limplies
+            \aVal{=}\uReg{\aEv}
+          }
+          \limplies
+          \bForm[\uReg{\aEv}/\aReg]
+        \end{math},}
+    \item \label{read-tau-ind-addr}
+      if $\aEv\in\aEvs\setminus\bEvs$ then
+      % if $\aEv\in\aEvs$ and $\aEv\not\in\bEvs$ then
+      % \begin{math}
+      %   (\forall\aEv\in\aEvs\setminus\bEvs)
+      % \end{math}
+      \makebox[0pt][l]{\begin{math}
+          \aTr{\bEvs}{\bForm} \riff
+          % \PBR{
+          % (\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})
+          % \lor
+          %   % ((\cExp{=}\cVal\land\A{\cVal})\limplies\REF{\cVal}\EQ\uReg{\aEv})
+          % (\cExp{=}\cVal\limplies\REF{\cVal}\EQ\uReg{\aEv})
+          % }
+          \PBR{
+            \cExp{=}\cVal
+            \land 
+            \Q{\REF{\cVal}}
+            \limplies
+            \aVal{=}\uReg{\aEv} \lor \REF{\cVal}\EQ\uReg{\aEv}
+          }
+          \limplies
+          \bForm[\uReg{\aEv}/\aReg]
+        \end{math},}
+      \columnbreak
+    \item \label{read-tau-empty-addr}
+      if $\aEvs=\emptyset$ then 
+      \begin{math}
+        \aTr{\bEvs}{\bForm} \riff 
+        (\forall\bReg)\;
+        \bForm[\bReg/\aReg],
+      \end{math}  
+    \end{enumerate}  
+    \stepcounter{enumi}
+  \item[] \labeltext[\textsc{r}5]{}{read-term-addr}
+    \begin{enumerate}[leftmargin=0pt]
+    \item \label{read-term-nonempty-addr}
+      if $\aEvs\neq\emptyset$ or $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+    \item \label{read-term-empty-addr}
+      if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 
+    \end{enumerate}      
+    % \item \label{read-term-addr}
+    %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+  \end{enumerate}
+\end{multicols}

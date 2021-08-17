@@ -170,34 +170,43 @@
     %     [\aExp/\aLoc]
     %     % \land\aExp{=}\aVal
     %   \end{math},
-      \stepcounter{enumi}      
-    \item[] \labeltext[\textsc{w}4]{}{write-tau}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{write-tau-nonempty}
-        if $\aEvs\neq\emptyset$ then 
-        \makebox[0cm][l]{%
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff 
-          \bForm
-          [\aExp/\aLoc][\aExp{=}\aVal/\Q{\aLoc}],
-        \end{math}}
-      \item \label{write-tau-empty}
-        if $\aEvs=\emptyset$ then 
-        \begin{math}
-          \aTr{\bEvs}{\bForm} \riff 
-          \bForm
-          [\aExp/\aLoc][\FALSE/\Q{\aLoc}],
-        \end{math}
-      \end{enumerate}
-      \columnbreak
-      \stepcounter{enumi}      
-    \item[] \labeltext[\textsc{w}5]{}{write-term}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{write-term-nonempty}
-        if $\aEvs\neq\emptyset$ then $\aTerm \riff \aExp{=}\aVal$,
-      \item \label{write-term-empty}
-        if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
-      \end{enumerate}
+    \item \label{write-tau}
+      %\makebox[0cm][l]{%
+      \begin{math}
+        \aTr{\bEvs}{\bForm} \riff 
+        \bForm
+        [\aExp/\aLoc][\PBR{\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\aExp{=}\aVal}/\Q{\aLoc}],
+      \end{math}
+    \item \label{write-term}
+        $\aTerm \riff {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\aExp{=}\aVal}$,
+    %   \stepcounter{enumi}      
+    % \item[] \labeltext[\textsc{w}4]{}{write-tau}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{write-tau-nonempty}
+    %     if $\aEvs\neq\emptyset$ then 
+    %     \makebox[0cm][l]{%
+    %     \begin{math}
+    %       \aTr{\bEvs}{\bForm} \riff 
+    %       \bForm
+    %       [\aExp/\aLoc][\aExp{=}\aVal/\Q{\aLoc}],
+    %     \end{math}}
+    %   \item \label{write-tau-empty}
+    %     if $\aEvs=\emptyset$ then 
+    %     \begin{math}
+    %       \aTr{\bEvs}{\bForm} \riff 
+    %       \bForm
+    %       [\aExp/\aLoc][\FALSE/\Q{\aLoc}],
+    %     \end{math}
+    %   \end{enumerate}
+    %   \columnbreak
+    %   \stepcounter{enumi}      
+    % \item[] \labeltext[\textsc{w}5]{}{write-term}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{write-term-nonempty}
+    %     if $\aEvs\neq\emptyset$ then $\aTerm \riff \aExp{=}\aVal$,
+    %   \item \label{write-term-empty}
+    %     if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+    %   \end{enumerate}
     \end{enumerate}
   \end{multicols}
   \medskip

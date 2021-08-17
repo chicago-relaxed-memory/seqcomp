@@ -669,18 +669,19 @@ but the former does not.\footnote{These are distinguished by the context:
     \IF{\aReg {=} \bReg} \THEN \PW{\cLoc}{1} \FI.
   \end{math}}
 
+\todo{Remind that $\FALSE\riff\bigvee_\emptyset \aForm$.}
 In complete pomsets, \ref{top-term} requires that $\aTerm$ is a tautology,
-capturing termination.  In $\sSTORE{}{}$, \ref{write-term-empty} ensures that
+capturing termination.  In $\sSTORE{}{}$, \ref{write-term} ensures that
 all writes are included in complete pomsets.  This also ensures
 $\sembase{\PW{x}{1}}\not\supseteq\sembase{\IF{\aExp}\THEN\PW{x}{1}\FI}$,
 since $\sembase{\IF{\aExp}\THEN\PW{x}{1}\FI}$ includes the empty set with
 termination condition $\lnot\aExp$, but $\sembase{\PW{x}{1}}$ can only
 include the empty set with termination condition $\FALSE$.
 
-In addition, \ref{write-term-nonempty} ensures that complete pomsets do not
+In addition, \ref{write-term} ensures that complete pomsets do not
 include bogus writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted
 above, $\aPS$ can include $(1{=}\aVal\mid\DW{x}{\aVal})$, for any value
-$\aVal$.  In complete pomsets, however, \ref{write-term-nonempty} requires
+$\aVal$.  In complete pomsets, however, \ref{write-term} requires
 that $\aTerm$ implies $1{=}\aVal$.  In this case, \ref{pom-kappa-sat} would
 filter the pomset, since preconditions must be satisfiable.  However,
 unsatisfiable writes can be become satisfiable via merging:
@@ -1238,7 +1239,7 @@ reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}:
   \end{gathered}
 \end{gather*}
 In order to allow this execution, the precondition $\aForm$ must be a tautology.
-Using \ref{read-tau-ind} and \ref{write-tau-nonempty}, the precondition is
+Using \ref{read-tau-ind} and \ref{write-tau}, the precondition is
 \begin{math}
   \PBR{(1{=}r \lor x{=}r) \limplies r{\geq}0}[0/x]
 \end{math}
@@ -1256,6 +1257,7 @@ Local invariant reasoning requires that we track the state of variables in
 the logic, not just registers.  This is one reason we use predicate
 transformers rather than simple postconditions.
 
+\todo{Put tc12$'$ first.  Fix the narrative.}
 $\Q{x}$ ensures that the local state of $x$ is up-to-date when $x$ is read.
 \ref{read-kappa} and \ref{read-tau} add these ``quiescence'' constraints,
 which are simplified by \ref{write-tau}.
@@ -1323,7 +1325,6 @@ Consider the following example
     s{\neq}0))
   \end{aligned}
 \end{gather*}
-\todo{Fix the rest of this.}
 Note that the two branches of the conditional are the same except for the
 leading $\PWP{x}{0}$.  Without $\Q{x}$, the precondition $\aForm$ is
 $\TRUE$, which is a tautology, and the execution is
@@ -1392,17 +1393,17 @@ Control variant of \ref{TC12} with all initial values $0$:
 Building the precondition $\aForm$ from right to left:
 \begin{align*}
   \tag{$\PW{x}{s}$}
-  \aForm_1 &=
+  \aForm_1 &\riff
   s{=}0
   \\
   \tag{Prepending $\PR{\REFVAR{0}}{s}$}
-  \aForm_2 &=
+  \aForm_2 &\riff
   \PBR{\Q{\REFVAR{0}}\limplies 0{=}s}
   \limplies
   s{=}0
   \\
   \tag{Prepending $\IF{}$}
-  \aForm_3 &=
+  \aForm_3 &\riff
   \PBR{
     r{\neq}0
     \land
@@ -1413,7 +1414,7 @@ Building the precondition $\aForm$ from right to left:
     \aForm_2[1/\REFVAR{0}][\FALSE/\Q{\REFVAR{0}}]
   }
   \\[-1ex]
-  &=
+  &\riff
   \PBR{
     r{\neq}0
     \land
@@ -1440,7 +1441,7 @@ Building the precondition $\aForm$ from right to left:
   \\
   \intertext{Dependent case:}
   \tag{Prepending $\PR{y}{r}$}
-  \aForm_4 &=
+  \aForm_4 &\riff
   \PBR{
     \Q{y}
     \limplies
@@ -1450,7 +1451,7 @@ Building the precondition $\aForm$ from right to left:
   \aForm_3
   \\
   \tag{Prepending Initializers}
-  \aForm_5 &=
+  \aForm_5 &\riff
   1{=}r
   \limplies
   \PBR{
@@ -1469,7 +1470,7 @@ Building the precondition $\aForm$ from right to left:
   \\
   \intertext{Independent case:}
   \tag{Prepending $\PR{y}{r}$}
-  \aForm'_4 &=
+  \aForm'_4 &\riff
   \PBR{
     \Q{y}
     \limplies
@@ -1481,7 +1482,7 @@ Building the precondition $\aForm$ from right to left:
   \aForm_3
   \\
   \tag{Prepending Initializers}
-  \aForm'_5 &=
+  \aForm'_5 &\riff
   \PBR{
     1{=}r
     \lor

@@ -1,0 +1,244 @@
+% Let $\semcaaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
+
+\noindent
+If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
+$(\exists\cVal:\aEvs\fun\Val)$
+$(\exists\aVal:\aEvs\fun\Val)$
+$(\exists\aForm:\aEvs\fun\Formulae)$
+$(\exists\emptyForm\in\Formulae)$
+% $(\exists\emptyForm\in\Formulae)$
+\begin{multicols}{2}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
+  \item \label{write-E-ca-addr}
+    $\aForm$ partitions $\emptyForm$,
+    % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+  \item \label{write-lambda-ca-addr}
+    $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$,
+  \item \label{write-kappa-ca-addr}
+    \begin{math}
+      \labelingForm(\aEv) \riff
+      \aForm_\aEv
+      \land \cExp{=}\cVal_\aEv
+      \land \aExp{=}\aVal_\aEv
+    \end{math},      
+  \item
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \riff
+      \textstyle\bigwedge_{\dVal\in\Val}
+      \cExp{=}\dVal
+      \;\limplies
+    \end{math}
+    \\\makebox[\linewidth][r]{
+      \begin{math}
+        \bForm
+        [\aExp/{\dVal}]
+        [\textstyle\bigvee{}\!\!{}_{\cVal_\aEv=\dVal}\PBR{\aExp{=}\aVal_\aEv}/\Q{\REF{\dVal}}],
+      \end{math}}
+    % \item
+    %   \makebox[0pt][l]{%
+    %   \begin{math}
+    %     \aTr{\bEvs}{\bForm} \riff
+    %     \textstyle\bigwedge_{\dVal\in\Val}
+    %     \cExp{=}\dVal
+    %     \limplies
+    %     \bForm
+    %     [\aExp/{\dVal}]
+    %     [\PBR{\textstyle\bigvee{}\!\!{}_{\cVal_\aEv=\dVal}\aExp{=}\aVal_\aEv}/\Q{\REF{\dVal}}],
+    %       %     [\cForm_{{\dVal}}/\Q{\REF{\dVal}}],
+    %   \end{math}
+    %     %   where
+    %     %   $\cForm_\aLoc=\textstyle\bigvee_{\aEv\in\aEvs,\,\labelingAct(\aEv)=\DW{\aLoc}{\aVal}}\aExp{=}\aVal$ 
+    %     %   $\cForm_\aLoc=\textstyle\bigvee\{\aExp{=}\aVal\mid\exists\aEv\in\aEvs\land\labelingAct(\aEv)=\DW{\aLoc}{\aVal}\}$,
+    %     %   $\cForm_\dVal=\textstyle\bigvee\!_{\cVal_\aEv=\dVal}\aExp{=}\aVal_\aEv$,
+    % }
+    %   \columnbreak
+    %   \begin{math}
+    %     \begin{aligned}[t]
+    %       \aTr{\bEvs}{\bForm} \riff
+    %       &\textstyle\bigwedge_{\aEv\in\aEvs}
+    %       \PBR{
+    %       \aForm_\aEv
+    %       \limplies (\cExp{=}\cVal_\aEv)
+    %       \limplies 
+    %       \bForm[\aExp/\REF{\cVal_\aEv}][\aExp{=}\aVal_\aEv/\Q{\REF{\cVal_\aEv}}]
+    %     }
+    %       \\[-.5ex]
+    %       \land
+    %       &
+    %       \lnot\emptyForm
+    %     %       \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+    %       \limplies (\cExp{=}\dVal)
+    %       \limplies 
+    %       \bForm[\aExp/\REF{\dVal}][\FALSE/\Q{\REF{\dVal}}]
+    %     \end{aligned}
+    %   \end{math}
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{w}4]{}{write-tau-ca-addr}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{write-tau-dep-ca-addr}
+    %     \begin{math}
+    %       \aTr{\bEvs}{\bForm} \riff 
+    %       \aForm_\aEv
+    %       \limplies (\cExp{=}\cVal)
+    %       \limplies 
+    %       \bForm[\aExp/\REF{\cVal}]
+    %     \end{math},
+    %   \item \label{write-tau-empty-ca-addr}
+    %     \begin{math}
+    %       (\forall\dVal)
+    %     \end{math}
+    %     \begin{math}
+    %       \aTr{\bEvs}{\bForm} \riff 
+    %     %       (\!\not\exists\aEv\in\aEvs \suchthat \aForm_\aEv)
+    %       (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+    %       \limplies (\cExp{=}\dVal)
+    %       \limplies 
+    %       \bForm
+    %       [\aExp/\REF{\dVal}]
+    %     \end{math}  
+    %   \end{enumerate}  
+  \item \label {write-term-ca-addr}
+    \begin{math}
+      \aTerm \riff
+      \emptyForm
+      % \PBR{\bigvee_{\aEv\in\aEvs}\aForm_\aEv}
+      \land
+      \bigwedge_{\aEv\in\aEvs}\PBR{\aForm_\aEv \limplies \cExp{=}\cVal_\aEv \land\aExp{=}\aVal_\aEv}.
+    \end{math}
+    % \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{w}5]{}{write-term-ca-addr}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{write-term-nonempty-ca-addr}
+    %     $\aTerm \riff \aForm_\aEv \limplies \cExp{=}\cVal_\aEv \land \aExp{=}\aVal_\aEv$,
+    %   \item \label{write-term-empty-ca-addr}
+    %     \begin{math}
+    %       \aTerm \riff
+    %       \emptyForm.
+    %       %       \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
+    %     \end{math}
+    %   \end{enumerate}
+  \end{enumerate}
+\end{multicols}
+
+\medskip
+\noindent
+\begin{minipage}{1.0\linewidth}
+  If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\cExp}[\aThrd]$ then
+  $(\exists\cVal:\aEvs\fun\Val)$
+  $(\exists\aVal:\aEvs\fun\Val)$
+  $(\exists\aForm:\aEvs\fun\Formulae)$ 
+  $(\exists\emptyForm\in\Formulae)$
+  % $(\exists\emptyForm\in\Formulae)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+    \item \label{read-E-ca-addr}
+      $\aForm$ partitions $\emptyForm$,
+      % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+    \item \label{read-lambda-ca-addr}
+      $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$
+    \item \label{read-kappa-ca-addr}
+      \begin{math}
+        \labelingForm(\aEv) \riff
+        \aForm_\aEv
+        \land \cExp{=}\cVal_\aEv
+        \land \Q{\REF{\cVal}}
+      \end{math},
+    \item \label{read-tau-ca-addr}
+      \begin{math}
+        \begin{aligned}[t]
+          \aTr{\bEvs}{\bForm} \riff
+          &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
+          {
+            \PBR{
+              \aForm_\aEv
+              \land \cExp{=}\cVal_\aEv
+              \land \Q{\REF{\cVal}}
+              \limplies
+              \aVal_\aEv{=}\uReg{\aEv}
+            }
+            \limplies \bForm[\uReg{\aEv}/\aReg]
+          }
+          \\[-.5ex]
+          \land
+          &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
+          {
+            \PBR{
+              \aForm_\aEv
+              \land \cExp{=}\cVal_\aEv
+              \land \Q{\REF{\cVal}}
+              \limplies
+              \aVal_\aEv{=}\uReg{\aEv}
+              \lor
+              \REF{\cVal}\EQ\uReg{\aEv}
+            }
+            \limplies
+            \bForm[\uReg{\aEv}/\aReg]
+          }
+          \\[-.5ex]
+          \land
+          &
+          \lnot\emptyForm
+          % \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+          \limplies 
+          (\forall\bReg)\;
+          \bForm[\bReg/\aReg],
+        \end{aligned}
+      \end{math}
+      % \stepcounter{enumi}
+      % \item[] \labeltext[\textsc{r}4]{}{read-tau-ca-addr}
+      %   \begin{enumerate}[leftmargin=0pt]
+      %   \item \label{read-tau-dependent-ca-addr}
+      %     \begin{math}
+      %       (\forall\aEv\in\aEvs\cap\bEvs)
+      %     \end{math}
+      %     \begin{math}
+      %       \aTr{\bEvs}{\bForm} \riff
+      %       \aForm_\aEv
+      %       \limplies (\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv})
+      %       \limplies \bForm[\uReg{\aEv}/\aReg]
+      %     \end{math},      
+      %   \item \label{read-tau-independent-ca-addr}
+      %     \begin{math}
+      %       (\forall\aEv\in\aEvs\setminus\bEvs)
+      %     \end{math}
+      %     \begin{math}
+      %       \aTr{\bEvs}{\bForm} \riff
+      %       \aForm_\aEv 
+      %       \limplies
+      %       \PBR{(\cExp{=}\cVal_\aEv\limplies\aVal_\aEv{=}\uReg{\aEv}) \lor (\cExp{=}\cVal_\aEv\limplies\REF{\cVal}\EQ\uReg{\aEv})}
+      %       \limplies
+      %       \bForm[\uReg{\aEv}/\aReg]
+      %     \end{math},      
+      %   \item \label{read-tau-empty-ca-addr}
+      %     \begin{math}
+      %       (\forall\bReg)
+      %     \end{math}
+      %     \begin{math}
+      %       \aTr{\bEvs}{\bForm} \riff 
+      %       (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+      %       \limplies 
+      %       \bForm[\bReg/\aReg],
+      %     \end{math}  
+      %   \end{enumerate}  
+      \columnbreak
+      \stepcounter{enumi}
+    \item[] \labeltext[\textsc{r}5]{}{read-term-ca-addr}
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-term-nonempty-ca-addr}
+        if $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+      \item \label{read-term-empty-ca-addr}
+        if $\amode\gemode\mACQ$ then
+        \begin{math}
+          \aTerm \riff
+          \emptyForm.
+          % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
+        \end{math}
+      \end{enumerate}      
+      % \item \label{read-term-ca-addr}
+      %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+    \end{enumerate}
+  \end{multicols}
+\end{minipage}
+% \medskip Similarly, let $\frf{\semaddr{}}$ be defined as for $\frf{\semrr{}}$
+% in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
+% $\sLOAD{}{}$.
