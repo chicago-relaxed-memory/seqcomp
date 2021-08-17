@@ -758,9 +758,9 @@ and $\sLOAD{}{}$.
         if $\aEvs\neq\emptyset$ then 
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff 
-          \textstyle\bigwedge_{\dVal\in\Val}
-          (\cExp{=}\dVal)
-          \limplies 
+          \textstyle\bigvee_{\dVal\in\Val}
+          \cExp{=}\dVal
+          \land
           \bForm
           [\aExp/\REF{\dVal}]
           [\aExp{=}\aVal/\Q{\REF{\dVal}}],
@@ -772,9 +772,9 @@ and $\sLOAD{}{}$.
         \makebox[0pt][l]{
         \begin{math}
           \aTr{\bEvs}{\bForm} \riff 
-          \textstyle\bigwedge_{\dVal\in\Val}
-          (\cExp{=}\dVal)
-          \limplies 
+          \textstyle\bigvee_{\dVal\in\Val}
+          \cExp{=}\dVal
+          \land
           \bForm
           [\aExp/\REF{\dVal}]
           [\FALSE/\Q{\REF{\dVal}}],
@@ -918,20 +918,177 @@ $(\cExp{=}\cVal\limplies\aVal{=}\uReg{\aEv})$ by $(\aVal{=}\uReg{\aEv})$ in
 ordered before $\DWP{x}{1}$.
 
 
-\begin{scope}
+\ref{TC12} with all initial values $0$:
+\begin{gather*}
+  \taglabel{TC12}
+  \begin{gathered}
+    \PR{y}{r}\SEMI
+    \PW{\REFARRAY{}{r}}{1}\SEMI
+    %\IF{r}\THEN \PW{\REFARRAY{}{1}}{1} \ELSE \PW{\REFARRAY{}{0}}{1} \FI \SEMI
+    \PR{\REFARRAY{}{0}}{s}\SEMI
+    \PW{x}{\BANG s}
+    \PAR
+    \PW{y}{\PR{x}{}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        % \event{iy}{\DW{y}{0}}{left=of a1}
+        % \event{ix}{\DW{x}{0}}{right=2em of a2}
+        \event{b1}{\DR{y}{1}}{}
+        \event{b2}{\DW{\REFARRAY{}{1}}{1}}{right=of b1}
+        \event{b3}{\DR{\REFARRAY{}{0}}{0}}{right=of b2}
+        \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
+        \po{b1}{b2}
+        \po{b3}{b4}
+        \event{a1}{\DR{x}{1}}{right=3em of b4}
+        \event{a2}{\DW{y}{1}}{right=of a1}
+        \po{a1}{a2}
+        % \po[out=15,in=165]{b1}{b4}
+        \rf[out=-170,in=-10]{a2}{b1}
+        \rf{b4}{a1}
+        % \wk[out=-15,in=-165]{iy}{a2}
+        % \wk[out=-15,in=-165]{ix}{b4}
+      \end{tikzinline}}
+  \end{gathered}
+  % \\
+  % \aForm \riff
+  % (\Q{y}\limplies 1{=}r \lor y{=}r)\;
+  % \begin{aligned}[t]
+  %   \limplies\;&
+  %   (r{=}0 \land ((\Q{x}[\FALSE/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
+  %   \\[-1ex]
+  %   \land\;&
+  %   (r{\neq}0 \land ((\Q{x}[1{=}1/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
+  % \end{aligned}
+\end{gather*}
+
+Building the precondition $\aForm$ from right to left:
+\begin{align*}
+  \tag{$\PW{x}{s}$}
+  \aForm_1 &=
+  s{=}0
+  \\
+  \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
+  \aForm_2 &=
+  \PBR{\Q{\REFARRAY{}{0}}\limplies 0{=}s}
+  \limplies
+  s{=}0
+  \\
+  \tag{Prepending $\IF{}$}
+  \aForm_3 &=
+  \PBR{
+    r{=}1
+    \land
+    \aForm_2[1/\REFARRAY{}{1}][\TRUE/\Q{\REFARRAY{}{1}}]
+  }\lor\PBR{
+    r{=}0
+    \land
+    \aForm_2[1/\REFARRAY{}{0}][\FALSE/\Q{\REFARRAY{}{0}}]
+  }
+  \\[-1ex]
+  &=
+  \PBR{
+    r{=}1
+    \land
+    \PBR{
+      \PBR{
+        \Q{\REFARRAY{}{0}}
+        \limplies
+        0{=}s
+      }
+      \limplies
+      s{=}0
+    }
+  } \lor\PBR{
+    r{=}0
+    \land
+    % \PBR{
+    % \FALSE
+    % \limplies
+    % 0{=}s
+    % }
+    %   \limplies
+    s{=}0
+  }
+  \\
+  \intertext{Dependent case:}
+  \tag{Prepending $\PR{y}{r}$}
+  \aForm_4 &=
+  \PBR{
+    \Q{y}
+    \limplies
+    1{=}r
+  }
+  \limplies
+  \aForm_3
+  \\
+  \tag{Prepending Initializers}
+  \aForm_5 &=
+  1{=}r
+  \limplies
+  \PBR{
+    r{=}1
+    \land
+    \PBR{
+      0{=}s
+      \limplies
+      s{=}0
+    }
+  } \lor\PBR{
+    r{=}0
+    \land
+    s{=}0
+  }
+  \\
+  \intertext{Independent case:}
+  \tag{Prepending $\PR{y}{r}$}
+  \aForm'_4 &=
+  \PBR{
+    \Q{y}
+    \limplies
+    1{=}r
+    \lor
+    y{=}r
+  }
+  \limplies
+  \aForm_3
+  \\
+  \tag{Prepending Initializers}
+  \aForm'_5 &=
+  \PBR{
+    1{=}r
+    \lor
+    0{=}r
+  }
+  \limplies
+  \PBR{
+    r{=}1
+    \land
+    \PBR{
+      0{=}s
+      \limplies
+      s{=}0
+    }
+  } \lor\PBR{
+    r{=}0
+    \land
+    s{=}0
+  }
+\end{align*}
+
+\begin{comment}
   % \renewcommand{\ADDRARRAY}[2]{#2}%
   % \renewcommand{\REFARRAY}[2]{\REF{#2}}%
   \ref{TC12} describes another potential \oota{} behavior.
   % We write $\REFARRAY{\aExp}{\bExp}$ for $\REF{\aExp{+}\bExp}$.
-  Initially, $x \EQ y \EQ 0$,  $\REFARRAY{a}{0} \EQ 1$, and $\REFARRAY{a}{1} \EQ 2$:
+  Initially, $x \EQ y \EQ 0$,  $\REFARRAY{}{0} \EQ 1$, and $\REFARRAY{}{1} \EQ 2$:
   \begin{gather*}
     \taglabel{TC12}
     \begin{gathered}
       \PW{y}{\PR{x}{}}
       \PAR
       \PR{y}{r}\SEMI
-      \PW{\REFARRAY{a}{r}}{0}\SEMI
-      \PR{\REFARRAY{a}{0}}{s}\SEMI
+      \PW{\REFARRAY{}{r}}{0}\SEMI
+      \PR{\REFARRAY{}{0}}{s}\SEMI
       \PW{x}{s}\SEMI
       \\[-1ex]
       \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -941,8 +1098,8 @@ ordered before $\DWP{x}{1}$.
           % \event{iy}{\DW{y}{0}}{left=of a1}
           % \event{ix}{\DW{x}{0}}{right=2em of a2}
           \event{b1}{\DR{y}{1}}{right=3em of a2}
-          \event{b2}{\DW{\REFARRAY{a}{1}}{0}}{right=of b1}
-          \event{b3}{\DR{\REFARRAY{a}{0}}{1}}{right=of b2}
+          \event{b2}{\DW{\REFARRAY{}{1}}{0}}{right=of b1}
+          \event{b3}{\DR{\REFARRAY{}{0}}{1}}{right=of b2}
           \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
           \po{b1}{b2}
           %\po[out=15,in=165]{b1}{b4}
@@ -959,29 +1116,29 @@ ordered before $\DWP{x}{1}$.
     \aForm_1 &=
     s{=}1
     \\
-    \tag{Prepending $\PR{\REFARRAY{a}{0}}{s}$}
+    \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
     \aForm_2 &=
-    \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
+    \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
     \limplies
     s{=}1
     \\
-    \tag{Prepending $\PW{\REFARRAY{a}{r}}{0}$}
+    \tag{Prepending $\PW{\REFARRAY{}{r}}{0}$}
     \aForm_3 &=
     \PBR{
-      \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
+      \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
       \limplies
       s{=}1
-    }[0/\REFARRAY{a}{1}]
+    }[0/\REFARRAY{}{1}]
     \\
     \tag{Prepending $\PR{y}{r}$}
     \aForm_4 &=
     \PBR{r\EQ1 \lor y\EQ1}
     \limplies 
-    \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
+    \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
     \limplies
     s{=}1
     \\
-    \tag{Prepending $\PW{\REFARRAY{a}{0}}{1}$}
+    \tag{Prepending $\PW{\REFARRAY{}{0}}{1}$}
     \aForm_5 &=
     \PBR{r\EQ1 \lor y\EQ1}
     \limplies 
@@ -997,8 +1154,8 @@ ordered before $\DWP{x}{1}$.
       \PW{y}{\PR{x}{}}
       \PAR
       \PR{y}{r}\SEMI
-      \PW{\REFARRAY{a}{r}}{0}\SEMI
-      \PR{\REFARRAY{a}{0}}{s}\SEMI
+      \PW{\REFARRAY{}{r}}{0}\SEMI
+      \PR{\REFARRAY{}{0}}{s}\SEMI
       \PW{x}{s}\SEMI
       \\[-1ex]
       \hbox{\begin{tikzinline}[node distance=1.5em]
@@ -1008,8 +1165,8 @@ ordered before $\DWP{x}{1}$.
           % \event{iy}{\DW{y}{0}}{left=of a1}
           % \event{ix}{\DW{x}{0}}{right=2em of a2}
           \event{b1}{\DR{y}{1}}{right=3em of a2}
-          \event{b2}{\DW{\REFARRAY{a}{1}}{0}}{right=of b1}
-          \event{b3}{\DR{\REFARRAY{a}{0}}{1}}{right=of b2}
+          \event{b2}{\DW{\REFARRAY{}{1}}{0}}{right=of b1}
+          \event{b3}{\DR{\REFARRAY{}{0}}{1}}{right=of b2}
           \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
           \po{b1}{b2}
           \po[out=15,in=165]{b1}{b4}
@@ -1024,31 +1181,31 @@ ordered before $\DWP{x}{1}$.
   \begin{displaymath}
     \PR{y}{r}\SEMI
     \IF{r\EQ0}\THEN
-      \PW{\REFARRAY{a}{0}}{0}\SEMI
+      \PW{\REFARRAY{}{0}}{0}\SEMI
       \PW{x}{0}
     \ELIF{r\EQ1}\THEN
-      \PW{\REFARRAY{a}{1}}{0}\SEMI
+      \PW{\REFARRAY{}{1}}{0}\SEMI
       \PW{x}{1}
     \FI
   \end{displaymath}    
   Building the precondition $\aForm$ from right to left (assuming that
-  $x,y\not\in\{\REFARRAY{a}{0}, \REFARRAY{a}{1}\}$ and $x{\neq}y$):
+  $x,y\not\in\{\REFARRAY{}{0}, \REFARRAY{}{1}\}$ and $x{\neq}y$):
   \begin{align*}
     \tag{$\PW{x}{s}$}
     \aForm_1 &=
     s{=}1
     \\
-    \tag{Prepending $\PR{\REFARRAY{a}{0}}{s}$}
+    \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
     \aForm_2 &=
-    % \PBR{1{=}s \lor \REFARRAY{a}{0}\EQ s}
-    \PBR{1{=}s \lor (\A{\ADDRARRAY{a}{0}}\limplies\REFARRAY{a}{0}\EQ s)}
-    % \PBR{(\ADDRARRAY{a}{0}\EQ0\limplies1{=}s) \lor ((\ADDRARRAY{a}{0}\EQ0\land \A{0})\limplies\REFARRAY{a}{0}\EQ s)}
+    % \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
+    \PBR{1{=}s \lor (\A{\ADDRARRAY{}{0}}\limplies\REFARRAY{}{0}\EQ s)}
+    % \PBR{(\ADDRARRAY{}{0}\EQ0\limplies1{=}s) \lor ((\ADDRARRAY{}{0}\EQ0\land \A{0})\limplies\REFARRAY{}{0}\EQ s)}
     \limplies
     s{=}1
     \\
-    \tag{Prepending $\PW{\REFARRAY{a}{r}}{0}$}
+    \tag{Prepending $\PW{\REFARRAY{}{r}}{0}$}
     \aForm_3 &=
-    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{a}{0}})\limplies\REFARRAY{a}{0}\EQ s)}
+    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{}{0}})\limplies\REFARRAY{}{0}\EQ s)}
     \limplies
     s{=}1
     \\
@@ -1056,11 +1213,11 @@ ordered before $\DWP{x}{1}$.
     \aForm_4 &=
     \PBR{r\EQ1}
     \limplies 
-    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{a}{0}})\limplies\REFARRAY{a}{0}\EQ s)}
+    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{}{0}})\limplies\REFARRAY{}{0}\EQ s)}
     \limplies
     s{=}1
     \\
-    \tag{Prepending $\PW{\REFARRAY{a}{0}}{1}$}
+    \tag{Prepending $\PW{\REFARRAY{}{0}}{1}$}
     \aForm_5 &=
     \PBR{r\EQ1}
     \limplies 
@@ -1068,7 +1225,7 @@ ordered before $\DWP{x}{1}$.
     \limplies
     s{=}1
   \end{align*}
-\end{scope}
+\end{comment}
 
 % % 
 % In isolation, the precondition of $\DWP{x}{1}$ is $(s=1)$.  Using the erroneous

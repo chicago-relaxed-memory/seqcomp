@@ -1000,8 +1000,8 @@
 \newcommand{\TOUCHED}{\texttt{touched}\,}
 %\newcommand{\REFARRAY}[2]{#1\texttt{[}\mkern-2mu#2 \mkern-2mu\texttt{]}\mkern-0mu}
 \newcommand{\REFVAR}[1]{\ifx1#1{a}\else{b}\fi}
-\newcommand{\REFARRAY}[2]{\REF{#1{+}#2}}
-\newcommand{\ADDRARRAY}[2]{#1{+}#2}
+\newcommand{\REFARRAY}[2]{\REF{\ifnotempty{#1}{#1{+}}#2}}
+\newcommand{\ADDRARRAY}[2]{\ifnotempty{#1}{#1{+}}#2}
 \newcommand{\REF}[1]{\mkern-0mu\texttt{[}\mkern-2mu#1 \mkern-2mu\texttt{]}\mkern-0mu}
 \newcommand{\REFAcq}[1]{\REF{#1}^{\texttt{acq}}}
 \newcommand{\REFRel}[1]{\REF{#1}^{\texttt{rel}}}

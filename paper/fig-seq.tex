@@ -120,6 +120,7 @@
       \columnbreak
     \item \label{if-tau}
       % $\aTr{\bEvs}{\bForm} \riff (\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$,
+      % $\aTr{\bEvs}{\bForm} \riff \aForm\limplies\aTr[1]{\bEvs}{\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm}}$,
       $\aTr{\bEvs}{\bForm} \riff (\aForm\land\aTr[1]{\bEvs}{\bForm})\lor(\neg\aForm\land\aTr[2]{\bEvs}{\bForm})$,
     \item \label{if-term}
       % $\aTerm \riff (\aForm\limplies\aTerm[1])\land(\neg\aForm\limplies\aTerm[2])$.
@@ -213,7 +214,7 @@
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
     \item \label{read-kappa}
       %$\labelingForm(\aEv) \riff \TRUE$,
-      % $\labelingForm(\aEv) \riff \Q{\aLoc}$,
+      $\labelingForm(\aEv) \riff \Q{\aLoc}$,
      \stepcounter{enumi}
     \item[] \labeltext[\textsc{r}4]{}{read-tau}
       \begin{enumerate}[leftmargin=0pt]

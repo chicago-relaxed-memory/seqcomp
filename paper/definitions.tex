@@ -29,8 +29,8 @@ We encourage readers to skim the definitions and then skip to
 \label{sec:prelim}
 The syntax is built from
 \begin{itemize}
-\item a set of \emph{values} $\Val$, ranged over by
-  $\aVal$, $\bVal$, $\cVal$, $\dVal$,
+\item a set of \emph{values}
+  $\Val$, ranged over by $\aVal$, $\bVal$, $\cVal$, $\dVal$,
 \item a set of \emph{registers} $\Reg$, ranged over by
   $\aReg$, $\bReg$,
 \item a set of \emph{expressions} $\Exp$, ranged over by
@@ -43,7 +43,10 @@ be the set of memory references, ranged over by $\aLoc$, $\bLoc$, $\cLoc$.
 We require that
 \begin{itemize}
 \item values and registers are disjoint, 
-\item values include at least the constants $0$ and $1$,  
+\item values are finite\footnote{We require finiteness for the semantics of address
+    calculation (\textsection\ref{sec:addr}), which quantifies over all
+    values.  Using types, one could limit the finiteness assumption to the
+    subset of values used for address calculation.} and include at least the constants $0$ and $1$,  
 \item expressions include at least registers and values, 
 \item expressions do \emph{not} include references: $\aExp[\bExp/\aLoc]=\aExp$.
 \end{itemize}
@@ -1344,8 +1347,7 @@ be eliminated by taking $\aEvs=\emptyset$.  By including $\Q{x}$ in
 \eqref{top-kappa} requires tautologies, which means that all variables must
 be initialized sequentially in order to get rid of $\Q{\aLoc}$.
 
-Control variant of \ref{TC12}
-
+Control variant of \ref{TC12} with all initial values $0$:
 \begin{gather*}
   \tag{\textsc{tc12}$'$}\label{TC12'}
   \begin{gathered}
@@ -1387,7 +1389,7 @@ Control variant of \ref{TC12}
   % \end{aligned}
 \end{gather*}
 
-Building the precondition $\aForm$ from right to left (without $\A{}$):
+Building the precondition $\aForm$ from right to left:
 \begin{align*}
   \tag{$\PW{x}{s}$}
   \aForm_1 &=
@@ -1395,43 +1397,110 @@ Building the precondition $\aForm$ from right to left (without $\A{}$):
   \\
   \tag{Prepending $\PR{\REFVAR{0}}{s}$}
   \aForm_2 &=
-  \PBR{\Q{\REFVAR{0}}\limplies 1{=}s}
+  \PBR{\Q{\REFVAR{0}}\limplies 0{=}s}
   \limplies
   s{=}0
   \\
   \tag{Prepending $\IF{}$}
-  \aForm_3 &
-  \begin{aligned}[t]
-    =\;&\PBR{
-      r{\neq}0
-      \land
+  \aForm_3 &=
+  \PBR{
+    r{\neq}0
+    \land
+    \aForm_2[1/\REFVAR{1}][\TRUE/\Q{\REFVAR{1}}]
+  }\lor\PBR{
+    r{=}0
+    \land
+    \aForm_2[1/\REFVAR{0}][\FALSE/\Q{\REFVAR{0}}]
+  }
+  \\[-1ex]
+  &=
+  \PBR{
+    r{\neq}0
+    \land
+    \PBR{
       \PBR{
-        \Q{\REFVAR{0}}%[1{=}1/\Q{\REFVAR{1}}]
+        \Q{\REFVAR{0}}
         \limplies
-        1{=}s
+        0{=}s
       }
       \limplies
       s{=}0
     }
-    \\[-1ex]
-    \lor\;&\PBR{
-      r{=}0
-      \land
-      \PBR{
-        % \Q{\REFVAR{0}}[1{=}1/\Q{\REFVAR{0}}]
-        % \limplies
-        1{=}s
-      }
-      \limplies
-      s{=}0
-    }
-  \end{aligned}
+  } \lor\PBR{
+    r{=}0
+    \land
+    % \PBR{
+    % \FALSE
+    % \limplies
+    % 0{=}s
+    % }
+    %   \limplies
+    s{=}0
+  }
   \\
+  \intertext{Dependent case:}
   \tag{Prepending $\PR{y}{r}$}
   \aForm_4 &=
+  \PBR{
+    \Q{y}
+    \limplies
+    1{=}r
+  }
+  \limplies
+  \aForm_3
   \\
-  \tag{Prepending $\PW{\REFVAR{0}}{0}$}
+  \tag{Prepending Initializers}
   \aForm_5 &=
+  1{=}r
+  \limplies
+  \PBR{
+    r{\neq}0
+    \land
+    \PBR{
+      0{=}s
+      \limplies
+      s{=}0
+    }
+  } \lor\PBR{
+    r{=}0
+    \land
+    s{=}0
+  }
+  \\
+  \intertext{Independent case:}
+  \tag{Prepending $\PR{y}{r}$}
+  \aForm'_4 &=
+  \PBR{
+    \Q{y}
+    \limplies
+    1{=}r
+    \lor
+    y{=}r
+  }
+  \limplies
+  \aForm_3
+  \\
+  \tag{Prepending Initializers}
+  \aForm'_5 &=
+  \PBR{
+    1{=}r
+    \lor
+    0{=}r
+  }
+  \limplies
+  \PBR{
+    r{\neq}0
+    \land
+    \PBR{
+      0{=}s
+      \limplies
+      s{=}0
+    }
+  } \lor\PBR{
+    r{=}0
+    \land
+    s{=}0
+  }
 \end{align*}
 
 % As a sanity check, consider the
