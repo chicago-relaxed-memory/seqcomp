@@ -208,6 +208,9 @@ Then collapsing $r$ and $s$ and substituting the initial value of $y$ (say $0$),
 \subsection{Register Consistency}
 \label{sec:false}
 
+\todo{Drop \ref{pom-kappa-sat}.  Move this into a discussion of the proof of
+  compilation correctness.}
+
 If a precondition is false, you can be pretty sure it's useless.  In this
 subsection, we develop a criterion for eliminating such useless pomsets.
 
@@ -354,16 +357,16 @@ if $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
     $\labelingForm(\aEv) \riff \TRUE$,
   \item \label{fence-tau}
     $\aTr{\bEvs}{\bForm} \riff \bForm$,
-    \stepcounter{enumi}      
-  \item[] \labeltext[\textsc{f}5]{}{fence-term}
-    \begin{enumerate}[leftmargin=0pt]
-    \item \label{fence-term-nonempty}
-      if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
-    \item \label{fence-term-empty}
-      if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
-    \end{enumerate}
-    % \item \label{fence-term}
-    %   if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+  %   \stepcounter{enumi}      
+  % \item[] \labeltext[\textsc{f}5]{}{fence-term}
+  %   \begin{enumerate}[leftmargin=0pt]
+  %   \item \label{fence-term-nonempty}
+  %     if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
+  %   \item \label{fence-term-empty}
+  %     if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+  %   \end{enumerate}
+    \item \label{fence-term}
+      $\aTerm \riff \kappaE{}$.
   \end{enumerate}
 \end{multicols}
 This semantics is identical to that of
@@ -719,6 +722,191 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 \end{comment}
 
 
+\subsection{If-Closure}
+\label{sec:semca}
+
+In order to model sequential composition, we must allow inconsistent
+predicates in a single pomset, unlike \PwP{}
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}.  For example, if
+$\aCmd=(\PW{x}{1})$, then the semantics \reffig{fig:seq} does \emph{not} allow:
+\begin{gather*}
+  \IF{\aExp}\THEN\PW{x}{1}\FI
+  \SEMI
+  \aCmd
+  \SEMI
+  \IF{\lnot\aExp}\THEN\PW{x}{1}\FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{x}{1}}{}
+      \event{b}{\DW{x}{1}}{right=of a}
+      \wki{a}{b}
+    \end{tikzinline}}
+\end{gather*}
+However, if
+$\aCmd=(\IF{\lnot\aExp}\THEN\PW{x}{1}\FI\SEMI\IF{\aExp}\THEN\PW{x}{1}\FI)$,
+then it %\refdef{def:pomsets-trans}
+\emph{does} allow the execution.  Looking at the initial program:
+\begin{align*}
+  \begin{gathered}
+    \IF{\aExp}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a}{\aExp\mid\DW{x}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \PW{x}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a}{\DW{x}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \IF{\lnot\aExp}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+\end{align*}
+\noindent
+The difficulty is that the middle action can coalesce either with the right
+action, or the left, but not both.  Thus, we are stuck with some
+non-tautological precondition.  Our solution is to allow a pomset to
+contain many events for a single action, as long as the events have
+disjoint preconditions.
+
+\refdef{def:semca} allows the execution, by splitting the middle command:
+\begin{align*}
+  \begin{gathered}
+    \IF{\aExp}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \eventl{d}{a}{\aExp\mid\DW{x}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \PW{x}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \eventl{d}{a}{\lnot\aExp\mid\DW{x}{1}}{}
+        \eventl{e}{b}{\aExp\mid\DW{x}{1}}{right=of a}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \IF{\lnot\aExp}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1em]
+        \eventl{e}{a}{\lnot\aExp\mid\DW{x}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+\end{align*}
+Coalescing events gives the desired result.
+
+
+This is not simply a theoretical question; it is observable.  For example,
+the semantics of \reffig{fig:seq} does not allow the following, since it must add order in the
+first thread from the read of $y$ to one of the writes to $x$.
+\begin{gather*}
+  \begin{gathered}
+    \PR{y}{r}\SEMI
+    \IF{r}\THEN\PW{x}{1}\FI \SEMI
+    \PW{x}{1} \SEMI
+    \IF{\lnot r}\THEN\PW{x}{1}\FI\SEMI
+    \PW{z}{r}
+    \\[-.5ex]{}\PAR{}
+    \IF{x}\THEN
+    \PW{x}{0} \SEMI
+    \IF{x}\THEN \PW{y}{1} \FI
+    \FI
+  \end{gathered}    
+  \\[-1ex]
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \event{a2}{\DW{x}{1}}{right=of a1}
+      \event{a0}{\DR{y}{1}}{left=of a1}
+      \event{a3}{\DW{z}{1}}{right=of a2}
+      \wki{a1}{a2}
+      \po[out=15,in=165]{a0}{a3}
+      \event{b0}{\DR{x}{1}}{below right=1em and -1em of a0}
+      \event{b1}{\DW{x}{0}}{right=of b0}
+      \event{b2}{\DR{x}{1}}{right=of b1}
+      \event{b3}{\DW{y}{1}}{right=of b2}
+      \wki{b0}{b1}
+      \wki{b1}{b2}
+      \po{b2}{b3}
+      \rf[out=158,in=-22]{b3}{a0}
+      \rf{a1}{b0}
+      \rf{a2}{b2}
+      \wk{b1}{a2}
+    \end{tikzinline}}
+\end{gather*}  
+% \begin{example}
+%   \label{ex:if1}
+%   \refdef{def:pomsets-trans} does \emph{not} allow:
+%   \begin{gather*}
+%     \aCmd=\PBR{
+%     \PW{x}{0}\SEMI
+%     \PW{x}{\BANG\BANG r}\SEMI
+%     \PW{x}{1}
+%   }
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=1em]
+%       \event{a}{\DW{x}{0}}{}
+%       \event{b}{\DW{x}{1}}{right=of a}
+%       \wk{a}{b}
+%     \end{tikzinline}}
+%   \end{gather*}
+%   However, for any $\aExp$, \refdef{def:pomsets-trans} \emph{does} allow:
+%   \begin{gather*}
+%     \IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI
+%     \\
+%     \hbox{\begin{tikzinline}[node distance=1em]
+%       \event{a}{\DW{x}{0}}{}
+%       \event{b}{\DW{x}{1}}{right=of a}
+%       \wk{a}{b}
+%     \end{tikzinline}}
+%   \end{gather*}
+%   If $r=0$, the middle store can merge left; otherwise, it can merge right.
+% \end{example}
+
+% The difficulty is that any pomset can contain at most one event for the
+% middle store.  
+
+\begin{definition}
+  % \label{def:partition}
+  % Let $\aEvs\subseteq\AllEvents$ and $\aForm:\aEvs\fun\Formulae$ and
+  % $\emptyForm\in\Formulae$.  We say that $\aForm$ \emph{partitions}
+  % $\emptyForm$ if
+  % %\begin{multicols}{2}
+  %   \begin{enumerate*}
+  %   % \item $\aForm_\aEv$ is satisfiable,
+  %   \item if $\aForm_\aEv\land\aForm_\bEv$ is satisfiable then $\aEv=\bEv$,
+  %   % \item $\aForm_\aEv\rimplies\emptyForm$,
+  %   % \item $\lnot\emptyForm\lor\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ is a tautology.
+  %   \item $\emptyForm\riff\bigvee{}\!\!{}_{\aEv\in\aEvs}\aForm_\aEv$.
+  %   \end{enumerate*}
+  % %\end{multicols}
+  % %Let $\semca{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:  
+  \label{def:semca}
+  \input{fig-ca.tex}
+\end{definition}
+The definition allows multiple events to represent a single action, each with
+a disjoint precondition.  The predicate transformers are derived from those
+defined for the conditional.
+
+This modification validates
+%\reflem{lem:if}\ref{lem:if:seq}--\ref{lem:if:elim} as equations.
+\reflem{lem:if}\ref{lem:if:seq}, \ref{lem:seq:if}, and \ref{lem:if:elim} as equations.
+
+We show how to combine address calculation and if-closure in
+\textsection\ref{sec:semcaaddr}.
+
+
 \subsection{Address Calculation}
 \label{sec:addr}
 
@@ -734,7 +922,16 @@ does not deal with provenance \cite{DBLP:journals/pacmpl/LeeHJLRL18}.
 % $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
 \begin{definition}
   \label{def:semaddr}
-  %Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
+  %Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$
+  %and $\sLOAD{}{}$:
+  \noindent
+  Within a pomset $\aPS$, let 
+  \begin{math}
+    \kappaE{\aLoc}=
+    {\textstyle\bigvee{}\{\labelingForm(\aEv)\mid\aEv\in\aEvs\land\labeling(\aEv)=\DW{\aLoc}{}\}}.
+    %[\textstyle\bigvee{}\!\!{}_{\cVal_\aEv=\dVal}\PBR{\aExp{=}\aVal_\aEv}/\Q{\REF{\dVal}}],
+  \end{math}
+
   \input{fig-addr.tex}
 \end{definition}
 The combination of read-read independency (\textsection\ref{sec:read-read}) and address
@@ -1181,192 +1378,6 @@ Building the precondition $\aForm$ from right to left:
 %   \end{gathered}
 % \end{gather*}
 % All the preconditions are now tautologies.
-
-\subsection{If-Closure}
-\label{sec:semca}
-
-In order to model sequential composition, we must allow inconsistent
-predicates in a single pomset, unlike \PwP{}
-\cite{DBLP:journals/pacmpl/JagadeesanJR20}.  For example, if
-$\aCmd=(\PW{x}{1})$, then the semantics \reffig{fig:seq} does \emph{not} allow:
-\begin{gather*}
-  \IF{\aExp}\THEN\PW{x}{1}\FI
-  \SEMI
-  \aCmd
-  \SEMI
-  \IF{\lnot\aExp}\THEN\PW{x}{1}\FI
-  \\
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a}{\DW{x}{1}}{}
-      \event{b}{\DW{x}{1}}{right=of a}
-      \wki{a}{b}
-    \end{tikzinline}}
-\end{gather*}
-However, if
-$\aCmd=(\IF{\lnot\aExp}\THEN\PW{x}{1}\FI\SEMI\IF{\aExp}\THEN\PW{x}{1}\FI)$,
-then it %\refdef{def:pomsets-trans}
-\emph{does} allow the execution.  Looking at the initial program:
-\begin{align*}
-  \begin{gathered}
-    \IF{\aExp}\THEN\PW{x}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a}{\aExp\mid\DW{x}{1}}{}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}
-    \PW{x}{1}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a}{\DW{x}{1}}{}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}
-    \IF{\lnot\aExp}\THEN\PW{x}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-\noindent
-The difficulty is that the middle action can coalesce either with the right
-action, or the left, but not both.  Thus, we are stuck with some
-non-tautological precondition.  Our solution is to allow a pomset to
-contain many events for a single action, as long as the events have
-disjoint preconditions.
-
-\refdef{def:semca} allows the execution, by splitting the middle command:
-\begin{align*}
-  \begin{gathered}
-    \IF{\aExp}\THEN\PW{x}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \eventl{d}{a}{\aExp\mid\DW{x}{1}}{}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}
-    \PW{x}{1}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{d}{a}{\lnot\aExp\mid\DW{x}{1}}{}
-        \eventl{e}{b}{\aExp\mid\DW{x}{1}}{right=of a}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}
-    \IF{\lnot\aExp}\THEN\PW{x}{1}\FI
-    \\
-    \hbox{\begin{tikzinline}[node distance=1em]
-        \eventl{e}{a}{\lnot\aExp\mid\DW{x}{1}}{}
-      \end{tikzinline}}
-  \end{gathered}
-\end{align*}
-Coalescing events gives the desired result.
-
-
-This is not simply a theoretical question; it is observable.  For example,
-the semantics of \reffig{fig:seq} does not allow the following, since it must add order in the
-first thread from the read of $y$ to one of the writes to $x$.
-\begin{gather*}
-  \begin{gathered}
-    \PR{y}{r}\SEMI
-    \IF{r}\THEN\PW{x}{1}\FI \SEMI
-    \PW{x}{1} \SEMI
-    \IF{\lnot r}\THEN\PW{x}{1}\FI\SEMI
-    \PW{z}{r}
-    \\[-.5ex]{}\PAR{}
-    \IF{x}\THEN
-    \PW{x}{0} \SEMI
-    \IF{x}\THEN \PW{y}{1} \FI
-    \FI
-  \end{gathered}    
-  \\[-1ex]
-  \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{a1}{\DW{x}{1}}{}
-      \event{a2}{\DW{x}{1}}{right=of a1}
-      \event{a0}{\DR{y}{1}}{left=of a1}
-      \event{a3}{\DW{z}{1}}{right=of a2}
-      \wki{a1}{a2}
-      \po[out=15,in=165]{a0}{a3}
-      \event{b0}{\DR{x}{1}}{below right=1em and -1em of a0}
-      \event{b1}{\DW{x}{0}}{right=of b0}
-      \event{b2}{\DR{x}{1}}{right=of b1}
-      \event{b3}{\DW{y}{1}}{right=of b2}
-      \wki{b0}{b1}
-      \wki{b1}{b2}
-      \po{b2}{b3}
-      \rf[out=158,in=-22]{b3}{a0}
-      \rf{a1}{b0}
-      \rf{a2}{b2}
-      \wk{b1}{a2}
-    \end{tikzinline}}
-\end{gather*}  
-% \begin{example}
-%   \label{ex:if1}
-%   \refdef{def:pomsets-trans} does \emph{not} allow:
-%   \begin{gather*}
-%     \aCmd=\PBR{
-%     \PW{x}{0}\SEMI
-%     \PW{x}{\BANG\BANG r}\SEMI
-%     \PW{x}{1}
-%   }
-%     \\
-%     \hbox{\begin{tikzinline}[node distance=1em]
-%       \event{a}{\DW{x}{0}}{}
-%       \event{b}{\DW{x}{1}}{right=of a}
-%       \wk{a}{b}
-%     \end{tikzinline}}
-%   \end{gather*}
-%   However, for any $\aExp$, \refdef{def:pomsets-trans} \emph{does} allow:
-%   \begin{gather*}
-%     \IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI
-%     \\
-%     \hbox{\begin{tikzinline}[node distance=1em]
-%       \event{a}{\DW{x}{0}}{}
-%       \event{b}{\DW{x}{1}}{right=of a}
-%       \wk{a}{b}
-%     \end{tikzinline}}
-%   \end{gather*}
-%   If $r=0$, the middle store can merge left; otherwise, it can merge right.
-% \end{example}
-
-% The difficulty is that any pomset can contain at most one event for the
-% middle store.  
-
-\begin{definition}
-  \label{def:partition}
-  Let $\aEvs\subseteq\AllEvents$ and $\aForm:\aEvs\fun\Formulae$ and
-  $\emptyForm\in\Formulae$.  We say that $\aForm$ \emph{partitions}
-  $\emptyForm$ if
-  %\begin{multicols}{2}
-    \begin{enumerate*}
-    % \item $\aForm_\aEv$ is satisfiable,
-    \item if $\aForm_\aEv\land\aForm_\bEv$ is satisfiable then $\aEv=\bEv$,
-    % \item $\aForm_\aEv\rimplies\emptyForm$,
-    % \item $\lnot\emptyForm\lor\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ is a tautology.
-    \item $\emptyForm\riff\bigvee{}\!\!{}_{\aEv\in\aEvs}\aForm_\aEv$.
-    \end{enumerate*}
-  %\end{multicols}
-  %Let $\semca{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$ and $\sLOAD{}{}$:
-  
-  \label{def:semca}
-  \input{fig-ca.tex}
-\end{definition}
-The definition allows multiple events to represent a single action, each with
-a disjoint precondition.  The predicate transformers are derived from those
-defined for the conditional.
-
-This modification validates
-%\reflem{lem:if}\ref{lem:if:seq}--\ref{lem:if:elim} as equations.
-\reflem{lem:if}\ref{lem:if:seq}, \ref{lem:seq:if}, and \ref{lem:if:elim} as equations.
-
-We show how to combine address calculation and if-closure in
-\textsection\ref{sec:semcaaddr}.
-
 
 \subsection{Combining Address Calculation and If-Closure}
 \label{sec:semcaaddr}

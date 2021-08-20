@@ -10,6 +10,14 @@
   \medskip
 
   \noindent
+  Within a pomset $\aPS$, let 
+  \begin{math}
+    \kappaE{}=
+    {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\labelingForm(\aEv)}.
+  \end{math}
+  \medskip
+
+  \noindent
   If $\aPS\in\sSKIP$ then $\aEvs = \emptyset$
   and $\aTr{\bEvs}{\bForm} \riff \bForm$
   and $\aTerm\riff\TRUE$.
@@ -175,10 +183,10 @@
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff 
         \bForm
-        [\aExp/\aLoc][\PBR{\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\aExp{=}\aVal}/\Q{\aLoc}],
+        [\aExp/\aLoc][\kappaE{}/\Q{\aLoc}],
       \end{math}
     \item \label{write-term}
-        $\aTerm \riff {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\aExp{=}\aVal}$,
+        $\aTerm \riff \kappaE{}$,
     %   \stepcounter{enumi}      
     % \item[] \labeltext[\textsc{w}4]{}{write-tau}
     %   \begin{enumerate}[leftmargin=0pt]
@@ -233,7 +241,7 @@
         %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
-          (\Q{\aLoc}\limplies\aVal{=}\aReg)
+          (\labelingForm(\aEv)\limplies\aVal{=}\aReg)
           \limplies \bForm,
         \end{math}}
       \item \label{read-tau-ind}
@@ -242,7 +250,13 @@
         %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
         \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
-          \PBR{\Q{\aLoc}\limplies\aVal{=}\aReg \lor \aLoc{=}\aReg}
+          \PBR{
+            \labelingForm(\aEv)
+            \limplies
+            \PBR{
+              \aVal{=}\aReg \lor \aLoc{=}\aReg
+            }
+          }
           \limplies \bForm,
         \end{math}}
         \columnbreak

@@ -1,21 +1,22 @@
 \noindent
 If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
 $(\exists\aVal:\aEvs\fun\Val)$
-$(\exists\aForm:\aEvs\fun\Formulae)$
-$(\exists\emptyForm\in\Formulae)$
+%$(\exists\aForm:\aEvs\fun\Formulae)$
+%$(\exists\emptyForm\in\Formulae)$
 % $(\exists\emptyForm\in\Formulae)$
 \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
-  \item \label{write-E-ca}
-    $\aForm$ partitions $\emptyForm$,
+  % \item \label{write-E-ca}
+  %   $\aForm$ partitions $\emptyForm$,
     % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+    \stepcounter{enumi}
   \item \label{write-lambda-ca}
     $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
   \item \label{write-kappa-ca}
     \begin{math}
-      \labelingForm(\aEv) \riff
-      \aForm_\aEv
-      \land
+      \labelingForm(\aEv) \rimplies
+      % \aForm_\aEv
+      % \land
       \aExp{=}\aVal_\aEv
     \end{math},
     
@@ -24,7 +25,7 @@ $(\exists\emptyForm\in\Formulae)$
     \begin{math}
       \aTr{\bEvs}{\bForm} \riff
       \bForm
-      [\aExp/\aLoc][{\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs} \PBR{\aForm_\aEv \land \aExp{=}\aVal_\aEv}}/\Q{\aLoc}],
+      [\aExp/\aLoc][{\kappaE{}}/\Q{\aLoc}], %\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs} \PBR{\aForm_\aEv \land \aExp{=}\aVal_\aEv}
     \end{math}
     % \begin{math}
     %   \begin{aligned}[t]
@@ -80,7 +81,7 @@ $(\exists\emptyForm\in\Formulae)$
     %   }
     %   \end{math}.
   \item \label{write-term-ca}
-    $\aTerm \riff {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\aForm_\aEv \land \aExp{=}\aVal_\aEv}}$,
+    $\aTerm \riff \kappaE{}$, %{\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\aForm_\aEv \land \aExp{=}\aVal_\aEv}}$,
     % \begin{math}
     %   \aTerm \riff
     %   \emptyForm
@@ -104,21 +105,20 @@ $(\exists\emptyForm\in\Formulae)$
 \begin{minipage}{1.0\linewidth}
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
-  $(\exists\aForm:\aEvs\fun\Formulae)$ 
-  $(\exists\emptyForm\in\Formulae)$
-  % $(\exists\emptyForm\in\Formulae)$
+  %$(\exists\emptyForm\in\Formulae)$
+  %$(\exists\labelingForm\in\Formulae)$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-    \item \label{read-E-ca}
-      $\aForm$ partitions $\emptyForm$,
+    % \item \label{read-E-ca}
+    %   $\labelingForm$ partitions $\emptyForm$,
       % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+      \stepcounter{enumi}
     \item \label{read-lambda-ca}
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
     \item \label{read-kappa-ca}
       \begin{math}
-        \labelingForm(\aEv) \riff      
-        \aForm_\aEv
-        \land\Q{\aLoc}
+        \labelingForm(\aEv) \rimplies
+        \Q{\aLoc}
       \end{math},
     \item \label{read-tau-ca}
       \begin{math}
@@ -126,7 +126,7 @@ $(\exists\emptyForm\in\Formulae)$
           \aTr{\bEvs}{\bForm} \riff
           &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
           \PBR{
-            \aForm_\aEv \land\Q{\aLoc}
+            \labelingForm(\aEv)
             \limplies \aVal_\aEv{=}\uReg{\aEv}
           }
           \limplies
@@ -135,16 +135,16 @@ $(\exists\emptyForm\in\Formulae)$
           \land
           &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
           \PBR{
-            \aForm_\aEv \land\Q{\aLoc}
+            \labelingForm(\aEv)
             \limplies
-            {\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+            \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
           }
           \limplies
           \bForm[\uReg{\aEv}/\aReg]
           \\[-.5ex]
           \land
           &
-          \lnot\emptyForm
+          \lnot\kappaE{} 
           % \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
           \limplies 
           (\forall\bReg)\;
@@ -199,7 +199,7 @@ $(\exists\emptyForm\in\Formulae)$
         if $\amode\gemode\mACQ$ then
         \begin{math}
           \aTerm \riff
-          \emptyForm.
+          \kappaE{}. %\emptyForm.
           % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
         \end{math}
       \end{enumerate}      
@@ -232,19 +232,151 @@ $(\exists\emptyForm\in\Formulae)$
     %   \end{enumerate}
   \end{multicols}
 \end{minipage}
-% \medskip
-% Could make \textsc{d}4b:
-% \begin{math}
-%   (\forall\aEv\in\aEvs\setminus\bEvs)
-% \end{math}
-% \begin{math}
-%   \aTr{\bEvs}{\bForm} \riff
-%   \aForm_\aEv 
-%   \limplies
-%   \PBR{\aVal_\aEv{=}\uReg{\aEv} \land \aLoc{=}\uReg{\aEv}}
-%   \limplies
-%   \bForm[\uReg{\aEv}/\aReg][\uReg{\aEv}/\aLoc]
-% \end{math},
-% \medskip Similarly, let $\frf{\semca{}}$ be defined as for $\frf{\semrr{}}$
-% in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
-% $\sLOAD{}{}$.
+
+% \begin{minipage}{1.0\linewidth}
+%   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
+%   $(\exists\aVal:\aEvs\fun\Val)$
+%   $(\exists\aForm:\aEvs\fun\Formulae)$ 
+%   $(\exists\emptyForm\in\Formulae)$
+%   % $(\exists\emptyForm\in\Formulae)$
+%   \begin{multicols}{2}
+%     \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+%     \item \label{read-E-ca}
+%       $\aForm$ partitions $\emptyForm$,
+%       % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+%     \item \label{read-lambda-ca}
+%       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
+%     \item \label{read-kappa-ca}
+%       \begin{math}
+%         \labelingForm(\aEv) \riff      
+%         \aForm_\aEv
+%         \land\Q{\aLoc}
+%       \end{math},
+%     \item \label{read-tau-ca}
+%       \begin{math}
+%         \begin{aligned}[t]
+%           \aTr{\bEvs}{\bForm} \riff
+%           &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
+%           \PBR{
+%             \aForm_\aEv \land\Q{\aLoc}
+%             \limplies \aVal_\aEv{=}\uReg{\aEv}
+%           }
+%           \limplies
+%           \bForm[\uReg{\aEv}/\aReg]
+%           \\[-.5ex]
+%           \land
+%           &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
+%           \PBR{
+%             \aForm_\aEv \land\Q{\aLoc}
+%             \limplies
+%             {\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+%           }
+%           \limplies
+%           \bForm[\uReg{\aEv}/\aReg]
+%           \\[-.5ex]
+%           \land
+%           &
+%           \lnot\emptyForm
+%           % \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+%           \limplies 
+%           (\forall\bReg)\;
+%           \bForm[\bReg/\aReg]
+%         \end{aligned}
+%       \end{math}
+%       \columnbreak
+%       % \item[] \labeltext[\textsc{r}4]{}{read-tau-ca}
+%       %   \begin{enumerate}[leftmargin=0pt]
+%       %   \item \label{read-tau-dependent-ca}
+%       %     \begin{math}
+%       %       (\forall\aEv\in\aEvs\cap\bEvs)
+%       %     \end{math}
+%       %     \begin{math}
+%       %       \aTr{\bEvs}{\bForm} \riff
+%       %       \aForm_\aEv
+%       %       \limplies \aVal_\aEv{=}\uReg{\aEv}
+%       %       \limplies \bForm[\uReg{\aEv}/\aReg]
+%       %     \end{math},
+      
+%       %   \item \label{read-tau-independent-ca}
+%       %     \begin{math}
+%       %       (\forall\aEv\in\aEvs\setminus\bEvs)
+%       %     \end{math}
+%       %     \begin{math}
+%       %       \aTr{\bEvs}{\bForm} \riff
+%       %       \aForm_\aEv 
+%       %       \limplies
+%       %       \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+%       %       \limplies
+%       %       \bForm[\uReg{\aEv}/\aReg]
+%       %     \end{math},
+      
+%       %   \item \label{read-tau-empty-ca}
+%       %     \begin{math}
+%       %       (\forall\bReg)
+%       %     \end{math}
+%       %     \begin{math}
+%       %       \aTr{\bEvs}{\bForm} \riff 
+%       %       %       (\!\not\exists\aEv\in\aEvs \suchthat \aForm_\aEv)
+%       %       (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+%       %       \limplies 
+%       %       \bForm[\bReg/\aReg],
+%       %     \end{math}  
+%       %   \end{enumerate}  
+%       \stepcounter{enumi}
+%     \item[] \labeltext[\textsc{r}5]{}{read-term-ca}
+%       \begin{enumerate}[leftmargin=0pt]
+%       \item \label{read-term-nonempty-ca}
+%         if $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+%       \item \label{read-term-empty-ca}
+%         if $\amode\gemode\mACQ$ then
+%         \begin{math}
+%           \aTerm \riff
+%           \emptyForm.
+%           % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
+%         \end{math}
+%       \end{enumerate}      
+%       % \item \label{read-term-ca}
+%       %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+%     \end{enumerate}
+%     % \begin{multicols}{2}
+%     %   \noindent
+%     %   And either
+%     %   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+%     %     \setcounter{enumi}{1}
+%     %   \item \label{read-lambda-x}
+%     %     $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
+%     %   \item \label{read-kappa-x}
+%     %     \begin{math}
+%     %       \labelingForm(\aEv) \riff
+%     %       \aForm_\aEv
+%     %     \end{math},
+%     %   \end{enumerate}
+%     %   or $\amode\neq\mRLX$ and
+%     %   \begin{enumerate}[topsep=0pt,label=(\textsc{d}\arabic*),ref=\textsc{d}\arabic*]
+%     %     \setcounter{enumi}{1}
+%     %   \item \label{read-lambda-x}
+%     %     $\labelingAct(\aEv) = \DR[\mRLX]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
+%     %   \item \label{read-kappa-x}
+%     %     \begin{math}
+%     %       \labelingForm(\aEv) \riff
+%     %       \aForm_\aEv\land \aLoc{=}\aVal_\aEv
+%     %     \end{math},
+%     %   \end{enumerate}
+%   \end{multicols}
+% \end{minipage}
+% % \medskip
+% % Could make \textsc{d}4b:
+% % \begin{math}
+% %   (\forall\aEv\in\aEvs\setminus\bEvs)
+% % \end{math}
+% % \begin{math}
+% %   \aTr{\bEvs}{\bForm} \riff
+% %   \aForm_\aEv 
+% %   \limplies
+% %   \PBR{\aVal_\aEv{=}\uReg{\aEv} \land \aLoc{=}\uReg{\aEv}}
+% %   \limplies
+% %   \bForm[\uReg{\aEv}/\aReg][\uReg{\aEv}/\aLoc]
+% % \end{math},
+% % \medskip Similarly, let $\frf{\semca{}}$ be defined as for $\frf{\semrr{}}$
+% % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and
+% % $\sLOAD{}{}$.

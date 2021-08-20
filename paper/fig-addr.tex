@@ -47,18 +47,16 @@ $(\exists\aVal\in\Val)$
     %   \end{enumerate}
     %   \columnbreak
   \item \label{write-tau-addr}
-    % \makebox[0pt][l]{%
+    \makebox[0pt][l]{%
     \begin{math}
       \aTr{\bEvs}{\bForm} \riff 
       \textstyle\bigwedge_{\dVal\in\Val}
       \cExp{=}\dVal
       \;\limplies
-    \end{math}
-    \\\makebox[\linewidth][r]{
-      \begin{math}
         \bForm
         [\aExp/\REF{\dVal}]
-        [\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\aExp{=}\aVal}/\Q{\REF{\dVal}}],
+        [\kappaE{\REF{\dVal}}/\Q{\REF{\dVal}}],
+        %[\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\aExp{=}\aVal}/\Q{\REF{\dVal}}],
         % [\TRUE/\A{\cVal}]
         % [(\cExp{\neq}\Aother\land\A{\Aother})/\A{\Aother{\neq}\cVal}]
       \end{math}}
@@ -106,9 +104,7 @@ $(\exists\aVal\in\Val)$
       \makebox[0pt][l]{\begin{math}
           \aTr{\bEvs}{\bForm} \riff
           \PBR{
-            \cExp{=}\cVal
-            \land 
-            \Q{\REF{\cVal}}
+            \labelingForm(\aEv) 
             \limplies
             \aVal{=}\uReg{\aEv}
           }
@@ -130,11 +126,9 @@ $(\exists\aVal\in\Val)$
           % (\cExp{=}\cVal\limplies\REF{\cVal}\EQ\uReg{\aEv})
           % }
           \PBR{
-            \cExp{=}\cVal
-            \land 
-            \Q{\REF{\cVal}}
+            \labelingForm(\aEv) 
             \limplies
-            \aVal{=}\uReg{\aEv} \lor \REF{\cVal}\EQ\uReg{\aEv}
+            \PBR{\aVal{=}\uReg{\aEv} \lor \REF{\cVal}\EQ\uReg{\aEv}}
           }
           \limplies
           \bForm[\uReg{\aEv}/\aReg]

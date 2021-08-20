@@ -4,35 +4,35 @@
 If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
 $(\exists\cVal:\aEvs\fun\Val)$
 $(\exists\aVal:\aEvs\fun\Val)$
-$(\exists\aForm:\aEvs\fun\Formulae)$
-$(\exists\emptyForm\in\Formulae)$
+% $(\exists\aForm:\aEvs\fun\Formulae)$
+% $(\exists\emptyForm\in\Formulae)$
 % $(\exists\emptyForm\in\Formulae)$
 \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
-  \item \label{write-E-ca-addr}
-    $\aForm$ partitions $\emptyForm$,
+  % \item \label{write-E-ca-addr}
+  %   $\aForm$ partitions $\emptyForm$,
     % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+    \stepcounter{enumi}
   \item \label{write-lambda-ca-addr}
     $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$,
   \item \label{write-kappa-ca-addr}
     \begin{math}
-      \labelingForm(\aEv) \riff
-      \aForm_\aEv
-      \land \cExp{=}\cVal_\aEv
+      \labelingForm(\aEv) \rimplies
+      % \aForm_\aEv \land
+      \cExp{=}\cVal_\aEv
       \land \aExp{=}\aVal_\aEv
     \end{math},      
   \item
+    \makebox[0pt][l]{%
     \begin{math}
       \aTr{\bEvs}{\bForm} \riff
       \textstyle\bigwedge_{\dVal\in\Val}
       \cExp{=}\dVal
       \;\limplies
-    \end{math}
-    \\\makebox[\linewidth][r]{
-      \begin{math}
         \bForm
         [\aExp/{\dVal}]
-        [\textstyle\bigvee{}\!\!{}_{\cVal_\aEv=\dVal}\PBR{\aExp{=}\aVal_\aEv}/\Q{\REF{\dVal}}],
+        %[\textstyle\bigvee{}\!\!{}_{\cVal_\aEv=\dVal}\PBR{\aExp{=}\aVal_\aEv}/\Q{\REF{\dVal}}],
+        [\kappaE{\REF{\dVal}}/\Q{\REF{\dVal}}],
       \end{math}}
     % \item
     %   \makebox[0pt][l]{%
@@ -100,10 +100,11 @@ $(\exists\emptyForm\in\Formulae)$
   \item \label {write-term-ca-addr}
     \begin{math}
       \aTerm \riff
-      \emptyForm
-      % \PBR{\bigvee_{\aEv\in\aEvs}\aForm_\aEv}
-      \land
-      \bigwedge_{\aEv\in\aEvs}\PBR{\aForm_\aEv \limplies \cExp{=}\cVal_\aEv \land\aExp{=}\aVal_\aEv}.
+      % \emptyForm
+      % % \PBR{\bigvee_{\aEv\in\aEvs}\aForm_\aEv}
+      % \land
+      \kappaE{}.
+      %\bigwedge_{\aEv\in\aEvs}\PBR{\aForm_\aEv \limplies \cExp{=}\cVal_\aEv \land\aExp{=}\aVal_\aEv}.
     \end{math}
     % \stepcounter{enumi}
     % \item[] \labeltext[\textsc{w}5]{}{write-term-ca-addr}
@@ -126,14 +127,15 @@ $(\exists\emptyForm\in\Formulae)$
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\cExp}[\aThrd]$ then
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
-  $(\exists\aForm:\aEvs\fun\Formulae)$ 
-  $(\exists\emptyForm\in\Formulae)$
+  % $(\exists\aForm:\aEvs\fun\Formulae)$ 
+  % $(\exists\emptyForm\in\Formulae)$
   % $(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-    \item \label{read-E-ca-addr}
-      $\aForm$ partitions $\emptyForm$,
-      % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+    % \item \label{read-E-ca-addr}
+    %   $\aForm$ partitions $\emptyForm$,
+    %   % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+    \stepcounter{enumi}
     \item \label{read-lambda-ca-addr}
       $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$
     \item \label{read-kappa-ca-addr}
@@ -150,9 +152,7 @@ $(\exists\emptyForm\in\Formulae)$
           &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
           {
             \PBR{
-              \aForm_\aEv
-              \land \cExp{=}\cVal_\aEv
-              \land \Q{\REF{\cVal}}
+              \labelingForm(\aEv)
               \limplies
               \aVal_\aEv{=}\uReg{\aEv}
             }
@@ -163,13 +163,13 @@ $(\exists\emptyForm\in\Formulae)$
           &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
           {
             \PBR{
-              \aForm_\aEv
-              \land \cExp{=}\cVal_\aEv
-              \land \Q{\REF{\cVal}}
+              \labelingForm(\aEv)
               \limplies
-              \aVal_\aEv{=}\uReg{\aEv}
-              \lor
-              \REF{\cVal}\EQ\uReg{\aEv}
+              \PBR{
+                \aVal_\aEv{=}\uReg{\aEv}
+                \lor
+                \REF{\cVal}\EQ\uReg{\aEv}
+              }
             }
             \limplies
             \bForm[\uReg{\aEv}/\aReg]
@@ -177,7 +177,7 @@ $(\exists\emptyForm\in\Formulae)$
           \\[-.5ex]
           \land
           &
-          \lnot\emptyForm
+          \lnot\kappaE{} % \emptyForm
           % \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
           \limplies 
           (\forall\bReg)\;
@@ -230,7 +230,7 @@ $(\exists\emptyForm\in\Formulae)$
         if $\amode\gemode\mACQ$ then
         \begin{math}
           \aTerm \riff
-          \emptyForm.
+          \kappaE{}. %\emptyForm.
           % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
         \end{math}
       \end{enumerate}      
