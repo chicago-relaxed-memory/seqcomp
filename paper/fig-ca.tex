@@ -6,10 +6,11 @@ $(\exists\aVal:\aEvs\fun\Val)$
 % $(\exists\emptyForm\in\Formulae)$
 \begin{multicols}{2}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
-  % \item \label{write-E-ca}
-  %   $\aForm$ partitions $\emptyForm$,
+  \item \label{write-E-ca}
+    % $\aForm$ partitions $\emptyForm$,
     % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-    \stepcounter{enumi}
+    if $\labelingForm(\bEv)\land \labelingForm(\aEv)$ is satisfiable then $\bEv=\aEv$,
+    %\stepcounter{enumi}
   \item \label{write-lambda-ca}
     $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
   \item \label{write-kappa-ca}
@@ -109,10 +110,11 @@ $(\exists\aVal:\aEvs\fun\Val)$
   %$(\exists\labelingForm\in\Formulae)$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-    % \item \label{read-E-ca}
-    %   $\labelingForm$ partitions $\emptyForm$,
+    \item \label{read-E-ca}
+      % $\labelingForm$ partitions $\emptyForm$,
       % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-      \stepcounter{enumi}
+      if $\labelingForm(\bEv)\land \labelingForm(\aEv)$ is satisfiable then $\bEv=\aEv$,
+      % \stepcounter{enumi}
     \item \label{read-lambda-ca}
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
     \item \label{read-kappa-ca}

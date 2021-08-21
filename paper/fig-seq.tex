@@ -15,6 +15,7 @@
     \kappaE{}=
     {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\labelingForm(\aEv)}.
   \end{math}
+  \todo{Remind that $\textstyle\bigvee\emptyset = \FALSE$}
   \medskip
 
   \noindent
@@ -239,11 +240,14 @@
         if $\aEv\in\aEvs\cap\bEvs$ then
         %if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
         %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
-        \makebox[0pt][l]{\begin{math}
-          \aTr{\bEvs}{\bForm} \riff
-          (\labelingForm(\aEv)\limplies\aVal{=}\aReg)
-          \limplies \bForm,
-        \end{math}}
+        \makebox[0pt][l]{%
+          \begin{math}
+            \aTr{\bEvs}{\bForm} \riff
+            (\labelingForm(\aEv)\limplies\aVal{=}\aReg)
+            \limplies \bForm,
+          \end{math}
+          \todo{Degenerates to \ref{read-tau-empty} when $\labelingForm(\aEv)=\FALSE$.}
+        }
       \item \label{read-tau-ind}
         if $\aEv\in\aEvs\setminus\bEvs$ then
         %if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
@@ -272,9 +276,16 @@
     \item[] \labeltext[\textsc{r}5]{}{read-term}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{read-term-nonempty}
-        if $\aEvs\neq\emptyset$ or $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+        % if $\aEvs\neq\emptyset$ or $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+        if $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
       \item \label{read-term-empty}
-        if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 
+        % if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$.
+        if $\amode\gemode\mACQ$ then
+        \begin{math}
+          \aTerm \riff
+          \kappaE{}. %\emptyForm.
+          % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
+        \end{math}
       \end{enumerate}      
     % \item \label{read-term}
     %   if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 

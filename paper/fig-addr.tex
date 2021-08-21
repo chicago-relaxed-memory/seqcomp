@@ -61,7 +61,8 @@ $(\exists\aVal\in\Val)$
         % [(\cExp{\neq}\Aother\land\A{\Aother})/\A{\Aother{\neq}\cVal}]
       \end{math}}
   \item \label{write-term-addr}
-    $\aTerm \riff {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\cExp{=}\cVal \land \aExp{=}\aVal}}$.
+    % $\aTerm \riff {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\cExp{=}\cVal \land \aExp{=}\aVal}}$.
+    $\aTerm \riff \kappaE{}$.
     % \stepcounter{enumi}
     % \item[] \labeltext[\textsc{w}5]{}{write-term-addr}
     %   \begin{enumerate}[leftmargin=0pt]
@@ -146,9 +147,16 @@ $(\exists\aVal\in\Val)$
   \item[] \labeltext[\textsc{r}5]{}{read-term-addr}
     \begin{enumerate}[leftmargin=0pt]
     \item \label{read-term-nonempty-addr}
-      if $\aEvs\neq\emptyset$ or $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+      %if $\aEvs\neq\emptyset$ or $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
+      if $\amode\lemode\mRLX$ then $\aTerm \riff \TRUE$,
     \item \label{read-term-empty-addr}
-      if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \FALSE$. 
+      %if $\aEvs=\emptyset$ and $\amode\gemode\mACQ$ then $\aTerm \riff \kappaE{}$. 
+        if $\amode\gemode\mACQ$ then
+        \begin{math}
+          \aTerm \riff
+          \kappaE{}. %\emptyForm.
+          % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
+        \end{math}
     \end{enumerate}      
     % \item \label{read-term-addr}
     %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 

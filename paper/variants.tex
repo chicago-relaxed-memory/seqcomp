@@ -110,7 +110,7 @@ the events are destined to coalesce.
       %if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff
-        \aVal{=}\uReg{\aEv}
+        (\labelingForm(\aEv)\limplies\aVal{=}\uReg{\aEv})
         \limplies \bForm[\uReg{\aEv}/\aReg]
       \end{math},    
     \item \label{read-tau-ind-reg}
@@ -118,7 +118,7 @@ the events are destined to coalesce.
       %if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
       \begin{math}
         \aTr{\bEvs}{\bForm} \riff
-        \PBR{\aVal{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}} \limplies
+        (\labelingForm(\aEv)\limplies\PBR{\aVal{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}) \limplies
         \bForm[\uReg{\aEv}/\aReg],
       \end{math}
     \item \label{read-tau-empty-reg}
