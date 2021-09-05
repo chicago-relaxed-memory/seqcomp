@@ -106,20 +106,23 @@ $(\exists\aVal:\aEvs\fun\Val)$
 \begin{minipage}{1.0\linewidth}
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]$ then
   $(\exists\aVal:\aEvs\fun\Val)$
+  $(\exists\aForm:\aEvs\fun\Formulae)$
   %$(\exists\emptyForm\in\Formulae)$
   %$(\exists\labelingForm\in\Formulae)$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
     \item \label{read-E-ca}
       % $\labelingForm$ partitions $\emptyForm$,
-      % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
-      if $\labelingForm(\bEv)\land \labelingForm(\aEv)$ is satisfiable then $\bEv=\aEv$,
+      if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
+      %if $\labelingForm(\bEv)\land \labelingForm(\aEv)$ is satisfiable then $\bEv=\aEv$,
       % \stepcounter{enumi}
     \item \label{read-lambda-ca}
       $\labelingAct(\aEv) = \DR[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$
     \item \label{read-kappa-ca}
       \begin{math}
-        \labelingForm(\aEv) \rimplies
+        \labelingForm(\aEv) \riff
+        \aForm_\aEv
+        \land
         \Q{\aLoc}
       \end{math},
     \item \label{read-tau-ca}
@@ -127,27 +130,35 @@ $(\exists\aVal:\aEvs\fun\Val)$
         \begin{aligned}[t]
           \aTr{\bEvs}{\bForm} \riff
           &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
+          \aForm_\aEv\land
           \PBR{
-            \labelingForm(\aEv)
-            \limplies \aVal_\aEv{=}\uReg{\aEv}
+            \PBR{
+              \Q{\aLoc}
+              %\labelingForm(\aEv)
+              \limplies \aVal_\aEv{=}\uReg{\aEv}
+            }
+            \limplies
+            \bForm[\uReg{\aEv}/\aReg]
           }
-          \limplies
-          \bForm[\uReg{\aEv}/\aReg]
           \\[-.5ex]
           \land
           &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
+          \aForm_\aEv\land
           \PBR{
-            \labelingForm(\aEv)
+            \PBR{
+              \Q{\aLoc}
+              %\labelingForm(\aEv)
+              \limplies
+              \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+            }
             \limplies
-            \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+            \bForm[\uReg{\aEv}/\aReg]
           }
-          \limplies
-          \bForm[\uReg{\aEv}/\aReg]
           \\[-.5ex]
           \land
           &
-          \lnot\kappaE{} 
-          % \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+          % \lnot\kappaE{} 
+          \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
           \limplies 
           (\forall\bReg)\;
           \bForm[\bReg/\aReg]

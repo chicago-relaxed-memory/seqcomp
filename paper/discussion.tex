@@ -1,3 +1,26 @@
+\begin{comment}
+Dead Store Elimination (Still) Considered Harmful
+
+DSE "removes stores that have no effect on the program result, either
+because the stored value is overwritten or because it is never read again."
+
+The example they give is of the second type: "because it is never read
+again".  To validate this, we would need a more complex model of memory
+using provenance for pointers...
+
+Section 3.3.3 (Volatile Function Pointer) has a lovely example of
+if-introduction: Compilers are not allowed to get rid of calls through
+virtual functions, but they can use if-introduction and then get rid of the
+static call that they introduce on one side of the if/else...
+
+Possibly interesting references:
+
+[28] N. Benton. Simple relational correctness proofs for static analyses and program transformations. In ACM SIGPLAN Notices, volume 39, pages 14–25, 2004.
+[29] C. Deng and K. S. Namjoshi. Securing a compiler transformation. In Proceedings of the 23rd Static Analysis Symposium, SAS ’16, pages 170– 188, 2016.
+[30] V. D’Silva, M. Payer, and D. Song. The correctness-security gap in compiler optimization. In Security and Privacy Workshops, SPW ’15, pages 73–87, 2015.
+[31] X. Leroy. Formal certification of a compiler backend or: programming a compiler with a proof assistant. In ACM SIGPLAN Notices, volume 41, pages 42–54, 2006.
+\end{comment}
+
 % \subsection{Post-Hoc Verification of Fulfillment for \PwTmcaTITLE{2}}
 % \label{sec:post-hoc}
 
