@@ -130,8 +130,8 @@ $(\exists\aVal:\aEvs\fun\Val)$
         \begin{aligned}[t]
           \aTr{\bEvs}{\bForm} \riff
           &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
-          \aForm_\aEv\land
-          \PBR{
+          \aForm_\aEv\limplies
+          {
             \PBR{
               \Q{\aLoc}
               %\labelingForm(\aEv)
@@ -143,8 +143,8 @@ $(\exists\aVal:\aEvs\fun\Val)$
           \\[-.5ex]
           \land
           &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
-          \aForm_\aEv\land
-          \PBR{
+          \aForm_\aEv\limplies
+          {
             \PBR{
               \Q{\aLoc}
               %\labelingForm(\aEv)
@@ -160,6 +160,46 @@ $(\exists\aVal:\aEvs\fun\Val)$
           % \lnot\kappaE{} 
           \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
           \limplies 
+          (\forall\bReg)\;
+          \bForm[\bReg/\aReg]
+        \end{aligned}
+      \end{math}
+      \\
+      \begin{math}
+        \begin{aligned}[t]
+          \aTr{\bEvs}{\bForm} \riff
+          &\textstyle\bigvee_{\aEv\in\aEvs\cap\bEvs}
+          \aForm_\aEv\land
+          \PBR{
+            \PBR{
+              \Q{\aLoc}
+              %\labelingForm(\aEv)
+              \limplies \aVal_\aEv{=}\uReg{\aEv}
+            }
+            \limplies
+            \bForm[\uReg{\aEv}/\aReg]
+          }
+          \\[-.5ex]
+          \lor
+          &\textstyle\bigvee_{\aEv\in\aEvs\setminus\bEvs}
+          \aForm_\aEv\land
+          \PBR{
+            \PBR{
+              \Q{\aLoc}
+              %\labelingForm(\aEv)
+              \limplies
+              \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+            }
+            \limplies
+            \bForm[\uReg{\aEv}/\aReg]
+          }
+          \\[-.5ex]
+          \lor
+          &
+          % \lnot\kappaE{} 
+          \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+          %\textstyle \lnot(\bigvee_{\aEv\in\aEvs}\aForm_\aEv)
+          \land 
           (\forall\bReg)\;
           \bForm[\bReg/\aReg]
         \end{aligned}
