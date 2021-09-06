@@ -42,7 +42,7 @@ available for referees at https://fpl.cs.depaul.edu/jriely/PwT.zip
 
 We agree that a new memory model needs to be positioned against existing
 models.  The usual result here is a compilation correctness to hardware
-memory models.  For PwR-MCA, we address this by showing compilation result
+memory models.  For PwT-MCA, we address this by showing compilation result
 for Armv8 model (§5).  (This could be easily extended to the x86-TSO model
 since x86-TSO has a stronger model than Armv8.)  Developing a non-MCA version
 of this semantics which could cover compilation to PTX and IBM Power is our
