@@ -22,3 +22,19 @@ Direct comparing of behaviors allowed by other memory models for programming lan
 is not as interesting since all of them are incomparable, i.e., there are examples which are allowed by one/disallowed by another
 and vice versa.
 TODO: say something good about properties of our model comparing to these models.
+
+
+# Reviewer B. Promising-ARM/RISC-V [Pulte et al. 2019] is evaluated on a concurrent queue implemented in 215 lines of C++ code. Does PwT-C11 work at this scale?
+Promising-ARM/RISC-V is a hardware memory model, that is, it is supposed to allow less behaviors comparing to programming language-level models like PwT-C11.
+TODO: more on testing in our model.
+
+# Reviewer B. Syntactic vs. semantic dependencies and their usage in compilers
+Yes, tracking semantic dependencies is intrinsically harder than syntactic ones, and hardware memory models stick with syntax.
+However, we cannot settle with syntactic dependencies for models of programming languages since common compiler optimizations
+used in almost all real compilers (including GCC and Clang) may remove syntactic dependencies (unlike semantic ones).
+That is, a programming language memory model which supports compiler optimizations and disallows OOTA (unlike the C/C++ memory model)
+has to track semantic dependencies in one way or another. All other proposed solutions to this problem do that
+(Promising [Kang-al:POPL17], Weakestmo [Chakraborty-Vafeiadis:POPL19], MRD [Paviotti-al:ESOP20], PwP [Jagadeesan-al:OOPSLA20]).
+The point of the submission is to make the idea of tracking dependencies with logic, proposed by Jagadeesan et. al [2020],
+to be compositional on the SEQ operator.
+TODO: more here
