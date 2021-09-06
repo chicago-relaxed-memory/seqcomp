@@ -43,4 +43,9 @@ has to track semantic dependencies in one way or another. All other proposed sol
 (Promising [Kang-al:POPL17], Weakestmo [Chakraborty-Vafeiadis:POPL19], MRD [Paviotti-al:ESOP20], PwP [Jagadeesan-al:OOPSLA20]).
 The point of the submission is to make the idea of tracking dependencies with logic, proposed by Jagadeesan et. al [2020],
 to be compositional on the SEQ operator.
+
+Also, a compiler does not have to use the proposed semantics directly, i.e., for calculating dependencies.
+Instead, the semantics has to be a wrapper over a reasonable set of compiler optimizations. That is, the optimizations
+could make more conservative assumptions about dependencies than the semantics. This is what we are trying to achieve.
+
 TODO: more here
