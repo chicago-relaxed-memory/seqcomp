@@ -14,6 +14,7 @@ We agree that the model is complicated and requires formal results to be sure in
 that is why we have been working on its mechanization.
 Currently, we have mechanized in Coq Lemma 4.5 from the paper
 (associativity of sequential composition and SKIP being left and right ids for sequential composition).
+Associativity supports the automatic evaluation tool -- PwTer chooses one order for evaluation and yet is complete by associativity.
 
 We also agree that a new memory model needs to be positioned against existing models.
 The usual result here is a compilation correctness to hardware memory models.
@@ -43,6 +44,7 @@ has to track semantic dependencies in one way or another. All other proposed sol
 (Promising [Kang-al:POPL17], Weakestmo [Chakraborty-Vafeiadis:POPL19], MRD [Paviotti-al:ESOP20], PwP [Jagadeesan-al:OOPSLA20]).
 The point of the submission is to make the idea of tracking dependencies with logic, proposed by Jagadeesan et. al [2020],
 to be compositional on the SEQ operator.
+[MB -- the last sentence casts the motivation of the paper in a minimising way.]
 
 Also, a compiler does not have to use the proposed semantics directly, i.e., for calculating dependencies.
 Instead, the semantics has to be a wrapper over a reasonable set of compiler optimizations. That is, the optimizations
