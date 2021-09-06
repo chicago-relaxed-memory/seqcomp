@@ -2,6 +2,12 @@ We are thankful to reviewers for their work.
 
 # Reviewer A. Why is it challenging to give a denotational semantics to sequential composition?
 TODO
+[MB -- This question is mapping to the questions of motivation from Reviewers A and C. We should reiterate the broader motivation here:
+1. thin air is a problem with the semantics of all optimised concurrent languages
+2. there are only a handful of solutions out there and many of those are flawed
+3. a solution framed as an SDEP relation is the only approach compatible with the existing C++ concurrency definition
+4. sequential composition is necessary (but not sufficient) for scalable reasoning about big chunks of code, and no one else has that.
+]
 
 # Reviewers A and C. Correctness of the model, mechanization, relation to other models
 We agree that the model is complicated and requires formal results to be sure in its correctness,
