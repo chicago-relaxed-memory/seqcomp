@@ -1,5 +1,10 @@
 We are thankful to reviewers for their work.
 
+Since submission we have formalised this work in Coq.
+We have mechanically proved in Coq that Lemma 4.5 from the paper holds, which validates the compositionality of this model as well as being a necessary property the completeness of the tool.
+We have further proved in Coq that `skip` is the left and right unit for sequential composition, showing that the (SEQ, Skip) structure is a monoid over PwTs -- as expected.
+[SC: It's probably worth someone more qualified checking this last statement!]
+
 # Reviewer A and C. Why is a denotational semantics for sequential composition challenging and worthwhile?
 TODO
 [MB -- This question is mapping to the questions of motivation from Reviewers A and C. We should reiterate the broader motivation here:
@@ -23,6 +28,14 @@ In addition, referee C asks "My worry is: is this a big enough "win"
 to be worth all this effort?" We would argue yes, that having a model
 behind peephole compiler optimizations is worth it, and that this
 requires a compositional treatment of sequential composition.
+
+To determine whether a dependency is present in some fragment of code, MRD requires that all following code is evaluated.
+With PwT, the presence or absence of a dependency can be understood in isolation.
+In practice, this enables future applications where PwT can be used to modularly validate assumptions about program dependencies in larger blocks of code incrementally -- rather than the approach of MRD where evaluation must be done totally.
+
+Further, PwT-C11 is only the second semantics which interoperates with C++ through a semantic dependency relation, and the first one to be fully compositional.
+Semantic dependency is a worthwhile goal: a restriction of $acyclic(sdep \cup rf)$ is a statement which is compatible with the existing C++ standard, subject to a good definition of sdep.
+With the exception of MRD, other thin-air free programming language memory models do not distil dependencies down to a relation compatible with the existing C++ standard.
 
 # Reviewers A and C. Correctness of the model, mechanization, relation to other models
 We agree that the model is complicated and requires formal results to be sure in its correctness,
@@ -48,6 +61,8 @@ TODO: say something good about properties of our model comparing to these models
 
 # Reviewer B. Promising-ARM/RISC-V [Pulte et al. 2019] is evaluated on a concurrent queue implemented in 215 lines of C++ code. Does PwT-C11 work at this scale?
 Promising-ARM/RISC-V is a hardware memory model, that is, it is supposed to allow less behaviors comparing to programming language-level models like PwT-C11.
+It is worth commenting that the Promising arc of papers is now quite deep (by our count 1 POPL paper and 3 PLDI papers), expecting the same depth of results in a single paper is unreasonable -- even for POPL.
+[SC: this is likely too combative and should be dropped... ]
 TODO: more on testing in our model.
 
 # Reviewer B. Syntactic vs. semantic dependencies and their usage in compilers
