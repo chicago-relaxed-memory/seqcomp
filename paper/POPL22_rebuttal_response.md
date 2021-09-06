@@ -1,6 +1,6 @@
 We are thankful to reviewers for their work.
 
-# Reviewer A. Why is it challenging to give a denotational semantics to sequential composition?
+# Reviewer A and C. Why is a denotational semantics for sequential composition challenging and worthwhile?
 TODO
 [MB -- This question is mapping to the questions of motivation from Reviewers A and C. We should reiterate the broader motivation here:
 1. thin air is a problem with the semantics of all optimised concurrent languages
