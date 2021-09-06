@@ -16,10 +16,10 @@ TODO
 
 To determine whether a dependency is present in some fragment of code, MRD requires that all following code is evaluated.
 With PwT, the presence or absence of a dependency can be understood in isolation.
-In practice, this means future applications where PwT can be used to modularly validate assumptions about program dependencies in larger blocks of code incrementally -- rather than the approach of MRD where evaluation must be done totally.
+In practice, this enables future applications where PwT can be used to modularly validate assumptions about program dependencies in larger blocks of code incrementally -- rather than the approach of MRD where evaluation must be done totally.
 
 Further, PwT-C11 is only the second semantics which interoperates with C++ through a semantic dependency relation, and the first one to be fully compositional.
-Semantic dependency is a worthwhile goal: a restriction of acyclic(sdep \cup rf) is a statement which is compatible with the existing C++ standard, subject to a good definition of sdep.
+Semantic dependency is a worthwhile goal: a restriction of $acyclic(sdep \cup rf)$ is a statement which is compatible with the existing C++ standard, subject to a good definition of sdep.
 With the exception of MRD, other thin-air free programming language memory models do not distil dependencies down to a relation compatible with the existing C++ standard.
 
 # Reviewers A and C. Correctness of the model, mechanization, relation to other models
