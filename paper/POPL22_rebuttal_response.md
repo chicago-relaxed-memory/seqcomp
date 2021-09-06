@@ -9,6 +9,21 @@ TODO
 4. sequential composition is necessary (but not sufficient) for scalable reasoning about big chunks of code, and no one else has that.
 ]
 
+Both referees asked about the motivation for a compositional model of
+sequential composition, why not consider S1 and S2 equal if, for every
+continuation S0, we have [[ S1 ; S0 ]] = [[ S2 ; S0 ]]?  The problem
+is that this requires a quantification over all continuations S0. This
+quantification is problematic, both from a theoretical point of view
+(the syntax of programs is now mentioned in the definition of the
+semantics) and in practice (tools cannot quantify over infinite
+sets. This is a related problem to contextual equivalence, full
+abstraction and the CIU theorem.
+
+In addition, referee C asks "My worry is: is this a big enough "win"
+to be worth all this effort?" We would argue yes, that having a model
+behind peephole compiler optimizations is worth it, and that this
+requires a compositional treatment of sequential composition.
+
 # Reviewers A and C. Correctness of the model, mechanization, relation to other models
 We agree that the model is complicated and requires formal results to be sure in its correctness,
 that is why we have been working on its mechanization.
