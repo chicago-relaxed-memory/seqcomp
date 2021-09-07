@@ -107,8 +107,8 @@ and PwP require perfect knowledge of the future.
 With PwT, the presence or absence of a dependency can be understood in isolation.
 In practice, this enables future applications where PwT can be used to modularly validate assumptions about program dependencies in larger blocks of code incrementally -- rather than the approach of MRD/PwP where evaluation must be done totally.
 
-Further, PwT-C11 is only the second semantics which interoperates with C++ through a semantic dependency relation, and the first one to be fully compositional.
-Semantic dependency is a worthwhile goal: a restriction of $acyclic(sdep \cup rf)$ is a statement which is compatible with the existing C++ standard, subject to a good definition of sdep.
+Further, PwT-C11 is only the second semantics to interoperate with C++ through a semantic dependency relation, and the first one to be fully compositional.
+Semantic dependency is a worthwhile goal: a restriction of $acyclic(SDEP \cup RF)$ is a statement which is compatible with the existing C++ standard, subject to a good definition of SDEP.
 With the exception of MRD, other thin-air free programming language memory models do not distil dependencies down to a relation compatible with the existing C++ standard.
 
 ## Reviewer B. Syntactic vs. semantic dependencies and their usage in compilers
@@ -127,7 +127,7 @@ capture the meaning of sequential composition.
 
 Note also that a compiler does not have to use the proposed semantics
 directly, i.e., for calculating dependencies.  Instead, the semantics is
-meant to be a wrapper that validate some reasonable set of compiler
+meant to be a wrapper that validates some reasonable set of compiler
 optimizations. A compiler may make more conservative assumptions about
 dependencies than the semantics. This is explicitly allowed by Lemma 4.8
 (augment closure).
