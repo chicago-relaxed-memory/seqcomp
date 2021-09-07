@@ -144,9 +144,8 @@ The task is simplified in a hardware model, such as Promising-ARM/RISC-V.  In
 a software model such as PwT-C11 or PwT-MCA, the state space is larger, and
 therefore the task is that much more difficult.
 
-## Reviewer A and B: Presentation
+## Reviewers A and B: Presentation
 
 We have tried to make §§1-4 readable, as these communicate the basic idea.
 It is true that §§5-9 are mostly definitions and results, but this seems
 inevitable given the space constraints.
-
