@@ -1,7 +1,15 @@
 We are thankful to reviewers for their work.
 In this response, we address the referees main concerns.
 
-First, we reiterate the broader context of our work: Thin air is a problem
+Before that, we want to address one of the main concerns of referees A and C:
+
+* There is now a formalization of this work in Coq
+
+Details below.
+
+## Overall comments
+
+We reiterate the broader context of our work: Thin air is a problem
 with the semantics of all optimized concurrent languages.  There are only a
 handful of solutions and all have deficiencies.  We focus on denotations with
 semantic dependency (SDEP) and sequential composition for the following
