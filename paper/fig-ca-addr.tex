@@ -4,7 +4,7 @@
 If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
 $(\exists\cVal:\aEvs\fun\Val)$
 $(\exists\aVal:\aEvs\fun\Val)$
-% $(\exists\aForm:\aEvs\fun\Formulae)$
+$(\exists\aForm:\aEvs\fun\Formulae)$
 % $(\exists\emptyForm\in\Formulae)$
 % $(\exists\emptyForm\in\Formulae)$
 \begin{multicols}{2}
@@ -15,11 +15,11 @@ $(\exists\aVal:\aEvs\fun\Val)$
     % \stepcounter{enumi}
     if $\labelingForm(\bEv)\land \labelingForm(\aEv)$ is satisfiable then $\bEv=\aEv$,    
   \item \label{write-lambda-ca-addr}
-    $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$,
+    $\labelingAct(\aEv) = \DW[\amode]{\REF{\cVal_\aEv}}[\ascope]{\aVal_\aEv}[\aThrd]$,
   \item \label{write-kappa-ca-addr}
     \begin{math}
-      \labelingForm(\aEv) \rimplies
-      % \aForm_\aEv \land
+      \labelingForm(\aEv) \riff
+      \aForm_\aEv \land
       \cExp{=}\cVal_\aEv
       \land \aExp{=}\aVal_\aEv
     \end{math},      
@@ -104,7 +104,7 @@ $(\exists\aVal:\aEvs\fun\Val)$
       % \emptyForm
       % % \PBR{\bigvee_{\aEv\in\aEvs}\aForm_\aEv}
       % \land
-      \kappaE{}.
+      \kappaE{},
       %\bigwedge_{\aEv\in\aEvs}\PBR{\aForm_\aEv \limplies \cExp{=}\cVal_\aEv \land\aExp{=}\aVal_\aEv}.
     \end{math}
     % \stepcounter{enumi}
@@ -119,6 +119,8 @@ $(\exists\aVal:\aEvs\fun\Val)$
     %       %       \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
     %     \end{math}
     %   \end{enumerate}
+    \item \label{write-phi}
+      $\aForm_\aEv[\bExp/\uReg{\bEv}]=\aForm_\aEv$.
   \end{enumerate}
 \end{multicols}
 
@@ -128,7 +130,7 @@ $(\exists\aVal:\aEvs\fun\Val)$
   If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\cExp}[\aThrd]$ then
   $(\exists\cVal:\aEvs\fun\Val)$
   $(\exists\aVal:\aEvs\fun\Val)$
-  % $(\exists\aForm:\aEvs\fun\Formulae)$ 
+  $(\exists\aForm:\aEvs\fun\Formulae)$ 
   % $(\exists\emptyForm\in\Formulae)$
   % $(\exists\emptyForm\in\Formulae)$
   \begin{multicols}{2}
@@ -139,13 +141,13 @@ $(\exists\aVal:\aEvs\fun\Val)$
       % \stepcounter{enumi}
       if $\labelingForm(\bEv)\land \labelingForm(\aEv)$ is satisfiable then $\bEv=\aEv$,      
     \item \label{read-lambda-ca-addr}
-      $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal}}[\ascope]{\aVal_\aEv}[\aThrd]$
+      $\labelingAct(\aEv) = \DR[\amode]{\REF{\cVal_\aEv}}[\ascope]{\aVal_\aEv}[\aThrd]$
     \item \label{read-kappa-ca-addr}
       \begin{math}
         \labelingForm(\aEv) \riff
         \aForm_\aEv
         \land \cExp{=}\cVal_\aEv
-        \land \Q{\REF{\cVal}}
+        \land \Q{\REF{\cVal_\aEv}}
       \end{math},
     \item \label{read-tau-ca-addr}
       \begin{math}
@@ -153,6 +155,8 @@ $(\exists\aVal:\aEvs\fun\Val)$
           \aTr{\bEvs}{\bForm} \riff
           &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
           {
+            \aForm_\aEv
+            \limplies
             \PBR{
               \labelingForm(\aEv)
               \limplies
@@ -164,13 +168,15 @@ $(\exists\aVal:\aEvs\fun\Val)$
           \land
           &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
           {
+            \aForm_\aEv
+            \limplies
             \PBR{
               \labelingForm(\aEv)
               \limplies
               \PBR{
                 \aVal_\aEv{=}\uReg{\aEv}
                 \lor
-                \REF{\cVal}\EQ\uReg{\aEv}
+                \REF{\cVal_\aEv}\EQ\uReg{\aEv}
               }
             }
             \limplies
@@ -179,8 +185,8 @@ $(\exists\aVal:\aEvs\fun\Val)$
           \\[-.5ex]
           \land
           &
-          \lnot\kappaE{} % \emptyForm
-          % \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+          %\lnot\kappaE{} % \emptyForm
+          \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
           \limplies 
           (\forall\bReg)\;
           \bForm[\bReg/\aReg],
@@ -232,12 +238,14 @@ $(\exists\aVal:\aEvs\fun\Val)$
         if $\amode\gemode\mACQ$ then
         \begin{math}
           \aTerm \riff
-          \kappaE{}. %\emptyForm.
+          \kappaE{}, %\emptyForm.
           % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
         \end{math}
       \end{enumerate}      
       % \item \label{read-term-ca-addr}
       %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+    \item \label{read-phi}
+      $\aForm_\aEv[\bExp/\uReg{\bEv}]=\aForm_\aEv$.
     \end{enumerate}
   \end{multicols}
 \end{minipage}

@@ -10,12 +10,13 @@
   \medskip
 
   \noindent
-  Within a pomset $\aPS$, let 
+  % Within a pomset $\aPS$,
+  Let 
   \begin{math}
-    \kappaE{}=
-    {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\labelingForm(\aEv)}.
+    \kappaE{\bEvs}=
+    {\textstyle\bigvee{}\!\!{}_{\bEv\in\bEvs}\labelingForm(\bEv)}.
   \end{math}
-  \todo{Remind that $\textstyle\bigvee\emptyset = \FALSE$}
+  Note that $\kappaE{\emptyset} = \FALSE$.
   \medskip
 
   \noindent
@@ -246,7 +247,6 @@
             (\labelingForm(\aEv)\limplies\aVal{=}\aReg)
             \limplies \bForm,
           \end{math}
-          \todo{Degenerates to \ref{read-tau-empty} when $\labelingForm(\aEv)=\FALSE$.}
         }
       \item \label{read-tau-ind}
         if $\aEv\in\aEvs\setminus\bEvs$ then

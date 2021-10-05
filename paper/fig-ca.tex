@@ -1,7 +1,7 @@
 \noindent
 If $\aPS \in \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]$ then
 $(\exists\aVal:\aEvs\fun\Val)$
-%$(\exists\aForm:\aEvs\fun\Formulae)$
+$(\exists\aForm:\aEvs\fun\Formulae)$
 %$(\exists\emptyForm\in\Formulae)$
 % $(\exists\emptyForm\in\Formulae)$
 \begin{multicols}{2}
@@ -15,9 +15,9 @@ $(\exists\aVal:\aEvs\fun\Val)$
     $\labelingAct(\aEv) = \DW[\amode]{\aLoc}[\ascope]{\aVal_\aEv}[\aThrd]$,
   \item \label{write-kappa-ca}
     \begin{math}
-      \labelingForm(\aEv) \rimplies
-      % \aForm_\aEv
-      % \land
+      \labelingForm(\aEv) \riff
+      \aForm_\aEv
+      \land
       \aExp{=}\aVal_\aEv
     \end{math},
     
@@ -98,7 +98,9 @@ $(\exists\aVal:\aEvs\fun\Val)$
     %   \item \label{write-term-empty-ca}
     %     $\aTerm \riff \bigvee_{\aEv\in\aEvs}\aForm_\aEv$.
     %   \end{enumerate}
-  \end{enumerate}
+  \item \label{write-phi}
+    $\aForm_\aEv[\bExp/\uReg{\bEv}]=\aForm_\aEv$.
+  \end{enumerate}  
 \end{multicols}
 
 \medskip
@@ -133,8 +135,8 @@ $(\exists\aVal:\aEvs\fun\Val)$
           \aForm_\aEv\limplies
           {
             \PBR{
-              \Q{\aLoc}
-              %\labelingForm(\aEv)
+              %\Q{\aLoc}
+              \labelingForm(\aEv)
               \limplies \aVal_\aEv{=}\uReg{\aEv}
             }
             \limplies
@@ -146,8 +148,8 @@ $(\exists\aVal:\aEvs\fun\Val)$
           \aForm_\aEv\limplies
           {
             \PBR{
-              \Q{\aLoc}
-              %\labelingForm(\aEv)
+              %\Q{\aLoc}
+              \labelingForm(\aEv)
               \limplies
               \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
             }
@@ -164,46 +166,47 @@ $(\exists\aVal:\aEvs\fun\Val)$
           \bForm[\bReg/\aReg]
         \end{aligned}
       \end{math}
-      \\
-      \begin{math}
-        \begin{aligned}[t]
-          \aTr{\bEvs}{\bForm} \riff
-          &\textstyle\bigvee_{\aEv\in\aEvs\cap\bEvs}
-          \aForm_\aEv\land
-          \PBR{
-            \PBR{
-              \Q{\aLoc}
-              %\labelingForm(\aEv)
-              \limplies \aVal_\aEv{=}\uReg{\aEv}
-            }
-            \limplies
-            \bForm[\uReg{\aEv}/\aReg]
-          }
-          \\[-.5ex]
-          \lor
-          &\textstyle\bigvee_{\aEv\in\aEvs\setminus\bEvs}
-          \aForm_\aEv\land
-          \PBR{
-            \PBR{
-              \Q{\aLoc}
-              %\labelingForm(\aEv)
-              \limplies
-              \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
-            }
-            \limplies
-            \bForm[\uReg{\aEv}/\aReg]
-          }
-          \\[-.5ex]
-          \lor
-          &
-          % \lnot\kappaE{} 
-          \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
-          %\textstyle \lnot(\bigvee_{\aEv\in\aEvs}\aForm_\aEv)
-          \land 
-          (\forall\bReg)\;
-          \bForm[\bReg/\aReg]
-        \end{aligned}
-      \end{math}
+      % \\
+      % \begin{math}
+      %   \begin{aligned}[t]
+      %     \aTr{\bEvs}{\bForm} \riff
+      %     &\textstyle\bigvee_{\aEv\in\aEvs\cap\bEvs}
+      %     \aForm_\aEv\land
+      %     \PBR{
+      %       \PBR{
+      %         \Q{\aLoc}
+      %         %\labelingForm(\aEv)
+      %         \limplies \aVal_\aEv{=}\uReg{\aEv}
+      %       }
+      %       \limplies
+      %       \bForm[\uReg{\aEv}/\aReg]
+      %     }
+      %     \\[-.5ex]
+      %     \lor
+      %     &\textstyle\bigvee_{\aEv\in\aEvs\setminus\bEvs}
+      %     \aForm_\aEv\land
+      %     \PBR{
+      %       \PBR{
+      %         \Q{\aLoc}
+      %         %\labelingForm(\aEv)
+      %         \limplies
+      %         \PBR{\aVal_\aEv{=}\uReg{\aEv} \lor \aLoc{=}\uReg{\aEv}}
+      %       }
+      %       \limplies
+      %       \bForm[\uReg{\aEv}/\aReg]
+      %     }
+      %     \\[-.5ex]
+      %     \lor
+      %     &
+      %     % \lnot\kappaE{} 
+      %     \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+      %     %\textstyle \lnot(\bigvee_{\aEv\in\aEvs}\aForm_\aEv)
+      %     \land 
+      %     (\forall\bReg)\;
+      %     \bForm[\bReg/\aReg]
+      %   \end{aligned}
+      % \end{math}
+
       \columnbreak
       % \item[] \labeltext[\textsc{r}4]{}{read-tau-ca}
       %   \begin{enumerate}[leftmargin=0pt]
@@ -252,12 +255,14 @@ $(\exists\aVal:\aEvs\fun\Val)$
         if $\amode\gemode\mACQ$ then
         \begin{math}
           \aTerm \riff
-          \kappaE{}. %\emptyForm.
+          \kappaE{}, %\emptyForm.
           % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
         \end{math}
       \end{enumerate}      
       % \item \label{read-term-ca}
       %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+    \item \label{read-phi}
+      $\aForm_\aEv[\bExp/\uReg{\bEv}]=\aForm_\aEv$.
     \end{enumerate}
     % \begin{multicols}{2}
     %   \noindent

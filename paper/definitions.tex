@@ -341,7 +341,8 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 
 \emph{Predicate transformers} are functions on formulae that preserve
 logical structure, providing a natural model of sequential composition.
-The definition comes from \citet{DBLP:journals/cacm/Dijkstra75}:
+The definition follows \citet{DBLP:journals/cacm/Dijkstra75}. (See
+\textsection\ref{sec:false} for a discussion.)
 
 \begin{definition}
   \label{def:trans}
@@ -455,6 +456,7 @@ preconditions to weaken.
   \end{enumerate*}      
   \vspace{-.5\baselineskip}
   \begin{proof}
+    \todo{Reference coq.}
     Straightforward calculation.
     \eqref{monoid:unit} requires \ref{pom-term-tau} for
     the termination condition in $\xSEMIP{\aPSS}{\sSKIP}$.
@@ -548,6 +550,7 @@ preconditions to weaken.
   \end{enumerate*}      
   \vspace{-.5\baselineskip}
   \begin{proof}
+    \todo{Reference coq.}
     Straightforward calculation.
   \end{proof}
 \end{lemma}
@@ -669,10 +672,9 @@ but the former does not.\footnote{These are distinguished by the context:
     \IF{\aReg {=} \bReg} \THEN \PW{\cLoc}{1} \FI.
   \end{math}}
 
-\todo{Remind that $\FALSE\riff\bigvee_\emptyset \aForm$.}
 In complete pomsets, \ref{top-term} requires that $\aTerm$ is a tautology,
 capturing termination.  In $\sSTORE{}{}$, \ref{write-term} ensures that
-all writes are included in complete pomsets.  This also ensures
+all writes are included in complete pomsets---note that $\kappaE{\emptyset} = \FALSE$.  This also ensures
 $\sembase{\PW{x}{1}}\not\supseteq\sembase{\IF{\aExp}\THEN\PW{x}{1}\FI}$,
 since $\sembase{\IF{\aExp}\THEN\PW{x}{1}\FI}$ includes the empty set with
 termination condition $\lnot\aExp$, but $\sembase{\PW{x}{1}}$ can only
@@ -682,8 +684,7 @@ In addition, \ref{write-term} ensures that complete pomsets do not
 include bogus writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted
 above, $\aPS$ can include $(1{=}\aVal\mid\DW{x}{\aVal})$, for any value
 $\aVal$.  In complete pomsets, however, \ref{write-term} requires
-that $\aTerm$ implies $1{=}\aVal$.  In this case, \ref{pom-kappa-sat} would
-filter the pomset, since preconditions must be satisfiable.  However,
+that $\aTerm$ implies $1{=}\aVal$.  We might wish to require that all preconditions be satisfiable.  However,
 unsatisfiable writes can be become satisfiable via merging:
 % Nonetheless, it is important that
 % \ref{write-term-nonempty} specifies $\aTerm\riff\aExp{=}\aVal$ rather than
@@ -919,6 +920,9 @@ By \ref{seq-tau}, predicate transformers are determined by composition; thus
 $\aTr{\bEvs}{\bForm}$ is $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$.  Since the
 transformer does not depend on whether the write is included, we do not draw
 dependencies for the write in the diagram.
+
+Note that both \ref{read-tau-dep} and \ref{read-tau-ind} degenerate to
+\ref{read-tau-empty} when $\labelingForm(\aEv)=\FALSE$.
 
 Turning to the precondition $\aForm$ on the write, recall that in order for
 $\aEv$ to participate in a top-level pomset, the precondition $\aForm$ must
@@ -2098,7 +2102,7 @@ represents logical negation:
         \event{a}{\DR{y}{1}}{}
         \xform{xd}{\bForm[1/r]}{right=of a}
         \xform{xi}{\bForm[1/r]\land\bForm[y/r]}{left=.5em of a}
-        \xo{a1}{xd}
+        \xo{a}{xd}
       \end{tikzinline}}    
   \end{gathered}
   &&

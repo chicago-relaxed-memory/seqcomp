@@ -205,133 +205,6 @@ Then collapsing $r$ and $s$ and substituting the initial value of $y$ (say $0$),
 \end{displaymath}
 
 
-\subsection{Register Consistency}
-\label{sec:false}
-
-\todo{Drop \ref{pom-kappa-sat}.  Move this into a discussion of the proof of
-  compilation correctness.}
-
-If a precondition is false, you can be pretty sure it's useless.  In this
-subsection, we develop a criterion for eliminating such useless pomsets.
-
-To achieve this, we would like to bolt a requirement into the definition of
-pomsets in order to weed out the useless ones.  Something like this:
-\begin{enumerate}
-\item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
-  $\labelingForm(\aEv)$ is satisfiable.
-\end{enumerate}
-For associativity, \eqref{pom-kappa-sat'} would in turn require
-\begin{enumerate}
-\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
-  $\aTr{}{\FALSE}\riff\FALSE$.
-\end{enumerate}
-\citet{DBLP:journals/cacm/Dijkstra75} requires exactly \ref{tr-false'}.
-Problem solved!  Unfortunately, our transformer for read actions
-\eqref{read-tau-dep} does not obey \ref{tr-false'}, since $\FALSE$ is not
-equivalent to $v{=}r\limplies\FALSE$.
-
-In this subsection, we refine these requirements into ones that do hold.  The
-main insight is to pull values for registers from the labels of pomset itself.
-%
-% \eqref{tr-false'} is too strong.
-% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
-% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
-% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
-% for some $\aVal$.
-% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
-% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
-% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
-%
-% We require the following:
-% \begin{enumerate}
-% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
-%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
-% \end{enumerate}
-%
-% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
-% for both reads):
-% \begin{gather*}
-%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
-%   \\
-%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
-%   \lor  
-%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
-% \end{gather*}
-%
-Thus, we define $\regForm{\labeling}$ to capture the \emph{register state} of a pomset.
-\begin{definition}  
-  \label{def:labeling:consistent}
-  Let 
-  \begin{math}
-    \regForm{\labeling}=
-    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}\EQ\aVal)
-    \textwhere \aEvs=\fdom(\labeling)
-  \end{math}.
-  
-  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
-  We say that it is \emph{$\labeling$-inconsistent} otherwise.
-\end{definition}
-
-
-%tau maps (things incompatible with chi) to (things incompatible with chi)
-Using this, we define the constraint on predicate transformers that we want.
-We also need to update the definition of predicate transformer families to
-carry the labeling.
-\begin{definition}
-  \label{def:trans'}
-  A \emph{$\labeling$-predicate transformer} is a %monotone
-  function
-  $\aTr{}{}:\Formulae\fun\Formulae$ such that
-  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
-  % \item \label{tr-implies'}
-  %   \labeltextXX{2}{x}{tr-and'}
-  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
-  \item[\eqref{tr-implies}]
-    \eqref{tr-and}\;
-    \eqref{tr-or}\; as in \refdef{def:trans},
-  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
-    % \item[\eqref{tr-false}]
-    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-  \end{enumerate}
-
-  \label{def:family'}
-  A \emph{family of $\labeling$-predicate transformers} over consists of a
-  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
-  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
-  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
-
-  
-  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
-  \setcounter{enumi}{\value{Btau}}
-  \item \label{pom-tau'}
-    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
-  \end{enumerate}
-\end{definition}
-
-Given these definitions, we can add the following requirement to the model,
-which enables us to prune pomsets that include $\labeling$-inconsistent
-preconditions and termination conditions.
-\begin{multicols}{2}
-  \begin{enumerate}
-    % \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
-    %   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-  \item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
-    $\labelingForm(\aEv)$ is $\labeling$-consistent,
-  \item[{\labeltext[\textsc{m}5b]{(\textsc{m}5b)}{pom-term-sat}}]
-    $\aTerm$ is $\labeling$-consistent.
-  \end{enumerate}
-\end{multicols}
-With this modification, dead-code elimination
-(\reflem{lem:if}\ref{lem:if:dead}) can be changed from an inclusion to an equation:
-\begin{displaymath}
-  \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-  =
-  \aPSS_1
-  \;\text{if $\aForm$ is a tautology.}
-\end{displaymath}
-
-
-
 \subsection{Fences and Read-Modify-Write Operations}
 \label{sec:fences}
 \label{sec:rmw}
@@ -877,6 +750,7 @@ first thread from the read of $y$ to one of the writes to $x$.
 % The difficulty is that any pomset can contain at most one event for the
 % middle store.  
 
+We show the rules for write and read.  The rule for fences requires similar treatment.
 \begin{definition}
   % \label{def:partition}
   % Let $\aEvs\subseteq\AllEvents$ and $\aForm:\aEvs\fun\Formulae$ and
@@ -895,6 +769,7 @@ first thread from the read of $y$ to one of the writes to $x$.
   \label{def:semca}
   \input{fig-ca.tex}
 \end{definition}
+\todo{Check \ref{read-tau-ca}.}
 The definition allows multiple events to represent a single action, each with
 a disjoint precondition.  The predicate transformers are derived from those
 defined for the conditional.
@@ -905,7 +780,7 @@ This modification validates
 
 We show how to combine address calculation and if-closure in
 \textsection\ref{sec:semcaaddr}.
-
+\todo{Narrate \ref{write-phi} and \ref{read-phi} or remove.}
 
 \subsection{Address Calculation}
 \label{sec:addr}
@@ -914,15 +789,14 @@ We show how to combine address calculation and if-closure in
 Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$
 and $\sLOAD{}{}$.  In this section, we develop a flat memory model, which
 does not deal with provenance \cite{DBLP:journals/pacmpl/LeeHJLRL18}.
-
 %
 % We assume a family of \emph{aliasing symbols} $\A{\aVal}$, indexed by value.
 % Let $\aForm$ be a formula that may include the pseudo-value $\Aother$.  Then
 % let $[\aForm/\A{\Aother\neq\cVal}]$ be the substitution that, for every
 % $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
+\todo{Check the following definition.}
 \begin{definition}
   \label{def:semaddr}
-  \todo{Fix this so that reads have predicate transformers...}
   %Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$
   %and $\sLOAD{}{}$:
   \noindent
@@ -1481,7 +1355,6 @@ Sequencing and merging:
 The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
 \begin{definition}
   \label{def:semcaaddr}
-  \todo{Fix this so that reads have predicate transformers...}  
   \input{fig-ca-addr.tex}
 \end{definition}
 

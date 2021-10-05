@@ -782,7 +782,7 @@
 \newcommand{\aTr}[3][]{\LOGIC@COLOR{\tau}^{#2}_{#1}\ifnotempty{#3}{(#3)}}
 \newcommand{\trd}[2]{\LOGIC@COLOR{\tau}_{#1}\ifnotempty{#2}{(#2)}}
 \newcommand{\aTerm}[1][]{\LOGIC@COLOR{\checkmark}\ifnotempty{#1}{\!_{#1}}}
-\newcommand{\kappaE}[1]{\labelingForm\ifemptyelse{#1}{_{\aEvs}}{_{#1}}}%{|}
+\newcommand{\kappaE}[1]{\labelingForm\ifemptyelse{#1}{({\aEvs})}{({#1})}}%{|}
 \newcommand{\labelingForm}{\LOGIC@COLOR{\kappa}}%\lambda_{\Formulae}}
 \newcommand{\labeling}{\LABEL@COLOR{\lambda}}
 \newcommand{\labelingThrd}{\LABEL@COLOR{\lambda_{\mathsf{thrd}}}}
@@ -1049,7 +1049,7 @@
 \NewDocumentCommand\xSEMI{m m}{{#1}\SEMI{#2}}
 \NewDocumentCommand\xSEMIP{m m}{({#1}\SEMI{#2})}
 % \NewDocumentCommand\sPAR{m O{} m O{}}{\sRPAR{#1}[#2]{#3}[#4]}
-\NewDocumentCommand\sLET{m m O{}}{\textnormal{\textit{LET}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)_{#3}}}
+\NewDocumentCommand\sLET{m m O{}}{\textnormal{\textit{ASSIGN}}\ifnotempty{#1}{\allowbreak(#1,\,\allowbreak#2)_{#3}}}
 \newcommand{\sEXPAND}[1]{\textnormal{\textit{EXPAND}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sFORK}[1]{\textnormal{\textit{FORK}}\ifnotempty{#1}{\allowbreak(#1)}}
 \newcommand{\sFORKJOIN}[1]{\textnormal{\textit{FORKJOIN}}\ifnotempty{#1}{\allowbreak(#1)}}

@@ -24,6 +24,137 @@ Possibly interesting references:
 % \subsection{Post-Hoc Verification of Fulfillment for \PwTmcaTITLE{2}}
 % \label{sec:post-hoc}
 
+\subsection{Register Consistency}
+\label{sec:false}
+
+% \todo{Drop \ref{pom-kappa-sat} and m5b---they are wrong.  Move this into a
+%   discussion of the proof of compilation correctness.}
+
+% If a precondition is false, you can be pretty sure it's useless.  In this
+% subsection, we develop a criterion for eliminating such useless pomsets.
+
+% To achieve this, we would like to bolt a requirement into the definition of
+% pomsets in order to weed out the useless ones.  Something like this:
+% \begin{enumerate}
+% \item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
+%   $\labelingForm(\aEv)$ is satisfiable.
+% \end{enumerate}
+% For associativity, \eqref{pom-kappa-sat'} would in turn require
+
+In addition to the three criteria of \refdef{def:trans}
+\citet{DBLP:journals/cacm/Dijkstra75} requires
+\begin{enumerate}
+\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
+  $\aTr{}{\FALSE}\riff\FALSE$.
+\end{enumerate}
+% \citet{DBLP:journals/cacm/Dijkstra75} requires exactly \ref{tr-false'}.
+% Problem solved!  
+Unfortunately, our transformer for read actions
+\eqref{read-tau-dep} does not obey \ref{tr-false'}, since $\FALSE$ is not
+equivalent to $v{=}r\limplies\FALSE$.
+
+In this subsection, we refine this requirement to one that does hold.  The
+main insight is to pull values for registers from the labels of pomset itself.
+%
+% \eqref{tr-false'} is too strong.
+% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
+% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
+% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
+% for some $\aVal$.
+% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
+% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
+% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
+%
+% We require the following:
+% \begin{enumerate}
+% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
+%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
+% \end{enumerate}
+%
+% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
+% for both reads):
+% \begin{gather*}
+%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
+%   \\
+%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
+%   \lor  
+%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
+% \end{gather*}
+%
+Thus, we define $\regForm{\labeling}$ to capture the \emph{register state} of a pomset.
+\begin{definition}  
+  \label{def:labeling:consistent}
+  Let 
+  \begin{math}
+    \regForm{\labeling}=
+    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}\EQ\aVal)
+    \textwhere \aEvs=\fdom(\labeling)
+  \end{math}.
+  
+  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
+  We say that it is \emph{$\labeling$-inconsistent} otherwise.
+\end{definition}
+
+
+%tau maps (things incompatible with chi) to (things incompatible with chi)
+Using this, we define the constraint on predicate transformers that we want.
+We also need to update the definition of predicate transformer families to
+carry the labeling.
+\begin{definition}
+  \label{def:trans'}
+  A \emph{$\labeling$-predicate transformer} is a %monotone
+  function
+  $\aTr{}{}:\Formulae\fun\Formulae$ such that
+  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
+  % \item \label{tr-implies'}
+  %   \labeltextXX{2}{x}{tr-and'}
+  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
+  \item[\eqref{tr-and}]
+    \eqref{tr-or}\;
+    \eqref{tr-implies}\; as in \refdef{def:trans},
+  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
+    % \item[\eqref{tr-false}]
+    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+  \end{enumerate}
+
+  \label{def:family'}
+  A \emph{family of $\labeling$-predicate transformers} over consists of a
+  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
+  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
+  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
+
+  
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \setcounter{enumi}{\value{Btau}}
+  \item \label{pom-tau'}
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
+  \end{enumerate}
+\end{definition}
+
+% Given these definitions, we can add the following requirement to the model,
+% which enables us to prune pomsets that include $\labeling$-inconsistent
+% preconditions and termination conditions.
+% \begin{multicols}{2}
+%   \begin{enumerate}
+%     % \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
+%     %   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+%   \item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
+%     $\labelingForm(\aEv)$ is $\labeling$-consistent,
+%   \item[{\labeltext[\textsc{m}5b]{(\textsc{m}5b)}{pom-term-sat}}]
+%     $\aTerm$ is $\labeling$-consistent.
+%   \end{enumerate}
+% \end{multicols}
+% With this modification, dead-code elimination
+% (\reflem{lem:if}\ref{lem:if:dead}) can be changed from an inclusion to an equation:
+% \begin{displaymath}
+%   \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+%   =
+%   \aPSS_1
+%   \;\text{if $\aForm$ is a tautology.}
+% \end{displaymath}
+
+
+
 \subsection{Comparison with Sequential Predicate Transformers}
 
 We compare traditional transformers to the dependent-case transformers of
@@ -919,6 +1050,8 @@ We leave the elaboration of this idea to future work.
 \subsection{Logical Encoding of Delay for \PwTmcaTITLE{}}
 \label{sec:delay}
 
+\todo{Remove this section?}
+
 In this subsection, we develop a logical encoding of $\rdelay$, which can
 replace \ref{seq-le-delays} in \PwTmca{1}.  It is not obvious how to repeat
 this trick for \PwTmca{2}, due to thread-local reads-from
@@ -1613,6 +1746,8 @@ Merging left and right, we have
 
 \subsection{Is Coherence/Delay Compatible with If-closure and Dead-Write-Removal?}
 
+\todo{Flesh this out.}
+
 This paper has a ``High-level abstraction for efficient computation''
 
 With if-closure, the following equation should hold:
@@ -1660,3 +1795,4 @@ Using dead write removal, these can be refined, respectively, to:
   }
 \end{align*}
 What has become of coherence?
+
