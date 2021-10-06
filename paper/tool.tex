@@ -7,44 +7,36 @@
 Finally, \PwTer{} also allows us to toggle the complete check of~\ref{def:complete}, providing an interface for understanding how fragments of code might compose by exposing preconditions and termination conditions that are not yet tautologies.
 We have run \PwTer{} over the Java Causality Tests~\cite{PughWebsite} supported in the input syntax, and tabulated the results in Figure~\ref{fig:tool}.
 
-It is noteworthy that the \PwT{} version of the semantics correctly identifies semantic dependencies in tests which would have thin-air executions, but without a definition of reads from and an axiom like $\textit{acyclic}(\rrfx \cup \rsdepx)$, \PwT{} does not forbid the thin-air executions (as in test cases 4, 5 and 10).
-In the \PwTc{} model there is a restriction which forbids cycles in $\rrfx \cup \rsdepx$, so this correctly rules out thin-air executions.
-In jctc16, we see that the restrictions of \PwTc{} are too strong, this is because the coherence restrictions in C++ are stronger than those of Java.
-The execution times give a good indication the poor scaling of the tool with program size: for longer test cases the tool takes exponentially longer to compute, and in some cases simply fails.
+The execution times give a good indication the poor scaling of the tool with program size: for larger test cases, the tool takes exponentially longer to compute, and in some cases simply fails.
 The compositional nature of the semantics makes tool building practical, but it is not enough to make it scalable for large tests.
-Unsurprisingly the execution time is dominated by the calculation of the denotation, with the additional axiomatic filtering step of \PwTc{} being within the margin of error. 
+Unsurprisingly the execution time is dominated by the calculation of the denotation, with the additional axiomatic filtering step of \PwTc{} being within margin of error difference of just calculating the \PwT{} semantics. 
 % \PwTer{} will be made open source upon publication.
 \PwTer{} is available online at \url{https://github.com/graymalkin/pomsets-with-predicate-transformers}.
 
 %% [Simon] I am not a fan of how this looks on the page.
 \begin{figure}[t]
 \begin{center}
-  \begin{tabularx}{0.9\textwidth}{c||c|c|c|c}
-    \multirow{2}{*}{\bf Test name} & \multicolumn{2}{c|}{\PwT{}} & \multicolumn{2}{c}{\PwTc{}} \\
-    \cline{2-5}
-                                   & Result & Execution Time (s)  & Result & Execution Time (s)  \\
-    \cline{1-5}
-    jctc1                          & pass   & 2.608               & pass   & 2.397 \\
-    jctc2                          & pass   & 25.754              & pass   & 25.780 \\
-    jctc3                          & pass   & 205.120             & pass   & 196.935 \\
-    jctc4                          & fail   & 2.110               & pass   & 2.269 \\
-    jctc5                          & fail   & 69.441              & pass   & 63.714 \\
-    jctc6                          & pass   & 12.489              & pass   & 11.245 \\
-    jctc7                          & pass   & 96.099              & pass   & 88.250 \\
-    jctc8                          & pass   & 2.473               & pass   & 2.482 \\
-    jctc9                          & pass   & 15.384              & pass   & 13.592 \\
-    jctc10                         & fail   & 513.234             & pass   & 494.133 \\
-    jctc11                         & $\bot$ & --                  & $\bot$ & \\
-    jctc12                         & $\bot$ & --                  & $\bot$ & \\
-    jctc13                         & fail   & 2.247               & pass   & 2.101 \\
-    % jctc14                         & unsupported   & --           & unsupported   & -- \\
-    % jctc15                         & unsupported   & --           & unsupported   & -- \\
-    jctc16                         & pass   & 9.232               & fail   & 8.492 \\
-    jctc17                         & pass   & 186.228             & pass   & 178.304 \\
-    jctc18                         & pass   & 2.247               & pass   & 177.292 \\
-    % jctc19                         & unsupported   & --           & unsupported   & -- \\
-    % jctc20                         & unsupported   & --           & unsupported   & -- \\
+  \begin{tabularx}{0.7\textwidth}{c||c|c|c}
+    \multirow{2}{*}{\bf Causality Test}   & \multicolumn{2}{c|}{\PwTc{}}    & \PwT{}\\
+    \cline{2-4}
+                                     & Result & Execution Time (s)  & Execution Time (s) \\
+    \cline{1-4}
+    jctc1                            & pass   & 2.397               & 2.608              \\
+    jctc2                            & pass   & 25.780              & 25.754             \\
+    jctc3                            & pass   & 196.935             & 205.120            \\
+    jctc4                            & pass   & 2.269               & 2.110              \\
+    jctc5                            & pass   & 63.714              & 69.441             \\
+    jctc6                            & pass   & 11.245              & 12.489             \\
+    jctc7                            & pass   & 88.250              & 96.099             \\
+    jctc8                            & pass   & 2.482               & 2.473              \\
+    jctc9                            & pass   & 13.592              & 15.384             \\
+    jctc10                           & pass   & 494.133             & 513.234            \\
+    jctc11                           & $\bot$ & --                  & --                 \\
+    jctc12                           & $\bot$ & --                  & --                 \\
+    jctc13                           & pass   & 2.101               & 2.247              \\
+    jctc17                           & pass   & 178.304             & 186.228            \\
+    jctc18                           & pass   & 177.292             & 2.247              \\
   \end{tabularx}
-  \caption{\label{fig:tool} Tool results for Java Causality Test Cases~\cite{PughWebsite}. $\bot$ indicates the tool failed to run for this test due to a memory overflow. Tests run on an Intel i9-9980HK with 64 GB of memory, execution times are the mean of 3 runs.}
+  \caption{\label{fig:tool} Tool results for supported Java Causality Test Cases~\cite{PughWebsite}. $\bot$ indicates the tool failed to run for this test due to a memory overflow. Tests run on an Intel i9-9980HK with 64 GB of memory, execution times are the mean of 3 runs.}
 \end{center}
 \end{figure}
