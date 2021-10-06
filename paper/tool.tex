@@ -1,22 +1,50 @@
 \section{\PwTerTITLE: automatic litmus test evaluator}
 \label{sec:tool}
 
-\todo{Replace screenshot with table of results.  Integrate into previous section.}
-
 \PwTer{} automatically and exhaustively calculates the allowed outcomes of litmus tests for the \PwT, \PwTpo, and \PwTc{} models. It is built in OCaml, and uses Z3~\cite{Z3Solver} to judge the truth of predicates constructed by the models. \PwTer{} obviates the need for error-prone hand evaluation.
 
-\PwTer{} allows several modes of evaluation: it can evaluate the rules of Fig.~\ref{fig:seq}, implementing \PwT; it can generate program order according to \textsection\ref{sec:c11}, implementing \PwTpo; and similar to \MRD~\cite{DBLP:conf/esop/PaviottiCPWOB20}, it can construct C11-style pre-executions and filter them according to the rules of \rcXI{} as described in \textsection\ref{sec:c11}.
+\PwTer{} allows several modes of evaluation: it can evaluate the rules of Fig.~\ref{fig:seq}, implementing \PwT; it can generate program order according to \textsection\ref{sec:c11}, implementing \PwTpo; and similar to \MRD~\cite{DBLP:conf/esop/PaviottiCPWOB20}, it can construct C11-style pre-executions and filter them according to the rules of \rcXI{} as described in \textsection\ref{sec:c11}, implementing \PwTc{}.
 Finally, \PwTer{} also allows us to toggle the complete check of~\ref{def:complete}, providing an interface for understanding how fragments of code might compose by exposing preconditions and termination conditions that are not yet tautologies.
-We show \PwTer{} in action in Fig.~\ref{fig:tool}. 
-\PwTer{} will be made open source upon publication.
-%\PwTer{} is available online at \url{https://github.com/graymalkin/pomsets-with-predicate-transformers}.
+We have run \PwTer{} over the Java Causality Tests~\cite{PughWebsite}, and tabulated the results in Figure~\ref{fig:tool}.
+
+It is noteworthy that the \PwTc{} version of the semantics does correctly identity semantic dependencies in tests which would have thin-air executions, but without a definition of reads from, and an axiom like $\textit{acyclic}(\rrfx \cup \rsdepx)$ it does not forbid the thin-air executions (as in test cases 4, 5 and 10).
+In the \PwTc{} model there is a restriction which forbids cycles in $\rrfx \cup \rsdepx$, so this correctly forbids thin-air executions.
+In jctc16, we see that the restrictions of \PwTc{} are too strong, this is because the coherence restrictions in C++ are stronger than those of Java.
+The execution times give a good indication the poor scaling of the tool with program size: for longer test cases the tool takes exponentially longer to compute, and in some cases simply fails.
+The compositional nature of the semantics makes tool building practical, but it is not enough to make it scalable for large tests.
+Unsurprisingly the execution time is dominated by the calculation of the denotation, with the additional axiomatic filtering step of \PwTc{} being within the margin of error. 
+% \PwTer{} will be made open source upon publication.
+\PwTer{} is available online at \url{https://github.com/graymalkin/pomsets-with-predicate-transformers}.
 
 %% [Simon] I am not a fan of how this looks on the page.
 \begin{figure}[t]
 \begin{center}
-  \includegraphics[width=0.75\textwidth]{tool.png}
-  \vspace{-2em}
-  \Description{Image shows tool running on a Mac. Java Causality Test Case 1 is printed, followed by an invocation of the tool as {\tt ./pomsets.exe --check --complete data/tests/jctc/jctc1.lit}, which shows that the tool passes the assertion listed in the test.}
-  \caption{\label{fig:tool} Example output of \PwTer, validating TC1~\cite{PughWebsite}.}
+  \begin{tabularx}{0.9\textwidth}{c||c|c|c|c}
+    \multirow{2}{*}{\bf Test name} & \multicolumn{2}{c|}{\PwT{}} & \multicolumn{2}{c}{\PwTc{}} \\
+    \cline{2-5}
+                                   & Result & Execution Time (s)  & Result & Execution Time (s)  \\
+    \cline{1-5}
+    jctc1                          & pass   & 2.608               & pass   & 2.397 \\
+    jctc2                          & pass   & 25.754              & pass   & 25.780 \\
+    jctc3                          & pass   & 205.120             & pass   & 196.935 \\
+    jctc4                          & fail   & 2.110               & pass   & 2.269 \\
+    jctc5                          & fail   & 69.441              & pass   & 63.714 \\
+    jctc6                          & pass   & 12.489              & pass   & 11.245 \\
+    jctc7                          & pass   & 96.099              & pass   & 88.250 \\
+    jctc8                          & pass   & 2.473               & pass   & 2.482 \\
+    jctc9                          & pass   & 15.384              & pass   & 13.592 \\
+    jctc10                         & fail   & 513.234             & pass   & 494.133 \\
+    jctc11                         & $\bot$ & --                  & $\bot$ & \\
+    jctc12                         & $\bot$ & --                  & $\bot$ & \\
+    jctc13                         & fail   & 2.247               & pass   & 2.101 \\
+    jctc14                         & unsupported   & --           & unsupported   & -- \\
+    jctc15                         & unsupported   & --           & unsupported   & -- \\
+    jctc16                         & pass   & 9.232               & fail   & 8.492 \\
+    jctc17                         & pass   & 186.228             & pass   & 178.304 \\
+    jctc18                         & pass   & 2.247               & pass   & 177.292 \\
+    jctc19                         & unsupported   & --           & unsupported   & -- \\
+    jctc20                         & unsupported   & --           & unsupported   & -- \\
+  \end{tabularx}
+  \caption{\label{fig:tool} Tool results for Java Causality Test Cases~\cite{PughWebsite}. $\bot$ indicates the tool failed to run for this test due to a memory overflow. Tests run on an Intel i9-9980HK with 64 GB of memory, execution times are the mean of 3 runs.}
 \end{center}
 \end{figure}
