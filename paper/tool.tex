@@ -5,10 +5,10 @@
 
 \PwTer{} allows several modes of evaluation: it can evaluate the rules of Fig.~\ref{fig:seq}, implementing \PwT; it can generate program order according to \textsection\ref{sec:c11}, implementing \PwTpo; and similar to \MRD~\cite{DBLP:conf/esop/PaviottiCPWOB20}, it can construct C11-style pre-executions and filter them according to the rules of \rcXI{} as described in \textsection\ref{sec:c11}, implementing \PwTc{}.
 Finally, \PwTer{} also allows us to toggle the complete check of~\ref{def:complete}, providing an interface for understanding how fragments of code might compose by exposing preconditions and termination conditions that are not yet tautologies.
-We have run \PwTer{} over the Java Causality Tests~\cite{PughWebsite}, and tabulated the results in Figure~\ref{fig:tool}.
+We have run \PwTer{} over the Java Causality Tests~\cite{PughWebsite} supported in the input syntax, and tabulated the results in Figure~\ref{fig:tool}.
 
-It is noteworthy that the \PwTc{} version of the semantics does correctly identity semantic dependencies in tests which would have thin-air executions, but without a definition of reads from, and an axiom like $\textit{acyclic}(\rrfx \cup \rsdepx)$ it does not forbid the thin-air executions (as in test cases 4, 5 and 10).
-In the \PwTc{} model there is a restriction which forbids cycles in $\rrfx \cup \rsdepx$, so this correctly forbids thin-air executions.
+It is noteworthy that the \PwT{} version of the semantics correctly identifies semantic dependencies in tests which would have thin-air executions, but without a definition of reads from and an axiom like $\textit{acyclic}(\rrfx \cup \rsdepx)$, \PwT{} does not forbid the thin-air executions (as in test cases 4, 5 and 10).
+In the \PwTc{} model there is a restriction which forbids cycles in $\rrfx \cup \rsdepx$, so this correctly rules out thin-air executions.
 In jctc16, we see that the restrictions of \PwTc{} are too strong, this is because the coherence restrictions in C++ are stronger than those of Java.
 The execution times give a good indication the poor scaling of the tool with program size: for longer test cases the tool takes exponentially longer to compute, and in some cases simply fails.
 The compositional nature of the semantics makes tool building practical, but it is not enough to make it scalable for large tests.
@@ -37,13 +37,13 @@ Unsurprisingly the execution time is dominated by the calculation of the denotat
     jctc11                         & $\bot$ & --                  & $\bot$ & \\
     jctc12                         & $\bot$ & --                  & $\bot$ & \\
     jctc13                         & fail   & 2.247               & pass   & 2.101 \\
-    jctc14                         & unsupported   & --           & unsupported   & -- \\
-    jctc15                         & unsupported   & --           & unsupported   & -- \\
+    % jctc14                         & unsupported   & --           & unsupported   & -- \\
+    % jctc15                         & unsupported   & --           & unsupported   & -- \\
     jctc16                         & pass   & 9.232               & fail   & 8.492 \\
     jctc17                         & pass   & 186.228             & pass   & 178.304 \\
     jctc18                         & pass   & 2.247               & pass   & 177.292 \\
-    jctc19                         & unsupported   & --           & unsupported   & -- \\
-    jctc20                         & unsupported   & --           & unsupported   & -- \\
+    % jctc19                         & unsupported   & --           & unsupported   & -- \\
+    % jctc20                         & unsupported   & --           & unsupported   & -- \\
   \end{tabularx}
   \caption{\label{fig:tool} Tool results for Java Causality Test Cases~\cite{PughWebsite}. $\bot$ indicates the tool failed to run for this test due to a memory overflow. Tests run on an Intel i9-9980HK with 64 GB of memory, execution times are the mean of 3 runs.}
 \end{center}
