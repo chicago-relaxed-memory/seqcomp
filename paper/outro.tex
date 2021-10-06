@@ -15,7 +15,7 @@ step-indexing to account for loops; a similar approach could be applied here.
 
 \PwTmca{} does not validate access elimination: store-forwarding and
 dead-write-removal are unsound.  We expect that these can be validated by
-allowing events with different labels to merge. % in some instances.
+allowing events with different actions to merge. % in some instances.
 
 \PwTmca{1} is a simpler model than \PwTmca{2}, but requires fences on
 acquiring reads for \armeight{}.  It would be illuminating to find out what

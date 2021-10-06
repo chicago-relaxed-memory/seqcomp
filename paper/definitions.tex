@@ -430,27 +430,27 @@ preconditions to weaken.
   \begin{enumerate*}[label=(\alph*),ref=\alph*]
   \item \label{monoid:unit}
     \begin{math}
-      \aPSS
+      \sem{\aCmd}
       % =
-      % \xPARP{\aPSS}{\sSKIP}
+      % \xPARP{\aCmd}{\SKIP}
       =
-      \xSEMIP{\aPSS}{\sSKIP}
+      \sem{\xSEMIP{\aCmd}{\SKIP}}
       =
-      \xSEMIP{\sSKIP}{\aPSS}.
+      \sem{\xSEMIP{\SKIP}{\aCmd}}.
     \end{math}
 
   % \\\item \label{monoid:par}
   %   \begin{math}
-  %     \xPAR{\xPARP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
+  %     \xPAR{\xPARP{\aCmd_1}{\aCmd_2}}{\aCmd_3}
   %     =
-  %     \xPAR{\aPSS_1}{\xPARP{\aPSS_2}{\aPSS_3}}.
+  %     \xPAR{\aCmd_1}{\xPARP{\aCmd_2}{\aCmd_3}}.
   %   \end{math}
 
   \\\item \label{monoid:seq}
     \begin{math}
-      \xSEMI{\xSEMIP{\aPSS_1}{\aPSS_2}}{\aPSS_3}
+      \sem{\xSEMI{\xSEMIP{\aCmd_1}{\aCmd_2}}{\aCmd_3}}
       =
-      \xSEMI{\aPSS_1}{\xSEMIP{\aPSS_2}{\aPSS_3}}.
+      \sem{\xSEMI{\aCmd_1}{\xSEMIP{\aCmd_2}{\aCmd_3}}}.
     \end{math}
 
   \end{enumerate*}      
@@ -459,7 +459,7 @@ preconditions to weaken.
     \todo{Reference coq.}
     Straightforward calculation.
     \eqref{monoid:unit} requires \ref{pom-term-tau} for
-    the termination condition in $\xSEMIP{\aPSS}{\sSKIP}$.
+    the termination condition in $\xSEMIP{\aCmd}{\SKIP}$.
     \eqref{monoid:seq} requires both
     conjunction closure (\ref{tr-and}, for the termination condition) and disjunction
     closure (\ref{tr-or}, for the predicate transformers themselves).
@@ -474,78 +474,78 @@ preconditions to weaken.
     \setcounter{enumi}{3}
     \item \label{lem:if:if}
     \begin{math}
-      \xIFTHEN{\aForm}{
-        \xIFTHEN{\bForm}{\aPSS}{}
-      }{}
+      \sem{\xIFTHEN{\aForm}{
+        \xIFTHEN{\bForm}{\aCmd}{}
+      }{}}
       =
-      \xIFTHEN{\aForm\land\bForm}{\aPSS}{}.
+      \sem{\xIFTHEN{\aForm\land\bForm}{\aCmd}{}}.
     \end{math}
 
   \\\item \label{lem:if:seq}
     \begin{math}
-      \xIFTHEN{\aForm}{
-        \xSEMI{\aPSS_1}{\aPSS_3}
+      \sem{\xIFTHEN{\aForm}{
+        \xSEMI{\aCmd_1}{\aCmd_3}
       }{
-        \xSEMI{\aPSS_2}{\aPSS_3}
-      }
+        \xSEMI{\aCmd_2}{\aCmd_3}
+      }}
       \supseteq
-      \xSEMI{
-        \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+      \sem{\xSEMI{
+        \xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}
       }{
-        \aPSS_3
-      }.
+        \aCmd_3
+      }}.
     \end{math}
 
   \\\item \label{lem:seq:if}
     \begin{math}
-      \xIFTHEN{\aForm}{
-        \xSEMI{\aPSS_1}{\aPSS_2}
+      \sem{\xIFTHEN{\aForm}{
+        \xSEMI{\aCmd_1}{\aCmd_2}
       }{
-        \xSEMI{\aPSS_1}{\aPSS_3}
-      }
+        \xSEMI{\aCmd_1}{\aCmd_3}
+      }}
       \supseteq
-      \xSEMI{
-        \aPSS_1
+      \sem{\xSEMI{
+        \aCmd_1
       }{
-        \xIFTHEN{\aForm}{\aPSS_2}{\aPSS_3}
-      }.
+        \xIFTHEN{\aForm}{\aCmd_2}{\aCmd_3}
+      }}.
     \end{math}
 
   \\\item \label{lem:if:elim}
     \begin{math}
-      \xIFTHEN{\aForm}{\aPSS}{\aPSS}
+      \sem{\xIFTHEN{\aForm}{\aCmd}{\aCmd}}
       \supseteq
-      \aPSS.
+      \sem{\aCmd}.
     \end{math}
 
   \\\item \label{lem:if:dead}
     \begin{math}
-      \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
       \supseteq
-      \aPSS_1
+      \sem{\aCmd_1}
     \end{math}
     if $\aForm$ is a tautology.
 
   \\\item
     \begin{math} \label{lem:ifelse:if:if1}
-      \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
       \supseteq
-      \xSEMI{
-        \xIFTHEN{\aForm}{\aPSS_1}{}
+      \sem{\xSEMI{
+        \xIFTHEN{\aForm}{\aCmd_1}{}
       }{
-        \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
-      }.
+        \xIFTHEN{\lnot\aForm}{\aCmd_2}{}
+      }}.
     \end{math}
     
   \\\item
     \begin{math} \label{lem:ifelse:if:if2}
-      \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
       \supseteq
-      \xSEMI{
-        \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+      \sem{\xSEMI{
+        \xIFTHEN{\lnot\aForm}{\aCmd_2}{}
       }{
-        \xIFTHEN{\aForm}{\aPSS_1}{}
-      }.
+        \xIFTHEN{\aForm}{\aCmd_1}{}
+      }}.
     \end{math}
   \end{enumerate*}      
   \vspace{-.5\baselineskip}
@@ -1167,7 +1167,7 @@ are two possibilities:
 \subsection{A Refinement: No Dependencies into Reads}
 \label{sec:read-read}
 
-To avoid stalling the \CPU{} pipeline unnecessarily, hardware does not
+To avoid stalling the CPU pipeline unnecessarily, hardware does not
 enforce control dependencies between reads.  To support if-closure
 (\textsection\ref{sec:semca}), software models must not distinguish control
 dependencies from other dependencies.  Thus, we are forced to drop all

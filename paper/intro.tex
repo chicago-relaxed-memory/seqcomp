@@ -118,7 +118,7 @@ but this is not the case.
 
 \subsection{Sequential Composition} %Predicate Transformers}
 
-Introductory programmers are taught \emph{sequential abstraction}: that the
+Novice programmers are taught \emph{sequential abstraction}: that the
 program $\aCmd_1\SEMI \aCmd_2$ executes $\aCmd_1$ before $\aCmd_2$.  Since
 the late 1960s, we've been able to explain this using logic
 \citep{Hoare:1969:ABC:363235.363259}.  In
@@ -256,8 +256,8 @@ understand the underlying hardware and compilers.
 
 For single-threaded programs, memory can be thought of as you might
 expect: programs write to, and read from, memory references.
-This can be thought of as a total order of reads and writes (pink arrows \tikz[baseline]{\draw [po] (0,0.1) -- (0.5,0.1);}),
-where each read has a matching \emph{fulfilling} write (green arrows \tikz[baseline]{\draw [rf] (0,0.1) -- (0.5,0.1);}),
+This can be thought of as a total order over memory actions ($\xwki$),
+where each read has a matching \emph{fulfilling} write ($\xrf$),
 for example:
 \begin{gather*}
   \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}\SEMI
@@ -268,21 +268,21 @@ for example:
       \event{wx0}{\DW{x}{0}}{}
       \event{wx1}{\DW{x}{1}}{right=of wx0}
       \event{wy2}{\DW{y}{2}}{right=of wx1}
-      \event{ry2}{\DR{y}{2}}{right=3em of wy2}
+      \event{ry2}{\DR{y}{2}}{right=of wy2}
       \event{rx1}{\DR{x}{1}}{right=of ry2}
       \rf[out=15,in=165]{wy2}{ry2}
       \rf[out=15,in=165]{wx1}{rx1}
-      \po{wx0}{wx1}
-      \po{wx1}{wy2}
-      \po{wy2}{ry2}
-      \po{ry2}{rx1}
+      \wki{wx0}{wx1}
+      \wki{wx1}{wy2}
+      \wki{wy2}{ry2}
+      \wki{ry2}{rx1}
     \end{tikzinline}}
 \end{gather*}
 
 % (In examples, $\aReg$--$\bReg$ range over thread-local registers and $\aLoc$-$\cLoc$
 % range over shared memory references.)
 
-This model naturally extends to the case of shared-memory concurrency, leading to a \emph{sequentially consistent}
+This model extends naturally to the case of shared-memory concurrency, leading to a \emph{sequentially consistent}
 semantics \cite{Lamport:1979:MMC:1311099.1311750}, in which \emph{program order} inside a thread implies
 a total \emph{causal order} between read and write events, for example
 (where $\SEMI\!$ has higher precedence than $\PAR$):
@@ -300,11 +300,13 @@ a total \emph{causal order} between read and write events, for example
       \event{rx1}{\DR{x}{1}}{right=of ry2}
       \rf[out=15,in=165]{wy2}{ry2}
       \rf[out=15,in=165]{wx1}{rx1}
-      \po{wx0}{wx1}
-      \po{wx1}{wy2}
-      \po{ry2}{rx1}
+      \wki{wx0}{wx1}
+      \wki{wx1}{wy2}
+      \wki{ry2}{rx1}
     \end{tikzinline}}
 \end{gather*}
+In general, there will be many such executions, reflecting different
+interleavings of the threads.
 
 Unfortunately, this model does not compile efficiently to commodity
 hardware, resulting in a 37--73\% increase in CPU time on Arm8~\cite{Liu:2019:ASC:3314221.3314611} and,
@@ -315,8 +317,7 @@ data centers, electricity bills and carbon footprint). Unsurprisingly,
 many have chosen to prioritize efficiency over elegance.
 
 This has led to \emph{relaxed memory models}, in which the requirement of
-sequential consistency is weakened to only apply \emph{per-location} and not globally
-over the whole program. This allows executions that
+sequential consistency is weakened to only apply \emph{per-location}. This allows executions that
 are inconsistent with program order, such as:
 \begin{gather*}
   \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
@@ -332,13 +333,14 @@ are inconsistent with program order, such as:
       \event{rx0}{\DR{x}{0}}{right=of ry2}
       \rf[out=15,in=165]{wy2}{ry2}
       \rf[out=15,in=165]{wx0}{rx0}
-      \po{wx0}{wx1}
+      \wki{wx0}{wx1}
       \wk[out=-165,in=-15]{rx0}{wx1}
     \end{tikzinline}}
 \end{gather*}
+Reads must be ordered between the available writes, creating \emph{antidependencies} $(\DR{x}{0}\xwk\DW{x}{1})$.
 
 In such models, the causal order between events is important,
-and includes control and data dependencies, to avoid
+and includes control and data dependencies ($\xpo$), to avoid
 paradoxical ``out of thin air'' examples such as:
 \begin{gather*}
   \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}
@@ -751,5 +753,5 @@ on speculative execution \cite{Manson:2005:JMM:1047659.1040336,
 We provide a detailed comparison with these approaches in \textsection\ref{sec:promising}.
 
 Other work in relaxed memory has shown that tooling is especially useful to researchers, architects, and language specifiers, enabling them to build intuitions experimentally~\cite{DBLP:conf/esop/PaviottiCPWOB20,PrideMM,alglave,Batty:2011:MCC:1926385.1926394}.
-Unfortunately, it is not obvious that tools can be built for all thin-air free models, the calculation of \citet{Pichon-Pharabod:2016:CSR:2837614.2837616} does not have a termination proof for an arbitrary input, and the enormous state space for the operational models of \citet{DBLP:conf/popl/KangHLVD17} and \citet{DBLP:journals/pacmpl/ChakrabortyV19} is a daunting prospect for a tool builder -- and as yet no tool exists for automatically evaluating these models.
+Unfortunately, it is not obvious that tools can be built for all thin-air-free models, the calculation of \citet{Pichon-Pharabod:2016:CSR:2837614.2837616} does not have a termination proof for an arbitrary input, and the enormous state space for the operational models of \citet{DBLP:conf/popl/KangHLVD17} and \citet{DBLP:journals/pacmpl/ChakrabortyV19} is a daunting prospect for a tool builder -- and as yet no tool exists for automatically evaluating these models.
 We describe a tool, \PwTer, for automatically evaluating \PwT{} in \textsection\ref{sec:tool}.
