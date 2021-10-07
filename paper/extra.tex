@@ -140,7 +140,7 @@ Thin air is disallowed.
           \event{b2}{\DW{x}{1}}{right=of b1}
           \po{b1}{b2}
           \rf{a2}{b1}
-          \rf[out=170,in=10]{b2}{a1}
+          \rf[out=-170,in=-10]{b2}{a1}
           % \wk[out=-15,in=-165]{iy}{a2}
           % \wk[out=-15,in=-165]{ix}{b2}
         \end{tikzinline}}}
@@ -165,7 +165,7 @@ The control variant (\cite[TC13]{PughWebsite}) is also disallowed:
           \event{wx}{\DW{x}{1}}{right=of ry}
           \po{ry}{wx}
           \rf{wy}{ry}
-          \rf[out=170,in=10]{wx}{rx}
+          \rf[out=-170,in=-10]{wx}{rx}
           % \wk[out=-15,in=-165]{y0}{wy}
           % \wk[out=-15,in=-165]{x0}{wx}
         \end{tikzinline}}}
@@ -255,7 +255,7 @@ is no write to fulfill $(\DR{y}{1})$.
         \event{ry}{\DR{y}{1}}{right=3em of wy}
         \event{wx}{\DW{x}{1}}{right=of ry}
         \po{ry}{wx}
-        \rf[out=170,in=10]{wx}{rx}
+        \rf[out=-170,in=-10]{wx}{rx}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -283,7 +283,7 @@ is no write to fulfill $(\DR{y}{1})$.
         \event{wx3}{\DW{x}{3}}{right=of ry1}
         \po{ry1}{wx3}
         \wk[in=165,out=15]{rx2}{wx3}
-        \rf[in=-170,out=-10]{wy1}{ry1}
+        \rf[in=170,out=10]{wy1}{ry1}
         \rf[in=170,out=10]{wx2}{rx2}
         \rf[out=-170,in=-10]{wx3}{rx3}
         \wk[out=-170,in=-10]{wx1}{wx2}
@@ -330,7 +330,7 @@ x = r3
           \event{wx0}{\DW{x}{0}}{right=of rz}
           \po{rz}{wx0}
           \rf{wy}{ry}
-          \rf[out=170,in=10]{wx}{rx}
+          \rf[out=-170,in=-10]{wx}{rx}
           \rf[out=10,in=170]{z0}{rz}
         \end{tikzinline}}}
   \end{gathered}
@@ -552,7 +552,7 @@ The following outcome is allowed by the promising semantics
         \event{wx3}{\DW{x}{3}}{right=of ry1}
         \po{ry1}{wx3}
         \wki[in=165,out=15]{rx2}{wx3}
-        \rf[in=-170,out=-10]{wy1}{ry1}
+        \rf[in=170,out=10]{wy1}{ry1}
         \rf[in=170,out=10]{wx2}{rx2}
         \rf[out=-170,in=-10]{wx3}{rx3}
         \wk[out=-170,in=-10]{wx1}{wx2}
@@ -697,7 +697,7 @@ non-\mca{} architectures.
         \wki{c2}{c3}
         \rf{a3}{b1}
         \rf{b3}{c1}
-        \rf[out=173,in=7]{c3}{a1}  
+        \rf[out=-173,in=-7]{c3}{a1}  
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -719,7 +719,7 @@ Two thread variant:
   \event{b3}{\DW{x}{1}}{right=of b2}
   \wki{b2}{b3}
   \rf{a3}{b1}
-  \rf[out=173,in=7]{b3}{a1}  
+  \rf[out=-173,in=-7]{b3}{a1}  
     \end{tikzinline}}
 \end{gather*}
 \ref{IRIW} is allowed if all accesses are relaxed, but not if the initial
@@ -756,7 +756,7 @@ reads are acquiring:
         \sync{ry1}{rx0}
         \rf{wx1}{rx1}
         \rf{wy1}{ry1}
-        \wk[out=170,in=10]{rx0}{wx1}
+        \wk[out=-170,in=-10]{rx0}{wx1}
         \wk{ry0}{wy1}
       \end{tikzinline}}
   \end{gathered}
@@ -783,7 +783,7 @@ reads are acquiring:
         \rf{wx1}{rx1}
         \rf{wy1}{ry1}
         \sync{ry1}{rx0}
-        \wk[out=170,in=10]{rx0}{wx1}
+        \wk[out=-170,in=-10]{rx0}{wx1}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -812,7 +812,7 @@ valid under some earlier sketches of the model:
         \po{e}{f}
         \rf{b}{c}
         \rf{d}{e}
-        \rf[out=172,in=8]{f}{a}
+        \rf[out=-172,in=-8]{f}{a}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -845,7 +845,7 @@ by \PS{}.
       \rf{b4}{c1}
       \rf{a1}{b3}
       \wk{b2}{a1} 
-      \rf[out=170,in=10]{c2}{b1}
+      \rf[out=-170,in=-10]{c2}{b1}
    \end{tikzinline}}
 \end{gather*}
 
@@ -932,7 +932,7 @@ semantics.
         \event{b2}{\DR{\REF{1}}{0}}{right=of b1}
         \sync{b1}{b2}
         \rf{a4}{b1}
-        \wk[out=170,in=10]{b2}{a2}
+        \wk[out=-170,in=-10]{b2}{a2}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -1057,7 +1057,7 @@ Here are some additional examples:
         \sync{a6}{a7}
         \event{a8}{1{=}1\bigmid\DW{y}{1}}{right=of a7}
         \graypo{a7}{a8}
-        \sync[out=-18,in=-162]{a6}{a8}
+        \sync[out=18,in=162]{a6}{a8}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -1083,7 +1083,7 @@ Here are some additional examples:
         \event{b2}{\DW{x}{1}}{right=of b1}
         \po{b1}{b2}
         \rf{a4}{b1}
-        \rf[out=170,in=10]{b2}{a1}
+        \rf[out=-170,in=-10]{b2}{a1}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -1136,7 +1136,7 @@ Java Causality Test Case 18 asks that we justify the following execution:
         \rf[out=-165,in=-15]{d}{e}
         \rf{f}{a}
         \rf[out=15,in=165]{f}{c}
-        \wki[out=-15,in=-165]{i}{f}
+        \wki[out=15,in=165]{i}{f}
       \end{tikzinline}}
   \end{gathered}
 \end{displaymath}
@@ -1193,7 +1193,7 @@ This is not a tautology.  But we get one by coalescing $s$ and $r$:
       \po{e}{f}
       \rf[out=-165,in=-15]{d}{e}
       \rf{f}{a}
-      \wki[out=-15,in=-165]{i}{f}
+      \wki[out=15,in=165]{i}{f}
     \end{tikzinline}}
 \end{gather*}
 % \begin{displaymath}
@@ -1238,7 +1238,7 @@ This is not a tautology.  But we get one by coalescing $s$ and $r$:
         \po{e}{f}
         \rf[out=-165,in=-15]{d}{e}
         \rf{f}{a}
-        \wki[out=-15,in=-165]{i}{f}
+        \wki[out=15,in=165]{i}{f}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -1586,7 +1586,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
         \po{a1}{a2}
         \event{a0}{\DR{z}{1}}{left=of a1}
         \event{a00}{\DW{z}{0}}{left=of a0}
-        % \po[out=-15,in=-165]{a0}{a2}
+        % \po[out=15,in=165]{a0}{a2}
       \end{tikzinline}}
   \end{gathered}          
 \end{gather*}
@@ -1628,7 +1628,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
         \po{a1}{a2}
         \event{a0}{\DR{z}{1}}{left=of a1}
         \event{a00}{\DW{z}{0}}{left=of a0}
-        % \po[out=-15,in=-165]{a0}{a2}
+        % \po[out=15,in=165]{a0}{a2}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -1680,8 +1680,8 @@ order from both sides.
         \sync{c}{d}
         \sync[out=15,in=165]{d}{f}
         \rf{c}{b}
-        \rf[out=-8,in=-172]{a}{f}
-        \wk[in=10,out=170]{e}{a}
+        \rf[out=8,in=172]{a}{f}
+        \wk[in=-10,out=-170]{e}{a}
         \wk{e}{f}
       \end{tikzinline}}
   \end{gathered}
@@ -1914,8 +1914,8 @@ promising semantics allows this behavior.
       %\sync{c1}{c2}
       \wk{a3}{b1}
       \rf{b3}{c1}
-      \rf[out=170,in=10]{c2}{a1}
-      \sync[out=-10,in=-170]{a2}{b2}
+      \rf[out=-170,in=-10]{c2}{a1}
+      \sync[out=10,in=170]{a2}{b2}
     \end{tikzinline}}
 \end{gather*}
 Allowed behavior on POWER...
@@ -1972,7 +1972,7 @@ promising semantics in \cite{promising-ldrf}.
         \po[out=10,in=170]{a2}{a6}
         % \po[out=15,in=165]{a3}{a6}
         \po{a5}{a6}
-        \wk[out=-20,in=-160]{a4}{a6}
+        \wk[out=20,in=160]{a4}{a6}
         % \po{b2}{b3}
         \rf[out=15,in=165]{a6}{b2}
         \rf[out=-170,in=-10]{b3}{a5}
@@ -2016,10 +2016,10 @@ It is not possible for two \RMW{}s to see the same write.
         \event{b2}{\DW{x}{1}}{right=of b1}
         \rmw{a1}{a2}
         \rf{a0}{a1}
-        \rf[out=-15,in=-165]{a0}{b1}
-        \wk[out=-15,in=-165]{a1}{b2}
-        \wk{b1}{a2}
-        \graywk[bend left]{a2}{b1}
+        \rf[out=15,in=165]{a0}{b1}
+        \wk[out=15,in=165]{a1}{b2}
+        \wk[out=-15,in=-165]{b1}{a2}
+        \graywk{a2}{b1}
         \rmw{b1}{b2}
       \end{tikzinline}}
   \end{gathered}
@@ -2049,7 +2049,7 @@ quantification over multiple futures in order to disallow executions such as
         \event{b2}{\DW{x}{0}}{right=of b1}
         \rmw{a1}{a1b}
         \rmw{b0}{b0b}
-        \rf[out=-13,in=-163]{a2}{b1}
+        \rf[out=13,in=163]{a2}{b1}
         \po{a1}{a2}
         \sync{b0}{b1}
         \po{b1}{b2}
@@ -2104,7 +2104,7 @@ semantics permits \ref{GA+E}:
         \event{b1}{\DR{y}{1}}{right=of b0}
         \event{b2}{\DW{x}{1}}{right=of b1}
         % \rmw{a1}{a2}
-        \rf[out=-15,in=-160]{a2}{b1}
+        \rf[out=15,in=160]{a2}{b1}
         \po{b1}{b2}
         \rf[out=-165,in=-15]{b2}{a1}
         \wk[out=10,in=170]{a0}{b0}
@@ -2183,9 +2183,9 @@ semantics permits \ref{RP}:
           \event{b3}{\DR{x}{1}}{right=of b2}
           \rmw{a2}[below]{a3}
           \wk{b2}{a3}
-          \wk[out=-15,in=-165]{a2}{b2}
-          \rf[out=-15,in=-165]{a3}{b3}
-          \liftrmw[out=165,in=15]{b2}{a2}
+          \wk[out=15,in=165]{a2}{b2}
+          \rf[out=15,in=165]{a3}{b3}
+          \liftrmw[out=-165,in=-15]{b2}{a2}
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
@@ -2210,8 +2210,8 @@ semantics permits \ref{RP}:
           \rmw{b1}{b2}
           \rf{i}{a1}
           \rf[out=15,in=165]{i}{b1}
-          \wk[out=-15,in=-165]{a1}{b2}
-          \liftrmw[out=-15,in=-165]{a2}{b1}
+          \wk[out=15,in=165]{a1}{b2}
+          \liftrmw[out=15,in=165]{a2}{b1}
           % \wk{a1}{b2}
           \wk{b1}{a2}
         \end{tikzinline}}
@@ -2245,13 +2245,13 @@ semantics permits \ref{RP}:
           \event{b4}{\DWRel{x}{1}}{right=2em of b3}
           \rmw{b3}{b4}
           \event{b5}{\DW{y}{1}}{right=of b4}
-          \sync[out=-20,in=-160]{b1}{b4}
-          \po[out=-20,in=-160]{b3}{b5}
+          \sync[out=20,in=160]{b1}{b4}
+          \po[out=20,in=160]{b3}{b5}
           \event{a1}{\DR{y}{1}}{right=3em of b5}
           \event{a2}{\DW{z}{1}}{right=of a1}
           \po{a1}{a2}
           \rf{b5}{a1}
-          \rf[out=170,in=10]{a2}{b1}
+          \rf[out=-170,in=-10]{a2}{b1}
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
@@ -2276,13 +2276,13 @@ semantics permits \ref{RP}:
           \event{b4}{\DW{x}{1}}{right=2em of b3}
           \rmw{b3}{b4}
           \event{b5}{\DW{y}{1}}{right=of b4}
-          \po[out=-20,in=-160]{b1}{b4}
-          \po[out=-20,in=-160]{b3}{b5}
+          \po[out=20,in=160]{b1}{b4}
+          \po[out=20,in=160]{b3}{b5}
           \event{a1}{\DR{y}{1}}{right=3em of b5}
           \event{a2}{\DW{z}{1}}{right=of a1}
           \po{a1}{a2}
           \rf{b5}{a1}
-          \rf[out=170,in=10]{a2}{b1}
+          \rf[out=-170,in=-10]{a2}{b1}
         \end{tikzinline}}
     \end{gathered}
   \end{gather*}
@@ -2309,7 +2309,7 @@ This is allowed by \weakestmo{}, but not \PS{}.
           \event{b2}{\DW{x}{0}}{right=of b1}
           \rmw{a1}{a1b}
           \rmw{b0}{b0b}
-          \rf[out=-13,in=-163]{a2}{b1}
+          \rf[out=13,in=163]{a2}{b1}
           \sync[out=20,in=160]{a1}{a2}
           \sync[out=20,in=160]{b0}{b1}
           \po{b1}{b2}
@@ -2339,7 +2339,7 @@ This is allowed by \weakestmo{}, but not \PS{}.
           \event{b2}{\DW{x}{0}}{right=of b1}
           \rmw{a1}{a1b}
           \rmw{b0}{b0b}
-          \rf[out=-13,in=-163]{a2}{b1}
+          \rf[out=13,in=163]{a2}{b1}
           \po[out=20,in=160]{a1}{a2}
           \po[out=20,in=160]{b0}{b1}
           \po{b1}{b2}
@@ -2472,8 +2472,8 @@ is actually unsound.
       \sync{c1}{c2}
       \rf{b3}{c1}
       \rf{a2}{b1}
-      \wky[out=170,in=10]{c2}{a1}
-      \sync[out=-15,in=-165]{b1}{b3}
+      \wky[out=-170,in=-10]{c2}{a1}
+      \sync[out=15,in=165]{b1}{b3}
    \end{tikzinline}}
 \end{gather*}
 (R)C11 disallows the annotated behavior, due in particular to the release sequence formed from the
@@ -2508,10 +2508,10 @@ program as well
       \sync{c1}{c2}
       \rf{b3}{c1}
       \rf[out=15,in=165]{a2}{b1}
-      \sync[out=-15,in=-165]{b0}{b2}
-      \wky[out=170,in=10]{c2}{a1}
-      \sync[out=-15,in=-165]{b1}{b3}
-      \sync[out=-20,in=-160]{b0}{b3}
+      \sync[out=15,in=165]{b0}{b2}
+      \wky[out=-170,in=-10]{c2}{a1}
+      \sync[out=15,in=165]{b1}{b3}
+      \sync[out=20,in=160]{b0}{b3}
    \end{tikzinline}}
 \end{gather*}
 
@@ -2543,7 +2543,7 @@ cases:
       \sync{c1}{c2}
       \rf{b3}{c1}
       \rf{a2}{b1}
-      \wky[out=170,in=10]{c2}{a1}
+      \wky[out=-170,in=-10]{c2}{a1}
       %\sync[out=-15,in=-165]{b1}{b3}
       %\wkx[out=-15,in=-165]{b1}{b3}
    \end{tikzinline}}
@@ -2574,10 +2574,10 @@ cases:
       \sync{c1}{c2}
       \rf{b3}{c1}
       \rf[out=15,in=165]{a2}{b1}
-      \sync[out=-15,in=-165]{b0}{b2}
-      \wky[out=170,in=10]{c2}{a1}
+      \sync[out=15,in=165]{b0}{b2}
+      \wky[out=-170,in=-10]{c2}{a1}
       %\sync[out=-15,in=-165]{b1}{b3}
-      \sync[out=-20,in=-160]{b0}{b3}
+      \sync[out=20,in=160]{b0}{b3}
       %\wkx[out=-15,in=-165]{b1}{b3}
    \end{tikzinline}}
 \end{gather*}
@@ -2786,7 +2786,7 @@ to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
       \sync{a1}{a2}
       \rf[out=20,in=160]{a1}{a3}
       \rf[out=20,in=160]{a2}{b1}
-      \wk[out=-20,in=-160]{a3}{b2}
+      \wk[out=20,in=160]{a3}{b2}
       \sync{b1}{b2}
       % \node(ai)[left=3em of a1]{};
       % \bgoval[yellow!50]{(ai)}{P}
@@ -2804,7 +2804,7 @@ to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
       \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       \rf[out=20,in=160]{a2}{b1}
-      \rf[out=160,in=20]{b2}{a3}
+      \rf[out=-160,in=-20]{b2}{a3}
       \sync{b1}{b2}
     \end{tikzinline}}
 \end{gather}
@@ -2849,8 +2849,8 @@ particular,
       \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       % \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
-      % \wk[out=-20,in=-160]{a3}{b2}
+      \rf{a2}{b1}
+      % \wk[out=20,in=160]{a3}{b2}
       \sync{b1}{b2}
       % \node(ai)[left=3em of a1]{};
       % \bgoval[yellow!50]{(ai)}{P}
@@ -2872,7 +2872,7 @@ not affect the set of pomsets that are considered.  In particular,
       % \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
       \sync{a1}{a2}
       % \rf[out=20,in=160]{a1}{a3}
-      \rf[out=20,in=160]{a2}{b1}
+      \rf{a2}{b1}
       % \wk[out=-20,in=-160]{a3}{b2}
       % \sync{b1}{b2}
       % \node(ai)[left=3em of a1]{};
@@ -3315,7 +3315,7 @@ Another
       \event{b}{\DRreg{s}{x}{2}}{right=of a}
       \event{c}{\DW{y}{1}}{right=of b}
       \event{d}{\DW{z}{1}}{right=of c}
-      \po[out=-15,in=-165]{a}{c}
+      \po[out=15,in=165]{a}{c}
       \po[out=15,in=165]{b}{d}
     \end{tikzinline}}
   \\
@@ -3324,7 +3324,7 @@ Another
       \event{b}{\DRreg{s}{x}{2}}{right=of a}
       \event{c}{\DW{y}{1}}{right=of b}
       \event{d}{\DW{z}{1}}{right=of c}
-      \po[out=-15,in=-165]{a}{c}
+      \po[out=15,in=165]{a}{c}
       \po[out=15,in=165]{a}{d}
     \end{tikzinline}}
 \end{gather*}          
@@ -3344,7 +3344,7 @@ Another
       \event{b}{\DRreg{s}{x}{2}}{right=of a}
       \event{c}{\DW{y}{1}}{right=of b}
       \event{d}{\DW{z}{1}}{right=of c}
-      \po[out=-15,in=-165]{a}{c}
+      \po[out=15,in=165]{a}{c}
       \po[out=15,in=165]{b}{d}
     \end{tikzinline}}
   \\
@@ -3652,7 +3652,7 @@ But we can have:
       \event{a4}{x{=}1\bigmid\DW{z}{1}}{right=of a3}
       \event{b2}{\DR{x}{1}}{left=of a1}
       \po[out=15,in=165]{b2}{a3}
-      \po[out=-15,in=-165]{b2}{a4}
+      \po[out=15,in=165]{b2}{a4}
       % \po[out=15,in=165]{a1}{a3}
       % \po[out=15,in=165]{a2}{a4}
     \end{tikzinline}}

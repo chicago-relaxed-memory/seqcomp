@@ -376,7 +376,7 @@ paradoxical ``out of thin air'' examples such as:
       \event{ry1}{\DR{y}{1}}{right=3em of wy1}
       \event{wx1}{\DW{x}{1}}{right=of ry1}
       \rf[out=15,in=165]{wy1}{ry1}
-      \rf[out=165,in=15]{wx1}{rx1}
+      \rf[out=-165,in=-15]{wx1}{rx1}
       \po{rx1}{wy1}
       \po{ry1}{wx1}
     \end{tikzinline}}
@@ -399,7 +399,7 @@ results in:
       \event{ry1}{\DR{y}{1}}{right=3em of wy1}
       \event{wx1}{\DW{x}{1}}{right=of ry1}
       \rf[out=15,in=165]{wy1}{ry1}
-      \rf[out=165,in=15]{wx1}{rx1}
+      \rf[out=-165,in=-15]{wx1}{rx1}
       \po{ry1}{wx1}
     \end{tikzinline}}
 \end{gather*}
@@ -421,7 +421,7 @@ execution:
       \event{ry1}{\DR{y}{1}}{right=3em of wy1}
       \event{wx1}{\DW{x}{1}}{right=of ry1}
       \rf[out=15,in=165]{wy1}{ry1}
-      \rf[out=165,in=15]{wx1}{rx1}
+      \rf[out=-165,in=-15]{wx1}{rx1}
       \po{rx1}{wy1}
       \po{ry1}{wx1}
     \end{tikzinline}}
