@@ -964,7 +964,7 @@ Here is the complete program for \ref{TC6}:
     \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
         \event{i1}{\DW{y}{0}}{}
         \event{a1}{\DR{y}{1}}{right=3em of i1}
-        \event{a2}{\aForm\mid\DW{x}{1}}{right=of a1}
+        \event{a2}{\aForm\bigmid\DW{x}{1}}{right=of a1}
         \event{b1}{\DR{y}{1}}{right=3em of a2}
         \event{b2}{\DW{x}{1}}{right=of b1}
         \po{b1}{b2}
@@ -995,7 +995,7 @@ Here are some additional examples:
     \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
         \event{i1}{\DW{y}{0}}{}
         \event{a1}{\DR{y}{1}}{right=3em of i1}
-        \event{a2}{\aForm\mid\DW{x}{1}}{right=of a1}
+        \event{a2}{\aForm\bigmid\DW{x}{1}}{right=of a1}
         \event{b1}{\DR{y}{1}}{right=3em of a2}
         \event{b2}{\DW{x}{1}}{right=of b1}
         \po{b1}{b2}
@@ -1019,7 +1019,7 @@ Here are some additional examples:
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
         \event{rx1}{\DR{x}{1}}{right=3em of wx0}
-        \event{wy1}{0\geq0\mid\DW{y}{1}}{right=of rx1}
+        \event{wy1}{0\geq0\bigmid\DW{y}{1}}{right=of rx1}
         \event{ry1}{\DR{y}{1}}{right=3em of wy1}
         \event{wx1}{\DW{x}{1}}{right=of ry1}
         \event{wx2}{\DW{x}{{-2}}}{right=3em of wx1}
@@ -1055,7 +1055,7 @@ Here are some additional examples:
         \rf{b5}{a6}
         \event{a7}{\DR{x}{1}}{right=of a6}
         \sync{a6}{a7}
-        \event{a8}{1{=}1\mid\DW{y}{1}}{right=of a7}
+        \event{a8}{1{=}1\bigmid\DW{y}{1}}{right=of a7}
         \graypo{a7}{a8}
         \sync[out=-18,in=-162]{a6}{a8}
       \end{tikzinline}}
@@ -1077,7 +1077,7 @@ Here are some additional examples:
         \event{a2}{\DWRel{y}{1}}{right=of a1}
         \sync{a1}{a2}
         \event{a3}{\DR{y}{1}}{right=of a2}
-        \event{a4}{1{=}1\mid\DW{z}{1}}{right=of a3}
+        \event{a4}{1{=}1\bigmid\DW{z}{1}}{right=of a3}
         \rf{a2}{a3}
         \event{b1}{\DR{z}{1}}{right=3em of a4}
         \event{b2}{\DW{x}{1}}{right=of b1}
@@ -1131,7 +1131,7 @@ Java Causality Test Case 18 asks that we justify the following execution:
         \event{a}{\DR{x}{1}}{right=3em of f}
         % \event{b}{\DW{x}{1}}{right=of a}
         \event{c}{\DR{x}{1}}{right=of a}
-        \event{d}{\aForm\mid\DW{y}{1}}{right=of c}
+        \event{d}{\aForm\bigmid\DW{y}{1}}{right=of c}
         \po{e}{f}
         \rf[out=-165,in=-15]{d}{e}
         \rf{f}{a}
@@ -1189,7 +1189,7 @@ This is not a tautology.  But we get one by coalescing $s$ and $r$:
       \event{a}{\DR{x}{1}}{right=3em of f}
       % \event{b}{\DW{x}{1}}{right=of a}
       % \event{c}{\DR{x}{1}}{right=of a}
-      \event{d}{\aForm\mid\DW{y}{1}}{right=of a}
+      \event{d}{\aForm\bigmid\DW{y}{1}}{right=of a}
       \po{e}{f}
       \rf[out=-165,in=-15]{d}{e}
       \rf{f}{a}
@@ -1234,7 +1234,7 @@ This is not a tautology.  But we get one by coalescing $s$ and $r$:
         \event{a}{\DR{x}{1}}{right=3em of f}
         % \event{b}{\DW{x}{1}}{right=of a}
         % \event{c}{\DR{x}{1}}{right=of a}
-        \event{d}{\aForm\mid\DW{y}{1}}{right=of a}
+        \event{d}{\aForm\bigmid\DW{y}{1}}{right=of a}
         \po{e}{f}
         \rf[out=-165,in=-15]{d}{e}
         \rf{f}{a}
@@ -1462,8 +1462,8 @@ Instead we weaken with the read into r2.
     \IF{r_2{=}1}\THEN \PR{y}{r_3}\SEMI \PW{x}{r_3}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a1}{r_2{=}1 \mid \DR{y}{1}}{}
-        \event{a2}{r_2{=}1 \land y{=}1 \mid \DW{x}{1}}{right=of a1}
+        \event{a1}{r_2{=}1 \bigmid \DR{y}{1}}{}
+        \event{a2}{r_2{=}1 \land y{=}1 \bigmid \DW{x}{1}}{right=of a1}
       \end{tikzinline}}
   \end{gathered}
   \qquad
@@ -1471,22 +1471,22 @@ Instead we weaken with the read into r2.
     \IF{r_2{\neq}1}\THEN \PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{r_2{\neq}1 \mid \DW{x}{1}}{}
+        \event{a2}{r_2{\neq}1 \bigmid \DW{x}{1}}{}
       \end{tikzinline}}
   \end{gathered}
   \\
   \IF{r_2{=}1}\THEN \PR{y}{r_3}\SEMI \PW{x}{r_3} \ELSE \PW{x}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-      \event{a1}{r_2{=}1 \mid \DR{y}{1}}{}
-      \event{a2}{(r_2{=}1 \land y{=}1) \lor (r_2{\neq}1) \mid \DW{x}{1}}{right=of a1}
+      \event{a1}{r_2{=}1 \bigmid \DR{y}{1}}{}
+      \event{a2}{(r_2{=}1 \land y{=}1) \lor (r_2{\neq}1) \bigmid \DW{x}{1}}{right=of a1}
     \end{tikzinline}}
   \\
   \PR{y}{r_2} \SEMI\IF{r_2{=}1}\THEN \PR{y}{r_3}\SEMI \PW{x}{r_3} \ELSE \PW{x}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DR{y}{1}}{}
-      \event{a2}{(y{=}1 \land y{=}1) \lor (y{\neq}1) \mid\DW{x}{1}}{right=of a1}
+      \event{a2}{(y{=}1 \land y{=}1) \lor (y{\neq}1) \bigmid\DW{x}{1}}{right=of a1}
       \event{a0}{\DR{y}{1}}{left=of a1}
       % \po[out=-15,in=-165]{a0}{a2}
     \end{tikzinline}}
@@ -1520,7 +1520,7 @@ In any execution, we must have 1 before 2, or 2 before 1.
       \IF{r_1{=}2}\THEN \PW{y}{1} \ELSE \PW{y}{r_2}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-          \event{a2}{r_1{=}2\lor (r_1{\neq}2 \land r_2{=}1)\mid \DW{y}{1}}{}
+          \event{a2}{r_1{=}2\lor (r_1{\neq}2 \land r_2{=}1)\bigmid \DW{y}{1}}{}
         \end{tikzinline}}
     \end{gathered}
     \\
@@ -1531,7 +1531,7 @@ In any execution, we must have 1 before 2, or 2 before 1.
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1em]
           \event{a2}{\DW{y}{1}}{}
-          % \event{a2}{1{=}2\lor 1{=}1\mid \DW{y}{1}}{}
+          % \event{a2}{1{=}2\lor 1{=}1\bigmid \DW{y}{1}}{}
           \event{a1}{\DR{z}{1}}{left=of a2}
           \event{a0}{\DR{x}{1}}{left=of a1}
           \po{a1}{a2}
@@ -1552,8 +1552,8 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{r{=}0\mid\DW{y}{1}}{}
-        \event{a1}{r{=}0\mid\DR{x}{1}}{left=of a2}
+        \event{a2}{r{=}0\bigmid\DW{y}{1}}{}
+        \event{a1}{r{=}0\bigmid\DR{x}{1}}{left=of a2}
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gathered}      
@@ -1562,8 +1562,8 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \IF{r}\THEN \PR{x}{s}\SEMI \PW{y}{r}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{r{=}1\mid\DW{y}{1}}{}
-        \event{a1}{r{\neq}0\mid\DR{x}{1}}{left=of a2}
+        \event{a2}{r{=}1\bigmid\DW{y}{1}}{}
+        \event{a1}{r{\neq}0\bigmid\DR{x}{1}}{left=of a2}
       \end{tikzinline}}
   \end{gathered}      
   \\
@@ -1571,7 +1571,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\ELSE \PW{y}{r}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{r{=}0\lor r{=}1\mid\DW{y}{1}}{}
+        \event{a2}{r{=}0\lor r{=}1\bigmid\DW{y}{1}}{}
         \event{a1}{\DR{x}{1}}{left=of a2}
         \po{a1}{a2}
       \end{tikzinline}}
@@ -1581,7 +1581,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \PW{z}{0}\SEMI \PR{z}{r}\SEMI \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\ELSE \PW{y}{r}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{0{=}0\lor 0{=}1\mid\DW{y}{1}}{}
+        \event{a2}{0{=}0\lor 0{=}1\bigmid\DW{y}{1}}{}
         \event{a1}{\DR{x}{1}}{left=of a2}
         \po{a1}{a2}
         \event{a0}{\DR{z}{1}}{left=of a1}
@@ -1595,8 +1595,8 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{r{=}0\mid\DW{y}{1}}{}
-        \event{a1}{r{=}0\mid\DR{x}{1}}{left=of a2}
+        \event{a2}{r{=}0\bigmid\DW{y}{1}}{}
+        \event{a1}{r{=}0\bigmid\DR{x}{1}}{left=of a2}
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gathered}      
@@ -1605,7 +1605,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \IF{r}\THEN \PW{y}{r}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{r{=}1\mid\DW{y}{1}}{}
+        \event{a2}{r{=}1\bigmid\DW{y}{1}}{}
       \end{tikzinline}}
   \end{gathered}      
   \\
@@ -1613,8 +1613,8 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\ELSE \PW{y}{r}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{r{=}0\lor r{=}1\mid\DW{y}{1}}{}
-        \event{a1}{r{=}0\mid\DR{x}{1}}{left=of a2}
+        \event{a2}{r{=}0\lor r{=}1\bigmid\DW{y}{1}}{}
+        \event{a1}{r{=}0\bigmid\DR{x}{1}}{left=of a2}
         \po{a1}{a2}
       \end{tikzinline}}
   \end{gathered}          
@@ -1623,7 +1623,7 @@ Irrelevant Read Introduction (can I read 1 for both y and z?)
     \PW{z}{0}\SEMI \PR{z}{r}\SEMI \IF{\BANG r}\THEN \IF{x}\THEN \PW{y}{1}\FI\ELSE \PW{y}{r}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{a2}{0{=}0\lor 0{=}1\mid\DW{y}{1}}{}
+        \event{a2}{0{=}0\lor 0{=}1\bigmid\DW{y}{1}}{}
         \event{a1}{\DR{x}{1}}{left=of a2}
         \po{a1}{a2}
         \event{a0}{\DR{z}{1}}{left=of a1}
@@ -2099,7 +2099,7 @@ semantics permits \ref{GA+E}:
     \hbox{\begin{tikzinline}[node distance=2em]
         \event{a0}{\DW{x}{0}}{}
         \event{a1}{\DR{x}{1}}{right=3em of a0}
-        \event{a2}{0{<}10\mid\DW{y}{1}}{right=of a1}
+        \event{a2}{0{<}10\bigmid\DW{y}{1}}{right=of a1}
         \event{b0}{\DW{x}{42}}{right=3em of a2}
         \event{b1}{\DR{y}{1}}{right=of b0}
         \event{b2}{\DW{x}{1}}{right=of b1}
@@ -3009,8 +3009,8 @@ augmentation to get the others.
     \IF{r{>}0}\THEN \PW{y}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
-        \event{c}{r{>}0 \mid \DW{y}{1}}{}
-        \final{f}{r{>}0 \mid \SUB{1/y}}{below=of c}
+        \event{c}{r{>}0 \bigmid \DW{y}{1}}{}
+        \final{f}{r{>}0 \bigmid \SUB{1/y}}{below=of c}
       \end{tikzinline}}
   \end{gathered}
   \qquad
@@ -3018,8 +3018,8 @@ augmentation to get the others.
     \IF{r{>}0}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
-        \event{d}{r{>}0 \mid \DW{z}{1}}{}
-        \final{f}{r{>}0 \mid \SUB{1/z}}{below=of d}
+        \event{d}{r{>}0 \bigmid \DW{z}{1}}{}
+        \final{f}{r{>}0 \bigmid \SUB{1/z}}{below=of d}
       \end{tikzinline}}
   \end{gathered}
   \\
@@ -3030,7 +3030,7 @@ augmentation to get the others.
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
         \event{a}{\DW{x}{1}}{}
-        \event{b}{\DRreg{r}{x}{2} \mid \SUB{1/x,1/r}}{right=of a}
+        \event{b}{\DRreg{r}{x}{2} \bigmid \SUB{1/x,1/r}}{right=of a}
         \final{f}{\SUB{1/x}}{below=of a}
       \end{tikzinline}}
   \end{gathered}
@@ -3041,9 +3041,9 @@ augmentation to get the others.
     \IF{r{>}0}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
-        \event{c}{r{>}0 \mid \DW{y}{1}}{}
-        \event{d}{r{>}0 \mid \DW{z}{1}}{right=of c}
-        \final{f}{r{>}0 \mid \SUB{1/y,1/z}}{below=of c}
+        \event{c}{r{>}0 \bigmid \DW{y}{1}}{}
+        \event{d}{r{>}0 \bigmid \DW{z}{1}}{right=of c}
+        \final{f}{r{>}0 \bigmid \SUB{1/y,1/z}}{below=of c}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -3070,7 +3070,7 @@ It is also possible that the read is necessary to give a value for $r$:
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
         \event{a}{\DW{x}{0}}{}
-        \event{b}{\DRreg{r}{x}{2} \mid \SUB{0/x,0/r}}{right=of a}
+        \event{b}{\DRreg{r}{x}{2} \bigmid \SUB{0/x,0/r}}{right=of a}
         \final{f}{\SUB{0/x}}{below=of a}
       \end{tikzinline}}
   \end{gathered}
@@ -3081,9 +3081,9 @@ It is also possible that the read is necessary to give a value for $r$:
     \IF{r{>}0}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
-        \event{c}{r{>}0 \mid \DW{y}{1}}{}
-        \event{d}{r{>}0 \mid \DW{z}{1}}{right=of c}
-        \final{f}{r{>}0 \mid \SUB{1/y,1/z}}{below=of c}
+        \event{c}{r{>}0 \bigmid \DW{y}{1}}{}
+        \event{d}{r{>}0 \bigmid \DW{z}{1}}{right=of c}
+        \final{f}{r{>}0 \bigmid \SUB{1/y,1/z}}{below=of c}
       \end{tikzinline}}
   \end{gathered}  
 \end{gather*}
@@ -3114,8 +3114,8 @@ Dependency on two reads:
     \IF{r{<}s}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
-        \event{c}{r{<}s \mid \DW{z}{1}}{}
-        \final{f}{r{<}s \mid \SUB{1/z}}{below=of c}
+        \event{c}{r{<}s \bigmid \DW{z}{1}}{}
+        \final{f}{r{<}s \bigmid \SUB{1/z}}{below=of c}
       \end{tikzinline}}
   \end{gathered}
   \\
@@ -3125,9 +3125,9 @@ Dependency on two reads:
     \hbox{\begin{tikzinline}[node distance=.2em]
         \event{a}{\DRreg{r}{x}{1}}{}
         \event{b}{\DRreg{s}{y}{2}}{right=of a}
-        \event{c}{x{<}2 \mid \DW{z}{1}}{right=1em of b}
+        \event{c}{x{<}2 \bigmid \DW{z}{1}}{right=1em of b}
         \po{b}{c}
-        \final{f}{r{<}s \mid \SUB{x/r,y/s,1/z}}{below=of a}
+        \final{f}{r{<}s \bigmid \SUB{x/r,y/s,1/z}}{below=of a}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -3157,8 +3157,8 @@ Don't need to worry about confusing reads:
     \PW{z}{s}
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
-        \event{c}{s{<}0 \mid \DW{z}{1}}{}
-        \final{f}{s{<}0 \mid \SUB{1/z}}{below=of c}
+        \event{c}{s{<}0 \bigmid \DW{z}{1}}{}
+        \final{f}{s{<}0 \bigmid \SUB{1/z}}{below=of c}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -3188,8 +3188,8 @@ But we also have
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
         \event{b}{\DRreg{s}{x}{2}}{}
-        \event{c}{x{<}0 \mid \DW{z}{1}}{right=of b}
-        \final{f}{x{<}0 \mid \SUB{x/s,1/z}}{below=of c}
+        \event{c}{x{<}0 \bigmid \DW{z}{1}}{right=of b}
+        \final{f}{x{<}0 \bigmid \SUB{x/s,1/z}}{below=of c}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -3220,8 +3220,8 @@ Dependency on two reads (No dependency here):
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
         \event{b}{\DRreg{s}{x}{2}}{}
-        \event{c}{r{=}x \mid \DW{z}{1}}{right=of b}
-        \final{f}{r{=}x \mid \SUB{x/s,1/z}}{below=of c}
+        \event{c}{r{=}x \bigmid \DW{z}{1}}{right=of b}
+        \final{f}{r{=}x \bigmid \SUB{x/s,1/z}}{below=of c}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -3252,8 +3252,8 @@ Another example:
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
         \event{b}{\DRreg{s}{x}{1}}{}
-        \event{c}{x{=}1 \mid \DW{z}{1}}{right=of b}
-        \final{f}{x{=}1 \mid \SUB{x/s,1/z}}{below=of c}
+        \event{c}{x{=}1 \bigmid \DW{z}{1}}{right=of b}
+        \final{f}{x{=}1 \bigmid \SUB{x/s,1/z}}{below=of c}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -3364,7 +3364,7 @@ Another
   \\
   \hbox{\begin{tikzinline}[node distance=1em]
       \event{b}{\DRreg{s}{x}{2}}{}
-      \event{c}{r{>}0\mid\DW{y}{1}}{right=of b}
+      \event{c}{r{>}0\bigmid\DW{y}{1}}{right=of b}
       \event{d}{\DW{z}{1}}{right=of c}
       % \po{b}{c}
       \po[out=15,in=165]{b}{d}
@@ -3378,7 +3378,7 @@ Another
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=1em]
 %     \event{b}{\DRreg{s}{x}{2}}{}
-%     \event{c}{r{=}x\mid\DW{y}{1}}{right=of b}
+%     \event{c}{r{=}x\bigmid\DW{y}{1}}{right=of b}
 %     \event{d}{\DW{z}{1}}{right=of c}
 %     \po{b}{c}
 %     \po[out=15,in=165]{b}{d}
@@ -3402,9 +3402,9 @@ Another
     \SEMI \IF{s{>}0}\THEN \PW{z}{1}\FI
     \\[-1ex]
     \hbox{\begin{tikzinline}[node distance=.2em]
-        \event{c}{r{>}0 \mid \DW{y}{1}}{}
-        \event{d}{s{>}0 \mid \DW{z}{1}}{right=of c}
-        \final{f}{r{>}0 \land s{>}0 \mid \SUB{1/y,1/z}}{below=of c}
+        \event{c}{r{>}0 \bigmid \DW{y}{1}}{}
+        \event{d}{s{>}0 \bigmid \DW{z}{1}}{right=of c}
+        \final{f}{r{>}0 \land s{>}0 \bigmid \SUB{1/y,1/z}}{below=of c}
       \end{tikzinline}}
   \end{gathered}
 \end{gather*}
@@ -3444,8 +3444,8 @@ The following is not a pomset (consistency):
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-      \event{a3}{r\EQ1\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{r\EQ2\mid\DW{z}{2}}{right=of a3}
+      \event{a3}{r\EQ1\bigmid\DW{y}{1}}{right=of a2}
+      \event{a4}{r\EQ2\bigmid\DW{z}{2}}{right=of a3}
     \end{tikzinline}}
 \end{gather*}
 
@@ -3463,7 +3463,7 @@ Without 4b, we still do not allow:
       \event{a2}{\DR{x}{2}}{right=of a1}
       \event{a3}{\DW{y}{1}}{right=of a2}
       \event{a4}{\DW{z}{2}}{right=of a3}
-      \event{a5}{x{=}x\mid\DW{a}{1}}{right=of a4}
+      \event{a5}{x{=}x\bigmid\DW{a}{1}}{right=of a4}
       \po[out=15,in=165]{a1}{a3}
       \po[out=15,in=165]{a2}{a4}
     \end{tikzinline}}
@@ -3476,9 +3476,9 @@ The following is not a pomset (consistency):
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-      \event{a3}{r{=}1\mid\DW{y}{1}}{}
-      \event{a4}{s{=}2\mid\DW{z}{2}}{right=of a3}
-      \event{a5}{r{=}s\mid\DW{a}{1}}{right=of a4}
+      \event{a3}{r{=}1\bigmid\DW{y}{1}}{}
+      \event{a4}{s{=}2\bigmid\DW{z}{2}}{right=of a3}
+      \event{a5}{r{=}s\bigmid\DW{a}{1}}{right=of a4}
     \end{tikzinline}}
 \end{gather*}
 
@@ -3492,7 +3492,7 @@ We do allow:
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DR{x}{1}}{}
       \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{x{=}x\mid\DW{a}{1}}{right=of a2}
+      \event{a3}{x{=}x\bigmid\DW{a}{1}}{right=of a2}
     \end{tikzinline}}
 \end{gather*}
 % \begin{gather*}
@@ -3502,7 +3502,7 @@ We do allow:
 %   \nonumber
 %   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
 %     \event{a2}{\DR{x}{2}}{}
-%     \event{a3}{r{=}x\mid\DW{a}{1}}{right=of a2}
+%     \event{a3}{r{=}x\bigmid\DW{a}{1}}{right=of a2}
 %   \end{tikzinline}}
 % \end{gather*}
 And also
@@ -3517,7 +3517,7 @@ And also
       \event{a0}{\DR{x}{0}}{}
       \event{a1}{\DR{x}{2}}{right=of a0}
       \event{a2}{\DR{x}{1}}{right=of a1}
-      \event{a3}{1{\leq}1\mid\DW{y}{1}}{right=of a2}
+      \event{a3}{1{\leq}1\bigmid\DW{y}{1}}{right=of a2}
       \po[out=15,in=165]{a0}{a3}
     \end{tikzinline}}
 \end{gather*}
@@ -3534,8 +3534,8 @@ This is not a pomset:
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a3}{\DR{x}{3}}{}
       \event{a4}{\DR{x}{4}}{right=of a3}
-      \event{a5}{x{=}1\mid\DW{y}{1}}{right=of a4}
-      \event{a6}{x{=}2\mid\DW{z}{2}}{right=of a5}
+      \event{a5}{x{=}1\bigmid\DW{y}{1}}{right=of a4}
+      \event{a6}{x{=}2\bigmid\DW{z}{2}}{right=of a5}
     \end{tikzinline}}
 \end{gather*}
 Note that reads that we delay must all be consistent.
@@ -3551,8 +3551,8 @@ Also note that we cannot have:
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a3}{\DR{x}{3}}{}
       \event{a4}{\DR{x}{4}}{right=of a3}
-      \event{a5}{x{=}1\mid\DW{y}{1}}{right=of a4}
-      \event{a6}{x{=}1\mid\DW{z}{2}}{right=of a5}
+      \event{a5}{x{=}1\bigmid\DW{y}{1}}{right=of a4}
+      \event{a6}{x{=}1\bigmid\DW{z}{2}}{right=of a5}
       \event{b3}{\DW{a}{3}}{below=of a3}
       \event{b4}{\DW{b}{4}}{below=of a4}
       \po{a3}{b3}
@@ -3567,9 +3567,9 @@ Because the following is not a pomset:
   \\[-1ex]
   \nonumber
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-      \event{a5}{r{=}1\mid\DW{y}{1}}{right=of a4}
-      \event{a6}{s{=}1\mid\DW{z}{2}}{right=of a5}
-      \event{b4}{s{=}4\mid\DW{b}{4}}{below left=of a5}
+      \event{a5}{r{=}1\bigmid\DW{y}{1}}{right=of a4}
+      \event{a6}{s{=}1\bigmid\DW{z}{2}}{right=of a5}
+      \event{b4}{s{=}4\bigmid\DW{b}{4}}{below left=of a5}
     \end{tikzinline}}
 \end{gather*}
 But we can have the following, since there is no order the reads:
@@ -3648,8 +3648,8 @@ But we can have:
   \hbox{\begin{tikzinline}[node distance=.5em and 1em]
       \event{a1}{\DR{x}{3}}{}
       \event{a2}{\DR{x}{4}}{right=of a1}
-      \event{a3}{x{=}1\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{x{=}1\mid\DW{z}{1}}{right=of a3}
+      \event{a3}{x{=}1\bigmid\DW{y}{1}}{right=of a2}
+      \event{a4}{x{=}1\bigmid\DW{z}{1}}{right=of a3}
       \event{b2}{\DR{x}{1}}{left=of a1}
       \po[out=15,in=165]{b2}{a3}
       \po[out=-15,in=-165]{b2}{a4}

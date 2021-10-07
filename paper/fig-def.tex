@@ -12,12 +12,20 @@
     $\labeling: \aEvs \fun \Act$ defines an \emph{action} for each event,
     \makecounter{Bkappa}
   \item \label{pom-kappa} \makecounter{kappa}
-    $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
-    % such that
-    % \begin{enumerate}
-    % \item \label{pom-kappa-sat}
-    %   $\labelingForm(\aEv)$ is satisfiable,
-    % \end{enumerate}
+    $\labelingForm:\AllEvents\fun\Formulae$ defines a \emph{precondition} for each event,
+    such that
+    \begin{enumerate}
+    \item \label{pom-kappa-sat}
+      $\aEv\notin\aEvs$ implies $\labelingForm(\aEv)=\FALSE$,
+    \end{enumerate}
+  %   \makecounter{Bkappa}
+  % \item \label{pom-kappa} \makecounter{kappa}
+  %   $\labelingForm:\aEvs\fun\Formulae$ defines a \emph{precondition} for each event,
+  %   % such that
+  %   % \begin{enumerate}
+  %   % \item \label{pom-kappa-sat}
+  %   %   $\labelingForm(\aEv)$ is satisfiable,
+  %   % \end{enumerate}
     \makecounter{Btau}
   \item \label{pom-tau} \makecounter{tau}
     $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of predicate transformers} over $\aEvs$, 
@@ -26,7 +34,7 @@
     $\aTerm:\Formulae$ is a \emph{termination condition}, such that 
     \begin{enumerate}
     \item \label{pom-term-tau}
-      $\aTerm\rimplies\aTr{}{\TRUE}$,
+      $\aTerm\rimplies\aTrAbbrv{\aEvs}{\TRUE}$,
     \end{enumerate}
     \makecounter{Ble}
   \item \label{pom-le} \makecounter{le}

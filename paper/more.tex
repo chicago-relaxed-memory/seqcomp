@@ -14,7 +14,7 @@ $\aVal$; the fact that $\aVal$ must be $1$ is captured in the logic (see
 The structural rules combine pomsets:  Parallel composition is disjoint
 union, inheriting labeling, order and $\rrfx$ from the two sides.  Any
 $\rrfx$ edges added between the two sides must also be added to the order
-(\ref{par-rf-le1} and \ref{par-rf-le2}).
+(\ref{par-le-rf1} and \ref{par-le-rf2}).
 % 
 Sequential composition is similar, with two changes: \ref{seq-E} does not
 require disjointness (see \textsection\ref{sec:ex:term}), and
@@ -119,7 +119,7 @@ merging:
     \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{b}{2{=}3\mid\DW{x}{3}}{}      
+        \event{b}{2{=}3\bigmid\DW{x}{3}}{}      
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -127,7 +127,7 @@ merging:
     \IF{\aExp}\THEN\PW{x}{3}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{c}{\aExp\mid\DW{x}{3}}{}      
+        \event{c}{\aExp\bigmid\DW{x}{3}}{}      
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -142,7 +142,7 @@ By merging, the semantics allows the following:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a}{\DW{x}{1}}{}      
-        \event{c}{\aExp\mid\DW{x}{3}}{right=of a}
+        \event{c}{\aExp\bigmid\DW{x}{3}}{right=of a}
         \wki{a}{c}
       \end{tikzinline}}    
   \end{gathered}
@@ -759,7 +759,7 @@ must precede those of $\sem{\aCmd_2}$.
           \PW[\mRLX]{x}{\aExp}
           \\
           \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-              \event{a}{\aExp{=}v\mid\DW[\mRLX]{x}{v}}{}
+              \event{a}{\aExp{=}v\bigmid\DW[\mRLX]{x}{v}}{}
               \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
               \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
               \xo[xright]{a}{xd}
@@ -770,7 +770,7 @@ must precede those of $\sem{\aCmd_2}$.
           \PW[\amode\in\{\mREL, \mSC \}]{x}{\aExp}
           \\
           \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-              \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
+              \event{a}{\Q{} \land \aExp{=}v\bigmid\DW[\amode]{x}{v}}{}
               \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
               \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
               \xo[xright]{a}{xd}
@@ -794,7 +794,7 @@ must precede those of $\sem{\aCmd_2}$.
           \PR[\mSC]{x}{r}
           \\
           \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-              \event{a}{\Q{} \mid \DR[\mSC]{x}{v}}{}
+              \event{a}{\Q{} \bigmid \DR[\mSC]{x}{v}}{}
               \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
               \xform{xd}{v{=}r\limplies\bForm}{below=of a}
               \xo[xright]{a}{xd}
@@ -811,7 +811,7 @@ must precede those of $\sem{\aCmd_2}$.
         \PW[\amode]{x}{\aExp}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \event{a}{\Q{} \land \aExp{=}v\mid\DW[\amode]{x}{v}}{}
+            \event{a}{\Q{} \land \aExp{=}v\bigmid\DW[\amode]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Q{}]}{above=of a}
             \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
             \xo[xright]{a}{xd}
@@ -1018,7 +1018,7 @@ Extend the definition of par, if, seq to include:
       \IF{\BANG r}\THEN \PW{y}{1} \FI
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a2}{r{=}0\mid\DW{y}{1}}{}      
+          \event{a2}{r{=}0\bigmid\DW{y}{1}}{}      
           \xform{xi}{\bForm[1/y]}{below=of a2}
         \end{tikzinline}}    
     \end{gathered}
@@ -1139,7 +1139,7 @@ $(\exists\aLocs\subseteq\Loc)$
         \PW[\fREL]{x}{\aExp}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\land\Qw{*}\land\aExp{=}v\mid\DW[\mREL]{x}{v}}{}
+            \raevent{a}{\Qr{*}\land\Qw{*}\land\aExp{=}v\bigmid\DW[\mREL]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
             \xo[xright]{a}{xd}
@@ -1150,7 +1150,7 @@ $(\exists\aLocs\subseteq\Loc)$
         \PF{\fREL}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\land\Qw{*}\mid\DF{\fREL}}{}
+            \raevent{a}{\Qr{*}\land\Qw{*}\bigmid\DF{\fREL}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xo[xright]{a}{xd}
@@ -1163,7 +1163,7 @@ $(\exists\aLocs\subseteq\Loc)$
         \PR[\fACQ]{x}{r}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qw{x}\land\Qr{*}\mid\DR[\fACQ]{x}{v}}{}
+            \raevent{a}{\Qw{x}\land\Qr{*}\bigmid\DR[\fACQ]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{v{=}r\limplies\bForm}{below=of a}
             \xo[xright]{a}{xd}
@@ -1174,7 +1174,7 @@ $(\exists\aLocs\subseteq\Loc)$
         \PF{\fACQ}
         \\
         \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\mid\DF{\fACQ}}{}
+            \raevent{a}{\Qr{*}\bigmid\DF{\fACQ}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xo[xright]{a}{xd}
@@ -1186,7 +1186,7 @@ $(\exists\aLocs\subseteq\Loc)$
       \PF{\fSC}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DF{\mSC}}{}
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\bigmid\DF{\mSC}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm}{below=of a}
           \xo[xright]{a}{xd}
@@ -1197,7 +1197,7 @@ $(\exists\aLocs\subseteq\Loc)$
       \PW[\fSC]{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\land\aExp{=}\aVal\mid\DW[\fSC]{x}{v}}{}
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\land\aExp{=}\aVal\bigmid\DW[\fSC]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm\land\aExp{=}\aVal}{below=of a}
           \xo[xright]{a}{xd}
@@ -1208,7 +1208,7 @@ $(\exists\aLocs\subseteq\Loc)$
       \PR[\fSC]{x}{\aExp}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DR[\fSC]{x}{v}}{}
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\bigmid\DR[\fSC]{x}{v}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xo[xright]{a}{xd}
@@ -1278,7 +1278,7 @@ $(\exists\aLocs\subseteq\Loc)$
   %     \\
   %     \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
   %       \raevent{b}{\DR[\mACQ]{x}{2}}{}
-  %       \event{c}{\Dx{x}\mid\DW{y}{1}}{right=.7em of b}
+  %       \event{c}{\Dx{x}\bigmid\DW{y}{1}}{right=.7em of b}
   %     \end{tikzinline}}  
   %   \end{gathered}  
   % \end{align*}

@@ -3,6 +3,18 @@
   \raggedright
   
   \noindent
+  If $\aPS\in\sSKIP$ then $\aEvs = \emptyset$
+  and $\aTr{\bEvs}{\bForm} \riff \bForm$
+  and $\aTerm\riff\TRUE$.
+  \medskip
+
+  \noindent
+  If $\aPS\in\sLET{\aReg}{\aExp}$ then $\aEvs = \emptyset$
+  and $\aTr{\bEvs}{\bForm} \riff \bForm[\aExp/\aReg]$
+  and $\aTerm\riff\TRUE$.  
+  \medskip
+
+  \noindent
   Suppose $\aRel_i$ is a relation in $\aEvs_i\times\aEvs_i$.
   We say $\aRel \rextendsdef{\aRel_i}{}$ if
   ${\aRel}\supseteq {\aRel_i}$ and
@@ -10,27 +22,49 @@
   \medskip
 
   \noindent
-  % Within a pomset $\aPS$,
-  Let 
-  \begin{math}
-    \kappaE{\bEvs}=
-    {\textstyle\bigvee{}\!\!{}_{\bEv\in\bEvs}\labelingForm(\bEv)}.
-  \end{math}
-  Note that $\kappaE{\emptyset} = \FALSE$.
-  \medskip
-
-  \noindent
-  If $\aPS\in\sSKIP$ then $\aEvs = \emptyset$
-  and $\aTr{\bEvs}{\bForm} \riff \bForm$
-  and $\aTerm\riff\TRUE$.
+  If $\aPS \in \sPAR{\aPSS_1}{\aPSS_2}$ then  
+  $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{p}\arabic*),ref=\textsc{p}\arabic*]
+    \item \label{par-E}
+      $\aEvs = (\aEvs_1\uplus\aEvs_2)$,
+    \item \label{par-lambda}
+      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+    \item \label{par-kappa}
+      $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)\lor \labelingForm_2(\aEv)$,
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{p}3]{}{par-kappa}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{par-kappa1}
+    %     if $\aEv\in\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$,
+    %   \item \label{par-kappa2}
+    %     if $\aEv\in\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_2(\aEv)$,
+    %   \end{enumerate}
+    \item \label{par-tau}
+      $\aTr{\bEvs}{\bForm} \riff \aTr[2]{\bEvs}{\bForm}$,
+    \item \label{par-term}
+      $\aTerm \riff \aTerm[1]\land\aTerm[2]$,
+    \item \label{par-le}
+    %     ${\lt}\rsupset{\lt_1}{\lt_2}$,
+      ${\lt}\rextends{\lt_1}{\lt_2}$.
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{p}6]{}{par-le}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{par-le-subset}
+    %     ${\lt}\supseteq{\lt_1}\cup{\lt_2}$,
+    %   \item \label{par-le-project}
+    %     ${\lt_i}={\lt}\cap(\aEvs_i\times \aEvs_i)$, for $i\in\{1,2\}$.        
+    %   \end{enumerate}
+    \end{enumerate}
+  \end{multicols}
   \medskip
 
   \noindent
   If $\aPS \in \sSEMI{\aPSS_1}{\aPSS_2}$ then $(\exists\aPS_1\in\aPSS_1)$ $(\exists\aPS_2\in\aPSS_2)$\\
   let
   %$\labelingForm'_2(\aEv)=\aTr[1]{}{\labelingForm_2(\aEv})$ if $\labeling(\aEv)$ is a $\sread$---otherwise
-  $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$, where
-  $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$,
+  $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$ where
+  $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$
   % RELEASE:
   % \\ and
   % $\aTerm[1](\aEv) = \aTerm[1]$ if $\labeling(\aEv)$ is a $\srelease$---otherwise
@@ -64,30 +98,32 @@
       $\aEvs = (\aEvs_1\cup\aEvs_2)$,
     \item \label{seq-lambda}
       ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{s}3]{}{seq-kappa}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{seq-kappa1}
-        if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$,
-      \item \label{seq-kappa2}
-        if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm'_2(\aEv)$, % \land \aTerm[1](\aEv)$,
-      \item \label{seq-kappa12}
-        % if $\aEv{\in}\aEvs_1{\cap}\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv){\lor}\labelingForm'_2(\aEv)$,\\
-        \makebox[0pt][l]{%
-          if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv) \riff {\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)}$,% \land \aTerm[1](\aEv)$,
-        }
-        % where
-        % $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,
-        % where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$
-        % is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise,
-      % \item \label{seq-kappa-release}
-      %   if $\labeling_2(\aEv)$ is a $\srelease$ then $\labelingForm(\aEv) \riff \aTerm[1]$,
-      \end{enumerate}
-      \columnbreak
+    \item \label{seq-kappa}
+      $\labelingForm(\aEv) \riff {\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)}$,
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{s}3]{}{seq-kappa}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{seq-kappa1}
+    %     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv)$,
+    %   \item \label{seq-kappa2}
+    %     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \riff \labelingForm'_2(\aEv)$, % \land \aTerm[1](\aEv)$,
+    %   \item \label{seq-kappa12}
+    %     % if $\aEv{\in}\aEvs_1{\cap}\aEvs_2$ then $\labelingForm(\aEv) \riff \labelingForm_1(\aEv){\lor}\labelingForm'_2(\aEv)$,\\
+    %     \makebox[0pt][l]{%
+    %       if $\aEv\in\aEvs_1\cap\aEvs_2$ then $\labelingForm(\aEv) \riff {\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)}$,% \land \aTerm[1](\aEv)$,
+    %     }
+    %     % where
+    %     % $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$,
+    %     % where $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ if $\labeling(\aEv)$
+    %     % is a write, and $\Cdown{\aEv}=\aEvs_1$, otherwise,
+    %   % \item \label{seq-kappa-release}
+    %   %   if $\labeling_2(\aEv)$ is a $\srelease$ then $\labelingForm(\aEv) \riff \aTerm[1]$,
+    %   \end{enumerate}
+    %   \columnbreak
     \item \label{seq-tau}
       $\aTr{\bEvs}{\bForm} \riff \aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
     \item \label{seq-term}
-      $\aTerm \riff \aTerm[1]\land\aTr[1]{}{\aTerm[2]}$,
+      $\aTerm \riff \aTerm[1]\land\aTrAbbrv[1]{\aEvs_1}{\aTerm[2]}$,
     \item \label{seq-le}
       ${\lt}\rextends{\lt_1}{\lt_2}$.
       % ${\lt}\supseteq{\lt_1}\cup{\lt_2}$.
@@ -113,21 +149,23 @@
     \item \label{if-lambda}
       ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
       % \item[(\ref{par-E}--\ref{par-le})] as for $\sPAR{}{}$,
-      \stepcounter{enumi}
-    \item[] \labeltext[\textsc{i}3]{}{if-kappa}
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{if-kappa1}
-        if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \riff \aForm\land\labelingForm_1(\aEv)$,
-      \item \label{if-kappa2}
-        if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \riff \neg\aForm\land\labelingForm_2(\aEv)$, 
-      \item \label{if-kappa12}
-        \makebox[0pt][l]{%
-          if $\aEv\in\aEvs_1\cap\aEvs_2$ then
-          % $\labelingForm(\aEv) \riff (\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$,
-          $\labelingForm(\aEv) \riff (\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$,
-        }
-      \end{enumerate}
-      \columnbreak
+    \item \label{if-kappa}
+      $\labelingForm(\aEv) \riff (\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$,
+    %   \stepcounter{enumi}
+    % \item[] \labeltext[\textsc{i}3]{}{if-kappa}
+    %   \begin{enumerate}[leftmargin=0pt]
+    %   \item \label{if-kappa1}
+    %     if $\aEv\in\aEvs_1\setminus\aEvs_2$ then $\labelingForm(\aEv) \riff \aForm\land\labelingForm_1(\aEv)$,
+    %   \item \label{if-kappa2}
+    %     if $\aEv\in\aEvs_2\setminus\aEvs_1$ then $\labelingForm(\aEv) \riff \neg\aForm\land\labelingForm_2(\aEv)$, 
+    %   \item \label{if-kappa12}
+    %     \makebox[0pt][l]{%
+    %       if $\aEv\in\aEvs_1\cap\aEvs_2$ then
+    %       % $\labelingForm(\aEv) \riff (\aForm\limplies\labelingForm_1(\aEv))\land(\neg\aForm\limplies\labelingForm_2(\aEv))$,
+    %       $\labelingForm(\aEv) \riff (\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$,
+    %     }
+    %   \end{enumerate}
+    %   \columnbreak
     \item \label{if-tau}
       % $\aTr{\bEvs}{\bForm} \riff (\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm})$,
       % $\aTr{\bEvs}{\bForm} \riff \aForm\limplies\aTr[1]{\bEvs}{\neg\aForm\limplies\aTr[2]{\bEvs}{\bForm}}$,
@@ -151,10 +189,68 @@
   \medskip
 
   \noindent
-  If $\aPS\in\sLET{\aReg}{\aExp}$ then $\aEvs = \emptyset$
-  and $\aTr{\bEvs}{\bForm} \riff \bForm[\aExp/\aReg]$
-  and $\aTerm\riff\TRUE$.
-  
+  % Within a pomset $\aPS$,
+  Let 
+  \begin{math}
+    \kappaE{\bEvs}=
+    {\textstyle\bigvee{}\!\!{}_{\bEv\in\bEvs}\labelingForm(\bEv)}.
+  \end{math}
+  Note that $\kappaE{\emptyset} = \FALSE$.
+  \medskip
+
+  \noindent
+  If $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
+\begin{multicols}{2}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
+  \item \label{fence-E}
+    % $\aEvs\neq\emptyset$ and
+    % if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+    $\fcard{\aEvs}\leq 1$,
+  \item \label{fence-lambda}
+    $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
+  \item \label{fence-kappa}
+    $\labelingForm(\aEv) \riff \TRUE$,
+  \item \label{fence-tau}
+    $\aTr{\bEvs}{\bForm} \riff \bForm$,
+  %   \stepcounter{enumi}      
+  % \item[] \labeltext[\textsc{f}5]{}{fence-term}
+  %   \begin{enumerate}[leftmargin=0pt]
+  %   \item \label{fence-term-nonempty}
+  %     if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
+  %   \item \label{fence-term-empty}
+  %     if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+  %   \end{enumerate}
+    \item \label{fence-term}
+      $\aTerm \riff \kappaE{}$.
+  \end{enumerate}
+\end{multicols}
+  % \noindent
+  % If $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
+  % % $(\exists\aLocs\subseteq\Loc)$
+  % % $(\exists\bmode\in\{\amode,\mRLX\})$
+  % \begin{multicols}{2}
+  %   \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
+  %   \item \label{fence-E}
+  %     % $\aEvs\neq\emptyset$ and
+  %     if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+  %   \item \label{fence-lambda}
+  %     $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
+  %   \item \label{fence-kappa}
+  %     $\labelingForm(\aEv) \riff \TRUE$,
+  %   \item \label{fence-tau}
+  %     $\aTr{\bEvs}{\bForm} \riff \bForm$,
+  %     \stepcounter{enumi}      
+  %   \item[] \labeltext[\textsc{f}5]{}{fence-term}
+  %     \begin{enumerate}[leftmargin=0pt]
+  %     \item \label{fence-term-nonempty}
+  %       if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
+  %     \item \label{fence-term-empty}
+  %       if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+  %     \end{enumerate}
+  %   % \item \label{fence-term}
+  %   %   if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+  %   \end{enumerate}
+  % \end{multicols}
   \medskip
 
   \noindent
@@ -293,53 +389,34 @@
   \end{multicols}
   \medskip
 
-  % \noindent
-  % If $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
-  % % $(\exists\aLocs\subseteq\Loc)$
-  % % $(\exists\bmode\in\{\amode,\mRLX\})$
-  % \begin{multicols}{2}
-  %   \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
-  %   \item \label{fence-E}
-  %     % $\aEvs\neq\emptyset$ and
-  %     if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-  %   \item \label{fence-lambda}
-  %     $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
-  %   \item \label{fence-kappa}
-  %     $\labelingForm(\aEv) \riff \TRUE$,
-  %   \item \label{fence-tau}
-  %     $\aTr{\bEvs}{\bForm} \riff \bForm$,
-  %     \stepcounter{enumi}      
-  %   \item[] \labeltext[\textsc{f}5]{}{fence-term}
-  %     \begin{enumerate}[leftmargin=0pt]
-  %     \item \label{fence-term-nonempty}
-  %       if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
-  %     \item \label{fence-term-empty}
-  %       if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
-  %     \end{enumerate}
-  %   % \item \label{fence-term}
-  %   %   if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
-  %   \end{enumerate}
-  % \end{multicols}
   \vspace{-.5\baselineskip}
-  \begin{align*}
+  \begin{gather*}
     \begin{aligned}
       \sembase{\LET{\aReg}{\aExp}} &= \sLET{\aReg}{\aExp}
       \\
-      \sembase{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
-      \\
       \sembase{\PW[\amode]{\aLoc}{\aExp}} &= \sSTORE[\amode]{\aLoc}[\ascope]{\aExp}[\aThrd]
-      % \\
-      % \sembase{\PF[\ascope]{\fmode}} &= \sFENCE[\ascope]{\fmode}[\aThrd]
+      \\
+      \sembase{\PR[\amode]{\aLoc}{\aReg}} &= \sLOAD[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
     \end{aligned}
-    &&
+    \qquad
     \begin{aligned}
+      \sembase{\PF[\ascope]{\fmode}} &= \sFENCE[\ascope]{\fmode}[\aThrd]
+      \\
       \sembase{\SKIP} &= \sSKIP 
+      \\
+      \;\;
+    \end{aligned}
+    \qquad
+    \begin{aligned}
+      \sembase{\aCmd_1 \RPAR \aCmd_2} &= \sPAR{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
       \\
       \sembase{\aCmd_1 \SEMI \aCmd_2} &= \sSEMI{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
       \\
-      \sembase{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} &= \sIFTHEN{\aExp{\neq}0}{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
+      \makebox[0cm][r]{$\sembase{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI}$} &= \sIFTHEN{\aExp{\neq}0}{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
     \end{aligned}
-  \end{align*}
+    % \\
+    % \sembase{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} = \sIFTHEN{\aExp{\neq}0}{\sembase{\aCmd_1}}{\sembase{\aCmd_2}}
+  \end{gather*}
   %\vspace{-.5\baselineskip}
   \caption{PwT Semantics}
   \label{fig:seq}

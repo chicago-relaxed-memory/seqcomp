@@ -8,6 +8,12 @@ model using examples (\textsection\ref{sec:ex:pomset}--\ref{sec:ex:last}).
 We encourage readers to skim the definitions and then skip to
 \textsection\ref{sec:ex:pomset}, coming back as needed.
 
+In this section, we concentrate on the sequential semantics, ignoring the
+requirement that concurrent reads be \emph{fulfilled} by matching writes. We
+extend the model to a full concurrent semantics in \textsection\ref{sec:mca}
+and \textsection\ref{sec:c11} by defining a \emph{reads-from} relation ($\rrfx$) subject
+to various constraints.
+
 %% Batty suggest example where dependencies are added and also go away, perhaps
 %% by store forwarding. Something like:
 %% \texttt{(r=x; y=1); (s=y; z=s+r)}
@@ -123,11 +129,11 @@ systematically drop the annotation.
 
 \emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
 given mode, as well as the usual structural constructs. Following
-\cite{DBLP:conf/icfp/FerreiraHJ96}, $\RPAR$ denotes parallel composition,
+\citet{DBLP:conf/icfp/FerreiraHJ96}, $\RPAR$ denotes parallel composition,
 preserving thread state on the right after a join.  In examples and
 sublanguages without join, we use the symmetric $\PAR$ operator.
 
-We use common syntax sugar, such as \emph{extended expressions}, $\aEExp$,
+We use common syntactic sugar, such as \emph{extended expressions}, $\aEExp$,
 which include memory locations.  For example, if $\aEExp$ includes a single
 occurrence of $\aLoc$, then $\bLoc\GETS\aEExp\SEMI \aCmd$ is shorthand for
 $\aReg\GETS\aLoc\SEMI\bLoc\GETS\aEExp[\aReg/\aLoc]\SEMI \aCmd$.  Each
@@ -150,9 +156,10 @@ require that
 In \textsection\ref{sec:additional}, we drop this restriction, requiring
 instead that
 \begin{itemize}
-\item there are registers
-  $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$, that do not
-  appear in programs: $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.
+\item there are registers that do not
+  appear in programs (see \textsection\ref{sec:semreg}).
+  % $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$, that do not
+  % appear in programs: $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.
 \end{itemize}
 % In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
 % assumption.
@@ -384,14 +391,14 @@ applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.  % We
   predicate transformer $\aTr{\bEvs}{}$ for each $\bEvs\subseteq\AllEvents$,
   such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}
   \rimplies \aTr{\bEvs}{\bForm}$.
-
-  We write $\aTr{}{\bForm}$ as an abbreviation of $\aTr{\aEvs}{\bForm}$.
+  %We write $\aTrAbbrv{\aEvs}{\bForm}$ as an abbreviation of $\aTr{\aEvs}{\bForm}$.
 \end{definition}
 In a family of predicate transformers, the transformer of a smaller set must
 entail the transformer of a larger set.  Thus bigger sets are \emph{better}
-and $\aTr{}{\bForm}$---the transformer of the biggest set---is the
-\emph{best}.  (Note that the definition is written to be insensitive to
-events outside $\aEvs$.)
+and $\aTrAbbrv{\aEvs}{\bForm}$---the transformer of the biggest set---is the
+\emph{best}.  (The definition is insensitive to events outside $\aEvs$---it
+is for this reason that we have taken $\bEvs\subseteq\AllEvents$ rather than
+$\bEvs\subseteq\aEvs$.)
 
 In sequential composition, adding more order can only increase the size of
 ${\Cdown{\aEv}}{}$.  Following \refdef{def:family}, the larger
@@ -419,11 +426,12 @@ transformer.  Sequential dependency is calculated by $\labelingForm'_2$ in
 the semantics of sequential composition.
 
 Before discussing the details of the model, we note that the semantics
-satisfies the expected monoid laws and is closed with respect to
-\emph{augmentation}.  Augments include more order and stronger formulae; in
-examples, we typically consider pomsets that are augment-minimal.  One
-intuitive reading of augment closure is that adding order can only cause
-preconditions to weaken.
+satisfies the expected monoid laws, as well as some laws concerning the
+conditional. We have verified \reflem{lem:monoid} and
+\reflem{lem:if}\ref{lem:if:seq} in Coq\footnote{Specifically, we have proven
+  these results for the semantics of \reffig{fig:seq} with the refinements of
+  \textsection\ref{sec:read-read}, \textsection\ref{sec:semreg}, and
+  \textsection\ref{sec:semca}}.
 \begin{lemma}
   \label{lem:monoid}
   
@@ -446,7 +454,7 @@ preconditions to weaken.
   %     \xPAR{\aCmd_1}{\xPARP{\aCmd_2}{\aCmd_3}}.
   %   \end{math}
 
-  \\\item \label{monoid:seq}
+  \item \label{monoid:seq}
     \begin{math}
       \sem{\xSEMI{\xSEMIP{\aCmd_1}{\aCmd_2}}{\aCmd_3}}
       =
@@ -454,32 +462,43 @@ preconditions to weaken.
     \end{math}
 
   \end{enumerate*}      
-  \vspace{-.5\baselineskip}
-  \begin{proof}
-    \todo{Reference coq.}
-    Straightforward calculation.
-    \eqref{monoid:unit} requires \ref{pom-term-tau} for
-    the termination condition in $\xSEMIP{\aCmd}{\SKIP}$.
-    \eqref{monoid:seq} requires both
-    conjunction closure (\ref{tr-and}, for the termination condition) and disjunction
-    closure (\ref{tr-or}, for the predicate transformers themselves).
-    \eqref{monoid:seq} also requires that \ref{seq-le} enforce projection as
-    well as inclusion (see the definition of $\rextendsdef{}{}$).
-  \end{proof}
 \end{lemma}
+The proof of \eqref{monoid:unit} requires \ref{pom-term-tau} for
+the termination condition in $\xSEMIP{\aCmd}{\SKIP}$.
+\eqref{monoid:seq} requires both
+conjunction closure (\ref{tr-and}, for the termination condition) and disjunction
+closure (\ref{tr-or}, for the predicate transformers themselves).
+\eqref{monoid:seq} also requires that \ref{seq-le} enforce projection as
+well as inclusion (see the definition of $\rextendsdef{}{}$).
+
 \begin{lemma}
   \label{lem:if}
 
   \begin{enumerate*}[label=(\alph*),ref=\alph*]
-    \setcounter{enumi}{3}
-    \item \label{lem:if:if}
+    \setcounter{enumi}{2}
+  \item \label{lem:if:elim}
     \begin{math}
-      \sem{\xIFTHEN{\aForm}{
-        \xIFTHEN{\bForm}{\aCmd}{}
-      }{}}
-      =
-      \sem{\xIFTHEN{\aForm\land\bForm}{\aCmd}{}}.
+      \sem{\xIFTHEN{\aForm}{\aCmd}{\aCmd}}
+      \supseteq
+      \sem{\aCmd}.
     \end{math}
+
+    % \\\item \label{lem:if:if}
+    % \begin{math}
+    %   \sem{\xIFTHEN{\aForm}{
+    %     \xIFTHEN{\bForm}{\aCmd}{}
+    %   }{}}
+    %   =
+    %   \sem{\xIFTHEN{\aForm\land\bForm}{\aCmd}{}}.
+    % \end{math}
+
+  \\\item \label{lem:if:dead}
+    \begin{math}
+      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
+      \supseteq
+      \sem{\aCmd_1}
+    \end{math}
+    if $\aForm$ is a tautology.
 
   \\\item \label{lem:if:seq}
     \begin{math}
@@ -511,23 +530,14 @@ preconditions to weaken.
       }}.
     \end{math}
 
-  \\\item \label{lem:if:elim}
+  \\\item  \label{lem:ifelse:if:if}
     \begin{math}
-      \sem{\xIFTHEN{\aForm}{\aCmd}{\aCmd}}
-      \supseteq
-      \sem{\aCmd}.
-    \end{math}
-
-  \\\item \label{lem:if:dead}
-    \begin{math}
-      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
-      \supseteq
-      \sem{\aCmd_1}
-    \end{math}
-    if $\aForm$ is a tautology.
-
-  \\\item
-    \begin{math} \label{lem:ifelse:if:if1}
+      \sem{\xSEMI{
+        \xIFTHEN{\lnot\aForm}{\aCmd_2}{}
+      }{
+        \xIFTHEN{\aForm}{\aCmd_1}{}
+      }}
+      \subseteq
       \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
       \supseteq
       \sem{\xSEMI{
@@ -537,59 +547,71 @@ preconditions to weaken.
       }}.
     \end{math}
     
-  \\\item
-    \begin{math} \label{lem:ifelse:if:if2}
-      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
-      \supseteq
-      \sem{\xSEMI{
-        \xIFTHEN{\lnot\aForm}{\aCmd_2}{}
-      }{
-        \xIFTHEN{\aForm}{\aCmd_1}{}
-      }}.
-    \end{math}
+  % \\\item  \label{lem:ifelse:if:if1}
+  %   \begin{math}
+  %     \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
+  %     \supseteq
+  %     \sem{\xSEMI{
+  %       \xIFTHEN{\aForm}{\aCmd_1}{}
+  %     }{
+  %       \xIFTHEN{\lnot\aForm}{\aCmd_2}{}
+  %     }}.
+  %   \end{math}
+    
+  % \\\item  \label{lem:ifelse:if:if2}
+  %   \begin{math}
+  %     \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
+  %     \supseteq
+  %     \sem{\xSEMI{
+  %       \xIFTHEN{\lnot\aForm}{\aCmd_2}{}
+  %     }{
+  %       \xIFTHEN{\aForm}{\aCmd_1}{}
+  %     }}.
+  %   \end{math}
   \end{enumerate*}      
-  \vspace{-.5\baselineskip}
-  \begin{proof}
-    \todo{Reference coq.}
-    Straightforward calculation.
-  \end{proof}
 \end{lemma}
 In \textsection\ref{sec:semca}, we refine the semantics to validate the
 reverse inclusions for \eqref{lem:if:seq}, \eqref{lem:seq:if}, and
 \eqref{lem:if:elim}.
-In \textsection\ref{sec:false}, we refine the semantics to validate the
-reverse inclusion for \eqref{lem:if:dead}.
 For \reffig{fig:seq}, 
-\eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2} can be strengthened
+\eqref{lem:ifelse:if:if} %and \eqref{lem:ifelse:if:if2}
+can be strengthened
 to equations, rather than inclusions.  However, the reverse direction does
 not hold for \PwTmca{} (\textsection\ref{sec:mca1}) nor for \PwTpo{} (\textsection\ref{sec:c11}).
 For further discussion, see \textsection\ref{sec:delay}.
-\begin{definition}
-  \label{def:augment}
-  $\aPS_2$ is an \emph{augment} of $\aPS_1$ if all fields are equal except,
-  perhaps, the order, where we require ${\lt_2}\supseteq{\lt_1}$.
-  % \begin{multicols}{4}
-  %   \begin{enumerate}
-  %   \item $\aEvs_2=\aEvs_1$,
-  %   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
-  %   \item $\labelingForm_2(\aEv) \riff \labelingForm_1(\aEv)$,
-  %   \item $\aTr[2]{\bEvs}{\bForm}\riff \aTr[1]{\bEvs}{\bForm}$,
-  %   \item $\aTerm[2] \riff \aTerm[1]$,
-  %   \item ${\le_2}\supseteq{\le_1}$,
-  %   \item ${\rrfx_2}={\rrfx_1}$.
-  %   \end{enumerate}
-  % \end{multicols}
-\end{definition}
+
+The semantics is also closed with respect to augmentation.  $\aPS_2$ is an
+\emph{augment} of $\aPS_1$ if all fields are equal except, perhaps, the
+order, where we require ${\lt_2}\supseteq{\lt_1}$.  In examples, we typically
+consider pomsets that are augment-minimal.  One intuitive reading of augment
+closure is that adding order can only cause preconditions to weaken.  % The
+% proof is straightforward, by induction on the definition of $\sembase{}$.
+% \begin{definition}
+%   \label{def:augment}
+%   $\aPS_2$ is an \emph{augment} of $\aPS_1$ if all fields are equal except,
+%   perhaps, the order, where we require ${\lt_2}\supseteq{\lt_1}$.
+%   % \begin{multicols}{4}
+%   %   \begin{enumerate}
+%   %   \item $\aEvs_2=\aEvs_1$,
+%   %   \item $\labelingAct_2(\aEv)=\labelingAct_1(\aEv)$,
+%   %   \item $\labelingForm_2(\aEv) \riff \labelingForm_1(\aEv)$,
+%   %   \item $\aTr[2]{\bEvs}{\bForm}\riff \aTr[1]{\bEvs}{\bForm}$,
+%   %   \item $\aTerm[2] \riff \aTerm[1]$,
+%   %   \item ${\le_2}\supseteq{\le_1}$,
+%   %   \item ${\rrfx_2}={\rrfx_1}$.
+%   %   \end{enumerate}
+%   % \end{multicols}
+% \end{definition}
 \begin{lemma}
   % Suppose $\aPS_1\in\sembase{\aCmd}$.
   If $\aPS_1\in\sembase{\aCmd}$ and $\aPS_2$  augments $\aPS_1$ then $\aPS_2\in\sembase{\aCmd}$.
   % \item If $\aPS_2$ is a downset of $\aPS_1$ then $\aPS_2\in\sembase{\aCmd}$.
   % \end{lemma}
 
-  \vspace{-.5\baselineskip}
-  \begin{proof}
-    Induction on the definition of $\sembase{}$.
-  \end{proof}
+  % \vspace{-.5\baselineskip}
+  % \begin{proof}
+  %   Induction on the definition of $\sembase{}$.
+  % \end{proof}
 \end{lemma}
 
 
@@ -637,10 +659,10 @@ map to pomsets with at most one event.  $\SKIP$ maps to the empty pomset.
 Note only that $\sembase{\PW{x}{1}}$ can write any value $\aVal$; the fact
 that $\aVal$ must be $1$ is captured in the logic.
 
-The structural rules combine pomsets: $\sSEMI{}{}$ and $\sIF{}$ perform a
-union, inheriting labeling and order from the two sides.  We say that
-$\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ \emph{coalesce} if $\bEv=\aEv$.
-
+The structural rules combine pomsets: $\sPAR{}{}$ performs disjoint union,
+inheriting labeling and order from the two sides.  $\sSEMI{}{}$ and $\sIF{}$
+perform a union.  We say
+that $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ \emph{coalesce} if $\bEv=\aEv$.
 As a trivial consequence of using union rather than disjoint union,
 \ref{seq-E} validates \emph{mumbling} \cite{DBLP:journals/iandc/Brookes96} by
 coalescing events.  For example
@@ -663,14 +685,14 @@ is a valid refinement.  It is equally obvious that
   \sem{\PW{\aLoc}{1} \SEMI \PW{\aLoc}{1}}
 \end{math}
 is not a valid refinement, since the latter includes a two-element pomset,
-but the former does not.\footnote{These are distinguished by the context:
+but the former does not. ({These are distinguished by the context:
   \begin{math}
     \hole{} \PAR
     \PR{x}{r} \SEMI
     \PW{x}{2} \SEMI
     \PR{x}{s}\SEMI
     \IF{\aReg {=} \bReg} \THEN \PW{\cLoc}{1} \FI.
-  \end{math}}
+  \end{math}})
 
 In complete pomsets, \ref{top-term} requires that $\aTerm$ is a tautology,
 capturing termination.  In $\sSTORE{}{}$, \ref{write-term} ensures that
@@ -685,7 +707,7 @@ include bogus writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted
 above, $\aPS$ can include $(1{=}\aVal\mid\DW{x}{\aVal})$, for any value
 $\aVal$.  In complete pomsets, however, \ref{write-term} requires
 that $\aTerm$ implies $1{=}\aVal$.  We might wish to require that all preconditions be satisfiable.  However,
-unsatisfiable writes can be become satisfiable via merging:
+unsatisfiable writes can become satisfiable via merging:
 % Nonetheless, it is important that
 % \ref{write-term-nonempty} specifies $\aTerm\riff\aExp{=}\aVal$ rather than
 % $\aTerm\riff\TRUE$, since 
@@ -702,7 +724,7 @@ unsatisfiable writes can be become satisfiable via merging:
     \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{b}{2{=}3\mid\DW{x}{3}}{}      
+        \event{b}{2{=}3\bigmid\DW{x}{3}}{}      
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -710,7 +732,7 @@ unsatisfiable writes can be become satisfiable via merging:
     \IF{\aExp}\THEN\PW{x}{3}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{c}{\aExp\mid\DW{x}{3}}{}      
+        \event{c}{\aExp\bigmid\DW{x}{3}}{}      
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -725,7 +747,7 @@ By merging, the semantics allows the following:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a}{\DW{x}{1}}{}      
-        \event{c}{\aExp\mid\DW{x}{3}}{right=of a}
+        \event{c}{\aExp\bigmid\DW{x}{3}}{right=of a}
         %\wki{a}{c}
       \end{tikzinline}}    
   \end{gathered}
@@ -749,7 +771,7 @@ expected: the program terminates if both subprograms terminate.
 
 In $\sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$, the termination condition
 \eqref{if-term} is $(\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$:
-the program terminates as long as the ``true'' branch terminates.
+the program terminates as long as the taken branch terminates.
 Thus
 \begin{math}
   \sembase{\IF{\TRUE} \THEN\PW{x}{1} \ELSE\PW{y}{1} \FI}
@@ -789,10 +811,15 @@ we take $\Q{\aLoc}=\TRUE$, for all $\aLoc$.
 % In top-level pomsets, \ref{top-kappa} requires that every precondition
 % $\labelingForm(\aEv)$ is a tautology.
 
+Note that $\sembase{\aCmd_1 \RPAR \aCmd_2}$ is asymmetric, taking the
+predicate transformer for $\aCmd_2$ in \ref{par-tau}.
+
 Preconditions are discharged during sequential composition by applying
 predicate transformers $\aTr[1]{}{}$ from the left to preconditions
-$\labelingForm_2(\aEv)$ on the right.  The specific rules are
-\ref{seq-kappa2} and \ref{seq-kappa12}, which use the transformed predicate
+$\labelingForm_2(\aEv)$ on the right.  The specific rule is
+\ref{seq-kappa},
+% \ref{seq-kappa2} and \ref{seq-kappa12},
+which uses the transformed predicate
 $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$, where
 $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ is the set of events that
 precede $\aEv$ in causal order.  We call $\Cdown{\aEv}$ the \emph{dependent
@@ -866,13 +893,13 @@ $\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{\bForm[r/y]}{}
-        \eventr{\aEv}{a2}{r{=}\bVal\mid\DW{y}{\bVal}}{left=of xd}      
+        \eventr{\aEv}{a2}{r{=}\bVal\bigmid\DW{y}{\bVal}}{left=of xd}      
         \xform{xi}{\bForm[r/y]}{left=.5em of a2}
         \xo{a2}{xd}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-First we consider the case that $\aVal=\bVal$.  For example if $\aVal=\bVal=1$, we have:
+First we consider the case that $\aVal=\bVal$.  For example, if $\aVal=\bVal=1$, we have:
 \begin{align*}
   \begin{gathered}
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
@@ -886,7 +913,7 @@ First we consider the case that $\aVal=\bVal$.  For example if $\aVal=\bVal=1$, 
   \begin{gathered}
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{\bForm[r/y]}{}
-        \eventr{\aEv}{a2}{r{=}1\mid\DW{y}{1}}{left=of xd}      
+        \eventr{\aEv}{a2}{r{=}1\bigmid\DW{y}{1}}{left=of xd}      
         \xform{xi}{\bForm[r/y]}{left=.5em of a2}
         \xo{a2}{xd}
       \end{tikzinline}}    
@@ -911,7 +938,7 @@ Combining these into a single pomset, we have:
         \xform{xd}{1{=}r\limplies\bForm[r/y]}{}
         \eventr{\bEv}{a1}{\DR{x}{1}}{left=of xd}
         \xform{xi}{(1{=}r\lor x{=}r)\limplies\bForm[r/y]}{left=.5em of a1}
-        \eventr{\aEv}{a2}{\aForm\mid\DW{y}{1}}{right=of xd}      
+        \eventr{\aEv}{a2}{\aForm\bigmid\DW{y}{1}}{right=of xd}      
         \xo{a1}{xd}
       \end{tikzinline}}    
   \end{gathered}
@@ -952,7 +979,7 @@ Eliding transformers, the two outcomes are:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{1}}{}
-        \eventr{\aEv}{a2}{x{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{x{=}1\bigmid\DW{y}{1}}{right=of a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -965,7 +992,7 @@ pomset $\aPS_0$ that writes $1$ to $x$:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{\bForm[1/x]}{}
-        \eventr{\cEv}{a2}{1{=}1\mid\DW{x}{1}}{left=of xd}      
+        \eventr{\cEv}{a2}{1{=}1\bigmid\DW{x}{1}}{left=of xd}      
         \xform{xi}{\bForm[1/x]}{left=.5em of a2}
         \xo{a2}{xd}
       \end{tikzinline}}    
@@ -975,9 +1002,9 @@ pomset $\aPS_0$ that writes $1$ to $x$:
     \PW{x}{1}\SEMI \PR{x}{r}\SEMI \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \eventr{\cEv}{a0}{1{=}1\mid\DW{x}{1}}{}
+        \eventr{\cEv}{a0}{1{=}1\bigmid\DW{x}{1}}{}
         \eventr{\bEv}{a1}{\DR{x}{1}}{right=of a0}
-        \eventr{\aEv}{a2}{1{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{1{=}1\bigmid\DW{y}{1}}{right=of a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -993,7 +1020,7 @@ possibilities. Taking $\aVal{=}0$ and $\bVal{=}1$:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{0}}{}
-        \eventr{\aEv}{a2}{0{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{0{=}r\limplies r{=}1\bigmid\DW{y}{1}}{right=of a1}
         \po{a1}{a2}
       \end{tikzinline}}    
   \end{gathered}
@@ -1003,7 +1030,7 @@ possibilities. Taking $\aVal{=}0$ and $\bVal{=}1$:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{0}}{}
-        \eventr{\aEv}{a2}{(0{=}r\lor x{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{(0{=}r\lor x{=}r)\limplies r{=}1\bigmid\DW{y}{1}}{right=of a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1019,7 +1046,7 @@ them.  For example, the precondition of $\aEv$ is a tautology in:
         \xform{xd}{0{=}r\limplies\bForm[r/y]}{}
         \eventr{\bEv}{a1}{\DR{x}{0}}{left=of xd}
         \xform{xi}{(0{=}r\lor x{=}r)\limplies\bForm[r/y]}{left=.5em of a1}
-        \eventr {\aEv}{a2}{(0{=}r\lor x{=}r)\limplies 1{=}1\mid\DW{y}{1}}{right=of xd}      
+        \eventr {\aEv}{a2}{(0{=}r\lor x{=}r)\limplies 1{=}1\bigmid\DW{y}{1}}{right=of xd}      
         \xo{a1}{xd}
       \end{tikzinline}}    
   \end{gathered}
@@ -1029,7 +1056,7 @@ them.  For example, the precondition of $\aEv$ is a tautology in:
 %   \\
 %   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
 %       \event{rx0}{\DR{x}{0}}{}
-%       \event{wy1}{1{=}1 \mid \DW{y}{1}}{right=of rx0}
+%       \event{wy1}{1{=}1 \bigmid \DW{y}{1}}{right=of rx0}
 %     \end{tikzinline}}
 % \end{gather*}
 
@@ -1058,10 +1085,10 @@ if $\aExp{\neq}0$ is a tautology then
 \end{math}
 The reverse inclusion does not hold.
 
-For events from $\aEvs_1$, \ref{if-kappa1} requires
+For events from $\aEvs_1$, \ref{if-kappa} requires
 $\aForm\land\labelingForm_1(\aEv)$. For events from $\aEvs_2$,
-\ref{if-kappa2} requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For
-coalescing events in $\aEvs_1\cap\aEvs_2$, \ref{if-kappa12} requires
+\ref{if-kappa} requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For
+coalescing events in $\aEvs_1\cap\aEvs_2$, \ref{if-kappa} requires
 $(\aForm\land\labelingForm_1(\aEv)) \lor
 (\lnot\aForm\land\labelingForm_2(\aEv))$.  This semantics allows common code
 to be lifted out of a conditional, validating the transformation
@@ -1072,8 +1099,8 @@ to be lifted out of a conditional, validating the transformation
 
 
 
-By allowing events to coalesce, \ref{if-kappa12} ensures that control
-dependencies are calculated semantically.  For example, consider
+By allowing events to coalesce, \ref{if-kappa} ensures that control
+dependencies are calculated semantically, rather than syntactically.  For example, consider
 $\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, which is build
 from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
 \begin{align*}
@@ -1081,7 +1108,7 @@ from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \eventr{e}{wy1}{r{=}1 \mid \DW{y}{1}}{}
+        \eventr{e}{wy1}{r{=}1 \bigmid \DW{y}{1}}{}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -1089,7 +1116,7 @@ from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
     \PW{y}{1}
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \eventr{e}{wy1}{1{=}1 \mid \DW{y}{1}}{}
+        \eventr{e}{wy1}{1{=}1 \bigmid \DW{y}{1}}{}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -1098,12 +1125,12 @@ from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
     \\
     \nonumber
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \eventr{e}{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \mid \DW{y}{1}}{}
+        \eventr{e}{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \bigmid \DW{y}{1}}{}
       \end{tikzinline}}
   \end{gathered}  
 \end{align*}
-Here, the precondition in the combined pomset is a tautology, independent of $r$.
-
+Here, the precondition in the combined pomset is a tautology, independent of
+$r$.
 
 Control dependencies are eliminated in the same way as data dependencies.
 For example:
@@ -1124,7 +1151,7 @@ For example:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \xform{xd}{\aTr[2]{\{\aEv\}}{\bForm}}{}
-        \eventr{\aEv}{a2}{r{=}1\mid\DW{y}{\bVal}}{left=of xd}      
+        \eventr{\aEv}{a2}{r{=}1\bigmid\DW{y}{\bVal}}{left=of xd}      
         \xform{xi}{\aTr[2]{\emptyset}{\bForm}}{left=.5em of a2}
         \xo{a2}{xd}
       \end{tikzinline}}    
@@ -1149,7 +1176,7 @@ are two possibilities:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{1}}{}
-        \eventr{\aEv}{a2}{1{=}r\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{1{=}r\limplies r{=}1\bigmid\DW{y}{1}}{right=of a1}
         \po{a1}{a2}
       \end{tikzinline}}    
   \end{gathered}
@@ -1159,16 +1186,19 @@ are two possibilities:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \eventr{\bEv}{a1}{\DR{x}{1}}{}
-        \eventr{\aEv}{a2}{(1{=}r\lor x{=}r)\limplies r{=}1\mid\DW{y}{1}}{right=of a1}
+        \eventr{\aEv}{a2}{(1{=}r\lor x{=}r)\limplies r{=}1\bigmid\DW{y}{1}}{right=of a1}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
+
+
+\todo{Add example showing empty set on untaken branch.}
 
 \subsection{A Refinement: No Dependencies into Reads}
 \label{sec:read-read}
 
 To avoid stalling the CPU pipeline unnecessarily, hardware does not
-enforce control dependencies between reads.  To support if-closure
+enforce control dependencies between reads.  To support if-introduction
 (\textsection\ref{sec:semca}), software models must not distinguish control
 dependencies from other dependencies.  Thus, we are forced to drop all
 dependencies into reads.  To achieve this, we modify the definition of
@@ -1180,7 +1210,7 @@ $\labelingForm'_2$ in \reffig{fig:seq}.
 \begin{displaymath}
   \labelingForm'_2(\aEv)=
   \begin{cases}
-    \aTr[1]{}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a}\sread
+    \aTrAbbrv[1]{\aEvs_1}{\labelingForm_2(\aEv)} & \text{if}\; \labeling(\aEv) \;\text{is a}\sread
     \\
     \aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv)} & \text{otherwise, where}\; \Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}
   \end{cases}
@@ -1193,7 +1223,7 @@ $\labelingForm'_2$ in \reffig{fig:seq}.
   % \end{cases}
 \end{displaymath}
   % \end{definition}
-Thus reads always use the ``best'' transformer, $\aTr[1]{}{}$.  In order for
+Thus reads always use the ``best'' transformer, $\aTrAbbrv[1]{\aEvs_1}{}$.  In order for
 non-reads to get a good transformer, they need to add order.
   
 Throughout the remainder of the paper, we use this definition.  (The lack of
@@ -1219,7 +1249,7 @@ reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}:
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
         \event{rx1}{\DR{x}{1}}{right=3em of wx0}
-        \event{wy1}{\aForm\mid\DW{y}{1}}{right=of rx1}
+        \event{wy1}{\aForm\bigmid\DW{y}{1}}{right=of rx1}
         \event{ry1}{\DR{y}{1}}{right=3em of wy1}
         \event{wx1}{\DW{x}{1}}{right=of ry1}
         \po{ry1}{wx1}
@@ -1229,7 +1259,7 @@ reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}:
         %\wki{wx0}{rx1}
       \end{tikzinline}}
     % \hbox{\begin{tikzinline}[node distance=1.5em and 2em]
-    %   \event{wy1}{0\geq0\mid\DW{y}{1}}{}
+    %   \event{wy1}{0\geq0\bigmid\DW{y}{1}}{}
     %   \event{rx1}{\DR{x}{1}}{left=of wy1}
     %   \event{wx0}{\DW{x}{0}}{below left=-.2em and 2em of rx1}
     %   \event{ry1}{\DR{y}{1}}{below=of rx1}
@@ -1305,7 +1335,7 @@ Consider the following example
         \event{a2}{\DR{y}{1}}{right=of a1}
         %\event{a3}{\DW{x}{0}}{right=of a2}
         \event{a4}{\DR{x}{1}}{right=of a2}
-        \event{a5}{\aForm\mid\DW{z}{1}}{right=of a4}
+        \event{a5}{\aForm\bigmid\DW{z}{1}}{right=of a4}
         \event{b1}{\DR{z}{1}}{right=5em of a5}
         \event{b2}{\DW{y}{1}}{right=of b1}
         %\po{a2}{a3}
@@ -1336,8 +1366,8 @@ $\TRUE$, which is a tautology, and the execution is
 allowed, resulting in a violation of \drfsc.  To construct this pomset, we
 have chosen the empty pomset for $\sembase{\PW{x}{0}}$.  The constraints on
 complete pomsets do not filter out this pomset, since $\PW{x}{0}$ is in the
-false-branch of the conditional.  The problem here is that we have forgotten
-the local state of $x$ in the false-branch of the execution.  Nonetheless, we
+untaken branch of the conditional.  The problem here is that we have forgotten
+the local state of $x$ in the untaken branch of the execution.  Nonetheless, we
 are using the subsequent read.
 
 With $\Q{x}$, the precondition of $\aForm$ is $\FALSE$.
@@ -1370,7 +1400,7 @@ Control variant of \ref{TC12} with all initial values $0$:
         \event{b1}{\DR{y}{1}}{}
         \event{b2}{\DW{\REFVAR{1}}{1}}{right=of b1}
         \event{b3}{\DR{\REFVAR{0}}{0}}{right=of b2}
-        \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
+        \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
         \po{b1}{b2}
         \po{b3}{b4}
         \event{a1}{\DR{x}{1}}{right=3em of b4}
@@ -1523,15 +1553,15 @@ Building the precondition $\aForm$ from right to left:
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
 %         \event{a1}{\DR{y}{1}}{}
-%         \event{a2}{1{=}r\limplies r{\neq}0\mid\DW{x}{1}}{right=of a1}
-%         \event{a3}{1{=}r\limplies \aTr[1]{}{\Q{x}}\mid\DR{x}{2}}{right=of a2}
+%         \event{a2}{1{=}r\limplies r{\neq}0\bigmid\DW{x}{1}}{right=of a1}
+%         \event{a3}{1{=}r\limplies \aTr[1]{}{\Q{x}}\bigmid\DR{x}{2}}{right=of a2}
 %         \po{a1}{a2}
 %         %\wki{a2}{a3}
 %       \end{tikzinline}}
 %     \qquad\qquad\qquad
 %     \hbox{\begin{tikzinline}[node distance=1em]
 %         \event{a1}{\DR{y}{0}}{}
-%         \event{a3}{0{=}r\limplies \aTr[2]{}{\Q{x}}\mid\DR{x}{2}}{right=of a1}
+%         \event{a3}{0{=}r\limplies \aTr[2]{}{\Q{x}}\bigmid\DR{x}{2}}{right=of a1}
 %       \end{tikzinline}}
 %   \end{gathered}  
 % \end{align*}
@@ -1591,7 +1621,7 @@ Building the precondition $\aForm$ from right to left:
 %         \event{a1}{\DW{x}{1}}{}
 %         \event{a2}{\DR{y}{1}}{right=of a1}
 %         %\event{a3}{\DW{x}{0}}{right=of a2}
-%         \event{a4}{\aForm\mid\DR{x}{1}}{right=of a2}
+%         \event{a4}{\aForm\bigmid\DR{x}{1}}{right=of a2}
 %         \event{a5}{\DW{z}{1}}{right=of a4}
 %         \event{b1}{\DR{z}{1}}{right=3em of a5}
 %         \event{b2}{\DW{y}{1}}{right=of b1}
@@ -1638,15 +1668,15 @@ Building the precondition $\aForm$ from right to left:
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
 %         \event{a1}{\DR{y}{1}}{}
-%         \event{a2}{1{=}r\limplies r{\neq}0\mid\DW{x}{1}}{right=of a1}
-%         \event{a3}{1{=}r\limplies \aTr[1]{}{\Q{x}}\mid\DR{x}{2}}{right=of a2}
+%         \event{a2}{1{=}r\limplies r{\neq}0\bigmid\DW{x}{1}}{right=of a1}
+%         \event{a3}{1{=}r\limplies \aTr[1]{}{\Q{x}}\bigmid\DR{x}{2}}{right=of a2}
 %         \po{a1}{a2}
 %         %\wki{a2}{a3}
 %       \end{tikzinline}}
 %     \qquad\qquad\qquad
 %     \hbox{\begin{tikzinline}[node distance=1em]
 %         \event{a1}{\DR{y}{0}}{}
-%         \event{a3}{0{=}r\limplies \aTr[2]{}{\Q{x}}\mid\DR{x}{2}}{right=of a1}
+%         \event{a3}{0{=}r\limplies \aTr[2]{}{\Q{x}}\bigmid\DR{x}{2}}{right=of a1}
 %       \end{tikzinline}}
 %   \end{gathered}  
 % \end{align*}
@@ -1682,13 +1712,13 @@ Building the precondition $\aForm$ from right to left:
 %     \FI
 %     \\
 %     \hbox{\begin{tikzinlinesmall}[node distance=1em]
-%         \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
-%         \event{a5}{r{\neq}0\land((1{=}s\lor x{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{\neq}0\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{\neq}0\land((1{=}s\lor x{=}s)\limplies s{\neq}0)\bigmid\DW{z}{1}}{right=of a4}
 %       \end{tikzinlinesmall}}
 %     \\
 %     \hbox{\begin{tikzinlinesmall}[node distance=1em]
-%         \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
-%         \event{a5}{r{\neq}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{\neq}0\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{\neq}0\land(1{=}s\limplies s{\neq}0)\bigmid\DW{z}{1}}{right=of a4}
 %         \po{a4}{a5}
 %       \end{tikzinlinesmall}}
 %   \end{gathered}
@@ -1705,26 +1735,26 @@ Building the precondition $\aForm$ from right to left:
 %     \FI
 %     \\
 %     % \hbox{\begin{tikzinlinesmall}[node distance=1em]
-%     %     \event{a3}{r{=}0\mid\DW{x}{0}}{}
-%     %     \event{a4}{r{=}0\mid\DR{x}{1}}{right=of a3}
-%     %     \event{a5}{r{=}0\land((1{=}s\lor x{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+%     %     \event{a3}{r{=}0\bigmid\DW{x}{0}}{}
+%     %     \event{a4}{r{=}0\bigmid\DR{x}{1}}{right=of a3}
+%     %     \event{a5}{r{=}0\land((1{=}s\lor x{=}s)\limplies s{\neq}0)\bigmid\DW{z}{1}}{right=of a4}
 %     %   \end{tikzinlinesmall}}
 %     % \\
 %     % \hbox{\begin{tikzinlinesmall}[node distance=1em]
-%     %     \event{a3}{r{=}0\mid\DW{x}{0}}{}
-%     %     \event{a4}{r{=}0\mid\DR{x}{1}}{right=of a3}
-%     %     \event{a5}{r{=}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+%     %     \event{a3}{r{=}0\bigmid\DW{x}{0}}{}
+%     %     \event{a4}{r{=}0\bigmid\DR{x}{1}}{right=of a3}
+%     %     \event{a5}{r{=}0\land(1{=}s\limplies s{\neq}0)\bigmid\DW{z}{1}}{right=of a4}
 %     %     \po{a4}{a5}
 %     %   \end{tikzinlinesmall}}
 %     % \\
 %     \hbox{\begin{tikzinlinesmall}[node distance=1em]
-%         \event{a4}{r{=}0\mid\DR{x}{1}}{}
-%         \event{a5}{r{=}0\land((1{=}s\lor 0{=}s)\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{=}0\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{=}0\land((1{=}s\lor 0{=}s)\limplies s{\neq}0)\bigmid\DW{z}{1}}{right=of a4}
 %       \end{tikzinlinesmall}}
 %     \\
 %     \hbox{\begin{tikzinlinesmall}[node distance=1em]
-%         \event{a4}{r{=}0\mid\DR{x}{1}}{}
-%         \event{a5}{r{=}0\land(1{=}s\limplies s{\neq}0)\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{=}0\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{=}0\land(1{=}s\limplies s{\neq}0)\bigmid\DW{z}{1}}{right=of a4}
 %         \po{a4}{a5}
 %       \end{tikzinlinesmall}}
 %   \end{gathered}
@@ -1740,13 +1770,13 @@ Building the precondition $\aForm$ from right to left:
 %     \FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
-%         \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{\neq}0\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{\neq}0\land x{\neq}0\bigmid\DW{z}{1}}{right=of a4}
 %       \end{tikzinline}}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a4}{r{\neq}0\mid\DR{x}{1}}{}
-%         \event{a5}{r{\neq}0\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{\neq}0\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{\neq}0\bigmid\DW{z}{1}}{right=of a4}
 %         \po{a4}{a5}
 %       \end{tikzinline}}
 %   \end{gathered}
@@ -1763,13 +1793,13 @@ Building the precondition $\aForm$ from right to left:
 %     \FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a4}{r{=}0\mid\DR{x}{1}}{}
-%         \event{a5}{\FALSE\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{=}0\bigmid\DR{x}{1}}{}
+%         \event{a5}{\FALSE\bigmid\DW{z}{1}}{right=of a4}
 %       \end{tikzinline}}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a4}{r{=}0\mid\DR{x}{1}}{}
-%         \event{a5}{r{=}0\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{=}0\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{=}0\bigmid\DW{z}{1}}{right=of a4}
 %         \po{a4}{a5}
 %       \end{tikzinline}}
 %   \end{gathered}
@@ -1794,7 +1824,7 @@ Building the precondition $\aForm$ from right to left:
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
 %         \event{a4}{\DR{x}{1}}{}
-%         \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+%         \event{a5}{r{\neq}0\land x{\neq}0\bigmid\DW{z}{1}}{right=of a4}
 %       \end{tikzinline}}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
@@ -1954,13 +1984,13 @@ Building the precondition $\aForm$ from right to left:
 %     \FI
 %     % \\
 %     % \hbox{\begin{tikzinline}[node distance=1em]
-%     %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-%     %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+%     %     \event{a4}{r{\neq}0\land\Q{x}\bigmid\DR{x}{1}}{}
+%     %     \event{a5}{r{\neq}0\land x{\neq}0\bigmid\DW{z}{1}}{right=of a4}
 %     %   \end{tikzinline}}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-%         \event{a5}{r{\neq}0\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{r{\neq}0\land\Q{x}\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{\neq}0\bigmid\DW{z}{1}}{right=of a4}
 %         \po{a4}{a5}
 %       \end{tikzinline}}
 %   \end{gathered}
@@ -1977,13 +2007,13 @@ Building the precondition $\aForm$ from right to left:
 %     \FI
 %     % \\
 %     % \hbox{\begin{tikzinline}[node distance=1em]
-%     %     \event{a4}{\FALSE\mid\DR{x}{1}}{}
-%     %     \event{a5}{\FALSE\mid\DW{z}{1}}{right=of a4}
+%     %     \event{a4}{\FALSE\bigmid\DR{x}{1}}{}
+%     %     \event{a5}{\FALSE\bigmid\DW{z}{1}}{right=of a4}
 %     %   \end{tikzinline}}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a4}{\FALSE\mid\DR{x}{1}}{}
-%         \event{a5}{r{=}0\mid\DW{z}{1}}{right=of a4}
+%         \event{a4}{\FALSE\bigmid\DR{x}{1}}{}
+%         \event{a5}{r{=}0\bigmid\DW{z}{1}}{right=of a4}
 %         \po{a4}{a5}
 %       \end{tikzinline}}
 %   \end{gathered}
@@ -2007,12 +2037,12 @@ Building the precondition $\aForm$ from right to left:
 %     \FI
 %     % \\
 %     % \hbox{\begin{tikzinline}[node distance=1em]
-%     %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-%     %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+%     %     \event{a4}{r{\neq}0\land\Q{x}\bigmid\DR{x}{1}}{}
+%     %     \event{a5}{r{\neq}0\land x{\neq}0\bigmid\DW{z}{1}}{right=of a4}
 %     %   \end{tikzinline}}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%         \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
+%         \event{a4}{r{\neq}0\land\Q{x}\bigmid\DR{x}{1}}{}
 %         \event{a5}{\DW{z}{1}}{right=of a4}
 %         \po{a4}{a5}
 %       \end{tikzinline}}
@@ -2038,13 +2068,13 @@ Building the precondition $\aForm$ from right to left:
 %     \FI
 %     % \\
 %     % \hbox{\begin{tikzinline}[node distance=1em]
-%     %     \event{a4}{r{\neq}0\land\Q{x}\mid\DR{x}{1}}{}
-%     %     \event{a5}{r{\neq}0\land x{\neq}0\mid\DW{z}{1}}{right=of a4}
+%     %     \event{a4}{r{\neq}0\land\Q{x}\bigmid\DR{x}{1}}{}
+%     %     \event{a5}{r{\neq}0\land x{\neq}0\bigmid\DW{z}{1}}{right=of a4}
 %     %   \end{tikzinline}}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
 %         \event{a2}{\DR{y}{1}}{}
-%         \event{a4}{1{=}r\limplies(r{\neq}0\land\Q{x})\mid\DR{x}{1}}{right=of a2}
+%         \event{a4}{1{=}r\limplies(r{\neq}0\land\Q{x})\bigmid\DR{x}{1}}{right=of a2}
 %         \event{a5}{\DW{z}{1}}{right=of a4}
 %         \po{a4}{a5}
 %       \end{tikzinline}}
@@ -2092,7 +2122,7 @@ this style we would have (as in \cite{DBLP:journals/pacmpl/JagadeesanJR20}):
 Sadly, \ref{read-tau-ind-p} fails \ref{tr-or}, and therefore is not a
 predicate transformer.  This is not merely a theoretical inconvenience:
 adopting \ref{read-tau-ind-p} would also break associativity.  Consider the
-following example, where we elide transformers for the writes and ``$\BANG$''
+following example, where we elide transformers for the writes and ``\texttt{!}''
 represents logical negation:
 \begin{align*}
   \begin{gathered}[t]
@@ -2110,7 +2140,7 @@ represents logical negation:
     \PW{x}{\BANG r} 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{b}{r{=}0\mid\DW{x}{1}}{}
+        \event{b}{r{=}0\bigmid\DW{x}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -2118,7 +2148,7 @@ represents logical negation:
     \PW{x}{\BANG\BANG r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{b}{r{\neq}0\mid\DW{x}{1}}{}
+        \event{b}{r{\neq}0\bigmid\DW{x}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
   % &&
@@ -2179,7 +2209,7 @@ Associating to the left and the coalescing, instead:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \event{b}{1{=}0\land y{=}0\mid\DW{x}{1}}{right=of a}
+        \event{b}{1{=}0\land y{=}0\bigmid\DW{x}{1}}{right=of a}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -2188,7 +2218,7 @@ Associating to the left and the coalescing, instead:
     %\SEMI \PW{x}{0} 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{b}{r{\neq}0\mid\DW{x}{1}}{}
+        \event{b}{r{\neq}0\bigmid\DW{x}{1}}{}
         %\event{c}{\DW{x}{0}}{right=of b}
         %\wki{b}{c}
       \end{tikzinline}}    
@@ -2205,7 +2235,7 @@ Associating to the left and the coalescing, instead:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \event{b}{\aForm\mid\DW{x}{1}}{right=of a}
+        \event{b}{\aForm\bigmid\DW{x}{1}}{right=of a}
         % \event{c}{\DW{x}{0}}{right=of b}
         % \wki{b}{c}
       \end{tikzinline}}    

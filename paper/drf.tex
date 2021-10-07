@@ -332,10 +332,10 @@ includes a race involving $\aEv$.
   \emph{preserved} program order, as required by sequential composition and
   conditional.  The other two relations are cross-thread subsets of
   $({\lt_*}\setminus{\rpox})$: $\rrfe$ (reads-from-external) orders writes
-  before reads, satisfying \ref{par-rf-le}; $\rcae$
+  before reads, satisfying \ref{par-le-rf1} and \ref{par-le-rf2}; $\rcae$
   (coherence-after-external) orders read and write accesses before writes,
-  satisfying \ref{pom-rf-block}. (Within a thread, \ref{seq-le-mca2} induces
-  order that is included in ${\rppo}$.)
+  satisfying \ref{pom-rf-block}. (Within a thread, \ref{seq-le-delays-rf} and
+  \ref{seq-le-rf-rf} induce order that is included in ${\rppo}$.)
 
   Using this decomposition, we can show the following.
   \begin{lemma}

@@ -1,13 +1,16 @@
 \section{\PwTmcaTITLE{}: Pomsets with Predicate Transformers for MCA}
 \label{sec:mca}
 
-We derive a model of concurrent computation by adding \emph{parallel
-  composition} and \emph{reads-from} to \reffig{fig:seq}.  To model coherence
+We derive a model of concurrent computation by adding
+% \emph{parallel composition} and 
+\emph{reads-from} to \reffig{fig:seq}.  To model coherence
 and synchronization, we add \emph{delay} to the rule for sequential
-composition.  For \mca{} architectures, it is sufficient to encode delay in
+composition.  For \emph{multicopy-atomic} (\mca{}) architectures, it is sufficient to encode delay in
 the pomset order.  The resulting model, \PwTmca{1}, supports optimal lowering
 for relaxed access on \armeight{}, but requires extra synchronization for
-acquiring reads.
+acquiring reads.  (\emph{Lowering} is the translation of language-level
+operators to machine instructions.  A lowering is \emph{optimal} if it
+provides the most efficient execution possible.)
 
 A variant, \PwTmca{2}, supports optimal lowering for all access modes on
 \armeight{}.  To achieve this, \PwTmca{2} drops the global requirement that
@@ -26,7 +29,7 @@ and $\rdelays$---as well a distinguished set of $\sread$ actions; see
 \textsection\ref{sec:actions}.
 \begin{definition}
   \label{def:pwt:mca1}
-  A \PwTmca{1} is a \PwT{} (\refdef{def:pomset}) equipped
+  The definition of \PwTmca{1} extends that of \PwT{} %(\refdef{def:pomset})
   with a relation $\rrfx$ such that 
   \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
     \setcounter{enumi}{\value{Brf}}
@@ -51,26 +54,38 @@ and $\rdelays$---as well a distinguished set of $\sread$ actions; see
 
   \noindent
   \label{def:pwt:mca:complete}
-  A \PwTmca{} is \emph{complete} if %it is a complete \PwT{} (\refdef{def:pomset}) and
+  The definition of completeness extends \refdef{def:pomset} as follows:
   \begin{multicols}{2}
     \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
-    \item[\eqref{top-kappa}]
-      \eqref{top-term}\;
-      as in \refdef{def:pomset},
       \setcounter{enumi}{\value{Brf}}
     \item \label{top-rf}
       if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
     \end{enumerate}
   \end{multicols}
-  \bigskip
-  
-  %The semantic rules are as follows:
-  \input{fig-mca1.tex}
+
+  \noindent
+  The semantic function extends \reffig{fig:seq} as follows:
+  \begin{multicols}{2}
+    \begin{enumerate}[topsep=0pt,label=(\textsc{i}\arabic*),ref=\textsc{i}\arabic*]
+    \item[{\labeltext[\textsc{p}7]{(\textsc{p}7)}{par-rf}}]
+      \labeltext[\textsc{s}7]{(\textsc{s}7)}{seq-rf}\;
+      \labeltext[\textsc{i}7]{(\textsc{i}7)}{if-rf}\;
+      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+      \setcounter{enumi}{\value{le}}
+    \item[]
+      \begin{enumerate}[leftmargin=0pt]
+      \item \label{seq-le-delays}
+        if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$.
+      \end{enumerate}
+    \end{enumerate}  
+  \end{multicols}
+  % The semantic rules are as follows:
+  % \input{fig-mca1.tex}
 \end{definition}
-Let
-\begin{math}
-  \sem{\aCmd_1 \RPAR \aCmd_2} = \sPAR{\sem{\aCmd_1}}{\sem{\aCmd_2}}.
-\end{math}
+% Let
+% \begin{math}
+%   \sem{\aCmd_1 \RPAR \aCmd_2} = \sPAR{\sem{\aCmd_1}}{\sem{\aCmd_2}}.
+% \end{math}
 We write $\semmca{1}{}$ for the semantic function when it is unclear from context.
 
 In complete pomsets, $\rrfx$ must pair every read with a matching write
@@ -163,7 +178,7 @@ about data races.  For further examples, see \textsection\ref{sec:extras} and
 \cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20}.
 
 Lemmas \ref{lem:monoid} and \ref{lem:if} hold for \PwTmca{1}.  For further
-discussion of items \eqref{lem:ifelse:if:if1} and \eqref{lem:ifelse:if:if2},
+discussion of item \eqref{lem:ifelse:if:if} %and \eqref{lem:ifelse:if:if2},
 see \textsection\ref{sec:delay}.
 
 

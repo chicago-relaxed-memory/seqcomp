@@ -4,7 +4,7 @@
       \mathstrut\PW{x}{\aExp}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \event{a}{\aExp{=}v\land\Qr{x}\land\Qw{x}\mid\DW{x}{v}}{}
+          \event{a}{\aExp{=}v\land\Qr{x}\land\Qw{x}\bigmid\DW{x}{v}}{}
           \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{\aLoc}]}{above=of a}
           \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{\aLoc}]}{below=of a}
           \xos{a}{xd}
@@ -15,7 +15,7 @@
       \PW[\mREL]{x}{\aExp}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \raevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\mid\DW[\mREL]{x}{v}}{}
+          \raevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\bigmid\DW[\mREL]{x}{v}}{}
           \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{x}]}{above=of a}
           \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{x}]}{below=of a}
           \xos{a}{xd}
@@ -26,7 +26,7 @@
       \PW[\mSC]{x}{\aExp}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \scevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\land\Qsc \mid\DW[\mSC]{x}{v}}{}
+          \scevent{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\land\Qsc \bigmid\DW[\mSC]{x}{v}}{}
           \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{x}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{x}][(\aExp{=}\aVal\land \Qsc)/\Qsc]}{below=of a}
           \xos{a}{xd}
@@ -40,7 +40,7 @@
       \mathstrut\PR{x}{r}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \event{a}{\Qw{x}\mid\DR{x}{v}}{}
+          \event{a}{\Qw{x}\bigmid\DR{x}{v}}{}
           \xform{xi}{\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies \bForm[\FALSE/\Qr{x}]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xos{a}{xd}
@@ -51,7 +51,7 @@
       \PR[\mACQ]{x}{r}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \raevent{a}{\Qw{x}\mid\DR[\mACQ]{x}{v}}{}
+          \raevent{a}{\Qw{x}\bigmid\DR[\mACQ]{x}{v}}{}
           \xform{xi}{\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xos{a}{xd}
@@ -62,7 +62,7 @@
       \PR[\mSC]{x}{r}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \scevent{a}{\Qw{x}\land\Qsc\mid\DR[\mSC]{x}{v}}{}
+          \scevent{a}{\Qw{x}\land\Qsc\bigmid\DR[\mSC]{x}{v}}{}
           \xform{xi}{\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xos{a}{xd}
@@ -75,7 +75,7 @@
         \mathstrut\smash{\PF{\fREL}}
         \\
         \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\land\Qw{*}\mid\DF{\fREL}}{}
+            \raevent{a}{\Qr{*}\land\Qw{*}\bigmid\DF{\fREL}}{}
             \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xos[xright]{a}{xd}
@@ -86,7 +86,7 @@
         \PF{\fACQ}
         \\
         \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-            \raevent{a}{\Qr{*}\mid\DR[\fACQ]{x}{v}}{}
+            \raevent{a}{\Qr{*}\bigmid\DR[\fACQ]{x}{v}}{}
             \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
             \xform{xd}{\bForm}{below=of a}
             \xos[xright]{a}{xd}
@@ -97,7 +97,7 @@
       \PF{\fSC}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\mid\DF{\mSC}}{}
+          \scevent{a}{\Qr{*}\land\Qw{*}\land\Qsc\bigmid\DF{\mSC}}{}
           \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}][\FALSE/\Qsc]}{above=of a}
           \xform{xd}{\bForm}{below=of a}
           \xos[xright]{a}{xd}

@@ -35,7 +35,7 @@
     %     ${\lt_i}={\lt}\cap(\aEvs_i\times \aEvs_i)$, for $i\in\{1,2\}$.        
     %   \end{enumerate}
     \item \label{par-rf}
-        ${\rrfx}\rsupset{\rrfx_1}{\rrfx_2}$.
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
       \stepcounter{enumi}
     \end{enumerate}
   \end{multicols}
@@ -76,7 +76,6 @@
       \eqref{seq-term}\;
       \eqref{seq-le}\;
       as in \reffig{fig:seq},
-      \setcounter{enumi}{\value{le}}
     % \item \label{seq-E}
     %   $\aEvs = (\aEvs_1\cup\aEvs_2)$,
     % \item \label{seq-lambda}
@@ -103,6 +102,7 @@
     % \item \label{seq-term}
     %   $\aTerm \riff \aTerm[1]\land\aTr[1]{}{\aTerm[2]}$,
     %   \stepcounter{enumi}
+      \setcounter{enumi}{\value{le}}
     \item[]
       % \labeltext[\textsc{s}6]{}{seq-le}
       \begin{enumerate}[leftmargin=0pt]
@@ -117,7 +117,7 @@
       \end{enumerate}
     %   \stepcounter{enumi}
       \item \label{seq-rf}
-        ${\rrfx}\rsupset{\rrfx_1}{\rrfx_2}$.
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
     % \item[] \labeltext[\textsc{s}7]{}{seq-rf}
     %   \begin{enumerate}[leftmargin=0pt]
     %   \item \label{seq-rf-project}
@@ -180,7 +180,7 @@
     %   \end{enumerate}
     %   \stepcounter{enumi}
       \item \label{if-rf}
-        ${\rrfx}\rsupset{\rrfx_1}{\rrfx_2}$.
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
     % \item[] \labeltext[\textsc{i}7]{}{if-rf}
     %   \begin{enumerate}[leftmargin=0pt]
     %   \item \label{if-rf-project}

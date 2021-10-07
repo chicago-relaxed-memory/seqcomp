@@ -313,10 +313,10 @@ $\fmrg{}$ using a double arrow
     $}
     \\
     \hbox{\begin{tikzinlinesmall}[node distance=1.5em]
-        \event{e}{(v{=}r\lor w{=}r)\limplies (r{=}0\lor r{=}1)\mid\DW{x}{1}}{}
+        \event{e}{(v{=}r\lor w{=}r)\limplies (r{=}0\lor r{=}1)\bigmid\DW{x}{1}}{}
         \event{r}{\DR{y}{v}}{left=of e}
-        \phevent{e1}{v{=}r\limplies r{=}0\mid\DW{x}{1}}{below left=1em and -7em of e}
-        \phevent{e2}{v{=}r\limplies r{=}1\mid\DW{x}{1}}{below right=1em and -7em of e}
+        \phevent{e1}{v{=}r\limplies r{=}0\bigmid\DW{x}{1}}{below left=1em and -7em of e}
+        \phevent{e2}{v{=}r\limplies r{=}1\bigmid\DW{x}{1}}{below right=1em and -7em of e}
         \pox{r}[pos=0,below]{e1}
         \pox[out=-15,in=-167]{e1}[below]{e2}
         \mrg{e1}{e}
@@ -361,10 +361,10 @@ $\fmrg{}$ using a double arrow
   %   \FI
   %   \\
   %   \hbox{\begin{tikzinline}[node distance=1.5em]
-  %       \event{e}{(1{=}r\lor 0{=}r)\limplies (r{=}0\lor r{=}1)\mid\DW{x}{2}}{}
+  %       \event{e}{(1{=}r\lor 0{=}r)\limplies (r{=}0\lor r{=}1)\bigmid\DW{x}{2}}{}
   %       \event{r}{\DR{y}{1}}{left=of e}
-  %       \phevent{e1}{1{=}r\limplies r{=}0\mid\DW{x}{2}}{below left=1em and -7em of e}
-  %       \phevent{e2}{1{=}r\limplies r{=}1\mid\DW{x}{2}}{below right=1em and -7em of e}
+  %       \phevent{e1}{1{=}r\limplies r{=}0\bigmid\DW{x}{2}}{below left=1em and -7em of e}
+  %       \phevent{e2}{1{=}r\limplies r{=}1\bigmid\DW{x}{2}}{below right=1em and -7em of e}
   %       \pox{r}[pos=0,below]{e1}
   %       \pox[out=-15,in=-167]{e1}[below]{e2}
   %       \mrg{e1}{e}
@@ -390,10 +390,10 @@ ignores synchronization and coherence completely.
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}
-        \eventrr{e}{e}{s{\neq}0\mid\DW{x}{2}}{right=of d1}
-        \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e}
-        \eventr{d}{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above=1em of e}
+        \phevent{d1}{r{\neq}0\bigmid\DW{x}{1}}{}
+        \eventrr{e}{e}{s{\neq}0\bigmid\DW{x}{2}}{right=of d1}
+        \phevent{d2}{r{=}0\bigmid\DW{x}{1}}{right=of e}
+        \eventr{d}{d}{r{\neq}0\lor r{=}0\bigmid\DW{x}{1}}{above=1em of e}
         \pox[out=-15,in=-167]{d1}[below]{e}
         \pox[out=-15,in=-167]{e}[below]{d2}
         % \pox[bend right]{e}[right]{d}
@@ -447,9 +447,9 @@ In \PwTmca{}, delay stops the merge in \eqref{eq5}.
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{d1}{r{\neq}0\mid\DW{x}{1}}{}
-        \event{e}{s{\neq}0\mid\DW{x}{2}}{right=of d1}
-        \event{d2}{r{=}0\mid\DW{x}{1}}{right=of e}
+        \event{d1}{r{\neq}0\bigmid\DW{x}{1}}{}
+        \event{e}{s{\neq}0\bigmid\DW{x}{2}}{right=of d1}
+        \event{d2}{r{=}0\bigmid\DW{x}{1}}{right=of e}
         \po{d1}{e}
         \po{e}{d2}
         \pox[out=-15,in=-167]{d1}[below]{e}
@@ -521,12 +521,12 @@ Old example:
   % \IF{\BANG r}\THEN\PW{x}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=1.5em]
-      \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}
-      \phevent{e1}{r{\neq}0\mid\DW{x}{2}}{right=of d1}
-      \phevent{e2}{r{=}0\mid\DW{x}{2}}{right=of e1}
-      \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e2}
-      \event{d}{r{\neq}0\lor r{=}0\mid\DW{x}{1}}{above right=1.5em and -3em of d1}
-      \event{e}{r{\neq}0\lor r{=}0\mid\DW{x}{2}}{above right=1.5em and -3em of e2}
+      \phevent{d1}{r{\neq}0\bigmid\DW{x}{1}}{}
+      \phevent{e1}{r{\neq}0\bigmid\DW{x}{2}}{right=of d1}
+      \phevent{e2}{r{=}0\bigmid\DW{x}{2}}{right=of e1}
+      \phevent{d2}{r{=}0\bigmid\DW{x}{1}}{right=of e2}
+      \event{d}{r{\neq}0\lor r{=}0\bigmid\DW{x}{1}}{above right=1.5em and -3em of d1}
+      \event{e}{r{\neq}0\lor r{=}0\bigmid\DW{x}{2}}{above right=1.5em and -3em of e2}
       %\event{r}{\DR{y}{1}}{left=of d}
       %\wki[out=5,in=175]{d}{e}
       \pox[out=-15,in=-167]{d1}[below]{e1}
@@ -854,10 +854,10 @@ For TC2, we have:
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1.5em]
 %         %\event{a1}{\DR{y}{1}}
-%         \phevent{d1}{r{\neq}0\mid\DW{x}{1}}{}               %x{d_1}
-%         \phevent{e1}{r{\neq}0\mid\DW{x}{2}}{right=of d1}    %x{e_1}
-%         \phevent{d2}{r{=}0\mid\DW{x}{1}}{right=of e1}    %x{d_2}
-%         \phevent{e2}{r{=}0\mid\DW{x}{2}}{right=of d2}    %x{e_2}
+%         \phevent{d1}{r{\neq}0\bigmid\DW{x}{1}}{}               %x{d_1}
+%         \phevent{e1}{r{\neq}0\bigmid\DW{x}{2}}{right=of d1}    %x{e_1}
+%         \phevent{d2}{r{=}0\bigmid\DW{x}{1}}{right=of e1}    %x{d_2}
+%         \phevent{e2}{r{=}0\bigmid\DW{x}{2}}{right=of d2}    %x{e_2}
 %         \event{d}{\DW{x}{1}}{above=of d1}
 %         \event{e}{\DW{x}{2}}{above=of e2}
 %         \wki[out=5,in=175]{d}{e}
@@ -894,10 +894,10 @@ For TC2, we have:
 %     % \IF{\BANG r}\THEN\PW{x}{1}\FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1.5em]
-%         \phevent{d1}{1{\neq}0\mid\DW{x}{1}}{}               %x{d_1}
-%         \phevent{e1}{1{\neq}0\mid\DW{x}{2}}{right=of d1}    %x{e_1}
-%         \phevent{d2}{1{=}0\mid\DW{x}{1}}{right=of e1}    %x{d_2}
-%         \phevent{e2}{1{=}0\mid\DW{x}{2}}{right=of d2}    %x{e_2}
+%         \phevent{d1}{1{\neq}0\bigmid\DW{x}{1}}{}               %x{d_1}
+%         \phevent{e1}{1{\neq}0\bigmid\DW{x}{2}}{right=of d1}    %x{e_1}
+%         \phevent{d2}{1{=}0\bigmid\DW{x}{1}}{right=of e1}    %x{d_2}
+%         \phevent{e2}{1{=}0\bigmid\DW{x}{2}}{right=of d2}    %x{e_2}
 %         \event{d}{\DW{x}{1}}{above=of d1}
 %         \event{e}{\DW{x}{2}}{above=of e2}
 %         \event{r}{\DR{y}{1}}{left=of d}

@@ -1,3 +1,5 @@
+\newcommand{\bigmid}{\Bigm\vert}
+\newcommand{\textsections}{\textsection\textsection}
 \newcommand{\UNDEFINED}{\mathbf{undef}}
 \usepackage{multirow,tabularx}
 
@@ -113,7 +115,7 @@
 \newcommand{\Cb}{,\allowbreak}
 \newcommand{\Cc}{,\;\allowbreak}
 \newcommand{\fcard}[1]{{|}#1{|}}
-\newcommand{\Cdown}[1]{\smash{\downarrow}#1}
+\newcommand{\Cdown}[1]{C}%\smash{\downarrow}#1}
 \newcommand{\lubscope}{\sqcup}
 \newcommand{\ltscope}{\sqsubset}
 \newcommand{\lescope}{\sqsubseteq}
@@ -781,6 +783,7 @@
 \newcommand{\Bool}{\mathsf{Bool}}
 
 \newcommand{\aTr}[3][]{\LOGIC@COLOR{\tau}^{#2}_{#1}\ifnotempty{#3}{(#3)}}
+\newcommand{\aTrAbbrv}[3][]{\LOGIC@COLOR{\tau}^{#2}_{#1}\ifnotempty{#3}{(#3)}}
 \newcommand{\trd}[2]{\LOGIC@COLOR{\tau}_{#1}\ifnotempty{#2}{(#2)}}
 \newcommand{\aTerm}[1][]{\LOGIC@COLOR{\checkmark}\ifnotempty{#1}{\!_{#1}}}
 \newcommand{\kappaE}[1]{\labelingForm\ifemptyelse{#1}{({\aEvs})}{({#1})}}%{|}
@@ -1160,36 +1163,36 @@
 \tikzstyle{baselinecenter} = [baseline={([yshift=-.5ex]current bounding box.west)}]
 %\tikzstyle{baselinecenter} = [baseline=(current bounding box.west)]
 \tikzstyle{event} = [draw=black, fill=blue!5, rectangle, rounded corners, minimum size=3ex]
-\newcommand{\event}[3]{\node[event](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\event}[3]{\node[event](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{phevent} = [draw=gray, fill=gray!10, rectangle, dashed, rounded corners, minimum size=3ex]
-\newcommand{\phevent}[3]{\node[phevent](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\phevent}[3]{\node[phevent](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{raevent} = [event] %[draw=black, fill=red!7, double, rectangle, rounded corners, minimum size=3ex]
-\newcommand{\raevent}[3]{\node[raevent](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\raevent}[3]{\node[raevent](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{scevent} = [event] %[draw=black, fill=orange!20, double, thick, rectangle, rounded corners, minimum size=3ex]
-\newcommand{\scevent}[3]{\node[scevent](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\scevent}[3]{\node[scevent](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{xform} = [draw=gray!80!black, fill=gray!10, rectangle, minimum size=3ex]
-\newcommand{\xform}[3]{\node[xform](#1)[#3]{$\mathstrut#2$};}%\mid\aForm$};}
+\newcommand{\xform}[3]{\node[xform](#1)[#3]{$\mathstrut\smash{#2}$};}%\mid\aForm$};}
 \tikzstyle{zlbl} = [gray!70!black]
 %\newcommand{\@zz}[1]{\makebox[0ex]{\smash{\raisebox{-.5ex}{{${#1}{:}\;$}}}}}
 \newcommand{\@zz}[1]{\makebox[0ex]{\smash{\raisebox{.5ex}{{${}^{#1}$}}}}}
 \newcommand{\@zzr}[1]{\makebox[0ex]{\smash{\raisebox{-.5ex}{{${}^{#1}$}}}}}
 \newcommand{\@zzl}[1]{\makebox[0ex][r]{\smash{\raisebox{-.5ex}{{${#1}{:}$}}}}}
-\newcommand{\eventl}[4]{\node[event](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
-\newcommand{\eventr}[4]{\node[event](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
-\newcommand{\eventrr}[4]{\node[event](#2)[#4,label={[zlbl]right:\@zzr{#1}}]{$\mathstrut#3$};}
-\newcommand{\pheventx}[4]{\node[phevent](#2)[#4]{$\mathstrut#1:#3$};}
-\newcommand{\pheventl}[4]{\node[phevent](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
-\newcommand{\pheventr}[4]{\node[phevent](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
-\newcommand{\raeventl}[4]{\node[raevent](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
-\newcommand{\raeventr}[4]{\node[raevent](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
-\newcommand{\sceventl}[4]{\node[scevent](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut#3$};}
-\newcommand{\sceventr}[4]{\node[scevent](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut#3$};}
+\newcommand{\eventl}[4]{\node[event](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut\smash{#3}$};}
+\newcommand{\eventr}[4]{\node[event](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut\smash{#3}$};}
+\newcommand{\eventrr}[4]{\node[event](#2)[#4,label={[zlbl]right:\@zzr{#1}}]{$\mathstrut\smash{#3}$};}
+\newcommand{\pheventx}[4]{\node[phevent](#2)[#4]{$\mathstrut#1:\smash{#3}$};}
+\newcommand{\pheventl}[4]{\node[phevent](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut\smash{#3}$};}
+\newcommand{\pheventr}[4]{\node[phevent](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut\smash{#3}$};}
+\newcommand{\raeventl}[4]{\node[raevent](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut\smash{#3}$};}
+\newcommand{\raeventr}[4]{\node[raevent](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut\smash{#3}$};}
+\newcommand{\sceventl}[4]{\node[scevent](#2)[#4,label={[zlbl]left:\@zz{#1}}]{$\mathstrut\smash{#3}$};}
+\newcommand{\sceventr}[4]{\node[scevent](#2)[#4,label={[zlbl]right:\@zz{#1}}]{$\mathstrut\smash{#3}$};}
 \tikzstyle{internal} = [color=gray, draw=gray, dashed, fill=gray!10, rectangle, rounded corners, minimum size=3ex]
-\newcommand{\internal}[3]{\node[internal](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\internal}[3]{\node[internal](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{cloudy} = [draw=black, fill=blue!10, cloud, aspect=2]
-\newcommand{\cloud}[3]{\node[cloudy](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\cloud}[3]{\node[cloudy](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{final} = [draw=black, fill=blue!10, rectangle, rounded corners, double, minimum size=3ex]
-\newcommand{\final}[3]{\node[final](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\final}[3]{\node[final](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzset{nonevent/.style={
         event, 
         append after command={
@@ -1248,9 +1251,9 @@
 %     postaction={-stealth,draw,,#3,line width=(#1)/3,shorten <=(#1)/3,shorten >=2*(#1)/3},
 %   },
 % }
-\newcommand{\phnonevent}[3]{\node[phnonevent](#1)[#3]{$\mathstrut#2$};}
-\newcommand{\nonevent}[3]{\node[nonevent](#1)[#3]{$\mathstrut#2$};}
-\newcommand{\nonfinal}[3]{\node[nonfinal](#1)[#3]{$\mathstrut#2$};}
+\newcommand{\phnonevent}[3]{\node[phnonevent](#1)[#3]{$\mathstrut\smash{#2}$};}
+\newcommand{\nonevent}[3]{\node[nonevent](#1)[#3]{$\mathstrut\smash{#2}$};}
+\newcommand{\nonfinal}[3]{\node[nonfinal](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{race} = [-,thick,decorate,decoration={zigzag,segment length = 0.2cm, amplitude = 0.5mm},color=red!50!black]
 \newcommand{\race}[3][]{\begin{pgfonlayer}{background}\draw[race,#1](#2) to (#3);\end{pgfonlayer}}
 \newcommand{\xrace}{\xarrowtikz{race}{\;\;\;\;}}

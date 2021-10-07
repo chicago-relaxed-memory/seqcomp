@@ -6,13 +6,13 @@
 
 Recently, \citet{promising-ldrf} showed that certain combinations of compiler
 optimizations are inconsistent with local \drf{} guarantees.  All of the
-examples that prove inconsistency have the same shape: they combine read
-introduction and case analysis (aka, if-closure).  Effectively, this turns
-one read into two, where different conditional branches can be taken for the
-two copies of the read.  This is reminiscent of the type of \emph{bait and
-  switch} behavior noted by \citet{DBLP:journals/pacmpl/JagadeesanJR20}: the
-promising semantics (\PS{}) \cite{DBLP:conf/popl/KangHLVD17} and related
-models
+examples that prove inconsistency have the same shape: they combine
+read-introduction and case analysis (aka, if-introduction).  Effectively,
+this turns one read into two, where different conditional branches can be
+taken for the two copies of the read.  This is reminiscent of the type of
+\emph{bait and switch} behavior noted by
+\citet{DBLP:journals/pacmpl/JagadeesanJR20}: the promising semantics (\PS{})
+\cite{DBLP:conf/popl/KangHLVD17} and related models
 \citep{DBLP:conf/esop/JagadeesanPR10,DBLP:journals/pacmpl/ChakrabortyV19,Manson:2005:JMM:1047659.1040336},
 fail to validate compositional reasoning of temporal properties.  Consider
 example \ref{oota4} from \cite{DBLP:journals/pacmpl/JagadeesanJR20}:
@@ -151,18 +151,18 @@ replacing $b$.
 inevitable due to compiler optimizations.  The examples crucially involve the
 following sequence of operations:
 \begin{itemize}
-\item read introduction,
-\item if introduction, branching on the read just introduced.
+\item read-introduction,
+\item if-introduction, branching on the read just introduced.
 \end{itemize}
 We believe this combination of optimizations is unsound.  This is obviously
-the case in \cXI: read introduction may cause undefined behavior (\ub), due to
+the case in \cXI: read-introduction may cause undefined behavior (\ub), due to
 the possible introduction of a data race.
 
 The situation is more delicate in \llvm.  The short version of the story is
 that load-hoisting followed by case analysis is unsound in \llvm, without freeze. 
 This happens because:
 \begin{itemize}
-\item read introduction may result in the undefined value $\UNDEFINED$, due
+\item read-introduction may result in the undefined value $\UNDEFINED$, due
   to the possible introduction of a data race \cite{DBLP:conf/cgo/ChakrabortyV17}, and
 \item branching on an undefined value in \llvm{} results in \ub. 
 \end{itemize}
@@ -197,7 +197,7 @@ conservative \cite[\textsection9]{DBLP:conf/pldi/LeeKSHDMRL17}.
 Thus, the difference between \PS{} and \PwT{} can be understood in terms of
 the valid program transformations.  \PS{} allows reads to be introduced, with
 subsequent case analysis on the value read.  \PwT{} validates case analysis,
-but invalidates read introduction.
+but invalidates read-introduction.
 
 Allowing executions such as \ref{oota4} and \ref{LDRF-Fail-PS} also
 invalidates compositional reasoning for temporal safety properties (see
@@ -465,7 +465,7 @@ references.
     \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
         \event{a1}{\DR{x}{1}}{}
         \event{a2}{\DR{x}{2}}{right=of a1}
-        \event{a3}{1{=}x\limplies 2{=}x\limplies x{<} x\mid\DW{y}{1}}{right=of a2}
+        \event{a3}{1{=}x\limplies 2{=}x\limplies x{<} x\bigmid\DW{y}{1}}{right=of a2}
         \po[out=20,in=160]{a1}{a3}
         \po{a2}{a3}
       \end{tikzinline}}
@@ -503,7 +503,7 @@ the middle read event:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a0}{\DW{x}{0}}{}
         % \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{r{\geq}0\mid\DW{y}{1}}{right=3em of a1}      
+        \event{a2}{r{\geq}0\bigmid\DW{y}{1}}{right=3em of a1}      
         % \wk{a0}{a1}
       \end{tikzinline}}    
   \end{gathered}
@@ -517,7 +517,7 @@ is $[0/r][0/x]$, resulting in:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a0}{\DW{x}{0}}{}
         % \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{0{\geq}0\mid\DW{y}{1}}{right=3em of a1}      
+        \event{a2}{0{\geq}0\bigmid\DW{y}{1}}{right=3em of a1}      
         % \wk{a0}{a1}
       \end{tikzinline}}    
   \end{gathered}
@@ -538,7 +538,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
         \IF{\aExp}\THEN\PW{x}{1}\FI
         \\
         \hbox{\begin{tikzinline}[node distance=1em]
-            \event{a}{\aExp\mid\DW{x}{1}}{}
+            \event{a}{\aExp\bigmid\DW{x}{1}}{}
           \end{tikzinline}}
       \end{gathered}
       &&
@@ -546,7 +546,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
         \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
         \\
         \hbox{\begin{tikzinline}[node distance=1em]
-            \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
+            \event{a}{\lnot\aExp\bigmid\DW{x}{1}}{}
           \end{tikzinline}}
       \end{gathered}
       &&
@@ -554,7 +554,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
         \IF{\aExp}\THEN\PW{y}{1}\FI
         \\
         \hbox{\begin{tikzinline}[node distance=1em]
-            \event{a}{\aExp\mid\DW{y}{1}}{}
+            \event{a}{\aExp\bigmid\DW{y}{1}}{}
           \end{tikzinline}}
       \end{gathered}
       &&
@@ -562,7 +562,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
         \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
         \\
         \hbox{\begin{tikzinline}[node distance=1em]
-            \event{a}{\lnot\aExp\mid\DW{y}{1}}{}
+            \event{a}{\lnot\aExp\bigmid\DW{y}{1}}{}
           \end{tikzinline}}
       \end{gathered}
     \end{align*}
@@ -600,7 +600,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
         \IF{\aExp}\THEN\PW{x}{1}\FI
         \\
         \hbox{\begin{tikzinline}[node distance=1em]
-            \event{a}{\aExp\mid\DW{x}{1}}{}
+            \event{a}{\aExp\bigmid\DW{x}{1}}{}
           \end{tikzinline}}
       \end{gathered}
       &&
@@ -610,8 +610,8 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
         \IF{\aExp}\THEN\PW{y}{1}\FI
         \\
         \hbox{\begin{tikzinline}[node distance=1em]
-            \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
-            \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+            \event{a}{\lnot\aExp\bigmid\DW{x}{1}}{}
+            \event{b}{\aExp\bigmid\DW{y}{1}}{right=of a}
           \end{tikzinline}}
       \end{gathered}
       &&
@@ -619,7 +619,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
         \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
         \\
         \hbox{\begin{tikzinline}[node distance=1em]
-            \event{a}{\lnot\aExp\mid\DW{y}{1}}{}
+            \event{a}{\lnot\aExp\bigmid\DW{y}{1}}{}
           \end{tikzinline}}
       \end{gathered}
     \end{align*}
@@ -658,7 +658,7 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \IF{\aExp}\THEN\PR{x}{r}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
-          \event{a}{\aExp\mid\DR{x}{1}}{}
+          \event{a}{\aExp\bigmid\DR{x}{1}}{}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -666,7 +666,7 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \PW{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
-          \event{a}{r{=}1\mid\DW{y}{1}}{}
+          \event{a}{r{=}1\bigmid\DW{y}{1}}{}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -674,7 +674,7 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
-          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
+          \event{a}{\lnot\aExp\bigmid\DR{x}{1}}{}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -686,8 +686,8 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \PW{y}{r}
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
-          \event{a}{\aExp\mid\DR{x}{1}}{}
-          \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+          \event{a}{\aExp\bigmid\DR{x}{1}}{}
+          \event{b}{\aExp\bigmid\DW{y}{1}}{right=of a}
           \po{a}{b}
         \end{tikzinline}}
     \end{gathered}
@@ -696,7 +696,7 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
-          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
+          \event{a}{\lnot\aExp\bigmid\DR{x}{1}}{}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -711,7 +711,7 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
           \event{a}{\DR{x}{1}}{}
-          \event{b}{\aExp\mid\DW{y}{1}}{right=of a}
+          \event{b}{\aExp\bigmid\DW{y}{1}}{right=of a}
           \po{a}{b}
         \end{tikzinline}}
     \end{gathered}
@@ -722,7 +722,7 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \IF{\aExp}\THEN\PR{x}{r}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
-          \event{a}{\aExp\mid\DR{x}{1}}{}
+          \event{a}{\aExp\bigmid\DR{x}{1}}{}
         \end{tikzinline}}
     \end{gathered}
     &&
@@ -732,8 +732,8 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
       \\
       \hbox{\begin{tikzinline}[node distance=1em]
-          \event{a}{\lnot\aExp\mid\DR{x}{1}}{}
-          \event{b}{r{=}1\mid\DW{y}{1}}{left=of a}
+          \event{a}{\lnot\aExp\bigmid\DR{x}{1}}{}
+          \event{b}{r{=}1\bigmid\DW{y}{1}}{left=of a}
         \end{tikzinline}}
     \end{gathered}
   \end{align*}
@@ -772,8 +772,8 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \PW{x}{s}
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-          \event{a2}{r\EQ2\mid\DR{\REF{2}}{1}}{}
-          \event{a3}{(r\EQ2\limplies 1\EQ s) \limplies s\EQ1\mid\DW{x}{1}}{right=of a2}
+          \event{a2}{r\EQ2\bigmid\DR{\REF{2}}{1}}{}
+          \event{a3}{(r\EQ2\limplies 1\EQ s) \limplies s\EQ1\bigmid\DW{x}{1}}{right=of a2}
           \po{a2}{a3}
         \end{tikzinline}}
     \end{gathered}
@@ -784,7 +784,7 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
     %   \PW{x}{s}
     %   \\
     %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-    %     \event{b}{s\EQ1\mid\DW{x}{1}}{}
+    %     \event{b}{s\EQ1\bigmid\DW{x}{1}}{}
     %   \end{tikzinline}}
     % \end{gathered}
     % \\
@@ -794,8 +794,8 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
       \\
       \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
           % \event{a1}{\DR{y}{2}}{}
-          \event{a2}{r\EQ2\mid\DR{\REF{2}}{1}}{}%right=of a1}
-          \event{a3}{r\EQ2\land\REF{2}\EQ1\mid\DW{x}{1}}{right=of a2}
+          \event{a2}{r\EQ2\bigmid\DR{\REF{2}}{1}}{}%right=of a1}
+          \event{a3}{r\EQ2\land\REF{2}\EQ1\bigmid\DW{x}{1}}{right=of a2}
           \po{a2}{a3}
         \end{tikzinline}}
     \end{gathered}
@@ -888,7 +888,7 @@ Under the semantics of \jjr{}, we have
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a1}{\DR{x}{1}}{}
       \event{a2}{\DR{x}{1}}{right=of a1}
-      \event{a3}{1\EQ1\land1\EQ x \land x\EQ1 \land x=x\mid\DW{y}{1}}{right=of a2}
+      \event{a3}{1\EQ1\land1\EQ x \land x\EQ1 \land x=x\bigmid\DW{y}{1}}{right=of a2}
     \end{tikzinline}}
 \end{gather*}
 The precondition of $\DWP{y}{1}$ is \emph{not} a tautology, and therefore

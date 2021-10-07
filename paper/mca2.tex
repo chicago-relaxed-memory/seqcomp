@@ -44,15 +44,35 @@ thus the above execution is allowed.
 
 \begin{definition}
   \label{def:pwt:mca2}
-  A \PwTmca{2} is a \PwT{} (\refdef{def:pomset}) equipped with an injective
-  relation $\rrfx$ that satisfies requirements \ref{pom-rf-match} and
-  \ref{pom-rf-block} of \refdef{def:pwt:mca1}.
+  The definition of \PwTmca{2} is derived from that of \PwTmca{1} by
+  removing \ref{pom-rf-le} and adding the following:
 
-  A \PwTmca{2} is \emph{complete} if it satisfies
-  \ref{top-kappa}, \ref{top-term}, and \ref{top-rf}---this is the same as for
-  \PwTmca{1}. 
+  \begin{enumerate}[topsep=0pt]
+  \item[{\labeltext[\textsc{p}6a]{(\textsc{p}6a)}{par-le-rf1}}]
+    if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\lt\aEv$,
+  \item[{\labeltext[\textsc{p}6b]{(\textsc{p}6b)}{par-le-rf2}}]
+    if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\xrfx\bEv$ then $\aEv\lt\bEv$,
+  \item[{\labeltext[\textsc{s}6a]{(\textsc{s}6a)}{seq-le-delays-rf}}]
+    if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ 
+    then either $\bEv\xrfx\aEv$ or $\bEv\le\aEv$,
+  \item[{\labeltext[\textsc{s}6b]{(\textsc{s}6b)}{seq-le-rf-rf}}]
+    if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\labeling_1(\bEv) \rblocks \labeling_2(\aEv)$
+    then $\cEv\xrfx\aEv$ implies $\bEv\le\cEv$.
+    % \\
+    % if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ and $\bEv\xrfx\aEv$
+    % then $\cEv\le\bEv$.
+  % \item[{\labeltext[\textsc{i}6a]{(\textsc{i}6a)}{if-le-rf}}]
+  %   ${\rrfx}\subseteq {\rrfx_1}\cup {\rrfx_2}$
+  \end{enumerate}
+  % The definition of \PwTmca{2} is a \PwT{} (\refdef{def:pomset}) equipped with an injective
+  % relation $\rrfx$ that satisfies requirements \ref{pom-rf-match} and
+  % \ref{pom-rf-block} of \refdef{def:pwt:mca1}.
 
-  \input{fig-mca2.tex}
+  % A \PwTmca{2} is \emph{complete} if it satisfies
+  % \ref{top-kappa}, \ref{top-term}, and \ref{top-rf}---this is the same as for
+  % \PwTmca{1}. 
+
+  %\input{fig-mca2.tex}
 \end{definition}
 % We write $\semmca{2}{}$ for the semantic function.
 A \PwTmca{2} need not satisfy requirement \ref{pom-rf-le}, and thus we may
@@ -68,19 +88,15 @@ have $\bEv\xrfx\aEv$ and $\aEv\lt\bEv$.
 % This change both allows and requires us to weaken the definition of
 % \emph{delays} to drop write-to-read order from $\eqreorderco$.
 
-\todo{Example using \ref{seq-le-delays-rf} and \ref{seq-le-rf-rf}. To make
-  space, \reflem{lem:mca2} could move to appendix.}
+\todo{Example using \ref{seq-le-delays-rf} and \ref{seq-le-rf-rf}. Perhaps
+  move \reflem{lem:mca2} to appendix.}
 
 With the weakening of \ref{seq-le-delays}, we must be careful not to allow
-spurious pairs to be added to the $\rrfx$ relation.  Thus we add
-\ref{par-rf-project},
-\ref{seq-rf-project}, and
-\ref{if-rf-project}.
-For example, \ref{if-rf-project} ensures that
+spurious pairs to be added to the $\rrfx$ relation.  For example, %\ref{if-rf-project} ensures that
 \begin{math}
   \frf{\semrr{\IF{b}\THEN\PR{x}{r}\PAR\PW{x}{1}\ELSE\PR{x}{r}\SEMI\PW{x}{1}\FI}}
 \end{math}
-does not include 
+should not include 
 \begin{math}
   \smash{\hbox{\begin{tikzinlinesmall}[node distance=1.5em]
         \event{a}{\DR{x}{1}}{}
@@ -89,6 +105,7 @@ does not include
         \wki{a}{b}
       \end{tikzinlinesmall}}}
 \end{math}, taking $\rrfx$ from the left and $\lt$ from the right.
+The use of $\rextends{}{}$ ensures this.
 
 % \PwTmca{2} does not enforce \ref{pom-rf-le}: $\bEv\xrfx\aEv$ may not imply
 % $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come from different sides of a
@@ -97,7 +114,8 @@ As a consequence of dropping \ref{pom-rf-le}, sequential $\rrfx$ must be validat
 pomset construction, rather than post-hoc.  In \textsection\ref{sec:c11}, we
 show how to construct program order ($\rpox$) for complete pomsets using
 phantom events ($\fmrg{}$).  Using this construction, the following lemma
-gives a post-hoc verification technique for $\rrfx$.
+gives a post-hoc verification technique for $\rrfx$.  Let $\fmrginv{}$ be the
+inverse of $\fmrg{}$.
 \begin{lemma}
   \label{lem:mca2}
   If $\aPS\in\frf{\semmca{2}{\aCmd}}$ is complete, then
@@ -108,7 +126,7 @@ gives a post-hoc verification technique for $\rrfx$.
   \item internal fulfillment:
     $(\exists\bEv'\in\fmrginv{\bEv})$
     $(\exists\aEv'\in\fmrginv{\aEv})$
-    $\bEv'\xpox\aEv'$ and $(\not\exists\cEv')$
+    $\bEv'\xpox\aEv'$ and $(\not\exists\cEv)$
     $\labelingForm(\cEv)$ is a tautology and
     $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv'\xpox\cEv\xpox\aEv'$.
   \end{itemize}

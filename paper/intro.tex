@@ -40,8 +40,8 @@ dependencies semantically. \citet{DBLP:conf/esop/PaviottiCPWOB20} defined
 Modular Relaxed Dependencies (\MRD), which use event structures to calculate
 dependencies for \cXI, targeting the Intermediate Memory Model (\IMM)
 \cite{DBLP:journals/pacmpl/PodkopaevLV19}. \citet{DBLP:journals/pacmpl/JagadeesanJR20} defined
-Pomsets with Preconditions (\PwP), which use preconditions and logic to
-calculate dependencies for a Java-like language targeting multicopy-atomic (\mca{}) hardware, such as
+Pomsets\footnote{A pomset is a labeled partial order.} with Preconditions (\PwP), which use preconditions and logic to
+calculate dependencies for a Java-like language targeting {multicopy-atomic} (\mca{}) hardware, such as
 \armeight{} \cite{DBLP:journals/pacmpl/PulteFDFSS18}.  However, neither paper
 treated sequential composition as a first-class citizen.  \MRD{} encoded
 sequential composition using continuation-passing, and \PwP{} used prefixing,
@@ -53,17 +53,37 @@ In this paper, we show that \PwP{} can be extended with \emph{families of
 is \emph{compositional} and \emph{direct}: \emph{compositional} in that the
 denotation of $(\aCmd_1\SEMI \aCmd_2)$ can be computed from the denotation of
 $\aCmd_1$ and the denotation of $\aCmd_2$, and \emph{direct} in that these
-can be calculated independently.  The definition is associative: the
-denotation of $((\aCmd_1\SEMI \aCmd_2)\SEMI \aCmd_3)$ is the same as the
-denotation of $(\aCmd_1\SEMI (\aCmd_2\SEMI \aCmd_3))$.  It also validates
-expected laws concerning the interaction of sequencing and conditional
-execution.
+can be calculated independently.
+
+The model has been formalized in Coq.  We have formally verified that the
+sequential composition satisfies the expected monoid laws
+(\reflem{lem:monoid}).  In addition we have formally verified that
+\begin{math}
+  \sem{\xIFTHEN{\aForm}{
+      \xSEMI{\aCmd_1}{\aCmd_3}
+    }{
+      \xSEMI{\aCmd_2}{\aCmd_3}
+    }}
+  \supseteq
+  \sem{\xSEMI{
+      \xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}
+    }{
+      \aCmd_3
+    }}
+\end{math}
+(\reflem{lem:if}\ref{lem:if:seq}).
+
+% The
+% definition is associative: the denotation of
+% $((\aCmd_1\SEMI \aCmd_2)\SEMI \aCmd_3)$ is the same as the denotation of
+% $(\aCmd_1\SEMI (\aCmd_2\SEMI \aCmd_3))$.  It also validates expected laws
+% concerning the interaction of sequencing and conditional execution.
 
 To manage complexity, we have layered the definitions.  After an overview and
 discussion of related work, we
 define sequential dependencies in \textsection\ref{sec:model}.  We then add
 concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
-which provides a Java-like model for \mca{} hardware, similar to that of
+which provides a Java-like model for {multicopy-atomic} (\mca{}) hardware, similar to that of
 \citet{DBLP:journals/pacmpl/JagadeesanJR20};
 \textsection\ref{sec:results} summarizes the results for this model. In \textsection\ref{sec:c11},
 we define \PwTc{}, which models \cXI, adapting the approach of
@@ -318,7 +338,8 @@ many have chosen to prioritize efficiency over elegance.
 
 This has led to \emph{relaxed memory models}, in which the requirement of
 sequential consistency is weakened to only apply \emph{per-location}. This allows executions that
-are inconsistent with program order, such as:
+are inconsistent with program order, such as the following, which contains an
+\emph{antidependency} $(\xwk)$:
 \begin{gather*}
   \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}}
   \PAR
@@ -337,7 +358,8 @@ are inconsistent with program order, such as:
       \wk[out=-165,in=-15]{rx0}{wx1}
     \end{tikzinline}}
 \end{gather*}
-Reads must be ordered between the available writes, creating \emph{antidependencies} $(\DR{x}{0}\xwk\DW{x}{1})$.
+% Reads must be ordered between blocking writes, creating
+% \emph{antidependencies} such as $\DRP{x}{0}\xwk\DWP{x}{1}$.
 
 In such models, the causal order between events is important,
 and includes control and data dependencies ($\xpo$), to avoid
@@ -408,7 +430,7 @@ A compiler may lift the assignment $\PW{y}{1}$ out of the conditional,
 thus removing the dependency.
 
 To address this, \citet{DBLP:journals/pacmpl/JagadeesanJR20} introduced
-\emph{Pomsets with Preconditions (\PwP{})}, where events are labeled with logical
+\emph{Pomsets with Preconditions} (\PwP{}), where events are labeled with logical
 formulae.  Nontrivial preconditions are introduced by store actions (modeling
 data dependencies) and conditionals (modeling control dependencies):
 \begin{gather*}
@@ -416,11 +438,11 @@ data dependencies) and conditionals (modeling control dependencies):
   \\
   \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
+      \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{}
     \end{tikzinline}}
 \end{gather*}
-Preconditions are discharged by being ordered after a read (we assume the
-usual precedence for logical operators---$\lnot$, $\land$, $\lor$, $\limplies$): 
+In this diagram, $(s {<} 1)$ is a control dependency and $(r{*}s){=}0$ is a data dependency. Preconditions are discharged by being ordered after a read (we assume the
+usual precedence for logical operators): 
 \begin{gather*}
   \tag{$\dagger$}\label{eq1}
   \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
@@ -429,7 +451,7 @@ usual precedence for logical operators---$\lnot$, $\land$, $\lor$, $\limplies$):
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{rx0}{\DR{x}{0}}{}
       \event{ry0}{\DR{y}{0}}{right=of rx0}
-      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
       \po{ry0}{wz0}
     \end{tikzinline}}
 \end{gather*}
@@ -535,7 +557,7 @@ showing how $\bForm$ is transformed, for example:
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{rx0}{\DR{x}{0}}{}
         \xform{rx0d}{(0{=}r) \limplies \bForm}{right=of rx0}
-        \xo{rx0}{rx0d}
+        %\xo{rx0}{rx0d}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -545,7 +567,7 @@ showing how $\bForm$ is transformed, for example:
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
         \event{ry0}{\DR{y}{0}}{}
         \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
-        \xo{ry0}{ry0d}
+        %\xo{ry0}{ry0d}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -553,9 +575,9 @@ showing how $\bForm$ is transformed, for example:
     \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
+        \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{}
         \xform{wz0d}{\bForm[r{*}s/z]}{right=of wz0}
-        \xo{wz0}{wz0d}
+        %\xo{wz0}{wz0d}
       \end{tikzinline}}
   \end{gathered}
 \end{align*}
@@ -573,38 +595,37 @@ moved from the sequential semantics of \emph{substitution} and
 % local state of the thread, therefore we assign it the identity transformer.
 
 For a sequentially consistent semantics, sequential composition is
-straightforward: we apply each predicate transformer to the preconditions of
-subsequent events, composing the predicate transformers.  (In subsequent
-diagrams, we only show predicate transformers for reads.)
+straightforward: we apply each predicate transformer to subsequent
+preconditions, composing the predicate transformers.
 \begin{gather*}
   \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
-  \\[-1.5ex]
-  \nonumber
+  \\
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
       \event{rx0}{\DR{x}{0}}{}
       \event{ry0}{\DR{y}{0}}{right=of rx0}
-      \event{wz0}{(0{=}r) \limplies (0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
-      \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{left=of rx0}
-      \po{rx0}{ry0}
-      \po{ry0}{wz0}
-      \xo{rx0}{rx0ry0d}
-      \xo[out=155,in=15]{ry0}{rx0ry0d}
+      \event{wz0}{(0{=}r) \limplies (0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
+      \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm[r{*}s/z]}{right=of wz0}
+      \wki{rx0}{ry0}
+      \wki{ry0}{wz0}
+      %\xo{rx0}{rx0ry0d}
+      %\xo[out=155,in=15]{ry0}{rx0ry0d}
       % \xo{wz0}{rx0ry0d}
     \end{tikzinline}}
 \end{gather*}
-This model works for the sequentially consistent case, but needs to be
-weakened for the relaxed case. The key observation of this paper is
+This works for the sequentially consistent case, but needs to be
+weakened for the relaxed case.
+
+The key observation of this paper is
 that rather than working with one predicate transformer, we should
 work with a \emph{family} of predicate transformers, indexed by sets
 of events.
-
 For example, for single-event pomsets, there are two predicate
 transformers, since there are two subsets of any one-element set.
 The \emph{independent}
 transformer is indexed by the empty set, whereas the \emph{dependent}
 transformer is indexed by the singleton.
 We visualize this by including more than one transformed predicate,
-with an edge leading to the dependent one. For example:
+with a dotted edge leading to the dependent one ($\xxo$). For example:
 \begin{align*}
   \begin{gathered}
     \PR{x}{r}
@@ -632,7 +653,7 @@ with an edge leading to the dependent one. For example:
   %   \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
   %   \\
   %   \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
-  %     \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{}
+  %     \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{}
   %     \xform{wz0i}{\bForm}{left=.4em of wz0}
   %     \xform{wz0d}{\bForm}{right=of wz0}
   %     \xo{wz0}{wz0d}
@@ -648,10 +669,10 @@ for \eqref{eq1} by choosing
 the predicate transformer which is independent of $(\DR x0)$
 but dependent on $(\DR y0)$, which is the transformer
 which maps $\bForm$ to $(0{=}s) \limplies \bForm$.
+(In subsequent diagrams, we only show predicate transformers for reads.)
 \begin{gather*}
   \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
   \\
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=2ex and 1.2em]
       \xform{wz0i}{\bForm}{}
       \xform{rx0d}{(0{=}r) \limplies \bForm}{right=of wz0i}
@@ -659,7 +680,7 @@ which maps $\bForm$ to $(0{=}s) \limplies \bForm$.
       \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of rx0ry0d}
       \event{rx0}{\DR{x}{0}}{above left=of rx0ry0d}
       \event{ry0}{\DR{y}{0}}{above right=of rx0ry0d}
-      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
       \po{ry0}{wz0}
       \xo{rx0}{rx0d}
       \xo{ry0}{ry0d}
@@ -668,34 +689,35 @@ which maps $\bForm$ to $(0{=}s) \limplies \bForm$.
     \end{tikzinline}}
 \end{gather*}
 In the diagram, the dotted lines indicate set inclusion into the index of the transformer-family.
-As a sanity check, we can see that sequential composition is
+As a quick correctness test, we can see that sequential composition is
 associative in this case, since it does not matter whether we
-associate to the left, with intermediate step:
-\begin{gather*}
-  \PR{x}{r}\SEMI \PR{y}{s}
-  \\
-  \nonumber
-  \hbox{\begin{tikzinline}[node distance=2ex and 1.5em]
-      \xform{rx0d}{(0{=}r) \limplies \bForm}{}
-      \event{rx0}{\DR{x}{0}}{right=of rx0d}
-      \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{right=of rx0}
-      \event{ry0}{\DR{y}{0}}{right=of rx0ry0d}
-      \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
-      \xform{wz0i}{\bForm}{left=of rx0d}
-      \xo{rx0}{rx0d}
-      \xo{ry0}{ry0d}
-      \xo{rx0}{rx0ry0d}
-      \xo{ry0}{rx0ry0d}
-    \end{tikzinline}}
-\end{gather*}
-or to the right, with intermediate step:
+associate to the left, with the intermediate step eliding $\DWP{z}{0}$ in the
+diagram above,
+% \begin{gather*}
+%   \PR{x}{r}\SEMI \PR{y}{s}
+%   \\
+%   \nonumber
+%   \hbox{\begin{tikzinline}[node distance=2ex and 1.5em]
+%       \xform{rx0d}{(0{=}r) \limplies \bForm}{}
+%       \event{rx0}{\DR{x}{0}}{right=of rx0d}
+%       \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{right=of rx0}
+%       \event{ry0}{\DR{y}{0}}{right=of rx0ry0d}
+%       \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
+%       \xform{wz0i}{\bForm}{left=of rx0d}
+%       \xo{rx0}{rx0d}
+%       \xo{ry0}{ry0d}
+%       \xo{rx0}{rx0ry0d}
+%       \xo{ry0}{rx0ry0d}
+%     \end{tikzinline}}
+% \end{gather*}
+or to the right, with the intermediate step:
 \begin{gather*}
   \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
   \\
   \nonumber
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
       \event{ry0}{\DR{y}{0}}{}
-      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \mid \DW{z}{0}}{right=of ry0}
+      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
       \xform{ry0d}{(0{=}s) \limplies \bForm}{left=of ry0}
       \xform{wz0i}{\bForm}{left=of ry0d}
       \po{ry0}{wz0}

@@ -6,7 +6,7 @@
 In the paper so far, we have assumed that registers are assigned at most
 once.  We have done this primarily for readability.  In the first subsection
 below, we drop this assumption, instead using substitution to rename
-registers.  We use the set
+registers.  We use a set of registers indexed by event identifier:
 $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$.  By assumption
 (\textsection\ref{sec:prelim}), these registers do not appear in programs:
 $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.  The resulting semantics satisfies
@@ -16,13 +16,13 @@ Our approach to register recycling allows us to define a criterion for
 eliminating certain types of useless pomsets (\textsection\ref{sec:false}).
 
 In the remainder of this section we consider several mostly-orthogonal features: address
-calculation, if-closure, fences, and read-modify-write operations.  Address
-calculation and if-closure do have some interaction, and we spell out the
+calculation, if-introduction, and read-modify-write operations.  Address
+calculation and if-introduction do have some interaction, and we spell out the
 combined semantics in \textsection\ref{sec:semcaaddr}.
 
-It is worth pointing out that address calculation and if-closure only affect
-the semantics of read and write.  Fences introduce new trivial actions.
-\RMW{}s require more infrastructure in order to ensure atomicity while
+It is worth pointing out that address calculation and if-introduction only affect
+the semantics of read and write.  
+\RMW{}s introduce new infrastructure in order to ensure atomicity while
 compiling to \armeight{} using load-exclusive and store-exclusive.
 
 These extensions preserve all of the program transformation discussed thus
@@ -87,7 +87,7 @@ $\aEv$ in the independent case becomes
 which is a tautology.  In \eqref{eq4}, the first read resolves the
 nondeterminism in both the first and the second read.  Given the choice of
 event names, the outcome of the second read is predetermined!  In
-\eqref{eq3}, the second read remains nondeterministic, even in the case that
+\eqref{eq3}, the second read remains nondeterministic, even if
 the events are destined to coalesce.  
 
 \begin{definition}
@@ -156,7 +156,7 @@ Consider the case where the reads are merged, both seeing 1:
   &&
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{a}{\DR{y}{1}}{}
-      \event{b}{\aForm\mid\DW{x}{1}}{right=of a}
+      \event{b}{\aForm\bigmid\DW{x}{1}}{right=of a}
     \end{tikzinline}}
 \end{align*}
 In order to independent of both reads, we take the precondition $\aForm$ to be:
@@ -205,55 +205,56 @@ Then collapsing $r$ and $s$ and substituting the initial value of $y$ (say $0$),
 \end{displaymath}
 
 
-\subsection{Fences and Read-Modify-Write Operations}
-\label{sec:fences}
+\subsection{Read-Modify-Write Operations}
+%\label{sec:fences}
 \label{sec:rmw}
 
-The semantics of fences is straightforward.
-Let
-\begin{math}
-  \sembase{\PF[\ascope]{\fmode}} = \sFENCE[\ascope]{\fmode}[\aThrd],
-\end{math}
-where
-if $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
-% $(\exists\aLocs\subseteq\Loc)$
-% $(\exists\bmode\in\{\amode,\mRLX\})$
-\begin{multicols}{3}
-  \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
-  \item \label{fence-E}
-    % $\aEvs\neq\emptyset$ and
-    % if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
-    $\fcard{\aEvs}\leq 1$,
-  \item \label{fence-lambda}
-    $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
-  \item \label{fence-kappa}
-    $\labelingForm(\aEv) \riff \TRUE$,
-  \item \label{fence-tau}
-    $\aTr{\bEvs}{\bForm} \riff \bForm$,
-  %   \stepcounter{enumi}      
-  % \item[] \labeltext[\textsc{f}5]{}{fence-term}
-  %   \begin{enumerate}[leftmargin=0pt]
-  %   \item \label{fence-term-nonempty}
-  %     if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
-  %   \item \label{fence-term-empty}
-  %     if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
-  %   \end{enumerate}
-    \item \label{fence-term}
-      $\aTerm \riff \kappaE{}$.
-  \end{enumerate}
-\end{multicols}
-This semantics is identical to that of
-\cite{DBLP:journals/pacmpl/JagadeesanJR20}; see there for examples.
+% The semantics of fences is straightforward.
+% Let
+% \begin{math}
+%   \sembase{\PF[\ascope]{\fmode}} = \sFENCE[\ascope]{\fmode}[\aThrd],
+% \end{math}
+% where
+% if $\aPS \in \sFENCE[\ascope]{\amode}[\aThrd]$ then
+% % $(\exists\aLocs\subseteq\Loc)$
+% % $(\exists\bmode\in\{\amode,\mRLX\})$
+% \begin{multicols}{3}
+%   \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
+%   \item \label{fence-E}
+%     % $\aEvs\neq\emptyset$ and
+%     % if $\bEv,\aEv\in\aEvs$ then $\bEv=\aEv$,
+%     $\fcard{\aEvs}\leq 1$,
+%   \item \label{fence-lambda}
+%     $\labelingAct(\aEv) = \DF[\ascope]{\amode}[\aThrd]$,
+%   \item \label{fence-kappa}
+%     $\labelingForm(\aEv) \riff \TRUE$,
+%   \item \label{fence-tau}
+%     $\aTr{\bEvs}{\bForm} \riff \bForm$,
+%   %   \stepcounter{enumi}      
+%   % \item[] \labeltext[\textsc{f}5]{}{fence-term}
+%   %   \begin{enumerate}[leftmargin=0pt]
+%   %   \item \label{fence-term-nonempty}
+%   %     if $\aEvs\neq\emptyset$ then $\aTerm \riff \TRUE$,
+%   %   \item \label{fence-term-empty}
+%   %     if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
+%   %   \end{enumerate}
+%     \item \label{fence-term}
+%       $\aTerm \riff \kappaE{}$.
+%   \end{enumerate}
+% \end{multicols}
+% This semantics is identical to that of
+% \cite{DBLP:journals/pacmpl/JagadeesanJR20}; see there for examples.
 
 % \subsection{}
 
-%We give the semantics of \RMW{}s without address calculation or if-closure.
+%We give the semantics of \RMW{}s without address calculation or if-introduction.
 
 % From the data model, we require an additional binary relation over
 % $\Act\times\Act$: $\roverlapsdef$.  For the actions in this paper, we say
 % $\aAct \roverlapsdef \bAct$ if they access the same location.
 
-\RMW{} operations are more complex.  To support \RMW{}s, we add a relation
+% \RMW{} operations are more complex.  
+To support \RMW{}s, we add a relation
 ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
 \RMW{} to the succeeding write.
 % Let two actions \emph{overlap} if they access the same location.
@@ -499,7 +500,7 @@ consider the independent transformers of the last thread and initializer:
     \IF{\BANG r}\THEN \PW{y}{1} \FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em]
-        \event{a2}{r{=}0\mid\DW{y}{1}}{}      
+        \event{a2}{r{=}0\bigmid\DW{y}{1}}{}      
         \xform{xi}{\bForm[1/y]}{left=of a2}
       \end{tikzinline}}    
   \end{gathered}
@@ -535,7 +536,7 @@ predicate transformer of the $\PFADD{}{}{}$:
     \IF{\BANG r}\THEN \PW{y}{1} \FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em]
-        \event{a2}{r{=}0\mid\DW{y}{1}}{}      
+        \event{a2}{r{=}0\bigmid\DW{y}{1}}{}      
         \xform{xi}{\bForm[1/y]}{left=of a2}
       \end{tikzinline}}    
   \end{gathered}
@@ -595,7 +596,7 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 \end{comment}
 
 
-\subsection{If-Closure}
+\subsection{If-Introduction (aka Case Analysis)}
 \label{sec:semca}
 
 In order to model sequential composition, we must allow inconsistent
@@ -624,7 +625,7 @@ then it %\refdef{def:pomsets-trans}
     \IF{\aExp}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a}{\aExp\mid\DW{x}{1}}{}
+        \event{a}{\aExp\bigmid\DW{x}{1}}{}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -640,7 +641,7 @@ then it %\refdef{def:pomsets-trans}
     \IF{\lnot\aExp}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1em]
-        \event{a}{\lnot\aExp\mid\DW{x}{1}}{}
+        \event{a}{\lnot\aExp\bigmid\DW{x}{1}}{}
       \end{tikzinline}}
   \end{gathered}
 \end{align*}
@@ -657,7 +658,7 @@ disjoint preconditions.
     \IF{\aExp}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1em]
-        \eventl{d}{a}{\aExp\mid\DW{x}{1}}{}
+        \eventl{d}{a}{\aExp\bigmid\DW{x}{1}}{}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -665,8 +666,8 @@ disjoint preconditions.
     \PW{x}{1}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{d}{a}{\lnot\aExp\mid\DW{x}{1}}{}
-        \eventl{e}{b}{\aExp\mid\DW{x}{1}}{right=of a}
+        \eventl{d}{a}{\lnot\aExp\bigmid\DW{x}{1}}{}
+        \eventl{e}{b}{\aExp\bigmid\DW{x}{1}}{right=of a}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -674,7 +675,7 @@ disjoint preconditions.
     \IF{\lnot\aExp}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1em]
-        \eventl{e}{a}{\lnot\aExp\mid\DW{x}{1}}{}
+        \eventl{e}{a}{\lnot\aExp\bigmid\DW{x}{1}}{}
       \end{tikzinline}}
   \end{gathered}
 \end{align*}
@@ -769,22 +770,24 @@ We show the rules for write and read.  The rule for fences requires similar trea
   \label{def:semca}
   \input{fig-ca.tex}
 \end{definition}
-\todo{Check \ref{read-tau-ca}.}
 The definition allows multiple events to represent a single action, each with
 a disjoint precondition.  The predicate transformers are derived from those
 defined for the conditional.
+\ref{write-phi-ca} and \ref{read-phi-ca} require that the predicates do not
+mention registers in $\uRegs{\AllEvents}$.
+
 
 This modification validates
 %\reflem{lem:if}\ref{lem:if:seq}--\ref{lem:if:elim} as equations.
 \reflem{lem:if}\ref{lem:if:seq}, \ref{lem:seq:if}, and \ref{lem:if:elim} as equations.
 
-We show how to combine address calculation and if-closure in
+We show how to combine address calculation and if-introduction in
 \textsection\ref{sec:semcaaddr}.
-\todo{Narrate \ref{write-phi} and \ref{read-phi} or remove.}
 
 \subsection{Address Calculation}
 \label{sec:addr}
 
+\todo{Check definitions and examples in this subsection.}
 
 Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$
 and $\sLOAD{}{}$.  In this section, we develop a flat memory model, which
@@ -794,7 +797,6 @@ does not deal with provenance \cite{DBLP:journals/pacmpl/LeeHJLRL18}.
 % Let $\aForm$ be a formula that may include the pseudo-value $\Aother$.  Then
 % let $[\aForm/\A{\Aother\neq\cVal}]$ be the substitution that, for every
 % $\dVal\neq\cVal$, replaces $\A{\dVal}$ by $\aForm[\dVal/\Aother]$.
-\todo{Check the following definition.}
 \begin{definition}
   \label{def:semaddr}
   %Let $\semaddr{}$ be defined as in \reffig{fig:seq}, changing $\sSTORE{}{}$
@@ -844,8 +846,6 @@ This execution would become possible, however, if we were to remove
 $(\cExp{=}\cVal)$ from \ref{read-tau-addr}.  In this case, $\DRP{y}{2}$ would
 not necessarily be dependency ordered before $\DWP{x}{1}$.
 
-
-\todo{Check above example.  Narrate TC12.}
 \ref{TC12} with all initial values $0$:
 \begin{gather*}
   \taglabel{TC12}
@@ -864,7 +864,7 @@ not necessarily be dependency ordered before $\DWP{x}{1}$.
         \event{b1}{\DR{y}{1}}{}
         \event{b2}{\DW{\REFARRAY{}{1}}{1}}{right=of b1}
         \event{b3}{\DR{\REFARRAY{}{0}}{0}}{right=of b2}
-        \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
+        \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
         \po{b1}{b2}
         \po{b3}{b4}
         \event{a1}{\DR{x}{1}}{right=3em of b4}
@@ -1028,7 +1028,7 @@ Building the precondition $\aForm$ from right to left:
           \event{b1}{\DR{y}{1}}{right=3em of a2}
           \event{b2}{\DW{\REFARRAY{}{1}}{0}}{right=of b1}
           \event{b3}{\DR{\REFARRAY{}{0}}{1}}{right=of b2}
-          \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
+          \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
           \po{b1}{b2}
           %\po[out=15,in=165]{b1}{b4}
           \rf{a2}{b1}
@@ -1095,7 +1095,7 @@ Building the precondition $\aForm$ from right to left:
           \event{b1}{\DR{y}{1}}{right=3em of a2}
           \event{b2}{\DW{\REFARRAY{}{1}}{0}}{right=of b1}
           \event{b3}{\DR{\REFARRAY{}{0}}{1}}{right=of b2}
-          \event{b4}{\aForm\mid\DW{x}{1}}{right=of b3}
+          \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
           \po{b1}{b2}
           \po[out=15,in=165]{b1}{b4}
           \rf{a2}{b1}
@@ -1176,7 +1176,7 @@ Building the precondition $\aForm$ from right to left:
 %     \PR{\REF{r}}{s}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%       \event{b}{r\EQ2\mid\DR{\REF{2}}{1}}{}
+%       \event{b}{r\EQ2\bigmid\DR{\REF{2}}{1}}{}
 %       \xform{xd}{(r\EQ2\limplies 1\EQ s) \limplies\bForm}{below=of b}
 %       \xform{xi}{((r\EQ2\limplies 1\EQ s)\lor\RW) \limplies\bForm}{above=of b}
 %       \xo[xright]{b}{xd}
@@ -1187,7 +1187,7 @@ Building the precondition $\aForm$ from right to left:
 %     \PW{x}{s}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%       \event{b}{s\EQ1\mid\DW{x}{1}}{}
+%       \event{b}{s\EQ1\bigmid\DW{x}{1}}{}
 %       \xform{xd}{\bForm}{below=of b}
 %       \xform{xi}{\bForm}{above=of b}
 %       \xo[out=-30]{b}{xd}
@@ -1201,9 +1201,9 @@ Building the precondition $\aForm$ from right to left:
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
 %       \event{a1}{\DR{y}{2}}{}
-%       \event{a2}{(2{=}r\lor\RW)\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
+%       \event{a2}{(2{=}r\lor\RW)\limplies r\EQ2\bigmid\DR{\REF{2}}{1}}{right=of a1}
 %       \event{a3}{(2{=}r\lor\RW)\limplies (r\EQ2\limplies 1\EQ s)
-%       \limplies s\EQ1\mid\DW{x}{1}}{below right=.5em and -8em of a2}
+%       \limplies s\EQ1\bigmid\DW{x}{1}}{below right=.5em and -8em of a2}
 %       \po{a2}{a3}
 %     \end{tikzinline}}
 %   \end{gathered}
@@ -1215,9 +1215,9 @@ Building the precondition $\aForm$ from right to left:
 %     %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
 %       \event{a1}{\DR{y}{2}}{}
-%       \event{a2}{(2{=}r\lor\FALSE)\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
+%       \event{a2}{(2{=}r\lor\FALSE)\limplies r\EQ2\bigmid\DR{\REF{2}}{1}}{right=of a1}
 %       \event{a3}{(2{=}r\lor\TRUE)\limplies (r\EQ2\limplies 1\EQ s)
-%       \limplies s\EQ1\mid\DW{x}{1}}{below right=.5em and -8em of a2}
+%       \limplies s\EQ1\bigmid\DW{x}{1}}{below right=.5em and -8em of a2}
 %       \po{a2}{a3}
 %     \end{tikzinline}}
 %   \end{gathered}
@@ -1229,9 +1229,9 @@ Building the precondition $\aForm$ from right to left:
 %     %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
 %       \event{a1}{\DR{y}{2}}{}
-%       \event{a2}{2{=}r\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
+%       \event{a2}{2{=}r\limplies r\EQ2\bigmid\DR{\REF{2}}{1}}{right=of a1}
 %       \event{a3}{(r\EQ2\limplies 1\EQ s)
-%       \limplies s\EQ1\mid\DW{x}{1}}{below right=.5em and -8em of a2}
+%       \limplies s\EQ1\bigmid\DW{x}{1}}{below right=.5em and -8em of a2}
 %       \po{a2}{a3}
 %     \end{tikzinline}}
 %   \end{gathered}
@@ -1244,9 +1244,9 @@ Building the precondition $\aForm$ from right to left:
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
 %       \event{a1}{\DR{y}{2}}{}
-%       \event{a2}{2{=}r\limplies r\EQ2\mid\DR{\REF{2}}{1}}{right=of a1}
+%       \event{a2}{2{=}r\limplies r\EQ2\bigmid\DR{\REF{2}}{1}}{right=of a1}
 %       \event{a3}{2{=}r\limplies (r\EQ2\limplies 1\EQ s)
-%       \limplies s\EQ1\mid\DW{x}{1}}{below right=.5em and -5em of a2}
+%       \limplies s\EQ1\bigmid\DW{x}{1}}{below right=.5em and -5em of a2}
 %       \po[out=-20,in=180]{a1}{a3}
 %       \po{a2}{a3}
 %     \end{tikzinline}}
@@ -1254,7 +1254,7 @@ Building the precondition $\aForm$ from right to left:
 % \end{gather*}
 % All the preconditions are now tautologies.
 
-\subsection{Combining Address Calculation and If-Closure}
+\subsection{Combining Address Calculation and If-Introduction}
 \label{sec:semcaaddr}
 
 \refdef{def:semaddr} is naive with respect to merging events.  Consider the
@@ -1264,8 +1264,8 @@ following example:
     \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-        \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
+        \eventl{c}{a}{r\EQ1\mathbin{\bigmid}\DW{\REF{1}}{0}}{}
+        \eventl{d}{b}{r\EQ1\mathbin{\bigmid}\DW{\REF{0}}{0}}{right=of a}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -1273,8 +1273,8 @@ following example:
     \PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{d}{a}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{}
-        \eventl{e}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of a}
+        \eventl{d}{a}{r\EQ0\mathbin{\bigmid}\DW{\REF{0}}{0}}{}
+        \eventl{e}{b}{r\EQ0\mathbin{\bigmid}\DW{\REF{0}}{1}}{right=of a}
         \wki{a}{b}
       \end{tikzinline}}
   \end{gathered}
@@ -1290,9 +1290,9 @@ Merging, we have:
     \FI
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-        \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-        \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
+        \eventl{c}{a}{r\EQ1\mathbin{\bigmid}\DW{\REF{1}}{0}}{}
+        \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\bigmid}\DW{\REF{0}}{0}}{right=of a}
+        \eventl{e}{c}{r\EQ0\mathbin{\bigmid}\DW{\REF{0}}{1}}{right=of b}
         \wki{b}{c}
       \end{tikzinline}}
   \end{gathered}
@@ -1306,23 +1306,23 @@ Merging, we have:
 %     \FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=1em]
-%       \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-%       \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
+%       \eventl{c}{a}{r\EQ1\mathbin{\bigmid}\DW{\REF{1}}{0}}{}
+%       \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\bigmid}\DW{\REF{0}}{0}}{right=of a}
 %     \end{tikzinline}}
 %   \end{gathered}
 % \end{align*}
 The precondition of $\DWREF{0}{0}$ is a tautology; however, this is not
 possible for $(\PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r})$ alone, using \refdef{def:semaddr}.
 
-\refdef{def:semcaaddr}, enables this execution using if-closure.  Under this
+\refdef{def:semcaaddr}, enables this execution using if-introduction.  Under this
 semantics, we have:
 \begin{align*}
   \begin{gathered}
     \PW{\REF{r}}{0}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-        \eventl{d}{b}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
+        \eventl{c}{a}{r\EQ1\mathbin{\bigmid}\DW{\REF{1}}{0}}{}
+        \eventl{d}{b}{r\EQ0\mathbin{\bigmid}\DW{\REF{0}}{0}}{right=of a}
       \end{tikzinline}}
   \end{gathered}
   &&
@@ -1330,8 +1330,8 @@ semantics, we have:
     \PW{\REF{0}}{\BANG r}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{d}{b}{r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{}
-        \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
+        \eventl{d}{b}{r\EQ1\mathbin{\bigmid}\DW{\REF{0}}{0}}{}
+        \eventl{e}{c}{r\EQ0\mathbin{\bigmid}\DW{\REF{0}}{1}}{right=of b}
       \end{tikzinline}}
   \end{gathered}
 \end{align*}
@@ -1345,9 +1345,9 @@ Sequencing and merging:
     \PW{\REF{0}}{\BANG r}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \eventl{c}{a}{r\EQ1\mathbin{\mid}\DW{\REF{1}}{0}}{}
-        \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\mid}\DW{\REF{0}}{0}}{right=of a}
-        \eventl{e}{c}{r\EQ0\mathbin{\mid}\DW{\REF{0}}{1}}{right=of b}
+        \eventl{c}{a}{r\EQ1\mathbin{\bigmid}\DW{\REF{1}}{0}}{}
+        \eventl{d}{b}{r\EQ0\lor r\EQ1\mathbin{\bigmid}\DW{\REF{0}}{0}}{right=of a}
+        \eventl{e}{c}{r\EQ0\mathbin{\bigmid}\DW{\REF{0}}{1}}{right=of b}
         \wki{b}{c}
       \end{tikzinline}}
   \end{gathered}

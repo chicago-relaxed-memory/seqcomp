@@ -258,7 +258,7 @@ for $\aCmd_1$ can be derived by eliminating the initial write.
   %   \\
   %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
   %     \event{a}{\DR{x}{2}}{}
-  %     \event{b}{2{=}s\limplies(s{+}r){=}7\mid\DW{x}{7}}{right=of a}%6.5em of a}
+  %     \event{b}{2{=}s\limplies(s{+}r){=}7\bigmid\DW{x}{7}}{right=of a}%6.5em of a}
   %     \po{a}{b}
   %     \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{below right=.5em and -1em of a}
   %       %     \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{above=of a}
@@ -280,8 +280,8 @@ for $\aCmd_1$ can be derived by eliminating the initial write.
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a}{\DR{x}{2}}{}
-        \event{b}{2{=}s\limplies(s{+}r){=}7\mid\DW{x}{7}}{right=of a}
-        \event{c}{t{=}2\mid\DW{x}{2}}{left=of a}
+        \event{b}{2{=}s\limplies(s{+}r){=}7\bigmid\DW{x}{7}}{right=of a}
+        \event{c}{t{=}2\bigmid\DW{x}{2}}{left=of a}
         \xform{xdd}{2{=}s \limplies \bForm[s{+}r/x]}{right=of b}%below right=.5em and -1em of a}
         %\xo{a}{xdd}
         \xo{b}{xdd}
@@ -417,7 +417,7 @@ The predicate transformers are:
 %     \PW{x}{s{+}r}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-%       \event{a}{(s{+}r){=}7\mid\DW{x}{7}}{}
+%       \event{a}{(s{+}r){=}7\bigmid\DW{x}{7}}{}
 %       \xform{xi}{\bForm}{above=of a}
 %       \xform{xd}{\bForm}{below=of a}
 %       \xo[xright]{a}{xd}
@@ -431,7 +431,7 @@ The predicate transformers are:
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
 %       \event{a}{\DR{x}{2}}{}
-%       \event{b}{(s{+}r){=}7\mid\DW{x}{7}}{right=of a}
+%       \event{b}{(s{+}r){=}7\bigmid\DW{x}{7}}{right=of a}
 %       \xform{xdd}{2{=}s \limplies \bForm}{above=of a}
 %       \xform{xdi}{2{=}s \limplies \bForm}{below=of a}
 %       \xform{xii}{\bForm}{above=of b}
@@ -462,7 +462,7 @@ The predicate transformers are:
 %     \PW{x}{s{+}r}
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-%       \event{a}{(s{+}r){=}7\mid\DW{x}{7}}{}
+%       \event{a}{(s{+}r){=}7\bigmid\DW{x}{7}}{}
 %       \xform{xi}{\bForm[s{+}r/x]}{above=of a}
 %       \xform{xd}{\bForm[s{+}r/x]}{below=of a}
 %       \xo[xright]{a}{xd}
@@ -500,9 +500,6 @@ The predicate transformers are:
 % \end{proposition}
 
 
-\subsection{Combining Address Calculation and If-Closure}
-
-
 \subsection{The Need for Respect}
 In \reffig{fig:seq}, we choose the weakest precondition.  Because of this,
 associativity requires that \ref{seq-le} is $\PBR{{\lt}\rextends{\lt_1}{\lt_2}}$
@@ -521,7 +518,7 @@ Associating to the left, we might have:
   \aPS_{12}=
   \hbox{\begin{tikzinline}[node distance=1em]
       \eventr{d}{d}{\DR{x}{}}{}
-      \eventr{e}{e}{\aForm\mid \DW{y}{}}{right=of d}
+      \eventr{e}{e}{\aForm\bigmid \DW{y}{}}{right=of d}
     \end{tikzinline}}
   &&
   \aPS_{3}= \emptyset
@@ -529,11 +526,11 @@ Associating to the left, we might have:
   \aPS=
   \hbox{\begin{tikzinline}[node distance=1em]
       \eventr{d}{d}{\DR{x}{}}{}
-      \eventr{e}{e}{\aForm\mid \DW{y}{}}{right=of d}
+      \eventr{e}{e}{\aForm\bigmid \DW{y}{}}{right=of d}
       \po{d}{e}
     \end{tikzinline}}
 \end{align*}
-When building $\aPS_{12}$, we would have had $\Cdown{e}=\emptyset$, and thus
+When building $\aPS_{12}$, the dependent set of $e$ would be the empty set, and thus
 $\aForm$ must have been constructed using the independent transformer
 \ref{read-tau-ind}.  Attempting to repeat this, associating to the right:
 \begin{align*}
@@ -544,17 +541,17 @@ $\aForm$ must have been constructed using the independent transformer
   &&
   \aPS_{23}=
   \hbox{\begin{tikzinline}[node distance=1em]
-      \eventr{e}{e}{\aForm'\mid \DW{y}{}}{}
+      \eventr{e}{e}{\aForm'\bigmid \DW{y}{}}{}
     \end{tikzinline}}
   &&
   \aPS'=
   \hbox{\begin{tikzinline}[node distance=1em]
       \eventr{d}{d}{\DR{x}{}}{}
-      \eventr{e}{e}{\aForm'\mid \DW{y}{}}{right=of d}
+      \eventr{e}{e}{\aForm'\bigmid \DW{y}{}}{right=of d}
       \po{d}{e}
     \end{tikzinline}}
 \end{align*}
-In $\aPS'$, however, $\Cdown{e}=\{d\}$, and thus $\aForm'$ must be
+In $\aPS'$, however, now the dependent set of $e$ is the singleton $\{d\}$; thus $\aForm'$ must be
 constructed using the dependent transformer \ref{read-tau-dep}.
 Since
 \begin{math}
@@ -599,7 +596,7 @@ We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a3}{\DR{x}{1}}{}
-      \event{a4}{x\EQ1\mid\DW{z}{1}}{right=of a3}
+      \event{a4}{x\EQ1\bigmid\DW{z}{1}}{right=of a3}
     \end{tikzinline}}
 \end{gather*}
 \begin{gather*}
@@ -608,13 +605,13 @@ We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a2}{\DW{x}{1}}{}
       \event{a3}{\DR{x}{1}}{right=of a2}
-      \event{a4}{1\EQ1\mid\DW{z}{1}}{right=of a3}
+      \event{a4}{1\EQ1\bigmid\DW{z}{1}}{right=of a3}
     \end{tikzinline}}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a2}{\DW{x}{1}}{}
       \event{a3}{\DR{x}{1}}{right=of a2}
-      \event{a4}{r\EQ1\mid\DW{z}{1}}{right=of a3}
+      \event{a4}{r\EQ1\bigmid\DW{z}{1}}{right=of a3}
     \end{tikzinline}}
 \end{gather*}
 
@@ -653,8 +650,8 @@ Perhaps surprisingly, this semantics is incomparable with that of
   \IF{r\land s}\THEN \PW{z}{1}\FI
   \\
   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
-      \event{a3}{r\land s\;\mathsf{even}\mid\DW{y}{1}}{}
-      \event{a4}{r\land s\mid\DW{z}{1}}{right=of a3}
+      \event{a3}{r\land s\;\mathsf{even}\bigmid\DW{y}{1}}{}
+      \event{a4}{r\land s\bigmid\DW{z}{1}}{right=of a3}
     \end{tikzinline}}
 \end{gather*}
 Prepending $\PRP{x}{s}$, we get the same result regardless of whether we
@@ -667,8 +664,8 @@ we show the independent case:
   \\
   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
       \event{a2}{\DR{x}{2}}{}
-      \event{a3}{(2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{(2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+      \event{a3}{(2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\bigmid\DW{y}{1}}{right=of a2}
+      \event{a4}{(2{=}s\lor x{=}s)\limplies (r\land s)\bigmid\DW{z}{1}}{right=of a3}
     \end{tikzinline}}
 \end{gather*}
 Since the preconditions mention $x$, prepending $\PRP{x}{r}$, we now get
@@ -683,8 +680,8 @@ any substitution, we have:
   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
       \event{a1}{\DR{x}{1}}{}
       \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+      \event{a3}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s\;\mathsf{even})\bigmid\DW{y}{1}}{right=of a2}
+      \event{a4}{1{=}r\limplies  (2{=}s\lor x{=}s)\limplies (r\land s)\bigmid\DW{z}{1}}{right=of a3}
       \po[out=12,in=168]{a1}{a3}
       \po[out=10,in=170]{a1}{a4}
     \end{tikzinline}}
@@ -727,8 +724,8 @@ The situation reverses with the substitution $[r/x]$:
   \hbox{\begin{tikzinline}[node distance=0.5em and 1.5em]
       \event{a1}{\DR{x}{1}}{}
       \event{a2}{\DR{x}{2}}{right=of a1}
-      \event{a3}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s\;\mathsf{even})\mid\DW{y}{1}}{right=of a2}
-      \event{a4}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s)\mid\DW{z}{1}}{right=of a3}
+      \event{a3}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s\;\mathsf{even})\bigmid\DW{y}{1}}{right=of a2}
+      \event{a4}{1{=}r\limplies  (2{=}s\lor r{=}s)\limplies (r\land s)\bigmid\DW{z}{1}}{right=of a3}
       \po[out=12,in=168]{a1}{a3}
       \po[out=10,in=170]{a1}{a4}
     \end{tikzinline}}
@@ -910,7 +907,7 @@ Attempting to get $\DRP{y}{0}$, we instead get:
     \IF{\BANG r}\THEN\PR{y}{s}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{b}{r\EQ0\mid\DR{y}{0}}{}
+        \event{b}{r\EQ0\bigmid\DR{y}{0}}{}
       \end{tikzinline}}
   \end{gathered}    
 \end{align*}
@@ -946,8 +943,8 @@ Revisiting \jmm{} causality test case 1 from the end of \textsection\ref{sec:ex:
     \PW{z}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a2}{r{\geq}0\mid\DW{y}{1}}{}      
-        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}      
+        \event{a2}{r{\geq}0\bigmid\DW{y}{1}}{}      
+        \event{a3}{r{=}1\bigmid\DW{z}{1}}{right=of a2}      
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -963,8 +960,8 @@ Revisiting \jmm{} causality test case 1 from the end of \textsection\ref{sec:ex:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a0}{\DW{x}{0}}{}
         \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=of a1}      
-        \event{a3}{1{=}r\limplies r{=}1\mid\DW{z}{1}}{right=of a2}
+        \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\bigmid\DW{y}{1}}{right=of a1}      
+        \event{a3}{1{=}r\limplies r{=}1\bigmid\DW{z}{1}}{right=of a2}
         \po[out=-15,in=-165]{a1}{a3}
         \wki{a0}{a1}
       \end{tikzinline}}    
@@ -985,8 +982,8 @@ the precondition of $\DWP{y}{1}$ is not a tautology:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a0}{\DW{x}{0}}{}
         % \event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{r{\geq}0\mid\DW{y}{1}}{right=6em of a0}      
-        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}
+        \event{a2}{r{\geq}0\bigmid\DW{y}{1}}{right=6em of a0}      
+        \event{a3}{r{=}1\bigmid\DW{z}{1}}{right=of a2}
         % \wk{a0}{a1}
       \end{tikzinline}}    
   \end{gathered}
@@ -1004,8 +1001,8 @@ elimination to merge $\DWP{x}{0}$ and $\DRP{x}{0}$:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a0}{\DW{x}{0}}{}
         %\event{a1}{\DR{x}{1}}{right=of a0}
-        \event{a2}{(0{=}r\lor 0{=}r)\limplies r{\geq}0\mid\DW{y}{1}}{right=6em of a0}      
-        \event{a3}{r{=}1\mid\DW{z}{1}}{right=of a2}
+        \event{a2}{(0{=}r\lor 0{=}r)\limplies r{\geq}0\bigmid\DW{y}{1}}{right=6em of a0}      
+        \event{a3}{r{=}1\bigmid\DW{z}{1}}{right=of a2}
         %\po[out=-15,in=-165]{a1}{a3}
         %\wki{a0}{a1}
       \end{tikzinline}}    
@@ -1058,29 +1055,47 @@ this trick for \PwTmca{2}, due to thread-local reads-from
 and thread-local blockers (\ref{seq-le-delays-rf} and \ref{seq-le-rf-rf} in \refdef{def:pwt:mca2}).
 
 As motivation, recall that we stated 
-\reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2} as inclusions:
+\reflem{lem:if}\eqref{lem:ifelse:if:if} %--\eqref{lem:ifelse:if:if2}
+using inclusions:
 \begin{enumerate}
-\item[\eqref{lem:ifelse:if:if1}]
-  \begin{math} 
-    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-    \supseteq
-    \xSEMI{
-      \xIFTHEN{\aForm}{\aPSS_1}{}
-    }{
-      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
-    }.
-  \end{math}
+  \item[\eqref{lem:ifelse:if:if}]
+    \begin{math}
+      \sem{\xSEMI{
+        \xIFTHEN{\lnot\aForm}{\aCmd_2}{}
+      }{
+        \xIFTHEN{\aForm}{\aCmd_1}{}
+      }}
+      \subseteq
+      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
+      \supseteq
+      \sem{\xSEMI{
+        \xIFTHEN{\aForm}{\aCmd_1}{}
+      }{
+        \xIFTHEN{\lnot\aForm}{\aCmd_2}{}
+      }}.
+    \end{math}
   
-\item[\eqref{lem:ifelse:if:if2}]
-  \begin{math} 
-    \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-    \supseteq
-    \xSEMI{
-      \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
-    }{
-      \xIFTHEN{\aForm}{\aPSS_1}{}
-    }.
-  \end{math}
+% \item[\eqref{lem:ifelse:if:if1}]
+%   \begin{math} 
+%     \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+%     \supseteq
+%     \xSEMI{
+%       \xIFTHEN{\aForm}{\aPSS_1}{}
+%     }{
+%       \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+%     }.
+%   \end{math}
+  
+% \item[\eqref{lem:ifelse:if:if2}]
+%   \begin{math} 
+%     \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+%     \supseteq
+%     \xSEMI{
+%       \xIFTHEN{\lnot\aForm}{\aPSS_2}{}
+%     }{
+%       \xIFTHEN{\aForm}{\aPSS_1}{}
+%     }.
+%   \end{math}
 \end{enumerate}
 \PwTmca{} does not satisfy the reverse inclusion.
 The culprit is $\rdelay$, which introduces order regardless of whether
@@ -1135,7 +1150,7 @@ Example where $\cForm_\labeling=(r{=}0)$
     \IF{r\OR s}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{b}{r{\neq}0\lor s{\neq}0\mid\DW{x}{1}}{}
+        \event{b}{r{\neq}0\lor s{\neq}0\bigmid\DW{x}{1}}{}
       \end{tikzinline}}
   \end{gathered}    
   &&
@@ -1143,7 +1158,7 @@ Example where $\cForm_\labeling=(r{=}0)$
     \IF{\BANG s}\THEN\PW{x}{2}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{c}{s{=}0\mid\DW{x}{2}}{}
+        \event{c}{s{=}0\bigmid\DW{x}{2}}{}
       \end{tikzinline}}
   \end{gathered}    
 \end{align*}
@@ -1164,8 +1179,8 @@ $((r{\neq}0 \lor s{\neq}0)\land s{=}0)$ is satisfiable (take $r{=}1$ and $s{=}0$
     \IF{\BANG s}\THEN\PW{x}{2}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{b}{r{\neq}0\lor s{\neq}0\mid\DW{x}{1}}{}
-        \event{c}{s{=}0\mid\DW{x}{2}}{right=of b}
+        \event{b}{r{\neq}0\lor s{\neq}0\bigmid\DW{x}{1}}{}
+        \event{c}{s{=}0\bigmid\DW{x}{2}}{right=of b}
         \wki{b}{c}
       \end{tikzinline}}
   \end{gathered}    
@@ -1180,8 +1195,8 @@ $((r{\neq}0 \lor s{\neq}0)\land s{=}0)$ is satisfiable (take $r{=}1$ and $s{=}0$
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a}{\DR{y}{0}}{}
-        \event{b}{r{=}0\limplies (r{\neq}0\lor s{\neq}0)\mid\DW{x}{1}}{right=of a}
-        \event{c}{s{=}0\mid\DW{x}{2}}{right=of b}
+        \event{b}{r{=}0\limplies (r{\neq}0\lor s{\neq}0)\bigmid\DW{x}{1}}{right=of a}
+        \event{c}{s{=}0\bigmid\DW{x}{2}}{right=of b}
         \po{a}{b}
         \wki{b}{c}
       \end{tikzinline}}
@@ -1197,7 +1212,7 @@ $(s{\neq}0\land s{=}0)$ is unsatisfiable:
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a}{\DR{y}{0}}{}
-        \event{b}{r{=}0\limplies (r{\neq}0\lor s{\neq}0)\mid\DW{x}{1}}{right=of a}
+        \event{b}{r{=}0\limplies (r{\neq}0\lor s{\neq}0)\bigmid\DW{x}{1}}{right=of a}
         \po{a}{b}
       \end{tikzinline}}
   \end{gathered}    
@@ -1206,7 +1221,7 @@ $(s{\neq}0\land s{=}0)$ is unsatisfiable:
     \IF{\BANG s}\THEN\PW{x}{2}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{c}{s{=}0\mid\DW{x}{2}}{}
+        \event{c}{s{=}0\bigmid\DW{x}{2}}{}
       \end{tikzinline}}
   \end{gathered}    
 \end{align*}
@@ -1220,8 +1235,8 @@ $(s{\neq}0\land s{=}0)$ is unsatisfiable:
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a}{\DR{y}{0}}{}
-        \event{b}{r{=}0\limplies (r{\neq}0\lor s{\neq}0)\mid\DW{x}{1}}{right=of a}
-        \event{c}{s{=}0\mid\DW{x}{2}}{right=of b}
+        \event{b}{r{=}0\limplies (r{\neq}0\lor s{\neq}0)\bigmid\DW{x}{1}}{right=of a}
+        \event{c}{s{=}0\bigmid\DW{x}{2}}{right=of b}
         \po{a}{b}
       \end{tikzinline}}
   \end{gathered}    
@@ -1291,7 +1306,7 @@ We define some helper notation:
   \end{scope}
 \end{definition}
 Update the following rules from \reffig{fig:seq}.  (The change is similar for
-address calculation and if-closure.)
+address calculation and if-introduction.)
 
 \todo{This is buggy.  Need to enforce order for
   coherence/synchronization/dependency into a write and
@@ -1413,7 +1428,7 @@ top-level pomsets.
       \PW{x}{1}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \event{a}{1{=}v\land\Qr{x}\land\Qw{x}\mid\DW{x}{v}}{}
+          \event{a}{1{=}v\land\Qr{x}\land\Qw{x}\bigmid\DW{x}{v}}{}
           \xform{xi}{\bForm[1/\aLoc][\FALSE/\Qw{\aLoc}]}{above=of a}
           \xform{xd}{\bForm[1/\aLoc]}{below=of a}
           \xos{a}{xd}
@@ -1424,7 +1439,7 @@ top-level pomsets.
       \PW[\mREL]{x}{1}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \raevent{a}{1{=}v\land\Qr{*}\land\Qw{*}\mid\DW[\mREL]{x}{v}}{}
+          \raevent{a}{1{=}v\land\Qr{*}\land\Qw{*}\bigmid\DW[\mREL]{x}{v}}{}
           \xform{xi}{\bForm[1/\bLoc][\FALSE/\Qw{x}]}{above=of a}
           \xform{xd}{\bForm[1/\bLoc]}{below=of a}
           \xos{a}{xd}
@@ -1438,11 +1453,11 @@ top-level pomsets.
   %   \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
   %   \\
   %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %         \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
+  %         \event{a1}{\QS{\aLoc}{\mRLX}\bigmid\DW{x}{1}}{}
   %         \xform{x1d}{\bForm}{below right=of a1}
   %         \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mREL}]}{below=of a1}
   %         \xo{a1}{x1d}
-  %         \raevent{a2}{\FALSE\mid\DW{\bLoc}{1}}{above right=of x1d}
+  %         \raevent{a2}{\FALSE\bigmid\DW{\bLoc}{1}}{above right=of x1d}
   %         %\xform{x2d}{\bForm}{below left=of a2}
   %         \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
   %         \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mREL}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
@@ -1457,11 +1472,11 @@ top-level pomsets.
   %   % \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
   %   % \\
   %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %         \event{a1}{\QS{\aLoc}{\mRLX}\mid\DW{x}{1}}{}
+  %         \event{a1}{\QS{\aLoc}{\mRLX}\bigmid\DW{x}{1}}{}
   %         \xform{x1d}{\bForm}{below right=of a1}
   %         \xform{x2i}{\bForm[\FALSE/\QS{\bLoc}{\mREL}]}{below=of a1}
   %         \xo{a1}{x1d}
-  %         \raevent{a2}{\QS{\bLoc}{\mREL}\mid\DW{\bLoc}{1}}{above right=of x1d}
+  %         \raevent{a2}{\QS{\bLoc}{\mREL}\bigmid\DW{\bLoc}{1}}{above right=of x1d}
   %         %\xform{x2d}{\bForm}{below left=of a2}
   %         \xform{x1i}{\bForm[\FALSE/\QS{\aLoc}{\mRLX}]}{below=of a2}
   %         \xform{xii}{\bForm[\FALSE/\QS{\bLoc}{\mREL}][\FALSE/\QS{\aLoc}{\mRLX}]}{below right=of a2}
@@ -1481,7 +1496,7 @@ top-level pomsets.
       \PR[\mACQ]{y}{r}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \raevent{a}{\Qw{y}\mid\DR[\mACQ]{y}{v}}{}
+          \raevent{a}{\Qw{y}\bigmid\DR[\mACQ]{y}{v}}{}
           \xform{xi}{\PBR{1{=}\aReg \lor y{=}\aReg} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xos{a}{xd}
@@ -1492,7 +1507,7 @@ top-level pomsets.
       \PR{x}{r}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \event{a}{\Qw{x}\mid\DR{x}{v}}{}
+          \event{a}{\Qw{x}\bigmid\DR{x}{v}}{}
           \xform{xi}{\PBR{1{=}\aReg \lor x{=}\aReg} \limplies \bForm[\FALSE/\Qr{x}]}{above=of a}
           \xform{xd}{v{=}r\limplies\bForm}{below=of a}
           \xos{a}{xd}
@@ -1507,12 +1522,12 @@ top-level pomsets.
   %   \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
   %   \\
   %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %         \raevent{a1}{\QL{\bLoc}{\mACQ}\mid\DR{y}{1}}{}
+  %         \raevent{a1}{\QL{\bLoc}{\mACQ}\bigmid\DR{y}{1}}{}
   %         \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
   %         \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
   %         \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mACQ}][\FALSE/\QL{\aLoc}{\mRLX}]}{above=of xdd}
   %         \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mACQ}]}{right=of xdd}
-  %         \event{a2}{\FALSE\mid\DR{x}{1}}{above=of x2d}
+  %         \event{a2}{\FALSE\bigmid\DR{x}{1}}{above=of x2d}
   %         \xos[xleft]{a1}{x1d}
   %         \xos{a2}{x2d}
   %         \xo{a1}{xdd}
@@ -1525,12 +1540,12 @@ top-level pomsets.
   %   % \PR[\mACQ]{y}{r}\SEMI \PR{x}{s}
   %   % \\
   %   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-  %         \raevent{a1}{\QL{\bLoc}{\mACQ}\mid\DR{y}{1}}{}
+  %         \raevent{a1}{\QL{\bLoc}{\mACQ}\bigmid\DR{y}{1}}{}
   %         \xform{x1d}{r{=}1\limplies\bForm[\FALSE/\QL{\aLoc}{\mRLX}]}{below=of a1}
   %         \xform{xdd}{r{=}1\limplies s{=}1\limplies\bForm}{right=of x1d}
   %         \xform{xii}{\bForm[\FALSE/\QL{\bLoc}{\mACQ}][\FALSE/\QL{\aLoc}{\mRLX}]}{above=of xdd}
   %         \xform{x2d}{s{=}1\limplies\bForm[\FALSE/\QL{\bLoc}{\mACQ}]}{right=of xdd}
-  %         \event{a2}{\QL{\aLoc}{\mRLX}\mid\DR{x}{1}}{above=of x2d}
+  %         \event{a2}{\QL{\aLoc}{\mRLX}\bigmid\DR{x}{1}}{above=of x2d}
   %         \xos[xleft]{a1}{x1d}
   %         \xos{a2}{x2d}
   %         \xo{a1}{xdd}
@@ -1549,7 +1564,7 @@ in \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  Consider the following.
     \IF{r}\THEN\PW{x}{2}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+        \event{a1}{r{\neq}0\bigmid\DW{x}{2}}{}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -1573,7 +1588,7 @@ in \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  Consider the following.
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a4}{r{=}0   \mid\DW{x}{1}}{}
+        \event{a4}{r{=}0   \bigmid\DW{x}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1588,10 +1603,10 @@ in \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  Consider the following.
 %     \IF{\BANG r}\THEN\PW{x}{1}\FI
 %     \\
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%         \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+%         \event{a1}{r{\neq}0\bigmid\DW{x}{2}}{}
 %         \event{a2}{            \DW{x}{1}}{right=of a1}
 %         \event{a3}{            \DW{x}{2}}{right=of a2}
-%         \event{a4}{r{=}0   \mid\DW{x}{1}}{right=of a3}
+%         \event{a4}{r{=}0   \bigmid\DW{x}{1}}{right=of a3}
 %       \end{tikzinline}}    
 %   \end{gathered}
 % \end{align*}
@@ -1602,7 +1617,7 @@ Augmenting the middle preconditions and then using sequential composition, we ha
     \IF{r}\THEN\PW{x}{2}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+        \event{a1}{r{\neq}0\bigmid\DW{x}{2}}{}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -1612,8 +1627,8 @@ Augmenting the middle preconditions and then using sequential composition, we ha
     \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a2}{r{\neq}0\mid\DW{x}{1}}{}
-        \event{a3}{r{=}0   \mid\DW{x}{2}}{right=of a1}
+        \event{a2}{r{\neq}0\bigmid\DW{x}{1}}{}
+        \event{a3}{r{=}0   \bigmid\DW{x}{2}}{right=of a1}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -1621,7 +1636,7 @@ Augmenting the middle preconditions and then using sequential composition, we ha
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a4}{r{=}0   \mid\DW{x}{1}}{}
+        \event{a4}{r{=}0   \bigmid\DW{x}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1630,10 +1645,10 @@ writes of the middle pomset.
 % \begin{align*}
 %   \begin{gathered}[t]
 %     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-%         \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
-%         \event{a2}{r{=}0   \mid\DW{x}{1}}{right=of a1}
-%         \event{a3}{r{\neq}0\mid\DW{x}{2}}{right=of a2}
-%         \event{a4}{r{=}0   \mid\DW{x}{1}}{right=of a3}
+%         \event{a1}{r{\neq}0\bigmid\DW{x}{2}}{}
+%         \event{a2}{r{=}0   \bigmid\DW{x}{1}}{right=of a1}
+%         \event{a3}{r{\neq}0\bigmid\DW{x}{2}}{right=of a2}
+%         \event{a4}{r{=}0   \bigmid\DW{x}{1}}{right=of a3}
 %       \end{tikzinline}}    
 %   \end{gathered}
 % \end{align*}
@@ -1683,7 +1698,7 @@ As shown by the following single-threaded code, allowing this outcome would viol
 This is one reason that we use \emph{weakest} preconditions, rather than
 preconditions.
 
-The same problem does not occur due to if-closure (at least not for complete
+The same problem does not occur due to if-introduction (at least not for complete
 pomsets, where you need to have termination being a tautology, so you can't
 arbitrarily choose to partition $\emptyForm\neq\TRUE$:
 \begin{align*}
@@ -1691,7 +1706,7 @@ arbitrarily choose to partition $\emptyForm\neq\TRUE$:
     \IF{r}\THEN\PW{x}{2}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a1}{r{\neq}0\mid\DW{x}{2}}{}
+        \event{a1}{r{\neq}0\bigmid\DW{x}{2}}{}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -1701,10 +1716,10 @@ arbitrarily choose to partition $\emptyForm\neq\TRUE$:
     \PW{x}{2}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a2}{r{\neq}0\mid\DW{x}{1}}{}
-        \event{a2p}{r{=}0\mid\DW{x}{1}}{below=of a2}
-        \event{a3}{r{=}0\mid\DW{x}{2}}{right=of a1}
-        \event{a3p}{r{\neq}0\mid\DW{x}{2}}{below=of a3}
+        \event{a2}{r{\neq}0\bigmid\DW{x}{1}}{}
+        \event{a2p}{r{=}0\bigmid\DW{x}{1}}{below=of a2}
+        \event{a3}{r{=}0\bigmid\DW{x}{2}}{right=of a1}
+        \event{a3p}{r{\neq}0\bigmid\DW{x}{2}}{below=of a3}
         \wki{a2}{a3p}
         \wki{a2p}{a3}
       \end{tikzinline}}    
@@ -1714,7 +1729,7 @@ arbitrarily choose to partition $\emptyForm\neq\TRUE$:
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{a4}{r{=}0\mid\DW{x}{1}}{}
+        \event{a4}{r{=}0\bigmid\DW{x}{1}}{}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -1731,8 +1746,8 @@ Merging left and right, we have
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a1a3}{\DW{x}{2}}{}
-        \event{a2p}{r{=}0\mid\DW{x}{1}}{right=of a1a3}
-        \event{a3p}{r{\neq}0\mid\DW{x}{2}}{right=of a2p}
+        \event{a2p}{r{=}0\bigmid\DW{x}{1}}{right=of a1a3}
+        \event{a3p}{r{\neq}0\bigmid\DW{x}{2}}{right=of a2p}
         \event{a2a4}{\DW{x}{1}}{right=of a3p}
         \wki[out=165,in=10]{a2a4}{a3p}
         \wki[out=170,in=15]{a2p}{a1a3}
@@ -1744,13 +1759,11 @@ Merging left and right, we have
 \end{example}
 
 
-\subsection{Is Coherence/Delay Compatible with If-closure and Dead-Write-Removal?}
+\subsection{Is Coherence/Delay Compatible with If-Introduction and Dead-Write-Removal?}
 
 \todo{Flesh this out.}
 
-This paper has a ``High-level abstraction for efficient computation''
-
-With if-closure, the following equation should hold:
+With if-introduction, the following equation should hold:
 \begin{align*}
   &\sem{
     \IF{r}\THEN\PW{x}{2}\FI
