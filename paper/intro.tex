@@ -40,7 +40,7 @@ dependencies semantically. \citet{DBLP:conf/esop/PaviottiCPWOB20} defined
 Modular Relaxed Dependencies (\MRD), which use event structures to calculate
 dependencies for \cXI, targeting the Intermediate Memory Model (\IMM)
 \cite{DBLP:journals/pacmpl/PodkopaevLV19}. \citet{DBLP:journals/pacmpl/JagadeesanJR20} defined
-Pomsets\footnote{A pomset is a labeled partial order.} with Preconditions (\PwP), which use preconditions and logic to
+Pomsets with Preconditions (\PwP), which use preconditions and logic to
 calculate dependencies for a Java-like language targeting {multicopy-atomic} (\mca{}) hardware, such as
 \armeight{} \cite{DBLP:journals/pacmpl/PulteFDFSS18}.  However, neither paper
 treated sequential composition as a first-class citizen.  \MRD{} encoded
@@ -325,8 +325,9 @@ a total \emph{causal order} between read and write events, for example
       \wki{ry2}{rx1}
     \end{tikzinline}}
 \end{gather*}
-In general, there will be many such executions, reflecting different
-interleavings of the threads.
+We can represent such an execution as a labelled partial order, or
+\emph{pomset} \cite{GISCHER1988199}.  A program may give rise to many
+executions, each reflecting a different interleaving of the threads.
 
 Unfortunately, this model does not compile efficiently to commodity
 hardware, resulting in a 37--73\% increase in CPU time on Arm8~\cite{Liu:2019:ASC:3314221.3314611} and,
