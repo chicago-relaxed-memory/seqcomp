@@ -1639,6 +1639,40 @@ order from both sides.
 \subsection{SC Access}
 \todo{Discuss.}
 
+\todo{Volatile read = full fence followed by acquire; Volatile write =
+  release followed by full fence.  But this is not enough on power to
+  guarantee that all-volatile program has only SC executions. On power,
+  release-acquire implemented with lwsync}
+
+\url{https://bugs.openjdk.java.net/browse/JDK-8262877}
+\begin{verbatim}
+volatile int x, y;
+
+Thread 1: x = 2; r1 = y // 0
+
+Thread 2: y = 1
+
+Thread 3: r2 = y; x = 1 // 1
+
+Thread 4: r3 = x; r4 = x // 1,2
+\end{verbatim}
+The state (r1,r2,r3,r4) = (0,1,1,2) is forbidden, as it violates sequential
+consistency. (You can show it by constructing the syncronization order that
+leads to this result and observing it is cyclic).
+
+Current PPC code is one (the only?) platform that runs into the SC violation
+with current barrier placement. Current placement seems to be:
+
+Violation of SC-DRF from \cite[Fig.~9]{DBLP:conf/pldi/WattPPBDFPG20}:
+\begin{verbatim}
+Thread 1: x^sc = 1
+Thread 2: x^sc = 2; r = x^sc; if (r==1) then s=x
+\end{verbatim}
+The program is DRF.
+Should not be possible to have \verb|r==1,s==2|.
+
+
+
 \cite[\textsection8.2]{Dolan:2018:BDR:3192366.3192421}:
 \begin{gather*}
   \taglabel{SC1}

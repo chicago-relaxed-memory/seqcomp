@@ -751,7 +751,10 @@ first thread from the read of $y$ to one of the writes to $x$.
 % The difficulty is that any pomset can contain at most one event for the
 % middle store.  
 
-We show the rules for write and read.  The rule for fences requires similar treatment.
+We show the rules for write and read.\footnote{The Coq development uses
+  $\rimplies$ rather than $\riff$ in \ref{write-kappa-ca} and
+  \ref{read-kappa-ca}.  Given the quantification over $\aForm$, these are
+  equivalent.}  The rule for fences requires similar treatment.
 \begin{definition}
   % \label{def:partition}
   % Let $\aEvs\subseteq\AllEvents$ and $\aForm:\aEvs\fun\Formulae$ and

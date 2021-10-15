@@ -314,11 +314,15 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
   \end{math}.
 
   Let ${\reorderra}$ capture conflict due to
-  synchronization:\footnote{Symmetry would suggest that we include
+  synchronization:\footnote{This formalization includes
+  \emph{release sequences}
+  \begin{math}
+        ( \DW[\gemode\mREL]{\aLoc}{}\Cb\DW{\aLoc}{} ).
+  \end{math} Symmetry would suggest that we include
   \begin{math}
     (\DR{\aLoc}{}, \DR[\gemode\mACQ]{\aLoc}{}),
   \end{math}
-  but this is not sound for \armeight{}.}
+  but this is not sound for \armeight{}.}   
   \begin{math}
     {\reorderra}
     =\{
@@ -405,7 +409,10 @@ ${\Cdown{\aEv}}{}$.  Following \refdef{def:family}, the larger
 ${\Cdown{\aEv}}{}$ is, the better, at least in terms of satisfying
 preconditions.  Thus more order means weaker preconditions.
 
-\input{fig-def.tex}
+\begin{definition}
+  \label{def:pomset}
+  \input{fig-def.tex}
+\end{definition}
 Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
 We give the semantics of programs $\sembase{}$ in \reffig{fig:seq}.
 % Let $\Pom$ be the set of all pomsets.

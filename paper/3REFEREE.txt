@@ -426,3 +426,45 @@ are the models different when a thread reads its own write?
 852: "It's" -> "Its"
 
 1163: I'm not too sure what "If-closure" means exactly. Could you clarify?
+
+
+
+Shepard
+===========================================================================
+
+Dear authors, congratulations on the conditional acceptance of your
+paper. Please find below the revisions that the reviewers require.
+
+1. Please add a claim about your Coq formalisation to your paper, and make
+your Coq proof scripts accessible. We noticed a couple of `Admitted' lemmas
+in your Coq proof scripts; these must be discharged before the paper can be
+accepted.
+
+2. Add more explanation about the broader context of your work, particularly
+with regard to semantic dependencies, along the lines given at the beginning
+of your response.
+
+3. Add more explanation about why a denotational semantics for weak
+sequential composition is challenging and worthwhile, along the lines given
+in your response about why the continuation S_0 is problematic both
+theoretically and practically, and why it causes problems for things like
+reasoning about system calls, etc.
+
+4. Bring more comparisons with PwP and promising semantics from the
+appendices (and from your response) into the main body of the paper. (I'm
+assuming the authors are in a position to buy a couple more pages as
+necessary.) It may not be worth bringing in all the details, but we expect at
+least a high-level summary of the material in those appendices.
+
+5. Clarify how the model can be used in compiler development, along the lines
+of the argument given in the response about how compiler-writers need not
+engage directly with this semantics, but can use more conservative models
+instead.
+
+6. Discuss the scalability challenges of your model, along the lines given at
+the end of your response.
+
+7. Fix/clarify the issues raised in Review A's "Presentation issues and
+typos", Review B's "Detailed comments", and Review C's line-by-line remarks,
+as appropriate. In particular, we strongly urge you not to abbreviate
+\tau^E as \tau, as it has confused multiple reviewers.

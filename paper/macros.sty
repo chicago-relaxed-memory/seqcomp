@@ -786,7 +786,7 @@
 \newcommand{\aTrAbbrv}[3][]{\LOGIC@COLOR{\tau}^{#2}_{#1}\ifnotempty{#3}{(#3)}}
 \newcommand{\trd}[2]{\LOGIC@COLOR{\tau}_{#1}\ifnotempty{#2}{(#2)}}
 \newcommand{\aTerm}[1][]{\LOGIC@COLOR{\checkmark}\ifnotempty{#1}{\!_{#1}}}
-\newcommand{\kappaE}[1]{\labelingForm\ifemptyelse{#1}{({\aEvs})}{({#1})}}%{|}
+\newcommand{\kappaE}[1]{\LOGIC@COLOR{\textrm{K}}\ifemptyelse{#1}{({\aEvs})}{({#1})}}%{|}
 \newcommand{\labelingForm}{\LOGIC@COLOR{\kappa}}%\lambda_{\Formulae}}
 \newcommand{\labeling}{\LABEL@COLOR{\lambda}}
 \newcommand{\labelingThrd}{\LABEL@COLOR{\lambda_{\mathsf{thrd}}}}
@@ -1383,9 +1383,13 @@
 \newcommand{\rfint}[3][]{\draw[rfint,#1](#2)to(#3);}
 \newcommand{\rrfint}{\ensuremath{\mathrel{\textcolor{\rfcolor}{\mathsf{rfi}}}}}%
 \newcommand{\xrfint}{\xarrowtikz{rfint}{\;\;}}%
-\NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfint,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}
+\tikzstyle{rfi} = [-latex,thick,color=\rfcolor,]
+\NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfi,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}
 \newcommand{\rrfi}{\ensuremath{\mathrel{\textcolor{\rfcolor}{\mathsf{rfi}}}}}%
-\newcommand{\xrfi}{\xarrowtikz{rfint}{rfi}}%
+\newcommand{\xrfi}{\xarrowtikz{rfi}{rfi}}%
+% \NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfint,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}
+% \newcommand{\rrfi}{\ensuremath{\mathrel{\textcolor{\rfcolor}{\mathsf{rfi}}}}}%
+% \newcommand{\xrfi}{\xarrowtikz{rfint}{rfi}}%
 
 \tikzstyle{wki} = [-latex,thick,color=\wkicolor,]%dashed,
 \newcommand{\wki}[3][]{\draw[wki,#1](#2)to(#3);}

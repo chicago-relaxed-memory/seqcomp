@@ -2,16 +2,12 @@ paper:
 	rm  -f paper.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error paper.tex
 	killall Skim
-diff:
-	git latexdiff --main paper.tex 89c1d7b06 --
-z:
-	rm  -f z.pdf
-	latexmk -xelatex --pvc --pdf --halt-on-error z.tex
-	killall Skim
 appendix:
 	rm  -f appendix.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error appendix.tex
 	killall Skim
+diff:
+	git latexdiff --main paper.tex 89c1d7b06 --
 talk:
 	rm  -f talk.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error talk.tex
@@ -39,5 +35,5 @@ all:
 	pdflatex paper
 
 clean:
-	rm -f *.log *.out *.aux *.dvi *.bbl *.blg *.fdb_latexmk *.fls *.synctex.gz
+	rm -f *.log *.out *.aux *.dvi *.bbl *.blg *.fdb_latexmk *.fls *.synctex.gz *.cb *.cb2
 	rm -f paper.pdf

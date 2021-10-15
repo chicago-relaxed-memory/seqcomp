@@ -962,7 +962,7 @@ Revisiting \jmm{} causality test case 1 from the end of \textsection\ref{sec:ex:
         \event{a1}{\DR{x}{1}}{right=of a0}
         \event{a2}{(1{=}r\lor 0{=}r)\limplies r{\geq}0\bigmid\DW{y}{1}}{right=of a1}      
         \event{a3}{1{=}r\limplies r{=}1\bigmid\DW{z}{1}}{right=of a2}
-        \po[out=-15,in=-165]{a1}{a3}
+        \po[out=15,in=165]{a1}{a3}
         \wki{a0}{a1}
       \end{tikzinline}}    
   \end{gathered}
@@ -1749,8 +1749,8 @@ Merging left and right, we have
         \event{a2p}{r{=}0\bigmid\DW{x}{1}}{right=of a1a3}
         \event{a3p}{r{\neq}0\bigmid\DW{x}{2}}{right=of a2p}
         \event{a2a4}{\DW{x}{1}}{right=of a3p}
-        \wki[out=165,in=10]{a2a4}{a3p}
-        \wki[out=170,in=15]{a2p}{a1a3}
+        \wki[out=-165,in=-10]{a2a4}{a3p}
+        \wki[out=-170,in=-15]{a2p}{a1a3}
         \wki{a3p}{a2a4}
         \wki{a1a3}{a2p} 
       \end{tikzinline}}    
