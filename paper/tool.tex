@@ -7,8 +7,12 @@
 Finally, \PwTer{} also allows us to toggle the complete check of~\ref{def:complete}, providing an interface for understanding how fragments of code might compose by exposing preconditions and termination conditions that are not yet tautologies.
 We have run \PwTer{} over the Java Causality Tests~\cite{PughWebsite} supported in the input syntax, and tabulated the results in Figure~\ref{fig:tool}.
 
-The execution times give a good indication the poor scaling of the tool with program size: for larger test cases, the tool takes exponentially longer to compute, and in some cases simply fails.
+The execution times give a good indication the poor scaling of the tool with program size: for larger test cases, the tool takes exponentially longer to compute, and for the largest tests the memory footprint is too large for even a well-equipped computer.
 The compositional nature of the semantics makes tool building practical, but it is not enough to make it scalable for large tests.
+The definitions of $\sSEMI{\aPSS_1}{\aPSS_2}$ and $\sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ -- in combination with the rules for reads and writes has exponential complexity.
+This is compounded by the hidden complexity of calculating the possible merges between pomsets through union in rules \ref{seq-E} and \ref{if-E}.
+Significant effort has been put into throwing away spurious merges early in \PwTer, so that executing the tool remains manageable for small examples.
+Some further optimisations may be possible within the tool to improve the situation further, such as killing 'dead-end' pomsets at each sequence operator, or by doing a directed search for particular execution outcomes.
 Unsurprisingly the execution time is dominated by the calculation of the denotation, with the additional axiomatic filtering step of \PwTc{} being within margin of error difference of just calculating the \PwT{} semantics. 
 % \PwTer{} will be made open source upon publication.
 \PwTer{} is available online at \url{https://github.com/graymalkin/pomsets-with-predicate-transformers}.
