@@ -1,20 +1,23 @@
 \section{\PwTmcaTITLE{} Results}
 \label{sec:results}
 
-\PwP{} \cite{DBLP:journals/pacmpl/JagadeesanJR20} is a novel memory model,
+\PwP{} %\cite{DBLP:journals/pacmpl/JagadeesanJR20}
+is a novel memory model,
 intended to serve as a semantic basis for a Java-like language, where all
 access is safe.  \PwTmca{} generalizes \PwP{}, making several small but
 significant changes.  As a result, we have had to re-prove most of the
-theorems from \PwP{}.
+theorems from \PwP{}.  The proofs can be found in \cite{appendix}.
 
-In \textsection\ref{sec:arm}, we show that \PwTmca{1} supports the optimal
+% In \textsection\ref{sec:arm},
+We show that \PwTmca{1} supports the optimal
 lowering of relaxed accesses to \armeight{} and that \PwTmca{2} supports the
 optimal lowering of \emph{all} accesses to \armeight{}.  The proofs are based
 on two recent characterizations of \armeight{} \cite{armed}.  For \PwTmca{1},
 we use \emph{External Global Consistency}.  For \PwTmca{2}, we use
 \emph{External Consistency}.
 
-In \textsection\ref{sec:sc}, we prove sequential consistency for
+%In \textsection\ref{sec:sc},
+We prove sequential consistency for
 local-data-race-free programs.  The proof uses \emph{program order}, which we
 construct for \cXI{} in \textsection\ref{sec:c11}.  The same construction
 works for \PwTmca{}.  (This proof assumes there are no \RMW{} operations.)
@@ -62,7 +65,7 @@ example, on read/write pairs:
 Notably, the semantics does \emph{not} validate read introduction.  When
 combined with case analysis (\textsection\ref{sec:semca}), read introduction
 can break temporal reasoning.  This combination is allowed by speculative
-operational models.  See \textsection\ref{sec:promising} for a discussion.
+operational models.  See \textsection\ref{sec:related} for a discussion.
 
 Prop.~6.1 of \cite{DBLP:journals/pacmpl/JagadeesanJR20} establishes a
 compositional principle for proving that programs validate formula in

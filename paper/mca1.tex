@@ -1,11 +1,17 @@
 \section{\PwTmcaTITLE{}: Pomsets with Predicate Transformers for MCA}
 \label{sec:mca}
 
-We derive a model of concurrent computation by adding
+In concurrent hardware, each processor has two views of each memory location:
+local and global.  In a \emph{multicopy-atomic} (\mca{}) architecture, there
+is only one global view, shared by all processors.  These two views are
+neatly reflected in \PwT{}: the local view corresponds to the preconditions.
+The global view corresponds to the partial order.
+
+In this section, we develop a model of concurrent computation by adding
 % \emph{parallel composition} and 
 \emph{reads-from} to \reffig{fig:seq}.  To model coherence
 and synchronization, we add \emph{delay} to the rule for sequential
-composition.  For \emph{multicopy-atomic} (\mca{}) architectures, it is sufficient to encode delay in
+composition.  For  \mca{} architectures, it is sufficient to encode delay in
 the pomset order.  The resulting model, \PwTmca{1}, supports optimal lowering
 for relaxed access on \armeight{}, but requires extra synchronization for
 acquiring reads.  (\emph{Lowering} is the translation of language-level
@@ -16,8 +22,10 @@ A variant, \PwTmca{2}, supports optimal lowering for all access modes on
 \armeight{}.  To achieve this, \PwTmca{2} drops the global requirement that
 \emph{reads-from} implies pomset order \eqref{pom-rf-le}.  The models are the
 same, except for \emph{internal reads}, where a thread reads its own write.
+We show an example at the beginning of \textsection\ref{sec:mca2}.
 
-The lowering proofs can be found in \textsection\ref{sec:arm}.  The proofs
+
+The lowering proofs can be found in \cite{appendix}.  The proofs
 use recent alternative characterizations of \armeight{} \cite{armed}.
 
 \subsection{\PwTmcaTITLE{1}}
@@ -174,12 +182,13 @@ The semantics gives the expected results for store buffering and load buffering,
 as well as litmus tests involving fences and SC access.  The model of
 coherence is weaker than C11, in order to support common subexpression
 elimination, and stronger than Java, in order to support local reasoning
-about data races.  For further examples, see \textsection\ref{sec:extras} and
+about data races.  For further examples, see %\textsection\ref{sec:extras} and
 \cite[\textsection3.1]{DBLP:journals/pacmpl/JagadeesanJR20}.
 
 Lemmas \ref{lem:monoid} and \ref{lem:if} hold for \PwTmca{1}.  For further
 discussion of item \eqref{lem:ifelse:if:if} %and \eqref{lem:ifelse:if:if2},
-see \textsection\ref{sec:delay}.
+see \cite{appendix}.
+%see \textsection\ref{sec:delay}.
 
 
 % To include \RMW{}s, also add

@@ -350,10 +350,29 @@ $\DWP[\mSC]{}{}$, and similarly for the other actions and modes.
 \subsection{\PwTTITLE: Pomsets with Predicate Transformers}
 \label{sec:pomsets}
 
-\emph{Predicate transformers} are functions on formulae that preserve
-logical structure, providing a natural model of sequential composition.
-The definition follows \citet{DBLP:journals/cacm/Dijkstra75}. (See
-\textsection\ref{sec:false} for a discussion.)
+\emph{Predicate transformers} are functions on formulae that preserve logical
+structure, providing a natural model of sequential composition.  The
+definition follows
+\citet{DBLP:journals/cacm/Dijkstra75}.\footnote{In \label{footnote:false}
+  addition to the three criteria of \refdef{def:trans},
+  \citet{DBLP:journals/cacm/Dijkstra75} requires
+  \labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}
+  $\aTr{}{\FALSE}\riff\FALSE$.  The dependent transformer for read actions
+  \eqref{read-tau-dep} fails \ref{tr-false'}, since $\FALSE$ is not
+  equivalent to $v{=}r\limplies\FALSE$.  We can define an analog of
+  \ref{tr-false'} for our model using the register naming conventions of
+  \textsection\ref{sec:additional}.  Define $\regForm{\labeling}$ to capture
+  the \emph{register state} of a pomset:
+  \begin{math}
+    \regForm{\labeling}=
+    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}\EQ\aVal)
+    \textwhere \aEvs=\fdom(\labeling).
+  \end{math}    
+  We say that $\aForm$ is \emph{$\labeling$-inconsistent} if $\aForm\land\regForm{\labeling}$ is unsatisfiable.
+  We can then require \labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}
+  if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is
+  $\labeling$-inconsistent.  \ref{tr-false} is not needed for the results of
+  this paper, therefore we have elided it from the main development.}
 
 \begin{definition}
   \label{def:trans}
@@ -432,13 +451,22 @@ each set of events in a pomset, \ref{pom-tau} provides a predicate
 transformer.  Sequential dependency is calculated by $\labelingForm'_2$ in
 the semantics of sequential composition.
 
+\todo{I struggled with the concept of a "termination condition". Can you add
+  a sentence or two of intuition here?}
+
+\todo{Fig 1. Please explain why (R4b) is defined in this way. In addition, why
+  can the set E of events be empty for read and write operations?}
+
 Before discussing the details of the model, we note that the semantics
 satisfies the expected monoid laws, as well as some laws concerning the
 conditional. We have verified \reflem{lem:monoid} and
 \reflem{lem:if}\ref{lem:if:seq} in Coq\footnote{Specifically, we have proven
   these results for the semantics of \reffig{fig:seq} with the refinements of
   \textsection\ref{sec:read-read}, \textsection\ref{sec:semreg}, and
-  \textsection\ref{sec:semca}}.
+  \textsection\ref{sec:semca}}.  Similar laws apply to parallel composition;
+although note that $\sem{\aCmd\RPAR\SKIP}\neq\sem{\aCmd}$, since this
+asymmetric operator throws away thread state from the left.
+
 \begin{lemma}
   \label{lem:monoid}
   
@@ -483,12 +511,13 @@ well as inclusion (see the definition of $\rextendsdef{}{}$).
 
   \begin{enumerate*}[label=(\alph*),ref=\alph*]
     \setcounter{enumi}{2}
-  \item \label{lem:if:elim}
+  \item \label{lem:if:dead}
     \begin{math}
-      \sem{\xIFTHEN{\aForm}{\aCmd}{\aCmd}}
+      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
       \supseteq
-      \sem{\aCmd}.
+      \sem{\aCmd_1}
     \end{math}
+    if $\aForm$ is a tautology.
 
     % \\\item \label{lem:if:if}
     % \begin{math}
@@ -499,13 +528,12 @@ well as inclusion (see the definition of $\rextendsdef{}{}$).
     %   \sem{\xIFTHEN{\aForm\land\bForm}{\aCmd}{}}.
     % \end{math}
 
-  \\\item \label{lem:if:dead}
+  \\\item \label{lem:if:elim}
     \begin{math}
-      \sem{\xIFTHEN{\aForm}{\aCmd_1}{\aCmd_2}}
+      \sem{\xIFTHEN{\aForm}{\aCmd}{\aCmd}}
       \supseteq
-      \sem{\aCmd_1}
+      \sem{\aCmd}.
     \end{math}
-    if $\aForm$ is a tautology.
 
   \\\item \label{lem:if:seq}
     \begin{math}
@@ -578,14 +606,12 @@ well as inclusion (see the definition of $\rextendsdef{}{}$).
   \end{enumerate*}      
 \end{lemma}
 In \textsection\ref{sec:semca}, we refine the semantics to validate the
-reverse inclusions for \eqref{lem:if:seq}, \eqref{lem:seq:if}, and
-\eqref{lem:if:elim}.
-For \reffig{fig:seq}, 
-\eqref{lem:ifelse:if:if} %and \eqref{lem:ifelse:if:if2}
-can be strengthened
-to equations, rather than inclusions.  However, the reverse direction does
-not hold for \PwTmca{} (\textsection\ref{sec:mca1}) nor for \PwTpo{} (\textsection\ref{sec:c11}).
-For further discussion, see \textsection\ref{sec:delay}.
+reverse inclusions for (\ref{lem:if:elim}--\ref{lem:seq:if}).  Although the
+semantics of \reffig{fig:seq} validates the reverse inclusions for
+\eqref{lem:ifelse:if:if}, these do not hold for \PwTmca{} (see \textsection\ref{sec:outro}).
+%\todo{Mention \PwTpo{}/\PwTc{}?}
+% (\textsection\ref{sec:mca})
+% (\textsection\ref{sec:c11})?
 
 The semantics is also closed with respect to augmentation.  $\aPS_2$ is an
 \emph{augment} of $\aPS_1$ if all fields are equal except, perhaps, the
@@ -621,6 +647,13 @@ closure is that adding order can only cause preconditions to weaken.  % The
   % \end{proof}
 \end{lemma}
 
+
+\todo{A compiler does not have to use the proposed semantics
+directly, i.e., for calculating dependencies.  Instead, the semantics is
+meant to be a wrapper that validates some reasonable set of compiler
+optimizations. A compiler may make more conservative assumptions about
+dependencies than the semantics. This is explicitly allowed by Lemma 4.8
+(augment closure).}
 
 
 
@@ -660,6 +693,12 @@ closure is that adding order can only cause preconditions to weaken.  % The
 \subsection{Pomsets and Complete Pomsets}
 \label{sec:ex:pomset}
 \label{sec:ex:term}
+
+
+\todo{We include empty pomsets in the semantics of reads/writes/fences to
+  allow them to appear on the false side of a conditional, for example, since
+  complete pomsets require that all preconditions are tautologies.}
+
 
 Ignoring the logic, the definitions are straightforward.  Reads and writes
 map to pomsets with at most one event.  $\SKIP$ maps to the empty pomset.
@@ -708,6 +747,8 @@ $\sembase{\PW{x}{1}}\not\supseteq\sembase{\IF{\aExp}\THEN\PW{x}{1}\FI}$,
 since $\sembase{\IF{\aExp}\THEN\PW{x}{1}\FI}$ includes the empty set with
 termination condition $\lnot\aExp$, but $\sembase{\PW{x}{1}}$ can only
 include the empty set with termination condition $\FALSE$.
+\todo{494: This seems wrong: you're saying that [x:=1] is not a non-strict superset
+of [if(M){x:=1}]. But they're surely equal if M is true?}
 
 In addition, \ref{write-term} ensures that complete pomsets do not
 include bogus writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted
@@ -966,8 +1007,9 @@ be a tautology at top-level.  There are two possibilities.
   $\aForm\riff(1{=}r\limplies r{=}1)$, a tautology.
 \item If $\bEv\not\lt\aEv$ then we apply the independent transformer and
   $\aForm\riff((1{=}r\lor x{=}r)\limplies r{=}1)$.  Under the assumption that $r$
-  is bound, this is logically equivalent to $(x{=}1)$. (We make this more
-  precise in \textsection\ref{sec:false}.)
+  is bound (see \cref{footnote:false}), this is logically equivalent to $(x{=}1)$.
+  % (We make this more
+  % precise in \textsection\ref{sec:false}.)
 \end{itemize}
 Eliding transformers, the two outcomes are:
 \begin{align*}
@@ -1232,10 +1274,11 @@ $\labelingForm'_2$ in \reffig{fig:seq}.
   % \end{definition}
 Thus reads always use the ``best'' transformer, $\aTrAbbrv[1]{\aEvs_1}{}$.  In order for
 non-reads to get a good transformer, they need to add order.
-  
-Throughout the remainder of the paper, we use this definition.  (The lack of
-dependencies into reads is one of the factors complicating downset closure;
-see \textsection\ref{sec:downset} for a discussion.)
+Throughout the remainder of the paper, we use this definition.
+
+% (The lack of
+% dependencies into reads is one of the factors complicating downset closure;
+% see \textsection\ref{sec:downset} for a discussion.)
 
 \subsection{Subtleties: Local Invariant Reasoning and Local State}
 \label{sec:lir}
@@ -1292,7 +1335,7 @@ which is indeed a tautology.  Intuitively, \ref{read-tau-ind} says that, to
 be independent of the read action, subsequent preconditions must be
 tautological under both $[v/r]$ and $[x/r]$.  Here $v$ is the value read, and
 $x$ tracks the ``local state'' of the variable.  This idea is borrowed from
-\cite{DBLP:journals/pacmpl/JagadeesanJR20}. %, which includes further examples.
+\citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} %, which includes further examples.
 %(See \textsection\ref{sec:ex:assoc} for a discussion of Skolemization.)
 Local invariant reasoning requires that we track the state of variables in
 the logic, not just registers.  This is one reason we use predicate

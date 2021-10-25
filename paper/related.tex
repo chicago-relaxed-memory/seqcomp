@@ -1,0 +1,111 @@
+\section{Related Work}
+\label{sec:related}
+
+\citet{DBLP:conf/snapl/MarinoMMNS15} argue that the ``silently shifting
+semicolon'' is sufficiently problematic for programmers that concurrent
+languages should guarantee sequential abstraction, despite the performance
+penalties (see also \citet{10.1145/3462206}).  In this paper, we take the
+opposite approach.  We have attempted to find the most intellectually
+tractable model that encompasses all of the messiness of relaxed memory.
+
+There are few prior studies of relaxed memory that include sequential
+composition and/or precise calculation of semantic dependencies.
+\citet{DBLP:journals/pacmpl/JagadeesanJR20} give a denotational semantics,
+using prefixing rather than sequential compositions.
+\citet{DBLP:conf/esop/PaviottiCPWOB20} give a denotational semantics,
+calculating dependencies using event structures rather than logic.  They give
+the semantics of sequential composition in continuation passing style,
+whereas we give it in direct style.  This paper provides a general technique
+for computing sequential dependencies and applies it to these two approaches.
+
+\todo{Text about PwP.}
+
+\todo{By the way, I note that PwP doesn't use these termination conditions,
+  and there's no explanation in the paper of why this part of the model has
+  changed, even in the appendix -- could you add it?}
+
+% We provide a detailed comparison with
+% \cite{DBLP:journals/pacmpl/JagadeesanJR20} in \textsection\ref{sec:diff}.
+
+\citet{DBLP:journals/corr/abs-1804-04214} define a semantics
+using pomsets without preconditions. Instead, their model uses syntactic
+dependencies, thus invalidating many compiler optimizations.  They also
+require a fence after every relaxed read on \armeight{}.
+%
+\citet{Pichon-Pharabod:2016:CSR:2837614.2837616} use event structures to
+calculate dependencies, combined with an operational semantics that
+incorporates program transformations.  This approach seems to require
+whole-program analysis.
+
+
+
+
+Other studies of relaxed memory can be categorized by their approach to
+dependency calculation.  Hardware models use syntactic dependencies
+\cite{alglave}.  Many software models do not bother with dependencies at all
+\cite{Batty:2011:MCC:1926385.1926394, DBLP:journals/pacmpl/WattRP19,
+  DBLP:conf/pldi/WattPPBDFPG20, goMM}.  Others have strong dependencies that
+disallow compiler optimizations and efficient implementation, typically
+requiring fences for every relaxed read on Arm
+\cite{Lamport:1979:MMC:1311099.1311750, DBLP:conf/pldi/LahavVKHD17,
+  Dolan:2018:BDR:3192366.3192421, DBLP:conf/lics/JeffreyR16,
+  Boehm:2014:OGA:2618128.2618134}. %, DBLP:journals/corr/abs-1804-04214}.
+%
+Many of the most prominent models are operational, whole-program models based
+on speculative execution \cite{Manson:2005:JMM:1047659.1040336,
+  DBLP:conf/esop/JagadeesanPR10,
+  DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}.
+% We provide a detailed comparison with these approaches in \textsection\ref{sec:promising}.
+
+
+\todo{We agree that a new memory model needs to be positioned against existing
+models.  The usual result here is a compilation correctness to hardware
+memory models.  For PwT-MCA, we address this by showing compilation result
+for Armv8 model (§5).
+%
+Comparing software models, however, is unsatisfying: they are all
+incomparable, i.e., there are examples which are allowed by one/disallowed by
+the other and vice versa.
+%
+Morally, our model sits between the strong models (exemplified by RC11
+[Lahav-al:PLDI17]) and the speculative models (exemplified by the promising
+semantics [Kang-al:POPL17]).  As we argue in §1:
+%
+- The strong models require too much synchronization.
+%
+- The speculative models allow thin air behaviors.
+%
+Looking at the details, however, PwT-MCA is incomparable to both RC11 and
+promising semantics.  RC11 allows non-MCA behaviors that PwT-MCA disallows.
+PwT-MCA has a weaker notion of coherence than the promising semantics.
+%
+Some differences reflect an attempt to fix a bug.  For example, Weakestmo
+[Chakraborty-Vafeiadis:POPL19] purposefully disallows thin-air-like
+behaviors of the promising semantics.
+%
+Other differences reflect a different balance between allowed optimizations
+and reasoning principles.  There are fundamental conflicts, for example:
+%
+- between Common Subexpression Elimination (CSE) and read-read coherence
+  (§D.1)
+%
+- between if-introduction (aka, case analysis, if-closure) and java-style
+  final-field semantics.  (If-introduction requires that address dependencies
+  and control dependencies are the same.  Final-fields require that they be
+  different.)
+}
+\todo{Text about promising.}
+
+Other work in relaxed memory has shown that tooling is especially useful to
+researchers, architects, and language specifiers, enabling them to build
+intuitions
+experimentally~\cite{DBLP:conf/esop/PaviottiCPWOB20,PrideMM,alglave,Batty:2011:MCC:1926385.1926394}.
+Unfortunately, it is not obvious that tools can be built for all
+thin-air-free models, the calculation of
+\citet{Pichon-Pharabod:2016:CSR:2837614.2837616} does not have a termination
+proof for an arbitrary input, and the enormous state space for the
+operational models of \citet{DBLP:conf/popl/KangHLVD17} and
+\citet{DBLP:journals/pacmpl/ChakrabortyV19} is a daunting prospect for a tool
+builder -- and as yet no tool exists for automatically evaluating these
+models.  We described a tool, \PwTer, for automatically evaluating \PwT{} in
+\textsection\ref{sec:tool}.

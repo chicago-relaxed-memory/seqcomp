@@ -1,4 +1,5 @@
 \section{Conclusions} %Future Work}
+\label{sec:outro}
 
 This paper is the first to present a direct denotational semantics for
 sequential composition in a relaxed memory model that can be
@@ -16,7 +17,35 @@ step-indexing to account for loops; a similar approach could be applied here.
 \PwTmca{} does not validate access elimination: store-forwarding and
 dead-write-removal are unsound.  We expect that these can be validated by
 allowing events with different actions to merge. % in some instances.
+Nor does \PwTmca{} validate the reverse inclusions for
+\reflem{lem:if}\eqref{lem:ifelse:if:if}. The culprit is $\rdelay$, which
+introduces order regardless of whether preconditions are disjoint.  As an
+example, using augmentation, 
+\begin{math}
+  \sem{\IF{r}
+  \THEN \PW{x}{1}
+  \ELSE \PW{x}{2}
+  \FI}
+\end{math}
+has an execution with
+\begin{math}
+  (r{=}0\mid\DW{x}{2})
+  \xwki
+  (r{\neq}0\mid\DW{x}{1}),
+\end{math}
+whereas
+\begin{math}
+  \sem{
+    \IF{r} \THEN \PW{x}{1}\FI
+    \SEMI
+    \IF{\BANG r} \THEN \PW{x}{2}\FI
+  \FI}
+\end{math}
+has no such execution.  We expect that this can be remedied by encoding
+$\rdelay$ in the logic.
+%\todo{Comment on \PwTpo{} and \PwTc{}?}
 
+  
 \PwTmca{1} is a simpler model than \PwTmca{2}, but requires fences on
 acquiring reads for \armeight{}.  It would be illuminating to find out what
 the performance penalty is for these fences.
@@ -25,7 +54,7 @@ the performance penalty is for these fences.
 \PwT{} does not validate read introduction, whereas speculative operational
 semantics do.  Recent work shows a tension between read introduction and
 compositional reasoning for temporal safety properties (see
-\textsection\ref{sec:promising}).  Nonetheless, read introduction is
+\textsection\ref{sec:related}).  Nonetheless, read introduction is
 ubiquitous in some compilers.  It would be interesting to know if there is a
 performance penalty for banning read introduction.
 
@@ -68,10 +97,15 @@ performance penalty for banning read introduction.
 % % its constituent parts, we have shown how each of eight
 
 
-% \subsection*{Acknowledgements}
-% % This paper has been greatly improved by the comments of the anonymous reviewers.
-% Riely was supported by the National Science Foundation under
-% grant No.~CCR-1617175.
+\subsection*{Acknowledgements}
+This paper has been greatly improved by the comments of the anonymous reviewers.
+
+Riely was supported by the National Science Foundation under
+grant No.~CCR-1617175.
+
+\todo{Add support for Mark\&Simon.}
+
+\todo{Add support for Anton\&Ilya.}
 
 % % It is based upon work supported by the National Science Foundation under
 % % Grant No. CCR-1617175. Any opinions, findings, and conclusions or

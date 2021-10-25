@@ -15,47 +15,150 @@ In certain cases it is possible to ban concurrent access using separation
 \cite{OHearn:2007:RCL:1235896.1236121}, or to accept inefficient
 implementation in order to obtain sequential consistency
 \cite{DBLP:conf/snapl/MarinoMMNS15}.  When these approaches are not
-available, however, we are left with an enormous gap in our understanding of
-one of the most basic elements of computing: the humble semicolon.  Until
-recently, existing approaches either
+available, however, the humble semicolon becomes shrouded in mystery, covered
+in the cloak of something known as a \emph{memory model}.  Every language has
+such a model: For each read operation, it determines the set of available
+values.  Compilers and runtime systems are allowed to chose any value in the
+set.  To allow efficient implementation, the set must not be too small.  To
+allow invariant reasoning, the set must not be too large.
+
+For optimized concurrent languages, it is surprising difficult to define a
+model that allows common compiler optimizations and hardware reorderings yet
+disallows nonsense behaviors that don't arise in practice.  The latter are
+commonly known as ``thin air'' behaviors \cite{DBLP:conf/esop/BattyMNPS15}.
+There are only a handful of solutions, and all have deficiencies.  These can
+be classified by their approach to dependency tracking (from strongest to
+weakest):
 \begin{itemize}
-\item did not bother tracking dependencies, allowing ``thin air'' executions
-  --- as in C and C++~\cite{DBLP:conf/esop/BattyMNPS15},
-\item tracked dependencies conservatively, using syntax, requiring inefficient
-  implementation of relaxed access
-  \cite{DBLP:conf/pldi/LahavVKHD17,Boehm:2014:OGA:2618128.2618134,DBLP:conf/oopsla/VafeiadisN13,DBLP:journals/corr/abs-1804-04214}--- a non-starter for safe languages like Java,
-  and an unacceptable cost for low-level languages like C,
-\item computed dependencies using non-compositional operational models over
-  alternate worlds \cite{Manson:2005:JMM:1047659.1040336,
-    DBLP:conf/esop/JagadeesanPR10,
-    DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}---these
-  models validate many compiler optimizations, but
-  %allow some dubious executions 
-  fail to validate temporal safety properties
-  (see \textsection\ref{sec:promising}).
+\item Syntactic dependencies
+  \cite{DBLP:conf/pldi/LahavVKHD17,Boehm:2014:OGA:2618128.2618134,DBLP:conf/oopsla/VafeiadisN13,DBLP:journals/corr/abs-1804-04214}.
+  These models require inefficient implementation of relaxed access.  This is
+  a non-starter for safe languages like Java and Javascript, and may be an
+  unacceptable cost for low-level languages like \cXI{}.
+\item Semantic dependencies \cite{%
+    Manson:2005:JMM:1047659.1040336, DBLP:conf/esop/JagadeesanPR10,
+    DBLP:conf/popl/KangHLVD17, DBLP:journals/pacmpl/ChakrabortyV19,
+    DBLP:conf/pldi/LeeCPCHLV20, promising-ldrf}. These models compute
+  dependencies operationally using alternate worlds, making it impossible to
+  understood a single execution in isolation; they also allow executions that
+  violate temporal reasoning (see \textsection\ref{sec:related}).
+\item No dependencies, as in \cXI{} \cite{DBLP:conf/esop/BattyMNPS15} and
+  Javascript \cite{DBLP:journals/pacmpl/WattRP19}.  This allows thin air
+  executions.
 \end{itemize}
 
-Recently, two denotational models have been proposed that compute sequential
-dependencies semantically. \citet{DBLP:conf/esop/PaviottiCPWOB20} defined
-Modular Relaxed Dependencies (\MRD), which use event structures to calculate
-dependencies for \cXI, targeting the Intermediate Memory Model (\IMM)
-\cite{DBLP:journals/pacmpl/PodkopaevLV19}. \citet{DBLP:journals/pacmpl/JagadeesanJR20} defined
-Pomsets with Preconditions (\PwP), which use preconditions and logic to
-calculate dependencies for a Java-like language targeting {multicopy-atomic} (\mca{}) hardware, such as
-\armeight{} \cite{DBLP:journals/pacmpl/PulteFDFSS18}.  However, neither paper
-treated sequential composition as a first-class citizen.  \MRD{} encoded
-sequential composition using continuation-passing, and \PwP{} used prefixing,
-adding one event at a time on the left.  In both cases, adding an event
-requires perfect knowledge of the future.
+These models are all non-compositional in the sense that in order to
+calculate the meaning of any thread, all threads must be known.  Using the
+axiomatic approach of \cXI{}, for example, execution graphs are first
+constructed for each thread, using an operational semantics that allows a
+read to see any value.  The combined graphs are then filtered using a set of
+acyclicity axioms that determine which reads are valid.  These axioms use
+existentially defined global relations, such as memory order $\rmo$, which
+must be a per-location total order on write actions.
+
+Part of this non-compositionality is essential: In a concurrent system, the
+complete set of writes is known only at top-level.  However, much of it is
+incidental.  Two recent models have attempted to limit non-compositionality.
+\citet{DBLP:journals/pacmpl/JagadeesanJR20} defined Pomsets with
+Preconditions (\PwP), which use preconditions and logic to calculate
+dependencies for a Java-like language.
+\citet{DBLP:conf/esop/PaviottiCPWOB20} defined Modular Relaxed Dependencies
+(\MRD), which use event structures to calculate a semantic dependency
+relation ($\rsdep$).  \PwP{} is defined using (acyclic) labelled partial
+orders, or \emph{pomsets} \cite{GISCHER1988199}.  \MRD{} adds a causality
+axiom to \cXI{}, stating that $({\rsdep}\cup{\rrfx})$ must be acyclic.  In
+both approaches, acyclicity enables inductive reasoning.
+
+% While largely compositional, avoiding relations such as $\rmo$, \PwP{} still
+% requires some top-level filtering to ensure that every read has a matching
+% write---this seems unavoidable.  \MRD{} calculates $\rsdep$ compositionally,
+% but otherwise suffers from the non-compositionality of \cXI{}.
+
+While \PwP{} and \MRD{} both treat \emph{concurrency} compositionally, neither gives
+a compositional account of \emph{sequentiality}.  \PwP{} uses prefixing,
+adding one event at a time on the left.  \MRD{} encodes sequential
+composition using continuation-passing.  In both, adding an event requires
+perfect knowledge of the future.  For example, suppose that you are writing
+system call code and you wish to know if you can reorder a couple of
+statements.  Using \PwP{} or \MRD{}, you cannot tell whether this is possible
+without having the calling code!  More formally,
+\citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} state the equivalence
+allowing reordering independent writes as follows:
+\begin{align*}
+  \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp\SEMI\aCmd} &=
+  \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp\SEMI\aCmd} \;\;\text{if}\; \aLoc\neq\bLoc
+\end{align*}
+This requires a quantification over all continuations $\aCmd$. This is
+problematic, both from a theoretical point of view---the syntax of programs
+is now mentioned in the definition of the semantics---and in practice---tools
+cannot quantify over infinite sets. This problem is related to contextual
+equivalence, full abstraction
+\cite{DBLP:journals/tcs/Milner77,DBLP:journals/tcs/Plotkin77} and the CIU
+theorem of \citet{DBLP:conf/lics/MasonT92}.  
 
 In this paper, we show that \PwP{} can be extended with \emph{families of
   predicate transformers} (\PwT{}) to calculate sequential dependencies in a way that
 is \emph{compositional} and \emph{direct}: \emph{compositional} in that the
 denotation of $(\aCmd_1\SEMI \aCmd_2)$ can be computed from the denotation of
 $\aCmd_1$ and the denotation of $\aCmd_2$, and \emph{direct} in that these
-can be calculated independently.
+can be calculated independently.  With this formulation, we can show:
+\begin{align*}
+  \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
+  \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} \;\;\text{if}\; \aLoc\neq\bLoc
+\end{align*}
+Then the equivalence holds in any context---this form of the equivalence
+enables reasoning about peephole optimizations.  Unlike prior work, \PwT{}
+allows the presence or absence of a dependency can be understood in
+isolation.  This enables incremental and modular validation of assumptions
+about program dependencies in larger blocks of code.
 
-The model has been formalized in Coq.  We have formally verified that the
+Our main insight is that for language models, \emph{sequentiality} is the
+hard part.  \emph{Concurrency} is easy!  Or at least, it is no more difficult
+than it is for hardware.  Compilers make the difference, since they typically
+do little optimization between threads.  We motivate our approach to
+sequential dependencies in \textsection\ref{sec:overview} and provide formal
+definitions in \textsection\ref{sec:model}.  We extend the model to include
+additional features, such as address calculation and \RMW{}s, in
+\textsection\ref{sec:additional}.  We further discuss related work in
+\textsection\ref{sec:related}.
+
+We extend \PwT{} to a full memory model in \textsection\ref{sec:mca}, based
+on \PwP{} \cite{DBLP:journals/pacmpl/JagadeesanJR20}.
+\textsection\ref{sec:results} summarizes the results for this model.  The
+dependency relation calculated by \PwT{} can also be used with off-the-shelf
+models.  For example, in \textsection\ref{sec:c11} we show that it can be
+used as an $\rsdep$ relation for \cXI, adapting the approach of \MRD{}
+\cite{DBLP:conf/esop/PaviottiCPWOB20}.  % This is only the second semantics
+% to distill dependencies down to a relation compatible with the existing
+% \cpp{} standard, and the first one to be fully compositional.
+\textsection\ref{sec:tool} describes a tool for automatic evaluation of
+litmus tests in this model.  \cXI{} allows thin-air in order to avoid
+overhead in the implementation of relaxed reads.  Safe language like OCaml
+\cite{Dolan:2018:BDR:3192366.3192421} have typically made the opposite choice.  Just
+\PwT{} can be used to strengthen \cXI{}, it could also be used to weaken these
+models, allowing optimal lowering for relaxed reads while banning thin-air.
+
+
+% The
+% definition is associative: the denotation of
+% $((\aCmd_1\SEMI \aCmd_2)\SEMI \aCmd_3)$ is the same as the denotation of
+% $(\aCmd_1\SEMI (\aCmd_2\SEMI \aCmd_3))$.  It also validates expected laws
+% concerning the interaction of sequencing and conditional execution.
+
+% To manage complexity, we have layered the definitions.  After an overview and
+% discussion of related work, we
+% define sequential dependencies in \textsection\ref{sec:model}.  We then add
+% concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
+% which provides a Java-like model for {multicopy-atomic} (\mca{}) hardware, similar to that of
+% \citet{DBLP:journals/pacmpl/JagadeesanJR20};
+% \textsection\ref{sec:results} summarizes the results for this model. In \textsection\ref{sec:c11},
+% we define \PwTc{}, which models \cXI, adapting the approach of
+% \citet{DBLP:conf/esop/PaviottiCPWOB20};  \textsection\ref{sec:tool} 
+% describes a tool for automatic evaluation of litmus tests.  In \textsection\ref{sec:additional},
+% we extend the semantics to include additional features, such as address
+% calculation and \RMW{}s.  
+
+\PwT{} has been formalized in Coq.  We have formally verified that the
 sequential composition satisfies the expected monoid laws
 (\reflem{lem:monoid}).  In addition we have formally verified that
 \begin{math}
@@ -73,26 +176,8 @@ sequential composition satisfies the expected monoid laws
 \end{math}
 (\reflem{lem:if}\ref{lem:if:seq}).
 
-% The
-% definition is associative: the denotation of
-% $((\aCmd_1\SEMI \aCmd_2)\SEMI \aCmd_3)$ is the same as the denotation of
-% $(\aCmd_1\SEMI (\aCmd_2\SEMI \aCmd_3))$.  It also validates expected laws
-% concerning the interaction of sequencing and conditional execution.
 
-To manage complexity, we have layered the definitions.  After an overview and
-discussion of related work, we
-define sequential dependencies in \textsection\ref{sec:model}.  We then add
-concurrency.  In \textsection\ref{sec:mca}, we define \PwTmca{},
-which provides a Java-like model for {multicopy-atomic} (\mca{}) hardware, similar to that of
-\citet{DBLP:journals/pacmpl/JagadeesanJR20};
-\textsection\ref{sec:results} summarizes the results for this model. In \textsection\ref{sec:c11},
-we define \PwTc{}, which models \cXI, adapting the approach of
-\citet{DBLP:conf/esop/PaviottiCPWOB20};  \textsection\ref{sec:tool} 
-describes a tool for automatic evaluation of litmus tests.  In \textsection\ref{sec:additional},
-we extend the semantics to include additional features, such as address
-calculation and \RMW{}s.  
 
-% \todo{flesh this out}
 % \begin{itemize}
 % \item We provide a tool to execute litmus tests for both models.
 % \item \textsection\ref{sec:sc} We prove \drfsc{} for \PwTmca{}; \MRD{} inherits the result from \rcXI.
@@ -102,7 +187,7 @@ calculation and \RMW{}s.
 
 % % \subsection{Contributions}
 
-% % \todo{}
+
 % % We show how predicate transformers~\cite{DBLP:journals/cacm/Dijkstra75} can
 % % be added to pomsets with
 % % preconditions~\cite{DBLP:journals/pacmpl/JagadeesanJR20} to create a
@@ -148,48 +233,64 @@ as \emph{predicate transformers}, where predicates describe the state of
 memory in the system.  In the calculus of weakest preconditions, programs map
 postconditions to preconditions.  We recall the definition of
 $\fwp{\aCmd}{\bForm}$ for loop-free code below (where $\aReg$--$\bReg$ range over thread-local \emph{registers}
-and $\aExp$--$\bExp$ range over side-effect-free \emph{expressions}). 
-%\begin{multicols}{2}
-  \begin{enumerate}[,label=(\textsc{d}\arabic*),ref=\textsc{d}\arabic*]
-  \item
-    \begin{math}
-      \fwp{\SKIP}{\bForm} = \bForm
-    \end{math}
-  \item \label{wp-let}
-    $\fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]$
-    % \item 
-    %   \begin{math}
-    %     \fwp{\ABORT}{\bForm} = \FALSE
-    %   \end{math}
-    %   \stepcounter{enumi}
-    % \item[] \labeltext[\textsc{d}2]{}{wp-assign}
-    %   \begin{enumerate}[leftmargin=0pt]
-    %   \item \label{wp-write}
-    %     $\fwp{\PW{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
-    %   \item \label{wp-let}
-    %     $\fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]$
-    %   \item \label{wp-read}
-    %     $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \aLoc{=}\aReg\limplies\bForm$ %\bForm[\aLoc/\aReg]$ %
-    %   \end{enumerate}
-    % \item 
-    %   \begin{math}
-    %     \fwp{\LET{x}{\aExp}}{\bForm} = \bForm[\aExp/x]
-    %   \end{math}
-  \item
-    \begin{math}
-      \fwp{\aCmd_1;\aCmd_2}{\bForm} = \fwp{\aCmd_1}{\fwp{\aCmd_2}{\bForm}}
-    \end{math}
-  \item
-    \begin{math}
-      \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm}= {}
-    \end{math}
-    \begin{math}
-      ((\aExp{\ne}0) \limplies \fwp{\aCmd_1}{\bForm}) \land
-      ((\aExp{=}0) \limplies \fwp{\aCmd_2}{\bForm})
-    \end{math}
-  \end{enumerate}
-%\end{multicols}
-For this language, the Hoare triple
+and $\aExp$--$\bExp$ range over side-effect-free
+\emph{expressions}). 
+% \begin{multicols}{3}
+%   \begin{enumerate}[,label=(\textsc{d}\arabic*),ref=\textsc{d}\arabic*]
+%   \item \label{wp-let}
+%     $\fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]$
+%   \item
+%     \makebox[0cm][l]{
+%     \begin{math}
+%       \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm}= {}
+%     \end{math}
+%     \begin{math}
+%       ((\aExp{\ne}0) \limplies \fwp{\aCmd_1}{\bForm}) \land
+%       ((\aExp{=}0) \limplies \fwp{\aCmd_2}{\bForm})
+%     \end{math}}
+%     % \item 
+%     %   \begin{math}
+%     %     \fwp{\ABORT}{\bForm} = \FALSE
+%     %   \end{math}
+%     %   \stepcounter{enumi}
+%     % \item[] \labeltext[\textsc{d}2]{}{wp-assign}
+%     %   \begin{enumerate}[leftmargin=0pt]
+%     %   \item \label{wp-write}
+%     %     $\fwp{\PW{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
+%     %   \item \label{wp-let}
+%     %     $\fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]$
+%     %   \item \label{wp-read}
+%     %     $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \aLoc{=}\aReg\limplies\bForm$ %\bForm[\aLoc/\aReg]$ %
+%     %   \end{enumerate}
+%     % \item 
+%     %   \begin{math}
+%     %     \fwp{\LET{x}{\aExp}}{\bForm} = \bForm[\aExp/x]
+%     %   \end{math}
+%   \columnbreak
+%   \item
+%     \makebox[0cm][l]{
+%     \begin{math}
+%       \fwp{\aCmd_1;\aCmd_2}{\bForm} = \fwp{\aCmd_1}{\fwp{\aCmd_2}{\bForm}}
+%     \end{math}}
+%   \columnbreak
+%   \item
+%     \begin{math}
+%       \fwp{\SKIP}{\bForm} = \bForm
+%     \end{math}
+%   \end{enumerate}
+% \end{multicols}
+\begin{gather*}
+  \fwp{\LET{\aReg}{\aExp}}{\bForm} = \bForm[\aExp/\aReg]
+  \qquad
+  \fwp{\aCmd_1;\aCmd_2}{\bForm} = \fwp{\aCmd_1}{\fwp{\aCmd_2}{\bForm}}
+  \qquad
+  \fwp{\SKIP}{\bForm} = \bForm
+  \\
+  \fwp{\IF{\aExp}\THEN \aCmd_1\ELSE \aCmd_2\FI}{\bForm}= 
+  ((\aExp{\ne}0) \limplies \fwp{\aCmd_1}{\bForm}) \land
+  ((\aExp{=}0) \limplies \fwp{\aCmd_2}{\bForm})
+\end{gather*}    
+Without loops, the Hoare triple
 $\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when $\aForm \limplies
 \fwp{\aCmd}{\bForm}$.
 %% We have split
@@ -204,21 +305,29 @@ $\hoare{\aForm}{\aCmd}{\bForm}$ holds exactly when $\aForm \limplies
 %%   equivalent to $\fwp{\PR{\aLoc}{\aReg}}{\bForm} = \bForm[\aLoc/\aReg]$.}
 %%
 This is an elegant explanation of sequential computation in a sequential
-context. Note that \ref{wp-let} is sound because a read from a thread-local
+context. Note that the assignment rule %\ref{wp-let}
+is sound because a read from a thread-local
 register must be fulfilled by a preceding write in the same thread.
 In a concurrent context, with shared variables
-($\aLoc$--$\cLoc$), the obvious generalization
-%\begin{multicols}{2}
-\begin{itemize}
-\item[{\labeltext[\textsc{d}2a]{(\textsc{d}2a)}{wp-write}}] $\fwp{\LET{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
-\item[{\labeltext[\textsc{d}2b]{(\textsc{d}2b)}{wp-read}}] $\fwp{\LET{\aReg}{\aLoc}}{\bForm} = \bForm[\aLoc/\aReg]$
-\end{itemize}
-%\end{multicols}
-\noindent
-is unsound!  In particular, a read from a shared memory location may be fulfilled by a write
-in another thread, invalidating \ref{wp-read}.  (We assume that expressions
-% $\aExp$--$\bExp$
-do \emph{not} include shared variables.) % $\aLoc$--$\cLoc$.)
+($\aLoc$--$\cLoc$), the obvious generalization of the assignment rule
+% \eqref{wp-let}
+for reads,
+$\fwp{\LET{\aReg}{\aLoc}}{\bForm} = \bForm[\aLoc/\aReg]$,
+% \begin{multicols}{2}
+% \begin{itemize}
+% \item[{\labeltext[\textsc{d}1a]{(\textsc{d}1a)}{wp-write}}] $\fwp{\LET{\aLoc}{\aExp}}{\bForm} = \bForm[\aExp/\aLoc]$
+% \item[{\labeltext[\textsc{d}1b]{(\textsc{d}1b)}{wp-read}}] $\fwp{\LET{\aReg}{\aLoc}}{\bForm} = \bForm[\aLoc/\aReg]$
+% \end{itemize}
+% \end{multicols}
+% \allowbreak
+% \noindent
+is unsound!
+% (Expressions
+% % $\aExp$--$\bExp$
+% do \emph{not} include shared variables.) % $\aLoc$--$\cLoc$.)
+In particular, a read from a shared memory location may be fulfilled by a write
+in another thread.
+
 
 In this paper we answer the following question: what does sequential
 composition mean in a concurrent context?  An acceptable answer must satisfy
@@ -326,7 +435,7 @@ a total \emph{causal order} between read and write events, for example
     \end{tikzinline}}
 \end{gather*}
 We can represent such an execution as a labelled partial order, or
-\emph{pomset} \cite{GISCHER1988199}.  A program may give rise to many
+\emph{pomset} \cite{DBLP:conf/lop/Pratt85,GISCHER1988199}.  A program may give rise to many
 executions, each reflecting a different interleaving of the threads.
 
 Unfortunately, this model does not compile efficiently to commodity
@@ -362,9 +471,10 @@ are inconsistent with program order, such as the following, which contains an
 % Reads must be ordered between blocking writes, creating
 % \emph{antidependencies} such as $\DRP{x}{0}\xwk\DWP{x}{1}$.
 
-In such models, the causal order between events is important,
-and includes control and data dependencies ($\xpo$), to avoid
-paradoxical ``out of thin air'' examples such as:
+In such models, the causal order between events is important, and includes
+control and data dependencies ($\xpo$) to avoid paradoxical ``out of thin
+air'' examples such as the following.  (We routinely elide initializing
+writes when they are uninteresting.)
 \begin{gather*}
   \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \FI}
   \PAR
@@ -442,7 +552,8 @@ data dependencies) and conditionals (modeling control dependencies):
       \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{}
     \end{tikzinline}}
 \end{gather*}
-In this diagram, $(s {<} 1)$ is a control dependency and $(r{*}s){=}0$ is a data dependency. Preconditions are discharged by being ordered after a read (we assume the
+In this diagram, $(s {<} 1)$ is a control dependency and $(r{*}s){=}0$ is a
+data dependency. Preconditions are updated as events are prepended (we assume the
 usual precedence for logical operators): 
 \begin{gather*}
   \tag{$\dagger$}\label{eq1}
@@ -456,11 +567,13 @@ usual precedence for logical operators):
       \po{ry0}{wz0}
     \end{tikzinline}}
 \end{gather*}
-Note that there is dependency order from $(\DR{y}{0})$ to $(\DW{z}{0})$
-so the precondition for $(\DW{z}{0})$ only has to be satisfied assuming the hypothesis
-$(0{=}s)$. There is no matching order from $(\DR{x}{0})$ to $(\DW{z}{0})$
-which is why we do not assume the hypothesis $(0{=}r)$. Nonetheless, the precondition on
-$(\DW{z}{0})$ is a tautology, and so can be elided in the diagram:
+In this diagram there are two reads.  As evidenced by the arrow, the read of
+$y$ is ordered before the write, reflecting possible dependency; the read of
+$x$ is not, reflecting independency.  The dependent read of $y$ allows the
+precondition of the write to weaken: now the old precondition need only be
+satisfied assuming the hypothesis $(0{=}s)$.  The independent read of $x$
+allows no such weakening.  Nonetheless, the precondition of the write is now
+a tautology, and so can be elided in the diagram:
 \begin{gather*}
   % \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
   % \\
@@ -472,31 +585,40 @@ $(\DW{z}{0})$ is a tautology, and so can be elided in the diagram:
       \po{ry0}{wz0}
     \end{tikzinline}}
 \end{gather*}
+In order for a pomset to be \emph{complete}, all preconditions must be
+tautologies.  Thus, an execution of \eqref{eq1} that reads $\DR{y}{2}$ must
+elide the write action to be considered complete.  For this reason, we must
+allow read and write to generate empty pomsets, in addition to singletons.
 
 \subsection{Predicate Transformers For Relaxed Memory}
 
-Pomsets with Preconditions show how the logical approach to sequential
-dependency calculation can be mixed into a relaxed memory model.  However,
-\citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} do not provide a model of
-sequential composition.  Instead, their model uses \emph{prefixing}, which
-requires that the model is built from right to left: events are prepended one
-at a time, with perfect knowledge of the future.  This makes reasoning about
-sequential program fragments difficult.  For example,
-\citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} state the equivalence
-allowing reordering independent writes as follows,
-\begin{align*}
-  \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp\SEMI\aCmd} &=
-  \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp\SEMI\aCmd} \;\;\text{if}\; \aLoc\neq\bLoc
-\end{align*}
-where $\aCmd$ is the entire future computation!  By formalizing sequential
-composition, we can show:
-\begin{align*}
-  \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
-  \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} \;\;\text{if}\; \aLoc\neq\bLoc
-\end{align*}
-Then the equivalence holds in any
-%% (sequential)
-context.
+\PwP{} shows how the logical approach to sequential dependency calculation
+can be mixed into a relaxed memory model.  Our contribution is to extend
+\PwP{} with predicate transformers to arrive at a model of sequential
+composition.  Predicate transformers are a good fit for logical models of
+dependency calculation, since both are concerned with
+preconditions.% and how they are
+% transformed by sequential composition.
+
+% Instead, their model uses \emph{prefixing}, which
+% requires that the model is built from right to left: events are prepended one
+% at a time, with perfect knowledge of the future.  This makes reasoning about
+% sequential program fragments difficult.  For example,
+% \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} state the equivalence
+% allowing reordering independent writes as follows,
+% \begin{align*}
+%   \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp\SEMI\aCmd} &=
+%   \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp\SEMI\aCmd} \;\;\text{if}\; \aLoc\neq\bLoc
+% \end{align*}
+% where $\aCmd$ is the entire future computation!  By formalizing sequential
+% composition, we can show:
+% \begin{align*}
+%   \sem{\aLoc \GETS \aExp \SEMI \bLoc  \GETS \bExp} &=
+%   \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} \;\;\text{if}\; \aLoc\neq\bLoc
+% \end{align*}
+% Then the equivalence holds in any
+% %% (sequential)
+% context.
 
 
 % While existing models of relaxed memory have detailed treatments of parallel composition,
@@ -546,9 +668,8 @@ context.
 % in is the one for sequential composition, which maps sequential composition of programs
 % to function composition of predicate transformers.
 
-Predicate transformers are a good fit for logical models of dependency
-calculation, since both are concerned with preconditions and how they are
-transformed by sequential composition. Our first attempt is to associate a
+
+Our first attempt is to associate a
 predicate transformer with each pomset. We visualize this in diagrams by
 showing how $\bForm$ is transformed, for example:
 \begin{align*}
@@ -582,15 +703,16 @@ showing how $\bForm$ is transformed, for example:
       \end{tikzinline}}
   \end{gathered}
 \end{align*}
-The predicate transformer from the write matches
-\citeauthor{DBLP:journals/cacm/Dijkstra75}'s \ref{wp-write}.  For the reads,
-however, \ref{wp-read} defines the transformer of $\PR{x}{r}$ to be
+The predicate transformer for a write $\PW{z}{\aExp}$ matches
+\citeauthor{DBLP:journals/cacm/Dijkstra75}: taking $\bForm$ to
+$\bForm[\aExp/z]$.  For a read $\PR{\aLoc}{\aReg}$, however,
+\citeauthor{DBLP:journals/cacm/Dijkstra75} would transform $\bForm$ to
 $\bForm[x/r]$, which is equivalent to $(x{=}r) \limplies \bForm$ under the
-assumption that registers are assigned at most once.
-Instead, we use $(0{=}r) \limplies \bForm$, reflecting the fact that $0$ may
-come from a concurrent write.  The obligation to find a matching write is
-moved from the sequential semantics of \emph{substitution} and
-\emph{implication} to the concurrent semantics of \emph{fulfillment}.
+assumption that registers are assigned at most once.  Instead, we use
+$(0{=}r) \limplies \bForm$, reflecting the fact that $0$ may come from a
+concurrent write.  The obligation to find a matching write is moved from the
+sequential semantics of \emph{substitution} and \emph{implication} to the
+concurrent semantics of \emph{fulfillment}.
 
 % In the rightmost program above, the write to $z$ affects the shared store, not the
 % local state of the thread, therefore we assign it the identity transformer.
@@ -727,54 +849,3 @@ or to the right, with the intermediate step:
 \end{gather*}
 This is an instance of the general result that sequential composition forms a monoid.
 
-\section{Related Work}
-
-\citet{DBLP:conf/snapl/MarinoMMNS15} argue that the ``silently shifting
-semicolon'' is sufficiently problematic for programmers that concurrent
-languages should guarantee sequential abstraction, despite the performance
-penalties (see also \cite{10.1145/3462206}).  In this paper, we take the opposite approach.  We have
-attempted to find the most intellectually tractable model that encompasses
-all of the messiness of relaxed memory.
-
-There are few prior studies of relaxed memory that include sequential
-composition and/or precise calculation of semantic dependencies.
-\citet{DBLP:journals/pacmpl/JagadeesanJR20} give a denotational semantics,
-using prefixing rather than sequential compositions.
-\citet{DBLP:conf/esop/PaviottiCPWOB20} give a denotational semantics,
-calculating dependencies using event structures rather than logic.  They give
-the semantics of sequential composition in continuation passing style,
-whereas we give it in direct style.  This paper provides a general technique
-for computing sequential dependencies and applies it to these two approaches.
-We provide a detailed comparison with
-\cite{DBLP:journals/pacmpl/JagadeesanJR20} in \textsection\ref{sec:diff}.
-
-\citet{DBLP:journals/corr/abs-1804-04214} define a semantics
-using pomsets without preconditions. Instead, their model uses syntactic
-dependencies, thus invalidating many compiler optimizations.  They also
-require a fence after every relaxed read on \armeight{}.
-%
-\citet{Pichon-Pharabod:2016:CSR:2837614.2837616} use event structures to
-calculate dependencies, combined with an operational semantics that
-incorporates program transformations.  This approach seems to require
-whole-program analysis.
-
-Other studies of relaxed memory can be categorized by their approach to
-dependency calculation.  Hardware models use syntactic dependencies
-\cite{alglave}.  Many software models do not bother with dependencies at all
-\cite{Batty:2011:MCC:1926385.1926394, DBLP:journals/pacmpl/WattRP19,
-  DBLP:conf/pldi/WattPPBDFPG20, goMM}.  Others have strong dependencies that
-disallow compiler optimizations and efficient implementation, typically
-requiring fences for every relaxed read on Arm
-\cite{Lamport:1979:MMC:1311099.1311750, DBLP:conf/pldi/LahavVKHD17,
-  Dolan:2018:BDR:3192366.3192421, DBLP:conf/lics/JeffreyR16,
-  Boehm:2014:OGA:2618128.2618134}. %, DBLP:journals/corr/abs-1804-04214}.
-%
-Many of the most prominent models are operational, whole-program models based
-on speculative execution \cite{Manson:2005:JMM:1047659.1040336,
-  DBLP:conf/esop/JagadeesanPR10,
-  DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}.
-We provide a detailed comparison with these approaches in \textsection\ref{sec:promising}.
-
-Other work in relaxed memory has shown that tooling is especially useful to researchers, architects, and language specifiers, enabling them to build intuitions experimentally~\cite{DBLP:conf/esop/PaviottiCPWOB20,PrideMM,alglave,Batty:2011:MCC:1926385.1926394}.
-Unfortunately, it is not obvious that tools can be built for all thin-air-free models, the calculation of \citet{Pichon-Pharabod:2016:CSR:2837614.2837616} does not have a termination proof for an arbitrary input, and the enormous state space for the operational models of \citet{DBLP:conf/popl/KangHLVD17} and \citet{DBLP:journals/pacmpl/ChakrabortyV19} is a daunting prospect for a tool builder -- and as yet no tool exists for automatically evaluating these models.
-We describe a tool, \PwTer, for automatically evaluating \PwT{} in \textsection\ref{sec:tool}.

@@ -1,3 +1,5 @@
+\usepackage{cleveref}
+
 \newcommand{\bigmid}{\Bigm\vert}
 \newcommand{\textsections}{\textsection\textsection}
 \newcommand{\UNDEFINED}{\mathbf{undef}}
@@ -28,12 +30,13 @@
 \newcommand{\existsone}{\exists!}
 \renewcommand{\leq}{\leqslant}
 \renewcommand{\geq}{\geqslant}
-\newcommand{\MRD}{{\sc mrd-c11}}
+%\newcommand{\MRDnoC}{{\sc mrd}}
+\newcommand{\MRD}{{\sc mrd}}
 \newcommand{\PwP}{{\sc PwP}}
 \newcommand{\PwT}{{\sc PwT}}
 \newcommand{\PwTmca}[1]{{\sc \PwT-mca}\ifnotempty{#1}{$_{#1}$}}
 \newcommand{\PwTpo}{{\sc \PwT-po}}
-\newcommand{\PwTc}{{\sc \PwT-c11}}
+\newcommand{\PwTc}{{\sc \PwT-C11}}
 \newcommand{\PwTTITLE}{P\lowercase{w}T}
 \newcommand{\PwTmcaTITLE}[1]{\PwTTITLE-MCA{#1}}
 \newcommand{\PwTcTITLE}{\PwTTITLE-C11}
@@ -610,6 +613,7 @@
 \newcommand{\ID}{id}
 \newcommand{\RMW}{{\sc rmw}}
 \newcommand{\RMWs}{{\sc rmw}s}
+\newcommand{\SDEP}{{\sc sdep}}
 \newcommand{\drf}{{\sc drf}}
 \newcommand{\drfsc}{{\sc drf-sc}}
 \newcommand{\drfra}{{\sc drf-ra}}
@@ -628,8 +632,9 @@
 \newcommand{\IMM}{{\sc imm}}
 \newcommand{\PTX}{{\sc ptx}}
 \newcommand{\ppc}{{\sc power}}
-\newcommand{\rcXI}{{\sc rc11}}
-\newcommand{\cXI}{{\sc c11}}
+\newcommand{\rcXI}{{\sc RC11}}
+\newcommand{\cXI}{{\sc C11}}
+\newcommand{\cpp}{{\sc C}\texttt{+}\texttt{+}}
 \newcommand{\mca}{{\sc mca}}
 \newcommand{\iriw}{{\sc iriw}}
 \newcommand{\llvm}{{\sc llvm}}
@@ -1309,6 +1314,7 @@
 %\NewDocumentCommand \pox {O{} m O{} m} {\draw[pox,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{po}$}  (#4);}
 \NewDocumentCommand \pox {O{} m O{} m} {\draw[pox,#1](#2) to (#4);}
 \newcommand{\rpox}{\ensuremath{\mathrel{\textcolor{\pocolor}{\mathsf{po}}}}}%
+\newcommand{\rsdep}{\ensuremath{\mathrel{\textcolor{\pocolor}{\mathsf{sdep}}}}}%
 \newcommand{\xpox}{\xarrowtikz{pox}{po}}%
 
 \tikzstyle{ppo} = [-latex,thick,color=\pocolor,]
@@ -1424,6 +1430,9 @@
 \NewDocumentCommand \co {O{} m O{} m} {\draw[wk,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{co}$}  (#4);}
 \newcommand{\rco}{\ensuremath{\mathrel{\textcolor{\wkcolor}{\mathsf{co}}}}}%
 \newcommand{\xco}{\xarrowtikz{wk}{co}}%
+\NewDocumentCommand \mo {O{} m O{} m} {\draw[wk,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{mo}$}  (#4);}
+\newcommand{\rmo}{\ensuremath{\mathrel{\textcolor{\wkcolor}{\mathsf{mo}}}}}%
+\newcommand{\xmo}{\xarrowtikz{wk}{mo}}%
 \newcommand{\xcoinv}{\xarrowtikzrev{co}{co}}%
 \NewDocumentCommand \fr {O{} m O{} m} {\draw[wk,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{fr}$}  (#4);}
 \newcommand{\rfr}{\ensuremath{\mathrel{\textcolor{\wkcolor}{\mathsf{fr}}}}}%

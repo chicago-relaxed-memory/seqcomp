@@ -18,25 +18,30 @@
 % \begin{math}
 %   (S_2, \sigma_1) \Downarrow \sigma_2.
 % \end{math}
-Program logics and semantics tell us that when executing $(S_1; S_2)$ starting in state $s_0$,
-we execute $S_1$ in $s_0$ to arrive at $s_1$, then execute $S_2$ in $s_1$ to
-arrive at the final state $s_2$.  This is, of course, an abstraction.  Processors
-execute instructions out of order, due to pipelines and caches, and compilers
-reorder programs even more dramatically.  All of this reordering is meant to
-be unobservable in single-threaded code, but is observable in multi-threaded code.
-A formal attempt to understand the resulting mess is known
-as a ``relaxed memory model.''  The relaxed memory models that have been
-proposed to date either fail to address sequential composition directly, overly
-restrict processors and compilers, or permit nonsense thin-air behaviors which are
-unobservable in practice.
+Program logics and semantics tell a pleasant story about sequential
+composition: when executing $(S_1; S_2)$, we first execute $S_1$ then $S_2$.
+To improve performance, however, processors execute instructions out of
+order, and compilers reorder programs even more dramatically.  By design,
+single-threaded systems cannot observe these reorderings; however,
+multiple-threaded systems can, making the story considerably less pleasant.
+A formal attempt to understand the resulting mess is known as a ``relaxed
+memory model.''  Prior models either fail to address sequential composition
+directly, or overly restrict processors and compilers, or permit nonsense
+thin-air behaviors which are unobservable in practice.
 
-To support sequential composition while targeting modern hardware, we propose
-using preconditions and families of predicate transformers.  When composing
-$(S_1;S_2)$, the predicate transformers used to validate the preconditions of
-events in $S_2$ are chosen based on the semantic dependencies from events in
-$S_1$ to events in $S_2$.  We apply this approach to two existing memory
-models: ``Modular Relaxed Dependencies'' for C11 and ``Pomsets with
-Preconditions.''
+To support sequential composition while targeting modern hardware, we enrich
+the standard event-based approach with \emph{preconditions} and
+\emph{families of predicate transformers}.
+%
+% When calculating the precondition of an event $e$ in $\sem{S_1;S_2}$, from
+% $\sem{S_2}$ is derived by applying a predicate transformer chosen based on
+% events of $\sem{S_1}$ upon which $e$ depends.
+When calculating $\sem{S_1;S_2}$, the predicate transformer applied to the
+precondition of an event $e$ from $\sem{S_2}$ is chosen based on the set of
+events in $\sem{S_1}$ upon which $e$ depends.  We apply this approach to two
+existing memory models.
+% : ``Modular Relaxed Dependencies'' for C11 and
+% ``Pomsets with Preconditions.''
 
 
 \endinput

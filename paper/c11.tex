@@ -1,11 +1,12 @@
 \section{\PwTcTITLE: Pomsets with Predicate Transformers for C11}
 \label{sec:c11}
 
+
 \PwT{} can be used to generate semantic dependencies to prohibit thin-air
 executions of \cXI, while preserving optimal lowering for relaxed access.  We
 follow the approach of \citet{DBLP:conf/esop/PaviottiCPWOB20}, using our
 semantics to generate \cXI{} candidate executions with a dependency relation,
-then applying the rules of \rcXI{} \cite{DBLP:conf/pldi/LahavVKHD17}.  The
+then applying the axioms of \rcXI{} \cite{DBLP:conf/pldi/LahavVKHD17}.  The
 No-Thin-Air axiom of \rcXI{} is overly restrictive, requiring that
 ${\rrfx}\cup{\rpox}$ be acyclic.  Instead, we require that ${\rrfx}\cup{\lt}$
 is acyclic.  This is a more precise categorisation of thin-air behavior, and 
@@ -13,7 +14,87 @@ it allows aggressive compiler optimizations that would be erroneously forbidden
 by \rcXI's original No-Thin-Air axiom.
 
 The chief difficulty is instrumenting our semantics to generate program
-order, for use in the various axioms of \cXI{}.
+order, for use in the various axioms of \cXI{}.  Using the obvious
+construction (described in the proof of \reflem{lem:po}), $\rpox$ is a
+pre-order, which may include cycles due to coalescing.  For example:
+\begin{align*}
+  % \PR{y}{r}
+  % \SEMI
+  \IF{r}\THEN
+  \PW{x}{1}
+  \SEMI
+  \PW{y}{1}
+  \ELSE
+  \PW{y}{1}
+  \SEMI
+  \PW{x}{1}
+  \FI
+  &&
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{d}{\DW{x}{1}}{}
+      \event{e}{\DW{y}{1}}{right=of d}
+      \pox[out=15,in=165]{d}{e}
+      \pox[out=-165,in=-15]{e}{d}
+    \end{tikzinline}}
+\end{align*}
+We solve this by adding \emph{phantom} events.  The function $\fmrg{}$ maps
+phantom events to \emph{real} events.  For this program, we have the
+following \PwTpo{}.
+(We visualize $\rpox$ using a dotted arrow
+\begin{math}
+  \mkern-12mu
+  \begin{tikzpicture}
+    \node (a)  at (0, 0) {};
+    \node (b)  at (.7, 0) {};
+    \draw[pox](a)to(b);
+  \end{tikzpicture}
+  \mkern-12mu,
+\end{math}
+and
+$\fmrg{}$ using a double arrow 
+\begin{math}
+  \mkern-12mu
+  \begin{tikzpicture}
+    \node (a)  at (0, 0) {};
+    \node (b)  at (.7, 0) {};
+    \draw[mrg](a)to(b);
+  \end{tikzpicture}
+  \mkern-12mu
+\end{math}.)
+\begin{displaymath}
+  \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+      \phevent{d1}{r{\neq}0\bigmid\DW{x}{1}}{}
+      \phevent{e1}{r{\neq}0\bigmid\DW{y}{1}}{right=of d1}
+      \phevent{d2}{r{=}0\bigmid\DW{x}{1}}{right=of e1}
+      \phevent{e2}{r{=}0\bigmid\DW{y}{1}}{right=of d2}
+      \event{d}{\DW{x}{1}}{above=of e1}
+      \event{e}{\DW{y}{1}}{above=of d2}
+      \pox[out=-15,in=-165]{d1}{e1}
+      \pox[out=-165,in=-15]{e2}{d2}
+      \mrg{e1}{e}
+      \mrg{e2}{e}
+      \mrg{d1}{d}
+      \mrg{d2}{d}
+      % \event{e}{(v{=}r\lor w{=}r)\limplies (r{=}0\lor r{=}1)\bigmid\DW{x}{1}}{}
+      % \event{r}{\DR{y}{v}}{left=of e}
+      % \phevent{e1}{v{=}r\limplies r{=}0\bigmid\DW{x}{1}}{below left=1em and -7em of e}
+      % \phevent{e2}{v{=}r\limplies r{=}1\bigmid\DW{x}{1}}{below right=1em and -7em of e}
+      % \pox{r}[pos=0,below]{e1}
+      % \pox[out=-15,in=-167]{e1}[below]{e2}
+      % \mrg{e1}{e}
+      % \mrg{e2}{e}
+      % \event{i}{\DW{y}{w}}{left=of r}
+      % \pox[out=-15,in=-167]{i}[below]{r}
+      % \pox{r}{e}
+    \end{tikzinline}}    
+\end{displaymath}
+Once the pomset is completed, $r$ will be known, causing all the
+preconditions to be either tautological or unsatisfiable.  We can then
+extract program order by restricting phantom events to have tautological
+preconditions (\refdef{def:extract}).  Thus, our strategy for \cXI{} is to
+first construct a complete \PwTpo{}, then extract top-level program order,
+then apply the axioms of \rcXI{}.  We refer to a \PwTpo{} that survives this
+filtering as a \PwTc{}.
 
 \begin{definition}
   \label{def:po}
@@ -113,6 +194,9 @@ order, for use in the various axioms of \cXI{}.
       $\aTerm$ is a tautology.
     \end{enumerate}
   \end{multicols}
+
+  A complete \PwTpo{} is a \PwTc{} if it additionally satisfies the axioms of
+  \rcXI{}.
 \end{definition}
 Since $\fmrg{}$ is idempotent, we have $\fmrg{\fmrg{\aEv}} = \fmrg{\aEv}$.
 Equivalently, we could require $\fmrg{\aEv}\in\reEvs$.
@@ -153,30 +237,10 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
 
     We extend the semantics with $\rpox$ as follows.  For pomsets with at
     most one event, ${\rpox}$ is the identity.  For sequential composition,
-    ${\rpox}={\rpox_1}\cup {\rpox_2}\cup{\aEvs_1\times\aEvs_2}$.  For the
-    conditional, ${\rpox}={\rpox_1}\cup {\rpox_2}$.  By construction, $\rpox$
-    is a pre-order, which may include cycles due to coalescing.  For example:
-    \begin{align*}
-      % \PR{y}{r}
-      % \SEMI
-      \IF{r}\THEN
-      \PW{x}{1}
-      \SEMI
-      \PW{y}{1}
-      \ELSE
-      \PW{y}{1}
-      \SEMI
-      \PW{x}{1}
-      \FI
-      &&
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{d}{\DW{x}{1}}{}
-          \event{e}{\DW{y}{1}}{right=of d}
-          \pox[out=-15,in=-165]{d}[below]{e}
-          \pox[out=165,in=15]{e}[above]{d}
-        \end{tikzinline}}    
-    \end{align*}
-
+    ${\rpox}={\rpox_1}\cup {\rpox_2}\cup{\aEvs_1\times\aEvs_2}$.  For
+    parallel composition and the conditional,
+    ${\rpox}={\rpox_1}\cup {\rpox_2}$.  As noted at the beginning of this
+    section, $\rpox$ may contain cycles. 
     To find an acyclic $\rpox'$, we replay the construction of $\aPS$ to get
     $\aPS'$.  When building $\aPS'$, we require disjoint union in \ref{seq-E}
     and \ref{if-E}: $\aEvs' = \aEvs'_1\uplus\aEvs'_2$.  If and event is
@@ -214,6 +278,7 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
   \end{proof}
 \end{lemma}
 \begin{definition}
+  \label{def:extract}
   For a \PwTpo{}, let $\fextract{\aPS}$ be the projection
   of $\aPS$ onto the set
   \begin{math}
@@ -279,27 +344,6 @@ A pomset in the image of $\fextract{}$ is a \emph{candidate execution}.
 
 As an example, consider \labeltext[\textsc{tc6}]{Java Causality Test Case 6}{JC-TC6}.  Taking $w=0$ and $v=1$,
 the \PwTpo{} on the left below produces the candidate execution on the right.
-In diagrams, we visualize $\rpox$ using a dotted arrow
-\begin{math}
-  \mkern-12mu
-  \begin{tikzpicture}
-    \node (a)  at (0, 0) {};
-    \node (b)  at (.7, 0) {};
-    \draw[pox](a)to(b);
-  \end{tikzpicture}
-  \mkern-12mu,
-\end{math}
-and
-$\fmrg{}$ using a double arrow 
-\begin{math}
-  \mkern-12mu
-  \begin{tikzpicture}
-    \node (a)  at (0, 0) {};
-    \node (b)  at (.7, 0) {};
-    \draw[mrg](a)to(b);
-  \end{tikzpicture}
-  \mkern-12mu
-\end{math}.
 \begin{align*}
   \begin{gathered}[t]
     \makebox{\small$

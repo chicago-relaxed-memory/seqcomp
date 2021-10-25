@@ -12,8 +12,8 @@ $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$.  By assumption
 $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.  The resulting semantics satisfies
 redundant read elimination.
 
-Our approach to register recycling allows us to define a criterion for
-eliminating certain types of useless pomsets (\textsection\ref{sec:false}).
+% Our approach to register recycling allows us to define a criterion for
+% eliminating certain types of useless pomsets (\textsection\ref{sec:false}).
 
 In the remainder of this section we consider several mostly-orthogonal features: address
 calculation, if-introduction, and read-modify-write operations.  Address
@@ -144,8 +144,8 @@ elimination is sound:
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
 \end{displaymath}
 
-As a further example, consider \cite[Fig.~5]{DBLP:conf/ecoop/SevcikA08},
-referenced in \cite[\textsection6.4]{DBLP:conf/esop/PaviottiCPWOB20}.
+As a further example, consider Fig.~5 of \citet{DBLP:conf/ecoop/SevcikA08},
+referenced by \citet[\textsection6.4]{DBLP:conf/esop/PaviottiCPWOB20}.
 Consider the case where the reads are merged, both seeing 1:
 \begin{align*}
   \PR{y}{r}
@@ -433,7 +433,7 @@ One subtlety of the definition is that we use $\sLOADP{}{}$ rather than
 $\sLOAD{}{}$.  Thus, for \RMW{} operations, the independent case for a read
 is the same as the empty case.  To see why this should be, consider the
 \labeltext[\textsc{cdrf-rlx}]{relaxed variant of the \textsc{cdrf} example}{CDRF-RLX} from
-\cite{DBLP:conf/pldi/LeeCPCHLV20}, using $\sLOAD{}{}$ rather than $\sLOADP{}{}$.
+\citet{DBLP:conf/pldi/LeeCPCHLV20}, using $\sLOAD{}{}$ rather than $\sLOADP{}{}$.
 \begin{scope}
   \small
 \begin{gather*}
@@ -600,8 +600,7 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 \label{sec:semca}
 
 In order to model sequential composition, we must allow inconsistent
-predicates in a single pomset, unlike \PwP{}
-\cite{DBLP:journals/pacmpl/JagadeesanJR20}.  For example, if
+predicates in a single pomset, unlike \PwP{}.  For example, if
 $\aCmd=(\PW{x}{1})$, then the semantics \reffig{fig:seq} does \emph{not} allow:
 \begin{gather*}
   \IF{\aExp}\THEN\PW{x}{1}\FI
@@ -819,7 +818,7 @@ calculation is somewhat delicate.
 % , in
 % \ref{read-tau-dep-addr}.  The subsection of \textsection\ref{sec:diff} on
 % \ref{xCausal} discusses this example using the semantics of \jjr{}.
-Consider the following program, from \cite[\textsection5]{DBLP:journals/pacmpl/JagadeesanJR20}, where initially $x\EQ0$, $y\EQ0$, $\REF{0}\EQ0$,
+Consider the following program, from \citet[\textsection5]{DBLP:journals/pacmpl/JagadeesanJR20}, where initially $x\EQ0$, $y\EQ0$, $\REF{0}\EQ0$,
 $\REF{1}\EQ2$, and $\REF{2}\EQ1$.  It should only be possible to read $0$,
 disallowing the attempted execution below:
 \begin{gather*}

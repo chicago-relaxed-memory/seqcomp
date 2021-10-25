@@ -54,12 +54,19 @@ admits sequential composition.  PwP/MRD only got halfway there: No one would
 have ever been happy with Hoare logic if it failed to capture the meaning of
 sequential composition.
 
-With PwT, the presence or absence of a dependency can be understood in isolation.
-In practice, this enables future applications where PwT can be used to modularly validate assumptions about program dependencies in larger blocks of code incrementally -- rather than the approach of MRD/PwP where evaluation must be done totally.
+With PwT, the presence or absence of a dependency can be understood in
+isolation.  In practice, this enables future applications where PwT can be
+used to modularly validate assumptions about program dependencies in larger
+blocks of code incrementally -- rather than the approach of MRD/PwP where
+evaluation must be done totally.
 
-Further, PwT-C11 is only the second semantics to interoperate with C++ through a semantic dependency relation, and the first one to be fully compositional.
-Semantic dependency is a worthwhile goal: a restriction of $acyclic(SDEP \cup RF)$ is a statement which is compatible with the existing C++ standard, subject to a good definition of SDEP.
-With the exception of MRD, other thin-air free programming language memory models do not distil dependencies down to a relation compatible with the existing C++ standard.
+Further, PwT-C11 is only the second semantics to interoperate with C++
+through a semantic dependency relation, and the first one to be fully
+compositional.  Semantic dependency is a worthwhile goal: a restriction of
+$acyclic(SDEP \cup RF)$ is a statement which is compatible with the existing
+C++ standard, subject to a good definition of SDEP.  With the exception of
+MRD, other thin-air free programming language memory models do not distill
+dependencies down to a relation compatible with the existing C++ standard.
 
 ## Reviewers A and C. Correctness of the model, relating models.
 
@@ -103,12 +110,17 @@ and reasoning principles.  There are fundamental conflicts, for example:
 
 ## Reviewer B. Syntactic vs. semantic dependencies and their usage in compilers
 
-Yes, tracking semantic dependencies is intrinsically harder than syntactic ones, and hardware memory models stick with syntax.
-However, we cannot settle with syntactic dependencies for models of programming languages since common compiler optimizations
-used in almost all real compilers (including GCC and Clang) may remove syntactic dependencies (unlike semantic ones).
-That is, a programming language memory model which supports compiler optimizations and disallows OOTA (unlike the C/C++ memory model)
-has to track semantic dependencies in one way or another. All other proposed solutions to this problem do that
-(Promising [Kang-al:POPL17], Weakestmo [Chakraborty-Vafeiadis:POPL19], MRD [Paviotti-al:ESOP20], PwP [Jagadeesan-al:OOPSLA20]).
+Yes, tracking semantic dependencies is intrinsically harder than syntactic
+ones, and hardware memory models stick with syntax.  However, we cannot
+settle with syntactic dependencies for models of programming languages since
+common compiler optimizations used in almost all real compilers (including
+GCC and Clang) may remove syntactic dependencies (unlike semantic ones).
+That is, a programming language memory model which supports compiler
+optimizations and disallows OOTA (unlike the C/C++ memory model) has to track
+semantic dependencies in one way or another. All other proposed solutions to
+this problem do that (Promising [Kang-al:POPL17], Weakestmo
+[Chakraborty-Vafeiadis:POPL19], MRD [Paviotti-al:ESOP20], PwP
+[Jagadeesan-al:OOPSLA20]).
 
 A compiler does not have to use the proposed semantics
 directly, i.e., for calculating dependencies.  Instead, the semantics is
