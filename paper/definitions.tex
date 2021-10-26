@@ -451,7 +451,7 @@ each set of events in a pomset, \ref{pom-tau} provides a predicate
 transformer.  Sequential dependency is calculated by $\labelingForm'_2$ in
 the semantics of sequential composition.
 
-\todo{I struggled with the concept of a "termination condition". Can you add
+\todo{I struggled with the concept of a ``termination condition''. Can you add
   a sentence or two of intuition here?}
 
 \todo{Fig 1. Please explain why (R4b) is defined in this way. In addition, why
@@ -697,7 +697,8 @@ dependencies than the semantics. This is explicitly allowed by Lemma 4.8
 
 \todo{We include empty pomsets in the semantics of reads/writes/fences to
   allow them to appear on the false side of a conditional, for example, since
-  complete pomsets require that all preconditions are tautologies.}
+  complete pomsets require that all preconditions are tautologies.  (Already
+  added at end of 2.2, but probably good to repeat.)}
 
 
 Ignoring the logic, the definitions are straightforward.  Reads and writes
@@ -741,14 +742,14 @@ but the former does not. ({These are distinguished by the context:
   \end{math}})
 
 In complete pomsets, \ref{top-term} requires that $\aTerm$ is a tautology,
-capturing termination.  In $\sSTORE{}{}$, \ref{write-term} ensures that
-all writes are included in complete pomsets---note that $\kappaE{\emptyset} = \FALSE$.  This also ensures
-$\sembase{\PW{x}{1}}\not\supseteq\sembase{\IF{\aExp}\THEN\PW{x}{1}\FI}$,
-since $\sembase{\IF{\aExp}\THEN\PW{x}{1}\FI}$ includes the empty set with
-termination condition $\lnot\aExp$, but $\sembase{\PW{x}{1}}$ can only
-include the empty set with termination condition $\FALSE$.
-\todo{494: This seems wrong: you're saying that [x:=1] is not a non-strict superset
-of [if(M){x:=1}]. But they're surely equal if M is true?}
+capturing termination.  In $\sSTORE{}{}$, \ref{write-term} ensures that all
+writes are included in complete pomsets---note that
+$\kappaE{\emptyset} = \FALSE$.  This also ensures
+$\sembase{\PW{x}{1}}\not\supseteq\sembase{\IF{\aForm}\THEN\PW{x}{1}\FI}$
+(unless $\aForm$ is a tautology), since
+$\sembase{\IF{\aForm}\THEN\PW{x}{1}\FI}$ includes the empty set with
+$\aTerm\riff\lnot\aForm$, but $\sembase{\PW{x}{1}}$ can only
+include the empty set with $\aTerm\riff\FALSE$.
 
 In addition, \ref{write-term} ensures that complete pomsets do not
 include bogus writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted

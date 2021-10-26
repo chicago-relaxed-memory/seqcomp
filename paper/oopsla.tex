@@ -903,15 +903,14 @@ redundant read elimination fails.
 $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.  
 
 
-\endinput
-
-\myparagraph{Parallel Composition}
+\myparagraph{Termination Conditions and Parallel Composition}
 
 In \jjr{\textsection2.4}, parallel composition is defined allowing coalescing
 of events.  Here we have forbidden coalescing.  This difference appears to be
 arbitrary.  In \jjr{}, however, there is a mistake in the handling of
 termination actions.  The predicates should be joined using $\land$, not
-$\lor$.
+$\lor$.  Here we have used termination conditions rather than termination
+actions so that termination is handled separately.
 
 \myparagraph{Read-Modify-Write Actions}
 
@@ -936,17 +935,19 @@ in \jjr{};
 
 
 \myparagraph{Augmentation of Preconditions}
-\jjr{} allows augmentation of preconditions.
-As discussed in \textsection\ref{sec:delay}, this causes associativity to fail
-for $\rdelay$, at least when attempting to validate \reflem{lem:if}\eqref{lem:ifelse:if:if1}--\eqref{lem:ifelse:if:if2}
-Thus, we use \emph{weakest} preconditions, rather than general preconditions.
-As a result, we fail to validate the following
-refinement:
-\begin{math}
-  \aPSS_1
-  \not\supseteq
-  \xIFTHEN{\aForm}{\aPSS_1}{}.
-\end{math}
+\jjr{} allows arbitrary augmentation of preconditions.  Here we are more
+conservative, only allowing augmentation of preconditions in the semantics of
+primitive actions, as in \textsection\ref{sec:semca}.
+As discussed in \textsection\ref{sec:delay}, allowing arbitrary augmentation
+causes associativity to fail when encoding $\rdelay$ logically. 
+% Thus, we use \emph{weakest} preconditions, rather than general preconditions.
+% As a result, we fail to validate the following
+% refinement:
+% \begin{math}
+%   \aPSS_1
+%   \not\supseteq
+%   \xIFTHEN{\aForm}{\aPSS_1}{}.
+% \end{math}
 
 
 
