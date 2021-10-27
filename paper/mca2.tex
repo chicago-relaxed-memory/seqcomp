@@ -6,6 +6,8 @@ Lowering \PwTmca{1} to \armeight{} requires a full fence after every
 acquiring read.  To see why, consider the following attempted
 execution, where the final values of both $x$ and $y$ are $2$.
 \begin{gather*}
+  \taglabel{internal-acq}
+  \begin{gathered}
   \PW{x}{2}\SEMI 
   \PR[\mACQ]{x}{r}\SEMI
   \PW{y}{r{-}1} \PAR
@@ -24,6 +26,7 @@ execution, where the final values of both $x$ and $y$ are $2$.
       \sync{d}{e}
       \wk[out=-170,in=-10]{e}{a}
     \end{tikzinline}}
+\end{gathered}
 \end{gather*}
 The execution is  allowed by \armeight, but disallowed by \PwTmca{1}, due to
 the cycle.
@@ -52,7 +55,7 @@ thus the above execution is allowed.
     if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\bEv\xrfx\aEv$ then $\bEv\lt\aEv$,
   \item[{\labeltext[\textsc{p}6b]{(\textsc{p}6b)}{par-le-rf2}}]
     if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\aEv\xrfx\bEv$ then $\aEv\lt\bEv$,
-  \item[{\labeltext[\textsc{s}6a]{(\textsc{s}6a)}{seq-le-delays-rf}}]
+  \item[{\labeltext[\textsc{s}6a$'$]{(\textsc{s}6a$'$)}{seq-le-delays-rf}}]
     if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ 
     then either $\bEv\xrfx\aEv$ or $\bEv\le\aEv$,
   \item[{\labeltext[\textsc{s}6b]{(\textsc{s}6b)}{seq-le-rf-rf}}]
@@ -74,9 +77,21 @@ thus the above execution is allowed.
 
   %\input{fig-mca2.tex}
 \end{definition}
-% We write $\semmca{2}{}$ for the semantic function.
-A \PwTmca{2} need not satisfy requirement \ref{pom-rf-le}, and thus we may
-have $\bEv\xrfx\aEv$ and $\aEv\lt\bEv$.
+\ref{par-le-rf1} and \ref{par-le-rf2} ensure that $\bEv\xrfx\aEv$ implies
+$\bEv\lt\aEv$ when the actions come from different threads.  However, we may
+have $\bEv\xrfx\aEv$ and $\aEv\lt\bEv$ within a thread, as between
+$\DWP{x}{2}$ to $\DRP[\mACQ]{x}{2}$ in \ref{internal-acq}.  To allow this,
+\ref{seq-le-delays-rf} relaxes \ref{seq-le-delays} from \PwTmca{1}.
+\ref{seq-le-rf-rf} is then necessary to stop stale reads within a thread.
+For example, it prevents a read of $1$ in
+\begin{math}
+  \PW{x}{1}
+  \SEMI
+  \PW{x}{2}
+  \SEMI
+  \PR{x}{r}.
+\end{math}
+\todo{Is s6b necessary?}
 
 % 
 % The use of $\rextendsdef{}{}$ in \ref{if-rf-project}
@@ -88,8 +103,6 @@ have $\bEv\xrfx\aEv$ and $\aEv\lt\bEv$.
 % This change both allows and requires us to weaken the definition of
 % \emph{delays} to drop write-to-read order from $\eqreorderco$.
 
-\todo{Example using \ref{seq-le-delays-rf} and \ref{seq-le-rf-rf}. Perhaps
-  move \reflem{lem:mca2} to appendix.}
 
 With the weakening of \ref{seq-le-delays}, we must be careful not to allow
 spurious pairs to be added to the $\rrfx$ relation.  For example, %\ref{if-rf-project} ensures that
