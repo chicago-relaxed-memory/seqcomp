@@ -1,12 +1,6 @@
 \section{\PwTmcaTITLE{}: Pomsets with Predicate Transformers for MCA}
 \label{sec:mca}
 
-In concurrent hardware, each processor has two views of each memory location:
-local and global.  In a \emph{multicopy-atomic} (\mca{}) architecture, there
-is only one global view, shared by all processors.  These two views are
-neatly reflected in \PwT{}: the local view corresponds to the preconditions.
-The global view corresponds to the partial order.
-
 In this section, we develop a model of concurrent computation by adding
 % \emph{parallel composition} and 
 \emph{reads-from} to \reffig{fig:seq}.  To model coherence and

@@ -1590,6 +1590,43 @@ Building the precondition $\aForm$ from right to left:
   }
 \end{align*}
 
+
+\begin{gather*}
+  \PW{x}{0}
+  \SEMI
+  \PBR{
+    \PR{x}{r}
+    \SEMI
+    \IF{r\leq 1}\THEN
+    \PW{x}{2}
+    \SEMI
+    \PW{y}{1}
+    \FI
+    \PAR
+    \PW{x}{\PR{y}{}}
+  }
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
+      \event{i1}{\DW{x}{0}}{}
+      \event{a1}{\DR{x}{1}}{right=3em of i1}      
+      \event{a2}{\DW{x}{2}}{right=of a1}      
+      \event{a3}{\DW{y}{1}}{right=of a2}
+      \event{b1}{\DR{y}{1}}{right=3em of a3}
+      \event{b2}{\DW{x}{1}}{right=of b1}
+      \po{b1}{b2}
+      \rf{a3}{b1}
+      \wki{a1}{a2}
+      \rf[out=-170,in=-10]{b2}{a1}
+      \wk[out=10,in=170]{i1}{b2}
+    \end{tikzinline}}    
+\end{gather*}
+\PwT{} correctly allows this execution; \MRD{} forbids it. The precondition
+of $\DW{y}{1}$ is a tautology, but the co-product mechanism in \MRD{} does not
+recognize this and will seek a isomorphic justification under the $\DR{x}{2}$
+branch of the read in the event structure, and fail to find it, leaving the
+dependency in place.
+
+
 % As a sanity check, consider the
 % following pomsets,
 % \begin{align*}

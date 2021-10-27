@@ -392,7 +392,6 @@ for example:
   \THREAD{\PW{x}{0}\SEMI \PW{x}{1}\SEMI \PW{y}{2}\SEMI
     \PR{y}{r}\SEMI \PR{x}{s}}
   \\[-.4ex]
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{wx0}{\DW{x}{0}}{}
       \event{wx1}{\DW{x}{1}}{right=of wx0}
@@ -420,7 +419,6 @@ a total \emph{causal order} between read and write events, for example
   \PAR
   \THREAD{\PR{y}{r}\SEMI \PR{x}{s}}
   \\[-.4ex]
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{wx0}{\DW{x}{0}}{}
       \event{wx1}{\DW{x}{1}}{right=of wx0}
@@ -455,7 +453,6 @@ are inconsistent with program order, such as the following, which contains an
   \PAR
   \THREAD{\PR{y}{r}\SEMI \PR{x}{s}}
   \\[-.4ex]
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{wx0}{\DW{x}{0}}{}
       \event{wx1}{\DW{x}{1}}{right=of wx0}
@@ -480,7 +477,6 @@ writes when they are uninteresting.)
   \PAR
   \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
   \\[-.4ex]
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{rx1}{\DR{x}{1}}{}
       \event{wy1}{\DW{y}{1}}{right=of rx1}
@@ -503,7 +499,6 @@ results in:
   \PAR
   \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
   \\[-.4ex]
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{rx1}{\DR{x}{1}}{}
       \event{wy1}{\DW{y}{1}}{right=of rx1}
@@ -525,7 +520,6 @@ execution:
   \PAR
   \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
   \\[-.4ex]
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{rx1}{\DR{x}{1}}{}
       \event{wy1}{\DW{y}{1}}{right=of rx1}
@@ -545,25 +539,23 @@ To address this, \citet{DBLP:journals/pacmpl/JagadeesanJR20} introduced
 formulae.  Nontrivial preconditions are introduced by store actions (modeling
 data dependencies) and conditionals (modeling control dependencies):
 \begin{gather*}
-  \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  \IF{s{>}0} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \\
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{}
+      \event{wz0}{(s {>} 0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{}
     \end{tikzinline}}
 \end{gather*}
-In this diagram, $(s {<} 1)$ is a control dependency and $(r{*}s){=}0$ is a
+In this diagram, $(s {>} 0)$ is a control dependency and $(r{*}(s{-}1)){=}0$ is a
 data dependency. Preconditions are updated as events are prepended (we assume the
 usual precedence for logical operators): 
 \begin{gather*}
-  \tag{$\dagger$}\label{eq1}
-  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  %\tag{$\dagger$}\label{eq1}
+  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{>}0} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \\
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{rx0}{\DR{x}{0}}{}
-      \event{ry0}{\DR{y}{0}}{right=of rx0}
-      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
+      \event{rx0}{\DR{x}{1}}{}
+      \event{ry0}{\DR{y}{1}}{right=of rx0}
+      \event{wz0}{(1{=}s) \limplies (s{>}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
       \po{ry0}{wz0}
     \end{tikzinline}}
 \end{gather*}
@@ -571,24 +563,43 @@ In this diagram there are two reads.  As evidenced by the arrow, the read of
 $y$ is ordered before the write, reflecting possible dependency; the read of
 $x$ is not, reflecting independency.  The dependent read of $y$ allows the
 precondition of the write to weaken: now the old precondition need only be
-satisfied assuming the hypothesis $(0{=}s)$.  The independent read of $x$
+satisfied assuming the hypothesis $(1{=}s)$.  The independent read of $x$
 allows no such weakening.  Nonetheless, the precondition of the write is now
-a tautology, and so can be elided in the diagram:
+a tautology, and so can be elided in the diagram.
+
+We can complete the execution by adding the required writes:
 \begin{gather*}
-  % \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
-  % \\
-  \nonumber
+  \PW{x}{1}
+  \SEMI
+  \PW{y}{1}
+  \PAR
+  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{>}0} \THEN \PW{z}{r{*}(s{-}1)} \FI
+  \\
   \hbox{\begin{tikzinline}[node distance=1.5em]
-      \event{rx0}{\DR{x}{0}}{}
-      \event{ry0}{\DR{y}{0}}{right=of rx0}
-      \event{wz0}{\DW{z}{0}}{right=of ry0}
-      \po{ry0}{wz0}
+      \event{wx}{\DW{x}{1}}{}
+      \event{wy}{\DW{y}{1}}{right=of wx}
+      \event{rx}{\DR{x}{1}}{right=3em of wy}
+      \event{ry}{\DR{y}{1}}{right=of rx}
+      \event{wz}{\DW{z}{0}}{right=of ry}
+      \po{ry}{wz}
+      \rf[out=10,in=170]{wx}{rx}
+      \rf[out=10,in=170]{wy}{ry}
     \end{tikzinline}}
 \end{gather*}
-In order for a pomset to be \emph{complete}, all preconditions must be
-tautologies.  Thus, an execution of \eqref{eq1} that reads $\DR{y}{2}$ must
-elide the write action to be considered complete.  For this reason, we must
-allow read and write to generate empty pomsets, in addition to singletons.
+In order for a \PwP{} to be \emph{complete}, all preconditions must be
+tautologies and all reads must be fulfilled by matching writes.  The first
+requirement captures the sequential semantics.  The second requirement
+captures the concurrent semantics.  These correspond to two views of memory
+for each thread: thread-local and global.  In a
+\emph{multicopy-atomic} (\mca{}) architecture, there is only one global view,
+shared by all processors, which is neatly captured by the order of the
+pomset.
+
+An untaken conditional produces no events.  \PwP{} models this by including
+the empty pomset in the semantics of every program fragment.  To then ensure
+that $\SKIP$ is not a refinement of $\PW{x}{1}$, \PwP{} include the
+\emph{termination} action, $\aTerm{}$, which we have elided in the examples
+above.
 
 \subsection{Predicate Transformers For Relaxed Memory}
 
@@ -819,7 +830,6 @@ diagram above,
 % \begin{gather*}
 %   \PR{x}{r}\SEMI \PR{y}{s}
 %   \\
-%   \nonumber
 %   \hbox{\begin{tikzinline}[node distance=2ex and 1.5em]
 %       \xform{rx0d}{(0{=}r) \limplies \bForm}{}
 %       \event{rx0}{\DR{x}{0}}{right=of rx0d}
@@ -837,7 +847,6 @@ or to the right, with the intermediate step:
 \begin{gather*}
   \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
   \\
-  \nonumber
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
       \event{ry0}{\DR{y}{0}}{}
       \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
