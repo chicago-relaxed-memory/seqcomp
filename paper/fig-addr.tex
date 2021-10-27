@@ -2,7 +2,10 @@
 If $\aPS \in \sSTORE[\amode]{\cExp}[\ascope]{\aExp}[\aThrd]$ then
 $(\exists\cVal\in\Val)$
 $(\exists\aVal\in\Val)$
-\begin{multicols}{2}
+%\begin{vwcol}[widths={0.4,0.6}, sep=.3pc, justify=flush,rule=0pt,indent=1em]
+%  \begin{multicols}{2}
+\\[-.6\baselineskip]
+\begin{minipage}[t]{.44\textwidth}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
   \item \label{write-E-addr}
     if $\fcard{\aEvs}\leq1$,
@@ -15,6 +18,10 @@ $(\exists\aVal\in\Val)$
       \land
       \aExp{=}\aVal
     \end{math},      
+  \end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{.56\textwidth}
+  \begin{enumerate}[resume,topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
     % \stepcounter{enumi}
     % \item[] \labeltext[\textsc{w}4]{}{write-tau-addr}
     %   \begin{enumerate}[leftmargin=0pt]
@@ -47,19 +54,19 @@ $(\exists\aVal\in\Val)$
     %   \end{enumerate}
     %   \columnbreak
   \item \label{write-tau-addr}
-    \makebox[0pt][l]{%
+    %\makebox[0pt][l]{%
     \begin{math}
       \aTr{\bEvs}{\bForm} \riff 
       \textstyle\bigwedge_{\dVal\in\Val}
       \cExp{=}\dVal
-      \;\limplies
+      \limplies
         \bForm
         [\aExp/\REF{\dVal}]
         [\kappaE{\REF{\dVal}}/\Q{\REF{\dVal}}],
         %[\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\aExp{=}\aVal}/\Q{\REF{\dVal}}],
         % [\TRUE/\A{\cVal}]
         % [(\cExp{\neq}\Aother\land\A{\Aother})/\A{\Aother{\neq}\cVal}]
-      \end{math}}
+      \end{math}
   \item \label{write-term-addr}
     % $\aTerm \riff {\textstyle\bigvee{}\!\!{}_{\aEv\in\aEvs}\PBR{\cExp{=}\cVal \land \aExp{=}\aVal}}$.
     $\aTerm \riff \kappaE{}$.
@@ -72,14 +79,18 @@ $(\exists\aVal\in\Val)$
     %     if $\aEvs=\emptyset$ then $\aTerm \riff \FALSE$.
     %   \end{enumerate}
   \end{enumerate}
-\end{multicols}
+\end{minipage}
+% \end{vwcol}
+%\end{multicols}
 
 % \medskip
 \noindent
+\begin{minipage}[t]{\textwidth}
 If $\aPS \in \sLOAD[\amode]{\aReg}[\ascope]{\cExp}[\aThrd]$ then
 $(\exists\cVal\in\Val)$
 $(\exists\aVal\in\Val)$
-\begin{multicols}{2}
+\\[-.6\baselineskip]
+\begin{minipage}[t]{.44\textwidth}
   \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
   \item \label{read-E-addr}
     if $\fcard{\aEvs}\leq1$,
@@ -134,7 +145,15 @@ $(\exists\aVal\in\Val)$
           \limplies
           \bForm[\uReg{\aEv}/\aReg]
         \end{math},}
-      \columnbreak
+    \end{enumerate}
+  \end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{.56\textwidth}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+    \setcounter{enumi}{4}
+  \item[] 
+    \begin{enumerate}[leftmargin=0pt]
+      \setcounter{enumii}{2}
     \item \label{read-tau-empty-addr}
       if $\aEvs=\emptyset$ then 
       \begin{math}
@@ -142,7 +161,7 @@ $(\exists\aVal\in\Val)$
         (\forall\bReg)\;
         \bForm[\bReg/\aReg],
       \end{math}  
-    \end{enumerate}  
+    \end{enumerate}
     \stepcounter{enumi}
   \item[] \labeltext[\textsc{r}5]{}{read-term-addr}
     \begin{enumerate}[leftmargin=0pt]
@@ -158,7 +177,9 @@ $(\exists\aVal\in\Val)$
           % \bigvee_{\aEv\in\aEvs}\aForm_\aEv.
         \end{math}
     \end{enumerate}      
-    % \item \label{read-term-addr}
-    %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
   \end{enumerate}
-\end{multicols}
+  % \item \label{read-term-addr}
+  %   if $\aEvs=\emptyset$ and $\amode\neq\mRLX$ then $\aTerm \riff \FALSE$. 
+  \end{minipage}
+\end{minipage}
+

@@ -433,7 +433,6 @@ preconditions.  Thus more order means weaker preconditions.
   \input{fig-def.tex}
 \end{definition}
 Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
-We give the semantics of programs $\sembase{}$ in \reffig{fig:seq}.
 % Let $\Pom$ be the set of all pomsets.
 %
 The model has $6$ components, which can be daunting at first glance.  To aid
@@ -451,21 +450,28 @@ each set of events in a pomset, \ref{pom-tau} provides a predicate
 transformer.  Sequential dependency is calculated by $\labelingForm'_2$ in
 the semantics of sequential composition.
 
-\todo{I struggled with the concept of a ``termination condition''. Can you add
-  a sentence or two of intuition here?}
+Relative to \PwP{}, \PwT{} adds predicate transformers and termination
+conditions.  The latter are captured in \PwP{} as termination \emph{actions},
+discussed in \textsection\ref{sec:intro:mm}.
+% As with \PwP{}, the empty pomset is in the semantics of every
+% program---the termination condition prevents $\SKIP$ from being a refinement of
+% $\PW{x}{1}$.
 
-\todo{Fig 1. Please explain why (R4b) is defined in this way. In addition, why
-  can the set E of events be empty for read and write operations?}
+Throughout the rest of this section, we endeavor to explain \reffig{fig:seq},
+which gives the semantics of programs $\sembase{}$.  We defer discussion of
+two subtleties to \textsection\ref{sec:q}.  First, we ignore $\Q{\aLoc}$,
+taking $\Q{\aLoc}=\TRUE$, for all $\aLoc$.  Second, we ignore read rule
+\ref{read-tau-ind}.
 
-Before discussing the details of the model, we note that the semantics
-satisfies the expected monoid laws, as well as some laws concerning the
-conditional. We have verified \reflem{lem:monoid} and
-\reflem{lem:if}\ref{lem:if:seq} in Coq\footnote{Specifically, we have proven
-  these results for the semantics of \reffig{fig:seq} with the refinements of
-  \textsection\ref{sec:read-read}, \textsection\ref{sec:semreg}, and
-  \textsection\ref{sec:semca}}.  Similar laws apply to parallel composition;
-although note that $\sem{\aCmd\RPAR\SKIP}\neq\sem{\aCmd}$, since this
-asymmetric operator throws away thread state from the left.
+Before discussing the details, we note that the semantics satisfies the
+expected monoid laws, as well as some laws concerning the conditional. We
+have verified \reflem{lem:monoid} and \reflem{lem:if}\ref{lem:if:seq} in
+Coq\footnote{Specifically, we have proven these results for the semantics of
+  \reffig{fig:seq} with the refinements of \textsection\ref{sec:read-read},
+  \textsection\ref{sec:semreg}, and \textsection\ref{sec:semca}}.  Similar
+laws apply to parallel composition; although note that
+$\sem{\aCmd\RPAR\SKIP}\neq\sem{\aCmd}$, since this asymmetric operator throws
+away thread state from the left.
 
 \begin{lemma}
   \label{lem:monoid}
@@ -616,8 +622,7 @@ semantics of \reffig{fig:seq} validates the reverse inclusions for
 The semantics is also closed with respect to augmentation.  $\aPS_2$ is an
 \emph{augment} of $\aPS_1$ if all fields are equal except, perhaps, the
 order, where we require ${\lt_2}\supseteq{\lt_1}$.  In examples, we typically
-consider pomsets that are augment-minimal.  One intuitive reading of augment
-closure is that adding order can only cause preconditions to weaken.  % The
+consider pomsets that are augment-minimal.  % The
 % proof is straightforward, by induction on the definition of $\sembase{}$.
 % \begin{definition}
 %   \label{def:augment}
@@ -646,14 +651,10 @@ closure is that adding order can only cause preconditions to weaken.  % The
   %   Induction on the definition of $\sembase{}$.
   % \end{proof}
 \end{lemma}
-
-
-\todo{A compiler does not have to use the proposed semantics
-directly, i.e., for calculating dependencies.  Instead, the semantics is
-meant to be a wrapper that validates some reasonable set of compiler
-optimizations. A compiler may make more conservative assumptions about
-dependencies than the semantics. This is explicitly allowed by Lemma 4.8
-(augment closure).}
+One intuitive reading of augment closure is that adding order can only cause
+preconditions to weaken.  Augment closure also captures the intuition that it
+is always sound for a compiler to make more conservative assumptions about
+dependencies than the semantics.
 
 
 
@@ -693,12 +694,6 @@ dependencies than the semantics. This is explicitly allowed by Lemma 4.8
 \subsection{Pomsets and Complete Pomsets}
 \label{sec:ex:pomset}
 \label{sec:ex:term}
-
-
-\todo{We include empty pomsets in the semantics of reads/writes/fences to
-  allow them to appear on the false side of a conditional, for example, since
-  complete pomsets require that all preconditions are tautologies.  (Already
-  added at end of 2.2, but probably good to repeat.)}
 
 
 Ignoring the logic, the definitions are straightforward.  Reads and writes
@@ -741,15 +736,27 @@ but the former does not. ({These are distinguished by the context:
     \IF{\aReg {=} \bReg} \THEN \PW{\cLoc}{1} \FI.
   \end{math}})
 
-In complete pomsets, \ref{top-term} requires that $\aTerm$ is a tautology,
-capturing termination.  In $\sSTORE{}{}$, \ref{write-term} ensures that all
-writes are included in complete pomsets---note that
-$\kappaE{\emptyset} = \FALSE$.  This also ensures
-$\sembase{\PW{x}{1}}\not\supseteq\sembase{\IF{\aForm}\THEN\PW{x}{1}\FI}$
-(unless $\aForm$ is a tautology), since
-$\sembase{\IF{\aForm}\THEN\PW{x}{1}\FI}$ includes the empty set with
-$\aTerm\riff\lnot\aForm$, but $\sembase{\PW{x}{1}}$ can only
-include the empty set with $\aTerm\riff\FALSE$.
+In complete pomsets, \ref{top-kappa} requires that all preconditions be
+tautologies.  In order to allow complete pomsets with untaken conditionals,
+such as $\IF{\FALSE}\THEN\PW{x}{1}\FI$, we allow the empty pomset is in the
+semantics of all statements.  % To ensure that $\SKIP$ is not a refinement of
+% $\PW{x}{1}$,
+Termination conditions ensure that the empty pomset is not used
+inappropriately.  At top level, \ref{top-term} requires that $\aTerm$ is a
+tautology.  \ref{write-term} and \ref{fence-term} ensure that writes and
+fences are included in complete pomsets, unless they are inside an untaken
+conditional.   \ref{read-term}
+requires that acquiring reads be included.  %This also ensures that
+% $\sembase{\PW{x}{1}}\not\supseteq\sembase{\IF{\aForm}\THEN\PW{x}{1}\FI}$
+% (unless $\aForm$ is a tautology), since
+% $\sembase{\IF{\aForm}\THEN\PW{x}{1}\FI}$ includes the empty set with
+% $\aTerm\riff\lnot\aForm$, but $\sembase{\PW{x}{1}}$ can only
+% include the empty set with $\aTerm\riff\FALSE$.
+For example, termination conditions ensure that
+$\sembase{\PW{x}{1}}\not\supseteq\sembase{\SKIP}$, since $\sembase{\SKIP}$
+includes the empty pomset with $\aTerm\riff\TRUE$, but $\sembase{\PW{x}{1}}$
+can only include the empty pomset with
+$\aTerm\riff \kappaE{\emptyset} = \FALSE$.
 
 In addition, \ref{write-term} ensures that complete pomsets do not
 include bogus writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted
@@ -844,8 +851,6 @@ requires that every precondition $\labelingForm(\aEv)$ is a tautology.  Using
 cannot include a complete pomset with event $\DWP{x}{3}$, since $2{=}3$ is not a
 tautology.
 
-We defer discussion of $\Q{\aLoc}$ to \textsection\ref{sec:q}. Here we assume
-we take $\Q{\aLoc}=\TRUE$, for all $\aLoc$.
 % that occur in \ref{write-tau} and \ref{read-tau} serve similar purpose.  We defer discussion of these until
 % \textsection\ref{sec:q}.
 % We first explain preconditions and predicate transformers using data
@@ -1127,14 +1132,6 @@ conjunctive formulation: $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aFor
 %  is logically equivalent to
 %  \href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}. 
 
-This semantics validates dead code elimination:
-if $\aExp{\neq}0$ is a tautology then
-\begin{math}
-  \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} \supseteq
-  \sem{\aCmd_1}.
-\end{math}
-The reverse inclusion does not hold.
-
 For events from $\aEvs_1$, \ref{if-kappa} requires
 $\aForm\land\labelingForm_1(\aEv)$. For events from $\aEvs_2$,
 \ref{if-kappa} requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For
@@ -1146,8 +1143,6 @@ to be lifted out of a conditional, validating the transformation
   \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} \supseteq
   \sem{\aCmd}.
 \end{math}
-
-
 
 By allowing events to coalesce, \ref{if-kappa} ensures that control
 dependencies are calculated semantically, rather than syntactically.  For example, consider
@@ -1242,7 +1237,17 @@ are two possibilities:
 \end{align*}
 
 
-\todo{Add example showing empty set on untaken branch.}
+The semantics validates dead code elimination:
+if $\aExp{\neq}0$ is a tautology then
+\begin{math}
+  \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} \supseteq
+  \sem{\aCmd_1}.
+\end{math}
+Here, we take the empty pomset as the denotation of $\aCmd_2$.  Since
+$\not\aExp$ is unsatisfiable, \ref{if-term} ignores the termination condition
+of $\aCmd_2$.  It is worth noting that the reverse inclusion, dead code
+introduction, holds for \emph{complete} pomsets, but not in general.
+
 
 \subsection{A Refinement: No Dependencies into Reads}
 \label{sec:read-read}

@@ -143,6 +143,8 @@ elimination is sound:
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \PR[\amode]{\aLoc}{\bReg}} \supseteq 
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
 \end{displaymath}
+The semantics of \citet{DBLP:journals/pacmpl/JagadeesanJR20} does not
+validate redundant load elimination or \eqref{TC2}, contrary to the claim.
 
 As a further example, consider Fig.~5 of \citet{DBLP:conf/ecoop/SevcikA08},
 referenced by \citet[\textsection6.4]{DBLP:conf/esop/PaviottiCPWOB20}.

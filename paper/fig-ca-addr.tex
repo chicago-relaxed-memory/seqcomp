@@ -7,7 +7,9 @@ $(\exists\aVal:\aEvs\fun\Val)$
 $(\exists\aForm:\aEvs\fun\Formulae)$
 % $(\exists\emptyForm\in\Formulae)$
 % $(\exists\emptyForm\in\Formulae)$
-\begin{multicols}{2}
+%\begin{multicols}{2}
+\\[-.6\baselineskip]
+\begin{minipage}[t]{.45\textwidth}
   \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
   \item \label{write-E-ca-addr}
     % $\aForm$ partitions $\emptyForm$,
@@ -23,18 +25,22 @@ $(\exists\aForm:\aEvs\fun\Formulae)$
       \cExp{=}\cVal_\aEv
       \land \aExp{=}\aVal_\aEv
     \end{math},      
+  \end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{.55\textwidth}
+  \begin{enumerate}[resume,topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
   \item
-    \makebox[0pt][l]{%
+    %\makebox[0pt][l]{%
     \begin{math}
       \aTr{\bEvs}{\bForm} \riff
       \textstyle\bigwedge_{\dVal\in\Val}
       \cExp{=}\dVal
-      \;\limplies
+      \limplies
         \bForm
         [\aExp/{\dVal}]
         %[\textstyle\bigvee{}\!\!{}_{\cVal_\aEv=\dVal}\PBR{\aExp{=}\aVal_\aEv}/\Q{\REF{\dVal}}],
         [\kappaE{\REF{\dVal}}/\Q{\REF{\dVal}}],
-      \end{math}}
+      \end{math}
     % \item
     %   \makebox[0pt][l]{%
     %   \begin{math}
@@ -122,7 +128,8 @@ $(\exists\aForm:\aEvs\fun\Formulae)$
     \item \label{write-phi-ca-addr}
       $\aForm_\aEv[\bExp/\uReg{\bEv}]=\aForm_\aEv$.
   \end{enumerate}
-\end{multicols}
+\end{minipage}
+%\end{multicols}
 
 \medskip
 \noindent
@@ -133,8 +140,10 @@ $(\exists\aForm:\aEvs\fun\Formulae)$
   $(\exists\aForm:\aEvs\fun\Formulae)$ 
   % $(\exists\emptyForm\in\Formulae)$
   % $(\exists\emptyForm\in\Formulae)$
-  \begin{multicols}{2}
-    \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+  %\begin{multicols}{2}
+\\[-.6\baselineskip]
+\begin{minipage}[t]{.45\textwidth}
+  \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
     \item \label{read-E-ca-addr}
       % $\aForm$ partitions $\emptyForm$,
       %   % if $\aForm_\bEv\land\aForm_\aEv$ is satisfiable then $\bEv=\aEv$,
@@ -228,7 +237,11 @@ $(\exists\aForm:\aEvs\fun\Formulae)$
       %       \bForm[\bReg/\aReg],
       %     \end{math}  
       %   \end{enumerate}  
-      \columnbreak
+  \end{enumerate}
+\end{minipage}
+%\columnbreak
+\begin{minipage}[t]{.55\textwidth}
+  \begin{enumerate}[resume,topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
       \stepcounter{enumi}
     \item[] \labeltext[\textsc{r}5]{}{read-term-ca-addr}
       \begin{enumerate}[leftmargin=0pt]
@@ -247,7 +260,8 @@ $(\exists\aForm:\aEvs\fun\Formulae)$
     \item \label{read-phi-ca-addr}
       $\aForm_\aEv[\bExp/\uReg{\bEv}]=\aForm_\aEv$.
     \end{enumerate}
-  \end{multicols}
+  \end{minipage}
+  % \end{multicols}
 \end{minipage}
 % \medskip Similarly, let $\frf{\semaddr{}}$ be defined as for $\frf{\semrr{}}$
 % in \refdef{def:sem:frf}, with these definitions of $\sSTORE{}{}$ and

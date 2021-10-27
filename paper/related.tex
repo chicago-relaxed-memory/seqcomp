@@ -17,6 +17,7 @@ calculating dependencies using event structures rather than logic.  They give
 the semantics of sequential composition in continuation passing style,
 whereas we give it in direct style.  This paper provides a general technique
 for computing sequential dependencies and applies it to these two approaches.
+\todo{Add comment about MRD}
 
 There are many differences between \PwP{}
 \cite{DBLP:journals/pacmpl/JagadeesanJR20} and \PwT{}.  Two of these are
@@ -55,11 +56,18 @@ requiring fences for every relaxed read on Arm
   Dolan:2018:BDR:3192366.3192421, DBLP:conf/lics/JeffreyR16,
   Boehm:2014:OGA:2618128.2618134}. %, DBLP:journals/corr/abs-1804-04214}.
 %
-Many of the most prominent models are operational models based
-on speculative execution \cite{Manson:2005:JMM:1047659.1040336,
+Many of the most prominent models are operational models based on speculative
+execution \cite{Manson:2005:JMM:1047659.1040336,
   DBLP:conf/esop/JagadeesanPR10,
   DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}.
+
 Morally, \PwT{} fits between the strong models and the speculative ones.
+Looking at the details, however, \PwTmca{} is incomparable to both \rcXI{}
+\cite{DBLP:conf/pldi/LahavVKHD17} and the promising semantics
+\cite{DBLP:conf/popl/KangHLVD17}, to take two examples.  \rcXI{} allows
+non-\mca{} behaviors that \PwTmca{} disallows.  \PwTmca{} has a weaker notion
+of coherence than the promising semantics.
+
 % We provide a detailed comparison with these approaches in \textsection\ref{sec:promising}.
 
 
