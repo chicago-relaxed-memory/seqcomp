@@ -1602,7 +1602,7 @@ Building the precondition $\aForm$ from right to left:
 
 \MRD{} \cite{DBLP:conf/esop/PaviottiCPWOB20} validates 
 \emph{value range analysis}, which is similar to the local invariant
-reasoning of \PwT{}, but more brittle.
+reasoning of \PwT{}, but brittler.  Consider the following example:
 \begin{gather*}
   \PW{x}{0}
   \SEMI
@@ -1632,11 +1632,12 @@ reasoning of \PwT{}, but more brittle.
       \wk[out=10,in=170]{i1}{b2}
     \end{tikzinline}}    
 \end{gather*}
-\PwT{} correctly allows this execution; \MRD{} forbids it. The precondition
-of $\DW{y}{1}$ is a tautology, but the co-product mechanism in \MRD{} does not
-recognize this and will seek a isomorphic justification under the $\DR{x}{2}$
-branch of the read in the event structure, and fail to find it, leaving the
-dependency in place.
+\PwT{} correctly allows this execution; \MRD{} forbids it. The co-product
+mechanism in \MRD{} does not recognize that the precondition of $\DW{y}{1}$
+is a tautology.  Instead, it seeks an isomorphic justification under the
+$\DR{x}{2}$ branch of the read in the event structure, and---failing to find
+such a justification---leaves the dependency in place. \todo{Mark/Simon:
+  please check this.}
 
 
 % As a sanity check, consider the
