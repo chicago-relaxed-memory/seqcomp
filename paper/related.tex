@@ -9,28 +9,24 @@ opposite approach.  We have attempted to find the most intellectually
 tractable model that encompasses all of the messiness of relaxed memory.
 
 There are few prior studies of relaxed memory that include sequential
-composition and/or precise calculation of semantic dependencies.
-\citet{DBLP:journals/pacmpl/JagadeesanJR20} give a denotational semantics,
-using prefixing rather than sequential compositions.
-\citet{DBLP:conf/esop/PaviottiCPWOB20} give a denotational semantics,
-calculating dependencies using event structures rather than logic.  They give
-the semantics of sequential composition in continuation passing style,
-whereas we give it in direct style.  This paper provides a general technique
-for computing sequential dependencies and applies it to these two approaches.
-\todo{Add comment about MRD}
-
-There are many differences between \PwP{}
-\cite{DBLP:journals/pacmpl/JagadeesanJR20} and \PwT{}.  Two of these are
-motivated by requirements unique to \PwT{}: First, \PwP{} uses substitution
-to define read actions; \PwT{} Skolemizes in order to satisfy disjunction
-closure for predicate transformers (\textsection\ref{sec:ex:assoc}).  Second,
-\PwP{} requires \emph{consistency} and \emph{causal strengthening}; \PwT{}
-drops these in order to satisfy associativity (\reflem{lem:monoid}).  Other
-differences are stylistic: For example, we replaced the termination
-\emph{actions} of \PwP{} by termination \emph{conditions}---our formulation
-fixes an error in \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20}'s
-definition of parallel composition.  We also fix an error in their treatment
-of redundant read elimination.
+composition and/or precise calculation of semantic dependencies.  No prior
+work gives the semantics of sequential composition in direct style.
+\citet{DBLP:conf/esop/PaviottiCPWOB20} defined \MRD{}, which calculates
+dependencies using event structures rather than logic.  This strategy is
+brittler than ours, leading to false positives (\textsection\ref{sec:lir}).
+\citet{DBLP:journals/pacmpl/JagadeesanJR20} defined \PwP{}, using logical
+entailment to define dependency.  Although \PwT{} is based on \PwP{}, there
+are many differences.  Two of these are motivated by requirements unique to
+\PwT{}: First, \PwP{} uses substitution to define read actions; \PwT{}
+Skolemizes in order to satisfy disjunction closure for predicate transformers
+(\textsection\ref{sec:ex:assoc}).  Second, \PwP{} requires \emph{consistency}
+and \emph{causal strengthening}; \PwT{} drops these in order to satisfy
+associativity (\reflem{lem:monoid}).  Other differences are stylistic: For
+example, we use termination \emph{conditions} rather than termination
+\emph{actions}---our formulation fixes an error in
+\citeauthor{DBLP:journals/pacmpl/JagadeesanJR20}'s definition of parallel
+composition.  We also fix an error in their treatment of redundant read
+elimination (\textsection\ref{sec:semreg}).
 
 \citet{DBLP:journals/corr/abs-1804-04214} define a semantics
 using pomsets without preconditions. Instead, their model uses syntactic
