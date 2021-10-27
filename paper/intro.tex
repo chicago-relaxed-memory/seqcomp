@@ -732,7 +732,8 @@ concurrent semantics of \emph{fulfillment}.
 For a sequentially consistent semantics, sequential composition is
 straightforward: we apply each predicate transformer to subsequent
 preconditions, composing the predicate transformers.
-\begin{gather*}
+\begin{equation}
+\begin{gathered}
   \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
   \\
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
@@ -745,8 +746,10 @@ preconditions, composing the predicate transformers.
       %\xo{rx0}{rx0ry0d}
       %\xo[out=155,in=15]{ry0}{rx0ry0d}
       % \xo{wz0}{rx0ry0d}
-    \end{tikzinline}}
-\end{gather*}
+  \end{tikzinline}}
+\end{gathered}
+\label{eq1}
+\end{equation}
 This works for the sequentially consistent case, but needs to be
 weakened for the relaxed case.
 
