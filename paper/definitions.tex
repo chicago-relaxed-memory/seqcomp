@@ -2359,10 +2359,21 @@ uniquely chosen registers.  Using \reffig{fig:seq}, we compute
   \aForm\riff
   ((1{=}r\lor y{=}r)\limplies r{=}0)
   \lor
-  ((1{=}r\lor y{=}r)\limplies r{\neq}0), 
+  ((1{=}r\lor y{=}r)\limplies r{\neq}0),
 \end{math}
+which is equivalent to 
+\begin{math}
+  \aForm\riff
+  (1{=}r\lor y{=}r)\limplies (r{=}0 \lor r{\neq}0),
+\end{math}
+% \begin{math}
+%   (1{\neq}r\land y{\neq}r)\lor r{=}0
+%   \lor
+%   % (1{\neq}r\land y{\neq}r)\lor
+%    r{\neq}0,
+% \end{math}
 which is a tautology.
-\todo{Verify that this is a tautology!}
+\todo{Alan: Verify this.}
 
 %  We have proven associativity of
 %  \refdef{def:pomsets-trans} in Agda.
