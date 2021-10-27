@@ -1347,6 +1347,10 @@ Local invariant reasoning requires that we track the state of variables in
 the logic, not just registers.  This is one reason we use predicate
 transformers rather than simple postconditions.
 
+Test cases 6 and 8--9 are similar.  Test cases 2 and 17--18 require both
+local invariant reasoning and resolving the nondeterminism of reads using
+redundant read elimination---see \textsection\ref{sec:semreg}.
+
 \todo{Put tc12$'$ first.  Fix the narrative.}
 $\Q{x}$ ensures that the local state of $x$ is up-to-date when $x$ is read.
 \ref{read-kappa} and \ref{read-tau} add these ``quiescence'' constraints,
@@ -1596,6 +1600,9 @@ Building the precondition $\aForm$ from right to left:
 \end{align*}
 
 
+\MRD{} \cite{DBLP:conf/esop/PaviottiCPWOB20} validates 
+\emph{value range analysis}, which is similar to the local invariant
+reasoning of \PwT{}, but more brittle.
 \begin{gather*}
   \PW{x}{0}
   \SEMI
@@ -2355,6 +2362,7 @@ uniquely chosen registers.  Using \reffig{fig:seq}, we compute
   ((1{=}r\lor y{=}r)\limplies r{\neq}0), 
 \end{math}
 which is a tautology.
+\todo{This is wrong.}
 
 %  We have proven associativity of
 %  \refdef{def:pomsets-trans} in Agda.

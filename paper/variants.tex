@@ -88,7 +88,12 @@ which is a tautology.  In \eqref{eq4}, the first read resolves the
 nondeterminism in both the first and the second read.  Given the choice of
 event names, the outcome of the second read is predetermined!  In
 \eqref{eq3}, the second read remains nondeterministic, even if
-the events are destined to coalesce.  
+the events are destined to coalesce.
+
+Test Cases 17--18 \citep{PughWebsite} also require coalescing of reads.
+Contrary to the claim, the semantics of
+\citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} validates neither redundant
+load elimination nor these test cases.
 
 \begin{definition}
   Let $\semreg{}$ be defined as in \reffig{fig:seq}, changing \ref{read-tau}
@@ -143,8 +148,6 @@ elimination is sound:
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \PR[\amode]{\aLoc}{\bReg}} \supseteq 
   \semreg{\PR[\amode]{\aLoc}{\aReg} \SEMI \bReg  \GETS \aReg}
 \end{displaymath}
-The semantics of \citet{DBLP:journals/pacmpl/JagadeesanJR20} does not
-validate redundant load elimination or \eqref{TC2}, contrary to the claim.
 
 As a further example, consider Fig.~5 of \citet{DBLP:conf/ecoop/SevcikA08},
 referenced by \citet[\textsection6.4]{DBLP:conf/esop/PaviottiCPWOB20}.
