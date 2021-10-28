@@ -259,9 +259,18 @@ Then collapsing $r$ and $s$ and substituting the initial value of $y$ (say $0$),
 % $\aAct \roverlapsdef \bAct$ if they access the same location.
 
 % \RMW{} operations are more complex.  
-To support \RMW{}s, we add a relation
-${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
-\RMW{} to the succeeding write.
+To support \RMW{}s, we extend the syntax:
+\begin{align*}
+  \aCmd
+  \BNFDEF& \cdots 
+  \BNFSEP \PCAS[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
+  \BNFSEP \PFADD[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+  \BNFSEP \PEXCHG[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
+\end{align*}
+We require that $\aReg$ does not occur in $\cExp$.  Semantically, we add a
+relation ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a
+successful \RMW{} to the succeeding write.
+
 % Let two actions \emph{overlap} if they access the same location.
 % \begin{enumerate}
 % \item
@@ -304,18 +313,7 @@ ${\xrmw}\subseteq\aEvs\times\aEvs$ that relates the read of a successful
   \item[(\textsc{s}10)] (\textsc{i}10)\; (\textsc{p}10)\; 
     ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
   \end{enumerate}
-\end{definition}
-
-To define specific operations, we extend the syntax:
-\begin{align*}
-  \aCmd
-  \BNFDEF& \cdots 
-  \BNFSEP \PCAS[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}{\bExp}
-  \BNFSEP \PFADD[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
-  \BNFSEP \PEXCHG[\amode][\bmode]{\REF{\cExp}}[\ascope]{\aReg}{\aExp}
-\end{align*}
-We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic functions are as follows.
-\begin{definition}
+  
   Let $\sLOADP{}{}$ be defined as for $\sLOAD{}{}$, adding the constraint:
   \begin{enumerate}
   \item[{\labeltextXX{4d}{r}{read-tau-rmw}}]
@@ -325,30 +323,29 @@ We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic f
       \bForm.
     \end{math}
   \end{enumerate}
-  If $\aPS\in\sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]$ then
-  \begin{math}
-    %\sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]\subseteq\sSEMI{
-    \aPS\in\sSEMI{
-      \sLOADP[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
-    }{
-      \sSTORE[\bmode]{\aLoc}[\ascope]{\aReg{+}\aExp}[\aThrd]
-    }
-  \end{math}
-  and %s.t.
-  \\
-  If $\aPS\in\sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]$ then
-  \begin{math}
-    %\sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]\subseteq\sSEMI{
-    \aPS\in\sSEMI{    
-      \sLOADP[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
-    }{
-      \sSTORE[\bmode]{\aLoc}[\ascope]{\aExp}[\aThrd]
-    }
-  \end{math}
-  and %s.t.
-  \\
-  If $\aPS\in\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]$ then\\
-  \hfill
+  % If $\aPS\in\sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]$ then
+  % \begin{math}
+  %   %\sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]\subseteq\sSEMI{
+  %   \aPS\in\sSEMI{
+  %     \sLOADP[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
+  %   }{
+  %     \sSTORE[\bmode]{\aLoc}[\ascope]{\aReg{+}\aExp}[\aThrd]
+  %   }
+  % \end{math}
+  % and %s.t.
+  % \\
+  % If $\aPS\in\sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]$ then
+  % \begin{math}
+  %   %\sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]\subseteq\sSEMI{
+  %   \aPS\in\sSEMI{    
+  %     \sLOADP[\amode]{\aReg}[\ascope]{\aLoc}[\aThrd]
+  %   }{
+  %     \sSTORE[\bmode]{\aLoc}[\ascope]{\aExp}[\aThrd]
+  %   }
+  % \end{math}
+  % and %s.t.
+  % \\
+  If $\aPS\in\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]$ then
   \begin{math}
     %\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]\subseteq\sSEMI{
     \aPS\in\sSEMI{
@@ -368,14 +365,14 @@ We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic f
     \sem[\aThrd]{\PCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}}
     &=
     \sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]
-    \\
-    \sem[\aThrd]{\PFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}}
-    &=
-    \sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]
-    \\
-    \sem[\aThrd]{\PEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}}
-    &=
-    \sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]
+    % \\
+    % \sem[\aThrd]{\PFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}}
+    % &=
+    % \sFADD[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]
+    % \\
+    % \sem[\aThrd]{\PEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}}
+    % &=
+    % \sEXCHG[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}[\aThrd]
   \end{align*}
 \end{definition}
   % If $\aPS\in\mathit{FADD}(\aReg,\aLoc,\aExp,\amode_1,\amode_2)$ then
@@ -431,8 +428,9 @@ We require that $\aReg$ does not occur in $\cExp$.  The corresponding semantic f
   %   \end{enumerate}
   % \end{multicols}
 
-This definition ensures atomicity and supports lowering to Arm load/store
-exclusive operations.  See \cite{DBLP:journals/pacmpl/JagadeesanJR20} for examples.
+$\FADD$ and $\EXCHG$ are similar.  These definitions ensure atomicity and
+supports lowering to Arm load/store exclusive operations.  See
+\cite{DBLP:journals/pacmpl/JagadeesanJR20} for examples.
 
 One subtlety of the definition is that we use $\sLOADP{}{}$ rather than
 $\sLOAD{}{}$.  Thus, for \RMW{} operations, the independent case for a read
@@ -476,9 +474,10 @@ is the same as the empty case.  To see why this should be, consider the
 \end{gather*}
 \end{scope}
 A write should only be visible to one $\PFADD{}{}{}$ instruction, but here
-the write of $0$ is visible to two.  This is allowed because no order is
-required from $\DRP{x}{0}$ to $\DWP{y}{1}$ in the last thread.  To see why,
-consider the independent transformers of the last thread and initializer:
+the write of $0$ is visible to two!  This is allowed because, using
+$\sLOAD{}{}$ instead of $\sLOADP{}{}$, no order is required from $\DRP{x}{0}$
+to $\DWP{y}{1}$ in the last thread.  To see why, consider the independent
+transformers of the last thread and initializer:
 \begin{align*}
   \begin{gathered}[t]
     \PW{x}{0}
@@ -794,7 +793,7 @@ We show how to combine address calculation and if-introduction in
 \subsection{Address Calculation}
 \label{sec:addr}
 
-\todo{Check definitions and examples in this subsection.}
+%\todo{Check definitions and examples in this subsection.}
 
 Inevitably, address calculation complicates the definitions of $\sSTORE{}{}$
 and $\sLOAD{}{}$.  In this section, we develop a flat memory model, which
@@ -853,314 +852,6 @@ This execution would become possible, however, if we were to remove
 $(\cExp{=}\cVal)$ from \ref{read-tau-addr}.  In this case, $\DRP{y}{2}$ would
 not necessarily be dependency ordered before $\DWP{x}{1}$.
 
-\ref{TC12} with all initial values $0$:
-\begin{gather*}
-  \taglabel{TC12}
-  \begin{gathered}
-    \PR{y}{r}\SEMI
-    \PW{\REFARRAY{}{r}}{1}\SEMI
-    %\IF{r}\THEN \PW{\REFARRAY{}{1}}{1} \ELSE \PW{\REFARRAY{}{0}}{1} \FI \SEMI
-    \PR{\REFARRAY{}{0}}{s}\SEMI
-    \PW{x}{\BANG s}
-    \PAR
-    \PW{y}{\PR{x}{}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        % \event{iy}{\DW{y}{0}}{left=of a1}
-        % \event{ix}{\DW{x}{0}}{right=2em of a2}
-        \event{b1}{\DR{y}{1}}{}
-        \event{b2}{\DW{\REFARRAY{}{1}}{1}}{right=of b1}
-        \event{b3}{\DR{\REFARRAY{}{0}}{0}}{right=of b2}
-        \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
-        \po{b1}{b2}
-        \po{b3}{b4}
-        \event{a1}{\DR{x}{1}}{right=3em of b4}
-        \event{a2}{\DW{y}{1}}{right=of a1}
-        \po{a1}{a2}
-        % \po[out=15,in=165]{b1}{b4}
-        \rf[out=-170,in=-10]{a2}{b1}
-        \rf{b4}{a1}
-        % \wk[out=-15,in=-165]{iy}{a2}
-        % \wk[out=-15,in=-165]{ix}{b4}
-      \end{tikzinline}}
-  \end{gathered}
-  % \\
-  % \aForm \riff
-  % (\Q{y}\limplies 1{=}r \lor y{=}r)\;
-  % \begin{aligned}[t]
-  %   \limplies\;&
-  %   (r{=}0 \land ((\Q{x}[\FALSE/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
-  %   \\[-1ex]
-  %   \land\;&
-  %   (r{\neq}0 \land ((\Q{x}[1{=}1/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
-  % \end{aligned}
-\end{gather*}
-
-Building the precondition $\aForm$ from right to left:
-\begin{align*}
-  \tag{$\PW{x}{s}$}
-  \aForm_1 &\riff
-  s{=}0
-  \\
-  \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
-  \aForm_2 &\riff
-  \PBR{\Q{\REFARRAY{}{0}}\limplies 0{=}s}
-  \limplies
-  s{=}0
-  \\
-  \tag{Prepending $\IF{}$}
-  \aForm_3 &\riff
-  \PBR{
-    r{=}1
-    \limplies
-    \aForm_2[1/\REFARRAY{}{1}][\TRUE/\Q{\REFARRAY{}{1}}]
-  }\land\PBR{
-    r{=}0
-    \limplies
-    \aForm_2[1/\REFARRAY{}{0}][\FALSE/\Q{\REFARRAY{}{0}}]
-  }
-  \\[-1ex]
-  &\riff
-  \PBR{
-    r{=}1
-    \limplies
-    {
-      \PBR{
-        \Q{\REFARRAY{}{0}}
-        \limplies
-        0{=}s
-      }
-      \limplies
-      s{=}0
-    }
-  } \land\PBR{
-    r{=}0
-    \limplies
-    % \PBR{
-    % \FALSE
-    % \limplies
-    % 0{=}s
-    % }
-    %   \limplies
-    s{=}0
-  }
-  \\
-  \intertext{Dependent case:}
-  \tag{Prepending $\PR{y}{r}$}
-  \aForm_4 &\riff
-  \PBR{
-    \Q{y}
-    \limplies
-    1{=}r
-  }
-  \limplies
-  \aForm_3
-  \\
-  \tag{Prepending Initializers}
-  \aForm_5 &\riff
-  1{=}r
-  \limplies
-  \PBR{
-    r{=}1
-    \limplies
-    \PBR{
-      0{=}s
-      \limplies
-      s{=}0
-    }
-  } \land\PBR{
-    r{=}0
-    \limplies
-    s{=}0
-  }
-  \\
-  \intertext{Independent case:}
-  \tag{Prepending $\PR{y}{r}$}
-  \aForm'_4 &\riff
-  \PBR{
-    \Q{y}
-    \limplies
-    1{=}r
-    \lor
-    y{=}r
-  }
-  \limplies
-  \aForm_3
-  \\
-  \tag{Prepending Initializers}
-  \aForm'_5 &\riff
-  \PBR{
-    1{=}r
-    \lor
-    0{=}r
-  }
-  \limplies
-  \PBR{
-    r{=}1
-    \limplies
-    \PBR{
-      0{=}s
-      \limplies
-      s{=}0
-    }
-  } \land\PBR{
-    r{=}0
-    \limplies
-    s{=}0
-  }
-\end{align*}
-
-\begin{comment}
-  % \renewcommand{\ADDRARRAY}[2]{#2}%
-  % \renewcommand{\REFARRAY}[2]{\REF{#2}}%
-  \ref{TC12} describes another potential \oota{} behavior.
-  % We write $\REFARRAY{\aExp}{\bExp}$ for $\REF{\aExp{+}\bExp}$.
-  Initially, $x \EQ y \EQ 0$,  $\REFARRAY{}{0} \EQ 1$, and $\REFARRAY{}{1} \EQ 2$:
-  \begin{gather*}
-    \taglabel{TC12}
-    \begin{gathered}
-      \PW{y}{\PR{x}{}}
-      \PAR
-      \PR{y}{r}\SEMI
-      \PW{\REFARRAY{}{r}}{0}\SEMI
-      \PR{\REFARRAY{}{0}}{s}\SEMI
-      \PW{x}{s}\SEMI
-      \\[-1ex]
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{a1}{\DR{x}{1}}{}
-          \event{a2}{\DW{y}{1}}{right=of a1}
-          \po{a1}{a2}
-          % \event{iy}{\DW{y}{0}}{left=of a1}
-          % \event{ix}{\DW{x}{0}}{right=2em of a2}
-          \event{b1}{\DR{y}{1}}{right=3em of a2}
-          \event{b2}{\DW{\REFARRAY{}{1}}{0}}{right=of b1}
-          \event{b3}{\DR{\REFARRAY{}{0}}{1}}{right=of b2}
-          \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
-          \po{b1}{b2}
-          %\po[out=15,in=165]{b1}{b4}
-          \rf{a2}{b1}
-          \rf[out=-170,in=-10]{b4}{a1}
-          % \wk[out=-15,in=-165]{iy}{a2}
-          % \wk[out=-15,in=-165]{ix}{b4}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-  Building the precondition $\aForm$ from right to left (without $\A{}$):
-  \begin{align*}
-    \tag{$\PW{x}{s}$}
-    \aForm_1 &=
-    s{=}1
-    \\
-    \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
-    \aForm_2 &=
-    \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
-    \limplies
-    s{=}1
-    \\
-    \tag{Prepending $\PW{\REFARRAY{}{r}}{0}$}
-    \aForm_3 &=
-    \PBR{
-      \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
-      \limplies
-      s{=}1
-    }[0/\REFARRAY{}{1}]
-    \\
-    \tag{Prepending $\PR{y}{r}$}
-    \aForm_4 &=
-    \PBR{r\EQ1 \lor y\EQ1}
-    \limplies 
-    \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
-    \limplies
-    s{=}1
-    \\
-    \tag{Prepending $\PW{\REFARRAY{}{0}}{1}$}
-    \aForm_5 &=
-    \PBR{r\EQ1 \lor y\EQ1}
-    \limplies 
-    \PBR{1{=}s \lor 1\EQ s)}
-    \limplies
-    s{=}1
-  \end{align*}
-
-  Adding $\A{}$ fixes that:
-  \begin{gather*}
-    %\taglabel{TC12}
-    \begin{gathered}
-      \PW{y}{\PR{x}{}}
-      \PAR
-      \PR{y}{r}\SEMI
-      \PW{\REFARRAY{}{r}}{0}\SEMI
-      \PR{\REFARRAY{}{0}}{s}\SEMI
-      \PW{x}{s}\SEMI
-      \\[-1ex]
-      \hbox{\begin{tikzinline}[node distance=1.5em]
-          \event{a1}{\DR{x}{1}}{}
-          \event{a2}{\DW{y}{1}}{right=of a1}
-          \po{a1}{a2}
-          % \event{iy}{\DW{y}{0}}{left=of a1}
-          % \event{ix}{\DW{x}{0}}{right=2em of a2}
-          \event{b1}{\DR{y}{1}}{right=3em of a2}
-          \event{b2}{\DW{\REFARRAY{}{1}}{0}}{right=of b1}
-          \event{b3}{\DR{\REFARRAY{}{0}}{1}}{right=of b2}
-          \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
-          \po{b1}{b2}
-          \po[out=15,in=165]{b1}{b4}
-          \rf{a2}{b1}
-          \rf[out=-170,in=-10]{b4}{a1}
-          % \wk[out=-15,in=-165]{iy}{a2}
-          % \wk[out=-15,in=-165]{ix}{b4}
-        \end{tikzinline}}
-    \end{gathered}
-  \end{gather*}
-  A compiler should be able to refine the second thread to:
-  \begin{displaymath}
-    \PR{y}{r}\SEMI
-    \IF{r\EQ0}\THEN
-      \PW{\REFARRAY{}{0}}{0}\SEMI
-      \PW{x}{0}
-    \ELIF{r\EQ1}\THEN
-      \PW{\REFARRAY{}{1}}{0}\SEMI
-      \PW{x}{1}
-    \FI
-  \end{displaymath}    
-  Building the precondition $\aForm$ from right to left (assuming that
-  $x,y\not\in\{\REFARRAY{}{0}, \REFARRAY{}{1}\}$ and $x{\neq}y$):
-  \begin{align*}
-    \tag{$\PW{x}{s}$}
-    \aForm_1 &=
-    s{=}1
-    \\
-    \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
-    \aForm_2 &=
-    % \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
-    \PBR{1{=}s \lor (\A{\ADDRARRAY{}{0}}\limplies\REFARRAY{}{0}\EQ s)}
-    % \PBR{(\ADDRARRAY{}{0}\EQ0\limplies1{=}s) \lor ((\ADDRARRAY{}{0}\EQ0\land \A{0})\limplies\REFARRAY{}{0}\EQ s)}
-    \limplies
-    s{=}1
-    \\
-    \tag{Prepending $\PW{\REFARRAY{}{r}}{0}$}
-    \aForm_3 &=
-    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{}{0}})\limplies\REFARRAY{}{0}\EQ s)}
-    \limplies
-    s{=}1
-    \\
-    \tag{Prepending $\PR{y}{r}$}
-    \aForm_4 &=
-    \PBR{r\EQ1}
-    \limplies 
-    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{}{0}})\limplies\REFARRAY{}{0}\EQ s)}
-    \limplies
-    s{=}1
-    \\
-    \tag{Prepending $\PW{\REFARRAY{}{0}}{1}$}
-    \aForm_5 &=
-    \PBR{r\EQ1}
-    \limplies 
-    \PBR{1{=}s \lor (0\NEQ r\land\TRUE)\limplies 1\EQ s)}
-    \limplies
-    s{=}1
-  \end{align*}
-\end{comment}
 
 % % 
 % In isolation, the precondition of $\DWP{x}{1}$ is $(s=1)$.  Using the erroneous
@@ -1319,9 +1010,10 @@ Merging, we have:
 %   \end{gathered}
 % \end{align*}
 The precondition of $\DWREF{0}{0}$ is a tautology; however, this is not
-possible for $(\PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r})$ alone, using \refdef{def:semaddr}.
-
-\refdef{def:semcaaddr}, enables this execution using if-introduction.  Under this
+possible for $(\PW{\REF{r}}{0}\SEMI \PW{\REF{0}}{\BANG r})$ alone.
+%, using \refdef{def:semaddr}.
+%
+\refdef{def:semcaaddr} enables this execution using if-introduction.  Under this
 semantics, we have:
 \begin{align*}
   \begin{gathered}
@@ -1360,6 +1052,8 @@ Sequencing and merging:
   \end{gathered}
 \end{align*}
 The precondition of $\DWP{\REF{0}}{0}$ is a tautology, as required.
+
+\refdef{def:semcaaddr} is a mash-up of the \refdef{def:semca} and \refdef{def:semaddr}.
 \begin{definition}
   \label{def:semcaaddr}
   \input{fig-ca-addr.tex}

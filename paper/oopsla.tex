@@ -7,7 +7,7 @@
 Recently, \citet{promising-ldrf} showed that certain combinations of compiler
 optimizations are inconsistent with local \drf{} guarantees.  All of the
 examples that prove inconsistency have the same shape: they combine
-read-introduction and case analysis (aka, if-introduction).  Effectively,
+read-introduction and if-introduction (aka, case analysis).  Effectively,
 this turns one read into two, where different conditional branches can be
 taken for the two copies of the read.  This is reminiscent of the type of
 \emph{bait and switch} behavior noted by
@@ -66,7 +66,7 @@ involving $x$ and $y$.\footnote{All of the reads in \ref{oota4} are
   For \PwTc, there is a cycle in ${\rrfx}\cup{\lt}$.}  Under \PS{}, this
 outcome is allowed by {baiting} with the \texttt{else} branch, then
 {switching} to the \texttt{then} branch, based on a coin flip (${b}$).
-% Using a combination of read introduction and case analysis,
+% Using a combination of read-introduction and if-introduction,
 % the middle thread can be rewritten to:
 % \begin{displaymath}
 %   \begin{array}{l}
@@ -223,7 +223,7 @@ Finally, we note that it is possible that \PS{} is properly weaker than \PwT{}.
 % (2) inline two threads on both sides of the introduced conditional,
 % (3) choose different orders for the two threads for the two sides of the ( conditional.
 
-% Case analysis gives very weak results when combined with read introduction.
+% Case analysis gives very weak results when combined with read-introduction.
 % See \cite{promising-ldrf}.
 % These happen by performing transformations that: 
 % (1) introduce reads,
@@ -280,7 +280,7 @@ Finally, we note that it is possible that \PS{} is properly weaker than \PwT{}.
 
 
 % \begin{quotation}
-%   LLVM frequently performs such load introductions in the “simplify CFG”
+%   LLVM frequently performs such load-introductions in the “simplify CFG”
 %   pass; e.g., when hoisting loads outside of conditionals.
 % \end{quotation}
 

@@ -38,17 +38,19 @@ To capture this, we found it necessary to drop \ref{pom-rf-le} and relax
 % \refdef{def:pwt:mca1},
 adding local constraints on $\rrfx$ to $\sPAR{}{}$, $\sSEMI{}{}$ and
 $\sIF{}{}{}$.
-Rather than ensuring that there is no
-\emph{global} blocker for a sequentially fulfilled read \eqref{pom-rf-le}, we
-require only that there is no \emph{thread-local} blocker
-\eqref{seq-le-rf-rf}.
-For \PwTmca{2}, internal reads don't necessarily contribute to order, and
-thus the above execution is allowed.
+% Rather than ensuring that there is no
+% \emph{global} blocker for a sequentially fulfilled read \eqref{pom-rf-le}, we
+% require only that there is no \emph{thread-local} blocker
+% \eqref{seq-le-delays-rf}.
+% For \PwTmca{2}, internal reads don't necessarily contribute to order, and
+% thus the above execution is allowed.
+(For parallelism, we explicitly specify the domain of $\bEv$ and $\aEv$ in
+\ref{seq-le-delays-rf}.)
 
 \begin{definition}
   \label{def:pwt:mca2}
   The definition of \PwTmca{2} is derived from that of \PwTmca{1} by
-  removing \ref{pom-rf-le} and adding the following:
+  removing \ref{pom-rf-le} and \ref{seq-le-delays} and adding the following:
 
   \begin{enumerate}[topsep=0pt]
   \item[{\labeltext[\textsc{p}6a]{(\textsc{p}6a)}{par-le-rf1}}]
@@ -58,9 +60,9 @@ thus the above execution is allowed.
   \item[{\labeltext[\textsc{s}6a$'$]{(\textsc{s}6a$'$)}{seq-le-delays-rf}}]
     if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ 
     then either $\bEv\xrfx\aEv$ or $\bEv\le\aEv$,
-  \item[{\labeltext[\textsc{s}6b]{(\textsc{s}6b)}{seq-le-rf-rf}}]
-    if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\labeling_1(\bEv) \rblocks \labeling_2(\aEv)$
-    then $\cEv\xrfx\aEv$ implies $\bEv\le\cEv$.
+  % \item[{\labeltext[\textsc{s}6b]{(\textsc{s}6b)}{seq-le-rf-rf}}]
+  %   if $\bEv\in\aEvs_1$, $\aEv\in\aEvs_2$ and $\labeling_1(\bEv) \rblocks \labeling_2(\aEv)$
+  %   then $\cEv\xrfx\aEv$ implies $\bEv\le\cEv$.
     % \\
     % if $\labeling_1(\cEv) \rblocks \labeling_2(\aEv)$ and $\bEv\xrfx\aEv$
     % then $\cEv\le\bEv$.
@@ -80,10 +82,12 @@ thus the above execution is allowed.
 \ref{par-le-rf1} and \ref{par-le-rf2} ensure that $\bEv\xrfx\aEv$ implies
 $\bEv\lt\aEv$ when the actions come from different threads.  However, we may
 have $\bEv\xrfx\aEv$ and $\aEv\lt\bEv$ within a thread, as between
-$\DWP{x}{2}$ to $\DRP[\mACQ]{x}{2}$ in \ref{internal-acq}.  To allow this,
-\ref{seq-le-delays-rf} relaxes \ref{seq-le-delays} from \PwTmca{1}.
-\ref{seq-le-rf-rf} is then necessary to stop stale reads within a thread.
-For example, it prevents a read of $1$ in
+$\DWP{x}{2}$ to $\DRP[\mACQ]{x}{2}$ in \ref{internal-acq}, thus allowing this
+execution.
+% To accomplish this, \ref{seq-le-delays-rf} relaxes
+% \ref{seq-le-delays} from \PwTmca{1}.
+\ref {pom-rf-block} and \ref{seq-le-delays-rf} are sufficient to stop stale
+reads within a thread.  For example, it prevents a read of $1$ in
 \begin{math}
   \PW{x}{1}
   \SEMI
@@ -91,7 +95,7 @@ For example, it prevents a read of $1$ in
   \SEMI
   \PR{x}{r}.
 \end{math}
-\todo{Is s6b necessary?}
+
 
 % 
 % The use of $\rextendsdef{}{}$ in \ref{if-rf-project}
@@ -114,11 +118,11 @@ should not include
   \smash{\hbox{\begin{tikzinlinesmall}[node distance=1.5em]
         \event{a}{\DR{x}{1}}{}
         \event{b}{\DW{x}{1}}{right=of a}
-        \rfint[out=165,in=15]{b}{a}
-        \wki{a}{b}
+        \rfint[out=-165,in=-15]{b}{a}
+        \wki[out=15,in=165]{a}{b}
       \end{tikzinlinesmall}}}
 \end{math}, taking $\rrfx$ from the left and $\lt$ from the right.
-The use of $\rextends{}{}$ ensures this.
+The use of ``$\rextends{}{}$'' in \ref{if-le} and \ref{if-rf} ensures this.
 
 % \PwTmca{2} does not enforce \ref{pom-rf-le}: $\bEv\xrfx\aEv$ may not imply
 % $\bEv\le\aEv$ when $\bEv$ and $\aEv$ come from different sides of a
@@ -134,14 +138,20 @@ inverse of $\fmrg{}$.
   If $\aPS\in\frf{\semmca{2}{\aCmd}}$ is complete, then
   for every $\bEv\xrfx\aEv$ either
   \begin{itemize}
-  \item external fulfillment:
+  \item external fulfillment:\;\,
     $\bEv\lt\aEv$ and if $\labeling(\cEv) \rblocks\labeling(\aEv)$ then either $\cEv\le\bEv$ or $\aEv\le\cEv$, or
   \item internal fulfillment:
-    $(\exists\bEv'\in\fmrginv{\bEv})$
-    $(\exists\aEv'\in\fmrginv{\aEv})$
-    $\bEv'\xpox\aEv'$ and $(\not\exists\cEv)$
-    $\labelingForm(\cEv)$ is a tautology and
-    $\labeling(\cEv) \rblocks \labeling(\aEv)$ and $\bEv'\xpox\cEv\xpox\aEv'$.
+    \begin{math}
+      \begin{array}[t]{l}
+        (\exists\bEv'\in\fmrginv{\bEv})
+        (\exists\aEv'\in\fmrginv{\aEv})
+        \\ 
+        \bEv'\xpox\aEv' \textand (\not\exists\cEv)\;
+        % \labelingForm(\cEv) is a tautology \textand
+        \labeling(\cEv) \rblocks \labeling(\aEv) \textand
+        \bEv'\xpox\cEv\xpox\aEv'.        
+      \end{array}
+    \end{math}
   \end{itemize}
 \end{lemma}
 These mimic the \emph{external consistency} requirements of \armeight{}

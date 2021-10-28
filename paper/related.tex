@@ -16,12 +16,16 @@ dependencies using event structures rather than logic.  This strategy is
 brittler than ours, leading to false positives (\textsection\ref{sec:lir}).
 \citet{DBLP:journals/pacmpl/JagadeesanJR20} defined \PwP{}, using logical
 entailment to define dependency.  Although \PwT{} is based on \PwP{}, there
-are many differences.  Two of these are motivated by requirements unique to
-\PwT{}: First, \PwP{} uses substitution to define read actions; \PwT{}
-Skolemizes in order to satisfy disjunction closure for predicate transformers
-(\textsection\ref{sec:ex:assoc}).  Second, \PwP{} requires \emph{consistency}
-and \emph{causal strengthening}; \PwT{} drops these in order to satisfy
-associativity (\reflem{lem:monoid}).  Other differences are stylistic: For
+are many differences.
+Some of these are motivated by requirements unique to
+\PwT{} (see \textsection\ref{sec:ex:assoc}).
+% Two of these are motivated by requirements unique to
+% \PwT{}: First, \PwP{} uses substitution to define read actions; \PwT{}
+% Skolemizes in order to satisfy disjunction closure for predicate transformers
+% (\textsection\ref{sec:ex:assoc}).  Second, \PwP{} requires \emph{consistency}
+% and \emph{causal strengthening}; \PwT{} drops these in order to satisfy
+% associativity (\reflem{lem:monoid}).
+Other differences are stylistic: For
 example, we use termination \emph{conditions} rather than termination
 \emph{actions}---our formulation fixes an error in
 \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20}'s definition of parallel
@@ -112,7 +116,7 @@ the read just introduced.  These optimizations are validated by the
 speculative models---\citeauthor{promising-ldrf} manage to avoid the problem
 by adopting a sub-optimal lowering for \RMW{}s.  \PwT{} does not suffer from
 this problem, since \PwT{} does not validate read-introduction.  Nonetheless,
-read introduction is ubiquitous in some compilers
+read-introduction is ubiquitous in some compilers
 \cite{DBLP:conf/pldi/LeeKSHDMRL17}.  There appears to be a genuine tension
 between temporal reasoning, as supported by \PwT{}, and read-introduction, as
 supported by the speculative models.

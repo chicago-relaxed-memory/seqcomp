@@ -362,6 +362,316 @@ in \textsection\ref{sec:addr}.  The justification for \ref{TC12} states:
   \end{displaymath}
   With this code, it is clear that this is the same situation as test 4.
 \end{quotation}
+\ref{TC12} with all initial values $0$:
+\begin{gather*}
+  \taglabel{TC12}
+  \begin{gathered}
+    \PR{y}{r}\SEMI
+    \PW{\REFARRAY{}{r}}{1}\SEMI
+    %\IF{r}\THEN \PW{\REFARRAY{}{1}}{1} \ELSE \PW{\REFARRAY{}{0}}{1} \FI \SEMI
+    \PR{\REFARRAY{}{0}}{s}\SEMI
+    \PW{x}{\BANG s}
+    \PAR
+    \PW{y}{\PR{x}{}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        % \event{iy}{\DW{y}{0}}{left=of a1}
+        % \event{ix}{\DW{x}{0}}{right=2em of a2}
+        \event{b1}{\DR{y}{1}}{}
+        \event{b2}{\DW{\REFARRAY{}{1}}{1}}{right=of b1}
+        \event{b3}{\DR{\REFARRAY{}{0}}{0}}{right=of b2}
+        \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
+        \po{b1}{b2}
+        \po{b3}{b4}
+        \event{a1}{\DR{x}{1}}{right=3em of b4}
+        \event{a2}{\DW{y}{1}}{right=of a1}
+        \po{a1}{a2}
+        % \po[out=15,in=165]{b1}{b4}
+        \rf[out=-170,in=-10]{a2}{b1}
+        \rf{b4}{a1}
+        % \wk[out=-15,in=-165]{iy}{a2}
+        % \wk[out=-15,in=-165]{ix}{b4}
+      \end{tikzinline}}
+  \end{gathered}
+  % \\
+  % \aForm \riff
+  % (\Q{y}\limplies 1{=}r \lor y{=}r)\;
+  % \begin{aligned}[t]
+  %   \limplies\;&
+  %   (r{=}0 \land ((\Q{x}[\FALSE/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
+  %   \\[-1ex]
+  %   \land\;&
+  %   (r{\neq}0 \land ((\Q{x}[1{=}1/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
+  % \end{aligned}
+\end{gather*}
+
+Building the precondition $\aForm$ from right to left:
+\begin{align*}
+  \tag{$\PW{x}{s}$}
+  \aForm_1 &\riff
+  s{=}0
+  \\
+  \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
+  \aForm_2 &\riff
+  \PBR{\Q{\REFARRAY{}{0}}\limplies 0{=}s}
+  \limplies
+  s{=}0
+  \\
+  \tag{Prepending $\IF{}$}
+  \aForm_3 &\riff
+  \PBR{
+    r{=}1
+    \limplies
+    \aForm_2[1/\REFARRAY{}{1}][\TRUE/\Q{\REFARRAY{}{1}}]
+  }\land\PBR{
+    r{=}0
+    \limplies
+    \aForm_2[1/\REFARRAY{}{0}][\FALSE/\Q{\REFARRAY{}{0}}]
+  }
+  \\[-1ex]
+  &\riff
+  \PBR{
+    r{=}1
+    \limplies
+    {
+      \PBR{
+        \Q{\REFARRAY{}{0}}
+        \limplies
+        0{=}s
+      }
+      \limplies
+      s{=}0
+    }
+  } \land\PBR{
+    r{=}0
+    \limplies
+    % \PBR{
+    % \FALSE
+    % \limplies
+    % 0{=}s
+    % }
+    %   \limplies
+    s{=}0
+  }
+  \\
+  \intertext{Dependent case:}
+  \tag{Prepending $\PR{y}{r}$}
+  \aForm_4 &\riff
+  \PBR{
+    \Q{y}
+    \limplies
+    1{=}r
+  }
+  \limplies
+  \aForm_3
+  \\
+  \tag{Prepending Initializers}
+  \aForm_5 &\riff
+  1{=}r
+  \limplies
+  \PBR{
+    r{=}1
+    \limplies
+    \PBR{
+      0{=}s
+      \limplies
+      s{=}0
+    }
+  } \land\PBR{
+    r{=}0
+    \limplies
+    s{=}0
+  }
+  \\
+  \intertext{Independent case:}
+  \tag{Prepending $\PR{y}{r}$}
+  \aForm'_4 &\riff
+  \PBR{
+    \Q{y}
+    \limplies
+    1{=}r
+    \lor
+    y{=}r
+  }
+  \limplies
+  \aForm_3
+  \\
+  \tag{Prepending Initializers}
+  \aForm'_5 &\riff
+  \PBR{
+    1{=}r
+    \lor
+    0{=}r
+  }
+  \limplies
+  \PBR{
+    r{=}1
+    \limplies
+    \PBR{
+      0{=}s
+      \limplies
+      s{=}0
+    }
+  } \land\PBR{
+    r{=}0
+    \limplies
+    s{=}0
+  }
+\end{align*}
+
+\begin{comment}
+  % \renewcommand{\ADDRARRAY}[2]{#2}%
+  % \renewcommand{\REFARRAY}[2]{\REF{#2}}%
+  \ref{TC12} describes another potential \oota{} behavior.
+  % We write $\REFARRAY{\aExp}{\bExp}$ for $\REF{\aExp{+}\bExp}$.
+  Initially, $x \EQ y \EQ 0$,  $\REFARRAY{}{0} \EQ 1$, and $\REFARRAY{}{1} \EQ 2$:
+  \begin{gather*}
+    \taglabel{TC12}
+    \begin{gathered}
+      \PW{y}{\PR{x}{}}
+      \PAR
+      \PR{y}{r}\SEMI
+      \PW{\REFARRAY{}{r}}{0}\SEMI
+      \PR{\REFARRAY{}{0}}{s}\SEMI
+      \PW{x}{s}\SEMI
+      \\[-1ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{x}{1}}{}
+          \event{a2}{\DW{y}{1}}{right=of a1}
+          \po{a1}{a2}
+          % \event{iy}{\DW{y}{0}}{left=of a1}
+          % \event{ix}{\DW{x}{0}}{right=2em of a2}
+          \event{b1}{\DR{y}{1}}{right=3em of a2}
+          \event{b2}{\DW{\REFARRAY{}{1}}{0}}{right=of b1}
+          \event{b3}{\DR{\REFARRAY{}{0}}{1}}{right=of b2}
+          \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
+          \po{b1}{b2}
+          %\po[out=15,in=165]{b1}{b4}
+          \rf{a2}{b1}
+          \rf[out=-170,in=-10]{b4}{a1}
+          % \wk[out=-15,in=-165]{iy}{a2}
+          % \wk[out=-15,in=-165]{ix}{b4}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  Building the precondition $\aForm$ from right to left (without $\A{}$):
+  \begin{align*}
+    \tag{$\PW{x}{s}$}
+    \aForm_1 &=
+    s{=}1
+    \\
+    \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
+    \aForm_2 &=
+    \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PW{\REFARRAY{}{r}}{0}$}
+    \aForm_3 &=
+    \PBR{
+      \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
+      \limplies
+      s{=}1
+    }[0/\REFARRAY{}{1}]
+    \\
+    \tag{Prepending $\PR{y}{r}$}
+    \aForm_4 &=
+    \PBR{r\EQ1 \lor y\EQ1}
+    \limplies 
+    \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PW{\REFARRAY{}{0}}{1}$}
+    \aForm_5 &=
+    \PBR{r\EQ1 \lor y\EQ1}
+    \limplies 
+    \PBR{1{=}s \lor 1\EQ s)}
+    \limplies
+    s{=}1
+  \end{align*}
+
+  Adding $\A{}$ fixes that:
+  \begin{gather*}
+    %\taglabel{TC12}
+    \begin{gathered}
+      \PW{y}{\PR{x}{}}
+      \PAR
+      \PR{y}{r}\SEMI
+      \PW{\REFARRAY{}{r}}{0}\SEMI
+      \PR{\REFARRAY{}{0}}{s}\SEMI
+      \PW{x}{s}\SEMI
+      \\[-1ex]
+      \hbox{\begin{tikzinline}[node distance=1.5em]
+          \event{a1}{\DR{x}{1}}{}
+          \event{a2}{\DW{y}{1}}{right=of a1}
+          \po{a1}{a2}
+          % \event{iy}{\DW{y}{0}}{left=of a1}
+          % \event{ix}{\DW{x}{0}}{right=2em of a2}
+          \event{b1}{\DR{y}{1}}{right=3em of a2}
+          \event{b2}{\DW{\REFARRAY{}{1}}{0}}{right=of b1}
+          \event{b3}{\DR{\REFARRAY{}{0}}{1}}{right=of b2}
+          \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
+          \po{b1}{b2}
+          \po[out=15,in=165]{b1}{b4}
+          \rf{a2}{b1}
+          \rf[out=-170,in=-10]{b4}{a1}
+          % \wk[out=-15,in=-165]{iy}{a2}
+          % \wk[out=-15,in=-165]{ix}{b4}
+        \end{tikzinline}}
+    \end{gathered}
+  \end{gather*}
+  A compiler should be able to refine the second thread to:
+  \begin{displaymath}
+    \PR{y}{r}\SEMI
+    \IF{r\EQ0}\THEN
+      \PW{\REFARRAY{}{0}}{0}\SEMI
+      \PW{x}{0}
+    \ELIF{r\EQ1}\THEN
+      \PW{\REFARRAY{}{1}}{0}\SEMI
+      \PW{x}{1}
+    \FI
+  \end{displaymath}    
+  Building the precondition $\aForm$ from right to left (assuming that
+  $x,y\not\in\{\REFARRAY{}{0}, \REFARRAY{}{1}\}$ and $x{\neq}y$):
+  \begin{align*}
+    \tag{$\PW{x}{s}$}
+    \aForm_1 &=
+    s{=}1
+    \\
+    \tag{Prepending $\PR{\REFARRAY{}{0}}{s}$}
+    \aForm_2 &=
+    % \PBR{1{=}s \lor \REFARRAY{}{0}\EQ s}
+    \PBR{1{=}s \lor (\A{\ADDRARRAY{}{0}}\limplies\REFARRAY{}{0}\EQ s)}
+    % \PBR{(\ADDRARRAY{}{0}\EQ0\limplies1{=}s) \lor ((\ADDRARRAY{}{0}\EQ0\land \A{0})\limplies\REFARRAY{}{0}\EQ s)}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PW{\REFARRAY{}{r}}{0}$}
+    \aForm_3 &=
+    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{}{0}})\limplies\REFARRAY{}{0}\EQ s)}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PR{y}{r}$}
+    \aForm_4 &=
+    \PBR{r\EQ1}
+    \limplies 
+    \PBR{1{=}s \lor ((0\NEQ r\land \A{\ADDRARRAY{}{0}})\limplies\REFARRAY{}{0}\EQ s)}
+    \limplies
+    s{=}1
+    \\
+    \tag{Prepending $\PW{\REFARRAY{}{0}}{1}$}
+    \aForm_5 &=
+    \PBR{r\EQ1}
+    \limplies 
+    \PBR{1{=}s \lor (0\NEQ r\land\TRUE)\limplies 1\EQ s)}
+    \limplies
+    s{=}1
+  \end{align*}
+\end{comment}
+
+
 
 \cite[\textsection6]{DBLP:journals/pacmpl/JagadeesanJR20}:
 \begin{quote}
@@ -943,7 +1253,7 @@ follow.
 \end{gather*}
 
 \armeight{} enforces address dependencies between reads, but not control
-dependencies.  To support case-analysis (\AKA{} if-closure), we drop all
+dependencies.  To support if-introduction (\AKA{} case-analysis), we drop all
 dependencies between reads.  This, in turn, invalidates Java's final field
 semantics.
 \begin{gather*}
@@ -978,7 +1288,7 @@ semantics.
 The acquire annotation is required to ensure publication.  If address
 dependencies were enforced between reads then the acquire annotation could be
 dropped.  However, the compiler would need to track address dependencies in
-order to ensure that case analysis did not convert them to control
+order to ensure that if-introduction did not convert them to control
 dependencies.
 
 \subsection{Local Invariant Reasoning and Value Range Analysis}

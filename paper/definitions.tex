@@ -1245,8 +1245,9 @@ if $\aExp{\neq}0$ is a tautology then
 \end{math}
 Here, we take the empty pomset as the denotation of $\aCmd_2$.  Since
 $\not\aExp$ is unsatisfiable, \ref{if-term} ignores the termination condition
-of $\aCmd_2$.  It is worth noting that the reverse inclusion, dead code
-introduction, holds for \emph{complete} pomsets, but not in general.
+of $\aCmd_2$.  It is worth noting that the reverse inclusion,
+dead-code-introduction, holds for \emph{complete} pomsets, but not in
+general.
 
 
 \subsection{A Refinement: No Dependencies into Reads}
@@ -2184,14 +2185,18 @@ such a justification---leaves the dependency in place. \todo{Mark/Simon:
 
 
 
-\subsection{Associativity and Skolemization}
+\subsection{The Burdens of Associativity}
 \label{sec:ex:assoc}
 
-The predicate transformers we have chosen for \ref{read-tau-dep} and
-\ref{read-tau-ind} are different from the ones used traditionally, which are
-written using substitution.
-Attempting to write \ref{read-tau-dep} and \ref{read-tau-ind} in
-this style we would have (as in \cite{DBLP:journals/pacmpl/JagadeesanJR20}):
+Many of the design choices in \PwT{} are motivated by
+\reflem{lem:monoid}---in particular, the need for sequential composition to
+be associative.  In this subsection, we give three examples.
+
+First, the predicate transformers we have chosen for \ref{read-tau-dep}
+and \ref{read-tau-ind} are different from the ones used traditionally, which
+are written using substitution.  Attempting to write \ref{read-tau-dep} and
+\ref{read-tau-ind} in this style we would have (as in
+\cite{DBLP:journals/pacmpl/JagadeesanJR20}):
 \begin{enumerate}[topsep=0pt]
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-p}}]
   if $\aEv\in\aEvs\cap\bEvs$ then
@@ -2374,6 +2379,51 @@ which is equivalent to
 %    r{\neq}0,
 % \end{math}
 which is a tautology.
+
+
+Second, \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} impose \emph{consistency}, which requires that for every pomset
+$\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.  
+Associativity requires that we allow inconsistent
+preconditions.  To see this, note that
+\begin{displaymath}
+  \PBRbig{
+    \IF{\aExp}\THEN\PW{x}{1}\FI
+    \SEMI
+    \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+  } \;\SEMI\; \PBRbig{
+    \IF{\aExp}\THEN\PW{y}{1}\FI
+    \SEMI
+    \IF{\BANG\aExp}\THEN\PW{y}{1}\FI
+  } 
+\end{displaymath}
+has a complete pomset that writes $x$ and $y$, regardless of $\aExp$.
+In order to match this in
+\begin{displaymath}
+  \IF{\aExp}\THEN\PW{x}{1}\FI
+  \;\SEMI\;
+  \PBRbig{
+    \IF{\BANG\aExp}\THEN\PW{x}{1}\FI
+    \SEMI
+    \IF{\aExp}\THEN\PW{y}{1}\FI
+  }
+  \;\SEMI\;
+  \IF{\BANG\aExp}\THEN\PW{y}{1}\FI,
+\end{displaymath}
+the middle pomset must include the inconsistent actions
+$(\aExp{=}0\mid\DW{x}{1})$ and $(\aExp{\neq}0\mid\DW{y}{1})$.
+
+Finally, we drop \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20}'s
+\emph{causal strengthening} for the same reason. Consider:
+\begin{displaymath}
+  \IF{\aExp}\THEN\PR{x}{r}\FI
+  \SEMI
+  \PW{y}{r}
+  \SEMI
+  \IF{\BANG\aExp}\THEN\PR{x}{s}\FI
+\end{displaymath}
+Associating to the right, this program has a complete pomset containing
+$\DWP{y}{1}$.  Associating to the left, with causal strengthening, it does
+not.
 
 %  We have proven associativity of
 %  \refdef{def:pomsets-trans} in Agda.

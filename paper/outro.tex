@@ -1,20 +1,25 @@
-\section{Conclusions} %Future Work}
+\section{Limitations and Future Work}
 \label{sec:outro}
 
-\todo{add mechanization todos}
 
 This paper is the first to present a direct denotational semantics for
-sequential composition in a relaxed memory model that can be
-efficiently compiled to modern CPUs. We extract from this model a semantic
-dependency relation and use it to build \PwTc, a solution to the
-Out-of-Thin-Air problem in \cXI, and \PwTmca{}, a model for Java-like
-languages.
-% There is, as usual, more research to be done.
+sequential composition in a relaxed memory model that can be efficiently
+compiled to modern CPUs. We extract from this model a semantic dependency
+relation and use it to build \PwTc, a solution to the Out-of-Thin-Air problem
+in \cXI, and \PwTmca{}, a model intended for safe languages such as Java and
+Javascript.  Our work has several limitations, providing opportunities for
+future work.
 
-We have not treated loops in this model, though we expect that the usual
-approach of showing continuity for all the semantic operations with respect
-to set inclusion would go through. \citet{DBLP:conf/esop/PaviottiCPWOB20} use
-step-indexing to account for loops; a similar approach could be applied here.
+We have mechanized some proofs, but not all.  In particular, we have only a
+pen-and-paper proof showing that \PwTmca{} supports optimal lowering to
+\armeight{}.  The same is true for local data race-freedom (\ldrfsc{}).
+Additionally, our proof sketch for \ldrfsc{} elides \RMW{}s, which have
+caused complications in other models \cite{promising-ldrf}.
+
+We have not treated loops, although we expect that the usual approach of
+showing continuity for all the semantic operations with respect to set
+inclusion would go through. \citet{DBLP:conf/esop/PaviottiCPWOB20} use
+step-indexing to account for loops; perhaps this approach could be adapted.
 
 \PwTmca{} does not validate access elimination: store-forwarding and
 dead-write-removal are unsound.  We expect that these can be validated by
@@ -50,15 +55,26 @@ $\rdelay$ in the logic.
   
 \PwTmca{1} is a simpler model than \PwTmca{2}, but requires fences on
 acquiring reads for \armeight{}.  It would be illuminating to find out what
-the performance penalty is for these fences.
+the performance penalty is for these fences.  In a similar vein, it would be
+interesting to know if there is a performance penalty for banning
+read-introduction, which is not valid for \PwT{}.
 
-% In a similar vein,
-% \PwT{} does not validate read introduction, whereas speculative operational
-% semantics do.  Recent work shows a tension between read introduction and
-% compositional reasoning for temporal safety properties (see
-% \textsection\ref{sec:related}).  Nonetheless, read introduction is
+\PwTc{} can be lowered efficiently to any architecture supported by \cXI{},
+but inherits the top-level axioms of \rcXI{}, compromising compositionality.
+\PwTmca{} is as a compositional as a model of concurrent imperative
+programming can be, but is limited to \mca{} architectures for optimal
+lowering.  It would be interesting to explore the middle ground to find a
+fully compositional model that supports optimal lowering to all modern
+architectures.
+
+
+
+% In a similar vein, \PwT{} does not validate read-introduction, whereas
+% speculative operational semantics do.  Recent work shows a tension between
+% read-introduction and compositional reasoning for temporal safety properties
+% (see \textsection\ref{sec:related}).  Nonetheless, read introduction is
 % ubiquitous in some compilers.  It would be interesting to know if there is a
-% performance penalty for banning read introduction.
+% performance penalty for banning read-introduction.
 
 % An earlier version of this paper has been mechanized in Agda; it would be
 % reassuring to update the mechanization to bring it in line with the current state.
@@ -98,6 +114,8 @@ the performance penalty is for these fences.
 % % one wants all the features that it embodies.  By breaking the definition into
 % % its constituent parts, we have shown how each of eight
 
+Supplementary material for this paper available at
+\url{https://weakmemory.github.io/pwt}.
 
 \subsection*{Acknowledgements}
 This paper has been greatly improved by the comments of the anonymous reviewers.

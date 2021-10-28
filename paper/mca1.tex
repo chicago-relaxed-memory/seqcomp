@@ -20,7 +20,7 @@ A variant, \PwTmca{2}, supports optimal lowering for all access modes on
 same, except for \emph{internal reads}, where a thread reads its own write.
 We show an example at the beginning of \textsection\ref{sec:mca2}.
 
-The lowering proofs can be found in \cite{appendix}.  The proofs
+The lowering proofs can be found in \refAppendix{sec:arm}.  The proofs
 use recent alternative characterizations of \armeight{} \cite{armed}.
 
 \subsection{\PwTmcaTITLE{1}}
@@ -70,16 +70,16 @@ and $\rdelays$---as well a distinguished set of $\sread$ actions; see
   The semantic function extends \reffig{fig:seq} as follows:
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{i}\arabic*),ref=\textsc{s}\arabic*]
-    \item[{\labeltext[\textsc{p}7]{(\textsc{p}7)}{par-rf}}]
-      \labeltext[\textsc{s}7]{(\textsc{s}7)}{seq-rf}\;
-      \labeltext[\textsc{i}7]{(\textsc{i}7)}{if-rf}\;
-      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
       \setcounter{enumi}{\value{le}}
     \item[]
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-le-delays}
-        if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$.
+        if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$,
       \end{enumerate}
+    \item[{\labeltext[\textsc{p}7]{(\textsc{p}7)}{par-rf}}]
+      \labeltext[\textsc{s}7]{(\textsc{s}7)}{seq-rf}\;
+      \labeltext[\textsc{i}7]{(\textsc{i}7)}{if-rf}\;
+      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
     \end{enumerate}  
   \end{multicols}
   % The semantic rules are as follows:
