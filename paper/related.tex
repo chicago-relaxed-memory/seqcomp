@@ -8,13 +8,13 @@ penalties (see also \citet{10.1145/3462206}).  In this paper, we take the
 opposite approach.  We have attempted to find the most intellectually
 tractable model that encompasses all of the messiness of relaxed memory.
 
-There are few prior studies of relaxed memory that include sequential
-composition and/or precise calculation of semantic dependencies.  No prior
-work gives the semantics of sequential composition in direct style.
-\citet{DBLP:conf/esop/PaviottiCPWOB20} defined \MRD{}, which calculates
+There are two prior studies of relaxed memory that include precise
+calculation of semantic dependencies---neither gives the semantics of
+sequential composition in direct style.
+First, \citet{DBLP:conf/esop/PaviottiCPWOB20} defined \MRD{}, which calculates
 dependencies using event structures rather than logic.  This strategy is
 brittler than ours, leading to false positives (\textsection\ref{sec:lir}).
-\citet{DBLP:journals/pacmpl/JagadeesanJR20} defined \PwP{}, using logical
+Second, \citet{DBLP:journals/pacmpl/JagadeesanJR20} defined \PwP{}, using logical
 entailment to define dependency.  Although \PwT{} is based on \PwP{}, there
 are many differences.
 Some of these are motivated by requirements unique to
