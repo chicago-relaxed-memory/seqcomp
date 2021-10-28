@@ -1302,14 +1302,20 @@ Throughout the remainder of the paper, we use this definition.
 % dependencies into reads is one of the factors complicating downset closure;
 % see \textsection\ref{sec:downset} for a discussion.)
 
-\subsection{Subtleties: Local Invariant Reasoning and Local State}
+\subsection{Local State}
 \label{sec:lir}
 \label{sec:q}
 
-%Two aspects of \reffig{fig:seq} are fairly obscure: First,
-\ref{read-tau-ind} introduces locations into formula, in order to track the
-local state of memory.  This is necessary to support local invariant
-reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}:
+Several of the \jmm{} Causality Test Cases \cite{PughWebsite} center on
+compiler optimizations that result from limiting the range of variables.
+Because the compiler is allowed to collude with the scheduler when estimating
+the range, we refer to this as \emph{local invariant reasoning}.  The basic
+idea is that a write to $y$ is independent of a read of $x$ that precedes it,
+as long as the local state of $x$ prior to the read justifies the write.  For
+example, consider \eqref{TC1}:\footnote{Test cases 6 and 8--9 are similar.
+  Test cases 2 and 17--18 require both local invariant reasoning and
+  resolving the nondeterminism of reads using redundant read
+  elimination---see \textsection\ref{sec:semreg}.}
 \begin{gather*}
   \taglabel{TC1}
   \begin{gathered}
@@ -1317,7 +1323,7 @@ reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}:
     (\PR{x}{r}\SEMI\IF{r{\geq}0}\THEN \PW{y}{1} \FI
     \PAR
     \PW{x}{y})
-    \\[-1ex]
+    \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{wx0}{\DW{x}{0}}{}
         \event{rx1}{\DR{x}{1}}{right=3em of wx0}
@@ -1344,8 +1350,12 @@ reasoning as in \jmm{} Causality Test Case 1 \eqref{TC1} \cite{PughWebsite}:
     % \end{tikzinline}}
   \end{gathered}
 \end{gather*}
-In order to allow this execution, the precondition $\aForm$ must be a tautology.
-Using \ref{read-tau-ind} and \ref{write-tau}, the precondition is
+% The precondition on the conditional write to $y$ is $r{\geq}0$.
+Using local invariant reasoning, a compiler could determine that $x$ is
+always either $0$ or $1$, and therefore that the write to $y$ does not depend
+on the read of $x$, allowing these to be reordered, resulting in the
+execution shown above.  This is captured by our semantics as follows.  Using
+\ref{read-tau-ind} and \ref{write-tau}, the precondition $\aForm$ is
 \begin{math}
   \PBR{(1{=}r \lor x{=}r) \limplies r{\geq}0}[0/x]
 \end{math}
@@ -1353,24 +1363,27 @@ which is
 \begin{math}
   \PBR{(1{=}r \lor 0{=}r) \limplies r{\geq}0}
 \end{math}
-which is indeed a tautology.  Intuitively, \ref{read-tau-ind} says that, to
-be independent of the read action, subsequent preconditions must be
-tautological under both $[v/r]$ and $[x/r]$.  Here $v$ is the value read, and
-$x$ tracks the ``local state'' of the variable.  This idea is borrowed from
-\citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} %, which includes further examples.
+which is indeed a tautology, justifying the independency.  When used to form
+complete pomsets, \ref{read-tau-ind} requires that subsequent preconditions
+be tautological under the assumption that the value of the read is used
+$(1{=}r)$ and local value of $x$ is used instead $(x{=}r)$.
+
+This requires that we put locations into logical formulae, in addition to
+registers.  While logical formulae involving registers are discharged by
+predicate transformers from $\sLET{}{}$ or $\sLOAD{}{}{}$, logical formulae
+involving locations are discharged by predicate transformers from
+$\sSTORE{}{}{}$.  In other words, registers track the value of the most
+recent local read, whereas locations track the value of the most recent local
+write.  This provides a local view of memory, distinct from the global view
+manifest in the labels on events.  See
+\cite{DBLP:journals/pacmpl/JagadeesanJR20} for further discussion.
 %(See \textsection\ref{sec:ex:assoc} for a discussion of Skolemization.)
-Local invariant reasoning requires that we track the state of variables in
-the logic, not just registers.  This is one reason we use predicate
-transformers rather than simple postconditions.
 
-Test cases 6 and 8--9 are similar.  Test cases 2 and 17--18 require both
-local invariant reasoning and resolving the nondeterminism of reads using
-redundant read elimination---see \textsection\ref{sec:semreg}.
-
-\todo{Put tc12$'$ first.  Fix the narrative.}
-$\Q{x}$ ensures that the local state of $x$ is up-to-date when $x$ is read.
-\ref{read-kappa} and \ref{read-tau} add these ``quiescence'' constraints,
-which are simplified by \ref{write-tau}.
+A related concern arises when eliding changes to local state from the untaken
+branch of a conditional.
+% Of course, if we track local state incorrectly, bad things can happen, such
+% as a failure of \drfsc, which requires that properly synchronized programs
+% only exhibit SC behaviors.
 % Reads have trivial preconditions; thus, we introduce $\Q{x}$ in $\aTr{}{}$ \eqref{read-tau}
 % not $\labelingForm$ \eqref{read-kappa}. 
 Consider the following example 
@@ -1400,12 +1413,19 @@ Consider the following example
         \FI
       \FI      
     \end{array}
-    \PAR
+    \;\;\PAR\;\;
     \mkern8mu
     \IF{z}\THEN
       \PW{y}{1}
     \FI
-    \\
+  \end{gathered}
+\end{gather*}
+In SC executions, this program always reads $0$ for $y$, and therefore never
+writes $z$.  Thus, the program is data-race-free.  However, using
+\reffig{fig:seq} without $\Q{x}$, as we have done up to now, the following
+non-SC execution is allowed, violating \drfsc{}.
+\begin{gather*}
+  \begin{gathered}    
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DW{x}{1}}{}
         \event{a2}{\DR{y}{1}}{right=of a1}
@@ -1419,12 +1439,56 @@ Consider the following example
         %\wki[out=15,in=165]{a1}{a3}
         %\wki{a3}{a4}
         \rf{a5}{b1}
+        \rf[out=15,in=165]{a1}{a4}
         \rf[out=-170,in=-10]{b2}{a2}
         \po{a4}{a5}
       \end{tikzinline}}
   \end{gathered}
-  \\
+\end{gather*}
+The execution is allowed because the write to $z$ is independent of the
+preceding read of $y$.  Note that the write to $z$ \emph{does} depend on the read
+of $x$, just not the read of $y$.  The precondition $\aForm$ is:
+\begin{gather*}
   \aForm \riff
+  (1{=}r \lor y{=}r)
+  \limplies
+  \PBRbig{
+    (r{=}0 \land (1{=}s\limplies s{\neq}0))
+    \land
+    (r{\neq}0 \land (1{=}s\limplies s{\neq}0))
+  }
+  % \aForm \riff
+  % (1{=}r \lor y{=}r)\;
+  % \begin{aligned}[t]
+  %   \limplies\;&
+  %   (r{=}0 \land (1{=}s\limplies s{\neq}0))
+  %   \\[-1ex]
+  %   \land\;&
+  %   (r{\neq}0 \land (1{=}s\limplies s{\neq}0))
+  % \end{aligned}
+\end{gather*}
+Note that $\PW{x}{0}$ only appears on the untaken branch of the conditional.
+To construct the pomset, we have chosen the empty pomset for
+$\sembase{\PW{x}{0}}$.  The constraints on complete pomsets do not filter out
+this pomset, since $\PW{x}{0}$ is in the untaken branch of the conditional.
+The problem here is that we have forgotten the local state of $x$ in the
+untaken branch of the execution.  Nonetheless, we are using the subsequent
+read.  % The problem here is that we have ignored this write when calculating
+% the dependency between $\DR{y}{1}$ and $\DW{z}{1}$.
+
+To correct this, \ref{read-kappa} introduces quiescence symbols $\Q{x}$ into
+preconditions, and \ref{read-tau} subsequently introduces them to predicate
+transformers.  Quiescence symbols are only eliminated from formulae by
+preceding writes (\ref{write-tau}).  One simple consequence is that
+quiescence symbols guarantee initialization in complete pomsets:
+\eqref{top-kappa} requires tautologies, which means that every variables $x$
+that the execution reads from must be properly initialized in order to eliminate the
+precondition $\Q{\aLoc}$.
+
+With quiescence, the precondition of the example
+becomes the following:
+\begin{displaymath}
+  \aForm'\riff
   (\Q{y}\limplies 1{=}r \lor y{=}r)\;
   \begin{aligned}[t]
     \limplies\;&
@@ -1434,191 +1498,33 @@ Consider the following example
     (r{\neq}0 \land ((\Q{x}[1{=}1/\Q{x}]\limplies 1{=}s)\limplies
     s{\neq}0))
   \end{aligned}
-\end{gather*}
-\todo{Make this understandable.}
-Note that the two branches of the conditional are the same except for the
-leading $\PWP{x}{0}$.  Without $\Q{x}$, the precondition $\aForm$ is
-$\TRUE$, which is a tautology, and the execution is
-allowed, resulting in a violation of \drfsc.  To construct this pomset, we
-have chosen the empty pomset for $\sembase{\PW{x}{0}}$.  The constraints on
-complete pomsets do not filter out this pomset, since $\PW{x}{0}$ is in the
-untaken branch of the conditional.  The problem here is that we have forgotten
-the local state of $x$ in the untaken branch of the execution.  Nonetheless, we
-are using the subsequent read.
+\end{displaymath}
+Adding initializing writes, $\Q{y}$ becomes $\TRUE$ at top-level.
+Regardless, $\aForm'$ is non-tautological: in the top
+conjunct, we have lost the ability to use $1{=}s$ to prove $s{\neq}0$.
+Intuitively, $\Q{x}$ is true when the local state of $x$ is up to date, and
+false when it is stale.  In order to read $\aLoc$, $\Q{x}$ requires that the
+most recent prior write to $\aLoc$ must be in the pomset.  
 
-With $\Q{x}$, the precondition of $\aForm$ is $\FALSE$.
+% Note that the two branches of the conditional are the same except for the
+% leading $\PWP{x}{0}$.  Without $\Q{x}$, the precondition $\aForm$ is
+% $\TRUE$, which is a tautology, and the execution is
+% allowed, resulting in a violation of \drfsc.  
+
+
+%With $\Q{x}$, the precondition of $\aForm$ is $\FALSE$.
 %$\Q{x}[\FALSE/\Q{x}]$, which is unsatisfiable.
-Intuitively, $\Q{x}$ requires that the most recent prior
-write to $\aLoc$ must be in the pomset in order to read $\aLoc$.
 
 
-We include $\Q{x}$ in \ref{read-kappa} to reduce the number of useless
-pomsets---when $\Q{x}$ is false for $\PWP{x}{r}$, the read is useless and can
-be eliminated by taking $\aEvs=\emptyset$.  By including $\Q{x}$ in
-\ref{read-kappa}, we also guarantee initialization in complete pomsets:
-\eqref{top-kappa} requires tautologies, which means that all variables must
-be initialized sequentially in order to get rid of $\Q{\aLoc}$.
-
-Control variant of \ref{TC12} with all initial values $0$:
-\begin{gather*}
-  \tag{\textsc{tc12}$'$}\label{TC12'}
-  \begin{gathered}
-    \PR{y}{r}\SEMI
-    \IF{r}\THEN \PW{\REFVAR{1}}{1} \ELSE \PW{\REFVAR{0}}{1} \FI \SEMI
-    \PR{\REFVAR{0}}{s}\SEMI
-    \PW{x}{\BANG s}
-    \PAR
-    \PW{y}{\PR{x}{}}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        % \event{iy}{\DW{y}{0}}{left=of a1}
-        % \event{ix}{\DW{x}{0}}{right=2em of a2}
-        \event{b1}{\DR{y}{1}}{}
-        \event{b2}{\DW{\REFVAR{1}}{1}}{right=of b1}
-        \event{b3}{\DR{\REFVAR{0}}{0}}{right=of b2}
-        \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
-        \po{b1}{b2}
-        \po{b3}{b4}
-        \event{a1}{\DR{x}{1}}{right=3em of b4}
-        \event{a2}{\DW{y}{1}}{right=of a1}
-        \po{a1}{a2}
-        % \po[out=15,in=165]{b1}{b4}
-        \rf[out=-170,in=-10]{a2}{b1}
-        \rf{b4}{a1}
-        % \wk[out=-15,in=-165]{iy}{a2}
-        % \wk[out=-15,in=-165]{ix}{b4}
-      \end{tikzinline}}
-  \end{gathered}
-  % \\
-  % \aForm \riff
-  % (\Q{y}\limplies 1{=}r \lor y{=}r)\;
-  % \begin{aligned}[t]
-  %   \limplies\;&
-  %   (r{=}0 \land ((\Q{x}[\FALSE/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
-  %   \\[-1ex]
-  %   \land\;&
-  %   (r{\neq}0 \land ((\Q{x}[1{=}1/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
-  % \end{aligned}
-\end{gather*}
-
-Building the precondition $\aForm$ from right to left:
-\begin{align*}
-  \tag{$\PW{x}{s}$}
-  \aForm_1 &\riff
-  s{=}0
-  \\
-  \tag{Prepending $\PR{\REFVAR{0}}{s}$}
-  \aForm_2 &\riff
-  \PBR{\Q{\REFVAR{0}}\limplies 0{=}s}
-  \limplies
-  s{=}0
-  \\
-  \tag{Prepending $\IF{}$}
-  \aForm_3 &\riff
-  \PBR{
-    r{\neq}0
-    \land
-    \aForm_2[1/\REFVAR{1}][\TRUE/\Q{\REFVAR{1}}]
-  }\lor\PBR{
-    r{=}0
-    \land
-    \aForm_2[1/\REFVAR{0}][\FALSE/\Q{\REFVAR{0}}]
-  }
-  \\[-1ex]
-  &\riff
-  \PBR{
-    r{\neq}0
-    \land
-    \PBR{
-      \PBR{
-        \Q{\REFVAR{0}}
-        \limplies
-        0{=}s
-      }
-      \limplies
-      s{=}0
-    }
-  } \lor\PBR{
-    r{=}0
-    \land
-    % \PBR{
-    % \FALSE
-    % \limplies
-    % 0{=}s
-    % }
-    %   \limplies
-    s{=}0
-  }
-  \\
-  \intertext{Dependent case:}
-  \tag{Prepending $\PR{y}{r}$}
-  \aForm_4 &\riff
-  \PBR{
-    \Q{y}
-    \limplies
-    1{=}r
-  }
-  \limplies
-  \aForm_3
-  \\
-  \tag{Prepending Initializers}
-  \aForm_5 &\riff
-  1{=}r
-  \limplies
-  \PBR{
-    r{\neq}0
-    \land
-    \PBR{
-      0{=}s
-      \limplies
-      s{=}0
-    }
-  } \lor\PBR{
-    r{=}0
-    \land
-    s{=}0
-  }
-  \\
-  \intertext{Independent case:}
-  \tag{Prepending $\PR{y}{r}$}
-  \aForm'_4 &\riff
-  \PBR{
-    \Q{y}
-    \limplies
-    1{=}r
-    \lor
-    y{=}r
-  }
-  \limplies
-  \aForm_3
-  \\
-  \tag{Prepending Initializers}
-  \aForm'_5 &\riff
-  \PBR{
-    1{=}r
-    \lor
-    0{=}r
-  }
-  \limplies
-  \PBR{
-    r{\neq}0
-    \land
-    \PBR{
-      0{=}s
-      \limplies
-      s{=}0
-    }
-  } \lor\PBR{
-    r{=}0
-    \land
-    s{=}0
-  }
-\end{align*}
+% We include $\Q{x}$ in \ref{read-kappa} to reduce the number of useless
+% pomsets---when $\Q{x}$ is false for $\PWP{x}{r}$, the read is useless and can
+% be eliminated by taking $\aEvs=\emptyset$.
 
 
-\MRD{} \cite{DBLP:conf/esop/PaviottiCPWOB20} validates 
-\emph{value range analysis}, which is similar to the local invariant
-reasoning of \PwT{}, but brittler.  Consider the following example:
+
+
+We end this subsection by noting that value range
+analysis of \MRD{} \cite{DBLP:conf/esop/PaviottiCPWOB20} is overly conservative.  Consider the following execution:
 \begin{gather*}
   \PW{x}{0}
   \SEMI
@@ -1633,7 +1539,7 @@ reasoning of \PwT{}, but brittler.  Consider the following example:
     \PAR
     \PW{x}{\PR{y}{}}
   }
-  \\
+  \\[-1.2ex]
   \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
       \event{i1}{\DW{x}{0}}{}
       \event{a1}{\DR{x}{1}}{right=3em of i1}      
@@ -1645,7 +1551,7 @@ reasoning of \PwT{}, but brittler.  Consider the following example:
       \rf{a3}{b1}
       \wki{a1}{a2}
       \rf[out=-170,in=-10]{b2}{a1}
-      \wk[out=10,in=170]{i1}{b2}
+      \wk[out=8,in=172]{i1}{b2}
     \end{tikzinline}}    
 \end{gather*}
 \PwT{} correctly allows this execution; \MRD{} forbids it. The co-product

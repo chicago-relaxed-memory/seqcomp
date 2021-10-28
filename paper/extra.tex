@@ -344,6 +344,161 @@ The justification for forbidding this execution states:
 \ref{oota4} is an interesting border case, since it is allowed by speculative
 models (\textsection\ref{sec:promising}).
 
+Control variant of \ref{TC12} with all initial values $0$:
+\begin{gather*}
+  \tag{\textsc{tc12}$'$}\label{TC12'}
+  \begin{gathered}
+    \PR{y}{r}\SEMI
+    \IF{r}\THEN \PW{\REFVAR{1}}{1} \ELSE \PW{\REFVAR{0}}{1} \FI \SEMI
+    \PR{\REFVAR{0}}{s}\SEMI
+    \PW{x}{\BANG s}
+    \PAR
+    \PW{y}{\PR{x}{}}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        % \event{iy}{\DW{y}{0}}{left=of a1}
+        % \event{ix}{\DW{x}{0}}{right=2em of a2}
+        \event{b1}{\DR{y}{1}}{}
+        \event{b2}{\DW{\REFVAR{1}}{1}}{right=of b1}
+        \event{b3}{\DR{\REFVAR{0}}{0}}{right=of b2}
+        \event{b4}{\aForm\bigmid\DW{x}{1}}{right=of b3}
+        \po{b1}{b2}
+        \po{b3}{b4}
+        \event{a1}{\DR{x}{1}}{right=3em of b4}
+        \event{a2}{\DW{y}{1}}{right=of a1}
+        \po{a1}{a2}
+        % \po[out=15,in=165]{b1}{b4}
+        \rf[out=-170,in=-10]{a2}{b1}
+        \rf{b4}{a1}
+        % \wk[out=-15,in=-165]{iy}{a2}
+        % \wk[out=-15,in=-165]{ix}{b4}
+      \end{tikzinline}}
+  \end{gathered}
+  % \\
+  % \aForm \riff
+  % (\Q{y}\limplies 1{=}r \lor y{=}r)\;
+  % \begin{aligned}[t]
+  %   \limplies\;&
+  %   (r{=}0 \land ((\Q{x}[\FALSE/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
+  %   \\[-1ex]
+  %   \land\;&
+  %   (r{\neq}0 \land ((\Q{x}[1{=}1/\Q{x}]\limplies 1{=}s)\limplies s{=}0))
+  % \end{aligned}
+\end{gather*}
+
+Building the precondition $\aForm$ from right to left:
+\begin{align*}
+  \tag{$\PW{x}{\BANG s}$}
+  \aForm_1 &\riff
+  s{=}0
+  \\
+  \tag{Prepending $\PR{\REFVAR{0}}{s}$}
+  \aForm_2 &\riff
+  \PBR{\Q{\REFVAR{0}}\limplies 0{=}s}
+  \limplies
+  s{=}0
+  \\
+  \tag{Prepending $\IF{}$}
+  \aForm_3 &\riff
+  \PBR{
+    r{\neq}0
+    \land
+    \aForm_2[1/\REFVAR{1}][\TRUE/\Q{\REFVAR{1}}]
+  }\lor\PBR{
+    r{=}0
+    \land
+    \aForm_2[1/\REFVAR{0}][\FALSE/\Q{\REFVAR{0}}]
+  }
+  \\[-1ex]
+  &\riff
+  \PBR{
+    r{\neq}0
+    \land
+    \PBR{
+      \PBR{
+        \Q{\REFVAR{0}}
+        \limplies
+        0{=}s
+      }
+      \limplies
+      s{=}0
+    }
+  } \lor\PBR{
+    r{=}0
+    \land
+    % \PBR{
+    % \FALSE
+    % \limplies
+    % 0{=}s
+    % }
+    %   \limplies
+    s{=}0
+  }
+  \\
+  \intertext{Dependent case:}
+  \tag{Prepending $\PR{y}{r}$}
+  \aForm_4 &\riff
+  \PBR{
+    \Q{y}
+    \limplies
+    1{=}r
+  }
+  \limplies
+  \aForm_3
+  \\
+  \tag{Prepending Initializers}
+  \aForm_5 &\riff
+  1{=}r
+  \limplies
+  \PBR{
+    r{\neq}0
+    \land
+    \PBR{
+      0{=}s
+      \limplies
+      s{=}0
+    }
+  } \lor\PBR{
+    r{=}0
+    \land
+    s{=}0
+  }
+  \\
+  \intertext{Independent case:}
+  \tag{Prepending $\PR{y}{r}$}
+  \aForm'_4 &\riff
+  \PBR{
+    \Q{y}
+    \limplies
+    1{=}r
+    \lor
+    y{=}r
+  }
+  \limplies
+  \aForm_3
+  \\
+  \tag{Prepending Initializers}
+  \aForm'_5 &\riff
+  \PBR{
+    1{=}r
+    \lor
+    0{=}r
+  }
+  \limplies
+  \PBR{
+    r{\neq}0
+    \land
+    \PBR{
+      0{=}s
+      \limplies
+      s{=}0
+    }
+  } \lor\PBR{
+    r{=}0
+    \land
+    s{=}0
+  }
+\end{align*}
 
 \todo{What's the point?}
 We presented two examples of thin-air behavior involving address calculation
