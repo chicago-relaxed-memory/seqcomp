@@ -238,10 +238,10 @@ $\aForm$ is \emph{unsatisfiable} if $\aForm \rimplies \FALSE$, and
 
 \subsection{Actions in This Paper}
 \label{sec:actions}
-In this paper, we let actions be reads and writes and fences:
+In this paper, each action is either a read, a write, or a fence:
 \begin{displaymath}
-  \aAct,\bAct \BNFDEF \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
-  \BNFSEP \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
+  \aAct,\bAct \BNFDEF \DR[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
+  \BNFSEP \DW[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]
   \BNFSEP \DF[\ascope]{\fmode}[\aThrd]
 \end{displaymath}
 % % writes $\DWP[\amode]{\aLoc}[\ascope]{\aVal}[\aThrd]$,
@@ -402,9 +402,11 @@ transformers.
 As discussed in \S\ref{sec:intro}, predicate transformers suffice for
 sequentially consistent models, but not relaxed models, where dependency
 calculation is crucial.  For dependency calculation, we use a \emph{family}
-of predicate transformers, indexed by sets of events. In sequential
-composition, we will use $\aTr{\Cdown{\aEv}}{}$ as the predicate transformer
-applied to event $\aEv$ where $\bEv\in(\Cdown{\aEv})$ if $\bEv<\aEv$.  % We
+of predicate transformers, indexed by sets of events. When computing
+$\sem{\aCmd_1\SEMI\aCmd_2}$, we will use $\aTr{\Cdown{\aEv}}{}$ as the
+predicate transformer for event $\aEv\in\sem{\aCmd_2}$, where
+$\Cdown{\aEv}$ includes all of the events in $\sem{\aCmd_1}$ that precede
+$\aEv$ in causal order ($\bEv\in\Cdown{\aEv}$ when $\bEv<_1\aEv$).  % We
 % call $\Cdown{\aEv}$ the \emph{dependent set} of $\aEv$, and
 % $\aEvs\setminus\Cdown{\aEv}$ the \emph{independent set}.
 
@@ -432,36 +434,36 @@ preconditions.  Thus more order means weaker preconditions.
   \label{def:pomset}
   \input{fig-def.tex}
 \end{definition}
-Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
+We refer to \PwT{}s simply as pomsets.  Let $\aPS$ range over pomsets, and $\aPSS$ over sets of pomsets.
 % Let $\Pom$ be the set of all pomsets.
 %
-The model has $6$ components, which can be daunting at first glance.  To aid
-the reader, we use consistent numbering throughout. For example, item $6$
-always refers to the order relation.
 
-The core of the model is a pomset, which includes a set of events
-\eqref{pom-E}, a labeling \eqref{pom-lambda}, and an order \eqref{pom-le}.
+Throughout the rest of this section, we endeavor to explain \reffig{fig:seq},
+which gives the semantics of programs $\sembase{}$.  We use consistent sub-
+and super-scripts to refer to the components of a pomset.  For example
+$\lt_1$ is the order of $\aPS_1$, $\lt'$ is the order of $\aPS'$, and $\lt$
+is the order of $\aPS$.  We also use consistent numbering. For example, item
+$3$ always refers to $\labelingForm$ and item $6$ always refers to $\lt$.
 As usual, we write $\bEv\le\aEv$ to mean $\bEv\lt\aEv$ or $\bEv=\aEv$.
+%
+
+The core of the model is a labeled partial order, including a set of events
+\eqref{pom-E}, a labeling \eqref{pom-lambda}, and an order \eqref{pom-le}.
 %
 On top of this basic structure, \ref{pom-kappa}--\ref{pom-term} add a layer
 of logic.  For each pomset, \ref{pom-term} provides a termination condition.
 For each event in a pomset, \ref{pom-kappa} provides a precondition.  For
 each set of events in a pomset, \ref{pom-tau} provides a predicate
-transformer.  Sequential dependency is calculated by $\labelingForm'_2$ in
-the semantics of sequential composition.
+transformer.  The partial order and the logic are tied together formally in
+the definition of $\labelingForm'_2$ in $\sSEMI{}{}$ in \reffig{fig:seq},
+which calculates dependencies.
 
-Relative to \PwP{}, \PwT{} adds predicate transformers and termination
-conditions.  The latter are captured in \PwP{} as termination \emph{actions},
-discussed in \textsection\ref{sec:intro:mm}.
+% Relative to \PwP{}, \PwT{} adds predicate transformers and termination
+% conditions.  The latter are captured in \PwP{} as termination \emph{actions},
+% discussed in \textsection\ref{sec:intro:mm}.
 % As with \PwP{}, the empty pomset is in the semantics of every
 % program---the termination condition prevents $\SKIP$ from being a refinement of
 % $\PW{x}{1}$.
-
-Throughout the rest of this section, we endeavor to explain \reffig{fig:seq},
-which gives the semantics of programs $\sembase{}$.  We defer discussion of
-two subtleties to \textsection\ref{sec:q}.  First, we ignore $\Q{\aLoc}$,
-taking $\Q{\aLoc}=\TRUE$, for all $\aLoc$.  Second, we ignore read rule
-\ref{read-tau-ind}.
 
 Before discussing the details, we note that the semantics satisfies the
 expected monoid laws, as well as some laws concerning the conditional. We
@@ -506,11 +508,11 @@ away thread state from the left.
 \end{lemma}
 The proof of \eqref{monoid:unit} requires \ref{pom-term-tau} for
 the termination condition in $\xSEMIP{\aCmd}{\SKIP}$.
-\eqref{monoid:seq} requires both
+The proof of \eqref{monoid:seq} requires both
 conjunction closure (\ref{tr-and}, for the termination condition) and disjunction
 closure (\ref{tr-or}, for the predicate transformers themselves).
-\eqref{monoid:seq} also requires that \ref{seq-le} enforce projection as
-well as inclusion (see the definition of $\rextendsdef{}{}$).
+The proof of \eqref{monoid:seq} also requires that \ref{seq-le} enforce projection as
+well as inclusion (see the definition of $\rextendsdef{}{}$ in \reffig{fig:seq}).
 
 \begin{lemma}
   \label{lem:if}
@@ -619,10 +621,10 @@ semantics of \reffig{fig:seq} validates the reverse inclusions for
 % (\textsection\ref{sec:mca})
 % (\textsection\ref{sec:c11})?
 
-The semantics is also closed with respect to augmentation.  $\aPS_2$ is an
+The semantics is closed with respect to {augmentation:} $\aPS_2$ is an
 \emph{augment} of $\aPS_1$ if all fields are equal except, perhaps, the
-order, where we require ${\lt_2}\supseteq{\lt_1}$.  In examples, we typically
-consider pomsets that are augment-minimal.  % The
+order, where we require ${\lt_2}\supseteq{\lt_1}$.  
+% The
 % proof is straightforward, by induction on the definition of $\sembase{}$.
 % \begin{definition}
 %   \label{def:augment}
@@ -656,7 +658,10 @@ preconditions to weaken.  Augment closure also captures the intuition that it
 is always sound for a compiler to make more conservative assumptions about
 dependencies than the semantics.
 
-
+Unless otherwise noted,
+all pomsets in examples are \emph{complete} and
+\emph{augment-minimal}. % In examples, we typically
+% consider pomsets that are augment-minimal.  
 
 
 % \begin{definition}
@@ -691,19 +696,20 @@ dependencies than the semantics.
 % \end{itemize}
 
 \input{fig-seq.tex}
-\subsection{Pomsets and Complete Pomsets}
+\subsection{Pomsets and Complete Pomsets: Termination}
 \label{sec:ex:pomset}
 \label{sec:ex:term}
 
 
-Ignoring the logic, the definitions are straightforward.  Reads and writes
-map to pomsets with at most one event.  $\SKIP$ maps to the empty pomset.
-Note only that $\sembase{\PW{x}{1}}$ can write any value $\aVal$; the fact
-that $\aVal$ must be $1$ is captured in the logic.
-
+Ignoring the logic, the definitions of \reffig{fig:seq} are straightforward.
+Reads, writes and fences map to pomsets with at most one event---we allow the
+empty pomset so that these may appear in the untaken branch of a conditional.
+$\SKIP$ and register assignment map to the empty pomset.  
 The structural rules combine pomsets: $\sPAR{}{}$ performs disjoint union,
 inheriting labeling and order from the two sides.  $\sSEMI{}{}$ and $\sIF{}$
-perform a union.  We say
+perform a union.
+
+We say
 that $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ \emph{coalesce} if $\bEv=\aEv$.
 As a trivial consequence of using union rather than disjoint union,
 \ref{seq-E} validates \emph{mumbling} \cite{DBLP:journals/iandc/Brookes96} by
@@ -758,12 +764,12 @@ includes the empty pomset with $\aTerm\riff\TRUE$, but $\sembase{\PW{x}{1}}$
 can only include the empty pomset with
 $\aTerm\riff \kappaE{\emptyset} = \FALSE$.
 
-In addition, \ref{write-term} ensures that complete pomsets do not
-include bogus writes.  Suppose $\aPS\in\sembase{\PW{x}{1}}$.  As we noted
-above, $\aPS$ can include $(1{=}\aVal\mid\DW{x}{\aVal})$, for any value
-$\aVal$.  In complete pomsets, however, \ref{write-term} requires
-that $\aTerm$ implies $1{=}\aVal$.  We might wish to require that all preconditions be satisfiable.  However,
-unsatisfiable writes can become satisfiable via merging:
+Note that $\sembase{\PW{x}{2}}$ can write any value $\aVal$; the fact that
+$\aVal$ must be $2$ is captured in the logic.  In particular,
+\ref{write-term} requires that $\aTerm\riff 2{=}\aVal$ for this program
+and \ref{top-term} requires that $\aTerm$ be a tautology at top-level.  In
+combination, these ensure that complete pomsets do not include bogus writes.
+Consider the following incomplete pomsets:
 % Nonetheless, it is important that
 % \ref{write-term-nonempty} specifies $\aTerm\riff\aExp{=}\aVal$ rather than
 % $\aTerm\riff\TRUE$, since 
@@ -810,10 +816,9 @@ By merging, the semantics allows the following:
 \end{align*}
 This pomset is incomplete, however, since $\aTerm\riff2{=}3$.
 
-In $\sLOAD{}{}$, $\aTerm$ depends on the mode. \ref{read-term-empty} ensures
-that all acquiring reads are included in complete pomsets.  Instead
-\ref{read-term-nonempty} states that relaxed reads are optional: $\aTerm$ is
-alway true for relaxed reads.  From this, it is easy to see that
+For reads, the definition of $\aTerm$ depends on the mode: relaxed reads may
+be elided in complete pomsets (\ref{read-term-nonempty}), but acquiring reads
+must be included (\ref{read-term-empty}).  From this, it is easy to see that
 \begin{math}
   \sembase{\PR{x}{r}}
   \supseteq
@@ -821,12 +826,12 @@ alway true for relaxed reads.  From this, it is easy to see that
 \end{math}
 is a valid refinement (where the default mode is $\mRLX$).
 
-Ignoring predicate transformers, the $\sSEMI{}{}$ rule
-\ref{seq-term} takes $\aTerm$ to be $\aTerm_1\land\aTerm_2$.  This is as
-expected: the program terminates if both subprograms terminate.
-
-In $\sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$, the termination condition
-\eqref{if-term} is $(\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$:
+Ignoring predicate transformers, \ref{par-term} and \ref{seq-term} both take
+$\aTerm\riff\aTerm_1\land\aTerm_2$.  This is as expected: the program
+terminates if both subprograms terminate.
+%
+In %$\sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$, the termination condition
+\ref{if-term},  $\aTerm\riff(\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$:
 the program terminates as long as the taken branch terminates.
 Thus
 \begin{math}
@@ -841,15 +846,6 @@ events at top-level, use the empty set.
 \label{sec:ex:data}
 
 
-Preconditions are used to calculate dependencies.  They also determine which
-events can appear in a pomset.  In a complete pomset, \ref{top-kappa}
-requires that every precondition $\labelingForm(\aEv)$ is a tautology.  Using
-\ref{write-kappa},
-\begin{math}
-  \sembase{\PW{x}{2}}
-\end{math}
-cannot include a complete pomset with event $\DWP{x}{3}$, since $2{=}3$ is not a
-tautology.
 
 % that occur in \ref{write-tau} and \ref{read-tau} serve similar purpose.  We defer discussion of these until
 % \textsection\ref{sec:q}.
@@ -865,8 +861,11 @@ tautology.
 % In top-level pomsets, \ref{top-kappa} requires that every precondition
 % $\labelingForm(\aEv)$ is a tautology.
 
-Note that $\sembase{\aCmd_1 \RPAR \aCmd_2}$ is asymmetric, taking the
-predicate transformer for $\aCmd_2$ in \ref{par-tau}.
+In this section, we ignore the $\Q{\aLoc}$ symbols that appear in the
+semantics of read and write, taking $\Q{\aLoc}=\TRUE$, for all $\aLoc$.  We
+also introduce the independent transformer for reads \eqref{read-tau-ind}
+without explaining why it is defined as it is.  We take up both subjects in
+\textsection\ref{sec:q}.
 
 Preconditions are discharged during sequential composition by applying
 predicate transformers $\aTr[1]{}{}$ from the left to preconditions
@@ -877,7 +876,7 @@ which uses the transformed predicate
 $\labelingForm'_2(\aEv)=\aTr[1]{\Cdown{\aEv}}{\labelingForm_2(\aEv})$, where
 $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$ is the set of events that
 precede $\aEv$ in causal order.  We call $\Cdown{\aEv}$ the \emph{dependent
-  set} for $\aEv$.  Then $\aEvs\setminus(\Cdown{\aEv})$ is the
+  set} for $\aEv$.  Then $\aEvs\setminus\Cdown{\aEv}$ is the
 \emph{independent set}. % for $\aEv$.
 
 % Sequential composition uses the usual rule for composition of predicate
@@ -919,18 +918,17 @@ discuss address dependencies in \textsection\ref{sec:addr}.)
 
 The rules track dependencies.  We discuss data dependencies \eqref{write-kappa}
 here and control dependencies \eqref{if-kappa} in
-\textsection\ref{sec:ex:control}.  Unless otherwise noted, we assume pomsets
-are \emph{complete} and \emph{augment-minimal}.  % We do not discuss
+\textsection\ref{sec:ex:control}.   % We do not discuss
 % \ref{seq-kappa} further.  It simply ensures that all writes are
 % present before a release, even for incomplete pomsets (see
 % \textsection\ref{sec:ex:term}).
-
+%
 A simple example of a data dependency is a pomset
 $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$.  If $\aPS$ is complete, it must have
-two events. Then $\sSEMI{}{}$ requires that there are %$\aVal,\bVal\in\Val$ and
+two events. Then $\sSEMI{}{}$ requires %$\aVal,\bVal\in\Val$ and
 $\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
 \begin{align*}
-  \tag{$\dagger\dagger$}\label{eq2}
+  \tag{$\dagger$}\label{eq2}
   \begin{gathered}
     \PR{x}{r} 
     \\
@@ -946,14 +944,16 @@ $\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
     \PW{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{\bForm[r/y]}{}
-        \eventr{\aEv}{a2}{r{=}\bVal\bigmid\DW{y}{\bVal}}{left=of xd}      
+        %\xform{xd}{\bForm[r/y]}{}
+        \eventr{\aEv}{a2}{r{=}\bVal\bigmid\DW{y}{\bVal}}{}%left=of xd}      
         \xform{xi}{\bForm[r/y]}{left=.5em of a2}
-        \xo{a2}{xd}
+        %\xo{a2}{xd}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-First we consider the case that $\aVal=\bVal$.  For example, if $\aVal=\bVal=1$, we have:
+(Since dependent and independent transformers are the same for writes, we
+only show the independent transformer.)  First we consider the case that
+$\aVal=\bVal$.  For example, if $\aVal=\bVal=1$, we have:
 \begin{align*}
   \begin{gathered}
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
@@ -966,10 +966,10 @@ First we consider the case that $\aVal=\bVal$.  For example, if $\aVal=\bVal=1$,
   &&
   \begin{gathered}
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{\bForm[r/y]}{}
-        \eventr{\aEv}{a2}{r{=}1\bigmid\DW{y}{1}}{left=of xd}      
+        %\xform{xd}{\bForm[r/y]}{}
+        \eventr{\aEv}{a2}{r{=}1\bigmid\DW{y}{1}}{}      
         \xform{xi}{\bForm[r/y]}{left=.5em of a2}
-        \xo{a2}{xd}
+        %\xo{a2}{xd}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -997,15 +997,7 @@ Combining these into a single pomset, we have:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-By \ref{seq-tau}, predicate transformers are determined by composition; thus
-$\aTr{\bEvs}{\bForm}$ is $\aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$.  Since the
-transformer does not depend on whether the write is included, we do not draw
-dependencies for the write in the diagram.
-
-Note that both \ref{read-tau-dep} and \ref{read-tau-ind} degenerate to
-\ref{read-tau-empty} when $\labelingForm(\aEv)=\FALSE$.
-
-Turning to the precondition $\aForm$ on the write, recall that in order for
+Looking at the precondition $\aForm$ of the write, recall that in order for
 $\aEv$ to participate in a top-level pomset, the precondition $\aForm$ must
 be a tautology at top-level.  There are two possibilities.
 \begin{itemize}
@@ -1039,17 +1031,18 @@ Eliding transformers, the two outcomes are:
   \end{gathered}
 \end{align*}
 The independent case on the right can only participate in a top-level pomset
-if the precondition $(x{=}1)$ is discharged.  To do so, we must prepend a
-pomset $\aPS_0$ that writes $1$ to $x$:
+if the precondition $(x{=}1)$ is discharged.  To do so, we can prepend a
+program %pomset $\aPS_0$
+that writes $1$ to $x$:
 \begin{align*}
   \begin{gathered}
     \PW{x}{1}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{\bForm[1/x]}{}
-        \eventr{\cEv}{a2}{1{=}1\bigmid\DW{x}{1}}{left=of xd}      
+        %\xform{xd}{\bForm[1/x]}{}
+        \eventr{\cEv}{a2}{1{=}1\bigmid\DW{x}{1}}{}%left=of xd}      
         \xform{xi}{\bForm[1/x]}{left=.5em of a2}
-        \xo{a2}{xd}
+        %\xo{a2}{xd}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -1063,7 +1056,8 @@ pomset $\aPS_0$ that writes $1$ to $x$:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-Here we apply the predicate transformer $\aTr[0]{\emptyset}{}$ to $(x{=}1)$,
+Here we apply the transformer from the left %$\aTr[0]{\emptyset}{}$
+to $(x{=}1)$,
 resulting in the tautology $(1{=}1)$.
 
 
@@ -1115,6 +1109,24 @@ them.  For example, the precondition of $\aEv$ is a tautology in:
 %     \end{tikzinline}}
 % \end{gather*}
 
+Note that both \ref{read-tau-dep} and \ref{read-tau-ind} degenerate to
+\ref{read-tau-empty} when $\labelingForm(\aEv)=\FALSE$.
+
+Also note that $\sembase{\aCmd_1 \RPAR \aCmd_2}$ is asymmetric, taking the
+predicate transformer for $\aCmd_2$ in \ref{par-tau}.
+
+% In addition to calculating dependencies, preconditions also determine which
+% events can appear in a pomset, since complete pomset must have tautological
+% preconditions (\ref{top-kappa}).  For example, any pomset in 
+% \begin{math}
+%   \sem{
+%     \PW{x}{1}\SEMI\PW{y}{1}
+%     \PAR  
+%     \IF{\PR{x}{}}\THEN\PR{y}{r}\FI
+%   }
+% \end{math}
+% that includes a read of $y$ must also include a read of $x$.
+
 
 \subsection{Control Dependencies}
 \label{sec:ex:control}
@@ -1134,8 +1146,11 @@ conjunctive formulation: $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aFor
 
 For events from $\aEvs_1$, \ref{if-kappa} requires
 $\aForm\land\labelingForm_1(\aEv)$. For events from $\aEvs_2$,
-\ref{if-kappa} requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For
-coalescing events in $\aEvs_1\cap\aEvs_2$, \ref{if-kappa} requires
+it %\ref{if-kappa}
+requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For
+coalescing events in $\aEvs_1\cap\aEvs_2$,
+it %\ref{if-kappa}
+requires
 $(\aForm\land\labelingForm_1(\aEv)) \lor
 (\lnot\aForm\land\labelingForm_2(\aEv))$.  This semantics allows common code
 to be lifted out of a conditional, validating the transformation
@@ -1174,7 +1189,7 @@ from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
       \end{tikzinline}}
   \end{gathered}  
 \end{align*}
-Here, the precondition in the combined pomset is a tautology, independent of
+Here, the precondition in the combined pomset (on the right) is a tautology, independent of
 $r$.
 
 Control dependencies are eliminated in the same way as data dependencies.
@@ -1195,18 +1210,18 @@ For example:
     \IF{r{=}1}\THEN\PW{y}{1}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \xform{xd}{\aTr[2]{\{\aEv\}}{\bForm}}{}
-        \eventr{\aEv}{a2}{r{=}1\bigmid\DW{y}{\bVal}}{left=of xd}      
+        %\xform{xd}{\aTr[2]{\{\aEv\}}{\bForm}}{}
+        \eventr{\aEv}{a2}{r{=}1\bigmid\DW{y}{\bVal}}{}%left=of xd}      
         \xform{xi}{\aTr[2]{\emptyset}{\bForm}}{left=.5em of a2}
-        \xo{a2}{xd}
+        %\xo{a2}{xd}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
 where
 \begin{math}
   \aTr[2]{\emptyset}{\bForm}
-  \riff
-  \aTr[2]{\{\aEv\}}{\bForm}
+  % \riff
+  % \aTr[2]{\{\aEv\}}{\bForm}
   \riff
   (r{=}1\land\bForm[1/y])
   \lor
@@ -1244,7 +1259,7 @@ if $\aExp{\neq}0$ is a tautology then
   \sem{\aCmd_1}.
 \end{math}
 Here, we take the empty pomset as the denotation of $\aCmd_2$.  Since
-$\not\aExp$ is unsatisfiable, \ref{if-term} ignores the termination condition
+$\lnot\aExp$ is unsatisfiable, \ref{if-term} ignores the termination condition
 of $\aCmd_2$.  It is worth noting that the reverse inclusion,
 dead-code-introduction, holds for \emph{complete} pomsets, but not in
 general.
