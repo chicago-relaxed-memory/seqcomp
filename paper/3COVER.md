@@ -1,3 +1,7 @@
+Thanks for all of your excellent comments.  They have greatly improved the paper. 
+We have made substantial improvements throughout the paper.  Here is how we
+have addressed the required changes:
+
 > 1. Please add a claim about your Coq formalisation to your paper, and make
 > your Coq proof scripts accessible. We noticed a couple of `Admitted' lemmas
 > in your Coq proof scripts; these must be discharged before the paper can be
@@ -50,4 +54,5 @@ We have adopted all of your suggestions, with only one exception: We continue
 to use "termination condition" rather than "completion condition", as
 suggested.  Termination is necessary for completion, not sufficient, as the
 change of terminology might imply.
+
 
