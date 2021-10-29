@@ -107,9 +107,9 @@ can be calculated independently.  With this formulation, we can show:
   \sem{\bLoc  \GETS \bExp\SEMI \aLoc \GETS \aExp} \;\;\text{if}\; \aLoc\neq\bLoc
 \end{align*}
 Then the equivalence holds in any context---this form of the equivalence
-enables reasoning about peephole optimizations.  Unlike prior work, \PwT{}
-allows the presence or absence of a dependency can be understood in
-isolation.  This enables incremental and modular validation of assumptions
+enables reasoning about peephole optimizations.  Said differently, unlike prior work, \PwT{}
+allows the presence or absence of a dependency to be understood in
+isolation---this enables incremental and modular validation of assumptions
 about program dependencies in larger blocks of code.
 
 Our main insight is that for language models, \emph{sequentiality} is the
@@ -119,24 +119,27 @@ do little optimization between threads.  We motivate our approach to
 sequential dependencies in \textsection\ref{sec:overview} and provide formal
 definitions in \textsection\ref{sec:model}.  We extend the model to include
 additional features, such as address calculation and \RMW{}s, in
-\textsection\ref{sec:additional}.  We further discuss related work in
-\textsection\ref{sec:related}.
+\textsection\ref{sec:additional}.  We discuss related and future work in
+\textsection\ref{sec:related}--\ref{sec:outro}.
 
 We extend \PwT{} to a full memory model in \textsection\ref{sec:mca}, based
 on \PwP{} \cite{DBLP:journals/pacmpl/JagadeesanJR20}.
-\textsection\ref{sec:results} summarizes the results for this model.  The
-dependency relation calculated by \PwT{} can also be used with off-the-shelf
-models.  For example, in \textsection\ref{sec:c11} we show that it can be
-used as an $\rsdep$ relation for \cXI, adapting the approach of \MRD{}
+\textsection\ref{sec:results} summarizes the results for this model.  In
+addition to powering such a bespoke model, the dependency relation calculated
+by \PwT{} can also be used with off-the-shelf models.  For example, in
+\textsection\ref{sec:c11} we show that it can be used as an $\rsdep$ relation
+for \cXI, adapting the approach of \MRD{}
 \cite{DBLP:conf/esop/PaviottiCPWOB20}.  % This is only the second semantics
 % to distill dependencies down to a relation compatible with the existing
 % \cpp{} standard, and the first one to be fully compositional.
 \textsection\ref{sec:tool} describes a tool for automatic evaluation of
 litmus tests in this model.  \cXI{} allows thin-air in order to avoid
 overhead in the implementation of relaxed reads.  Safe language like OCaml
-\cite{Dolan:2018:BDR:3192366.3192421} have typically made the opposite choice.  Just
-\PwT{} can be used to strengthen \cXI{}, it could also be used to weaken these
-models, allowing optimal lowering for relaxed reads while banning thin-air.
+\cite{Dolan:2018:BDR:3192366.3192421} have typically made the opposite
+choice, accepting a performance penalty in order to avoid thin-air.  Just as
+\PwT{} can be used to strengthen \cXI{}, it could also be used to weaken
+these models, allowing optimal lowering for relaxed reads while banning
+thin-air.
 
 
 % The
@@ -213,7 +216,7 @@ sequential composition satisfies the expected monoid laws
 % % \cite{DBLP:journals/pacmpl/JagadeesanJR20} by using a recent alternative
 % % characterization of \armeight{}.
 
-Supplementary material for this paper available at
+Supplementary material for this paper is available at
 \url{https://weakmemory.github.io/pwt}.
 
 \section{Overview}
