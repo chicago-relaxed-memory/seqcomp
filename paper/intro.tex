@@ -500,7 +500,7 @@ but this depends crucially on the control dependency
 from $(\DR{x}{1})$ to $(\DW{y}{1})$, and the data dependency
 from $(\DR{y}{1})$ to $(\DW{x}{1})$. If either is missing, then this execution
 is acyclic and hence allowed. For example dropping the control dependency
-results in:
+results in the following execution, which should be allowed:
 \begin{gather*}
   \THREAD{\PR{x}{r}\SEMI \PW{y}{1}}
   \PAR

@@ -1389,13 +1389,11 @@ branch of a conditional.
 Consider the following example 
 \cite[\textsection6.3]{DBLP:conf/esop/PaviottiCPWOB20}:
 \begin{gather*}
-  \begin{gathered}    
+  \begin{array}{r}
     \PW{x}{1}
     \SEMI
     \PR{y}{r}
     \SEMI
-    \mkern-8mu
-    \begin{array}[t]{r}
       \IF{r\EQ0}\THEN
         \PW{x}{0}
         \SEMI
@@ -1413,19 +1411,20 @@ Consider the following example
         \FI
       \FI      
     \end{array}
-    \;\;\PAR\;\;
-    \mkern8mu
+    \quad
+    \Big\|
+    \quad
+  \begin{array}{r}
     \IF{z}\THEN
       \PW{y}{1}
     \FI
-  \end{gathered}
+  \end{array}
 \end{gather*}
 In SC executions, this program always reads $0$ for $y$, and therefore never
 writes $z$.  Thus, the program is data-race-free.  However, using
 \reffig{fig:seq} without $\Q{x}$, as we have done up to now, the following
 non-SC execution is allowed, violating \drfsc{}.
 \begin{gather*}
-  \begin{gathered}    
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DW{x}{1}}{}
         \event{a2}{\DR{y}{1}}{right=of a1}
@@ -1443,7 +1442,6 @@ non-SC execution is allowed, violating \drfsc{}.
         \rf[out=-170,in=-10]{b2}{a2}
         \po{a4}{a5}
       \end{tikzinline}}
-  \end{gathered}
 \end{gather*}
 The execution is allowed because the write to $z$ is independent of the
 preceding read of $y$.  Note that the write to $z$ \emph{does} depend on the read
@@ -1558,8 +1556,7 @@ analysis of \MRD{} \cite{DBLP:conf/esop/PaviottiCPWOB20} is overly conservative.
 mechanism in \MRD{} does not recognize that the precondition of $\DW{y}{1}$
 is a tautology.  Instead, it seeks an isomorphic justification under the
 $\DR{x}{2}$ branch of the read in the event structure, and---failing to find
-such a justification---leaves the dependency in place. \todo{Mark/Simon:
-  please check this.}
+such a justification---leaves the dependency in place. 
 
 
 % As a sanity check, consider the
@@ -2118,7 +2115,7 @@ and \ref{read-tau-ind} are different from the ones used traditionally, which
 are written using substitution.  Attempting to write \ref{read-tau-dep} and
 \ref{read-tau-ind} in this style we would have (as in
 \cite{DBLP:journals/pacmpl/JagadeesanJR20}):
-\begin{enumerate}[topsep=0pt]
+\begin{enumerate}%[topsep=0pt]
 \item[{\labeltext[\textsc{r}4a$'$]{(\textsc{r}4a$'$)}{read-tau-dep-p}}]
   if $\aEv\in\aEvs\cap\bEvs$ then
   %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
