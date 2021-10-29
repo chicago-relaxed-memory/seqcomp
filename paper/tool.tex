@@ -13,42 +13,30 @@ The definitions of $\sSEMI{\aPSS_1}{\aPSS_2}$ and $\sIF{\aForm}\sTHEN\aPSS_1\sEL
 This is compounded by the hidden complexity of calculating the possible merges between pomsets through union in rules \ref{seq-E} and \ref{if-E}.
 Significant effort has been put into throwing away spurious merges early in \PwTer, so that executing the tool remains manageable for small examples.
 Some further optimisations may be possible within the tool to improve the situation further, such as killing 'dead-end' pomsets at each sequence operator, or by doing a directed search for particular execution outcomes.
-Unsurprisingly the execution time is dominated by the calculation of the denotation, with the additional axiomatic filtering step of \PwTc{} being within margin of error difference of just calculating the \PwT{} semantics.
 For context, we have included the results of \MRD{} for the Java Causality tests~\cite{DBLP:conf/esop/PaviottiCPWOB20}.
-% \PwTer{} will be made open source upon publication.
-\PwTer{} is available online at \url{https://github.com/graymalkin/pomsets-with-predicate-transformers}.
-
-\todo{Remove link? --- perhaps we put in the appendices.}
+\PwTer{} is available with this paper's supplementary materials.
 
 \todo{Verify that referee comments sufficiently addressed regarding ``scalability challenges''.  Perhaps mention that it is easier for hardware models?}
-
-\todo{Shrink by using two columns and dump \PwT{}?}
 
 
 %% [Simon] I am not a fan of how this looks on the page.
 \begin{figure}[t]
-\begin{center}
-  \begin{tabularx}{0.8\textwidth}{c||c|c|c|c|c|c}
-    \multirow{2}{*}{\bf Causality Test}   & \multicolumn{2}{c|}{\PwTc{}}    & \PwT{}     & \multicolumn{3}{c}{\MRD}  \\
-    \cline{2-7}
-                                     & Result & Time (s)  &  Time (s) & \MRD   & \MRDIMM & \MRDRC  \\
-    \cline{1-7}
-    jctc1                            & pass   & 2.181     & 2.112     & pass    & pass    & pass   \\
-    jctc2                            & pass   & 25.605    & 21.404    & pass    & pass    & pass   \\
-    jctc3                            & pass   & 181.052   & 185.913   & pass    & pass    & pass   \\
-    jctc4                            & pass   & 1.943     & 1.906     & pass    & pass    & pass   \\
-    jctc5                            & pass   & 57.599    & 57.352    & pass    & pass    & pass   \\
-    jctc6                            & pass   & 10.297    & 10.271    & pass    & pass    & pass   \\
-    jctc7                            & pass   & 79.916    & 85.777    & pass    & pass    & pass   \\
-    jctc8                            & pass   & 2.211     & 2.171     & pass    & pass    & pass   \\
-    jctc9                            & pass   & 14.638    & 13.167    & pass    & pass    & pass   \\
-    jctc10                           & pass   & 538.614   & 526.774   & pass    & pass    & pass   \\
-    jctc11                           & $\bot$ & --        & --        & pass    & pass    & pass   \\
-    jctc12                           & $\bot$ & --        & --        & --      & --      & --     \\
-    jctc13                           & pass   & 2.225     & 2.154     & pass    & pass    & pass   \\
-    jctc17                           & pass   & 188.318   & 200.829   & fail    & pass    & fail   \\
-    jctc18                           & pass   & 182.788   & 170.625   & fail    & pass    & fail   \\
+\noindent\begin{center}
+  %\hspace{-9ex}%
+  \begin{tabularx}{\textwidth}{@{}c||c|c|c|c @{\extracolsep{5mm}}c||@{\extracolsep{1mm}}c|c|c|c}
+    % \multirow{2}{*}{\bf Test} &  & \multicolumn{3}{c}{\MRD} & & \multirow{2}{*}{\bf Test} &  & \multicolumn{3}{c}{\MRD}\\
+    % \cline{2-5} \cline{8-11}
+    {\bf Test} & \PwTc{}  & \MRD   & \MRDIMM & \MRDRC & {\bf Test} &\PwTc{} & \MRD & \MRDIMM & \MRDRC \\
+    \cline{1-5} \cline{6-10}
+    jctc1      & pass    & pass    & pass    & pass   & jctc9      & pass   & pass & pass     & pass \\
+    jctc2      & pass    & pass    & pass    & pass   & jctc10     & pass   & pass & pass     & pass \\
+    jctc3      & pass    & pass    & pass    & pass   & jctc11     & $\bot$ & pass & pass     & pass \\
+    jctc4      & pass    & pass    & pass    & pass   & jctc12     & $\bot$ & --   & --       & --   \\
+    jctc5      & pass    & pass    & pass    & pass   & jctc13     & pass   & pass & pass     & pass \\
+    jctc6      & pass    & pass    & pass    & pass   & jctc17     & pass   & fail & pass     & fail \\
+    jctc7      & pass    & pass    & pass    & pass   & jctc18     & pass   & fail & pass     & fail \\
+    jctc8      & pass    & pass    & pass    & pass
   \end{tabularx}
-  \caption{\label{fig:tool} Tool results for supported Java Causality Test Cases~\cite{PughWebsite}. $\bot$ indicates the tool failed to run for this test due to a memory overflow. Tests run on an Intel i9-9980HK with 64 GB of memory, execution times are the mean of 3 runs. For context, results for the various flavours of \MRD{} are included~\cite{DBLP:conf/esop/PaviottiCPWOB20}.}
+  \caption{\label{fig:tool} Tool results for supported Java Causality Test Cases~\cite{PughWebsite}. $\bot$ indicates the tool failed to run for this test due to a memory overflow. Tests run on an Intel i9-9980HK with 64 GB of memory. For context, results for the \MRD, \MRDIMM, and \MRDRC{} are also included~\cite{DBLP:conf/esop/PaviottiCPWOB20}.}
 \end{center}
 \end{figure}
