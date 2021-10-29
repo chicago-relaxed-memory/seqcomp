@@ -760,6 +760,9 @@ We show the rules for write and read.\footnote{The Coq development uses
   $\rimplies$ rather than $\riff$ in \ref{write-kappa-ca} and
   \ref{read-kappa-ca}.  Given the quantification over $\aForm$, these are
   equivalent.}  The rule for fences requires similar treatment.
+
+\noindent
+\begin{minipage}{1.0\textwidth}
 \begin{definition}
   % \label{def:partition}
   % Let $\aEvs\subseteq\AllEvents$ and $\aForm:\aEvs\fun\Formulae$ and
@@ -778,6 +781,10 @@ We show the rules for write and read.\footnote{The Coq development uses
   \label{def:semca}
   \input{fig-ca.tex}
 \end{definition}
+\end{minipage}
+\smallskip
+
+\noindent
 The definition allows multiple events to represent a single action, each with
 a disjoint precondition.  The predicate transformers are derived from those
 defined for the conditional.

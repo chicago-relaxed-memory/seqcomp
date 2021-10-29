@@ -1,3 +1,4 @@
+\input{fig-pwter.tex}
 \section{\PwTerTITLE: automatic litmus test evaluator}
 \label{sec:tool}
 
@@ -20,43 +21,3 @@ Some further optimisations may be possible within the tool to improve the situat
 % \todo{Verify that referee comments sufficiently addressed regarding ``scalability challenges''.  Perhaps mention that it is easier for hardware models?}
 
 
-%% [Simon] I am not a fan of how this looks on the page.
-\newcommand{\good}{{\color{green!70!black}\ding{52}}}
-\newcommand{\nogood}{{\color{red!90!black}\ding{56}}}
-\begin{table}[t]
-  \caption{\label{fig:tool} Tool results for supported Java Causality Test Cases~\cite{PughWebsite}. $\bot$ indicates the tool failed to run for this test due to a memory overflow. Tests run on an Intel i9-9980HK with 64 GB of memory. For context, results for the \MRD, \MRDIMM, and \MRDRC{} are also included~\cite{DBLP:conf/esop/PaviottiCPWOB20}.}
-
-\noindent\begin{center}
-  \begin{minipage}[t]{0.49\textwidth}
-  \begin{tabular}{l*{4}c}
-    \toprule
-    {\bf Test} & \PwTc & \MRD  & \MRDIMM & \MRDRC \\
-    \midrule
-    jctc1      & \good & \good & \good   & \good \\
-    jctc2      & \good & \good & \good   & \good \\
-    jctc3      & \good & \good & \good   & \good \\
-    jctc4      & \good & \good & \good   & \good \\
-    jctc5      & \good & \good & \good   & \good \\
-    jctc6      & \good & \good & \good   & \good \\
-    jctc7      & \good & \good & \good   & \good \\
-    jctc8      & \good & \good & \good   & \good \\
-    \bottomrule
-  \end{tabular}
-  \end{minipage}\hfill
-  \begin{minipage}[t]{0.49\textwidth}
-  \begin{tabular}{l*{4}c}
-    \toprule
-    {\bf Test} & \PwTc  & \MRD    & \MRDIMM & \MRDRC \\
-    \midrule
-    jctc9      & \good  & \good   & \good   & \good \\
-    jctc10     & \good  & \good   & \good   & \good \\
-    jctc11     & $\bot$ & \good   & \good   & \good \\
-    jctc12     & $\bot$ & --      & --      & --   \\
-    jctc13     & \good  & \good   & \good   & \good \\
-    jctc17     & \good  & \nogood & \good   & \nogood \\
-    jctc18     & \good  & \nogood & \good   & \nogood \\
-    \bottomrule
-  \end{tabular}
-  \end{minipage}
-\end{center}
-\end{table}

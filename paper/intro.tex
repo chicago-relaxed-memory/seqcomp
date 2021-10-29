@@ -518,15 +518,19 @@ results in the following execution, which should be allowed:
 \end{gather*}
 
 While syntactic dependency calculation suffices for hardware models, it is
-not preserved by common compiler optimizations. For example, if we calculate
-control dependencies syntactically, then there is a dependency from
-$(\DR{x}{1})$ to $(\DW{y}{1})$, and therefore a cycle in, the candidate
-execution:
+not preserved by common compiler optimizations. For example, consider the
+following program:
 \begin{gather*}
   \THREAD{\PR{x}{r}\SEMI \IF r \THEN \PW{y}{1} \ELSE \PW{y}{1} \FI}
   \PAR
   \THREAD{\PR{y}{s}\SEMI \PW{x}{s}}
-  \\[-.4ex]
+\end{gather*}
+Because $\PW{y}{1}$ occurs on both branches of the conditional, a compiler
+may lift it out.  With the dependency removed, the compiler could reorder the
+read of $x$ and write to $y$, allowing both reads to see $1$.  Attempting to
+generate this execution with syntactic dependencies, however, results in the
+following candidate execution, which has a cycle and therefore is disallowed:
+\begin{gather*}
   \hbox{\begin{tikzinline}[node distance=1.5em]
       \event{rx1}{\DR{x}{1}}{}
       \event{wy1}{\DW{y}{1}}{right=of rx1}
@@ -538,8 +542,6 @@ execution:
       \po{ry1}{wx1}
     \end{tikzinline}}
 \end{gather*}
-A compiler may lift the assignment $\PW{y}{1}$ out of the conditional,
-thus removing the dependency.
 
 To address this, \citet{DBLP:journals/pacmpl/JagadeesanJR20} introduced
 \emph{Pomsets with Preconditions} (\PwP{}), where events are labeled with logical
@@ -600,11 +602,11 @@ captures the concurrent semantics.  These correspond to two views of memory
 for each thread: thread-local and global.  In a
 \emph{multicopy-atomic} (\mca{}) architecture, there is only one global view,
 shared by all processors, which is neatly captured by the order of the
-pomset.
+pomset (see \textsection\ref{sec:mca}).
 
 An untaken conditional produces no events.  \PwP{} models this by including
 the empty pomset in the semantics of every program fragment.  To then ensure
-that $\SKIP$ is not a refinement of $\PW{x}{1}$, \PwP{} include the
+that $\SKIP$ is not a refinement of $\PW{x}{1}$, \PwP{} include a
 \emph{termination} action, $\aTerm{}$, which we have elided in the examples
 above.
 
@@ -695,8 +697,8 @@ showing how $\bForm$ is transformed, for example:
     \PR{x}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{rx0}{\DR{x}{0}}{}
-        \xform{rx0d}{(0{=}r) \limplies \bForm}{right=of rx0}
+        \event{rx0}{\DR{x}{1}}{}
+        \xform{rx0d}{(1{=}r) \limplies \bForm}{right=of rx0}
         %\xo{rx0}{rx0d}
       \end{tikzinline}}
   \end{gathered}
@@ -705,8 +707,8 @@ showing how $\bForm$ is transformed, for example:
     \PR{y}{s}
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{ry0}{\DR{y}{0}}{}
-        \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
+        \event{ry0}{\DR{y}{1}}{}
+        \xform{ry0d}{(1{=}s) \limplies \bForm}{right=of ry0}
         %\xo{ry0}{ry0d}
       \end{tikzinline}}
   \end{gathered}
@@ -715,7 +717,7 @@ showing how $\bForm$ is transformed, for example:
     \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{}
+        \event{wz0}{(s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{}
         \xform{wz0d}{\bForm[r{*}s/z]}{right=of wz0}
         %\xo{wz0}{wz0d}
       \end{tikzinline}}
@@ -727,7 +729,7 @@ $\bForm[\aExp/z]$.  For a read $\PR{\aLoc}{\aReg}$, however,
 \citeauthor{DBLP:journals/cacm/Dijkstra75} would transform $\bForm$ to
 $\bForm[x/r]$, which is equivalent to $(x{=}r) \limplies \bForm$ under the
 assumption that registers are assigned at most once.  Instead, we use
-$(0{=}r) \limplies \bForm$, reflecting the fact that $0$ may come from a
+$(1{=}r) \limplies \bForm$, reflecting the fact that $1$ may come from a
 concurrent write.  The obligation to find a matching write is moved from the
 sequential semantics of \emph{substitution} and \emph{implication} to the
 concurrent semantics of \emph{fulfillment}.
@@ -740,13 +742,13 @@ straightforward: we apply each predicate transformer to subsequent
 preconditions, composing the predicate transformers.
 \begin{equation}
 \begin{gathered}
-  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \\
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-      \event{rx0}{\DR{x}{0}}{}
-      \event{ry0}{\DR{y}{0}}{right=of rx0}
-      \event{wz0}{(0{=}r) \limplies (0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
-      \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm[r{*}s/z]}{right=of wz0}
+      \event{rx0}{\DR{x}{1}}{}
+      \event{ry0}{\DR{y}{1}}{right=of rx0}
+      \event{wz0}{(1{=}r) \limplies (1{=}s) \limplies (s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
+      \xform{rx0ry0d}{(1{=}r) \limplies(1{=}s) \limplies \bForm[r{*}(s{-}1)/z]}{right=of wz0}
       \wki{rx0}{ry0}
       \wki{ry0}{wz0}
       %\xo{rx0}{rx0ry0d}
@@ -775,9 +777,9 @@ with a dotted edge leading to the dependent one ($\xxo$). For example:
     \PR{x}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{rx0}{\DR{x}{0}}{}
+        \event{rx0}{\DR{x}{1}}{}
         \xform{rx0i}{\bForm}{left=.4em of rx0}
-        \xform{rx0d}{(0{=}r) \limplies \bForm}{right=of rx0}
+        \xform{rx0d}{(1{=}r) \limplies \bForm}{right=of rx0}
         \xo{rx0}{rx0d}
       \end{tikzinline}}
   \end{gathered}
@@ -786,9 +788,9 @@ with a dotted edge leading to the dependent one ($\xxo$). For example:
     \PR{y}{s}
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{ry0}{\DR{y}{0}}{}
+        \event{ry0}{\DR{y}{1}}{}
         \xform{ry0i}{\bForm}{left=.4em of ry0}
-        \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of ry0}
+        \xform{ry0d}{(1{=}s) \limplies \bForm}{right=of ry0}
         \xo{ry0}{ry0d}
       \end{tikzinline}}
   \end{gathered}
@@ -797,7 +799,7 @@ with a dotted edge leading to the dependent one ($\xxo$). For example:
   %   \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
   %   \\
   %   \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
-  %     \event{wz0}{(s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{}
+  %     \event{wz0}{(s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{}
   %     \xform{wz0i}{\bForm}{left=.4em of wz0}
   %     \xform{wz0d}{\bForm}{right=of wz0}
   %     \xo{wz0}{wz0d}
@@ -810,21 +812,21 @@ the one indexed by all the events before it in causal order.
 
 For example, we can recover the expected semantics
 for \eqref{eq1} by choosing
-the predicate transformer which is independent of $(\DR x0)$
-but dependent on $(\DR y0)$, which is the transformer
-which maps $\bForm$ to $(0{=}s) \limplies \bForm$.
+the predicate transformer which is independent of $(\DR x1)$
+but dependent on $(\DR y1)$, which is the transformer
+which maps $\bForm$ to $(1{=}s) \limplies \bForm$.
 (In subsequent diagrams, we only show predicate transformers for reads.)
 \begin{gather*}
-  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \\
   \hbox{\begin{tikzinline}[node distance=2ex and 1.2em]
       \xform{wz0i}{\bForm}{}
-      \xform{rx0d}{(0{=}r) \limplies \bForm}{right=of wz0i}
-      \xform{rx0ry0d}{(0{=}r) \limplies(0{=}s) \limplies \bForm}{right=of rx0d}
-      \xform{ry0d}{(0{=}s) \limplies \bForm}{right=of rx0ry0d}
-      \event{rx0}{\DR{x}{0}}{above left=of rx0ry0d}
-      \event{ry0}{\DR{y}{0}}{above right=of rx0ry0d}
-      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
+      \xform{rx0d}{(1{=}r) \limplies \bForm}{right=of wz0i}
+      \xform{rx0ry0d}{(1{=}r) \limplies(1{=}s) \limplies \bForm}{right=of rx0d}
+      \xform{ry0d}{(1{=}s) \limplies \bForm}{right=of rx0ry0d}
+      \event{rx0}{\DR{x}{1}}{above left=of rx0ry0d}
+      \event{ry0}{\DR{y}{1}}{above right=of rx0ry0d}
+      \event{wz0}{(1{=}s) \limplies (s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
       \po{ry0}{wz0}
       \xo{rx0}{rx0d}
       \xo{ry0}{ry0d}
@@ -833,10 +835,10 @@ which maps $\bForm$ to $(0{=}s) \limplies \bForm$.
     \end{tikzinline}}
 \end{gather*}
 In the diagram, the dotted lines indicate set inclusion into the index of the transformer-family.
-As a quick correctness test, we can see that sequential composition is
+As a quick correctness check, we can see that sequential composition is
 associative in this case, since it does not matter whether we
-associate to the left, with the intermediate step eliding $\DWP{z}{0}$ in the
-diagram above,
+associate to the left---with the intermediate step as in the diagram above,
+eliding the write action---
 % \begin{gather*}
 %   \PR{x}{r}\SEMI \PR{y}{s}
 %   \\
@@ -853,18 +855,19 @@ diagram above,
 %       \xo{ry0}{rx0ry0d}
 %     \end{tikzinline}}
 % \end{gather*}
-or to the right, with the intermediate step:
+or to the right---with the intermediate step:
 \begin{gather*}
-  \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \\
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-      \event{ry0}{\DR{y}{0}}{}
-      \event{wz0}{(0{=}s) \limplies (s {<} 1) \land (r{*}s){=}0 \bigmid \DW{z}{0}}{right=of ry0}
-      \xform{ry0d}{(0{=}s) \limplies \bForm}{left=of ry0}
+      \event{ry0}{\DR{y}{1}}{}
+      \event{wz0}{(1{=}s) \limplies (s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
+      \xform{ry0d}{(1{=}s) \limplies \bForm}{left=of ry0}
       \xform{wz0i}{\bForm}{left=of ry0d}
       \po{ry0}{wz0}
       \xo{ry0}{ry0d}
     \end{tikzinline}}
 \end{gather*}
-This is an instance of the general result that sequential composition forms a monoid.
+This is an instance of the general result that sequential composition forms a
+monoid (\reflem{lem:monoid}).
 

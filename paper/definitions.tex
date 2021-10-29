@@ -2,7 +2,7 @@
 \label{sec:model}
 
 After some preliminaries (\textsection\ref{sec:prelim}--\ref{sec:actions}),
-we define the basic model and establish some basic properties
+we define the model and establish some basic properties
 (\textsection\ref{sec:pomsets} and \reffig{fig:seq}).  We then explain the
 model using examples (\textsection\ref{sec:ex:pomset}--\ref{sec:ex:last}).
 We encourage readers to skim the definitions and then skip to
@@ -100,9 +100,6 @@ We model the following language.
 {release} ($\mREL$), {acquire} ($\mACQ$), and
 {sequentially consistent} ($\mSC$).
 %
-Let expressions ($\LET{\aReg}{\aExp}$) only affect thread-local state and
-thus do not have a mode.
-%
 Reads ($\PR[\amode]{\REF{\cExp}}[\ascope]{\aReg}$) support
 %$\mWK$,
 $\mRLX$,
@@ -124,14 +121,18 @@ $\mREL$,
 $\mACQ$,
 %$\mRA$,
 $\mSC$.
+%
+Register assignments ($\LET{\aReg}{\aExp}$) only affect thread-local state
+and therefore have no mode.
+%
 In examples, the default mode for reads and writes is $\mRLX$---we
 systematically drop the annotation. 
 
-\emph{Commands}, aka \emph{statements}, $\aCmd$, include memory accesses at a
-given mode, as well as the usual structural constructs. Following
-\citet{DBLP:conf/icfp/FerreiraHJ96}, $\RPAR$ denotes parallel composition,
-preserving thread state on the right after a join.  In examples and
-sublanguages without join, we use the symmetric $\PAR$ operator.
+\emph{Commands}, aka \emph{statements}, $\aCmd$, include fences and memory
+accesses at a given mode, as well as the usual structural
+constructs. Following \citet{DBLP:conf/icfp/FerreiraHJ96}, $\RPAR$ denotes
+parallel composition, preserving thread state on the right after a join.  In
+examples without join, we use the symmetric $\PAR$ operator.
 
 We use common syntactic sugar, such as \emph{extended expressions}, $\aEExp$,
 which include memory locations.  For example, if $\aEExp$ includes a single
@@ -145,24 +146,16 @@ $\IF{\aExp} \THEN \aCmd\ELSE \SKIP\FI$.
 
 Throughout \textsection\ref{sec:intro}--\ref{sec:tool} we 
 require that
-\begin{itemize}
-\item each register is assigned at most once in a program.
-  % \end{itemize}
-  % In \textsection\ref{sec:complications} and following, we
-  % require instead that
-  % \begin{itemize}
-  % \end{itemize}
-\end{itemize}
+% \begin{itemize}
+% \item
+  each register is assigned at most once in a program.
+%\end{itemize}
 In \textsection\ref{sec:additional}, we drop this restriction, requiring
 instead that
-\begin{itemize}
-\item there are registers that do not
-  appear in programs. % (see \textsection\ref{sec:semreg}).
-  % $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$, that do not
-  % appear in programs: $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$.
-\end{itemize}
-% In contexts that make no use of $\uRegs{\AllEvents}$, we make the first
-% assumption.
+% \begin{itemize}
+% \item
+  there are registers that do not appear in programs. 
+%\end{itemize}
 
 The semantics is built from the following.
 \begin{itemize}
@@ -406,9 +399,13 @@ of predicate transformers, indexed by sets of events. When computing
 $\sem{\aCmd_1\SEMI\aCmd_2}$, we will use $\aTr{\Cdown{\aEv}}{}$ as the
 predicate transformer for event $\aEv\in\sem{\aCmd_2}$, where
 $\Cdown{\aEv}$ includes all of the events in $\sem{\aCmd_1}$ that precede
-$\aEv$ in causal order ($\bEv\in\Cdown{\aEv}$ when $\bEv<_1\aEv$).  % We
+$\aEv$ in causal order ($\bEv<_1\aEv$ implies $\bEv\in\Cdown{\aEv}$).  % We
 % call $\Cdown{\aEv}$ the \emph{dependent set} of $\aEv$, and
 % $\aEvs\setminus\Cdown{\aEv}$ the \emph{independent set}.
+The following definition requires that the larger ${\Cdown{\aEv}}{}$ is, the
+better, at least in terms of satisfying preconditions.  Adding more order can
+only increase the size of ${\Cdown{\aEv}}{}$.  Thus more order means weaker
+preconditions.
 
 \begin{definition}
   \label{def:family}
@@ -424,11 +421,7 @@ and $\aTrAbbrv{\aEvs}{\bForm}$---the transformer of the biggest set---is the
 \emph{best}.  (The definition is insensitive to events outside $\aEvs$---it
 is for this reason that we have taken $\bEvs\subseteq\AllEvents$ rather than
 $\bEvs\subseteq\aEvs$.)
-
-In sequential composition, adding more order can only increase the size of
-${\Cdown{\aEv}}{}$.  Following \refdef{def:family}, the larger
-${\Cdown{\aEv}}{}$ is, the better, at least in terms of satisfying
-preconditions.  Thus more order means weaker preconditions.
+%
 
 \begin{definition}
   \label{def:pomset}
@@ -614,7 +607,7 @@ well as inclusion (see the definition of $\rextendsdef{}{}$ in \reffig{fig:seq})
   \end{enumerate*}      
 \end{lemma}
 In \textsection\ref{sec:semca}, we refine the semantics to validate the
-reverse inclusions for (\ref{lem:if:elim}--\ref{lem:seq:if}).  Although the
+reverse inclusions for (\ref{lem:if:elim}--\ref{lem:seq:if}) using if-introduction.  Although the
 semantics of \reffig{fig:seq} validates the reverse inclusions for
 \eqref{lem:ifelse:if:if}, these do not hold for \PwTmca{} (see \textsection\ref{sec:outro}).
 %\todo{Mention \PwTpo{}/\PwTc{}?}
@@ -653,8 +646,9 @@ order, where we require ${\lt_2}\supseteq{\lt_1}$.
   %   Induction on the definition of $\sembase{}$.
   % \end{proof}
 \end{lemma}
-One intuitive reading of augment closure is that adding order can only cause
-preconditions to weaken.  Augment closure also captures the intuition that it
+% One intuitive reading of augment closure is that adding order can only cause
+% preconditions to weaken.
+Augment closure also captures the intuition that it
 is always sound for a compiler to make more conservative assumptions about
 dependencies than the semantics.
 
@@ -733,7 +727,7 @@ is a valid refinement.  It is equally obvious that
   \sem{\PW{\aLoc}{1} \SEMI \PW{\aLoc}{1}}
 \end{math}
 is not a valid refinement, since the latter includes a two-element pomset,
-but the former does not. ({These are distinguished by the context:
+but the former does not. ({These are observationally distinguished by the context:
   \begin{math}
     \hole{} \PAR
     \PR{x}{r} \SEMI
@@ -751,8 +745,9 @@ Termination conditions ensure that the empty pomset is not used
 inappropriately.  At top level, \ref{top-term} requires that $\aTerm$ is a
 tautology.  \ref{write-term} and \ref{fence-term} ensure that writes and
 fences are included in complete pomsets, unless they are inside an untaken
-conditional.   \ref{read-term}
-requires that acquiring reads be included.  %This also ensures that
+conditional.
+% \ref{read-term}
+% requires that acquiring reads be included.  %This also ensures that
 % $\sembase{\PW{x}{1}}\not\supseteq\sembase{\IF{\aForm}\THEN\PW{x}{1}\FI}$
 % (unless $\aForm$ is a tautology), since
 % $\sembase{\IF{\aForm}\THEN\PW{x}{1}\FI}$ includes the empty set with
@@ -763,6 +758,16 @@ $\sembase{\PW{x}{1}}\not\supseteq\sembase{\SKIP}$, since $\sembase{\SKIP}$
 includes the empty pomset with $\aTerm\riff\TRUE$, but $\sembase{\PW{x}{1}}$
 can only include the empty pomset with
 $\aTerm\riff \kappaE{\emptyset} = \FALSE$.
+
+For reads, the definition of $\aTerm$ depends on the mode: relaxed reads may
+be elided in complete pomsets (\ref{read-term-nonempty}), but acquiring reads
+must be included (\ref{read-term-empty}).  From this, it is easy to see that
+\begin{math}
+  \sembase{\PR{x}{r}}
+  \supseteq
+  \sembase{\SKIP}
+\end{math}
+is a valid refinement (where the default mode is $\mRLX$).
 
 Note that $\sembase{\PW{x}{2}}$ can write any value $\aVal$; the fact that
 $\aVal$ must be $2$ is captured in the logic.  In particular,
@@ -814,17 +819,7 @@ By merging, the semantics allows the following:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-This pomset is incomplete, however, since $\aTerm\riff2{=}3$.
-
-For reads, the definition of $\aTerm$ depends on the mode: relaxed reads may
-be elided in complete pomsets (\ref{read-term-nonempty}), but acquiring reads
-must be included (\ref{read-term-empty}).  From this, it is easy to see that
-\begin{math}
-  \sembase{\PR{x}{r}}
-  \supseteq
-  \sembase{\SKIP}
-\end{math}
-is a valid refinement (where the default mode is $\mRLX$).
+However, this pomset is incomplete---regardless of $\aExp$---since $\aTerm\riff2{=}3$.
 
 Ignoring predicate transformers, \ref{par-term} and \ref{seq-term} both take
 $\aTerm\riff\aTerm_1\land\aTerm_2$.  This is as expected: the program
@@ -896,8 +891,8 @@ discuss address dependencies in \textsection\ref{sec:addr}.)
   Preconditions are introduced in: 
   \begin{itemize}
   %\item[\eqref{seq-kappa}] for release actions,
-  \item[\eqref{if-kappa}] for control dependencies, 
-  \item[\eqref{write-kappa}] for data dependencies on writes.
+  \item[\eqref{write-kappa}] for data dependencies,
+  \item[\eqref{if-kappa}] for control dependencies. 
   \item[] 
   \end{itemize}
   \columnbreak
@@ -925,7 +920,7 @@ here and control dependencies \eqref{if-kappa} in
 %
 A simple example of a data dependency is a pomset
 $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$.  If $\aPS$ is complete, it must have
-two events. Then $\sSEMI{}{}$ requires %$\aVal,\bVal\in\Val$ and
+two events. Then $\sSEMI{}{}$ (\reffig{fig:seq}) requires %$\aVal,\bVal\in\Val$ and
 $\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
 \begin{align*}
   \tag{$\dagger$}\label{eq2}
@@ -1009,7 +1004,7 @@ be a tautology at top-level.  There are two possibilities.
   % (We make this more
   % precise in \textsection\ref{sec:false}.)
 \end{itemize}
-Eliding transformers, the two outcomes are:
+Eliding transformers and tautological preconditions, the two outcomes are:
 \begin{align*}
   \begin{gathered}
     \PR{x}{r}\SEMI \PW{y}{r}
@@ -1056,7 +1051,7 @@ that writes $1$ to $x$:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-Here we apply the transformer from the left %$\aTr[0]{\emptyset}{}$
+Here we apply the transformer from the left $(\bForm[1/x])$ %$\aTr[0]{\emptyset}{}$
 to $(x{=}1)$,
 resulting in the tautology $(1{=}1)$.
 
@@ -1109,8 +1104,10 @@ them.  For example, the precondition of $\aEv$ is a tautology in:
 %     \end{tikzinline}}
 % \end{gather*}
 
-Note that both \ref{read-tau-dep} and \ref{read-tau-ind} degenerate to
-\ref{read-tau-empty} when $\labelingForm(\aEv)=\FALSE$.
+Note that both \ref{read-tau-dep} and \ref{read-tau-ind} degenerate to the
+identity transformer when $\labelingForm(\aEv)=\FALSE$.  This is the same as
+the transformer for the empty pomset \eqref{read-tau-empty}.
+
 
 Also note that $\sembase{\aCmd_1 \RPAR \aCmd_2}$ is asymmetric, taking the
 predicate transformer for $\aCmd_2$ in \ref{par-tau}.
@@ -1144,56 +1141,17 @@ conjunctive formulation: $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aFor
 %  is logically equivalent to
 %  \href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}. 
 
-For events from $\aEvs_1$, \ref{if-kappa} requires
-$\aForm\land\labelingForm_1(\aEv)$. For events from $\aEvs_2$,
-it %\ref{if-kappa}
-requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For
-coalescing events in $\aEvs_1\cap\aEvs_2$,
-it %\ref{if-kappa}
+Control dependencies are introduced by the conditional. For events from
+$\aEvs_1$, \ref{if-kappa} requires $\aForm\land\labelingForm_1(\aEv)$. For
+events from $\aEvs_2$, it %\ref{if-kappa}
+requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For coalescing events in
+$\aEvs_1\cap\aEvs_2$, it %\ref{if-kappa}
 requires
 $(\aForm\land\labelingForm_1(\aEv)) \lor
-(\lnot\aForm\land\labelingForm_2(\aEv))$.  This semantics allows common code
-to be lifted out of a conditional, validating the transformation
-\begin{math}
-  \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} \supseteq
-  \sem{\aCmd}.
-\end{math}
-
-By allowing events to coalesce, \ref{if-kappa} ensures that control
-dependencies are calculated semantically, rather than syntactically.  For example, consider
-$\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, which is build
-from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$ such as:
-\begin{align*}
-  \begin{gathered}
-    \PW{y}{r}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \eventr{e}{wy1}{r{=}1 \bigmid \DW{y}{1}}{}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}
-    \PW{y}{1}
-    \\
-    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \eventr{e}{wy1}{1{=}1 \bigmid \DW{y}{1}}{}
-      \end{tikzinline}}
-  \end{gathered}
-  &&
-  \begin{gathered}
-    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
-    \\
-    \nonumber
-    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \eventr{e}{wy1}{(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1) \bigmid \DW{y}{1}}{}
-      \end{tikzinline}}
-  \end{gathered}  
-\end{align*}
-Here, the precondition in the combined pomset (on the right) is a tautology, independent of
-$r$.
-
+(\lnot\aForm\land\labelingForm_2(\aEv))$.
+%
 Control dependencies are eliminated in the same way as data dependencies.
-For example:
+Consider:
 \begin{align*}
   \begin{gathered}
     \PR{x}{r} 
@@ -1212,21 +1170,26 @@ For example:
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         %\xform{xd}{\aTr[2]{\{\aEv\}}{\bForm}}{}
         \eventr{\aEv}{a2}{r{=}1\bigmid\DW{y}{\bVal}}{}%left=of xd}      
-        \xform{xi}{\aTr[2]{\emptyset}{\bForm}}{left=.5em of a2}
+        \xform{xi}{
+          (r{=}1\land\bForm[1/y])
+          \lor
+          (r{\neq}1\land\bForm)
+          %\aTr[2]{\emptyset}{\bForm}
+        }{left=.5em of a2}
         %\xo{a2}{xd}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-where
-\begin{math}
-  \aTr[2]{\emptyset}{\bForm}
-  % \riff
-  % \aTr[2]{\{\aEv\}}{\bForm}
-  \riff
-  (r{=}1\land\bForm[1/y])
-  \lor
-  (r{\neq}1\land\bForm).
-\end{math}
+% where
+% \begin{math}
+%   \aTr[2]{\emptyset}{\bForm}
+%   % \riff
+%   % \aTr[2]{\{\aEv\}}{\bForm}
+%   \riff
+%   (r{=}1\land\bForm[1/y])
+%   \lor
+%   (r{\neq}1\land\bForm).
+% \end{math}
 As for \eqref{eq2}, there
 %Reasoning as we did for \eqref{eq2} in \textsection\ref{sec:ex:data}, there
 are two possibilities:
@@ -1251,15 +1214,56 @@ are two possibilities:
   \end{gathered}
 \end{align*}
 
+When events coalesce, \ref{if-kappa} ensures that control
+dependencies are calculated semantically, rather than syntactically.  For example, consider
+$\aPS\in\sem{\IF {r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI}$, which is built
+from $\aPS_1\in\sem{\PW{y}{r}}$ and $\aPS_2\in\sem{\PW{y}{1}}$.  For example, consider:
+\begin{align*}
+  \begin{gathered}
+    \PW{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \eventr{e}{wy1}{r{=}1 \bigmid \DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \PW{y}{1}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \eventr{e}{wy1}{1{=}1 \bigmid \DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \IF{r{=}1} \THEN \PW{y}{r} \ELSE \PW{y}{1}\FI
+    \\
+    \nonumber
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \eventr{e}{wy1}{
+          %(r{=}1 \limplies r{=}1) \land (r{\ne}1 \limplies 1{=}1)
+          r{=}1 \lor (r{\ne}1 \land 1{=}1)
+          \bigmid \DW{y}{1}}{}
+      \end{tikzinline}}
+  \end{gathered}  
+\end{align*}
+Here, the precondition in the combined pomset (on the right) is a tautology, independent of
+$r$.
 
-The semantics validates dead code elimination:
+The semantics allows common code
+to be lifted out of a conditional, validating the transformation
+\begin{math}
+  \sem{\IF{\aExp}\THEN\aCmd\ELSE\aCmd\FI} \supseteq
+  \sem{\aCmd}.
+\end{math}
+The semantics also validates dead code elimination:
 if $\aExp{\neq}0$ is a tautology then
 \begin{math}
   \sem{\IF{\aExp}\THEN\aCmd_1\ELSE\aCmd_2\FI} \supseteq
   \sem{\aCmd_1}.
 \end{math}
 Here, we take the empty pomset as the denotation of $\aCmd_2$.  Since
-$\lnot\aExp$ is unsatisfiable, \ref{if-term} ignores the termination condition
+$\aExp{=}0$ is unsatisfiable, \ref{if-term} ignores the termination condition
 of $\aCmd_2$.  It is worth noting that the reverse inclusion,
 dead-code-introduction, holds for \emph{complete} pomsets, but not in
 general.
@@ -1312,10 +1316,10 @@ Because the compiler is allowed to collude with the scheduler when estimating
 the range, we refer to this as \emph{local invariant reasoning}.  The basic
 idea is that a write to $y$ is independent of a read of $x$ that precedes it,
 as long as the local state of $x$ prior to the read justifies the write.  For
-example, consider \eqref{TC1}:\footnote{Test cases 6 and 8--9 are similar.
-  Test cases 2 and 17--18 require both local invariant reasoning and
-  resolving the nondeterminism of reads using redundant read
-  elimination---see \textsection\ref{sec:semreg}.}
+example, consider \ref{TC1}:\footnote{TC6 and TC8--9 are similar.  TC2 and
+  TC17--18 require both local invariant reasoning and resolving the
+  nondeterminism of reads using redundant read elimination---see
+  \textsection\ref{sec:semreg}.}
 \begin{gather*}
   \taglabel{TC1}
   \begin{gathered}
@@ -1366,17 +1370,18 @@ which is
 which is indeed a tautology, justifying the independency.  When used to form
 complete pomsets, \ref{read-tau-ind} requires that subsequent preconditions
 be tautological under the assumption that the value of the read is used
-$(1{=}r)$ and local value of $x$ is used instead $(x{=}r)$.
+$(1{=}r)$ and under the assumption that the local value of $x$ is used
+instead $(x{=}r)$.
 
 This requires that we put locations into logical formulae, in addition to
 registers.  While logical formulae involving registers are discharged by
 predicate transformers from $\sLET{}{}$ or $\sLOAD{}{}{}$, logical formulae
 involving locations are discharged by predicate transformers from
-$\sSTORE{}{}{}$.  In other words, registers track the value of the most
-recent local read, whereas locations track the value of the most recent local
-write.  This provides a local view of memory, distinct from the global view
-manifest in the labels on events.  See
-\cite{DBLP:journals/pacmpl/JagadeesanJR20} for further discussion.
+$\sSTORE{}{}{}$.  In other words, registers track the value of reads, whereas
+locations track the value of the most recent local write.  This provides a
+local view of memory, distinct from the global view manifest in the labels on
+events.  See \cite{DBLP:journals/pacmpl/JagadeesanJR20} for further
+discussion.
 %(See \textsection\ref{sec:ex:assoc} for a discussion of Skolemization.)
 
 A related concern arises when eliding changes to local state from the untaken
@@ -1423,7 +1428,8 @@ Consider the following example
 In SC executions, this program always reads $0$ for $y$, and therefore never
 writes $z$.  Thus, the program is data-race-free.  However, using
 \reffig{fig:seq} without $\Q{x}$, as we have done up to now, the following
-non-SC execution is allowed, violating \drfsc{}.
+non-SC execution is allowed, violating \drfsc{}.  The execution takes the
+else branch of the conditional:
 \begin{gather*}
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a1}{\DW{x}{1}}{}
@@ -1465,13 +1471,11 @@ of $x$, just not the read of $y$.  The precondition $\aForm$ is:
   %   (r{\neq}0 \land (1{=}s\limplies s{\neq}0))
   % \end{aligned}
 \end{gather*}
-Note that $\PW{x}{0}$ only appears on the untaken branch of the conditional.
-To construct the pomset, we have chosen the empty pomset for
-$\sembase{\PW{x}{0}}$.  The constraints on complete pomsets do not filter out
-this pomset, since $\PW{x}{0}$ is in the untaken branch of the conditional.
-The problem here is that we have forgotten the local state of $x$ in the
-untaken branch of the execution.  Nonetheless, we are using the subsequent
-read.  % The problem here is that we have ignored this write when calculating
+The pomset is constructed by taking the empty set for $\PW{x}{0}$, which only
+appears on the untaken branch of the conditional.  The problem here is that
+we have forgotten the local state of $x$ in the untaken branch of the
+execution---nonetheless, we are using the subsequent read of $x$.
+% The problem here is that we have ignored this write when calculating
 % the dependency between $\DR{y}{1}$ and $\DW{z}{1}$.
 
 To correct this, \ref{read-kappa} introduces quiescence symbols $\Q{x}$ into
