@@ -1,165 +1,4 @@
-\begin{comment}
-Dead Store Elimination (Still) Considered Harmful
-
-DSE "removes stores that have no effect on the program result, either
-because the stored value is overwritten or because it is never read again."
-
-The example they give is of the second type: "because it is never read
-again".  To validate this, we would need a more complex model of memory
-using provenance for pointers...
-
-Section 3.3.3 (Volatile Function Pointer) has a lovely example of
-if-introduction: Compilers are not allowed to get rid of calls through
-virtual functions, but they can use if-introduction and then get rid of the
-static call that they introduce on one side of the if/else...
-
-Possibly interesting references:
-
-[28] N. Benton. Simple relational correctness proofs for static analyses and program transformations. In ACM SIGPLAN Notices, volume 39, pages 14–25, 2004.
-[29] C. Deng and K. S. Namjoshi. Securing a compiler transformation. In Proceedings of the 23rd Static Analysis Symposium, SAS ’16, pages 170– 188, 2016.
-[30] V. D’Silva, M. Payer, and D. Song. The correctness-security gap in compiler optimization. In Security and Privacy Workshops, SPW ’15, pages 73–87, 2015.
-[31] X. Leroy. Formal certification of a compiler backend or: programming a compiler with a proof assistant. In ACM SIGPLAN Notices, volume 41, pages 42–54, 2006.
-\end{comment}
-
-% \subsection{Post-Hoc Verification of Fulfillment for \PwTmcaTITLE{2}}
-% \label{sec:post-hoc}
-
-\subsection{Register Consistency}
-\label{sec:false}
-
-\todo{Explain why we cannot require that either $\labelingForm(\aEv)$ or
-  $\aTerm$ are $\labeling$-consistent.}
-
-
-% \todo{Drop \ref{pom-kappa-sat} and m5b---they are wrong.  Move this into a
-%   discussion of the proof of compilation correctness.}
-
-% If a precondition is false, you can be pretty sure it's useless.  In this
-% subsection, we develop a criterion for eliminating such useless pomsets.
-
-% To achieve this, we would like to bolt a requirement into the definition of
-% pomsets in order to weed out the useless ones.  Something like this:
-% \begin{enumerate}
-% \item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
-%   $\labelingForm(\aEv)$ is satisfiable.
-% \end{enumerate}
-% For associativity, \eqref{pom-kappa-sat'} would in turn require
-
-In addition to the three criteria of \refdef{def:trans}
-\citet{DBLP:journals/cacm/Dijkstra75} requires
-\begin{enumerate}
-\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
-  $\aTr{}{\FALSE}\riff\FALSE$.
-\end{enumerate}
-% \citet{DBLP:journals/cacm/Dijkstra75} requires exactly \ref{tr-false'}.
-% Problem solved!  
-Unfortunately, our transformer for read actions
-\eqref{read-tau-dep} does not obey \ref{tr-false'}, since $\FALSE$ is not
-equivalent to $v{=}r\limplies\FALSE$.
-
-In this subsection, we refine this requirement to one that does hold.  The
-main insight is to pull values for registers from the actions of pomset itself.
-%
-% \eqref{tr-false'} is too strong.
-% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
-% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
-% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
-% for some $\aVal$.
-% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
-% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
-% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
-%
-% We require the following:
-% \begin{enumerate}
-% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
-%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
-% \end{enumerate}
-%
-% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
-% for both reads):
-% \begin{gather*}
-%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
-%   \\
-%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
-%   \lor  
-%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
-% \end{gather*}
-%
-Thus, we define $\regForm{\labeling}$ to capture the \emph{register state} of a pomset.
-\begin{definition}  
-  \label{def:labeling:consistent}
-  Let 
-  \begin{math}
-    \regForm{\labeling}=
-    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}\EQ\aVal)
-    \textwhere \aEvs=\fdom(\labeling)
-  \end{math}.
-  
-  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
-  We say that it is \emph{$\labeling$-inconsistent} otherwise.
-\end{definition}
-
-
-%tau maps (things incompatible with chi) to (things incompatible with chi)
-Using this, we define the constraint on predicate transformers that we want.
-We also need to update the definition of predicate transformer families to
-carry the labeling.
-\begin{definition}
-  \label{def:trans'}
-  A \emph{$\labeling$-predicate transformer} is a %monotone
-  function
-  $\aTr{}{}:\Formulae\fun\Formulae$ such that
-  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
-  % \item \label{tr-implies'}
-  %   \labeltextXX{2}{x}{tr-and'}
-  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
-  \item[\eqref{tr-and}]
-    \eqref{tr-or}\;
-    \eqref{tr-implies}\; as in \refdef{def:trans},
-  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
-    % \item[\eqref{tr-false}]
-    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-  \end{enumerate}
-
-  \label{def:family'}
-  A \emph{family of $\labeling$-predicate transformers} over consists of a
-  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
-  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
-  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
-
-  
-  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
-  \setcounter{enumi}{\value{Btau}}
-  \item \label{pom-tau'}
-    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
-  \end{enumerate}
-\end{definition}
-
-% Given these definitions, we can add the following requirement to the model,
-% which enables us to prune pomsets that include $\labeling$-inconsistent
-% preconditions and termination conditions.
-% \begin{multicols}{2}
-%   \begin{enumerate}
-%     % \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
-%     %   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
-%   \item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
-%     $\labelingForm(\aEv)$ is $\labeling$-consistent,
-%   \item[{\labeltext[\textsc{m}5b]{(\textsc{m}5b)}{pom-term-sat}}]
-%     $\aTerm$ is $\labeling$-consistent.
-%   \end{enumerate}
-% \end{multicols}
-% With this modification, dead-code elimination
-% (\reflem{lem:if}\ref{lem:if:dead}) can be changed from an inclusion to an equation:
-% \begin{displaymath}
-%   \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
-%   =
-%   \aPSS_1
-%   \;\text{if $\aForm$ is a tautology.}
-% \end{displaymath}
-
-
-
-\subsection{Comparison with Sequential Predicate Transformers}
+\subsection{Further Comparison with Sequential Predicate Transformers}
 
 We compare traditional transformers to the dependent-case transformers of
 \reffig{fig:seq}. %; thus we consider only totally ordered executions.
@@ -502,6 +341,172 @@ The predicate transformers are:
 %   such that all preconditions in $\aPS\aSub$ are tautologies then 
 %   $\fwp{\aCmd}{\aForm}\aSub$
 % \end{proposition}
+
+
+\begin{comment}
+Dead Store Elimination (Still) Considered Harmful
+
+DSE "removes stores that have no effect on the program result, either
+because the stored value is overwritten or because it is never read again."
+
+The example they give is of the second type: "because it is never read
+again".  To validate this, we would need a more complex model of memory
+using provenance for pointers...
+
+Section 3.3.3 (Volatile Function Pointer) has a lovely example of
+if-introduction: Compilers are not allowed to get rid of calls through
+virtual functions, but they can use if-introduction and then get rid of the
+static call that they introduce on one side of the if/else...
+
+Possibly interesting references:
+
+[28] N. Benton. Simple relational correctness proofs for static analyses and program transformations. In ACM SIGPLAN Notices, volume 39, pages 14–25, 2004.
+[29] C. Deng and K. S. Namjoshi. Securing a compiler transformation. In Proceedings of the 23rd Static Analysis Symposium, SAS ’16, pages 170– 188, 2016.
+[30] V. D’Silva, M. Payer, and D. Song. The correctness-security gap in compiler optimization. In Security and Privacy Workshops, SPW ’15, pages 73–87, 2015.
+[31] X. Leroy. Formal certification of a compiler backend or: programming a compiler with a proof assistant. In ACM SIGPLAN Notices, volume 41, pages 42–54, 2006.
+\end{comment}
+
+% \subsection{Post-Hoc Verification of Fulfillment for \PwTmcaTITLE{2}}
+% \label{sec:post-hoc}
+
+\subsection{Register Consistency}
+\label{sec:false}
+
+
+% If a precondition is false, you can be pretty sure it's useless.  In this
+% subsection, we develop a criterion for eliminating such useless pomsets.
+
+% To achieve this, we would like to bolt a requirement into the definition of
+% pomsets in order to weed out the useless ones.  Something like this:
+% \begin{enumerate}
+% \item[{\labeltext[\textsc{m}3a$'$]{(\textsc{m}3a$'$)}{pom-kappa-sat'}}]
+%   $\labelingForm(\aEv)$ is satisfiable.
+% \end{enumerate}
+% For associativity, \eqref{pom-kappa-sat'} would in turn require
+
+In addition to the three criteria of \refdef{def:trans}
+\citet{DBLP:journals/cacm/Dijkstra75} requires
+\begin{enumerate}
+\item[{\labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}}]
+  $\aTr{}{\FALSE}\riff\FALSE$.
+\end{enumerate}
+% \citet{DBLP:journals/cacm/Dijkstra75} requires exactly \ref{tr-false'}.
+% Problem solved!  
+Unfortunately, our transformer for read actions
+\eqref{read-tau-dep} does not obey \ref{tr-false'}, since $\FALSE$ is not
+equivalent to $v{=}r\limplies\FALSE$.
+
+In this subsection, we refine this requirement to one that does hold.  The
+main insight is to pull values for registers from the actions of pomset itself.
+%
+% \eqref{tr-false'} is too strong.
+% We say $\aForm$ \emph{conjunctively depends on $\uReg{\aEv}$}
+% if $\aForm\rnotimplies\aForm[\aVal/\uReg{\aEv}]$
+% %or $\aForm[\aVal/\uReg{\aEv}]\rnotimplies\aForm$,
+% for some $\aVal$.
+% We say that $\aForm$ \emph{cannot contribute to a top-level tautology} if
+% $\aForm\riff\bigvee_{\aEv\in\aEvs}\aForm_\aEv$ where (for every $\aEv$) either
+% $\aForm_\aEv\riff\FALSE$ or $\aForm_\aEv$ conjunctively depends on $\uReg{\aEv}$.
+%
+% We require the following:
+% \begin{enumerate}
+% \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}]
+%   $\aTr{}{\FALSE}$ cannot contribute to a top-level tautology.
+% \end{enumerate}
+%
+% When put in \DNF, $\aTr{}{\FALSE}$ look like this (taking independent case
+% for both reads):
+% \begin{gather*}
+%   \IF{r}\THEN \PR{x}{s_d} \ELSE \PR{y}{s_e} \FI
+%   \\
+%   (r{\neq}0 \land s_d{\neq}v_d \land s_d{\neq}x)
+%   \lor  
+%   (r{=}0 \land s_e{\neq}v_e \land s_e{\neq}y)  
+% \end{gather*}
+%
+Thus, we define $\regForm{\labeling}$ to capture the \emph{register state} of a pomset.
+\begin{definition}  
+  \label{def:labeling:consistent}
+  Let 
+  \begin{math}
+    \regForm{\labeling}=
+    \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}\EQ\aVal)
+    \textwhere \aEvs=\fdom(\labeling)
+  \end{math}.
+  
+  We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
+  We say that it is \emph{$\labeling$-inconsistent} otherwise.
+\end{definition}
+
+
+%tau maps (things incompatible with chi) to (things incompatible with chi)
+Using this, we define the constraint on predicate transformers that we want.
+We also need to update the definition of predicate transformer families to
+carry the labeling.
+\begin{definition}
+  \label{def:trans'}
+  A \emph{$\labeling$-predicate transformer} is a %monotone
+  function
+  $\aTr{}{}:\Formulae\fun\Formulae$ such that
+  \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
+  % \item \label{tr-implies'}
+  %   \labeltextXX{2}{x}{tr-and'}
+  %   \labeltextXX{3}{x}{tr-or'} as in \refdef{def:trans},
+  \item[\eqref{tr-and}]
+    \eqref{tr-or}\;
+    \eqref{tr-implies}\; as in \refdef{def:trans},
+  \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] 
+    % \item[\eqref{tr-false}]
+    if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+  \end{enumerate}
+
+  \label{def:family'}
+  A \emph{family of $\labeling$-predicate transformers} over consists of a
+  $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
+  $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
+  then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
+
+  
+  \begin{enumerate}[,label=(\textsc{m}\arabic*),ref=\textsc{m}\arabic*]
+  \setcounter{enumi}{\value{Btau}}
+  \item \label{pom-tau'}
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers}, 
+  \end{enumerate}
+\end{definition}
+
+% Given these definitions, we can add the following requirement to the model,
+% which enables us to prune pomsets that include $\labeling$-inconsistent
+% preconditions and termination conditions.
+% \begin{multicols}{2}
+%   \begin{enumerate}
+%     % \item[{\labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}}] if $\bForm$ is
+%     %   $\labeling$-inconsistent, then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
+%   \item[{\labeltext[\textsc{m}3a]{(\textsc{m}3a)}{pom-kappa-sat}}]
+%     $\labelingForm(\aEv)$ is $\labeling$-consistent,
+%   \item[{\labeltext[\textsc{m}5b]{(\textsc{m}5b)}{pom-term-sat}}]
+%     $\aTerm$ is $\labeling$-consistent.
+%   \end{enumerate}
+% \end{multicols}
+% With this modification, dead-code elimination
+% (\reflem{lem:if}\ref{lem:if:dead}) can be changed from an inclusion to an equation:
+% \begin{displaymath}
+%   \xIFTHEN{\aForm}{\aPSS_1}{\aPSS_2}
+%   =
+%   \aPSS_1
+%   \;\text{if $\aForm$ is a tautology.}
+% \end{displaymath}
+
+
+It would seem reasonable to require that $\aTerm$ be $\labeling$-consistent
+in all pomsets.  However, doing so is incompatible with our approach to
+untaken conditionals.  Consider $\IF{\FALSE}\THEN\PW{x}{1}\FI$.  In order to
+construct the final empty pomset with $\aTerm\riff\TRUE$, we must allow the
+intermediate empty pomset with $\aTerm\riff\FALSE$.
+
+\todo{What about $\labelingForm(\aEv)$}
+
+% \todo{Drop \ref{pom-kappa-sat} and m5b---they are wrong.  Move this into a
+%   discussion of the proof of compilation correctness.}
 
 
 \subsection{The Need for Respect}
@@ -1056,7 +1061,7 @@ We leave the elaboration of this idea to future work.
 In this subsection, we develop a logical encoding of $\rdelay$, which can
 replace \ref{seq-le-delays} in \PwTmca{1}.  It is not obvious how to repeat
 this trick for \PwTmca{2}, due to thread-local reads-from
-and thread-local blockers (\ref{seq-le-delays-rf} and \ref{seq-le-rf-rf} in \refdef{def:pwt:mca2}).
+(\ref{seq-le-delays-rf} in \refdef{def:pwt:mca2}).
 
 As motivation, recall that we stated 
 \reflem{lem:if}\eqref{lem:ifelse:if:if} %--\eqref{lem:ifelse:if:if2}
@@ -1312,11 +1317,8 @@ We define some helper notation:
 Update the following rules from \reffig{fig:seq}.  (The change is similar for
 address calculation and if-introduction.)
 
-\todo{This is buggy.  Need to enforce order for
-  coherence/synchronization/dependency into a write and
-  coherence/synchronization, but not dependency, into reads.  Lack of
-  read-read dependency is bad here.  Note that the write rules should mention
-  D---see the agda version of write.}
+\todo{Add W from 1SUB 4.2 to get read-read independency.  The write rules
+  should mention D---see the agda version of write.}
 \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
   \setcounter{enumi}{\value{Bkappa}}
 \item \label{write-kappa-q}

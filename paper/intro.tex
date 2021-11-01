@@ -18,14 +18,14 @@ implementation in order to obtain sequential consistency (SC)
 available, however, the humble semicolon becomes shrouded in mystery, covered
 in the cloak of something known as a \emph{memory model}.  Every language has
 such a model: For each read operation, it determines the set of available
-values.  Compilers and runtime systems are allowed to chose any value in the
+values.  Compilers and runtime systems are allowed to choose any value in the
 set.  To allow efficient implementation, the set must not be too small.  To
 allow invariant reasoning, the set must not be too large.
 
 For optimized concurrent languages, it is surprising difficult to define a
 model that allows common compiler optimizations and hardware reorderings yet
 disallows nonsense behaviors that don't arise in practice.  The latter are
-commonly known as ``thin air'' behaviors \cite{DBLP:conf/esop/BattyMNPS15}.
+commonly known as ``thin-air'' behaviors \cite{DBLP:conf/esop/BattyMNPS15}.
 There are only a handful of solutions, and all have deficiencies.  These can
 be classified by their approach to dependency tracking (from strongest to
 weakest):
@@ -43,7 +43,7 @@ weakest):
   understood a single execution in isolation; they also allow executions that
   violate temporal reasoning (see \textsection\ref{sec:related}).
 \item No dependencies, as in \cXI{} \cite{DBLP:conf/esop/BattyMNPS15} and
-  Javascript \cite{DBLP:journals/pacmpl/WattRP19}.  This allows thin air
+  Javascript \cite{DBLP:journals/pacmpl/WattRP19}.  This allows thin-air
   executions.
 \end{itemize}
 
@@ -134,7 +134,7 @@ for \cXI, adapting the approach of \MRD{}
 % \cpp{} standard, and the first one to be fully compositional.
 \textsection\ref{sec:tool} describes a tool for automatic evaluation of
 litmus tests in this model.  \cXI{} allows thin-air in order to avoid
-overhead in the implementation of relaxed reads.  Safe language like OCaml
+overhead in the implementation of relaxed reads.  Safe languages like OCaml
 \cite{Dolan:2018:BDR:3192366.3192421} have typically made the opposite
 choice, accepting a performance penalty in order to avoid thin-air.  Just as
 \PwT{} can be used to strengthen \cXI{}, it could also be used to weaken

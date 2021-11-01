@@ -1141,14 +1141,18 @@ conjunctive formulation: $(\aForm\limplies\aTr[1]{\bEvs}{\bForm})\land(\neg\aFor
 %  is logically equivalent to
 %  \href{https://www.wolframalpha.com/input/?i=\%28a+implies+b\%29+and+\%28\%28not+a\%29+implies+c\%29}{$(\aForm\limplies\cForm_1)\land(\neg\aForm\limplies\cForm_2)$}. 
 
-Control dependencies are introduced by the conditional. For events from
-$\aEvs_1$, \ref{if-kappa} requires $\aForm\land\labelingForm_1(\aEv)$. For
-events from $\aEvs_2$, it %\ref{if-kappa}
-requires $\lnot\aForm\land\labelingForm_2(\aEv)$.  For coalescing events in
-$\aEvs_1\cap\aEvs_2$, it %\ref{if-kappa}
-requires
+Control dependencies are introduced by the conditional. 
+% For
+% events from $\aEvs_2$, it %\ref{if-kappa}
+% requires $\lnot\aForm\land\labelingForm_2(\aEv)$.
+For coalescing events in
+$\aEvs_1\cap\aEvs_2$, 
+\ref{if-kappa} requires
 $(\aForm\land\labelingForm_1(\aEv)) \lor
 (\lnot\aForm\land\labelingForm_2(\aEv))$.
+For other events from
+$\aEvs_i$, it requires $\aForm\land\labelingForm_i(\aEv)$, using
+\ref{pom-kappa-sat}.
 %
 Control dependencies are eliminated in the same way as data dependencies.
 Consider:

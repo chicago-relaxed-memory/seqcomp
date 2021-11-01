@@ -1,6 +1,99 @@
 \section{Discussion}
 \label{sec:discussion}
 
+\subsection{Read-Read Dependencies, If-Introduction, and Java Final Field Semantics}
+
+One might worry that the lack of read-read dependencies could cause \drfsc{}
+to fail.  For example, the following execution has a control dependency
+between the reads of the last thread, but this order is not enforced, neither
+by our model, nor \armeight.
+\begin{gather*}
+  \PW{z}{1}\SEMI\PW[\mREL]{y}{1}
+  \PAR
+  \PR[\mACQ]{y}{r}\SEMI\PW[\mREL]{x}{1}
+  \PAR
+  \IF{\PR{x}{}}\THEN\PR{z}{s}\FI  
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{z}{1}}{}
+      \event{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR[\mACQ]{y}{1}}{right=3em of b}
+      \event{d}{\DW[\mREL]{x}{1}}{right=of c}
+      \event{e}{\DR{x}{1}}{right=3em of d}
+      \event{f}{\DR{z}{0}}{right=of e}
+      \sync{a}{b}
+      \rf{b}{c}
+      \sync{c}{d}
+      \rf{d}{e}
+      % \ctrl{e}{f}
+      \wk[out=-170,in=-10]{f}{a}
+    \end{tikzinline}}
+\end{gather*}
+If the first read of the last thread is acquiring, then the execution is
+disallowed, since acquiring reads are ordered with respect to the reads that
+follow.
+\begin{gather*}
+  \PW{z}{1}\SEMI\PW[\mREL]{y}{1}
+  \PAR
+  \PR[\mACQ]{y}{r}\SEMI\PW[\mREL]{x}{1}
+  \PAR
+  \IF{\PR[\mACQ]{x}{}}\THEN\PR{z}{s}\FI  
+  \\
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a}{\DW{z}{1}}{}
+      \event{b}{\DW[\mREL]{y}{1}}{right=of a}
+      \event{c}{\DR[\mACQ]{y}{1}}{right=3em of b}
+      \event{d}{\DW[\mREL]{x}{1}}{right=of c}
+      \event{e}{\DR[\mACQ]{x}{1}}{right=3em of d}
+      \event{f}{\DR{z}{0}}{right=of e}
+      \sync{a}{b}
+      \rf{b}{c}
+      \sync{c}{d}
+      \rf{d}{e}
+      \po{e}{f}
+      \wk[out=-170,in=-10]{f}{a}
+    \end{tikzinline}}
+\end{gather*}
+
+\armeight{} enforces address dependencies between reads, but not control
+dependencies.  To support if-introduction (\AKA{} case-analysis), we drop all
+dependencies between reads.  This, in turn, invalidates Java's final field
+semantics.
+\begin{gather*}
+  \taglabel{addr2}
+  \begin{gathered}
+    \PBR{
+      \LET{r}{1} \SEMI
+      \PW{\REF{r}}{0} \SEMI
+      \PW{\REF{r}}{1} \SEMI
+      \PW[\mREL]{x}{r}
+    }
+    \PAR
+    \PBR{
+      \PR[\mACQ]{x}{r} \SEMI
+      \PR{\REF{r}}{s}
+    }
+    \\
+    \hbox{\begin{tikzinline}[node distance=1.5em]
+        \event{a1}{\DW{\REF{1}}{0}}{}
+        \event{a2}{\DW{\REF{1}}{1}}{right=of a1}
+        \wk{a1}{a2}
+        \event{a4}{\DWRel{x}{1}}{right=of a2}
+        \sync{a2}{a4}
+        \event{b1}{\DR[\mRA]{x}{1}}{right=3em of a4}
+        \event{b2}{\DR{\REF{1}}{0}}{right=of b1}
+        \sync{b1}{b2}
+        \rf{a4}{b1}
+        \wk[out=-170,in=-10]{b2}{a2}
+      \end{tikzinline}}
+  \end{gathered}
+\end{gather*}
+The acquire annotation is required to ensure publication.  If address
+dependencies were enforced between reads then the acquire annotation could be
+dropped.  However, the compiler would need to track address dependencies in
+order to ensure that if-introduction did not convert them to control
+dependencies.
+
 \subsection{Further Comparison to ``Promising Semantics'' [POPL 2017]}
 \label{sec:promising}
 
@@ -352,7 +445,7 @@ we discuss other differences.  We also point out some errors in
 \cite{DBLP:journals/pacmpl/JagadeesanJR20}, all of which have been confirmed
 by the authors.
 
-\myparagraph{Substitution}
+\subsubsection*{Substitution}
 
 \jjr{} uses substitution rather than Skolemizing.  Indeed our use of
 Skolemization is motivated by disjunction closure for predicate transformers,
@@ -487,8 +580,9 @@ references.
 % [Skolemization ensures disjunction closure, which is necessary
 % for associativity. Show example.]
 
-\myparagraph[p:downset]{Downset closure}
-
+% \myparagraph[p:downset]{Downset closure}
+\subsubsection*{Downset closure}
+\label{p:downset}
 \jjr{} enforces downset closure in the prefixing rule.  Even without this,
 downset closure would be different for the two semantics, due to the use of
 substitution in \jjr{}.  Consider the final pomset in the last example of
@@ -525,7 +619,7 @@ is $[0/r][0/x]$, resulting in:
 
 
 
-\myparagraph{Consistency}
+\subsubsection*{Consistency}
 \jjr{} imposes \emph{consistency}, which requires that for every pomset
 $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.  
 \begin{scope}
@@ -646,7 +740,7 @@ $\aPS$, $\bigwedge_{\aEv}\labelingForm(\aEv)$ is satisfiable.
   \end{scope}  
 \end{scope}
 
-\myparagraph{Causal Strengthening}
+\subsubsection*{Causal Strengthening}
 % \labeltext[]{Causal Strengthening}{xCausal}
 \jjr{} imposes \emph{causal strengthening}, which requires for every pomset
 $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)$. 
@@ -758,12 +852,12 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
   the right.
 \end{scope}
 
-% \myparagraph{Causal Strengthening and Address Dependencies}
+% \subsubsection*{Causal Strengthening and Address Dependencies}
 % \labeltext[]{Causal Strengthening and Address Dependencies}{xADDRxRRD}
 
 \begin{scope}  
   One use of causal strengthening is to ensure that address dependencies do
-  not introduce thin air reads.  Associating to the right, the intermediate
+  not introduce thin-air reads.  Associating to the right, the intermediate
   state of \ref{addr2} (\textsection\ref{sec:addr}) is:
   \begin{align*}
     \begin{gathered}[t]
@@ -805,7 +899,7 @@ $\aPS$, if $\bEv\lt\aEv$ then $\labelingForm(\aEv) \rimplies \labelingForm(\bEv)
   rather than conjunction, is more precise.
 \end{scope}
 
-\myparagraph{Internal Acquiring Reads}
+\subsubsection*{Internal Acquiring Reads}
 
 The proof of compilation to Arm in \jjr{} assumes that all internal reads can
 be eliminated.
@@ -855,7 +949,7 @@ We discuss two approaches to this problem in \textsection\ref{sec:arm}.
 % a recent alternative characterization of \armeight{}
 % \citep{alglave-git-alternate,arm-reference-manual}. %,armed-cats}.
 
-\myparagraph{Redundant Read Elimination}
+\subsubsection*{Redundant Read Elimination}
 
 Contrary to the claim, redundant read elimination fails for \jjr{}.
 We discuss redundant read elimination in \textsection\ref{sec:semreg}.
@@ -903,7 +997,7 @@ redundant read elimination fails.
 $\DWP{y}{1}$ was $1\EQ1\land x\EQ x$.  
 
 
-\myparagraph{Termination Conditions and Parallel Composition}
+\subsubsection*{Termination Conditions and Parallel Composition}
 
 In \jjr{\textsection2.4}, parallel composition is defined allowing coalescing
 of events.  Here we have forbidden coalescing.  This difference appears to be
@@ -912,7 +1006,7 @@ termination actions.  The predicates should be joined using $\land$, not
 $\lor$.  Here we have used termination conditions rather than termination
 actions so that termination is handled separately.
 
-\myparagraph{Read-Modify-Write Actions}
+\subsubsection*{Read-Modify-Write Actions}
 
 In \jjr{}, the atomicity axioms \ref{pom-rmw-atomic} erroneously applies only to
 overlapping writes, not overlapping reads.  The difficulty can be seen in
@@ -922,7 +1016,7 @@ In addition, \jjr{} uses $\sLOAD{}{}$ instead of $\sLOADP{}{}$ when
 calculating of dependency for \RMW{}s.  For a discussion, see the example at
 the end of \textsection\ref{sec:rmw}.
 
-\myparagraph{Data Race Freedom}
+\subsubsection*{Data Race Freedom}
 
 The definition of data race is wrong in \jjr{}.  It should require that that
 at least one action is relaxed.
@@ -934,7 +1028,7 @@ case of the theorem clarifies the discussion of the \textsc{past} example
 in \jjr{};
 
 
-\myparagraph{Augmentation of Preconditions}
+\subsubsection*{Augmentation of Preconditions}
 \jjr{} allows arbitrary augmentation of preconditions.  Here we are more
 conservative, only allowing augmentation of preconditions in the semantics of
 primitive actions, as in \textsection\ref{sec:semca}.

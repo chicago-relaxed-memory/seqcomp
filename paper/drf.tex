@@ -55,7 +55,7 @@ To state the theorem, we require several technical definitions.  The reader
 unfamiliar with \citep{Dolan:2018:BDR:3192366.3192421} may prefer to skip to
 the examples in the proof sketch, referring back as needed.
 
-\bookmark{Definitions}
+\subsection{Definitions}
 \begin{changed}
   \paragraph{Program Order}
   Let $\sempomca{2}{}$ be defined by applying the construction of
@@ -295,7 +295,7 @@ We say that $\aPS'$ is \emph{$L$-sequential after $\aPS$} if
   \end{gather*}
 \end{changed}
 
-\bookmark{Theorem and Proof Sketch}
+\subsection{Theorem and Proof Sketch}
 \begin{theorem}
   Let $\aPS$ be $L$-stable in $\aCmd$.  Let $\aPS'$ be a $\aCmd$-extension of
   $\aPS$ that is $L$-sequential after $\aPS$.  Let $\aPS''$ be a
@@ -334,8 +334,9 @@ includes a race involving $\aEv$.
   $({\lt_*}\setminus{\rpox})$: $\rrfe$ (reads-from-external) orders writes
   before reads, satisfying \ref{par-le-rf1} and \ref{par-le-rf2}; $\rcae$
   (coherence-after-external) orders read and write accesses before writes,
-  satisfying \ref{pom-rf-block}. (Within a thread, \ref{seq-le-delays-rf} and
-  \ref{seq-le-rf-rf} induce order that is included in ${\rppo}$.)
+  satisfying \ref{pom-rf-block}. (Within a thread, \ref{seq-le-delays-rf} 
+  %and \ref{seq-le-rf-rf}
+  induces order that is included in ${\rppo}$.)
 
   Using this decomposition, we can show the following.
   \begin{lemma}
@@ -501,3 +502,123 @@ includes a race involving $\aEv$.
 \end{proof}
 
 
+\subsection{A Note on Prior Work}
+
+In preparing this paper, we came across the following example, which appears
+to invalidate Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19}.
+\begin{gather}
+  \nonumber
+  \PW{x}{1}\SEMI
+  \PW[\mREL]{y}{1}\SEMI
+  \PR[\mACQ]{x}{r}
+  \PAR
+  \IF{\PR[\mACQ]{y}{}}\THEN \PW[\mREL]{x}{2}\FI
+  \\
+  \tag{\P}
+  \label{mix1}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      \rf[out=20,in=160]{a1}{a3}
+      \rf[out=20,in=160]{a2}{b1}
+      \wk[out=20,in=160]{a3}{b2}
+      \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
+    \end{tikzinline}}
+  \\
+  \nonumber
+  % \label{mix2}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      \raevent{a3}{\DR[\mACQ]{x}{2}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      \rf[out=20,in=160]{a2}{b1}
+      \rf[out=-160,in=-20]{b2}{a3}
+      \sync{b1}{b2}
+    \end{tikzinline}}
+\end{gather}
+The program is data-race free.  The two executions shown are the only
+top-level executions that include $\DWP[\mREL]{x}{2}$.
+
+Theorem 4.1 of \cite{DBLP:conf/ppopp/DongolJR19} is stated by extending
+execution sequences.  In the terminology of
+\cite{DBLP:conf/ppopp/DongolJR19}, a read is \emph{$L$-weak} if it is
+sequentially stale.  Let
+\begin{math}
+  \rho=\DWP{x}{1}\allowbreak
+  \DWP[\mREL]{y}{1}\allowbreak
+  \DRP[\mACQ]{y}{1}\allowbreak
+  \DWP[\mREL]{x}{2}
+\end{math}
+be a sequence and
+\begin{math}
+  \alpha=\DRP[\mACQ]{x}{1}.
+\end{math}
+$\rho$ is $L$-sequential and $\alpha$ is $L$-weak in $\rho\alpha$.  But there
+is no execution of this program that includes a data race, contradicting the
+theorem.  The error seems to be in Lemma A.4 of
+\cite{DBLP:conf/ppopp/DongolJR19}, which states that if $\alpha$ is $L$-weak
+after an $L$-sequential $\rho$, then $\alpha$ must be in a data race.  That
+is clearly false here, since $\DRP[\mACQ]{x}{1}$ is stale, but the program is
+data race free.
+
+In proving the SC-LDRF result in \cite[\textsection8]{DBLP:journals/pacmpl/JagadeesanJR20}, we noted that our proof
+technique is more robust than that of \cite{DBLP:conf/ppopp/DongolJR19},
+because it limits the prefixes that must be considered.  In \eqref{mix1}, the
+induction hypothesis requires that we add $\DRP[\mACQ]{x}{1}$ before
+$\DWP[\mREL]{x}{2}$ since $\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  In
+particular,
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      % \rf[out=20,in=160]{a1}{a3}
+      \rf{a2}{b1}
+      % \wk[out=20,in=160]{a3}{b2}
+      \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
+    \end{tikzinline}}
+\end{gather*}
+is not a downset of \eqref{mix1}, because
+$\DRP[\mACQ]{x}{1}\xwk\DWP[\mREL]{x}{2}$.  As noted in \cite[\textsection8]{DBLP:journals/pacmpl/JagadeesanJR20},
+this affects the inductive order in which we move across pomsets, but does
+not affect the set of pomsets that are considered.  In particular,
+\begin{gather*}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \raevent{a2}{\DW[\mREL]{y}{1}}{right=of a1}
+      % \raevent{a3}{\DR[\mACQ]{x}{1}}{right=of a2}
+      \raevent{b1}{\DR[\mACQ]{y}{1}}{right=3em of a3}
+      % \raevent{b1}{\DR[\mACQ]{y}{1}}{below=of a1}
+      % \raevent{b2}{\DW[\mREL]{x}{2}}{right=of b1}
+      \sync{a1}{a2}
+      % \rf[out=20,in=160]{a1}{a3}
+      \rf{a2}{b1}
+      % \wk[out=-20,in=-160]{a3}{b2}
+      % \sync{b1}{b2}
+      % \node(ai)[left=3em of a1]{};
+      % \bgoval[yellow!50]{(ai)}{P}
+      % \bgoval[pink!50]{(a1)(a2)(b1)(b2)}{P'\setminus P}
+      % \bgoval[green!10]{(a3)}{P'''\setminus P'}
+    \end{tikzinline}}
+\end{gather*}
+is a downset of \eqref{mix1}.
