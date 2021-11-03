@@ -1,0 +1,96 @@
+\begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
+  \setcounter{enumi}{\value{Bkappa}}
+\item \label{write-kappa-q-ca-addr}
+  \begin{math}
+    \labelingForm(\aEv) \riff
+    \aForm_\aEv \land
+    \cExp{=}\cVal_\aEv
+    \land
+    \QS{\REF{\cVal_\aEv}}{\amode}
+    \land
+    \aExp{=}\aVal_\aEv
+  \end{math},
+  \stepcounter{enumi}
+\item[] \labeltext[\textsc{w}4]{}{write-tau-q-ca-addr}
+  \begin{enumerate}[leftmargin=0pt]
+  \item \label{write-tau-dep-q-ca-addr}
+    if $\aEvs\cap\bEvs\neq\emptyset$ then
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \riff 
+      \bForm
+      [\aExp/\aLoc][(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}],
+    \end{math}
+  \item \label{write-tau-ind-q-ca-addr}
+    if $\aEvs\cap\bEvs=\emptyset$ then
+    \begin{math}
+      \aTr{\bEvs}{\bForm} \riff 
+      \bForm
+      [\aExp/\aLoc][\FALSE/\QS{\aLoc}{\amode}],
+    \end{math}
+  \end{enumerate}
+\item Hmmmm....
+  \begin{math}
+    \aTr{\bEvs}{\bForm} \riff
+    \textstyle\bigwedge_{\dVal\in\Val}
+    \cExp{=}\dVal
+    \limplies
+    \bForm
+    [\aExp/{\dVal}]
+    [\kappaE{\REF{\dVal}}/\Q{\REF{\dVal}}],
+  \end{math}
+\end{enumerate}
+\smallskip
+
+\begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+  \setcounter{enumi}{\value{Bkappa}}
+\item \label{read-kappa-q-ca-addr}
+  \begin{math}
+    \labelingForm(\aEv) \riff 
+        \aForm_\aEv
+        \land \cExp{=}\cVal_\aEv
+        \land \QL{\REF{\cVal_\aEv}}{\amode}
+  \end{math}
+\item \label{read-tau-q-ca-addr}
+  \begin{math}
+    \begin{aligned}[t]
+      \aTr{\bEvs}{\bForm} \riff
+      &\textstyle\bigwedge_{\aEv\in\aEvs\cap\bEvs}
+      {
+        \aForm_\aEv
+        \limplies
+        \PBR{
+          \labelingForm(\aEv)
+          \limplies
+          \aVal_\aEv{=}\uReg{\aEv}
+        }
+        \limplies \bForm[\uReg{\aEv}/\aReg]
+      }
+      \\[-.5ex]
+      \land
+      &\textstyle\bigwedge_{\aEv\in\aEvs\setminus\bEvs}
+      {
+        \aForm_\aEv
+        \limplies
+        \PBR{
+          \labelingForm(\aEv)
+          \limplies
+          \PBR{
+            \aVal_\aEv{=}\uReg{\aEv}
+            \lor
+            \REF{\cVal_\aEv}\EQ\uReg{\aEv}
+          }
+        }
+        \limplies
+        \bForm[\uReg{\aEv}/\aReg][\FALSE/\QL{\aLoc}{\amode}]
+      }
+      \\[-.5ex]
+      \land
+      &
+      % \lnot\kappaE{} % \emptyForm
+      \textstyle (\bigwedge_{\aEv\in\aEvs}\lnot\aForm_\aEv)
+      \limplies 
+      (\forall\bReg)\;
+      \bForm[\bReg/\aReg][\FALSE/\QL{\aLoc}{\amode}],
+    \end{aligned}
+  \end{math}
+\end{enumerate}    

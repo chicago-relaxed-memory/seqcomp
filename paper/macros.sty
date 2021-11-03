@@ -156,12 +156,12 @@
 % \newcommand{\DS}[3]{#3\,\mathsf{ds}_{#2}^{#1}}
 % \newcommand{\DS}[3]{\mathsf{ds}_{#2}^{#1}#3}
 % \newcommand{\DSP}[3]{(#3)\mathsf{ds}_{#2}^{#1}}
-\newcommand{\QL}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{L}#1}}}
-\newcommand{\QS}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{S}#1}}}
-\newcommand{\QF}[2]{\smash{\mathsf{Q}_{#2}^{\mathsf{F}#1}}}
+\newcommand{\QL}[2]{\mathsf{Q}^{\smash{\mathsf{L}#2}}_{#1}}
+\newcommand{\QS}[2]{\mathsf{Q}^{\smash{\mathsf{S}#2}}_{#1}}
+\newcommand{\QF}[2]{\mathsf{Q}^{\smash{\mathsf{F}#2}}_{#1}}
 \newcommand{\DS}[2]{{[}{#2}/\Dx{#1}{]}}
-\newcommand{\DL}[2]{\mathord{\downarrow^{#1}_{#2}}}
-\newcommand{\DLX}[3]{\mathord{\downarrow^{#1}_{#2,#3}}}
+\newcommand{\DL}[2]{\mathord{\downarrow_{#1}^{#2}}}
+\newcommand{\DLX}[3]{\mathord{\downarrow_{#1}^{#2,#3}}}
 
 \newcommand{\Qmode}[1]{\mathsf{Q}^{#1}}
 \newcommand{\Dmode}[1]{\Dx{#1}}
@@ -169,16 +169,18 @@
 \newcommand{\RO}{\lnot\mathsf{W}}
 \newcommand{\A}[1]{\mathsf{A}_{#1}}
 \newcommand{\Aother}{{\ast}}
+\newcommand{\Qall}{\mathsf{Q}^{*}_{*}}
+\newcommand{\Qsuball}[1]{[#1/\Qall]}
 \newcommand{\Q}[1]{\mathsf{Q}_{#1}}
-\newcommand{\Qstar}{\mathsf{Q}^{*}}
+\newcommand{\Qstar}{\mathsf{Q}_{*}}
 \newcommand{\D}{\Dx{\texttt{*}}}
 \newcommand{\Dx}[1]{\mathord{\downarrow^{#1}}}
-\newcommand{\Qx}[1]{\mathsf{Q}_{\mathsf{rw}}^{#1}}
-\newcommand{\Qr}[1]{\mathsf{Q}_{\mathsf{ro}}^{#1}}
-\newcommand{\Qw}[1]{\mathsf{Q}_{\mathsf{wo}}^{#1}}
-\newcommand{\Qsc}{\mathsf{Q}_{\mathsf{sc}}}
-\newcommand{\Qra}{\mathsf{Q}_{\mathsf{acq}}}
-\newcommand{\Qrlx}{\mathsf{Q}^{*}}%_{\mathsf{rlx}}}
+%\newcommand{\Qx}[1]{\mathsf{Q}^{\mathsf{rw}}_{#1}}
+\newcommand{\Qr}[1]{\mathsf{Q}^{\smash{\mathsf{R}}}_{#1}}
+\newcommand{\Qw}[1]{\mathsf{Q}^{\smash{\mathsf{W}}}_{#1}}
+\newcommand{\Qsc}{\mathsf{Q}^{\smash{\mathsf{SC}}}}
+%\newcommand{\Qra}{\mathsf{Q}^{\mathsf{}}}
+\newcommand{\Qrlx}{\mathsf{Q}_{*}}%_{\mathsf{rlx}}}
 \newcommand{\DxREF}[1]{\Dx{\REF{#1}}}
 \newcommand{\QxREF}[1]{\Qx{\REF{#1}}}
 \newcommand{\QwREF}[1]{\Qw{\REF{#1}}}
@@ -1177,6 +1179,10 @@
 \newcommand{\phevent}[3]{\node[phevent](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{raevent} = [event] %[draw=black, fill=red!7, double, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\raevent}[3]{\node[raevent](#1)[#3]{$\mathstrut\smash{#2}$};}
+\tikzstyle{raeventX} = [draw=black, fill=red!7, double, rectangle, rounded corners, minimum size=3ex]
+\newcommand{\raeventX}[3]{\node[raeventX](#1)[#3]{$\mathstrut\smash{#2}$};}
+\tikzstyle{sceventX} = [draw=black, fill=orange!20, double, thick, rectangle, rounded corners, minimum size=3ex]
+\newcommand{\sceventX}[3]{\node[sceventX](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{scevent} = [event] %[draw=black, fill=orange!20, double, thick, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\scevent}[3]{\node[scevent](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{xform} = [draw=gray!80!black, fill=gray!10, rectangle, minimum size=3ex]

@@ -497,13 +497,59 @@ carry the labeling.
 % \end{displaymath}
 
 
-It would seem reasonable to require that $\aTerm$ be $\labeling$-consistent
-in all pomsets.  However, doing so is incompatible with our approach to
-untaken conditionals.  Consider $\IF{\FALSE}\THEN\PW{x}{1}\FI$.  In order to
-construct the final empty pomset with $\aTerm\riff\TRUE$, we must allow the
-intermediate empty pomset with $\aTerm\riff\FALSE$.
+It would seem reasonable to require that $\labelingForm(\aEv)$ be
+$\labeling$-consistent.  However, this breaks associativity.  Compare the
+following, where $\uReg{e}=r$:
+\begin{align*}
+  \begin{gathered}[t]
+    \PR{y}{r}
+    \SEMI
+    \IF{r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \eventl{e}{a}{\DR{y}{1}}{}
+        \event{b}{r{\neq}0\bigmid\DW{x}{1}}{right=of a}
+        %\xform{xi}{\bForm[\uReg{e}/r]}{left=.5em of a}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+        \event{c}{r{=}0\bigmid\DW{x}{1}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
+and
+\begin{align*}
+  \begin{gathered}[t]
+    \PR{y}{r}
+    \\
+    \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
+        \eventl{e}{a}{\DR{y}{1}}{}
+        %\xform{xi}{\bForm[\uReg{e}/r]}{left=.5em of a}
+      \end{tikzinline}}    
+  \end{gathered}
+  &&
+  \begin{gathered}[t]
+    \IF{r}\THEN\PW{x}{1}\FI
+    \SEMI
+    \IF{\BANG r}\THEN\PW{x}{1}\FI
+    \\
+    \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+        \event{c}{\DW{x}{1}}{}
+      \end{tikzinline}}    
+  \end{gathered}
+\end{align*}
 
-\todo{What about $\labelingForm(\aEv)$}
+It would also seem reasonable to require that $\aTerm$ be
+$\labeling$-consistent in all pomsets.  However, doing so is incompatible
+with our approach to untaken conditionals.  Consider that the empty pomset is
+in the semantics of $\IF{\FALSE}\THEN\PW{x}{1}\FI$.  In order to construct
+the final pomset with $\aTerm\riff\TRUE$, we must allow the
+intermediate pomset with $\aTerm\riff\FALSE$.
+
 
 % \todo{Drop \ref{pom-kappa-sat} and m5b---they are wrong.  Move this into a
 %   discussion of the proof of compilation correctness.}
@@ -584,45 +630,67 @@ Then $\PBR{{\lt}\rextends{\lt_1}{\lt_2}}$ can be replaced by
 $\PBR{{\lt}\rsupset{\lt_1}{\lt_2}}$.
 
 \subsection{Write Substitutions}
-\todo{Discuss.}
 
-Alan example of why substitute M/x rather than v/x in the write rule:
-\begin{gather*}
-  \PR{y}{r}\SEMI \PW{x}{r}\SEMI \PR{x}{s} \SEMI \PW{z}{s}
-  \\
-  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
-      \event{a1}{\DR{y}{1}}{}
-      \event{a2}{\DW{x}{1}}{right=of a1}
-      \event{a3}{\DR{x}{1}}{right=of a2}
-      \event{a4}{\DW{z}{1}}{right=of a3}
-      % \po[out=15,in=165]{a1}{a4}
-      \po{a1}{a2}
-    \end{tikzinline}}
-\end{gather*}
-We lost the order from $\DR{y}{1}$ to $\DW{z}{1}$.
+In the predicate transformer for $\PW{x}{\aExp}$, we substitute $\aExp$ for
+$x$.  In an alternative semantics, one could substitute the value chosen for
+the action.  This alternative semantics looses dependencies.  Consider:
 \begin{gather*}
   \PR{x}{s}\SEMI \PW{z}{s}
   \\
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a3}{\DR{x}{1}}{}
-      \event{a4}{x\EQ1\bigmid\DW{z}{1}}{right=of a3}
+      \event{a4}{\PBR{1{=}s \lor x{=}s} \limplies s\EQ1\bigmid\DW{z}{1}}{right=of a3}
     \end{tikzinline}}
 \end{gather*}
-\begin{gather*}
-  \PW{x}{r} \SEMI \PR{x}{s}\SEMI \PW{z}{s}
-  \\
+Prepending a write and then a read, our semantics gives the following:
+\begin{align*}
+  \begin{gathered}
+    \PW{x}{r} \SEMI \PR{x}{s}\SEMI \PW{z}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.8em and 1em]
+        \event{a2}{\DW{x}{1}}{}
+        \event{a3}{\DR{x}{1}}{right=of a2}
+        \event{a4}{\PBR{1{=}s \lor r{=}s} \limplies s\EQ1\bigmid\DW{z}{1}}{right=of a3}
+      \end{tikzinline}}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \PR{y}{r}\SEMI \PW{x}{r}\SEMI \PR{x}{s} \SEMI \PW{z}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.8em and 1em]
+        \event{a1}{\DR{y}{1}}{}
+        \event{a2}{\DW{x}{1}}{right=of a1}
+        \event{a3}{\DR{x}{1}}{right=of a2}
+        \event{a4}{\DW{z}{1}}{right=of a3}
+        \po[out=15,in=165]{a1}{a4}
+        \po{a1}{a2}
+      \end{tikzinline}}
+  \end{gathered}
+\end{align*}
+With the alternative semantics, instead, we would have:
+\begin{align*}
+  \begin{gathered}
   \hbox{\begin{tikzinline}[node distance=.8em and 1em]
       \event{a2}{\DW{x}{1}}{}
       \event{a3}{\DR{x}{1}}{right=of a2}
-      \event{a4}{1\EQ1\bigmid\DW{z}{1}}{right=of a3}
+      \event{a4}{\PBR{1{=}s \lor 1{=}s} \limplies s\EQ1\bigmid\DW{z}{1}}{right=of a3}
     \end{tikzinline}}
-  \\
-  \hbox{\begin{tikzinline}[node distance=.8em and 1em]
-      \event{a2}{\DW{x}{1}}{}
-      \event{a3}{\DR{x}{1}}{right=of a2}
-      \event{a4}{r\EQ1\bigmid\DW{z}{1}}{right=of a3}
-    \end{tikzinline}}
-\end{gather*}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \PR{y}{r}\SEMI \PW{x}{r}\SEMI \PR{x}{s} \SEMI \PW{z}{s}
+    \\
+    \hbox{\begin{tikzinline}[node distance=.8em and 1em]
+        \event{a1}{\DR{y}{1}}{}
+        \event{a2}{\DW{x}{1}}{right=of a1}
+        \event{a3}{\DR{x}{1}}{right=of a2}
+        \event{a4}{\DW{z}{1}}{right=of a3}
+        % \po[out=15,in=165]{a1}{a4}
+        \po{a1}{a2}
+      \end{tikzinline}}
+  \end{gathered}
+\end{align*}
+The dependency from $\DR{y}{1}$ to $\DW{z}{1}$ has been lost.
 
 
 \subsection{Read Substitutions}
@@ -1056,8 +1124,6 @@ We leave the elaboration of this idea to future work.
 \subsection{Logical Encoding of Delay for \PwTmcaTITLE{}}
 \label{sec:delay}
 
-\todo{Remove this section?}
-
 In this subsection, we develop a logical encoding of $\rdelay$, which can
 replace \ref{seq-le-delays} in \PwTmca{1}.  It is not obvious how to repeat
 this trick for \PwTmca{2}, due to thread-local reads-from
@@ -1131,7 +1197,6 @@ has an execution with
 \end{math}
 has no such execution.
 
-\todo{What is the story here for \PwTpo{}?}
 
 In order to validate the reverse inclusions, we could require that
 \ref{seq-le-delays} not impose order when
@@ -1251,180 +1316,118 @@ $(s{\neq}0\land s{=}0)$ is unsatisfiable:
   \end{gathered}    
 \end{align*}
 
-This motivates the logic-based presentation of $\rdelay$.
-
-In the data model, we require additional symbols: $\Q{\mSC}$, $\Qr{\aLoc}$,
-and $\Qw{\aLoc}$.  We refer to these collectively as \emph{quiescence
-  symbols}.
-
-We update the \refdef{def:pomset} of complete pomset to substitute true for every
-quiescence symbol (notation $[\TRUE/\Q{}]$):
-\begin{definition}
-  A \PwT{} is \emph{complete} if
-  \begin{multicols}{2}
-    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
-      \setcounter{enumi}{\value{Bkappa}}
-    \item \label{top-kappa-q}
-      $\labelingForm(\aEv)[\TRUE/\Q{}]$ is a tautology,
-      \setcounter{enumi}{\value{Bterm}}
-    \item \label{top-term-q} $\aTerm{}[\TRUE/\Q{}]$ is a tautology.
-    \end{enumerate}
-  \end{multicols}
-\end{definition}
-
-We define some helper notation:
+This motivates the logic-based presentation of $\rdelay$.  We make the following
+changes to the data model:
+\begin{itemize}
+\item actions need not include access modes---for readability, we color
+  synchronizing events in example diagrams throughout this section,
+\item there exists a symbol $\RW$, indicating a write action---this is needed
+  to handle read-read independency (\textsection\ref{sec:read-read}),
+\item there exist symbols $\Qsc$, $\Qr{\aLoc}$, and $\Qw{\aLoc}$---we refer
+  to these collectively as \emph{quiescence symbols}.  Roughly, the old
+  $\Q{x}$ correspond to $\Qw{x}$.
+\end{itemize}
+We define some shorthand, using the symbols $\mathsf{S}$ for \emph{stores}
+(aka writes) and $\mathsf{L}$ for \emph{loads} (aka reads).
 \begin{definition}
   \label{def:QS}
-  Let $\Qr{*}=\textstyle\bigwedge_\bLoc \Qr{\bLoc}$, and similarly for $\Qw{*}$.\\
-  Let formulae $\QS{\aLoc}{\amode}$, $\QL{\aLoc}{\amode}$, and $\QF{}{\amode}$ be defined:
+  Let $\Qr{*}=\textstyle\bigwedge_\bLoc \Qr{\bLoc}$, and similarly for
+  $\Qw{*}$.
+  Let $\Qall=\Qr{*}\land\Qw{*} \land\Qsc$.
+
+  Let $[\aForm/\Qr{*}]$ substitute $\aForm$ for every $\Qr{\bLoc}$, and
+  similarly for $\Qw{*}$.
+  %
+  %Let $[\aForm/\Q{}]$ substitute $\aForm$ for every quiescence symbol.
+  Let $\Qsuball{\aForm} = [\aForm/\Qr{*}][\aForm/\Qw{*}][\aForm/\Qsc]$.
+  
+  Let formulae $\QF{}{\amode}$, $\QS{\aLoc}{\amode}$, and $\QL{\aLoc}{\amode}$ be defined:
   \begin{scope}
     \small
     \begin{align*}
-      \QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
+      \QF{}{\fREL}&=\Qr{*}\land\Qw{*} 
+      &\QS{\aLoc}{\mRLX}&=\Qr{\aLoc}\land\Qw{\aLoc}
       &\QL{\aLoc}{\mRLX}&=\Qw{\aLoc}
-      &\QF{}{\fREL}&=\Qr{*}\land\Qw{*} 
       \\
-      \QS{\aLoc}{\mREL}&= \Qr{*}\land\Qw{*} 
+      \QF{}{\fACQ} &=\Qr{*}
+      &\QS{\aLoc}{\mREL}&= \Qr{*}\land\Qw{*} 
       &\QL{\aLoc}{\mACQ}&=\Qw{\aLoc}
-      &\QF{}{\fACQ} &=\Qr{*}
       \\
-      \QS{\aLoc}{\mSC}&= \Qr{*}\land\Qw{*} \land \Qsc
+      \QF{}{\fSC} &= \Qall
+      &\QS{\aLoc}{\mSC}&= \Qall
       &\QL{\aLoc}{\mSC}&=\Qw{\aLoc}\land\Qsc      
-      &\QF{}{\fSC} &= \Qr{*}\land\Qw{*} \land\Qsc
     \end{align*}
   \end{scope}
   % \end{definition}
-% \begin{definition}
-  Let $[\aForm/\Qr{*}]$ substitute $\aForm$ for every $\Qr{\bLoc}$, and similarly for $\Qw{*}$.\\
-  Let substitutions $[\aForm/\QS{\aLoc}{\amode}]$, $[\aForm/\QL{\aLoc}{\amode}]$, and  $[\aForm/\QF{}{\amode}]$ be defined:
+  % \begin{definition}
+  
+  Let substitutions $[\aForm/\QF{}{\amode}]$, $[\aForm/\QS{\aLoc}{\amode}]$, and $[\aForm/\QL{\aLoc}{\amode}]$ be defined:
   \begin{scope}
     \small
     \begin{align*}
-      [\aForm/\QS{\aLoc}{\mRLX}] &= [\aForm/\Qw{\aLoc}]
+      [\aForm/\QF{}{\fREL}] &= [\aForm/\Qw{*}]
+      &{} [\aForm/\QS{\aLoc}{\mRLX}] &= [\aForm/\Qw{\aLoc}]
       &{} [\aForm/\QL{\aLoc}{\mRLX}] &= [\aForm/\Qr{\aLoc}]
-      &{} [\aForm/\QF{}{\fREL}] &= [\aForm/\Qw{*}]
       \\
-      [\aForm/\QS{\aLoc}{\mREL}] &= [\aForm/\Qw{\aLoc}]
+      [\aForm/\QF{}{\fACQ}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
+      &{} [\aForm/\QS{\aLoc}{\mREL}] &= [\aForm/\Qw{\aLoc}]
       &{} [\aForm/\QL{\aLoc}{\mACQ}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
-      &{} [\aForm/\QF{}{\fACQ}] &= [\aForm/\Qr{*},\aForm/\Qw{*}]
       \\
-      [\aForm/\QS{\aLoc}{\mSC}] &= [\aForm/\Qw{\aLoc},\aForm/\Qsc]
-      &{} [\aForm/\QL{\aLoc}{\mSC}] &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
-      &{} [\aForm/\QF{}{\fSC}] &= [\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
+      [\aForm/\QF{}{\fSC}] &= \Qsuball{\aForm}%[\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
+      &{} [\aForm/\QS{\aLoc}{\mSC}] &= [\aForm/\Qw{\aLoc},\aForm/\Qsc]
+      &{} [\aForm/\QL{\aLoc}{\mSC}] &= \Qsuball{\aForm}%[\aForm/\Qr{*},\aForm/\Qw{*},\aForm/\Qsc]
     \end{align*}
   \end{scope}
 \end{definition}
-Update the following rules from \reffig{fig:seq}.  (The change is similar for
-address calculation and if-introduction.)
 
-\todo{Add W from 1SUB 4.2 to get read-read independency.  The write rules
-  should mention D---see the agda version of write.}
-\begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
-  \setcounter{enumi}{\value{Bkappa}}
-\item \label{write-kappa-q}
-  \begin{math}
-    \labelingForm(\aEv) \riff
-    \aExp{=}\aVal
-    \land
-    \QS{\aLoc}{\amode}
-  \end{math},    
-  \stepcounter{enumi}      
-\item[] \labeltext[\textsc{w}5]{}{write-tau-q}
-  \begin{enumerate}[leftmargin=0pt]
-  \item \label{write-tau-nonempty-q}
-    if $\aEvs\neq\emptyset$ then 
-    \makebox[0cm][l]{%
-      \begin{math}
-        \aTr{\bEvs}{\bForm} \riff 
-        \bForm
-        [\aExp/\aLoc][(\aExp{=}\aVal\land\QS{\aLoc}{\amode})/\QS{\aLoc}{\amode}],
-      \end{math}}
-  \item \label{write-tau-empty-q}
-    if $\aEvs=\emptyset$ then 
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \riff 
-      \bForm
-      [\aExp/\aLoc][\FALSE/\QS{\aLoc}{\amode}],
-    \end{math}
-  \end{enumerate}
-\end{enumerate}
-\begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
-  \setcounter{enumi}{\value{Bkappa}}
-\item \label{read-kappa-q}
-  \begin{math}
-    \labelingForm(\aEv) \riff \QL{\aLoc}{\amode},
-  \end{math}
-  \stepcounter{enumi}
-\item[] \labeltext[\textsc{r}4]{}{read-tau-q}
-  \begin{enumerate}[leftmargin=0pt]
-  \item \label{read-tau-dep-q}
-    if $\aEv\in\aEvs\cap\bEvs$ then
-    %if $\aEv\in\aEvs$ and $\aEv\in\bEvs$ then
-    %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)\neq\emptyset$ then
-    \makebox[0pt][l]{\begin{math}
-        \aTr{\bEvs}{\bForm} \riff
-        \aVal{=}\aReg
-        \limplies \bForm,
-      \end{math}}
-  \item \label{read-tau-ind-q}
-    if $\aEv\in\aEvs\setminus\bEvs$ then
-    %if $\aEv\in\aEvs$ and $\aEv\notin\bEvs$ then
-    %if $\aEvs\neq\emptyset$ and $(\aEvs\cap\bEvs)=\emptyset$ then
-    \makebox[0pt][l]{\begin{math}
-        \aTr{\bEvs}{\bForm} \riff
-        \PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg}
-        \limplies \bForm [\FALSE/\QL{\aLoc}{\amode}],
-      \end{math}}
-  \item \label{read-tau-empty-q}
-    if $\aEvs=\emptyset$ then
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \riff
-      \bForm [\FALSE/\QL{\aLoc}{\amode}],
-    \end{math}
-  \end{enumerate}
-\end{enumerate}    
-\begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
-  \setcounter{enumi}{\value{Bkappa}}
-\item \label{fence-kappa-q}
-  $\labelingForm(\aEv) \riff \QF{\aLoc}{\amode}$,
-  \stepcounter{enumi}
-\item[] \labeltext[\textsc{f}4]{}{fence-tau-q}
-  \begin{enumerate}[leftmargin=0pt]
-  \item \label{fence-tau-dep-q}
-    if $\aEvs\neq\emptyset$ then
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \riff
-      \bForm,
-    \end{math}
-  \item \label{fence-tau-ind-q}
-    if $\aEvs=\emptyset$ then
-    \begin{math}
-      \aTr{\bEvs}{\bForm} \riff
-      \bForm [\FALSE/\QF{\aLoc}{\amode}].
-    \end{math}
-  \end{enumerate}
-\end{enumerate}
-  
-The quiescence formulae indicate what must precede an event.
-For example, all preceding accesses must be ordered before a releasing write,
-whereas only writes on $x$ must be ordered before a releasing read on $x$.
+With these notations in hand, we can modify the semantics of
+\textsection\ref{sec:model} as follows.  (We leave the generalization to the
+semantics of \textsection\ref{sec:additional} as future work.)
+\begin{definition}
+  \label{def:q}
+  Update the following rules from \reffig{fig:seq}.  
+  \input{fig-q.tex}
+\end{definition}
+% \begin{definition}
+%   \label{def:q:ca:addr}
+%   Update the following rules from \refdef{def:semcaaddr}.  
+%   \input{fig-q-ca-addr.tex}
+% \end{definition}
+The preconditions and the independent transformers have changed.  With the
+exception of write, the dependent transformers are unchanged.  For writes,
+the interpretation of $\Qw{x}$ of subtly different from that of the old
+$\Q{x}$---the transformer strengthens $\Qw{\aLoc}$ to
+$(\Qw{\aLoc}\land\aExp{=}\aVal)$ rather than replacing it by $\aExp{=}\aVal$.
+In order to ensure coherence, we have given up on initialization.
 
-The quiescence substitutions update quiescence symbols in subsequent code.
-For subsequent independent code, $\ref{write-kappa-q}$ and $\ref{read-kappa-q}$ substitute false.
-In complete pomsets, we substitute true for .
-%
-For example, we substitute $\FALSE$ for $\QS{\aLoc}{\mREL}$ in the independent
-case for a releasing write; this ensures that subsequent writes to $\aLoc$
-follow the releasing write in top-level pomsets.  Similarly, we substitute
-$\FALSE$ for $\QL{\aLoc}{\mACQ}$ in the independent case for an acquiring
-write; this ensures that all subsequent accesses follow the acquiring read in
-top-level pomsets.
 
-\reffig{fig:q1} shows  the effect of quiescence for each access mode.
+
+The precondition indicates which sequentially preceding events must be
+ordered before.  For example, all preceding accesses must be ordered before a
+releasing write, whereas only writes to the same location must be ordered
+before a acquiring read---the latter is due to coherence.
+
+Symmetrically, the transformer indicates which sequentially following must be
+ordered after.  For example, all following accesses must be ordered after an
+acquiring read, whereas only writes to the same location must be ordered
+after a releasing write read---again, the latter is due to coherence.
+
+% The quiescence substitutions update quiescence symbols in subsequent code.
+% For subsequent independent code, $\ref{write-kappa-q}$ and $\ref{read-kappa-q}$ substitute false.
+% In complete pomsets, we substitute true for .
+% %
+% For example, we substitute $\FALSE$ for $\QS{\aLoc}{\mREL}$ in the independent
+% case for a releasing write; this ensures that subsequent writes to $\aLoc$
+% follow the releasing write in top-level pomsets.  Similarly, we substitute
+% $\FALSE$ for $\QL{\aLoc}{\mACQ}$ in the independent case for an acquiring
+% write; this ensures that all subsequent accesses follow the acquiring read in
+% top-level pomsets.
+
+\reffig{fig:q:example} shows  the effect of quiescence for each access mode.
 \begin{figure}
-  \input{fig-q1.tex}
+  \input{fig-q-example.tex}
   \caption{The Effect of Quiescence for Each Access Mode}
-  \label{fig:q1}
+  \label{fig:q:example}
 \end{figure}
 
 \begin{example}
@@ -1435,25 +1438,25 @@ top-level pomsets.
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
           \event{a}{1{=}v\land\Qr{x}\land\Qw{x}\bigmid\DW{x}{v}}{}
-          \xform{xi}{\bForm[1/\aLoc][\FALSE/\Qw{\aLoc}]}{above=of a}
-          \xform{xd}{\bForm[1/\aLoc]}{below=of a}
+          \xform{xi}{\bForm[1/x][\FALSE/\Qw{x}]}{above=of a}
+          \xform{xd}{\bForm[1/x][(1{=}v\land \Qw{x})/\Qw{x}]}{below=of a}
           \xos{a}{xd}
         \end{tikzinlinesmall}}
     \end{gathered}
     &&
     \begin{gathered}[t]
-      \PW[\mREL]{x}{1}
+      \PW[\mREL]{y}{1}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \raevent{a}{1{=}v\land\Qr{*}\land\Qw{*}\bigmid\DW[\mREL]{x}{v}}{}
-          \xform{xi}{\bForm[1/\bLoc][\FALSE/\Qw{x}]}{above=of a}
-          \xform{xd}{\bForm[1/\bLoc]}{below=of a}
+          \raeventX{a}{1{=}v\land\Qr{*}\land\Qw{*}\bigmid\DW{y}{u}}{}
+          \xform{xi}{\bForm[1/y][\FALSE/\Qw{y}]}{above=of a}
+          \xform{xd}{\bForm[1/y][(1{=}u\land \Qw{y})/\Qw{y}]}{below=of a}
           \xos{a}{xd}
         \end{tikzinlinesmall}}
     \end{gathered}
   \end{align*}
   Since $\Qw{*}[\FALSE/\Qw{\aLoc}]$ is $\FALSE$, we must
-  introduce order to get a satisfiable precondition for $\DWP{y}{1}$.
+  introduce order to get a satisfiable precondition for $\DWP{y}{u}$.
   % composing these without order simplifies to:
   % \begin{gather*}
   %   \PW{x}{1}\SEMI \PW[\mREL]{y}{1}
@@ -1502,9 +1505,9 @@ top-level pomsets.
       \PR[\mACQ]{y}{r}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \raevent{a}{\Qw{y}\bigmid\DR[\mACQ]{y}{v}}{}
-          \xform{xi}{\PBR{1{=}\aReg \lor y{=}\aReg} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
-          \xform{xd}{v{=}r\limplies\bForm}{below=of a}
+          \raeventX{a}{\Qw{y}\bigmid\DR{y}{v}}{}
+          \xform{xi}{\PBR{\Qw{y}\limplies\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \lor \RW} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
+          \xform{xd}{\PBR{\Qw{y}\limplies v{=}r}\limplies\bForm}{below=of a}
           \xos{a}{xd}
         \end{tikzinlinesmall}}
     \end{gathered}
@@ -1513,15 +1516,15 @@ top-level pomsets.
       \PR{x}{r}
       \\
       \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
-          \event{a}{\Qw{x}\bigmid\DR{x}{v}}{}
-          \xform{xi}{\PBR{1{=}\aReg \lor x{=}\aReg} \limplies \bForm[\FALSE/\Qr{x}]}{above=of a}
-          \xform{xd}{v{=}r\limplies\bForm}{below=of a}
+          \event{a}{\Qw{x}\bigmid\DR{x}{u}}{}
+          \xform{xi}{\PBR{\Qw{x}\limplies\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \lor \RW} \limplies \bForm[\FALSE/\Qr{x}]}{above=of a}
+          \xform{xd}{\PBR{\Qw{x}\limplies u{=}r}\limplies\bForm}{below=of a}
           \xos{a}{xd}
         \end{tikzinlinesmall}}
     \end{gathered}
   \end{align*}
   Since $\Qw{x}[\FALSE/\Qw{*}]$ is $\FALSE$, we must
-  introduce order to get a satisfiable precondition for $\DWP{y}{1}$.
+  introduce order to get a satisfiable precondition for $\DRP{x}{u}$.
   % Since $\QL{\aLoc}{\mRLX}[\FALSE/\QL{\bLoc}{\mACQ}]$ is $\FALSE$,
   % composing these without order simplifies to:
   % \begin{gather*}
@@ -1704,9 +1707,12 @@ As shown by the following single-threaded code, allowing this outcome would viol
 This is one reason that we use \emph{weakest} preconditions, rather than
 preconditions.
 
-The same problem does not occur due to if-introduction (at least not for complete
-pomsets, where you need to have termination being a tautology, so you can't
-arbitrarily choose to partition $\emptyForm\neq\TRUE$:
+The same problem does not occur due to if-introduction, since complete
+pomsets require that the termination condition is a tautology; therefore we
+cannot arbitrarily strengthen preconditions without introducing a second
+event to cover.
+% , so you can't
+% arbitrarily choose to partition $\emptyForm\neq\TRUE$:
 \begin{align*}
   \begin{gathered}[t]
     \IF{r}\THEN\PW{x}{2}\FI
@@ -1765,13 +1771,46 @@ Merging left and right, we have
 \end{example}
 
 
-\subsection{Is Coherence/Delay Compatible with If-Introduction and Dead-Write-Removal?}
+\subsection{Optimizations Not Considered}
 
-\todo{Flesh this out.}
+We have not considered the following optimizations advocated by
+\citet{Manson:2005:JMM:1047659.1040336}:
+\begin{itemize}
+\item synchronization on thread local objects can be ignored or removed
+  altogether (the caveat to this is the fact that invocations of methods like
+  wait and notify have to obey the correct semantics – for example, even if
+  the lock is thread local, it must be acquired when perform- ing a wait),
+\item volatile fields of thread local objects can be treated as normal
+  fields,
+\item redundant synchronization (e.g., when a synchronized method is called
+  from another synchronized method on the same object) can be ignored or
+  removed.
+\end{itemize}
+Nor have we attempted to capture the following:
+\begin{itemize}
+\item read introduction,
+\item \emph{monotonicity}, which allows the access mode to strength, for
+  example from $\mRLX$ to $\mACQ$ to $\mSC$,
+\item access elimination, such as store forwarding, dead-write-removal,
+  redundant write after read elimination \cite[\textsection4.1]{DBLP:conf/ecoop/SevcikA08}.
+\end{itemize}
+One approach to elimination would be to allow {merging} of actions with
+different labels.  A list of safe merges can be found in \cite[\textsection
+E]{DBLP:conf/cgo/ChakrabortyV17} and \cite[\textsection7.1]{Kang19}.  For
+examples of unsafe merges and reorderings, see \cite[\textsection
+D]{DBLP:conf/cgo/ChakrabortyV17}.  See also
+\cite[\textsection6.2]{DBLP:journals/pacmpl/ChakrabortyV19}
 
-With if-introduction, the following equation should hold:
+% It would be nice if we could get at these with a strength reducing result:
+% synchronization actions can be replaced by relaxed actions in some cases.
+% Then the rules for relaxed read elimination and relaxed write elimination can
+% be used to get rid of them.
+
+Certain combinations of optimizations are quite delicate.  For example,
+consider if-introduction and dead-write-removal.  With if-introduction, the
+following equation should hold:
 \begin{align*}
-  &\sem{
+  \sem{
     \IF{r}\THEN\PW{x}{2}\FI
     \SEMI
     \PW{x}{1}
@@ -1781,8 +1820,8 @@ With if-introduction, the following equation should hold:
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \SEMI
     \PW{x}{3}
-  }
-  \\ &=
+  }&
+  \\ =
   \sem{
     \IF{\BANG r}\THEN\PW{x}{1}\FI
     \SEMI
@@ -1793,25 +1832,264 @@ With if-introduction, the following equation should hold:
     \IF{r}\THEN\PW{x}{2}\FI
     \SEMI
     \PW{x}{3}
-  }
+  }&
 \end{align*}
-Using dead write removal, these can be refined, respectively, to:
+Using dead write removal naively, these could be refined, respectively, to:
 \begin{align*}
-  &\sem{
+  \sem{
     \PW{x}{1}
     \SEMI
     \PW{x}{2}
     \SEMI
     \PW{x}{3}
-  }
-  \\ &\neq
+  }&
+  \\ \mathrel{\smash{\overset{?}{=}}}
   \sem{
     \PW{x}{2}
     \SEMI
     \PW{x}{1}
     \SEMI
     \PW{x}{3}
-  }
+  }&
 \end{align*}
+Depending upon the details of the model, these may be observably different.
+
 What has become of coherence?
+
+% Counterexample for first two (at least, for our MCA1 semantics):
+% \begin{verbatim}
+%  y=1; x^AR=1; r=x^AR; z=1
+% \end{verbatim}
+% If you see $z=1$ you must see $y=1$
+
+\subsection{The State of the Art Circa 2021}
+
+\citet{DBLP:conf/java/Pugh99} noticed that the semantics of Java 1.0 disabled
+common subexpression elimination.  This lead to a repaired model five years
+later \cite{Manson:2005:JMM:1047659.1040336}.  Shortly thereafter,
+\citet[\textsection7]{DBLP:conf/esop/CenciarelliKS07} noticed that the
+repaired model disabled the reordering of independent statements.  Here is
+the example:
+\begin{gather*}
+  \IF{x\land y}\THEN \PW{z}{1}\FI
+  \PAR
+  \IF{z}\THEN \PW{x}{1}\SEMI \PW{y}{1} \ELSE \PW{y}{1}\SEMI \PW{x}{1} \FI
+  \\
+  \hbox{\begin{tikzinline}[node distance=.5em and 1em]
+      \event{a1}{\DR{x}{1}}{}
+      \event{a2}{\DR{y}{1}}{right=of a1}
+      \event{a3}{\DW{z}{1}}{right=of a2}
+      \po{a2}{a3}
+      \po[out=15,in=165]{a1}{a3}      
+      \event{b1}{\DR{z}{1}}{right=3em of a3}
+      \event{b2}{\DW{y}{1}}{right=of b1}
+      \event{b3}{\DW{x}{1}}{right=of b2}
+      % \po{b1}{b2}
+      % \po[out=15,in=165]{b1}{b3}
+      \rf{a3}{b1}
+      \rf[out=-165,in=-15]{b2}{a2}
+      \rf[out=-165,in=-15]{b3}{a1}
+    \end{tikzinline}}
+\end{gather*}
+Quoting \citet[\textsection7]{DBLP:conf/esop/CenciarelliKS07}:
+\begin{quote}
+  After reordering the independent statements in the else branch, a compiler
+  may execute assignments $\PW{x}{1}$ and $\PW{y}{1}$ early, so that [the
+  execution is allowed].  However, such a behaviour is not legal according to
+  the current JMM, as it violates the condition that the happens-before
+  orders during validation be consistent with the final happens-before on the
+  committed actions. In fact, the latter will have the write to $x$ before the
+  write to $y$, but during validation the write to $y$ happens before the write
+  to $x$.
+\end{quote}
+
+Since then, several models have been proposed.  Many have been revised
+repeatedly to repair bugs.  (For example, this paper fixes several errors of
+\citet{DBLP:journals/pacmpl/JagadeesanJR20}.)
+
+In this subsection, we provide series of quotations from a discussion on the
+OpenJDK mailing lists, which provides an excellent summary of the state of
+the art in 2021, when this paper was written.  (The quotes are ordered for
+readability, with hyperlinks to the original discussion.)
+
+\begin{quotation}
+\href{https://mail.openjdk.java.net/pipermail/jdk-dev/2021-August/005904.html}{Raffaello Giulietti}:
+``JEP 188: Java Memory Model Update'' \href{https://openjdk.java.net/jeps/188}{[1]}, the JMM wiki \href{https://wiki.openjdk.java.net/display/jmm/Main}{[2]} and the 
+jmm-dev mailing list \href{https://mail.openjdk.java.net/pipermail/jmm-dev/}{[3]} seem quite inactive. (The latter point explains 
+why I'm posting to this list instead.)
+
+The introduction of \texttt{j.l.i.VarHandle} \href{https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/invoke/VarHandle.html}{[4]} brought more access modes to 
+Java, but in a narrative and informal way. A paper by Bender \& Palsberg 
+\href{https://dl.acm.org/doi/10.1145/3360568}{[5]}, addressing the formalization of the concurrent access modes, has 
+been published in 2019 but I'm not sure if it caught the attention of 
+the OpenJDK community.
+
+So what is the current thinking for progressing the JMM spec?
+
+\smallskip
+
+\href{https://mail.openjdk.java.net/pipermail/jdk-dev/2021-August/005909.html}{Hans Boehm}:
+I think it's safe to say that it has been slow going, not just for Java,
+but for other languages as well.
+
+In my view, the core problem, shared by pretty much all of them, is that we
+don't have an established way to give well-defined semantics to potentially
+racing unordered accesses, like ordinary variable accesses in Java, or
+\texttt{memory\_order\_relaxed} accesses in C and C++. That's particularly essential
+with the traditional Java language-based-security model, since we can't
+just give up on racing accesses to ordinary variables.
+
+I'm aware of a number of proposed solutions. But I don't think we currently
+have enough confidence that they
+\begin{enumerate}[label=(\alph*)]
+\item\label{HBa} Are correct, and don't have issues similar to the older models,
+\item Don't have unintended consequences, particularly for compilation, and
+\item Are sufficiently comprehensible by programmers to actually be useful.
+\end{enumerate}
+\ref{HBa} is hard because the models have gotten complex enough that reviewers
+are scarce. (A problem that I gather you're familiar with.) The authors are
+commonly experts at formally analyzing the models, but it's hard to analyze
+whether the model conflicts with some well-known, but perhaps not
+well-written-down compilation technique.
+
+Probably even more controversially, I think we've realized that existing
+compiler technology can compile such racing code in ways that some of us are
+not 100\% sure should really be allowed. Demonstrably unexecuted code can
+affect the semantics in ways that strike me as scary. (See
+\url{https://wg21.link/p1217} for a down-to-assembly C++ version; [if I
+understand correctly], Lochbihler and others earlier came up with some
+closely related observations for Java.)
+
+It might be possible to do what we've involuntarily done for C++: Punt the
+hard cases for now, and define what the model is for programs without
+racing ordinary accesses.
+
+%[p1217 is \cite{BoehmOOTA}.]
+
+\smallskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000447.html}{Andrew Haley}:
+\begin{quote}
+  (Quoting
+  \href{https://mail.openjdk.java.net/pipermail/jdk-dev/2021-August/005909.html}{Hans
+    Boehm}) Probably even more controversially, I think we've realized that
+  existing compiler technology can compile such racing code in ways that some
+  of us are not 100\% sure should really be allowed.
+\end{quote}
+This implies, does it not, that the problem is not formalization as
+such, but that we don't really understand what the language is
+supposed to mean? That's always been my problem with OOTA: I'm unsure
+whether the problem is due to the inadequacy of formal models, in
+which case the formalists can fix their own problem, or something we
+all have to pay attention to.
+
+\smallskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000450.html}{Hans
+  Boehm}: In some sense, I'm not sure either. The p1217 examples [formalized
+below as \ref{RFUB} and \ref{RFUB-NC}] bother me in that they seem to violate
+some global programming rules (``if \texttt{x} is only ever null or refers to
+an object properly constructed by the same thread, then \texttt{x} should
+never appear to refer to an incompletely constructed object'').  And there
+seems to be disagreement about whether the currently allowed behavior is
+``correct.''
+
+On the other hand, in practice the weirdness doesn't seem to break things.
+If you ask people advocating the current behavior, the answer will be
+that it doesn't matter because nobody writes code that way. If you ask
+people trying to analyzer or verify code, they'll probably be unhappy.
+And I haven't been able to convince myself that you cannot get yourself
+into these situations just by linking components together, each of which
+does something perfectly reasonable.
+
+And there are very common code
+patterns (like the standard implementation of reentrant locks used
+by all Java implementations) that break if you allow general OOTA
+behavior. Which at least means that you can't currently formally verify such
+code. The theorem you'd be trying to prove is false with respect to the
+part of the language spec we know how to formalize.
+
+It's a mess.
+
+
+\smallskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000447.html}{Andrew Haley}:
+\begin{quote}
+  (Quoting
+  \href{https://mail.openjdk.java.net/pipermail/jdk-dev/2021-August/005909.html}{Hans
+    Boehm}) Demonstrably unexecuted code can affect the semantics in ways
+  that strike me as scary. (See wg21.link/p1217 for a down-to-assembly C++
+  version; [if I understand correctly], Lochbihler and others earlier came up
+  with some closely related observations for Java.)
+\end{quote}
+Looking again at p1217, it seems to me that enforcing load-store
+ordering would have severe effects on compilers, at least without new
+optimization techniques. We hoist loads before loops and sink stores
+after them. When it all works out, there are no memory accesses in the
+loop. A load-store barrier in a loop would have the effect of forcing
+succeeding stores out to memory, and forcing preceding loads to reload
+from memory. It's not hard to imagine that this would cause an
+order-of-margnitude performance reduction in common cases.
+
+I suppose one could argue that such optimizations would continue to be
+valid, so only those stores which would have been emitted anyway would
+be affected. But that's not how compilers work, as far as I know. In
+our IR for C2, memory accesses are not pinned in any way, so the only
+way to make unrelated accesses execute in any particular order is to
+add a dependency between all loads and stores.
+
+\smallskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000450.html}{Hans Boehm}:
+I think it would be a fairly pervasive change to optimizers. It has also
+become clear in WG21, the C++ committee, that there is not enough
+support for requiring this. In that case, Ou and Demsky have a paper
+saying that the overhead is likely to be on the order of 1\% or less.
+For Java if it were applied everywhere, it would probably be
+appreciably higher.
+
+On the other hand, it's a bit harder than that to come up with examples
+where
+the generated x86 code has to be worse. Moving loads earlier in the
+code, or delaying stores, as you suggest, would still be fine. The only
+issue is with delaying loads past stores, which seems less common,
+though it can certainly be beneficial for reducing live ranges, probably
+some
+vectorization etc.
+
+But it seems unlikely that such a restriction will be applied even to
+C++ \texttt{memory\_order\_relaxed}, much less Java ordinary variables.
+
+\smallskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000449.html}{Doug
+  Lea}:
+My stance in the less formal account 
+(\url{http://gee.cs.oswego.edu/dl/html/j9mm.html}) as well as Shuyang Liu et 
+al's ongoing formalization (see links from 
+\url{http://compilers.cs.ucla.edu/people/}) is that the most you want to say 
+about racy Java programs is that they are typesafe. As in: you can't see 
+a String when expecting an int. Even this looser constraint is 
+challenging to specify, prove, and extend. But it is a path for Java 
+that might not apply to languages like C that are not guaranteed 
+typesafe anyway, and so enter Undefined Behavior territory (as opposed 
+to possibly-unexpected but still typesafe behavior).
+
+\smallskip
+
+\href{https://mail.openjdk.java.net/pipermail/jmm-dev/2021-August/000451.html}{Han Boehm}:
+But this now breaks some common idioms, right? In particular, I think a
+bunch of
+code assumes that racing assignments of equivalent primitive values or
+immutable
+objects to the same field are OK.
+
+If, in 2004, our view of language-based security had been the same as it is
+now,
+then I completely agree that this would have been the right approach. But I
+think
+doing it now would require significant user code changes. Which might still
+be the best way forward ...
+\end{quotation}
 

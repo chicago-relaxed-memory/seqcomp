@@ -1,0 +1,108 @@
+  \begin{enumerate}[topsep=0pt,label=(\textsc{f}\arabic*),ref=\textsc{f}\arabic*]
+    \setcounter{enumi}{\value{Bkappa}}
+  \item \label{fence-kappa-q}
+    $\labelingForm(\aEv) \riff \QF{}{\amode}$,
+    \stepcounter{enumi}
+  \item[] \labeltext[\textsc{f}4]{}{fence-tau-q}
+    \begin{enumerate}[leftmargin=0pt]
+      \item \label{fence-tau-dep-q}
+        if $\aEvs\cap\bEvs\neq\emptyset$ then
+      \begin{math}
+        \aTr{\bEvs}{\bForm} \riff 
+        \bForm,
+      \end{math}
+      \item \label{fence-tau-ind-q}
+        if $\aEvs\cap\bEvs=\emptyset$ then
+      \begin{math}
+        \aTr{\bEvs}{\bForm} \riff 
+        \bForm
+        [\FALSE/\QF{}{\amode}].
+      \end{math}
+    \end{enumerate}
+  \end{enumerate}
+  \smallskip
+
+  \begin{enumerate}[topsep=0pt,label=(\textsc{w}\arabic*),ref=\textsc{w}\arabic*]
+    \setcounter{enumi}{\value{Bkappa}}
+  \item \label{write-kappa-q}
+    \begin{math}
+      \labelingForm(\aEv) \riff
+      \QS{\aLoc}{\amode}
+      \land
+      \aExp{=}\aVal
+    \end{math},
+    \stepcounter{enumi}
+  \item[] \labeltext[\textsc{w}4]{}{write-tau-q}
+    \begin{enumerate}[leftmargin=0pt]
+      \item \label{write-tau-dep-q}
+        if $\aEvs\cap\bEvs\neq\emptyset$ then
+      \begin{math}
+        \aTr{\bEvs}{\bForm} \riff 
+        \bForm
+        [\aExp/\aLoc][(\Qw{\aLoc}\land\aExp{=}\aVal)/\Qw{\aLoc}],
+      \end{math}
+      \item \label{write-tau-ind-q}
+        if $\aEvs\cap\bEvs=\emptyset$ then
+      \begin{math}
+        \aTr{\bEvs}{\bForm} \riff 
+        \bForm
+        [\aExp/\aLoc][\FALSE/\QS{\aLoc}{\amode}].
+      \end{math}
+    \end{enumerate}
+  \end{enumerate}
+  \smallskip
+
+  \begin{enumerate}[topsep=0pt,label=(\textsc{r}\arabic*),ref=\textsc{r}\arabic*]
+    \setcounter{enumi}{\value{Bkappa}}
+  \item \label{read-kappa-q}
+    \begin{math}
+      \labelingForm(\aEv) \riff \QL{\aLoc}{\amode},
+    \end{math}
+    \stepcounter{enumi}
+  \item[] \labeltext[\textsc{r}4]{}{read-tau-q}
+    \begin{enumerate}[leftmargin=0pt]
+      \item \label{read-tau-dep-q}
+        if $\aEv\in\aEvs\cap\bEvs$ then
+        \makebox[0pt][l]{%
+          \begin{math}
+            \aTr{\bEvs}{\bForm} \riff
+            (\Qw{\aLoc}\limplies\aVal{=}\aReg)
+            \limplies \bForm,
+          \end{math}
+        }
+    \item \label{read-tau-ind-q}
+      if $\aEv\in\aEvs\setminus\bEvs$ then
+      \makebox[0pt][l]{\begin{math}
+          \aTr{\bEvs}{\bForm} \riff
+          \PBR{
+            \Qw{\aLoc}
+            \limplies
+            \PBR{
+              \aVal{=}\aReg \lor \aLoc{=}\aReg \lor\RW
+            }
+          }
+          \limplies \bForm [\FALSE/\QL{\aLoc}{\amode}],
+        \end{math}}
+    \item \label{read-tau-empty-q}
+      if $\aEvs=\emptyset$ then
+      \begin{math}
+        \aTr{\bEvs}{\bForm} \riff
+        \bForm [\FALSE/\QL{\aLoc}{\amode}].
+      \end{math}
+    \end{enumerate}
+  \end{enumerate}    
+  \smallskip
+
+  A \PwT{} is \emph{complete} if
+  \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+    \setcounter{enumi}{3}
+  \item[] \labeltext[\textsc{c}3]{}{top-kappa-q}
+    \begin{enumerate}[leftmargin=0pt]
+    \item \label{top-kappa-write-q}
+      if $\labeling(\aEv)$ is a write then $\labelingForm(\aEv)[\TRUE/\RW]\Qsuball{\TRUE}$ is a tautology,
+    \item \label{top-kappa-read-q}
+      if $\labeling(\aEv)$ is a read then $\labelingForm(\aEv)[\FALSE/\RW]\Qsuball{\TRUE}$ is a tautology,
+    \end{enumerate}
+    \setcounter{enumi}{\value{Bterm}}
+  \item \label{top-term-q} $\aTerm{}\Qsuball{\TRUE}$ is a tautology.
+  \end{enumerate}

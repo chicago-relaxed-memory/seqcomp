@@ -1,0 +1,108 @@
+\begin{align*}
+  \begin{gathered}
+      \begin{gathered}[t]
+        \mathstrut\smash{\PF{\fREL}}
+        \\
+        \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+            \raeventX{a}{\Qr{*}\land\Qw{*}\bigmid\DF{}}{}
+            \xform{xi}{\bForm[\FALSE/\Qw{*}]}{above=of a}
+            \xform{xd}{\bForm}{below=of a}
+            \xos[xright]{a}{xd}
+          \end{tikzinlinesmall}}
+      \end{gathered}      
+    \\[1ex]
+      \begin{gathered}[t]
+        \PF{\fACQ}
+        \\
+        \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+            \raeventX{a}{\Qr{*}\bigmid\DF{}}{}
+            \xform{xi}{\bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
+            \xform{xd}{\bForm}{below=of a}
+            \xos[xright]{a}{xd}
+          \end{tikzinlinesmall}}
+      \end{gathered}
+    \\[1ex]
+    \begin{gathered}[t]
+      \PF{\fSC}
+      \\
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \sceventX{a}{\Qall\bigmid\DF{}}{}
+          \xform{xi}{\bForm\Qsuball{\FALSE}}{above=of a}
+          \xform{xd}{\bForm}{below=of a}
+          \xos[xright]{a}{xd}
+        \end{tikzinlinesmall}}
+    \end{gathered}
+  \end{gathered}
+  &&
+  \begin{gathered}
+    \begin{gathered}[t]
+      \mathstrut\PW{x}{\aExp}
+      \\
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \event{a}{\aExp{=}v\land\Qr{x}\land\Qw{x}\bigmid\DW{x}{v}}{}
+          \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{\aLoc}]}{above=of a}
+          \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{\aLoc}]}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
+    \end{gathered}
+    \\[1ex]
+    \begin{gathered}[t]
+      \PW[\mREL]{x}{\aExp}
+      \\
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \raeventX{a}{\aExp{=}v\land\Qr{*}\land\Qw{*}\bigmid\DW{x}{v}}{}
+          \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{x}]}{above=of a}
+          \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{x}]}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
+    \end{gathered}
+    \\[1ex]
+    \begin{gathered}[t]
+      \PW[\mSC]{x}{\aExp}
+      \\
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \sceventX{a}{\aExp{=}v\land\Qall \bigmid\DW{x}{v}}{}
+          \xform{xi}{\bForm[\aExp/\aLoc][\FALSE/\Qw{x}][\FALSE/\Qsc]}{above=of a}
+          \xform{xd}{\bForm[\aExp/\aLoc][(\aExp{=}\aVal\land \Qw{\aLoc})/\Qw{x}]%[(\aExp{=}\aVal\land \Qsc)/\Qsc]
+          }{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
+    \end{gathered}
+  \end{gathered}
+  &&
+  %\mkern-60mu
+  \begin{gathered}
+    \begin{gathered}[t]
+      \mathstrut\PR{x}{r}
+      \\
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \event{a}{\Qw{x}\bigmid\DR{x}{v}}{}
+          \xform{xi}{\PBR{\Qw{x}\limplies\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \lor \RW} \limplies \bForm[\FALSE/\Qr{x}]}{above=of a}
+          \xform{xd}{\PBR{\Qw{x}\limplies v{=}r}\limplies\bForm}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
+    \end{gathered}
+    \\[1ex]
+    \begin{gathered}[t]
+      \PR[\mACQ]{x}{r}
+      \\
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \raeventX{a}{\Qw{x}\bigmid\DR{x}{v}}{}
+          \xform{xi}{\PBR{\Qw{x}\limplies\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \lor \RW} \limplies \bForm[\FALSE/\Qr{*}][\FALSE/\Qw{*}]}{above=of a}
+          \xform{xd}{\PBR{\Qw{x}\limplies v{=}r}\limplies\bForm}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
+    \end{gathered}
+    \\[1ex]
+    \begin{gathered}[t]
+      \PR[\mSC]{x}{r}
+      \\
+      \hbox{\begin{tikzinlinesmall}[node distance=.5em and 1.5em]
+          \sceventX{a}{\Qw{x}\land\Qsc\bigmid\DR{x}{v}}{}
+          \xform{xi}{\PBR{\Qw{x}\limplies\PBR{\aVal{=}\aReg \lor \aLoc{=}\aReg} \lor \RW} \limplies \bForm\Qsuball{\FALSE}}{above=of a}
+          \xform{xd}{\PBR{\Qw{x}\limplies v{=}r}\limplies\bForm}{below=of a}
+          \xos{a}{xd}
+        \end{tikzinlinesmall}}
+    \end{gathered}
+  \end{gathered}
+\end{align*}

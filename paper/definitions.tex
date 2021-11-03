@@ -349,11 +349,11 @@ definition follows
 \citet{DBLP:journals/cacm/Dijkstra75}.\footnote{In \label{footnote:false}
   addition to the three criteria of \refdef{def:trans},
   \citet{DBLP:journals/cacm/Dijkstra75} requires
-  \labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false'}
+  \labeltext[\textsc{x}4$'$]{(\textsc{x}4$'$)}{tr-false-footnote'}
   $\aTr{}{\FALSE}\riff\FALSE$.  The dependent transformer for read actions
-  \eqref{read-tau-dep} fails \ref{tr-false'}, since $\FALSE$ is not
+  \eqref{read-tau-dep} fails \ref{tr-false-footnote'}, since $\FALSE$ is not
   equivalent to $v{=}r\limplies\FALSE$.  We can define an analog of
-  \ref{tr-false'} for our model using the register naming conventions of
+  \ref{tr-false-footnote'} for our model using the register naming conventions of
   \textsection\ref{sec:additional}.  Define $\regForm{\labeling}$ to capture
   the \emph{register state} of a pomset:
   \begin{math}
@@ -362,7 +362,7 @@ definition follows
     \textwhere \aEvs=\fdom(\labeling).
   \end{math}    
   We say that $\aForm$ is \emph{$\labeling$-inconsistent} if $\aForm\land\regForm{\labeling}$ is unsatisfiable.
-  We can then require \labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false}
+  We can then require \labeltext[\textsc{x}4]{(\textsc{x}4)}{tr-false-footnote}
   if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is
   $\labeling$-inconsistent.  \ref{tr-false} is not needed for the results of
   this paper, therefore we have elided it from the main development.}
