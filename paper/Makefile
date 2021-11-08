@@ -3,6 +3,11 @@ paper:
 	rm  -f ${PAPER}.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error ${PAPER}.tex
 	killall Skim
+draft:
+	pdflatexn ${PAPER}
+	cp ${PAPER}.pdf DRAFT.pdf
+	pdflatexn combo
+	cp combo.pdf DRAFT-APPENDIX.pdf
 appendix:
 	rm  -f appendix.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error appendix.tex

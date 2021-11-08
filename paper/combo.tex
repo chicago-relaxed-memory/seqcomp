@@ -1,0 +1,343 @@
+% POPL
+% Sun 16 - Sat 22 January 2022 Philadelphia, Pennsylvania, United States
+% https://popl22.sigplan.org/
+%
+% 25 Pages, excluding bibliographic references and appendices.
+% Thu 8 Jul 2021 Submission Deadline
+% Sat 4 - Wed 8 Sep 2021 Author Response Period
+% Wed 29 Sep 2021 Notification
+% Mon 8 Nov 2021 Camera Ready Deadline
+% Hongseok Yang
+
+
+% Michael D. Adams, University of Michigan
+% Amal Ahmed, Northeastern University, USA
+% Robert Atkey, University of Strathclyde
+% Sandrine Blazy, Univ Rennes, IRISA
+% David Broman, KTH
+% Michael Carbin, Massachusetts Institute of Technology
+% Alvin Cheung, University of California, Berkeley
+% Wei-Ngan Chin, National University of Singapore
+% Pierre Clairambault, CNRS & ENS Lyon
+% Christos Dimoulas, PLT @ Northwestern University
+% Michael Emmi, Amazon Web Services
+% Ronald Garcia, University of British Columbia
+% Radu Grigore, Facebook
+% Ronghui Gu, Columbia University
+% Matthew Hague, Royal Holloway, University of London
+% Kihong Heo, KAIST
+% Ralf Hinze, Technische Universität Kaiserslautern
+% Jan Hoffmann, Carnegie Mellon University
+% Justin Hsu, University of Wisconsin-Madison, USA
+% Atsushi Igarashi, Kyoto University, Japan
+% Ranjit Jhala, University of California at San Diego
+% Benjamin Lucien Kaminski, University College London
+% Shin-ya Katsumata, National Institute of Informatics
+% Alex Kavvos, University of Bristol
+% Andrew Kennedy, Facebook London
+% Neel Krishnaswami, Computer Laboratory, University of Cambridge
+% Ori Lahav, Tel Aviv University
+% Leonidas Lampropoulos, University of Maryland, College Park
+% Woosuk Lee, Hanyang University
+% Hongjin Liang, Nanjing University
+% Anthony Widjaja Lin, Technische Universität Kaiserslautern and Max-Planck Institute for Software Systems
+% Fan Long, University of Toronto, Canada
+% P. Madhusudan, University of Illinois at Urbana-Champaign
+% Kenneth L. McMillan, UT Austin
+% J. Garrett Morris, The University of Iowa
+% Koko Muroya, RIMS, Kyoto University, JP
+% C.-H. Luke Ong, University of Oxford
+% Pavel Panchekha, University of Utah
+% Matthew Parkinson, Microsoft Research, UK
+% François Pottier, Inria, France
+% Philipp Ruemmer, Uppsala University
+% Chung-chieh Shan, Indiana University, USA
+% Filip Sieczkowski, University of Wrocław
+% Bas Spitters, Aarhus University
+% Sam Staton, University of Oxford
+% Kohei Suenaga, Graduate School of Informatics, Kyoto University
+% Tachio Terauchi, Waseda University
+% Aditya V. Thakur, University of California at Davis
+% Caterina Urban, INRIA & École Normale Supérieure | Université PSL
+% Niki Vazou, IMDEA Software Institute
+% Dimitrios Vytiniotis, DeepMind
+% John Wickerson, Imperial College London
+% James R. Wilcox, University of Washington
+% Nicolas Wu, Imperial College London, UK
+% Qirun Zhang, Georgia Institute of Technology, USA
+
+
+% SPLASH21 Program Committee
+% 23 pages, excluding bibliographic references and appendices.
+% Fri 2 Jul 2021 Notifications -- 1st round
+% Fri 13 Aug 2021 Paper Submission -- 2nd
+% Mon 30 Aug 2021 Notifications - final
+% Mon 13 Sep 2021 Camera-ready submissions
+% Oct 17-22 conference.
+% Sophia Drossopoulou
+% Erika Abraham RWTH Aachen University
+% Karim Ali University of Alberta
+% Davide Ancona DIBRIS, University of Genova, Italy
+% Gavin Bierman Oracle Labs
+% Judith Bishop Stellenbosch University
+% Steve Blackburn Australian National University
+% Michael D. Bond Ohio State University, USA
+% Edwin Brady University of St Andrews, UK
+% Michael Carbin Massachusetts Institute of Technology
+% Sarah E. Chasins University of California, Berkeley
+% James Cheney University of Edinburgh, UK
+% Shigeru Chiba The University of Tokyo
+% Mike Dodds Galois, Inc.
+% Kathi Fisler Brown University
+% Colin Gordon Drexel University
+% Justin Gottschlich Intel Labs / Penn
+% Michael Greenberg Pomona College
+% David Grove IBM Research
+% Arjun Guha Northeastern University
+% Michael Hicks University of Maryland at College Park
+% Marieke Huisman University of Twente
+% Atsushi Igarashi Kyoto University, Japan
+% Daniel Jackson MIT
+% Jeehoon Kang KAIST
+% Sarfraz Khurshid University of Texas at Austin
+% Viktor Kunčak EPFL, Switzerland
+% Yonghwi Kwon University of Virginia
+% Doug Lea State University of New York (SUNY) Oswego
+% Mohsen Lesani University of California at Riverside, USA
+% Crista Lopes University of California, Irvine
+% Mira Mezini TU Darmstadt, Germany
+% Todd Millstein University of California at Los Angeles
+% Sasa Misailovic University of Illinois at Urbana-Champaign
+% Andrew C. Myers Cornell University
+% Iulian Neamtiu New Jersey Institute of Technology
+% James Noble Victoria University of Wellington
+% Hakjoo Oh Korea University
+% Klaus Ostermann University of Tübingen
+% Nadia Polikarpova University of California at San Diego
+% Polyvios Pratikakis University of Crete
+% Gregor Richards University of Waterloo
+% Aritra Sengupta Amazon Web Services, USA
+% Yannis Smaragdakis University of Athens
+% Gustavo Soares Microsoft
+% Diomidis Spinellis Athens University of Economics and Business & TU Delft
+% Manu Sridharan University of California at Riverside
+% Alexander J. Summers University of British Columbia
+% Frank Tip Northeastern University
+% Laurence Tratt King's College London
+% Viktor Vafeiadis MPI-SWS
+% Jan Vitek Northeastern University / Czech Technical University
+% Mitchell Wand Northeastern University, USA
+% Weihang Wang University at Buffalo, SUNY
+% Adam Welc Uber Technologies
+% John Wickerson Imperial College London
+% Yunhui Zheng IBM Research
+
+% LICS21 Program Committee 
+% Leonid Libkin (Univ. of Edinburgh/ENS-Paris)
+% Christoph Berkholz (Humboldt-University Berlin)
+% Meghyn Bienvenu (CNRS, University of Bordeaux)
+% Filippo Bonchi (University of Pisa)
+% Véronique Bruyère (University of Mons)
+% Yu-Fang Chen (Academia Sinica)
+% Dmitry Chistikov (University of Warwick)
+% Silvia Crafa (University of Padova)
+% Amina Doumane (CNRS-ENS de Lyon)
+% Stéphanie Delaune (University Rennes, CNRS, IRISA)
+% Ekaterina Fokina (TU Wien)
+% Marco Gaboardi (Boston University)
+% Adria Gascon (Google UK)
+% Lauri Hella (Tampere University)
+% Ekaterina Komendantskaya (Heriott-Watt University)
+% Shankara Narayanan Krishna (IIT, Bombay)
+% Benoit Larose (UQAM, Montréal)
+% Jérôme Leroux (CNRS, University of Bordeaux)
+% Wim Martens (University of Bayreuth)
+% Peter O’Hearn (UCL/Facebook)
+% Daniela Petrisan (Université de Paris, CNRS, IRIF)
+% Miguel Romero (Universidad Adolfo Ibáñez)
+% Philippe Schnoebelen (CNRS & ENS Paris-Saclay)
+% Olivier Serre (Université de Paris, CNRS, IRIF)
+% Sebastian Siebertz (University of Bremen)
+% Kristina Sojakova (INRIA)
+% Alwen Tiu (Australian National University)
+% Patrick Totzke (University of Liverpool)
+% Szymon Torunczyk (University of Warsaw)
+% Takeshi Tsukada (University of Tokyo)
+% Jamie Vicary (University of Cambridge)
+% Michael Zakharyaschev (Birkbeck)
+% Anna Zamansky (Haifa University)
+% Georg Zetzsche (Max Planck Institute for Software Systems)
+% Thomas Zeume (Ruhr-Universität Bochum)
+
+
+\RequirePackage{amssymb}  %% bizarre error previous def of Bbbk if after documentclass
+\documentclass[acmsmall,screen]{acmart}\settopmatter{printfolios=true}
+\hypersetup{bookmarksnumbered,bookmarksopen=true,bookmarksdepth=3}
+\settopmatter{printfolios=true}
+\AtEndPreamble{%
+  % \theoremstyle{acmdefinition}
+  % \theoremstyle{plain}
+  % \newtheorem{theorem}{Theorem}[section]
+  % \newtheorem{proposition}[theorem]{Proposition}
+  % \theoremstyle{acmdefinition}
+  % \newtheorem{definition}[theorem]{Definition}
+  \theoremstyle{acmdefinition}
+  \newtheorem{remark}[theorem]{Remark}
+  \newtheorem{candidate}[theorem]{Candidate}
+  \renewcommand{\theequation}{\fnsymbol{equation}}
+
+  \newcommand{\app}[1]{{\color{blue!80!black}\textbf{ANTON: #1}}}
+}
+\bibliographystyle{ACM-Reference-Format}
+\citestyle{acmauthoryear}   %% For author/year citations
+
+\setcopyright{rightsretained}
+\acmPrice{}
+\acmDOI{}
+\acmYear{2022}
+\copyrightyear{2022}
+\acmSubmissionID{}
+\acmJournal{PACMPL}
+\acmVolume{0}
+\acmNumber{POPL}
+\acmArticle{0}
+\acmMonth{1}
+\startPage{1}
+
+% \begin{makeatletter}
+%   \gdef\@copyrightpermission{%
+%     This paper is published under the Creative Commons Attribution~4.0
+%     International (CC-BY~4.0) license.
+%   }
+% \end{makeatletter}
+% \acmYear{2020}
+% \acmDOI{XX.XXXX/XXXXXXX.XXXXXXX}
+
+\usepackage{macros}
+%\showRAfalse
+\showSCOPEfalse
+\begin{document}
+
+%\title{Denoting Efficient Sequential Composition}
+%\title{Efficient Sequential Composition}
+%\title{A High-Level Abstraction of Efficient Sequential Composition}
+%Predicate Transformers for Relaxed Memory
+% \title{The Leaky Semicolon---A Compositional Semantics}
+% \subtitle{Predicate Transformers and Semantic Dependencies in Relaxed-Memory Concurrency}
+\title{The Leaky Semicolon}
+\subtitle{Compositional Semantic Dependencies for Relaxed-Memory Concurrency}
+%\subtitle{Predicate Transformers and Semantic Dependencies in Relaxed-Memory Concurrency}
+\author{Alan Jeffrey}
+\orcid{0000-0001-6342-0318}
+\affiliation{
+  \institution{Roblox}
+  \city{Chicago}
+  \country{USA}
+}
+\email{ajeffrey@roblox.com}
+
+\author{James Riely}
+\orcid{0000-0002-8731-1463}
+\affiliation{
+  %\department{School of Computing}
+  \institution{DePaul University}
+  \city{Chicago}
+  \country{USA}
+}
+\email{jriely@cs.depaul.edu}
+
+\author{Mark Batty}
+\orcid{0000-0001-7053-4364}
+\affiliation{
+  %\department{School of Computing}
+  \institution{University of Kent}
+  \city{Canterbury}
+  \country{UK}
+}
+\email{m.j.batty@kent.ac.uk}
+
+\author{Simon Cooksey}
+\orcid{}
+\affiliation{
+  %\department{School of Computing}
+  \institution{University of Kent}
+  \city{Canterbury}
+  \country{UK}
+}
+\email{simon@graymalk.in}
+
+\author{Ilya Kaysin}
+\orcid{}
+\affiliation{
+  %\department{School of Computing}
+  \institution{JetBrains Research, Russia and University of Cambridge}
+  \city{}
+  \country{UK}
+}
+\email{ik404@cam.ac.uk}
+
+\author{Anton Podkopaev}
+\orcid{}
+\affiliation{
+  %\department{School of Computing}
+  \institution{HSE University}
+  \city{Saint Petersburg}
+  \country{Russia}
+}
+\email{apodkopaev@hse.ru}
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10003752.10003753.10003761.10003762</concept_id>
+       <concept_desc>Theory of computation~Parallel computing models</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10003752.10010124.10010138.10010141</concept_id>
+       <concept_desc>Theory of computation~Pre- and post-conditions</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10003752.10010124.10010131.10010133</concept_id>
+       <concept_desc>Theory of computation~Denotational semantics</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Theory of computation~Parallel computing models}
+\ccsdesc[300]{Theory of computation~Preconditions}
+%\ccsdesc[300]{Theory of computation~Denotational semantics}
+
+\keywords{Concurrency, Relaxed Memory Models, Multi-Copy Atomicity, ARMv8, Pomsets, Preconditions, 
+  Temporal Safety Properties, Thin-Air Reads, Compiler Optimizations} %% \keywords is optional
+\maketitle
+\input{intro.tex}
+\input{definitions.tex}
+\input{mca1.tex}
+\input{mca2.tex}
+\input{results.tex}
+\input{c11.tex}
+\input{tool.tex}
+\input{variants.tex}
+\input{related.tex}
+
+\input{outro.tex}
+\bibliography{bib}
+\newpage
+\appendix
+\input{arm.tex}
+\input{oopsla.tex}
+\input{discussion.tex}
+\input{extra.tex}
+\input{drf.tex}
+\end{document}
+
+% Local Variables:
+% mode: latex
+% TeX-master: t
+% End:
