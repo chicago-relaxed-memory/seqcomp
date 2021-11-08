@@ -347,23 +347,8 @@ models (\textsection\ref{sec:promising}).
 
 %\todo{What's the point?}
 We presented a thin-air behavior involving address calculation in
-\textsection\ref{sec:addr}.  \ref{TC12} provides another example.  The
-justification for \ref{TC12} states:
-\begin{quotation}
-  \renewcommand{\ADDRARRAY}[2]{#2}%
-  \renewcommand{\REFARRAY}[2]{\REF{#2}}%
-  Since no other thread accesses [either $\REFARRAY{a}{0}$ or
-  $\REFARRAY{a}{1}$], the code for [the second] thread should be equivalent
-  to:
-  \begin{displaymath}
-    \PR{y}{r}\SEMI
-    \PW{\REFARRAY{a}{r}}{0}\SEMI
-    \PBR{\LET{s}{\IF{r{=}0}\THEN 0 \ELSE 1\FI}}\SEMI
-    \PW{x}{s}\SEMI
-  \end{displaymath}
-  With this code, it is clear that this is the same situation as [\ref{OOTA1}].
-\end{quotation}
-\ref{TC12} with all initial values $0$:
+\textsection\ref{sec:addr}.  \ref{TC12} provides another example---eliding
+initializing writes, all $0$:
 \begin{gather*}
   \taglabel{TC12}
   \begin{gathered}
@@ -408,7 +393,7 @@ justification for \ref{TC12} states:
 
 Building the precondition $\aForm$ from right to left:
 \begin{align*}
-  \tag{$\PW{x}{s}$}
+  \tag{$\PW{x}{\BANG s}$}
   \aForm_1 &\riff
   s{=}0
   \\
@@ -519,10 +504,24 @@ Building the precondition $\aForm$ from right to left:
     s{=}0
   }
 \end{align*}
-
-Note that \ref{TC12} really isn't about address calculation.  The same
-example can be played out with 
-control dependencies.  (We elide initializing writes, all $0$):
+The justification for forbidding \ref{TC12} states:
+\begin{quotation}
+  \renewcommand{\ADDRARRAY}[2]{#2}%
+  \renewcommand{\REFARRAY}[2]{\REF{#2}}%
+  Since no other thread accesses [either $\REFARRAY{a}{0}$ or
+  $\REFARRAY{a}{1}$], the code for thread one should be equivalent
+  to:
+  \begin{displaymath}
+    \PR{y}{r}\SEMI
+    \PW{\REFARRAY{a}{r}}{1}\SEMI
+    \IF{r{=}0}\THEN \LET{s}{1} \ELSE \LET{s}{0}\FI{}\SEMI
+    \PW{x}{\BANG s}
+  \end{displaymath}
+  With this code, it is clear that this is the same situation as [\ref{OOTA1}].
+\end{quotation}
+%This makes it clear that \ref{TC12} is not really about address calculation.
+Here is the same example with control dependencies---again eliding
+initializing writes, all $0$:
 \begin{gather*}
   \tag{\textsc{tc12}$'$}\label{TC12'}
   \begin{gathered}
