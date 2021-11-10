@@ -2,21 +2,23 @@
 \section{\PwTerTITLE: automatic litmus test evaluator}
 \label{sec:tool}
 
-\PwTer{} automatically and exhaustively calculates the allowed outcomes of litmus tests for the \PwT, \PwTpo, and \PwTc{} models. It is built in OCaml, and uses Z3~\cite{Z3Solver} to judge the truth of predicates constructed by the models. \PwTer{} obviates the need for error-prone hand evaluation.
+\PwTer{} automatically and exhaustively calculates the allowed outcomes of litmus tests for the \PwT, \PwTpo, and \PwTc{} models, obviating the need for error-prone hand evaluation. It is built in OCaml, using Z3~\cite{Z3Solver} to judge the truth of predicates. % constructed by the models. 
 
 \PwTer{} allows several modes of evaluation: it can evaluate the rules of Fig.~\ref{fig:seq}, implementing \PwT; it can generate program order according to \textsection\ref{sec:c11}, implementing \PwTpo; and similar to \MRD~\cite{DBLP:conf/esop/PaviottiCPWOB20}, it can construct C11-style pre-executions and filter them according to the rules of \rcXI{} as described in \textsection\ref{sec:c11}, implementing \PwTc{}.
-Finally, \PwTer{} also allows us to toggle the complete check of~\ref{def:complete}, providing an interface for understanding how fragments of code might compose by exposing preconditions and termination conditions that are not yet tautologies.
+Finally, \PwTer{} also allows us to toggle the complete check of~\refdef{def:complete}, providing an interface for understanding how fragments of code might compose by exposing preconditions and termination conditions that are not yet tautologies.
+
 We have run \PwTer{} over the Java Causality Tests~\cite{PughWebsite} supported in the input syntax, and tabulated the results in Table~\ref{fig:tool}.
 For context, we have included the results of \MRD{} for the Java Causality tests~\cite{DBLP:conf/esop/PaviottiCPWOB20}.
-Of note is that test cases 17 and 18 for \MRD{} and \MRDRC{} do not give the correct outcome, this is for similar reasons to the example given in \textsection\ref{sec:lir}, where local invariant reasoning in \MRD{} is too constrained.
+Note that \MRD{} and \MRDRC{} do not give the correct outcome on jctc17--18---the reason is that local invariant reasoning in \MRD{} is too constrained (see \textsection\ref{sec:lir}).
 
-The execution times give a good indication the poor scaling of the tool with program size: for larger test cases, the tool takes exponentially longer to compute, and for the largest tests the memory footprint is too large for even a well-equipped computer.
+%The execution times give a good indication of the poor scaling of the tool with program size: 
+For larger test cases, the tool takes exponentially longer to compute, and for the largest tests the memory footprint is too large for even a well-equipped computer.
 The compositional nature of the semantics makes tool building practical, but it is not enough to make it scalable for large tests.
-The definitions of $\sSEMI{\aPSS_1}{\aPSS_2}$ and $\sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ -- in combination with the rules for reads and writes has exponential complexity.
+In combination with the rules for reads and writes, the definitions of $\sSEMI{\aPSS_1}{\aPSS_2}$ and $\sIF{\aForm}\sTHEN\aPSS_1\sELSE\aPSS_2\sFI$ have exponential complexity.
 This is compounded by the hidden complexity of calculating the possible merges between pomsets through union in rules \ref{seq-E} and \ref{if-E}.
 Significant effort has been put into throwing away spurious merges early in \PwTer, so that executing the tool remains manageable for small examples.
-Some further optimisations may be possible within the tool to improve the situation further, such as killing `dead-end' pomsets at each sequence operator, or by doing a directed search for particular execution outcomes.
-\PwTer{} is available with this paper's supplementary materials.
+Some further optimizations may be possible within the tool to improve the situation further, such as killing ``dead-end'' pomsets at each sequence operator, or by doing a directed search for particular execution outcomes.
+\PwTer{} is available in the supplementary material.
 
 % \todo{Verify that referee comments sufficiently addressed regarding ``scalability challenges''.  Perhaps mention that it is easier for hardware models?}
 

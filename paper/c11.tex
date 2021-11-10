@@ -8,15 +8,16 @@ follow the approach of \citet{DBLP:conf/esop/PaviottiCPWOB20}, using our
 semantics to generate \cXI{} candidate executions with a dependency relation,
 then applying the axioms of \rcXI{} \cite{DBLP:conf/pldi/LahavVKHD17}.  The
 No-Thin-Air axiom of \rcXI{} is overly restrictive, requiring that
-${\rrfx}\cup{\rpox}$ be acyclic.  Instead, we require that ${\rrfx}\cup{\lt}$
-is acyclic.  This is a more precise categorisation of thin-air behavior, and 
+$({\rrfx}\cup{\rpox})$ be acyclic.  Instead, we require that $({\rrfx}\cup{\lt})$
+is acyclic.  This is a more precise categorization of thin-air behavior, and 
 it allows aggressive compiler optimizations that would be erroneously forbidden
 by \rcXI's original No-Thin-Air axiom.
 
 The chief difficulty is instrumenting our semantics to generate program
 order, for use in the various axioms of \cXI{}.  Using the obvious
-construction (described in the proof of \reflem{lem:po}), $\rpox$ is a
-pre-order, which may include cycles due to coalescing.  For example:
+construction (described in the proof of \reflem{lem:po}), program order
+($\rpox$) is a pre-order, which may include cycles due to coalescing.  For
+example:
 \begin{align*}
   % \PR{y}{r}
   % \SEMI
@@ -194,6 +195,7 @@ filtering as a \PwTc{}.
       $\aTerm$ is a tautology.
     \end{enumerate}
   \end{multicols}
+  \smallskip
 
   A complete \PwTpo{} is a \PwTc{} if it additionally satisfies the axioms of
   \rcXI{}.
@@ -245,7 +247,7 @@ events (if $\aEv\in\phEvs$ then $\fmrg{\aEv}\in\dmEvs$).
     $\aPS'$.  When building $\aPS'$, we require disjoint union in \ref{seq-E}
     and \ref{if-E}: $\aEvs' = \aEvs'_1\uplus\aEvs'_2$.  If and event is
     unmerged in $\aPS$ ($\aEv\in\aEvs_1\uplus\aEvs_2$) then we choose the
-    same event name for $\aEvs'$ in $\aPS'$.  If an event is merged in
+    same event name for $\aPS'$.  If an event is merged in
     $\aPS$ ($\aEv\in\aEvs_1\cap\aEvs_2$) then we choose fresh event
     names---$\aEv'_1$ and $\aEv'_2$---and extend $\fmrg{}$
     accordingly: $\fmrg{\aEv'_1}=\fmrg{\aEv'_2}=\aEv$.  In $\aPS'$, we take
@@ -321,7 +323,7 @@ item \ref{pox-item} of the proof.  The dependency order is derived from the
 real events using $\fmrg{}$, as per item \ref{le-item}.
 % , which says that ${\bEv}\le'' {\aEv}$ exactly when $\fmrg{\bEv}\le\fmrg{\aEv}$.
 
-The following lemma shows that if $\aPS$ is \emph{complete}, then
+The following lemma (immediate from \ref{pom-m-kappa}) shows that if $\aPS$ is \emph{complete}, then
 $\fextract{\aPS}$ includes at least one simple event for every compound event
 in $\aPS$.
 
@@ -335,14 +337,14 @@ in $\aPS$.
   there is a phantom event $\cEv\in\fmrginv{\aEv}$
   such that
   $\labelingForm(\cEv)$ is a tautology.
-  \begin{proof}
-    Immediate from \ref{pom-m-kappa}.
-  \end{proof}
+  % \begin{proof}
+  %   Immediate from \ref{pom-m-kappa}.
+  % \end{proof}
 \end{lemma}
 
-A pomset in the image of $\fextract{}$ is a \emph{candidate execution}.
-
-As an example, consider \labeltext[\textsc{tc6}]{Java Causality Test Case 6}{JC-TC6}.  Taking $w=0$ and $v=1$,
+A pomset in the image of $\fextract{}$ is a \cXI{} \emph{candidate execution}.
+%
+As an example, consider \labeltext[\textsc{tc6}]{Java Causality Test Case 6}{JC-TC6} \cite{PughWebsite}.  Taking $w=0$ and $v=1$,
 the \PwTpo{} on the left below produces the candidate execution on the right.
 \begin{align*}
   \begin{gathered}[t]
@@ -423,7 +425,7 @@ We write $\sempo{}$ for the semantic function defined by applying the
 construction of \reflem{lem:po} to the base semantics of \ref{fig:seq}.  
 
 The dependency calculation of $\sempo{}$ is sufficient for \cXI; however, it
-ignores synchronization and coherence completely.
+ignores synchronization and coherence completely.  For example, consider:
 \begin{align*}
   \tag{$\ddagger$}\label{eq5}
   \begin{gathered}
@@ -447,7 +449,7 @@ ignores synchronization and coherence completely.
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-Adding a pair of reads to complete the pomset, we can extract the following candidate execution.
+Adding a pair of reads to complete the pomset, we can extract the following candidate executions.
 \begin{gather*}
   \PR{y}{r}
   \SEMI
@@ -501,19 +503,20 @@ In \PwTmca{}, delay stops the merge in \eqref{eq5}.
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-It is possible to mimic this in \cXI{}, without introducing extra
+It is possible to mimic this in \PwTc{}, without introducing extra
 dependencies: one can filter executions post-hoc using the relation
 $\ledelay$, defined as follows:
 \begin{displaymath}
   \fmrg{\bEv}\ledelay\fmrg{\aEv} \textif \bEv\xpox\aEv \textand \labeling(\bEv)\rdelays \labeling(\aEv).
 \end{displaymath}
 In \eqref{eq5}, we have both $d\ledelay e$ and $e \ledelay d$.  To rule out
-this execution, it suffices to require that $\ledelay$ is a partial order.
+\eqref{eq5}, %this execution,
+it suffices to require that $\ledelay$ is a partial order.
 
-Program \eqref{eq5} shows that the definition of semantic dependency is up for debate in \cXI, and
-the International Standard Organisation's C++ concurrency subgroup acknowledges that semantic
-dependency ($\rsdepx$) would address the Out-of-Thin-Air problem: \emph{Prohibiting executions that
-have cycles in $\rrfx \cup \rsdepx$ can therefore be expected to prohibit Out-of-Thin-Air behaviors}
+Program \eqref{eq5} shows that the definition of semantic dependency is up for debate in \cXI.
+The International Standard Organization's C++ concurrency subgroup acknowledges that semantic
+dependency ($\rsdepx$) would address the Out-of-Thin-Air problem: \emph{``Prohibiting executions that
+have cycles in $(\rrfx \cup \rsdepx)$ can therefore be expected to prohibit Out-of-Thin-Air behaviors''}
 ~\cite{mckenny:sdep}.
 \PwTc{} resolves program structure into a dependency relation---not a complex state---that is
 precise and easily adjusted. As refinements are made to \cXI, \PwTc{} can accommodate these and
