@@ -51,7 +51,7 @@ dependency calculation.  Hardware models use syntactic dependencies
 \cite{Batty:2011:MCC:1926385.1926394, DBLP:journals/pacmpl/WattRP19,
   DBLP:conf/pldi/WattPPBDFPG20, goMM}.  Others have strong dependencies that
 disallow compiler optimizations and efficient implementation, typically
-requiring fences for every relaxed read on Arm
+requiring fences for every relaxed read on \armeight{}
 \cite{Lamport:1979:MMC:1311099.1311750, DBLP:conf/pldi/LahavVKHD17,
   Dolan:2018:BDR:3192366.3192421, DBLP:conf/lics/JeffreyR16,
   Boehm:2014:OGA:2618128.2618134}. %, DBLP:journals/corr/abs-1804-04214}.
@@ -115,9 +115,7 @@ violated when read-introduction is followed by if-introduction, branching on
 the read just introduced.  These optimizations are validated by the
 speculative models---\citeauthor{promising-ldrf} manage to avoid the problem
 by adopting a sub-optimal lowering for \RMW{}s.  \PwT{} does not suffer from
-this problem, since \PwT{} does not validate read-introduction.  Nonetheless,
-read-introduction is ubiquitous in some compilers
-\cite{DBLP:conf/pldi/LeeKSHDMRL17}.  There appears to be a genuine tension
+this problem, since \PwT{} does not validate read-introduction.  There appears to be a genuine tension
 between temporal reasoning, as supported by \PwT{}, and read-introduction, as
 supported by the speculative models.
 
@@ -126,11 +124,11 @@ researchers, architects, and language specifiers, enabling them to build
 intuitions
 experimentally~\cite{DBLP:conf/esop/PaviottiCPWOB20,PrideMM,alglave,Batty:2011:MCC:1926385.1926394}.
 Unfortunately, it is not obvious that tools can be built for all
-thin-air-free models, the calculation of
+thin-air-free models: the calculation of
 \citet{Pichon-Pharabod:2016:CSR:2837614.2837616} does not have a termination
-proof for an arbitrary input, and the enormous state space for the
+proof for an arbitrary input; the enormous state space for the
 operational models of \citet{DBLP:conf/popl/KangHLVD17} and
-\citet{DBLP:journals/pacmpl/ChakrabortyV19} is a daunting prospect for a tool
-builder -- and as yet no tool exists for automatically evaluating these
-models.  We described a tool, \PwTer, for automatically evaluating \PwT{} in
+\citet{DBLP:journals/pacmpl/ChakrabortyV19} is daunting for a tool
+builder---and as yet no tool exists for automatically evaluating these
+models.  We described a tool for automatically evaluating \PwT{} in
 \textsection\ref{sec:tool}.

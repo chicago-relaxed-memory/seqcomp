@@ -3,38 +3,55 @@
 
 
 This paper is the first to present a direct denotational semantics for
-sequential composition in a relaxed memory model that can be efficiently
-compiled to modern CPUs. We extract from this model a semantic dependency
-relation and use it to build \PwTc, a solution to the Out-of-Thin-Air problem
-in \cXI, and \PwTmca{}, a model intended for safe languages such as Java and
-Javascript.  Our work has several limitations, providing opportunities for
-future work.
+sequential composition that can be efficiently compiled to modern \CPU{}s.  We
+defined two models: \PwTc{} solves the out-of-thin-air problem for \cXI, and
+\PwTmca{} solves it for safe languages such as Java and Javascript.
 
-We have mechanized some proofs, but not all.  In particular, we have only a
-pen-and-paper proof showing that \PwTmca{} supports optimal lowering to
-\armeight{}.  The same is true for local data race-freedom (\ldrfsc{}).
-Additionally, our proof sketch for \ldrfsc{} elides \RMW{}s, which have
-caused complications in other models \cite{promising-ldrf}.
+Our work has several limitations, providing opportunities for future work:
 
-We have not treated loops, although we expect that the usual approach of
-showing continuity for all the semantic operations with respect to set
-inclusion would go through. \citet{DBLP:conf/esop/PaviottiCPWOB20} use
-step-indexing to account for loops; perhaps this approach could be adapted.
+\PwTc{} can be lowered efficiently to any architecture supported by \cXI{},
+but inherits the top-level axioms of \rcXI{}, compromising compositionality.
+\PwTmca{} is as a compositional as a model of concurrent imperative
+programming can be, but is limited to \mca{} architectures for optimal
+lowering.  It would be interesting to explore the middle ground to find a
+fully compositional model that supports optimal lowering to all modern
+architectures.
 
-\PwTmca{} does not validate access elimination: store-forwarding and
-dead-write-removal are unsound.  We expect that these can be validated by
-allowing events with different actions to merge. % in some instances.
-Nor does \PwTmca{} validate the reverse inclusions for
-\reflem{lem:if}\eqref{lem:ifelse:if:if}. The culprit is $\rdelay$, which
-introduces order regardless of whether preconditions are disjoint.  As an
-example, using augmentation, 
+As mentioned in \textsection\ref{sec:related}, some safety guarantees may be
+violated when read-introduction is followed by if-introduction, branching on
+the read just introduced.  Nonetheless, read-introduction is ubiquitous in
+some compilers \cite{DBLP:conf/pldi/LeeKSHDMRL17}.  It would be interesting
+to know the cost of restricting this optimization.
+%  
+In a similar vein, \PwTmca{1} is a simpler model than \PwTmca{2}, but
+requires fences on acquiring reads for \armeight{}.  It would be illuminating
+to find out what the performance penalty is for these fences.
+
+We have defined the soundness of compiler optimizations in the model, rather
+than contextually: $\aCmd'$ is a sound refinement of $\aCmd$ if
+$\sem{\aCmd'}\subseteq\sem{\aCmd}$.  This approach has several
+advantages---for example, it is immediate that a sound optimization is sound
+in any context.  It also has a disadvantage: some optimizations complicate
+the semantics.  For example, \PwTmca{} does not validate access elimination,
+such as store-forwarding and dead-write-removal---consider that complete
+executions of
+\begin{math}
+  \sem{\PW{x}{1}\SEMI\PR{x}{r}}
+\end{math}
+must include a read action and that complete executions of
+\begin{math}
+  \sem{\PW{x}{1}\SEMI\PW{x}{2}}
+\end{math}
+must include two write actions.  As another example, \PwTmca{} does not
+validate the reverse inclusions for
+\reflem{lem:if}\eqref{lem:ifelse:if:if}---consider that
 \begin{math}
   \sem{\IF{r}
   \THEN \PW{x}{1}
   \ELSE \PW{x}{2}
   \FI}
 \end{math}
-has an execution with
+has an augmented (\reflem{lem:augment}) execution with
 \begin{math}
   (r{=}0\mid\DW{x}{2})
   \xwki
@@ -48,24 +65,27 @@ whereas
     \IF{\BANG r} \THEN \PW{x}{2}\FI
   \FI}
 \end{math}
-has no such execution.  We expect that this can be remedied by encoding
-$\rdelay$ in the logic.
+has no such execution.  We expect that these optimizations can be validated,
+at the cost of complicating the semantics.  For access elimination, it is
+likely sufficient to allow events with different actions to merge.  For
+\reflem{lem:if}\eqref{lem:ifelse:if:if}, it is likely sufficient to encoding
+$\rdelay$ in the logic---the problem in the execution above is that $\rdelay$
+introduces order regardless of whether preconditions are disjoint.
 %\todo{Comment on \PwTpo{} and \PwTc{}?}
 
-  
-\PwTmca{1} is a simpler model than \PwTmca{2}, but requires fences on
-acquiring reads for \armeight{}.  It would be illuminating to find out what
-the performance penalty is for these fences.  In a similar vein, it would be
-interesting to know if there is a performance penalty for banning
-read-introduction, which is not valid for \PwT{}.
+We have not treated loops, although we expect that the usual approach of
+showing continuity for all the semantic operations with respect to set
+inclusion would go through. \citet{DBLP:conf/esop/PaviottiCPWOB20} use
+step-indexing to account for loops; perhaps this approach could be adapted.
 
-\PwTc{} can be lowered efficiently to any architecture supported by \cXI{},
-but inherits the top-level axioms of \rcXI{}, compromising compositionality.
-\PwTmca{} is as a compositional as a model of concurrent imperative
-programming can be, but is limited to \mca{} architectures for optimal
-lowering.  It would be interesting to explore the middle ground to find a
-fully compositional model that supports optimal lowering to all modern
-architectures.
+While we have mechanized some proofs, most of our proofs are informal.
+In particular, we have only a pen-and-paper proof showing that \PwTmca{}
+supports optimal lowering to \armeight{}.  The same is true for local data
+race-freedom (\ldrfsc{})---additionally, our proof sketch for \ldrfsc{}
+elides \RMW{}s, which have caused complications in other models
+\cite{promising-ldrf}.
+
+
 
 
 
