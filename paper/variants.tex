@@ -20,16 +20,17 @@ calculation, if-introduction, and read-modify-write operations.  Address
 calculation and if-introduction do have some interaction, and we spell out the
 combined semantics in \textsection\ref{sec:semcaaddr}.
 
-It is worth pointing out that address calculation and if-introduction only affect
-the semantics of read and write.  
-\RMW{}s introduce new infrastructure in order to ensure atomicity while
-compiling to \armeight{} using load-exclusive and store-exclusive.
+It is worth pointing out that address calculation and if-introduction only
+affect the semantics of read and write.  \RMW{}s introduce new infrastructure
+in order to ensure atomicity while supporting Arm's load-exclusive and
+store-exclusive operations.
 
 These extensions preserve all of the program transformation discussed thus
 far, and apply equally to the various semantics we have discussed: \PwT{},
 \PwTmca{1}, \PwTmca{2}, and \PwTc{}.  The results discussed in
 \textsection\ref{sec:results} also apply equally, with the exception of
-\RMW{}s: we have not proven \drfsc{} or \armeight{} lowering for \RMW{}s.
+\RMW{}s, which are excluded from the proof of \drfsc{} and from the proof of
+lowering to \armeight{}.
 
 
 \subsection{Register Recycling and Redundant Read Elimination}
@@ -164,7 +165,7 @@ Consider the case where the reads are merged, both seeing 1:
       \event{b}{\aForm\bigmid\DW{x}{1}}{right=of a}
     \end{tikzinline}}
 \end{align*}
-In order to independent of both reads, we take the precondition $\aForm$ to be:
+In order to be independent of both reads, we take the precondition $\aForm$ to be:
 \begin{displaymath}
   \PBR{
     1{=}r\lor y{=}r
@@ -310,12 +311,14 @@ successful \RMW{} to the succeeding write.
     \end{enumerate}
   \end{enumerate}
 
+  \noindent
   Extend the definition of $\sSEMI{}{}$, $\sIF{}{}{}$ and $\sPAR{}{}$ to include:
   \begin{enumerate}
   \item[(\textsc{s}10)] (\textsc{i}10)\; (\textsc{p}10)\; 
     ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$,
   \end{enumerate}
   
+  \noindent
   Let $\sLOADP{}{}$ be defined as for $\sLOAD{}{}$, adding the constraint:
   \begin{enumerate}
   \item[{\labeltextXX{4d}{r}{read-tau-rmw}}]
@@ -347,6 +350,8 @@ successful \RMW{} to the succeeding write.
   % \end{math}
   % and %s.t.
   % \\
+
+  \noindent
   If $\aPS\in\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]$ then
   \begin{math}
     %\sCAS[\amode][\bmode]{\aLoc}[\ascope]{\aReg}{\aExp}{\bExp}[\aThrd]\subseteq\sSEMI{
@@ -431,14 +436,15 @@ successful \RMW{} to the succeeding write.
   % \end{multicols}
 
 $\FADD$ and $\EXCHG$ are similar.  These definitions ensure atomicity and
-supports lowering to Arm load/store exclusive operations.  See
-\cite{DBLP:journals/pacmpl/JagadeesanJR20} for examples.
+support lowering to Arm load/store exclusive operations.  See
+\citet{DBLP:journals/pacmpl/JagadeesanJR20} for examples.
 
 One subtlety of the definition is that we use $\sLOADP{}{}$ rather than
-$\sLOAD{}{}$.  Thus, for \RMW{} operations, the independent case for a read
-is the same as the empty case.  To see why this should be, consider the
-\labeltext[\textsc{cdrf-rlx}]{relaxed variant of the \textsc{cdrf} example}{CDRF-RLX} from
-\citet{DBLP:conf/pldi/LeeCPCHLV20}, using $\sLOAD{}{}$ rather than $\sLOADP{}{}$.
+$\sLOAD{}{}$: for \RMW{}s, the independent case for a read is the same as the
+empty case.  To see why this should be, consider the
+\labeltext[\textsc{cdrf-rlx}]{relaxed variant of the \textsc{cdrf}
+  example}{CDRF-RLX} from \citet{DBLP:conf/pldi/LeeCPCHLV20}, using
+$\sLOAD{}{}$ rather than $\sLOADP{}{}$.
 \begin{scope}
   \small
 \begin{gather*}
@@ -478,7 +484,10 @@ is the same as the empty case.  To see why this should be, consider the
 A write should only be visible to one $\PFADD{}{}{}$ instruction, but here
 the write of $0$ is visible to two!  This is allowed because, using
 $\sLOAD{}{}$ instead of $\sLOADP{}{}$, no order is required from $\DRP{x}{0}$
-to $\DWP{y}{1}$ in the last thread.  To see why, consider the independent
+to $\DWP{y}{1}$ in the last thread.
+
+
+To see why, consider the independent
 transformers of the last thread and initializer:
 \begin{align*}
   \begin{gathered}[t]
@@ -491,7 +500,7 @@ transformers of the last thread and initializer:
   \end{gathered}
   &&
   \begin{gathered}[t]
-    \smash{\FADD^{\mRLX,\mRLX}(x,1)}
+    \smash{r\GETS\FADD^{\mRLX,\mRLX}(x,1)}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a0}{\DR{x}{0}}{}
@@ -527,7 +536,7 @@ predicate transformer of the $\PFADD{}{}{}$:
   \end{gathered}
   &&
   \begin{gathered}[t]
-    \smash{\FADD^{\mRLX,\mRLX}(x,1)}
+    \smash{r\GETS\FADD^{\mRLX,\mRLX}(x,1)}
     \\
     \hbox{\begin{tikzinline}[node distance=1.5em]
         \event{a0}{\DR{x}{0}}{}
@@ -606,7 +615,7 @@ dependency order from $\DRP{x}{0}$ to $\DWP{y}{1}$.
 \label{sec:semca}
 
 In order to model sequential composition, we must allow inconsistent
-predicates in a single pomset, unlike \PwP{}.  For example, if
+predicates in a single pomset, unlike \PwP{} \cite{DBLP:journals/pacmpl/JagadeesanJR20}.  For example, if
 $\aCmd=(\PW{x}{1})$, then the semantics \reffig{fig:seq} does \emph{not} allow:
 \begin{gather*}
   \IF{\aExp}\THEN\PW{x}{1}\FI
@@ -785,8 +794,8 @@ We show the rules for write and read.\footnote{The Coq development uses
 \smallskip
 
 \noindent
-The definition allows multiple events to represent a single action, each with
-a disjoint precondition.  The predicate transformers are derived from those
+The definition allows multiple events to represent a single action, with
+disjoint preconditions.  The predicate transformers are derived from those
 defined for the conditional.
 \ref{write-phi-ca} and \ref{read-phi-ca} require that the predicates do not
 mention registers in $\uRegs{\AllEvents}$.
@@ -858,7 +867,7 @@ disallowing the attempted execution below:
   \end{gathered}
 \end{gather*}
 This execution would become possible, however, if we were to remove
-$(\cExp{=}\cVal)$ from \ref{read-tau-addr}.  In this case, $\DRP{y}{2}$ would
+$(\cExp{=}\cVal)$ from \ref{read-tau-addr}---it is included in $\labelingForm$.  In this case, $\DRP{y}{2}$ would
 not necessarily be dependency ordered before $\DWP{x}{1}$.
 
 
