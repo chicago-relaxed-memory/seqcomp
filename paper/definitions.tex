@@ -43,7 +43,7 @@ The syntax is built from
   $\aExp$, $\bExp$,  $\cExp$.
 \end{itemize}
 
-\emph{Memory references} are tagged values, written $\REF{\cVal}$.  Let $\Loc$
+\emph{Memory references}, aka \emph{locations}, are tagged values, written $\REF{\cVal}$.  Let $\Loc$
 be the set of memory references, ranged over by $\aLoc$, $\bLoc$, $\cLoc$.
 % 
 We require that
@@ -54,7 +54,8 @@ We require that
     values.  Using types, one could limit the finiteness assumption to the
     subset of values used for address calculation.} and include at least the constants $0$ and $1$,  
 \item expressions include at least registers and values, 
-\item expressions do \emph{not} include references: $\aExp[\bExp/\aLoc]=\aExp$.
+\item expressions do \emph{not} include memory references:
+  $\aExp[\bExp/\aLoc]=\aExp$ (for all $\aLoc$).
 \end{itemize}
 
 We model the following language.
@@ -136,8 +137,8 @@ examples without join, we use the symmetric $\PAR$ operator.
 
 We use common syntactic sugar, such as \emph{extended expressions}, $\aEExp$,
 which include memory locations.  For example, if $\aEExp$ includes a single
-occurrence of $\aLoc$, then $\bLoc\GETS\aEExp\SEMI \aCmd$ is shorthand for
-$\aReg\GETS\aLoc\SEMI\bLoc\GETS\aEExp[\aReg/\aLoc]\SEMI \aCmd$.  Each
+occurrence of $\aLoc$, then $(\bLoc\GETS\aEExp\SEMI \aCmd)$ is shorthand for
+$(\aReg\GETS\aLoc\SEMI\bLoc\GETS\aEExp[\aReg/\aLoc]\SEMI \aCmd)$.  Each
 occurrence of $\aLoc$ in an extended expression corresponds to an separate
 read.  We also write $\IF{\aExp} \THEN \aCmd \FI$ as shorthand for
 $\IF{\aExp} \THEN \aCmd\ELSE \SKIP\FI$.
@@ -402,7 +403,7 @@ $\Cdown{\aEv}$ includes all of the events in $\sem{\aCmd_1}$ that precede
 $\aEv$ in causal order ($\bEv<_1\aEv$ implies $\bEv\in\Cdown{\aEv}$).  % We
 % call $\Cdown{\aEv}$ the \emph{dependent set} of $\aEv$, and
 % $\aEvs\setminus\Cdown{\aEv}$ the \emph{independent set}.
-The following definition requires that the larger ${\Cdown{\aEv}}{}$ is, the
+Under the following definition, the larger ${\Cdown{\aEv}}{}$ is, the
 better, at least in terms of satisfying preconditions.  Adding more order can
 only increase the size of ${\Cdown{\aEv}}{}$.  Thus more order means weaker
 preconditions.
@@ -436,7 +437,7 @@ which gives the semantics of programs $\sembase{}$.  We use consistent sub-
 and super-scripts to refer to the components of a pomset.  For example
 $\lt_1$ is the order of $\aPS_1$, $\lt'$ is the order of $\aPS'$, and $\lt$
 is the order of $\aPS$.  We also use consistent numbering. For example, item
-$3$ always refers to $\labelingForm$ and item $6$ always refers to $\lt$.
+$3$ always refers to $\labelingForm$ and item $5$ always refers to $\aTerm$.
 As usual, we write $\bEv\le\aEv$ to mean $\bEv\lt\aEv$ or $\bEv=\aEv$.
 %
 
@@ -464,8 +465,9 @@ have verified \reflem{lem:monoid} and \reflem{lem:if}\ref{lem:if:seq} in
 Coq\footnote{Specifically, we have proven these results for the semantics of
   \reffig{fig:seq} with the refinements of \textsection\ref{sec:read-read},
   \textsection\ref{sec:semreg}, and \textsection\ref{sec:semca}}.  Similar
-laws apply to parallel composition; although note that
-$\sem{\aCmd\RPAR\SKIP}\neq\sem{\aCmd}$, since this asymmetric operator throws
+laws apply to parallel composition---for example
+$\sem{\aCmd}=\sem{\SKIP\RPAR\aCmd}$.  Note, however, that
+$\sem{\aCmd}\neq\sem{\aCmd\RPAR\SKIP}$---this asymmetric operator throws
 away thread state from the left.
 
 \begin{lemma}
@@ -648,7 +650,7 @@ order, where we require ${\lt_2}\supseteq{\lt_1}$.
 \end{lemma}
 % One intuitive reading of augment closure is that adding order can only cause
 % preconditions to weaken.
-Augment closure also captures the intuition that it
+Augment closure captures the intuition that it
 is always sound for a compiler to make more conservative assumptions about
 dependencies than the semantics.
 
@@ -701,7 +703,7 @@ empty pomset so that these may appear in the untaken branch of a conditional.
 $\SKIP$ and register assignment map to the empty pomset.  
 The structural rules combine pomsets: $\sPAR{}{}$ performs disjoint union,
 inheriting labeling and order from the two sides.  $\sSEMI{}{}$ and $\sIF{}$
-perform a union.
+both perform a union.
 
 We say
 that $\bEv\in\aEvs_1$ and $\aEv\in\aEvs_2$ \emph{coalesce} if $\bEv=\aEv$.
@@ -736,9 +738,9 @@ but the former does not. ({These are observationally distinguished by the contex
     \IF{\aReg {=} \bReg} \THEN \PW{\cLoc}{1} \FI.
   \end{math}})
 
-In complete pomsets, \ref{top-kappa} requires that all preconditions be
+In complete pomsets, \ref{top-kappa} requires that all preconditions must be
 tautologies.  In order to allow complete pomsets with untaken conditionals,
-such as $\IF{\FALSE}\THEN\PW{x}{1}\FI$, we allow the empty pomset is in the
+such as $\IF{\FALSE}\THEN\PW{x}{1}\FI$, we allow the empty pomset in the
 semantics of all statements.  % To ensure that $\SKIP$ is not a refinement of
 % $\PW{x}{1}$,
 Termination conditions ensure that the empty pomset is not used
@@ -799,7 +801,7 @@ Consider the following incomplete pomsets:
     \IF{\aExp}\THEN\PW{x}{3}\FI
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
-        \event{c}{\aExp\bigmid\DW{x}{3}}{}      
+        \event{c}{\aExp{\neq}0\bigmid\DW{x}{3}}{}      
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
@@ -814,12 +816,12 @@ By merging, the semantics allows the following:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1.5em]
         \event{a}{\DW{x}{1}}{}      
-        \event{c}{\aExp\bigmid\DW{x}{3}}{right=of a}
+        \event{c}{\aExp{\neq}0\bigmid\DW{x}{3}}{right=of a}
         %\wki{a}{c}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-However, this pomset is incomplete---regardless of $\aExp$---since $\aTerm\riff2{=}3$.
+However, this pomset is incomplete---regardless of $\aExp$---since $\aTerm\riff2{=}3\riff\FALSE$.
 
 Ignoring predicate transformers, \ref{par-term} and \ref{seq-term} both take
 $\aTerm\riff\aTerm_1\land\aTerm_2$.  This is as expected: the program
@@ -863,8 +865,8 @@ without explaining why it is defined as it is.  We take up both subjects in
 \textsection\ref{sec:q}.
 
 Preconditions are discharged during sequential composition by applying
-predicate transformers $\aTr[1]{}{}$ from the left to preconditions
-$\labelingForm_2(\aEv)$ on the right.  The specific rule is
+predicate transformers\allowbreak{}---$\hbox{}\,\aTr[1]{}{}$---from the left to
+preconditions---$\labelingForm_2(\aEv)$---on the right.  The specific rule is
 \ref{seq-kappa},
 % \ref{seq-kappa2} and \ref{seq-kappa12},
 which uses the transformed predicate
@@ -885,8 +887,7 @@ precede $\aEv$ in causal order.  We call $\Cdown{\aEv}$ the \emph{dependent
 
 
 Before looking at the details, it is useful to have a high-level view of how
-nontrivial preconditions and predicate transformers are introduced.  (We
-discuss address dependencies in \textsection\ref{sec:addr}.)
+nontrivial preconditions and predicate transformers are introduced.  
 \begin{multicols}{2}
   Preconditions are introduced in: 
   \begin{itemize}
@@ -903,25 +904,26 @@ discuss address dependencies in \textsection\ref{sec:addr}.)
   \item[\eqref{read-tau-ind}] for reads in the independent set,
   \item[\eqref{write-tau}] for writes.
   \end{itemize}
+\end{multicols}
   % \item These are glued together in \ref{seq-kappa}.
   %   \begin{itemize}
   %   \item \ref{seq-kappa2}  handles non-coalescing events,
   %   \item \ref{seq-kappa12} handles coalescing events.
   %   \end{itemize}
-\end{multicols}
 
 
-The rules track dependencies.  We discuss data dependencies \eqref{write-kappa}
-here and control dependencies \eqref{if-kappa} in
-\textsection\ref{sec:ex:control}.   % We do not discuss
-% \ref{seq-kappa} further.  It simply ensures that all writes are
-% present before a release, even for incomplete pomsets (see
-% \textsection\ref{sec:ex:term}).
-%
+The rules track dependencies.    
+We discuss data dependencies \eqref{write-kappa} here and control
+dependencies \eqref{if-kappa} in \textsection\ref{sec:ex:control}.  We enrich
+the semantics to handle address dependencies in \textsection\ref{sec:addr}.
+
 A simple example of a data dependency is a pomset
 $\aPS\in\sem{\PR{x}{r}\SEMI \PW{y}{r}}$.  If $\aPS$ is complete, it must have
-two events. Then $\sSEMI{}{}$ (\reffig{fig:seq}) requires %$\aVal,\bVal\in\Val$ and
-$\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
+two events. Then $\sSEMI{}{}$ (\reffig{fig:seq})
+requires %$\aVal,\bVal\in\Val$ and
+$\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the following
+form. (We only show the independent transformer for writes---ignoring
+$\Q{x}$, the dependent and independent transformers for writes are the same.)
 \begin{align*}
   \tag{$\dagger$}\label{eq2}
   \begin{gathered}
@@ -946,8 +948,7 @@ $\aPS_1\in \sem{\PR{x}{r}}$ and $\aPS_2\in \sem{\PW{y}{r}}$ of the form:
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-(Since dependent and independent transformers are the same for writes, we
-only show the independent transformer.)  First we consider the case that
+First we consider the case that
 $\aVal=\bVal$.  For example, if $\aVal=\bVal=1$, we have:
 \begin{align*}
   \begin{gathered}
@@ -1379,7 +1380,7 @@ instead $(x{=}r)$.
 
 This requires that we put locations into logical formulae, in addition to
 registers.  While logical formulae involving registers are discharged by
-predicate transformers from $\sLET{}{}$ or $\sLOAD{}{}{}$, logical formulae
+predicate transformers from $\sLET{}{}$ or $\sLOAD{}{}{}$ (\reffig{fig:seq}), logical formulae
 involving locations are discharged by predicate transformers from
 $\sSTORE{}{}{}$.  In other words, registers track the value of reads, whereas
 locations track the value of the most recent local write.  This provides a
@@ -1389,7 +1390,7 @@ discussion.
 %(See \textsection\ref{sec:ex:assoc} for a discussion of Skolemization.)
 
 A related concern arises when eliding changes to local state from the untaken
-branch of a conditional.
+branch of a conditional, creating \emph{indirect dependencies}.
 % Of course, if we track local state incorrectly, bad things can happen, such
 % as a failure of \drfsc, which requires that properly synchronized programs
 % only exhibit SC behaviors.
@@ -1429,70 +1430,79 @@ Consider the following example
     \FI
   \end{array}
 \end{gather*}
-In SC executions, this program always reads $0$ for $y$, and therefore never
-writes $z$.  Thus, the program is data-race-free.  However, using
-\reffig{fig:seq} without $\Q{x}$, as we have done up to now, the following
-non-SC execution is allowed, violating \drfsc{}.  The execution takes the
-else branch of the conditional:
+In SC executions, the left thread always takes the then-branch of the
+conditional, reading $0$ for $x$ and therefore not writing $z$.  As a result
+the second thread does not write $y$, and the program is data-race-free under
+SC.  To satisfy the \drfsc{} theorem, no other executions should be possible.
+%
+Complete executions of the left thread that take the then-branch must include
+$\DWP{x}{0}$, whereas those that take the else-branch must \emph{not} include
+$\DWP{x}{0}$.  A problem arises if events from the subsequent code of the
+left thread---common to the two branches---coalesce, thus removing an essential
+control dependency.  Consider the following candidate execution:
 \begin{gather*}
-    \hbox{\begin{tikzinline}[node distance=1.5em]
-        \event{a1}{\DW{x}{1}}{}
-        \event{a2}{\DR{y}{1}}{right=of a1}
-        %\event{a3}{\DW{x}{0}}{right=of a2}
-        \event{a4}{\DR{x}{1}}{right=of a2}
-        \event{a5}{\aForm\bigmid\DW{z}{1}}{right=of a4}
-        \event{b1}{\DR{z}{1}}{right=5em of a5}
-        \event{b2}{\DW{y}{1}}{right=of b1}
-        %\po{a2}{a3}
-        \po{b1}{b2}
-        %\wki[out=15,in=165]{a1}{a3}
-        %\wki{a3}{a4}
-        \rf{a5}{b1}
-        \rf[out=15,in=165]{a1}{a4}
-        \rf[out=-170,in=-10]{b2}{a2}
-        \po{a4}{a5}
-      \end{tikzinline}}
+  \tag{$\dagger\dagger$}\label{eq:666}
+  \hbox{\begin{tikzinline}[node distance=1.5em]
+      \event{a1}{\DW{x}{1}}{}
+      \event{a2}{\DR{y}{1}}{right=of a1}
+      % \event{a3}{\DW{x}{0}}{right=of a2}
+      \event{a4}{\DR{x}{1}}{right=of a2}
+      \event{a5}{\aForm\bigmid\DW{z}{1}}{right=of a4}
+      \event{b1}{\DR{z}{1}}{right=5em of a5}
+      \event{b2}{\DW{y}{1}}{right=of b1}
+      % \po{a2}{a3}
+      \po{b1}{b2}
+      % \wki[out=15,in=165]{a1}{a3}
+      % \wki{a3}{a4}
+      \rf{a5}{b1}
+      \rf[out=15,in=165]{a1}{a4}
+      \rf[out=-170,in=-10]{b2}{a2}
+      \po{a4}{a5}
+    \end{tikzinline}}
 \end{gather*}
-The execution is allowed because the write to $z$ is independent of the
-preceding read of $y$.  Note that the write to $z$ \emph{does} depend on the read
-of $x$, just not the read of $y$.  The precondition $\aForm$ is:
+Note that the write to $z$ depends on the read of $x$, but not the read of
+$y$.  Ignoring $\Q{x}$, as we have done up to now, the precondition $\aForm$
+is:
 \begin{gather*}
-  \aForm \riff
-  (1{=}r \lor y{=}r)
-  \limplies
-  \PBRbig{
-    (r{=}0 \land (1{=}s\limplies s{\neq}0))
-    \land
-    (r{\neq}0 \land (1{=}s\limplies s{\neq}0))
-  }
   % \aForm \riff
-  % (1{=}r \lor y{=}r)\;
-  % \begin{aligned}[t]
-  %   \limplies\;&
+  % (1{=}r \lor y{=}r)
+  % \limplies
+  % \PBRbig{
   %   (r{=}0 \land (1{=}s\limplies s{\neq}0))
-  %   \\[-1ex]
-  %   \land\;&
+  %   \land
   %   (r{\neq}0 \land (1{=}s\limplies s{\neq}0))
-  % \end{aligned}
+  % }
+  \aForm \riff
+  (1{=}r \lor y{=}r)\;
+  \begin{aligned}[t]
+    \limplies\;&
+    (r{=}0 \land (1{=}s\limplies s{\neq}0))
+    \\[-1ex]
+    \land\;&
+    (r{\neq}0 \land (1{=}s\limplies s{\neq}0))
+  \end{aligned}
 \end{gather*}
-The pomset is constructed by taking the empty set for $\PW{x}{0}$, which only
-appears on the untaken branch of the conditional.  The problem here is that
-we have forgotten the local state of $x$ in the untaken branch of the
-execution---nonetheless, we are using the subsequent read of $x$.
+Since $(1{=}s)$ implies $(s{\neq}0)$, the precondition is a tautology and
+\eqref{eq:666} is allowed, violating \drfsc{}.
+
+Without $\Q{x}$, the semantics enforces $\DWP{z}{1}$'s direct dependency on
+$\DRP{x}{1}$, but not its \emph{indirect} dependency on $\DRP{y}{1}$.  By
+eliding $\DWP{x}{0}$, we have forgotten the local state of $x$ in the untaken
+branch of the execution.  Nonetheless, we are using the
+subsequent---\emph{stale}---read of $x$, by merging it with the read from the
+taken branch.  This \emph{half-stale} merged read is then used to justify
+$\DWP{z}{1}$.
+%the merged write to $z$.
 % The problem here is that we have ignored this write when calculating
 % the dependency between $\DR{y}{1}$ and $\DW{z}{1}$.
 
-To correct this, \ref{read-kappa} introduces quiescence symbols $\Q{x}$ into
-preconditions, and \ref{read-tau} subsequently introduces them to predicate
-transformers.  Quiescence symbols are only eliminated from formulae by
-preceding writes (\ref{write-tau}).  One simple consequence is that
-quiescence symbols guarantee initialization in complete pomsets:
-\eqref{top-kappa} requires tautologies, which means that every variables $x$
-that the execution reads from must be properly initialized in order to eliminate the
-precondition $\Q{\aLoc}$.
-
-With quiescence, the precondition of the example
-becomes the following:
+In \reffig{fig:seq}, \ref{read-tau} corrects this by introducing quiescence
+symbols into predicate transformers. Quiescence symbols capture the intuition
+that---in the untaken branch of a conditional---the value of a read from $x$
+can only be used if the most recent local write to $x$ is included in the
+execution.  Quiescence symbols are eliminated from formulae by the closest
+preceding write (\ref{write-tau}).  With quiescence, the precondition of
+\eqref{eq:666} becomes the following:
 \begin{displaymath}
   \aForm'\riff
   (\Q{y}\limplies 1{=}r \lor y{=}r)\;
@@ -1506,11 +1516,17 @@ becomes the following:
   \end{aligned}
 \end{displaymath}
 Adding initializing writes, $\Q{y}$ becomes $\TRUE$ at top-level.
-Regardless, $\aForm'$ is non-tautological: in the top
-conjunct, we have lost the ability to use $1{=}s$ to prove $s{\neq}0$.
-Intuitively, $\Q{x}$ is true when the local state of $x$ is up to date, and
-false when it is stale.  In order to read $\aLoc$, $\Q{x}$ requires that the
-most recent prior write to $\aLoc$ must be in the pomset.  
+Regardless, $\aForm'$ is non-tautological: in the top conjunct, we have lost
+the ability to use $1{=}s$ to prove $s{\neq}0$.  Intuitively, $\Q{x}$ is true
+when the local state of $x$ is up to date, and false when it is stale.  In
+order to read $\aLoc$, $\Q{x}$ requires that the most recent prior write to
+$\aLoc$ must be in the pomset.
+
+We also include quiescence symbols directly in preconditions of reads
+\eqref{read-kappa}.  This guarantees initialization in complete pomsets:
+every $\DRP{x}{}$ must have a sequentially preceding $\DWP{x}{}$ in order to
+eliminate the precondition $\Q{x}$.
+
 
 % Note that the two branches of the conditional are the same except for the
 % leading $\PWP{x}{0}$.  Without $\Q{x}$, the precondition $\aForm$ is
@@ -1560,11 +1576,11 @@ analysis of \MRD{} \cite{DBLP:conf/esop/PaviottiCPWOB20} is overly conservative.
       \wk[out=8,in=172]{i1}{b2}
     \end{tikzinline}}    
 \end{gather*}
-\PwT{} correctly allows this execution; \MRD{} forbids it. The co-product
-mechanism in \MRD{} does not recognize that the precondition of $\DW{y}{1}$
-is a tautology.  Instead, it seeks an isomorphic justification under the
-$\DR{x}{2}$ branch of the read in the event structure, and---failing to find
-such a justification---leaves the dependency in place. 
+\PwT{} correctly allows this execution; \MRD{} forbids it by requiring
+$\DRP{x}{1}\xpo\DWP{y}{1}$. The co-product mechanism in \MRD{} seeks an
+isomorphic justification under the $\DRP{x}{2}$ branch of the read in the
+event structure, and---failing to find such a justification---leaves the
+dependency in place.
 
 % As a sanity check, consider the
 % following pomsets,
@@ -2150,10 +2166,10 @@ are written using substitution.  Attempting to write \ref{read-tau-dep} and
 % This choice for \ref{read-tau-empty} is forced by \refdef{def:family}, which
 % states that the predicate transformer for a small subset of $\aEvs$ must
 % imply the transformer for a larger subset.
-Sadly, \ref{read-tau-ind-p} fails \ref{tr-or}, and therefore is not a
-predicate transformer.  This is not merely a theoretical inconvenience:
-adopting \ref{read-tau-ind-p} would also break associativity.  Consider the
-following example, where we elide transformers for the writes and ``\texttt{!}''
+\ref{read-tau-ind-p} does not distribute through disjunction \eqref{tr-or},
+and therefore is not a predicate transformer.  This is not merely a
+theoretical inconvenience: adopting \ref{read-tau-ind-p} would also break
+associativity.  Consider the following example, where ``\texttt{!}''
 represents logical negation:
 \begin{align*}
   \begin{gathered}[t]
@@ -2161,9 +2177,9 @@ represents logical negation:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \xform{xd}{\bForm[1/r]}{right=of a}
+        %\xform{xd}{\bForm[1/r]}{right=of a}
         \xform{xi}{\bForm[1/r]\land\bForm[y/r]}{left=.5em of a}
-        \xo{a}{xd}
+        %\xo{a}{xd}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -2191,14 +2207,16 @@ represents logical negation:
   %     \end{tikzinline}}    
   % \end{gathered}
 \end{align*}
-Coalescing the writes and associating to the right,
-we have the following, since $(r{=}0 \lor r{\neq}0)\riff\TRUE$:
+
+Associating to the right, we 
+coalesce the writes then prepend the read:
 \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
+        \xform{xi}{\bForm[1/r]\land\bForm[y/r]}{left=.5em of a}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -2208,7 +2226,7 @@ we have the following, since $(r{=}0 \lor r{\neq}0)\riff\TRUE$:
     %\SEMI \PW{x}{0} 
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
-        \event{b}{\DW{x}{1}}{}
+        \event{b}{r{=}0\lor r{\neq}0\bigmid\DW{x}{1}}{}
         %\event{c}{\DW{x}{0}}{right=of b}
         %\wki{b}{c}
       \end{tikzinline}}    
@@ -2225,14 +2243,19 @@ we have the following, since $(r{=}0 \lor r{\neq}0)\riff\TRUE$:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \event{b}{\DW{x}{1}}{right=of a}
+        \event{b}{\aForm\bigmid\DW{x}{1}}{right=of a}
         %\event{c}{\DW{x}{0}}{right=of b}
         %\wki{b}{c}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-The precondition of $\DWP{x}{1}$ is a tautology.
-Associating to the left and then coalescing, instead:
+The precondition $\aForm$ is
+\begin{math}
+  (1{=}0\lor y{=}0)\land (1{\neq}0 \lor y{\neq}0),
+\end{math}
+which is a tautology.
+
+Associating to the left, instead, we prepend the read then coalesce the writes:
 \begin{align*}
   \begin{gathered}[t]
     \PR{y}{r}
@@ -2241,6 +2264,7 @@ Associating to the left and then coalescing, instead:
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
         \event{b}{1{=}0\land y{=}0\bigmid\DW{x}{1}}{right=of a}
+        \xform{xi}{\bForm[1/r]\land\bForm[y/r]}{left=.5em of a}
       \end{tikzinline}}    
   \end{gathered}
   &&
@@ -2266,28 +2290,29 @@ Associating to the left and then coalescing, instead:
     \\
     \hbox{\begin{tikzinline}[node distance=.5em and 1em]
         \event{a}{\DR{y}{1}}{}
-        \event{b}{\aForm\bigmid\DW{x}{1}}{right=of a}
+        \event{b}{\aForm'\bigmid\DW{x}{1}}{right=of a}
         % \event{c}{\DW{x}{0}}{right=of b}
         % \wki{b}{c}
       \end{tikzinline}}    
   \end{gathered}
 \end{align*}
-The precondition
+The precondition $\aForm'$ is
 \begin{math}
-  \aForm\riff(1{=}0\land y{=}0)\lor (1{\neq}0 \land y{\neq}0)
+  (1{=}0\land y{=}0)\lor (1{\neq}0 \land y{\neq}0),
 \end{math}
-is equivalent to $y{\neq}0$, which is not a tautology.
+which is not a tautology. %---it is equivalent to $(y{\neq}0)$.
 % This pomset can
 % never be complete due to the bogus write of $(\PW{x}{\BANG r})$, which will
 % show up in the termination condition $(1{=}0)$.  Nevertheless, this is a
 % problem, since associativity must hold for incomplete pomsets.
 %
+
 Our solution is to Skolemize, replacing substitution by implication, with 
 % uses of $\bForm[\aVal/\aReg]$
 % by $(\aReg{=}\aVal)\limplies\bForm$,
-uniquely chosen registers.  Using \reffig{fig:seq}, we compute
+uniquely chosen registers.  Using Skolemization, \reffig{fig:seq} computes
 \begin{math}
-  \aForm\riff
+  \aForm'\riff
   ((1{=}r\lor y{=}r)\limplies r{=}0)
   \lor
   ((1{=}r\lor y{=}r)\limplies r{\neq}0),
@@ -2295,7 +2320,7 @@ uniquely chosen registers.  Using \reffig{fig:seq}, we compute
 which is equivalent to 
 \begin{math}
   \aForm\riff
-  (1{=}r\lor y{=}r)\limplies (r{=}0 \lor r{\neq}0),
+  (1{=}r\lor y{=}r)\limplies (r{=}0 \lor r{\neq}0).
 \end{math}
 % \begin{math}
 %   (1{\neq}r\land y{\neq}r)\lor r{=}0
@@ -2303,7 +2328,7 @@ which is equivalent to
 %   % (1{\neq}r\land y{\neq}r)\lor
 %    r{\neq}0,
 % \end{math}
-which is a tautology.
+Both are tautologies.
 
 
 Second, \citeauthor{DBLP:journals/pacmpl/JagadeesanJR20} impose \emph{consistency}, which requires that for every pomset

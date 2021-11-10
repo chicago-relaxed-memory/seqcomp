@@ -53,7 +53,7 @@ axiomatic approach of \cXI{}, for example, execution graphs are first
 constructed for each thread, using an operational semantics that allows a
 read to see any value.  The combined graphs are then filtered using a set of
 acyclicity axioms that determine which reads are valid.  These axioms use
-existentially defined global relations, such as memory order $\rmo$, which
+existentially defined global relations, such as memory order ($\rmo$), which
 must be a per-location total order on write actions.
 
 Part of this non-compositionality is essential: In a concurrent system, the
@@ -117,9 +117,9 @@ hard part.  \emph{Concurrency} is easy!  Or at least, it is no more difficult
 than it is for hardware.  Compilers make the difference, since they typically
 do little optimization between threads.  We motivate our approach to
 sequential dependencies in \textsection\ref{sec:overview} and provide formal
-definitions in \textsection\ref{sec:model}.  We extend the model to include
-additional features, such as address calculation and \RMW{}s, in
-\textsection\ref{sec:additional}.  We discuss related and future work in
+definitions in \textsection\ref{sec:model}.  In
+\textsection\ref{sec:additional}, we extend the model to include
+additional features, such as address calculation and \RMW{}s.  We discuss related and future work in
 \textsection\ref{sec:related}--\ref{sec:outro}.
 
 We extend \PwT{} to a full memory model in \textsection\ref{sec:mca}, based
@@ -740,9 +740,9 @@ concurrent semantics of \emph{fulfillment}.
 For a sequentially consistent semantics, sequential composition is
 straightforward: we apply each predicate transformer to subsequent
 preconditions, composing the predicate transformers.
-\begin{equation}
-\begin{gathered}
+\begin{gather*}
   \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}(s{-}1)} \FI
+  \tag{*}\label{eq1}
   \\
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
       \event{rx0}{\DR{x}{1}}{}
@@ -755,9 +755,7 @@ preconditions, composing the predicate transformers.
       %\xo[out=155,in=15]{ry0}{rx0ry0d}
       % \xo{wz0}{rx0ry0d}
   \end{tikzinline}}
-\end{gathered}
-\label{eq1}
-\end{equation}
+\end{gather*}
 This works for the sequentially consistent case, but needs to be
 weakened for the relaxed case.
 
@@ -838,7 +836,7 @@ In the diagram, the dotted lines indicate set inclusion into the index of the tr
 As a quick correctness check, we can see that sequential composition is
 associative in this case, since it does not matter whether we
 associate to the left---with the intermediate step as in the diagram above,
-eliding the write action---
+eliding the write action---or to the right---with the intermediate step:
 % \begin{gather*}
 %   \PR{x}{r}\SEMI \PR{y}{s}
 %   \\
@@ -855,7 +853,6 @@ eliding the write action---
 %       \xo{ry0}{rx0ry0d}
 %     \end{tikzinline}}
 % \end{gather*}
-or to the right---with the intermediate step:
 \begin{gather*}
   \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \\
