@@ -8,18 +8,16 @@ synchronization, we add \emph{delay} to the rule for sequential composition.
 For \mca{} architectures, it is sufficient to encode delay in the pomset
 order.  The resulting model, \PwTmca{1}, supports optimal lowering for
 relaxed access on \armeight{}, but requires extra synchronization for
-acquiring reads.\footnote{\citet{DBLP:journals/pacmpl/JagadeesanJR20}
-  erroneously elide the required synchronization on acquiring reads.}
-(\emph{Lowering} is the translation of language-level operators to machine
-instructions.  A lowering is \emph{optimal} if it provides the most efficient
-execution possible.)
+acquiring reads.  (\emph{Lowering} is the translation of language-level
+operators to machine instructions.  A lowering is \emph{optimal} if it
+provides the most efficient execution possible.)
 
 A variant, \PwTmca{2}, supports optimal lowering for all access modes on
 \armeight{}.  To achieve this, \PwTmca{2} drops the global requirement that
 \emph{reads-from} implies pomset order \eqref{pom-rf-le}.  The models are the
 same, except for \emph{internal reads}, where a thread reads its own write.
 We show an example at the beginning of \textsection\ref{sec:mca2}.
-
+%
 The lowering proofs can be found in \refAppendix{sec:arm}.  The proofs
 use recent alternative characterizations of \armeight{} \cite{armed}.
 
@@ -55,33 +53,39 @@ and $\rdelays$---as well a distinguished set of $\sread$ actions; see
     \end{enumerate}
   \end{enumerate}
 
-  \noindent
   \label{def:pwt:mca:complete}
-  The definition of completeness extends \refdef{def:pomset} as follows:
-  \begin{multicols}{2}
-    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
-      \setcounter{enumi}{\value{Brf}}
-    \item \label{top-rf}
-      if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
-    \end{enumerate}
-  \end{multicols}
+  \noindent
+  \begin{minipage}{1.0\linewidth}
+    The definition of completeness extends \refdef{def:pomset} as follows:
+    \begin{multicols}{2}
+      \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+        \setcounter{enumi}{\value{Brf}}
+      \item \label{top-rf}
+        if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+      \end{enumerate}
+    \end{multicols}
+  \end{minipage}
+  \smallskip
 
   \noindent
-  The semantic function extends \reffig{fig:seq} as follows:
-  \begin{multicols}{2}
-    \begin{enumerate}[topsep=0pt,label=(\textsc{i}\arabic*),ref=\textsc{s}\arabic*]
-      \setcounter{enumi}{\value{le}}
-    \item[]
-      \begin{enumerate}[leftmargin=0pt]
-      \item \label{seq-le-delays}
-        if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$,
-      \end{enumerate}
-    \item[{\labeltext[\textsc{p}7]{(\textsc{p}7)}{par-rf}}]
-      \labeltext[\textsc{s}7]{(\textsc{s}7)}{seq-rf}\;
-      \labeltext[\textsc{i}7]{(\textsc{i}7)}{if-rf}\;
-      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
-    \end{enumerate}  
-  \end{multicols}
+  \begin{minipage}{1.0\linewidth}
+    The semantic function extends \reffig{fig:seq} as follows:
+    \begin{multicols}{2}
+      \begin{enumerate}[topsep=0pt,label=(\textsc{i}\arabic*),ref=\textsc{s}\arabic*]
+        \setcounter{enumi}{\value{le}}
+      \item[]
+        \begin{enumerate}[leftmargin=0pt]
+        \item \label{seq-le-delays}
+          if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$,
+        \end{enumerate}
+      \item[{\labeltext[\textsc{p}7]{(\textsc{p}7)}{par-rf}}]
+        \labeltext[\textsc{s}7]{(\textsc{s}7)}{seq-rf}\;
+        \labeltext[\textsc{i}7]{(\textsc{i}7)}{if-rf}\;
+        ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$.
+      \end{enumerate}  
+    \end{multicols}
+  \end{minipage}
+  \smallskip
   % The semantic rules are as follows:
   % \input{fig-mca1.tex}
 \end{definition}
@@ -91,17 +95,20 @@ and $\rdelays$---as well a distinguished set of $\sread$ actions; see
 % \end{math}
 %We write $\semmca{1}{}$ for the semantic function when it is unclear from context.
 
-In complete pomsets, $\rrfx$ must pair every read with a matching write
-\eqref{top-rf}.  The requirements \ref{pom-rf-match}, \ref{pom-rf-block}, and
-\ref{pom-rf-le} guarantee that reads are \emph{fulfilled}, as in
-\cite[\textsection 2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.
+In complete pomsets, reads-from ($\rrfx$) must pair every read with a
+matching write \eqref{top-rf}.  The requirements \ref{pom-rf-match},
+\ref{pom-rf-block}, and \ref{pom-rf-le} guarantee that reads are
+\emph{fulfilled}, as in \cite[\textsection
+2.7]{DBLP:journals/pacmpl/JagadeesanJR20}.  Parallel composition, sequential
+composition, and the conditional respect reads-from (\ref{par-rf},
+\ref{seq-rf}, \ref{if-rf}).
 
-The semantic rules are mostly straightforward: Parallel composition is disjoint
-union, and all constructs respect reads-from.  The monoid laws
-(\reflem{lem:monoid}) extend to parallel composition, with $\SKIP$ as right
-unit only due to the asymmetry of \ref{par-tau}.
+% The semantic rules are mostly straightforward: Parallel composition is disjoint
+% union, and all constructs respect reads-from.  The monoid laws
+% (\reflem{lem:monoid}) extend to parallel composition, with $\SKIP$ as right
+% unit only due to the asymmetry of \ref{par-tau}.
 
-Only \ref{seq-le-delays} requires explanation.
+%Only \ref{seq-le-delays} requires explanation.
 % \begin{lemma}
 %   \label{lem:rf:implies:le}
 %   For any $\aPS$ in the range of $\sembase{}$, $\bEv\xrfx\aEv$ implies
@@ -124,7 +131,7 @@ $\aAct\eqreordersc\bAct$.  \ref{seq-le-delays} guarantees that sequential
 order is enforced between conflicting accesses of the same location
 ($\eqreorderco$), into a release and out of an acquire ($\reorderra$), and
 between SC accesses ($\eqreordersc$).  Combined with the fulfillment
-requirements (\ref{pom-rf-match}, \ref{pom-rf-block} and \ref{pom-rf-le}),
+requirements (\ref{pom-rf-match}, \ref{pom-rf-block}, \ref{pom-rf-le}),
 these ensure coherence, publication, subscription and other idioms.  For
 example, consider the following:\footnote{We use different colors for arrows representing order:
   \begin{multicols}{2}

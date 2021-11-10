@@ -44,7 +44,7 @@ must include a read action and that complete executions of
 \end{math}
 must include two write actions.  As another example, \PwTmca{} does not
 validate the reverse inclusions for
-\reflem{lem:if}\eqref{lem:ifelse:if:if}---consider that
+\reflem{lem:if}\ref{lem:ifelse:if:if}---consider that
 \begin{math}
   \sem{\IF{r}
   \THEN \PW{x}{1}
@@ -68,7 +68,7 @@ whereas
 has no such execution.  We expect that these optimizations can be validated,
 at the cost of complicating the semantics.  For access elimination, it is
 likely sufficient to allow events with different actions to merge.  For
-\reflem{lem:if}\eqref{lem:ifelse:if:if}, it is likely sufficient to encoding
+\reflem{lem:if}\ref{lem:ifelse:if:if}, it is likely sufficient to encoding
 $\rdelay$ in the logic---the problem in the execution above is that $\rdelay$
 introduces order regardless of whether preconditions are disjoint.
 %\todo{Comment on \PwTpo{} and \PwTc{}?}

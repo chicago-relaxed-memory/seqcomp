@@ -2,9 +2,11 @@
 \subsection{\PwTmcaTITLE{2}}
 \label{sec:mca2}
 
-Lowering \PwTmca{1} to \armeight{} requires a full fence after every
-acquiring read.  To see why, consider the following attempted
-execution, where the final values of both $x$ and $y$ are $2$.
+Lowering \PwTmca{1} to \armeight{} requires a full fence before every
+acquiring read.\footnote{\citet{DBLP:journals/pacmpl/JagadeesanJR20}
+  erroneously elide the required synchronization on acquiring reads.}  To see
+why, consider the following attempted execution, where the final values of
+both $x$ and $y$ are $2$.
 \begin{gather*}
   \taglabel{internal-acq}
   \begin{gathered}
