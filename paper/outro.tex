@@ -68,9 +68,9 @@ whereas
 has no such execution.  We expect that these optimizations can be validated,
 at the cost of complicating the semantics.  For access elimination, it is
 likely sufficient to allow events with different actions to merge.  For
-\reflem{lem:if}\ref{lem:ifelse:if:if}, it is likely sufficient to encoding
+\reflem{lem:if}\ref{lem:ifelse:if:if}, it is likely sufficient to encode
 $\rdelay$ in the logic---the problem in the execution above is that $\rdelay$
-introduces order regardless of whether preconditions are disjoint.
+introduces order even when the preconditions are disjoint.
 %\todo{Comment on \PwTpo{} and \PwTc{}?}
 
 We have not treated loops, although we expect that the usual approach of
