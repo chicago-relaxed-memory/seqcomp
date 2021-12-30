@@ -261,7 +261,6 @@
 \sethlcolor{lightgray}
 \newcommand{\hlfancy}[2]{\sethlcolor{#1}\hl{#2}}
 \usepackage{alltt}
-\usepackage{float}
 % \begin{multicols}{2}
 %   \columnbreak
 % \end{multicols}
@@ -1400,7 +1399,8 @@
 \newcommand{\rrfint}{\ensuremath{\mathrel{\textcolor{\rfcolor}{\mathsf{rfi}}}}}%
 \newcommand{\xrfint}{\xarrowtikz{rfint}{\;\;}}%
 \tikzstyle{rfi} = [-latex,thick,color=\rfcolor,]
-\NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfi,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}
+%\NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfi,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}
+\NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfi,#1](#2) to (#4);}
 \newcommand{\rrfi}{\ensuremath{\mathrel{\textcolor{\rfcolor}{\mathsf{rfi}}}}}%
 \newcommand{\xrfi}{\xarrowtikz{rfi}{rfi}}%
 % \NewDocumentCommand \rfi {O{} m O{} m} {\draw[rfint,#1](#2) to [auto,#3] node {$\scriptstyle\mathsf{rfi}$}  (#4);}

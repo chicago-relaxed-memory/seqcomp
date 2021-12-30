@@ -33,17 +33,14 @@ weakest):
 \item Syntactic dependencies
   \cite{DBLP:conf/pldi/LahavVKHD17,Boehm:2014:OGA:2618128.2618134,DBLP:conf/oopsla/VafeiadisN13,DBLP:journals/corr/abs-1804-04214}.
   These models require inefficient implementation of relaxed access.  This is
-  a non-starter for safe languages like Java and Javascript, and may be an
+  a non-starter for safe languages like Java and JavaScript, and may be an
   unacceptable cost for low-level languages like \cXI{}.
-\item Semantic dependencies \cite{%
-    Manson:2005:JMM:1047659.1040336, DBLP:conf/esop/JagadeesanPR10,
-    DBLP:conf/popl/KangHLVD17, DBLP:journals/pacmpl/ChakrabortyV19,
-    DBLP:conf/pldi/LeeCPCHLV20, promising-ldrf}. These models compute
+\item Semantic dependencies \cite{Manson:2005:JMM:1047659.1040336,DBLP:conf/esop/JagadeesanPR10,DBLP:conf/popl/KangHLVD17,DBLP:journals/pacmpl/ChakrabortyV19,DBLP:conf/pldi/LeeCPCHLV20,promising-ldrf}. These models compute
   dependencies operationally using alternate worlds, making it impossible to
   understood a single execution in isolation; they also allow executions that
   violate temporal reasoning (see \textsection\ref{sec:related}).
 \item No dependencies, as in \cXI{} \cite{DBLP:conf/esop/BattyMNPS15} and
-  Javascript \cite{DBLP:journals/pacmpl/WattRP19}.  This allows thin-air
+  JavaScript \cite{DBLP:journals/pacmpl/WattRP19}.  This allows thin-air
   executions.
 \end{itemize}
 
@@ -64,7 +61,7 @@ Preconditions (\PwP), which use preconditions and logic to calculate
 dependencies for a Java-like language.
 \citet{DBLP:conf/esop/PaviottiCPWOB20} defined Modular Relaxed Dependencies
 (\MRD), which use event structures to calculate a semantic dependency
-relation ($\rsdep$).  \PwP{} is defined using (acyclic) labelled partial
+relation ($\rsdep$).  \PwP{} is defined using (acyclic) labeled partial
 orders, or \emph{pomsets} \cite{GISCHER1988199}.  \MRD{} adds a causality
 axiom to \cXI{}, stating that $({\rsdep}\cup{\rrfx})$ must be acyclic.  In
 both approaches, acyclicity enables inductive reasoning.
@@ -205,7 +202,7 @@ sequential composition satisfies the expected monoid laws
 % \item \S\ref{sec:additional} generalizes the basic semantics of read and write
 %   to validate compiler optimizations.
 % \end{itemize}
-% % Acknowledgements go here, once we're not double-blinded.
+% % Acknowledgments go here, once we're not double-blinded.
 % % The definitions in this paper have been formalized in Agda.
 % Because it is closely related, we expect that the memory-model results of
 % \cite{DBLP:journals/pacmpl/JagadeesanJR20} apply to our model, including
@@ -371,7 +368,7 @@ understand the underlying hardware and compilers.
 % \citet{DBLP:conf/snapl/MarinoMMNS15} argue that the ``silently shifting
 % semicolon'' is problematic for programmers, and thus concurrent languages
 % should guarantee sequential abstraction.  But processor and language
-% implementors balk at the prospect, due to significant costs.
+% implementers balk at the prospect, due to significant costs.
 
 % These leaves programmers in a bit of pickle: What does that semicolon mean?
 
@@ -439,7 +436,7 @@ a total \emph{causal order} between read and write events, for example
       \wki{ry2}{rx1}
     \end{tikzinline}}
 \end{gather*}
-We can represent such an execution as a labelled partial order, or
+We can represent such an execution as a labeled partial order, or
 \emph{pomset} \cite{DBLP:conf/lop/Pratt85,GISCHER1988199}.  A program may give rise to many
 executions, each reflecting a different interleaving of the threads.
 
@@ -714,10 +711,10 @@ showing how $\bForm$ is transformed, for example:
   \end{gathered}
   &&
   \begin{gathered}
-    \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+    \IF{s} \THEN \PW{z}{r{*}(s{-}1)} \FI
     \\
     \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
-        \event{wz0}{(s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{}
+        \event{wz0}{(s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{}
         \xform{wz0d}{\bForm[r{*}s/z]}{right=of wz0}
         %\xo{wz0}{wz0d}
       \end{tikzinline}}
@@ -741,13 +738,13 @@ For a sequentially consistent semantics, sequential composition is
 straightforward: we apply each predicate transformer to subsequent
 preconditions, composing the predicate transformers.
 \begin{gather*}
-  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}(s{-}1)} \FI
+  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \tag{*}\label{eq1}
   \\
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
       \event{rx0}{\DR{x}{1}}{}
       \event{ry0}{\DR{y}{1}}{right=of rx0}
-      \event{wz0}{(1{=}r) \limplies (1{=}s) \limplies (s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
+      \event{wz0}{(1{=}r) \limplies (1{=}s) \limplies (s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
       \xform{rx0ry0d}{(1{=}r) \limplies(1{=}s) \limplies \bForm[r{*}(s{-}1)/z]}{right=of wz0}
       \wki{rx0}{ry0}
       \wki{ry0}{wz0}
@@ -794,10 +791,10 @@ with a dotted edge leading to the dependent one ($\xxo$). For example:
   \end{gathered}
   % &&
   % \begin{gathered}
-  %   \IF{s{<}1} \THEN \PW{z}{r{*}s} \FI
+  %   \IF{s} \THEN \PW{z}{r{*}s} \FI
   %   \\
   %   \hbox{\begin{tikzinline}[node distance=1ex and1.5em]
-  %     \event{wz0}{(s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{}
+  %     \event{wz0}{(s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{}
   %     \xform{wz0i}{\bForm}{left=.4em of wz0}
   %     \xform{wz0d}{\bForm}{right=of wz0}
   %     \xo{wz0}{wz0d}
@@ -815,7 +812,7 @@ but dependent on $(\DR y1)$, which is the transformer
 which maps $\bForm$ to $(1{=}s) \limplies \bForm$.
 (In subsequent diagrams, we only show predicate transformers for reads.)
 \begin{gather*}
-  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}(s{-}1)} \FI
+  \PR{x}{r}\SEMI \PR{y}{s}\SEMI \IF{s} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \\
   \hbox{\begin{tikzinline}[node distance=2ex and 1.2em]
       \xform{wz0i}{\bForm}{}
@@ -824,7 +821,7 @@ which maps $\bForm$ to $(1{=}s) \limplies \bForm$.
       \xform{ry0d}{(1{=}s) \limplies \bForm}{right=of rx0ry0d}
       \event{rx0}{\DR{x}{1}}{above left=of rx0ry0d}
       \event{ry0}{\DR{y}{1}}{above right=of rx0ry0d}
-      \event{wz0}{(1{=}s) \limplies (s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
+      \event{wz0}{(1{=}s) \limplies (s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
       \po{ry0}{wz0}
       \xo{rx0}{rx0d}
       \xo{ry0}{ry0d}
@@ -854,11 +851,11 @@ eliding the write action---or to the right---with the intermediate step:
 %     \end{tikzinline}}
 % \end{gather*}
 \begin{gather*}
-  \PR{y}{s}\SEMI \IF{s{<}1} \THEN \PW{z}{r{*}(s{-}1)} \FI
+  \PR{y}{s}\SEMI \IF{s} \THEN \PW{z}{r{*}(s{-}1)} \FI
   \\
   \hbox{\begin{tikzinline}[node distance=1ex and 1.5em]
       \event{ry0}{\DR{y}{1}}{}
-      \event{wz0}{(1{=}s) \limplies (s {<} 1) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
+      \event{wz0}{(1{=}s) \limplies (s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=of ry0}
       \xform{ry0d}{(1{=}s) \limplies \bForm}{left=of ry0}
       \xform{wz0i}{\bForm}{left=of ry0d}
       \po{ry0}{wz0}

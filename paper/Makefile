@@ -1,4 +1,5 @@
 PAPER=paper
+TALK=talk5
 paper:
 	rm  -f ${PAPER}.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error ${PAPER}.tex
@@ -15,9 +16,12 @@ appendix:
 diff:
 	git latexdiff --main ${PAPER}.tex 89c1d7b06 --
 talk:
-	rm  -f talk.pdf
-	latexmk -xelatex --pvc --pdf --halt-on-error talk.tex
+	rm  -f ${TALK}.pdf
+	latexmk -xelatex --pvc --pdf --halt-on-error ${TALK}.tex
 	killall Skim
+pngs:
+	rm -f ~/Desktop/page-[0-9][0-9].png
+	open -a "PDF Save Pages as Images" ${TALK}.pdf
 clean:
 	latexmk -c
 
