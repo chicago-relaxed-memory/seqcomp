@@ -1,5 +1,4 @@
 PAPER=paper
-TALK=talk5
 paper:
 	rm  -f ${PAPER}.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error ${PAPER}.tex
@@ -15,6 +14,8 @@ appendix:
 	killall Skim
 diff:
 	git latexdiff --main ${PAPER}.tex 89c1d7b06 --
+
+TALK=talk
 talk:
 	rm  -f ${TALK}.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error ${TALK}.tex
