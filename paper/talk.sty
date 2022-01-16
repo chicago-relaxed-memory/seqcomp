@@ -1,0 +1,157 @@
+% the following allows \pause in amsmath environments
+% https://topanswers.xyz/tex?q=1126
+\renewrobustcmd{\beamer@@pause}[1][]{%
+  \unless\ifmeasuring@%
+  \ifblank{#1}%
+    {\stepcounter{beamerpauses}}%
+    {\setcounter{beamerpauses}{#1}}%
+  \onslide<\value{beamerpauses}->\relax%
+  \fi%
+}
+
+\newcommand{\LOGIC}[1]{{\color{blue!90}#1}}
+\newcommand{\dij}[3]{\ifnotempty{#1}{\LOGIC{#1}\Rightarrow}\textit{wp}(#2)\LOGIC{(#3)}}
+\renewcommand{\hoare}[3]{\ifnotempty{#1}{\LOGIC{\{#1\}}}\allowbreak\;#2\;\allowbreak\LOGIC{\{#3\}}}
+
+
+
+% \renewcommand{\PAR}{\,\mathbin{\mathtt{\textbf{|}}\mkern-2mu\mathtt{\textbf{|}}}\,}
+\renewcommand{\PAR}{\:\mathbin{\|}\:}
+\renewcommand{\fmode}{\kappa}
+%https://tex.stackexchange.com/questions/3915/image-on-full-slide-in-beamer-package
+% \usepackage{textpos}
+% \newcommand<>{\fullsizegraphic}[1]{
+%   \begin{textblock*}{0cm}(-1cm,-3.78cm)
+%   \includegraphics[width=\paperwidth]{#1}
+%   \end{textblock*}
+% }
+
+\usepackage[normalem]{ulem}
+\newcommand{\redxout}{\bgroup\markoverwith{\textcolor{black!50!black}{\rule[.5ex]{2pt}{1pt}}}\ULon}
+
+% get ams to ignore tag in spacing
+\renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{(\ignorespaces#1\unskip\@@italiccorr)}}}
+\newcommand{\spacetag}[2][3em]{\makebox[#1]{}\tag{#2}}
+\newcommand{\notagparens}{\renewcommand{\tagform@}[1]{\maketag@@@{\makebox[0pt][r]{\ignorespaces##1\unskip\@@italiccorr}}}}
+
+
+\renewcommand{\once}{\Diamond\mkern-10.1mu\text{--}\mkern4mu}
+\renewcommand{\always}{\Box\mkern-11.6mu\text{--}\mkern3mu}
+
+\newcommand{\imagepage}[2]{{\setbeamertemplate{navigation
+      symbols}{#2}\usebackgroundtemplate{\includegraphics[width=\paperwidth]{#1}}\begin{frame}\end{frame}}}
+\newenvironment{imageframe}[1]{\usebackgroundtemplate{\includegraphics[width=\paperwidth]{#1}}\begin{frame}}{\end{frame}}
+
+\newcommand{\semitransp}[2][35]{\textcolor{fg!#1}{#2}}
+
+%\usepackage{tikzsymbols}
+% \newcommand{\wink}{{\raisebox{-1pt}{\textcolor{black}{\Winkey[1.2][green]}}}}
+% \newcommand{\verygood}{{\raisebox{-1pt}{\textcolor{black}{\Cooley[1.2][green]}}}}
+% \newcommand{\good}{{\raisebox{-1pt}{\textcolor{black}{\Smiley[1.2][green]}}}} %Smiley
+% \newcommand{\hmmm}{{\raisebox{-1pt}{\textcolor{black}{\Neutrey[1.2][yellow]}}}}
+% \newcommand{\bad}{{\raisebox{-1pt}{\textcolor{black}{\Sadey[1.2][red]}}}}
+% \newcommand{\QMARK}{\makebox[0pt][l]{\color{blue!80!black}\text{?}}}
+% \newcommand{\CMARK}{\makebox[0pt][l]{\color{green!80!black}\Smiley[1]{}}}
+% \newcommand{\XMARK}{\makebox[0pt][l]{\color{red!80!black}\Sadey[1]{}}}
+
+% \usepackage{pifont}
+% \newcommand{\qmark}{{\color{blue!80!black}\text{?}}}
+% \newcommand{\cmark}{{\color{green!80!black}\text{\ding{51}}}}
+% \newcommand{\xmark}{{\color{red!80!black}\text{\ding{55}}}}
+% \newcommand{\QMARK}{\makebox[0pt][l]{\;\;\;\;\qmark}}
+% \newcommand{\CMARK}{\makebox[0pt][l]{\;\;\;\;\cmark}}
+% \newcommand{\XMARK}{\makebox[0pt][l]{\;\;\;\;\xmark}}
+
+\newcommand{\textgreen}[1]{{\color{green!80!black}#1}}
+\newcommand{\textred}[1]{{\color{red!80!black}#1}}
+
+\newcommand{\nohighlight}[2][]{#1}
+\newcommand{\highlight}[2][yellow]{\ifmmode%
+  \smash{\mathchoice%
+  {\colorbox{#1}{{$\mathstrut\displaystyle#2$}}}%
+  {\colorbox{#1}{{$\mathstrut\textstyle#2$}}}%
+  {\colorbox{#1}{{$\mathstrut\scriptstyle#2$}}}%
+  {\colorbox{#1}{{$\mathstrut\scriptscriptstyle#2$}}}}%
+  \else%
+    \colorbox{#1}{#2}%
+  \fi}
+\newcommand{\nohightight}[2][]{{\setlength{\fboxsep}{0pt}{#2}}}
+\newcommand{\hightight}[2][yellow]{{\setlength{\fboxsep}{0pt}\highlight[#1]{#2}}}
+\newcommand{\bggray}[2][gray!20]{\smash{\mathchoice%
+  {\colorbox{#1}{\smash{$\displaystyle#2$}}}%
+  {\colorbox{#1}{\smash{$\textstyle#2$}}}%
+  {\colorbox{#1}{$\scriptstyle#2$}}%
+  {\colorbox{#1}{$\scriptscriptstyle#2$}}}}%
+
+\newcommand{\qcite}[1]{\textcolor{gray}{#1}}
+\newcommand{\reg}[1]{\textcolor{gray}{#1}}
+
+\newenvironment{framecenter}{\vfill\begin{center}\usebeamerfont*{frametitle}\usebeamercolor[fg]{frametitle}\ignorespaces}
+{\end{center}\vfill\ignorespacesafterend}
+
+\newcommand{\elevenPoint}{%
+  \setbeamerfont{itemize/enumerate body}{size={\fontsize{11}{13}}}
+  \setbeamerfont{itemize/enumerate subbody}{size={\fontsize{10}{12}}}
+}
+\newcommand{\tenPoint}{%
+  \setbeamerfont{itemize/enumerate body}{size={\fontsize{10}{12}}}
+  \setbeamerfont{itemize/enumerate subbody}{size={\fontsize{9}{11}}}
+}
+
+\newcommand{\bigX}{%
+  \begin{tikzpicture}[overlay,remember picture]%
+      \node[xshift=-4mm,yshift=-.5mm](ll) at (current page.south west) {};%
+      \node[xshift=-4mm,yshift=-.5mm](ul) at (current page.north west) {};%
+      \node[xshift=4mm,yshift=-.5mm](ur) at (current page.north east) {};%
+      \node[xshift=4mm,yshift=-.5mm](lr) at (current page.south east) {};%
+      \draw[red,line width=1cm](ul)to(lr);%
+      \draw[red,line width=1cm](ur)to(ll);%
+  \end{tikzpicture}}
+
+\usepackage{anyfontsize}
+\newcommand{\sol}[2][5]{
+  \begin{tikzpicture}[overlay,remember picture]%
+    \node[rotate=#1, fill=green!10, rectangle, rounded corners] at (current page.center) {\color{green!90!black}\fontsize{48}{58}\selectfont #2};%
+  \end{tikzpicture}  
+}
+\newcommand{\probX}[2][-5]{
+  \bigX
+  \begin{tikzpicture}[overlay,remember picture]%
+    \node[rotate=#1, fill=red!10, rectangle, rounded corners] at (current page.center) {\color{red!90!black}\fontsize{48}{58}\selectfont #2};%
+  \end{tikzpicture}  
+}
+\newcommand{\prob}[2][-5]{
+  \begin{tikzpicture}[overlay,remember picture]%
+    \node[rotate=#1, fill=red!10, rectangle, rounded corners] at (current page.center) {\color{red!90!black}\fontsize{48}{58}\selectfont #2};%
+  \end{tikzpicture}  
+}
+\newcommand{\probPos}[2][1cm]{
+  \begin{tikzpicture}[overlay,remember picture]%
+    \node[rotate=-5, fill=red!10, rectangle, rounded corners] at ($(current page.center) + (0cm,#1)$) {\color{red!90!black}\fontsize{48}{58}\selectfont #2};%
+  \end{tikzpicture}  
+}
+\newcommand{\solPos}[2][-1cm]{
+  \begin{tikzpicture}[overlay,remember picture]%
+    \node[rotate=5, fill=green!10, rectangle, rounded corners] at ($(current page.center)+(0cm,#1)$) {\color{green!90!black}\fontsize{48}{58}\selectfont #2};%
+  \end{tikzpicture}  
+}
+\newcommand{\probPosR}[2][1cm]{
+  \begin{tikzpicture}[overlay,remember picture]%
+    \node[rotate=5, fill=red!10, rectangle, rounded corners] at ($(current page.center) + (0cm,#1)$) {\color{red!90!black}\fontsize{48}{58}\selectfont #2};%
+  \end{tikzpicture}  
+}
+\newcommand{\solPosR}[2][-1cm]{
+  \begin{tikzpicture}[overlay,remember picture]%
+    \node[rotate=-5, fill=green!10, rectangle, rounded corners] at ($(current page.center)+(0cm,#1)$) {\color{green!90!black}\fontsize{48}{58}\selectfont #2};%
+  \end{tikzpicture}  
+}
+  % \begin{tikzpicture}[remember picture,overlay]
+  %   \node[xshift=-2cm,yshift=-2cm] at (current page.north east){%
+  %     \includegraphics[width=2cm]{photo.png}
+  %   };
+  % \end{tikzpicture}
+
+% Local Variables:
+% mode: latex
+% TeX-master: "talk"
+% End:

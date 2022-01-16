@@ -1,0 +1,1299 @@
+\documentclass[t,aspectratio=169]{beamer} %tlmgr install translator
+% \usepackage{media9}
+
+\usepackage{macros}
+\usepackage{talk}
+
+% \includeonlyframes{oota-pomsets}  
+\usepackage{pdfcomment}
+% \setbeameroption{show notes on second screen}
+\newcommand<>{\pdfnote}[1]{%
+  \only#2{\marginnote{\pdfcomment[icon=note,hspace=10pt,color=white,hoffset=30cm]{#1}}}%
+  \note#2[item]{#1}%
+}
+\usecolortheme{seahorse}
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}%\insertframenumber/\inserttotalframenumber}
+\setbeamertemplate{itemize item}[circle]
+\setbeamertemplate{itemize subitem}[circle]
+\setbeamertemplate{itemize subsubitem}[circle]
+
+
+\begin{comment}
+  
+  While developing slides, use
+  \includeonlyframes{current}  
+
+  Then latex will only process slides with
+  \begin{frame}[label=y]
+  \end{frame}  
+  
+  \begin{frame}
+    \frametitle{}
+    \begin{itemize}
+    \item 
+    \end{itemize}
+  \end{frame}
+  \begin{itemize}
+  \item 
+  \end{itemize}
+
+  \begin{framecenter}
+  \end{framecenter}
+
+  Great Beamer guide here:
+  https://www.overleaf.com/learn/latex/Beamer_Presentations:_A_Tutorial_for_Beginners_(Part_4)—Overlay_Specifications
+
+  How to present on mac without blurring:
+  Use firefox, or Presentation.app
+  https://tex.stackexchange.com/questions/431423/os-x-blurry-beamer-presentations-on-sierra-high-sierra
+
+  With Presentation.app:
+  \usepackage{pdfcomment}
+  \newcommand{\pdfnote}[1]{\marginnote{\pdfcomment[icon=note]{#1}}}
+
+  To convert from PDF to KeyNOTE: use the automator suggestion here
+  https://apple.stackexchange.com/questions/95856/import-multiple-pages-from-a-pdf-as-separate-slides-in-keynote
+  I put the automator app here: https://www.dropbox.com/sh/1o36nes45cydmbx/AADPVWpeEBZj2vemVXkGKQXVa?dl=0
+  - Copy that to your machine somewhere.
+  - In the finder, drop talk.pdf onto "PDF Save Pages as Images.app".
+  - This will create a bunch of png files on the desktop
+  - Now, open keynote with a blank document.
+  - In the finder, select the files, drop onto the leftmost "slides" pane of Keynote.
+
+  Another display option is to use http://dspdfviewer.danny-edel.de
+
+  For Beamer notes:
+  \usepackage{pgfpages}
+  \setbeameroption{show notes on second screen}
+
+  Skim is not great for this:
+
+  To give a presentation with the Skim reader (http://skim-app.sourceforge.net) %on OSX so
+  that you see the notes on your laptop and the slides on the projector, do %the following:
+  
+  1. Generate just the presentation (hide notes) and save to slides.pdf
+  2. Generate only the notes (show only nodes) and save to notes.pdf
+  3. With Skim open both slides.pdf and notes.pdf
+  4. Click on slides.pdf to bring it to front.
+  5. In Skim, under "View -> Presentation Option -> Synchronized Noted Document"
+  select notes.pdf.
+  6. Now as you move around in slides.pdf the notes.pdf file will follow you.
+  7. Arrange windows so that notes.pdf is in full screen mode on your laptop
+  and slides.pdf is in presentation mode on the projector.
+  You can use the keys "t" and "d" to get different things on the presenter screen
+  
+  \pause
+  \onslide<>
+
+  \visible<>{during}                 \begin{visibleenv}<>during\end{visibleenv}
+  \invisible<>{other}                \begin{invisibleenv}<>other \end{invisibleenv}
+  
+  \onslide<>{during}
+  \uncover<>{during}                 \begin{uncoverenv}<>during\end{uncoverenv}
+  
+  \only<>{during}                    \begin{onlyenv}<>during\end{onlyenv}
+  \alt<>{during}{other}              \begin{altenv}<>{during-before}{during-after}{other-before}{other-after}text\end{altenv}
+  \temporal<>{before}{during}{after}
+  \setbeamercovered{transparent=35}
+
+
+  \begin{itemize}[<+-| alert@+>]
+  \end{itemize}
+
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+    \end{column}
+  \end{columns}
+
+\end{comment}
+
+\title{The Leaky Semicolon}
+\subtitle{Compositional Semantic Dependencies for Relaxed-Memory Concurrency}
+\author{
+  \alert{Alan Jeffrey}$^*$
+  \and
+  \alert{James Riely}$^\dagger$
+  \and
+  Mark Batty$^\ddagger$
+  \\
+  Simon Cooksey$^\ddagger$
+  \and
+  Ilya Kaysin$^{**}$
+  \and
+  Anton Podkopaev$^{\dagger\dagger}$
+}
+\date{POPL\\January 2022}
+\institute{
+  $^*$Roblox
+  \qquad
+  $^\dagger$DePaul
+  \qquad
+  $^\ddagger$Kent
+  \and
+  $^{**}$JetBrains + Cambridge
+  \qquad
+  $^{\dagger\dagger}$HSE
+}
+
+
+\begin{document}
+
+\begin{comment}
+\begin{frame}[label=title]
+  \maketitle
+\end{frame}
+
+% \begin{frame}
+%   \frametitle{Are these programs equal?}
+%   \huge
+%   \renewcommand{\aLoc}{{\color{blue}x}}
+%   \renewcommand{\bLoc}{{\color{green}y}}
+%   \renewcommand{\aReg}{{\color{red}r}}
+%   \renewcommand{\bReg}{{\color{red}s}}
+%   \begin{align*}
+%     \only<-2,4->{\phantom{\SEMI\framebox{$\PW{\aLoc}{\PR{\bLoc}{}}$}}}
+%     \PR{\aLoc}{\aReg} \SEMI \PW{\bLoc}{\aReg}
+%     \only<3>{\SEMI\framebox{$\PR{\bLoc}{\bReg}$}}
+%     &\visible<2->{\;\;\neq\;\;
+%     \PW{\bLoc}{\aReg} \SEMI  \PR{\aLoc}{\aReg}}
+%     \only<3>{\SEMI\framebox{$\PR{\bLoc}{\bReg}$}}
+%     \only<-2,4->{\phantom{\SEMI\framebox{$\PW{\aLoc}{\PR{\bLoc}{}}$}}}
+%     %     \\[1ex]
+%     %     \visible<3->{
+%     %     \alt<6>{\PW{\bLoc}{1}\SEMI  \PR{\aLoc}{\aReg}}{\PR{\aLoc}{\aReg} \only<4>{\SEMI\framebox{$\PW{\aLoc}{\PR{\bLoc}{}}$}}\SEMI \PW{\bLoc}{1}}
+%     %     &\;\;\alt<4,5>{\neq}{=}\;\;
+%     %     \PW{\bLoc}{1} \only<4>{\SEMI\framebox{$\PW{\aLoc}{\PR{\bLoc}{}}$}}\SEMI  \PR{\aLoc}{\aReg}}
+%     %     \\[1ex]
+%     %     \visible<8->{\PW{\aLoc}{1} \SEMI  \PW{\aLoc}{1}
+%     %     &\;\;\neq\;\;
+%     %     \PW{\aLoc}{1}}
+%   \end{align*}
+% \end{frame}
+% \begin{frame}
+%   \frametitle{Are these programs equal?}
+%   \huge
+%   \renewcommand{\aLoc}{{\color{blue}x}}
+%   \renewcommand{\bLoc}{{\color{green}y}}
+%   \renewcommand{\aReg}{{\color{red}r}}
+%   \begin{align*}
+%     \phantom{\SEMI\framebox{$\PW{\aLoc}{\PR{\bLoc}{}}$}}
+%     \PR{\aLoc}{\aReg} \SEMI  \PW{\bLoc}{\aReg}
+%     &\visible<2->{\;\;\neq\;\;
+%     \PW{\bLoc}{\aReg} \SEMI  \PR{\aLoc}{\aReg}}
+%     \phantom{\SEMI\framebox{$\PW{\aLoc}{\PR{\bLoc}{}}$}}
+%     \\[1ex]
+%     \visible<3->{
+%     \alt<6>{\PW{\bLoc}{1}\SEMI  \PR{\aLoc}{\aReg}}{\PR{\aLoc}{\aReg} \only<4>{\SEMI\framebox{$\PW{\aLoc}{\PR{\bLoc}{}}$}}\SEMI \PW{\bLoc}{1}}
+%     &\;\;\alt<4,5>{\neq}{=}\;\;
+%     \PW{\bLoc}{1} \only<4>{\SEMI\framebox{$\PW{\aLoc}{\PR{\bLoc}{}}$}}\SEMI  \PR{\aLoc}{\aReg}}
+%     \\[1ex]
+%     \visible<8->{\PW{\aLoc}{1} \SEMI  \PW{\aLoc}{2}
+%     &\;\;=\;\;
+%     \PW{\aLoc}{2}}
+%   \end{align*}
+% \end{frame}
+
+% \begin{frame}
+%   \huge
+%   \begin{gather*}
+%     \begin{aligned}
+%       r &\in  \text{Registers}\\
+%       M &\in  \text{Expressions}\\
+%       \visible<2->{x,y,z &\in \text{Shared Variables}\\}
+%     \end{aligned}
+%     \\
+%     \begin{array}{rcccccccc}
+%       S&\BNFDEF&\SKIP&\BNFSEP&\LET{r}{M}&\BNFSEP&S_1 \SEMI S_2
+%       \\
+%       \visible<2->{&\BNFSEP&\PW[]{x}{M}&\BNFSEP&\PR[]{x}{r}&\BNFSEP&S_1 \PAR S_2}
+%     \end{array}
+%   \end{gather*}
+% \end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Remembering nothing that happened after 1999 \ldots}
+  \onslide<2->Develop a model of imperative programming
+  \onslide<3->that supports:
+  \begin{itemize}
+  \item<3-> Shared-memory concurrency 
+  \item<4-> Compositional reasoning for sequencing and parallelism
+  \item<5-> A few other things:
+    \begin{itemize}
+    \item Features: pointers, release/acquire/SC access, fences, RMWs
+    \item Optimizations: reorderings, if-introduction, redundant read elimination, etc.
+    \item Java Causality Test Cases 
+    \item DRF-SC, No-Thin-Air, temporal invariant reasoning
+    \item Efficient implementation on Arm8
+    \item Connection to C11, JavaScript, PTX, etc.
+    \item Automatic litmus test checker
+    \item Certified proofs
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Sequential Computation\visible<3->{: Preconditions + \alt<9->{Predicate Transformers}{Hoare Logic}!}}
+  % \frametitle{\alt<-2>{What does this mean?}{Preconditions!}}
+  \huge
+  \begin{displaymath}
+    \PW{x}{0}
+    \SEMI
+    \PR{x}{r}
+    \SEMI
+    \PW{y}{r+1}
+  \end{displaymath}
+  \vspace{-2ex}
+  \only<2>{\sol{Preconditions!}}
+  \alt<-8>{
+    \begin{displaymatharray}{rll}
+      \visible<7->{\alt<7>{\hoare{}{&\PW{x}{0}&}  {x=0}}{\hoare{\TRUE}{&\PW{x}{0}&}  {x=0}}}\\
+      \visible<5->{\alt<5>{\phantom{\{x=0\}}\hoare{}{&\PR{x}{r}&}  {r=0}}{\hoare{x=0}  {&\PR{x}{r}&}  {r=0}}}\\
+      \visible<3->{\alt<3>{\hoare{}{&\PW{y}{r+1}&}{y=1}}{\hoare{r=0}  {&\PW{y}{r+1}&}{y=1}}}
+    \end{displaymatharray}
+  }{
+    \begin{displaymatharray}{rll}
+      \dij{\TRUE}{&\mkern-8mu\PW{x}{0}\mkern-8mu&}  {x=0}\mkern50mu\\
+      \dij{(x=0)}{&\mkern-8mu\PR{x}{r}\mkern-8mu&}  {r=0}\\
+      \dij{(r=0)}{&\mkern-8mu\PW{y}{r+1}\mkern-8mu&}{y=1}
+    \end{displaymatharray}
+  }
+  \normalsize
+  \onslide<3->
+  \vspace{1.5cm}
+  
+  [Hoare 1969] \only<9->{[Dijkstra 1975]}
+  \onslide<10->
+  \probX{Concurrency?}
+  \onslide<11->
+  \sol{Ordered Events!}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Concurrent Computation\visible<2->{: Pomsets! (aka labeled partial orders)}}
+  \huge
+  \begin{displaymath}
+    \PW{x}{0}
+    \SEMI
+    \PR{x}{r}
+    \SEMI
+    \PW{y}{r+1}
+    \PAR
+    \PW{x}{5}
+  \end{displaymath}
+  \vspace{-2ex}
+  \onslide<2->
+  \begin{displaymath}
+    \scalebox{2}{    
+      \begin{tikzinline}[node distance=2.5ex and 1.5em]
+        \event{a}{\DW{x}{0}}{}
+        \event{b}{\DR{x}{\alt<-4>{5}{0}}}{right=of a}
+        \event{c}{\DW{y}{\alt<-4>{6}{1}}}{right=of b}
+        \event{d}{\DW{x}{5}}{below=of a}      
+        \visible<3>{\po{a}{b}}
+        \visible<3>{\po{b}{c}}
+        \visible<3-4>{\rf{d}{b}}
+        \visible<4>{\wk{a}{d}}
+        \visible<5->{\rfi{a}{b}}
+        \visible<5->{\wk{b}{d}}
+        % \event{d}{\DW{x}{5}}{right=3em of c}      
+        % \visible<1-3>{\po{a}{b}}
+        % \po{b}{c}
+        % \visible<3-4>{\rf[out=-160,in=-20]{d}{b}}
+        % \visible<4-4>{\wk[out=20,in=160]{a}{d}}
+        % \visible<5->{\rfi{a}{b}}
+        % \visible<5->{\wk[out=20,in=160]{b}{d}}
+      \end{tikzinline}}
+  \end{displaymath}
+  \normalsize
+
+  \normalsize
+  \only<-3>{
+    \vspace{2cm}
+    [Pratt 1985] [Gischer 1988]
+    % [Brookes 1993] 
+    % ($r$ is a thread-local register)
+  }
+  \onslide<4->
+  \vspace{1cm}
+  Complete pomset: $\forall\DR{x}{v}$
+  \begin{itemize}
+  \item $\exists\DW{x}{v}<\DR{x}{v}$
+  \item $\forall\DW{x}{u}$ either $\DW{x}{u}\leq\DW{x}{v}$ or $\DR{x}{v}<\DW{x}{u}$
+  \end{itemize}
+  \onslide<6->
+  \probX{Hardware Reordering?}
+\end{frame}
+\begin{frame}
+  \frametitle{Concurrency?}
+  \huge
+  \begin{displaymath}
+    \PW{x}{0}
+    \SEMI
+    \PR{x}{r}
+    \SEMI
+    \PW{y}{r+1}
+    \PAR
+    \PW{x}{5}
+  \end{displaymath}
+  \vspace{-2ex}
+  \onslide<2->
+  \begin{displaymath}
+    \scalebox{2}{    
+      \begin{tikzinline}[node distance=2.5ex and 1.5em]
+        \event{a}{\DW{x}{0}}{}
+        \event{b}{\DR{x}{\alt<-4>{5}{0}}}{right=of a}
+        \event{c}{\DW{y}{\alt<-4>{6}{1}}}{right=of b}
+        \event{d}{\DW{x}{5}}{below=of a}      
+        \visible<2-3>{\po{a}{b}}
+        \po{b}{c}
+        \visible<3-4>{\rf{d}{b}}
+        \visible<4>{\wk{a}{d}}
+        \visible<5->{\rfi{a}{b}}
+        \visible<5->{\wk{b}{d}}
+        % \event{d}{\DW{x}{5}}{right=3em of c}      
+        % \visible<1-3>{\po{a}{b}}
+        % \po{b}{c}
+        % \visible<3-4>{\rf[out=-160,in=-20]{d}{b}}
+        % \visible<4-4>{\wk[out=20,in=160]{a}{d}}
+        % \visible<5->{\rfi{a}{b}}
+        % \visible<5->{\wk[out=20,in=160]{b}{d}}
+      \end{tikzinline}}
+  \end{displaymath}
+  \normalsize
+
+  \normalsize
+  \only<-3>{
+    \vspace{2cm}
+    [Gischer 1988] [Brookes 1993] 
+    % ($r$ is a thread-local register)
+  }
+  \onslide<4->
+  \vspace{1cm}
+  Complete pomset: $\forall\DR{x}{v}$
+  \begin{itemize}
+  \item $\exists\DW{x}{v}<\DR{x}{v}$
+  \item $\forall\DW{x}{u}$ either $\DW{x}{u}\leq\DW{x}{v}$ or $\DR{x}{v}<\DW{x}{u}$
+  \end{itemize}
+  \onslide<6->
+  \probX{Hardware Reordering?}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{\alt<-4>{Hardware Reordering?}{Deordering!}}
+  \huge
+  \begin{displaymath}
+    \PW{x}{0}
+    \SEMI
+    \PW{x}{1}
+    \SEMI
+    \PR{y}{r}
+    \PAR
+    \PW{y}{0}
+    \SEMI
+    \PW{y}{1}
+    \SEMI
+    \PR{x}{s}
+  \end{displaymath}
+  \begin{displaymath}
+    \scalebox{2}{    
+      \begin{tikzinline}[node distance=2.5ex and 1.5em]
+        \event{a}{\DW{x}{0}}{}
+        \event{b}{\DW{x}{1}}{right=of a}
+        \event{c}{\DR{y}{0}}{right=of b}
+        \event{d}{\DW{y}{0}}{below=of a}
+        \event{e}{\DW{y}{1}}{right=of d}
+        \event{f}{\DR{x}{0}}{right=of e}
+        \only<1-4>{
+          \po{a}{b}
+          \po{d}{e}
+        }
+        \only<1-4>{
+          \po{b}{c}
+          \po{e}{f}
+        }
+        \only<2->{
+          \rf{a}{f}
+          \wk{f}{b}
+        }
+        \only<3->{
+          \rf{d}{c}
+          \wk{c}{e}
+        }
+        % \rf[out=10,in=170]{a}{f}
+        % \rf[out=-170,in=-10]{d}{c}
+      \end{tikzinline}}
+  \end{displaymath}
+  \only<4>{\sol{Deorder!}}
+
+  \onslide<6->
+  \probX{SC-DRF?}
+  \onslide<7->
+  \prob[10]{Thin Air?}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\alt<-3>{SC-DRF?  Thin Air?}{Syntactic Dependencies!}}
+  \huge
+  \begin{displaymath}
+    \IF{\PR{x}{}}\THEN\PW{y}{1}\FI
+    \PAR
+    \IF{\PR{y}{}}\THEN\PW{x}{1}\FI
+  \end{displaymath}
+  \begin{displaymath}
+    \scalebox{2}{    
+      \begin{tikzinline}[node distance=2.5ex and 1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{y}{1}}{right=of a}
+        \event{c}{\DR{y}{1}}{below=of a}
+        \event{d}{\DW{x}{1}}{right=of c}
+        \only<4->{
+          \po{a}{b}
+          \po{c}{d}
+        }
+        \rf{d}{a}
+        \rf{b}{c}
+      \end{tikzinline}}
+  \end{displaymath}
+  \only<2-3>{\sol{Dependencies!}}
+  \only<3>{\sol[-10]{Syntactic Dependencies!}}
+  \onslide<5->
+  \probX{Compiler Reordering?}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\alt<-2>{Compiler Reordering?}{Semantic Dependencies!}}
+  %\frametitle{Putting it together}
+  \huge
+  \begin{displaymath}
+    \PR{x}{r}\SEMI \PW{y}{(r*0)+1}
+    \PAR
+    \PR{y}{s}\SEMI \PW{x}{s}
+  \end{displaymath}
+  \begin{displaymath}
+    \scalebox{2}{    
+      \begin{tikzinline}[node distance=2.5ex and 1.5em]
+        \event{a}{\DR{x}{1}}{}
+        \event{b}{\DW{y}{1}}{right=of a}
+        \event{c}{\DR{y}{1}}{below=of a}
+        \event{d}{\DW{x}{1}}{right=of c}
+        \only<-3>{
+          \po{a}{b}
+        }
+        \po{c}{d}
+        \rf{d}{a}
+        \rf{b}{c}
+      \end{tikzinline}}
+  \end{displaymath}
+  \only<2>{\sol{Semantic Dependencies!}}
+  \only<5->{\probX{How?}}
+\end{frame}
+
+% \begin{frame}
+%   \frametitle{Pomsets with Preconditions}
+%   \huge
+%   \begin{displaymath}
+%     \visible<6->{\PR{x}{r}\SEMI}
+%     \visible<4->{\PW{y}{(r*0)+1}}
+%     \visible<4->{\PAR}
+%     \visible<2->{\PR{y}{s}\SEMI}
+%     \visible<1->{\PW{x}{s}}
+%   \end{displaymath}
+%   \begin{displaymath}
+%     \scalebox{2}{    
+%       \begin{tikzinline}[node distance=2.5ex and 2em]
+%         \visible<6->{\event{a}{\DR{x}{1}\reg{r}}{}}
+%         \visible<4->{\event{b}{(r*0)+1 = 1\bigmid\DW{y}{1}}{right=of a}}
+%         \visible<2->{\event{c}{\DR{y}{1}\reg{s}}{below=of a}}
+%         \visible<1->{\event{d}{\visible<3->{1{=}s\limplies} s{=}1\bigmid\DW{x}{1}}{right=of c}}
+%         \visible<3->{\po{c}{d}}
+%         \visible<6->{\rf{d}{a}}
+%         \visible<4->{\rf{b}{c}}
+%       \end{tikzinline}}
+%   \end{displaymath}
+%   \only<8->{\probX{Control Independencies?}}
+% \end{frame}
+\begin{frame}
+  \frametitle{Pomsets with Preconditions \only<3->{and Predicate Transformers}}
+  \huge
+  \begin{displaymath}
+    \PR{y}{s} \mkern80mu\; \visible<2->{\SEMI} \mkern80mu \PW{x}{s}
+  \end{displaymath}
+  \vspace{-2ex}
+  \begin{displaymath}
+    \scalebox{1.7}{    
+      \begin{tikzinline}[node distance=100mu]
+        \event{c}{\TRUE\bigmid\DR{y}{1}\reg{s}}{}
+        \alt<-3>
+        {\event{d}{s{=}1\bigmid\DW{x}{1}}{right=of c}}
+        {\event{d}{1{=}s\limplies s{=}1\bigmid\DW{x}{1}}{right=71.5mu of c}}
+        \visible<4->{\po{c}{d}}
+      \end{tikzinline}}
+  \end{displaymath}
+  % \vspace{-1ex}
+  \onslide<3->
+  \Large
+  \begin{displaymath}
+    \mkern-20mu
+    \begin{array}[t]{c|r}
+      \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+      \emptyset & \bForm\\
+      \only<4>{\hightight}{\{\DR{y}{1}\reg{s}\}} & (1{=}s) \limplies \bForm                             
+    \end{array}
+    \mkern150mu
+    \begin{array}[t]{c|r}
+      \aEvs&\aTr{\aEvs}{\bForm}\\ \hline
+      \emptyset & \bForm\\
+      \{\DW{x}{1}\} & \bForm                             
+    \end{array}
+  \end{displaymath}
+\end{frame}
+\begin{frame}
+  \frametitle{Pomsets with Preconditions and Predicate Transformers}
+  \huge
+  \begin{displaymath}
+    \PR{x}{r} \mkern80mu\; \SEMI \mkern10mu \PW{y}{(r*0)+1}
+  \end{displaymath}
+  \vspace{-2ex}
+  \begin{displaymath}
+    \scalebox{1.7}{    
+      \begin{tikzinline}[node distance=60mu]
+        \event{a}{\TRUE\bigmid\DR{x}{1}\reg{s}}{}
+        \event{b}{(r*0)+1 = 1\bigmid\DW{y}{1}}{right=of a}
+      \end{tikzinline}}
+  \end{displaymath}
+  % \vspace{-1ex}
+  \Large
+
+  \begin{displaymath}
+    \mkern-20mu
+    \begin{array}[t]{c|r}
+      \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+      \hightight{\emptyset} & \bForm\\
+      \{\DR{x}{1}\reg{r}\} & (1{=}r) \limplies \bForm                             
+    \end{array}
+    \mkern150mu
+    \begin{array}[t]{c|r}
+      \aEvs&\aTr{\aEvs}{\bForm}\\ \hline
+      \emptyset & \bForm\\
+      \{\DW{y}{1}\} & \bForm                             
+    \end{array}
+  \end{displaymath}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Pomsets with Preconditions and Predicate Transformers}
+  \huge
+  \begin{displaymath}
+    \PR{x}{r}\SEMI \PW{y}{(r*0)+1}
+    \PAR
+    \PR{y}{s}\SEMI \PW{x}{s}
+  \end{displaymath}
+  \begin{displaymath}
+    \scalebox{2}{    
+      \begin{tikzinline}[node distance=2.5ex and 1.5em]
+        \event{a}{\only<-2>{\TRUE\bigmid}\DR{x}{1}}{}
+        \event{b}{\only<-2>{(r*0)+1 = 1\bigmid}\DW{y}{1}}{right=of a}
+        \event{c}{\only<-2>{\TRUE\bigmid}\DR{y}{1}}{below=of a}
+        \event{d}{\only<-2>{1{=}s\limplies s{=}1\bigmid}\DW{x}{1}}{right=of c}
+        \po{c}{d}
+        \only<2->{\rf{d}{a}}
+        \only<2->{\rf{b}{c}}
+      \end{tikzinline}}
+  \end{displaymath}
+  \only<4->{\sol{\begin{tabular}{c}Logic=Thread order\\Pomset=Global order\end{tabular}}}
+  \only<5->{\probX{Control Independencies?}}
+\end{frame}
+% \begin{frame}
+%   \frametitle{Pomsets with Predicate Transformers}
+%   \huge
+%   \begin{displaymath}
+%     \PR{x}{r}\SEMI \PW{y}{(r*0)+1}
+%   \end{displaymath}
+%   \vspace{-2ex}
+%   \onslide<2->
+%   \begin{displaymath}
+%     \scalebox{1.7}{    
+%       \begin{tikzinline}[node distance=2ex and 1.2em]
+%         \event{a}{\DR{x}{1}\reg{r}}{}
+%         \event{b}{(r*0)+1 = 1\bigmid\DW{y}{1}}{right=of a}
+%         % \event{c}{\DR{y}{1}\reg{s}}{below=of a}
+%         % \event{d}{\visible<3->{1{=}s\limplies} s{=}1\bigmid\DW{x}{1}}{right=of c}
+%         % \visible<3->{\po{c}{d}}
+%       \end{tikzinline}}
+%   \end{displaymath}
+%   % \vspace{-1ex}
+%   \onslide<2->
+%   \Large
+%   \begin{displaymath}
+%     \begin{array}[t]{c|r}
+%       \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+%       \emptyset & \bForm\\
+%       \{\DR{x}{1}\reg{r}\} & (1{=}r) \limplies \bForm
+%       % \DR{x}{1}\reg{r}&\multicolumn{1}{c}{\aTr{}{\bForm}}\\ \hline
+%       % \xmark & \bForm\\
+%       % \cmark & (1{=}r) \limplies \bForm
+%     \end{array}
+%   \end{displaymath}
+% \end{frame}
+
+\begin{frame}
+  \frametitle{\alt<-2>{Control Independencies?}{Merging!}}
+  \huge
+  \begin{displaymath}
+    \PR{x}{r}
+    \SEMI
+    \IF{r\neq 0}\THEN\PW{y}{1}\FI
+    \SEMI
+    \IF{r = 0}\THEN\PW{y}{1}\FI
+  \end{displaymath}
+  \begin{displaymath}
+    \scalebox{2}{    
+      \begin{tikzinline}[node distance=2.5ex and 1.5em]
+        \event{a}{\DR{x}{1}\reg{r}}{}
+        \alt<3->{
+          \event{b}{r\neq 0 \lor r=0\bigmid\DW{y}{1}}{right=of a}
+        }{
+          \event{b}{r\neq 0\bigmid\DW{y}{1}}{right=of a}
+          \event{c}{r=0\bigmid\DW{y}{1}}{right=of b}
+        }
+      \end{tikzinline}}
+  \end{displaymath}
+  \only<2>{\sol{Merging!}}
+  \only<4>{\probX{Associative?}}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Associative! (Left to Right)}
+  \huge
+  \begin{displaymath}
+    \visible<2->{(}
+    \PR{x}{r}
+    \visible<2->{\mkern18mu\;\SEMI\mkern18mu}
+    \PR{y}{s}
+    \visible<2->{)}
+    \visible<4->{\mkern20mu\;\SEMI\mkern20mu}
+    \IF{s} \THEN \PW{z}{r{*}(s{-}1)} \FI
+  \end{displaymath}
+  \vspace{-4ex}
+  \begin{displaymath}
+    \scalebox{1.4}{    
+      \begin{tikzinline}
+        \event{rx0}{\DR{x}{1}\reg{r}}{}
+        \event{ry0}{\DR{y}{1}\reg{s}}{right=50mu of rx0}
+        \alt<4->
+        {\event{wz0}{(1{=}s) \limplies (s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=30mu of ry0}
+          \po{ry0}{wz0}}
+        {\event{wz0}{(s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=60mu of ry0}}
+      \end{tikzinline}}
+  \end{displaymath}
+  % \vspace{-1ex}
+  \normalsize
+  \smallskip
+
+  \only<1-2>{
+    \begin{math}
+      \mkern-10mu
+      \begin{array}[t]{c|r}
+        \cEvs&\aTr{\cEvs}{\bForm}\\ \hline
+        \only<2>{\hightight}{\emptyset} & \bForm\\
+        \{\DR{x}{1}\reg{r}\} & (1{=}r) \limplies \bForm                             
+      \end{array}
+      \mkern20mu
+      \begin{array}[t]{c|r}
+        \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+        \emptyset & \bForm\\
+        \{\DR{y}{1}\reg{s}\} & (1{=}s) \limplies \bForm                             
+      \end{array}
+      \mkern50mu
+      \begin{array}[t]{c|r}
+        \aEvs&\aTr{\aEvs}{\bForm}\\ \hline
+        \emptyset & \bForm\\
+        \{\DW{y}{1}\} & \bForm                             
+      \end{array}
+    \end{math}
+  }
+  \only<3-4>{
+    \begin{math}
+      \mkern45mu
+      \begin{array}[t]{c|r}
+        \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+        \emptyset
+             & \bForm\\
+        \{\DR{x}{1}\reg{r}\}
+             & (1{=}r) \limplies \bForm\\
+        \only<4>{\hightight}{\{\DR{y}{1}\reg{s}\}}
+             & (1{=}s) \limplies \bForm\\
+        \{\DR{x}{1}\reg{r},\DR{y}{1}\reg{s}\}
+             & (1{=}r) \limplies(1{=}s) \limplies \bForm
+      \end{array}
+      \mkern70mu
+      \begin{array}[t]{c|r}
+        \aEvs&\aTr{\aEvs}{\bForm}\\ \hline
+        \emptyset & \bForm\\
+        \{\DW{y}{1}\} & \bForm                             
+      \end{array}
+    \end{math}
+  }
+  \only<5>{
+    \begin{math}
+      \mkern40mu
+      \begin{array}[t]{c|r}
+        \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+        \emptyset,\{\DW{y}{1}\}
+             & \bForm\\
+        \{\DR{x}{1}\reg{r}\},\{\DR{x}{1}\reg{r},\DW{y}{1}\}
+             & (1{=}r) \limplies \bForm\\
+        \{\DR{y}{1}\reg{s}\},\{\DR{y}{1}\reg{s},\DW{y}{1}\}
+             & (1{=}s) \limplies \bForm\\
+        \{\DR{x}{1}\reg{r},\DR{y}{1}\reg{s}\},\{\DR{x}{1}\reg{r},\DR{y}{1}\reg{s},\DW{y}{1}\}
+             & (1{=}r) \limplies(1{=}s) \limplies \bForm
+      \end{array}
+    \end{math}
+  }
+\end{frame}
+\begin{frame}
+  \frametitle{Associative! (Right to Left)}
+  \huge
+  \begin{displaymath}
+    \mkern8mu
+    \PR{x}{r}
+    \visible<4->{\mkern15mu\;\SEMI\mkern15mu}
+    \visible<2->{(}
+    \PR{y}{s}
+    \visible<2->{\mkern23mu\;\SEMI\mkern23mu}
+    \IF{s} \THEN \PW{z}{r{*}(s{-}1)} \FI
+    \visible<2->{)}
+  \end{displaymath}
+  \vspace{-4ex}
+  \begin{displaymath}
+    \scalebox{1.4}{    
+      \begin{tikzinline}
+        \event{rx0}{\DR{x}{1}\reg{r}}{}
+        \event{ry0}{\DR{y}{1}\reg{s}}{right=50mu of rx0}
+        \alt<2->
+        {\event{wz0}{(1{=}s) \limplies (s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=30mu of ry0}
+          \po{ry0}{wz0}}
+        {\event{wz0}{(s{\neq}0) \land (r{*}(s{-}1)){=}0 \bigmid \DW{z}{0}}{right=60mu of ry0}}
+      \end{tikzinline}}
+  \end{displaymath}
+  % \vspace{-1ex}
+  \normalsize
+  \smallskip
+
+  \only<1-2>{
+    \begin{math}
+      \mkern-10mu
+      \begin{array}[t]{c|r}
+        \cEvs&\aTr{\cEvs}{\bForm}\\ \hline
+        \emptyset & \bForm\\
+        \{\DR{x}{1}\reg{r}\} & (1{=}r) \limplies \bForm                             
+      \end{array}
+      \mkern20mu
+      \begin{array}[t]{c|r}
+        \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+        \emptyset & \bForm\\
+        \only<2>{\hightight}{\{\DR{y}{1}\reg{s}\}} & (1{=}s) \limplies \bForm                             
+      \end{array}
+      \mkern50mu
+      \begin{array}[t]{c|r}
+        \aEvs&\aTr{\aEvs}{\bForm}\\ \hline
+        \emptyset & \bForm\\
+        \{\DW{y}{1}\} & \bForm                             
+      \end{array}
+    \end{math}
+  }
+  \only<3-4>{
+    \begin{math}
+      \mkern-10mu
+      \begin{array}[t]{c|r}
+        \cEvs&\aTr{\cEvs}{\bForm}\\ \hline
+        \only<4>{\hightight}{\emptyset} & \bForm\\
+        \{\DR{x}{1}\reg{r}\} & (1{=}r) \limplies \bForm                             
+      \end{array}
+      \mkern70mu
+      \begin{array}[t]{c|r}
+        \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+        \emptyset,\{\DW{y}{1}\} & \bForm\\
+        \{\DR{y}{1}\reg{s}\}, \{\DR{y}{1}\reg{s},\DW{y}{1}\} & (1{=}s) \limplies \bForm                             
+      \end{array}
+    \end{math}
+  }
+  \only<5>{
+    \begin{math}
+      \mkern40mu
+      \begin{array}[t]{c|r}
+        \bEvs&\aTr{\bEvs}{\bForm}\\ \hline
+        \emptyset,\{\DW{y}{1}\}
+             & \bForm\\
+        \{\DR{x}{1}\reg{r}\},\{\DR{x}{1}\reg{r},\DW{y}{1}\}
+             & (1{=}r) \limplies \bForm\\
+        \{\DR{y}{1}\reg{s}\},\{\DR{y}{1}\reg{s},\DW{y}{1}\}
+             & (1{=}s) \limplies \bForm\\
+        \{\DR{x}{1}\reg{r},\DR{y}{1}\reg{s}\},\{\DR{x}{1}\reg{r},\DR{y}{1}\reg{s},\DW{y}{1}\}
+             & (1{=}r) \limplies(1{=}s) \limplies \bForm
+      \end{array}
+    \end{math}
+  }
+\end{frame}
+
+%\imagepage{sounds/fireworks.webp}
+
+\begin{frame}
+  \frametitle{Victory!}
+  \begin{itemize}
+  \item<+->No.  Where about certified proofs?
+  \item<+->Ilya has proofs.
+  \item<+->Victory!
+  \item<+->\probX{Real Hardware?}  
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multicopy Atomic Architectures}
+  \Huge
+  \begin{displaymath}
+    \aCmd_1 \SEMI \aCmd_2
+  \end{displaymath}
+  \   \smallskip
+
+  
+  \large
+  Let order include (in addition to dependency):
+  \begin{itemize}
+  \item Coherence  ($\DW{x}{} \xpo \DW{x}{}$)
+  \item Release/Acquire Access/Fences ($\DW{x}{} \xpo \DW[\mREL]{y}{}$, $\DR[\mACQ]{x}{} \xpo \DW{y}{}$)
+  \item SC Access/Fences ($\DW[\mSC]{x}{} \xpo \DR[\mSC]{y}{}$)
+  \end{itemize}
+  \onslide<2->
+   Arm8 optimal for: Relaxed$^{\textstyle\cmark}$\!  Release$^{\textstyle\cmark}$\! Acquiring$^{\textstyle\xmark}$
+
+  \onslide<3->
+  Arm8 some work:\,  Relaxed$^{\textstyle\cmark}$\!  Release$^{\textstyle\cmark}$\! Acquiring$^{\textstyle\cmark}$
+
+  \onslide<4->
+  \probX{Non-MCA?}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dependencies for RC11}
+  \large
+  Replace No-TAR axiom
+  %\onslide<2->
+  \probPos[.5cm]{$\textsf{sb}\cup\textsf{rf}$ is acyclic}
+  \onslide<2->
+  \solPos[-1.5cm]{$\textsf{sdep}\cup\textsf{rf}$ is acyclic}
+ 
+  \vfill
+  \vfill
+  \vfill
+  \vfill
+  \vfill
+  \vfill
+  \vfill
+  \vfill
+  \vfill
+  
+  \hbox{ } \hfill \textsf{sdep} = pomset order
+\end{frame}
+% \begin{frame}
+%   \frametitle{Merging?}
+%   \huge
+%   \begin{displaymath}
+%     \PR{x}{r}
+%     \SEMI
+%     \IF{r\neq 0}\THEN\PW{y}{1}\FI
+%     \SEMI
+%     \IF{r = 0}\THEN\PW{y}{1}\FI
+%   \end{displaymath}
+%   \begin{displaymath}
+%     \scalebox{2}{    
+%       \begin{tikzinline}[node distance=2.5ex and 1.5em]
+%         \event{a}{\DR{x}{1}\reg{r}}{}
+%         \event{b}{r\neq 0 \lor r=0\bigmid\DW{y}{1}}{right=of a}
+%         \only<2->{
+%           \phevent{c}{r\neq 0\bigmid\DW{y}{1}}{below right=2.5ex and -4em of b}
+%           \phevent{d}{r=0\bigmid\DW{y}{1}}{below left=2.5ex and -4em of b}
+%         }
+%       \end{tikzinline}}
+%   \end{displaymath}
+% \end{frame}
+\begin{frame}
+  \frametitle{Merging and Program Order?}
+  \huge
+  \begin{displaymath}
+    \IF{r}\THEN
+    \PW{x}{1}
+    \SEMI
+    \PW{y}{1}
+    \ELSE
+    \PW{y}{1}
+    \SEMI
+    \PW{x}{1}
+    \FI
+  \end{displaymath}
+  \only<1>{
+    \vspace{-3ex}
+    \begin{displaymath}
+      \scalebox{1.6}{    
+        \begin{tikzinline}[node distance=2.5ex and 4em]
+          \event{d}{\DW{x}{1}}{}
+          \event{e}{\DW{y}{1}}{right=of d}
+          \pox[out=15,in=165]{d}{e}
+          \pox[out=-165,in=-15]{e}{d}
+        \end{tikzinline}}
+    \end{displaymath}
+  }
+  \only<2->{
+    \vspace{-2ex}
+    \begin{displaymath}
+      \scalebox{1.6}{    
+        \begin{tikzinline}[node distance=1ex and 1.5em]
+          % \phevent{d1}{\makebox[5mm]{$\temporal<3>{r{\neq}0}{\TRUE}{\FALSE}$}\bigmid\DW{x}{1}}{}
+          % \phevent{e1}{\makebox[5mm]{$\temporal<3>{r{\neq}0}{\TRUE}{\FALSE}$}\bigmid\DW{y}{1}}{right=of d1}
+          % \phevent{d2}{\makebox[5mm]{$\temporal<3>{r{=}0}{\FALSE}{\TRUE}$}\bigmid\DW{x}{1}}{right=of e1}
+          % \phevent{e2}{\makebox[5mm]{$\temporal<3>{r{=}0}{\FALSE}{\TRUE}$}\bigmid\DW{y}{1}}{right=of d2}
+          % \pheventModal{d1}{r{\neq}0\bigmid\DW{x}{1}}{}{\temporal<3>{gray!10}{green!10}{red!10}}
+          % \pheventModal{e1}{r{\neq}0\bigmid\DW{y}{1}}{right=of d1}{\temporal<3>{gray!10}{green!10}{red!10}}
+          % \pheventModal{d2}{r{=}0   \bigmid\DW{x}{1}}{right=of e1}{\temporal<3>{gray!10}{red!10}{green!10}}
+          % \pheventModal{e2}{r{=}0   \bigmid\DW{y}{1}}{right=of d2}{\temporal<3>{gray!10}{red!10}{green!10}}
+          \temporal<3>{
+            \phevent{d1}{r{\neq}0\bigmid\DW{x}{1}}{}
+            \phevent{e1}{r{\neq}0\bigmid\DW{y}{1}}{right=of d1}
+            \phevent{d2}{r{=}0   \bigmid\DW{x}{1}}{right=of e1}
+            \phevent{e2}{r{=}0   \bigmid\DW{y}{1}}{right=of d2}
+          }{
+            \pheventGreen{d1}{r{\neq}0\bigmid\DW{x}{1}}{}
+            \pheventGreen{e1}{r{\neq}0\bigmid\DW{y}{1}}{right=of d1}
+            \pheventRed{d2}{r{=}0   \bigmid\DW{x}{1}}{right=of e1}
+            \pheventRed{e2}{r{=}0   \bigmid\DW{y}{1}}{right=of d2}
+          }{
+            \pheventRed{d1}{r{\neq}0\bigmid\DW{x}{1}}{}
+            \pheventRed{e1}{r{\neq}0\bigmid\DW{y}{1}}{right=of d1}
+            \pheventGreen{d2}{r{=}0   \bigmid\DW{x}{1}}{right=of e1}
+            \pheventGreen{e2}{r{=}0   \bigmid\DW{y}{1}}{right=of d2}
+          }
+          \event{d}{\DW{x}{1}}{above=of e1}
+          \event{e}{\DW{y}{1}}{above=of d2}
+          \pox[out=-15,in=-165]{d1}{e1}
+          \pox[out=-165,in=-15]{e2}{d2}
+          \mrg{e1}{e}
+          \mrg{e2}{e}
+          \mrg{d1}{d}
+          \mrg{d2}{d}
+          % \event{e}{(v{=}r\lor w{=}r)\limplies (r{=}0\lor r{=}1)\bigmid\DW{x}{1}}{}
+          % \event{r}{\DR{y}{v}}{left=of e}
+          % \phevent{e1}{v{=}r\limplies r{=}0\bigmid\DW{x}{1}}{below left=1em and -7em of e}
+          % \phevent{e2}{v{=}r\limplies r{=}1\bigmid\DW{x}{1}}{below right=1em and -7em of e}
+          % \pox{r}[pos=0,below]{e1}
+          % \pox[out=-15,in=-167]{e1}[below]{e2}
+          % \mrg{e1}{e}
+          % \mrg{e2}{e}
+          % \event{i}{\DW{y}{w}}{left=of r}
+          % \pox[out=-15,in=-167]{i}[below]{r}
+          % \pox{r}{e}
+        \end{tikzinline}}    
+    \end{displaymath}
+  }
+  \onslide<4->
+\end{frame}
+\end{comment}
+
+
+% \begin{frame}
+%   %\probX{Power?}  
+%   \probX{Control Independencies?}
+%   %\sol{\begin{tabular}{c}Logic=Local order\\Pomset=Other order\end{tabular}}
+%   %\sol{\begin{tabular}{c}Concurrency is easy!\\Sequentiality is hard!\end{tabular}}
+%   % \only<1>{\sol{Concurrency is easy!}}
+%   % \only<2>{\prob{Sequentiality is hard!}}
+%   %\probX{Non-MCA?}  
+% \end{frame}
+
+
+
+\begin{frame}
+  %\frametitle{Pomsets with Predicate Transformers}
+  \frametitle{Sequential composition for an optimized concurrent language}
+  \Large
+
+  \begin{itemize}
+  \item<+-> Dependency = Pomset order = Order seen by other threads
+  \item<+-> Very compositional for MCA
+    \normalsize
+    \begin{itemize}
+    \item Solution for Out-Of-Thin-Air models (C, JavaScript)
+    \end{itemize}
+  \item<+-> Denotational semantics
+    \normalsize
+    \begin{itemize}
+    \item \textcolor{blue}{Tractable} notion of refinement for peephole optimization
+    \item \textcolor{blue}{Understandable} by human beings
+    \end{itemize}
+  \item<+-> Main complexity
+    \normalsize
+    \begin{itemize}
+    \item Calculating dependencies
+    \item Merging and unmerging
+    \item In conditionals, single execution uses both sides
+    \end{itemize}    
+  \item<+-> More in the paper
+    \normalsize
+    \begin{itemize}
+    \item RMWs, address calculation, Indirect dependencies, If-introduction,
+      etc
+    %\item Associativity: Skolemization, Inconsistent preconditions
+    \end{itemize}    
+
+  \end{itemize}
+  % Details\ldots
+  % \normalsize
+  % \begin{itemize}
+  % \item Indirect dependencies, Read-Read independency
+  % \item Associativity: Skolemization, Inconsistent preconditions
+  % \item Compiler optimizations: If-introduction, redundant read elimination, etc
+  % \item Release/acquire, SC access, fences, RMWs, address calculation
+  % \end{itemize}
+  \only<+->{\solPosR[1cm]{Concurrency is easy!}}
+  \only<+->{\probPosR[-1cm]{Sequentiality is hard!}}
+\end{frame}
+\end{document}
+
+
+
+\begin{frame}
+  \frametitle{Temporal Reasoning!}
+  \Large
+  \begin{columns}
+    \begin{column}{.48\textwidth}      
+      \begin{displaymath}
+        \IF{\PR{x}{}}\THEN\PW{y}{1}\FI
+        \PAR
+        \IF{\PR{y}{}}\THEN\PW{x}{1}\FI
+      \end{displaymath}
+      \begin{displaymath}
+        \scalebox{1.6}{    
+          \begin{tikzinline}[node distance=2.5ex and 1.5em]
+            \event{a}{\DR{x}{1}}{}
+            \event{b}{\DW{y}{1}}{right=of a}
+            \event{c}{\DR{y}{1}}{below=of a}
+            \event{d}{\DW{x}{1}}{right=of c}
+            \po{a}{b}
+            \po{c}{d}
+            \rf{d}{a}
+            \rf{b}{c}
+          \end{tikzinline}}
+      \end{displaymath}
+    \end{column}
+    \pause
+    \begin{column}{.48\textwidth}      
+      \begin{displaymath}
+        [\DW{x}{1}\Rightarrow\once\DR{y}{1}]
+        \land
+        [\DW{y}{1}\Rightarrow\once\DR{x}{1}]
+      \end{displaymath}
+      \pause
+      \begin{displaymath}
+        [\DR{x}{1}\Rightarrow\once\DW{x}{1}]
+        \land
+        [\DR{y}{1}\Rightarrow\once\DW{y}{1}]
+      \end{displaymath}
+      \pause
+      \begin{displaymath}
+        \DW{x}{1}\Rightarrow\once\DW{x}{1}
+      \end{displaymath}
+      \pause
+      \begin{displaymath}
+        \llap{Coinduction: }
+        \aPS \models (\afo \Rightarrow\once{\afo}) \Rightarrow\lnot \afo
+      \end{displaymath}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Bait and switch}
+  \Large
+  \begin{gather*}
+    \PW{y}{\PR{x}{}}
+    \PAR
+    \hightight{\PR{y}{r}} \SEMI \IF{b}\THEN  \hightight{\PW{x}{r}} \SEMI \PW{z}{r} \ELSE \hightight{\PW{x}{1}} \FI
+    \PAR
+    \PW{b}{1}
+    \\
+    \visible<2->{
+      \scalebox{1.4}{    
+        \hbox{\begin{tikzinline}[node distance=2.5ex and 1.5em]
+            \event{rx}{\DR{x}{1}}{}
+            \event{wy}{\DW{y}{1}}{right=of rx}
+            \po{rx}{wy}
+            \event{ry}{\DR{y}{1}}{right=3em of wy} 
+            \event{wx}{\DW{x}{1}}{right=of ry}
+            \event{wz}{\DW{z}{1}}{right=of wx}
+            \event{rb}{\DR{b}{1}}{right=of wz}
+            \event{wb1}{\DW{b}{1}}{right=3em of rb}
+            \alt<-2>{\po[dotted]{ry}{wx}}{\po{ry}{wx}}
+            \rf{wb1}{rb}
+            \rf{wy}{ry}
+            \rf[out=-160,in=-20]{wx}{rx}
+            \po{rb}{wz}
+            \po[out=30,in=150]{ry}{wz}
+            \begin{pgfonlayer}{background}
+              % \node at ([shift={(45:.7)}]ry) [fill=yellow,rotate=45,align=left] {$\phantom{\smash{xxxxxxxxx}}$};
+              \node at ([shift={(0:.7)}]ry) [fill=yellow,align=left] {$\phantom{\smash{xxxxx}}$};
+            \end{pgfonlayer}
+          \end{tikzinline}}}}
+    \\
+    \visible<3->{
+      [\once\DW{y}{1} \Rightarrow \once\DR{x}{1}]
+      \land
+      [\notonce\DW{z}{1} \Rightarrow (\once\DR{y}{1} \land \always(\DW{x}{1} \Rightarrow \once\DR{y}{1}))]}
+  \end{gather*}  
+
+  \onslide<4->
+  \vspace{1cm}
+  \normalsize
+  Allow: \;Breaks safety [Lochbihler 2013] \\
+  \onslide<5->
+  Forbid: Breaks optimization [Cho et al PLDI 2021]\\
+  \hspace{1em} (Read introduction + if introduction)
+\end{frame}
+
+% \imagepage{images/what-if.jpg}{}
+
+% \begin{frame}
+%   \frametitle{Speculative models}
+%   \Large
+%   \begin{gather*}
+%     \PW{y}{\PR{x}{}}
+%     \PAR
+%     \PR{y}{r} \SEMI \IF{b}\THEN  \PW{x}{r} \SEMI \PW{z}{r} \ELSE \PW{x}{1} \FI
+%     \PAR
+%     \PW{b}{1}
+%   \end{gather*}  
+%   \normalsize
+%   \pause
+
+%   Many speculative models:
+%   \begin{itemize}
+%   \item Java Memory Model [Pugh \emph{et al.} 2005]
+%   \item Speculative operational semantics [Jagadeesan, Pitcher and Riely 2010]
+%   \item Event structures with AE-justification [Jeffrey and Riely 2016]
+%   \item Promising semantics [Kang \emph{et al.} 2017]
+%   \item \dots
+%   \end{itemize}
+%   \pause
+%   All fall for bait and switch.
+
+% \end{frame}
+
+\begin{frame}
+  \frametitle{Contribution}
+  A model of imperative programming that supports:
+  \begin{itemize}
+  \item shared-memory concurrency %(with data races)
+    % \item<+-> data races
+  \item hardware reorderings
+  \item compiler reorderings
+  \item temporal invariant reasoning
+  \item other things:
+    \begin{itemize}
+    \item java causality test cases
+    \item if-introduction (aka, case analysis)
+    \item redundant read elimination
+    \item implementation on x86-64 and Arm8
+    \item address calculation
+    \item release/acquire and SC access
+    \item fences and RMWs
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+
+% \begin{frame}
+%   \frametitle{Other things!}
+
+%   See the paper for\dots
+%   \begin{itemize}
+%   \item java causality test cases
+%   \item if-introduction (aka, case analysis)
+%   \item redundant read elimination
+%   \item implementation on x86-64 and Arm8
+%   \item address calculation
+%   \item release/acquire and SC access
+%   \item fences and RMWs
+%   \end{itemize}
+
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Conclusions}
+
+%   A memory model which supports
+%   \begin{itemize}
+%   \item shared-memory concurrency (with data races)
+%   \item hardware reorderings
+%   \item compiler reorderings
+%   \item temporal invariant reasoning
+%   \item other things
+%   \end{itemize}
+
+% \end{frame}
+\end{document}
+
+% Local Variables:
+% mode: latex
+% TeX-master: t
+% End:
+
+Hi, I'm James.  In this paper, we explore the interaction of sequential
+composition and mutable state in the context of optimized
+concurrent languages, such as C, Java and Javascript.
+
+Consider a simple language for straight-line code.
+We have commands that do nothing, assign a register, and do things sequentially.
+In this context, we can all agree on the meaning of the semicolon: S1 executes before, and S2 executes after.
+The semicolon provides a clear temporal barrier between the actions of S1 and S2.
+
+Things change when we add concurrency, with commands that write to shared memory, read from shared memory, and do things concurrently.
+When threads can access the same memory at the same time, the meaning of the semicolon has to change.
+There is no longer a clear distinction between before and after.
+As Marino and coauthors note, this amorphous, shifting semicolon creates many difficulties for programmers.
+They argue that sequentiality is an important abstraction, which should be protected.
+And I agree.
+But, unfortunately, saving the sacred semicolon comes at a cost:
+A cost in computing time, with knock-on costs in power consumption and the resulting environmental effects. 
+It's a cost that implementers of highly-optimized concurrent code may be unwilling pay.
+
+In this paper, we explore the opposite extreme:  Is there a tractable model of sequential composition that captures all of the messiness of relaxed memory models?
+
+
+
+
+It's very easy to get it wrong.
+Annoyingly, this is a rather mature area, so you have to do a lot of work to
+get a paper published.  Check it out!  And thanks for listening!
+
+
+
+
+
+I'm James.  I'm going to briefly introduce our attempt to provide a
+denotational account of sequential composition.  I know what you're thinking:
+wasn't that done in the 70's?  Well yes, but the context has changed: In this
+paper we consider sequential composition in an optimized language with
+shared-memory concurrency, like C, Java or JavaScript.  
+One way to understand meaning is to look at which things are equated and which aren't.
+
+Let's start by looking at two programs that are clearly different.
+The program on the left loads x into a register, then stores the value of register in y.
+The program on the right performs these operations in the opposite order, storing the prior value of the register before performing the load.
+These programs are distinguished by a sequential context that subsequently loads y.
+
+If instead the store takes a constant, then the order of the operations is not observable sequentially, and the programs are equated.

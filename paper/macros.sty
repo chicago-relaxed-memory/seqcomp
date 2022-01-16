@@ -1176,6 +1176,9 @@
 \newcommand{\event}[3]{\node[event](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{phevent} = [draw=gray, fill=gray!10, rectangle, dashed, rounded corners, minimum size=3ex]
 \newcommand{\phevent}[3]{\node[phevent](#1)[#3]{$\mathstrut\smash{#2}$};}
+%\newcommand{\pheventModal}[4]{\node[phevent,fill=#4](#1)[#3]{$\mathstrut\smash{#2}$};}
+\newcommand{\pheventRed}[3]{\node[phevent,fill=red!10](#1)[#3]{$\mathstrut\smash{#2}$};}
+\newcommand{\pheventGreen}[3]{\node[phevent,fill=green!10](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{raevent} = [event] %[draw=black, fill=red!7, double, rectangle, rounded corners, minimum size=3ex]
 \newcommand{\raevent}[3]{\node[raevent](#1)[#3]{$\mathstrut\smash{#2}$};}
 \tikzstyle{raeventX} = [draw=black, fill=red!7, double, rectangle, rounded corners, minimum size=3ex]

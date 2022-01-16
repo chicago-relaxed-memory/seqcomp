@@ -6,6 +6,7 @@ paper:
 draft:
 	pdflatexn ${PAPER}
 	cp ${PAPER}.pdf DRAFT.pdf
+	cp ${PAPER}.pdf ~/Public/papers/2022-popl.pdf
 	pdflatexn combo
 	cp combo.pdf DRAFT-APPENDIX.pdf
 appendix:
