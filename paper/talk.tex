@@ -141,7 +141,22 @@
 
 \begin{document}
 
-\begin{comment}
+\begin{frame}
+  \sol{They're the same!}
+
+  %\sol{MCA!}
+  % \solPosR[1cm]{Concurrency is easy!}
+  % \probPosR[-1cm]{Sequentiality is hard!}
+  %\probX{Power?}  
+  %\probX{Control Independencies?}
+  %\sol{\begin{tabular}{c}Dependencies\\for C11!\end{tabular}}
+  %\sol{\begin{tabular}{c}Concurrency is easy!\\Sequentiality is hard!\end{tabular}}
+  % \only<1>{\sol{Concurrency is easy!}}
+  % \only<2>{\prob{Sequentiality is hard!}}
+  %\probX{Non-MCA?}  
+\end{frame}
+
+
 \begin{frame}[label=title]
   \maketitle
 \end{frame}
@@ -216,12 +231,11 @@
 
 
 \begin{frame}
-  \frametitle{Remembering nothing that happened after 1999 \ldots}
-  \onslide<2->Develop a model of imperative programming
-  \onslide<3->that supports:
+  \frametitle{Revert to 1999 \ldots}
+  \onslide<2->A model of imperative programming
   \begin{itemize}
   \item<3-> Shared-memory concurrency 
-  \item<4-> Compositional reasoning for sequencing and parallelism
+  \item<4-> Compositional for both parallelism and sequencing 
   \item<5-> A few other things:
     \begin{itemize}
     \item Features: pointers, release/acquire/SC access, fences, RMWs
@@ -294,12 +308,12 @@
         \event{b}{\DR{x}{\alt<-4>{5}{0}}}{right=of a}
         \event{c}{\DW{y}{\alt<-4>{6}{1}}}{right=of b}
         \event{d}{\DW{x}{5}}{below=of a}      
-        \visible<3>{\po{a}{b}}
-        \visible<3>{\po{b}{c}}
-        \visible<3-4>{\rf{d}{b}}
-        \visible<4>{\wk{a}{d}}
-        \visible<5->{\rfi{a}{b}}
-        \visible<5->{\wk{b}{d}}
+        \visible<3-4>{\po{a}{b}}
+        \visible<3-4>{\po{b}{c}}
+        \visible<4-5>{\rf{d}{b}}
+        \visible<5>{\wk{a}{d}}
+        \visible<6->{\rfi{a}{b}}
+        \visible<6->{\wk{b}{d}}
         % \event{d}{\DW{x}{5}}{right=3em of c}      
         % \visible<1-3>{\po{a}{b}}
         % \po{b}{c}
@@ -314,18 +328,20 @@
   \normalsize
   \only<-3>{
     \vspace{2cm}
-    [Pratt 1985] [Gischer 1988]
-    % [Brookes 1993] 
+    [Gischer 1988]
+    % [Pratt 1985]
+    [Plotkin \& Pratt 1990]
+    [Brookes 1993] 
     % ($r$ is a thread-local register)
   }
   \onslide<4->
   \vspace{1cm}
-  Complete pomset: $\forall\DR{x}{v}$
+  $\DR{x}{v}$ is \emph{fulfilled} if: 
   \begin{itemize}
   \item $\exists\DW{x}{v}<\DR{x}{v}$
-  \item $\forall\DW{x}{u}$ either $\DW{x}{u}\leq\DW{x}{v}$ or $\DR{x}{v}<\DW{x}{u}$
+  \item \visible<5->{$\forall\DW{x}{u}$ either $\DW{x}{u}\leq\DW{x}{v}$ or $\DR{x}{v}<\DW{x}{u}$}
   \end{itemize}
-  \onslide<6->
+  \onslide<7->
   \probX{Hardware Reordering?}
 \end{frame}
 \begin{frame}
@@ -409,7 +425,7 @@
         \event{d}{\DW{y}{0}}{below=of a}
         \event{e}{\DW{y}{1}}{right=of d}
         \event{f}{\DR{x}{0}}{right=of e}
-        \only<1-4>{
+        \only<1->{
           \po{a}{b}
           \po{d}{e}
         }
@@ -492,6 +508,7 @@
   \end{displaymath}
   \only<2>{\sol{Semantic Dependencies!}}
   \only<5->{\probX{How?}}
+  \only<6->{\sol{\begin{tabular}{c}Pomsets \\+ Preconditions!\end{tabular}}}
 \end{frame}
 
 % \begin{frame}
@@ -864,7 +881,7 @@
 
   
   \large
-  Let order include (in addition to dependency):
+  Order includes (in addition to dependency):
   \begin{itemize}
   \item Coherence  ($\DW{x}{} \xpo \DW{x}{}$)
   \item Release/Acquire Access/Fences ($\DW{x}{} \xpo \DW[\mREL]{y}{}$, $\DR[\mACQ]{x}{} \xpo \DW{y}{}$)
@@ -924,7 +941,7 @@
 %   \end{displaymath}
 % \end{frame}
 \begin{frame}
-  \frametitle{Merging and Program Order?}
+  \frametitle{Merging and Synchronized-Before?}
   \huge
   \begin{displaymath}
     \IF{r}\THEN
@@ -1002,18 +1019,8 @@
   }
   \onslide<4->
 \end{frame}
-\end{comment}
 
 
-% \begin{frame}
-%   %\probX{Power?}  
-%   \probX{Control Independencies?}
-%   %\sol{\begin{tabular}{c}Logic=Local order\\Pomset=Other order\end{tabular}}
-%   %\sol{\begin{tabular}{c}Concurrency is easy!\\Sequentiality is hard!\end{tabular}}
-%   % \only<1>{\sol{Concurrency is easy!}}
-%   % \only<2>{\prob{Sequentiality is hard!}}
-%   %\probX{Non-MCA?}  
-% \end{frame}
 
 
 
@@ -1040,7 +1047,7 @@
     \begin{itemize}
     \item Calculating dependencies
     \item Merging and unmerging
-    \item In conditionals, single execution uses both sides
+    \item One execution of conditional uses one execution from each branch
     \end{itemize}    
   \item<+-> More in the paper
     \normalsize
