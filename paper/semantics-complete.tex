@@ -71,14 +71,13 @@
     \end{math}.
     
     \noindent
-    We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
-    We say that it is \emph{$\labeling$-inconsistent} otherwise.
+    We say that $\aForm$ is \emph{$\labeling$-inconsistent} if $\aForm\land\regForm{\labeling}$ is unsatisfiable.
   \end{definition}
   
   \noindent
   \begin{definition}
     \label{def:trans}
-    A \emph{predicate transformer} is a function
+    A \emph{$\labeling$-predicate transformer} is a function
     $\aTr{}{}:\Formulae\fun\Formulae$ such that
     \begin{enumerate}[,label=(\textsc{x}\arabic*),ref=\textsc{x}\arabic*]
     \item \label{tr-and}
@@ -97,10 +96,10 @@
   \noindent
   \begin{definition}
     \label{def:family}
-    A \emph{family of predicate transformers} over $\aEvs$ consists of a
-    predicate transformer $\aTr{\bEvs}{}$ for each $\bEvs\subseteq\AllEvents$,
-    such that if $\cEvs \cap \aEvs \subseteq \bEvs$ then $\aTr{\cEvs}{\bForm}
-    \rimplies \aTr{\bEvs}{\bForm}$.
+    A \emph{family of $\labeling$-predicate transformers} consists
+    of a $\labeling$-predicate transformer $\aTr{\bEvs}{}$ for each
+    $\bEvs\subseteq\AllEvents$, such that if $\cEvs \cap \aEvs \subseteq \bEvs$
+    then $\aTr{\cEvs}{\bForm} \rimplies \aTr{\bEvs}{\bForm}$.
   \end{definition}
   \medskip
 
@@ -123,7 +122,7 @@
     \end{enumerate}
     \makecounter{Btau}
   \item \label{pom-tau} \makecounter{tau}
-    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of predicate transformers} over $\aEvs$, 
+    $\aTr{}{}:2^{\AllEvents}\fun\Formulae \fun\Formulae$ is a \emph{family of $\labeling$-predicate transformers} over $\aEvs$, 
     \makecounter{Bterm}
   \item \label{pom-term} \makecounter{term}
     $\aTerm:\Formulae$ is a \emph{termination condition}, such that 
@@ -152,9 +151,9 @@
     ${\rrmw} : \aEvs\fun\aEvs$ is a partial function capturing read-modify-write \emph{atomicity}, such that
     \begin{enumerate}
     \item \label{pom-rmw-block} \label{pom-rmw-le}
-      if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$, % and $\bEv \lt \aEv$,
-    \item \label{pom-rmw-le}
-      if $\bEv\xrmw\aEv$ then $\bEv \lt \aEv$, 
+      if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$, and $\bEv \lt \aEv$,
+    % \item \label{pom-rmw-le}
+    %   if $\bEv\xrmw\aEv$ then $\bEv \lt \aEv$, 
     \item \label{pom-rmw-atomic}
       if $\bEv \xrmw \aEv$ and $\labeling(\cEv)\roverlaps\labeling(\bEv)$ then
       $\cEv\lt \aEv$ implies $\cEv\le \bEv$ and
@@ -235,20 +234,24 @@
     \item \label{if-E}
       $\aEvs = (\aEvs_1\cup\aEvs_2)$,
     \item \label{if-lambda}
-      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+      \labeltextXX{6}{i}{if-le}\,
+      \labeltextXX{7}{i}{if-rf}\,
+      \labeltextXX{10}{i}{if-rmw}\, as for $\sPAR{}{}$,
+    % \item \label{if-lambda}
+    %   ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$,       
     \item \label{if-kappa}
       $\labelingForm(\aEv) \riff (\aForm\land\labelingForm_1(\aEv))\lor(\neg\aForm\land\labelingForm_2(\aEv))$,
     \item \label{if-tau}
       $\aTr{\bEvs}{\bForm} \riff (\aForm\land\aTr[1]{\bEvs}{\bForm})\lor(\neg\aForm\land\aTr[2]{\bEvs}{\bForm})$,
     \item \label{if-term}
       $\aTerm \riff (\aForm\land\aTerm[1])\lor(\neg\aForm\land\aTerm[2])$,
-    \item \label{if-le}
-      ${\lt}\rextends{\lt_1}{\lt_2}$,
-    \item \label{if-rf}
-      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
-      \setcounter{enumi}{\value{Brmw}}
-    \item \label{par-rmw}
-      ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$.
+    % \item \label{if-le}
+    %   ${\lt}\rextends{\lt_1}{\lt_2}$,
+    % \item \label{if-rf}
+    %   ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,
+    %   \setcounter{enumi}{\value{Brmw}}
+    % \item \label{par-rmw}
+    %   ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$.
     \end{enumerate}
   \end{multicols}
   \medskip
@@ -260,30 +263,37 @@
   % $\Cdown{\aEv}=\{ \cEv \mid \cEv \lt \aEv \}$
   \begin{multicols}{2}
     \begin{enumerate}[topsep=0pt,label=(\textsc{s}\arabic*),ref=\textsc{s}\arabic*]
-    \item \label{seq-E}
-      $\aEvs = (\aEvs_1\cup\aEvs_2)$,
-    \item \label{seq-lambda}
-      ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
+    \item \label{seq-E} %\label{seq-lambda}
+      \labeltextXX{2}{s}{seq-lambda}\,
+      \labeltextXX{6}{s}{seq-le}\,
+      \labeltextXX{7}{s}{seq-rf}\,
+      \labeltextXX{10}{s}{seq-rmw}\, as for $\sIFTHEN{}{}{}$, %$\sPAR{}{}$,
+      \setcounter{enumi}{\value{Bkappa}}
+    % \item \label{seq-E}
+    %   $\aEvs = (\aEvs_1\cup\aEvs_2)$,
+    % \item \label{seq-lambda}
+    %   ${\labeling}=\PBR{{\labeling_1}\cup {\labeling_2}}$, 
     \item \label{seq-kappa}
       $\labelingForm(\aEv) \riff {\labelingForm_1(\aEv)\lor\labelingForm'_2(\aEv)}$,
     \item \label{seq-tau}
       $\aTr{\bEvs}{\bForm} \riff \aTr[1]{\bEvs}{\aTr[2]{\bEvs}{\bForm}}$,
     \item \label{seq-term}
       $\aTerm \riff \aTerm[1]\land\aTrAbbrv[1]{\aEvs_1}{\aTerm[2]}$,
-    \item \label{seq-le}
-      ${\lt}\rextends{\lt_1}{\lt_2}$,
+    % \item \label{seq-le}
+    %   ${\lt}\rextends{\lt_1}{\lt_2}$,
+    \item[] \setcounter{enumi}{\value{le}}
       \begin{enumerate}[leftmargin=0pt]
       \item \label{seq-le-delays}
         if $\labeling_1(\bEv) \rdelays \labeling_2(\aEv)$ then $\bEv\le\aEv$,
       \end{enumerate}
-    \item \label{par-rf}
-      ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,    
-      \setcounter{enumi}{\value{Brmw}}
-    \item \label{par-rmw}
-      ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$.
+    % \item \label{seq-rf}
+    %   ${\rrfx}\rextends{\rrfx_1}{\rrfx_2}$,    
+    %   \setcounter{enumi}{\value{Brmw}}
+    % \item \label{seq-rmw}
+    %   ${\rrmw}=\PBR{{\rrmw_1}\cup{\rrmw_2}}$.
     \end{enumerate}
   \end{multicols}
-  \vspace{-.7\baselineskip}
+  %\vspace{-.7\baselineskip}
   where
   \begin{displaymath}
     \labelingForm'_2(\aEv)=
@@ -312,7 +322,7 @@
   \medskip
 
   \noindent
-  Let $\FormulaeUReg$ be the set of $\Formulae$ without phantom registers: $\forall\aForm\in\FormulaeUReg$, $\forall\aEv\in\AllEvents$, $\forall\aVal\in\Val$, $\aForm\riff \aForm[\aVal/\uReg{\aEv}]$.
+  Let $\FormulaeUReg=\{\aForm\in\Formulae\mid \forall\aEv\in\AllEvents.\;\forall\aVal\in\Val.\;\aForm\riff \aForm[\aVal/\uReg{\aEv}]\}$.
   \medskip
 
   \noindent
