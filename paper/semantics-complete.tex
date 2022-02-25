@@ -5,9 +5,10 @@
   \section{Complete Semantics for PwT-MCA1}
 
   Here we combine the features of \textsection\textsection\ref{sec:pomsets},
-  \ref{sec:read-read}, \ref{sec:mca1}, \ref{sec:semreg}, \ref{sec:rmw}, and
-  \ref{sec:semca}.  Address calculation can be added by using the definition
-  of $\sSTORE{}{}$ and $\sLOAD{}{}$ from \textsection\ref{sec:semcaaddr}.  
+  \ref{sec:read-read}, \ref{sec:mca1}, \ref{sec:semreg}, \ref{sec:rmw},
+  \ref{sec:semca}, and \ref{sec:false}.  Address calculation can be added by
+  using the definition of $\sSTORE{}{}$ and $\sLOAD{}{}$ from
+  \textsection\ref{sec:semcaaddr}.
   % \begin{gather*}
   %   \begin{aligned}
   %     \aCmd
@@ -30,7 +31,7 @@
   \begin{itemize}
   \item a set of \emph{events} $\AllEvents$, ranged over by $\aEv$, $\bEv$,
     $\cEv$, and subsets ranged over by $\aEvs$, $\bEvs$, $\cEvs$,
-  \item a set of \emph{phantom registers} $\uRegs{}$ and a map $\uReg{}:\AllEvents\fun\uRegs{}$ (notation $\uReg{\aEv}$),  
+  %\item a set of \emph{phantom registers} $\uRegs{}$ and a map $\uReg{}:\AllEvents\fun\uRegs{}$ (notation $\uReg{\aEv}$),  
   \item a set of \emph{logical formulae} $\Formulae$, ranged over by $\aForm$,
     $\bForm$, $\cForm$,
   \item a set of \emph{actions} $\Act$, ranged over by $\aAct$, $\bAct$,
@@ -40,7 +41,10 @@
   \noindent
   We require that
   \begin{itemize}
-  \item commands do not include phantom registers: $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$,
+  \item registers include %\emph{phantom registers}
+    $\uRegs{\AllEvents}=\{\uReg{\aEv}\mid\aEv\in\AllEvents\}$ which do not appear in commands:
+    $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$,
+  %\item commands do not include phantom registers: $\aCmd[\bExp/\uReg{\aEv}]=\aCmd$,
   \item formulae include $\TRUE$, $\FALSE$, $\Q{\aLoc}$, and the equalities $(\aExp{=}\bExp)$ and $(\aLoc{=}\aExp)$,
   \item formulae are closed under $\lnot$, $\land$, $\lor$, $\limplies$, and
     substitutions $[\aExp/\aReg]$, $[\aExp/\aLoc]$, $[\aForm/\Q{\aLoc}]$,
@@ -56,6 +60,22 @@
   \end{itemize}
 
   \noindent
+  \begin{definition}  
+    \label{def:labeling:consistent}
+    Let $\aEvs\subseteq\AllEvents$ and $\labeling: \aEvs \fun \Act$.
+    Define
+    \begin{math}
+      \regForm{\labeling}=
+      \textstyle\bigwedge_{\{(\aEv,\aVal)\in(\aEvs\times\Val)\mid\labeling(\aEv)=\DRP{}{\aVal}\}}(\uReg{\aEv}\EQ\aVal)
+      % \textwhere \aEvs=\fdom(\labeling)
+    \end{math}.
+    
+    \noindent
+    We say that $\aForm$ is \emph{$\labeling$-consistent} if $\aForm\land\regForm{\labeling}$ is satisfiable.
+    We say that it is \emph{$\labeling$-inconsistent} otherwise.
+  \end{definition}
+  
+  \noindent
   \begin{definition}
     \label{def:trans}
     A \emph{predicate transformer} is a function
@@ -67,7 +87,9 @@
       $\aTr{}{\bForm_1\lor\bForm_2}\riff\aTr{}{\bForm_1}\lor\aTr{}{\bForm_2}$,
     \item \label{tr-implies}
       if $\aForm \rimplies \bForm$, then $\aTr{}{\aForm} \rimplies
-      \aTr{}{\bForm}$.
+      \aTr{}{\bForm}$,
+    \item \label{tr-false}
+      if $\bForm$ is $\labeling$-inconsistent then $\aTr{}{\bForm}$ is $\labeling$-inconsistent.
     \end{enumerate}
   \end{definition}
   \medskip
@@ -142,18 +164,22 @@
   \medskip
 
   \noindent
+  \begin{minipage}{\linewidth}\noindent
   A \PwT{} is \emph{complete} if
-  \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
-    \setcounter{enumi}{\value{Bkappa}}
-  \item \label{top-kappa}
-    $\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
-    \setcounter{enumi}{\value{Bterm}}
-  \item \label{top-term}
-    $\aTerm$ is a tautology,
-    \setcounter{enumi}{\value{Brf}}
-  \item \label{top-rf}
-    if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
-  \end{enumerate}
+  \begin{multicols}{2}
+    \begin{enumerate}[,label=(\textsc{c}\arabic*),ref=\textsc{c}\arabic*]
+      \setcounter{enumi}{\value{Bkappa}}
+    \item \label{top-kappa}
+      $\labelingForm(\aEv)$ is a tautology (for every $\aEv\in\aEvs$),
+      \setcounter{enumi}{\value{Bterm}}
+    \item \label{top-term}
+      $\aTerm$ is a tautology,
+      \setcounter{enumi}{\value{Brf}}
+    \item \label{top-rf}
+      if $\labeling(\aEv)$ is a $\sread$ then there is some $\bEv\xrfx\aEv$.
+    \end{enumerate}
+  \end{multicols}
+  \end{minipage}
   \medskip
 
   \newpage

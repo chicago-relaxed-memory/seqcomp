@@ -3,12 +3,23 @@ paper:
 	rm  -f ${PAPER}.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error ${PAPER}.tex
 	killall Skim
+combo:
+	rm  -f combo.pdf
+	latexmk -xelatex --pvc --pdf --halt-on-error combo.tex
+	killall Skim
 draft:
 	pdflatexn ${PAPER}
 	cp ${PAPER}.pdf DRAFT.pdf
-	cp ${PAPER}.pdf ~/Public/papers/2022-popl.pdf
 	pdflatexn combo
 	cp combo.pdf DRAFT-APPENDIX.pdf
+	cp combo.pdf ~/Public/papers/2022-popl.pdf
+	#cp ${PAPER}.pdf ~/Public/papers/2022-popl.pdf
+
+draft-combo:
+	pdflatexn combo
+	cp combo.pdf DRAFT-APPENDIX.pdf
+	cp combo.pdf ~/Public/papers/2022-popl.pdf
+
 appendix:
 	rm  -f appendix.pdf
 	latexmk -xelatex --pvc --pdf --halt-on-error appendix.tex
