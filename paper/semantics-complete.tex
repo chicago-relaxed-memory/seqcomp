@@ -130,9 +130,9 @@
     ${\rrmw} : \aEvs\fun\aEvs$ is a partial function capturing read-modify-write \emph{atomicity}, such that
     \begin{enumerate}
     \item \label{pom-rmw-block} \label{pom-rmw-le}
-      if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$ and $\bEv \lt \aEv$,
-      % \item \label{pom-rmw-le}
-      %   if $\bEv\xrmw\aEv$ then $\bEv \lt \aEv$, 
+      if $\bEv\xrmw\aEv$ then $\labeling(\aEv) \rblocks \labeling(\bEv)$, % and $\bEv \lt \aEv$,
+    \item \label{pom-rmw-le}
+      if $\bEv\xrmw\aEv$ then $\bEv \lt \aEv$, 
     \item \label{pom-rmw-atomic}
       if $\bEv \xrmw \aEv$ and $\labeling(\cEv)\roverlaps\labeling(\bEv)$ then
       $\cEv\lt \aEv$ implies $\cEv\le \bEv$ and
